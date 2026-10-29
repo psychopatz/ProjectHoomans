@@ -26,7 +26,9 @@ Core.CONDITION_FIELDS = {
     "companionDogSex", "companionDogFed", "npcType", "relationshipTier",
     "greetingState", "combatReactionRole", "combatReactionStyle",
     "combatReactionMood", "combatPressure", "killerActorKind",
-    "hordePhase",
+    "combatAttackType", "combatWeaponFamily", "combatWeaponSkill",
+    "combatSkillBand", "combatHitZone", "combatWoundType",
+    "combatWeaponNamed", "hordePhase",
 }
 
 function Core.copy(value, depth)
@@ -256,6 +258,13 @@ function Core.conditionContext(context)
         combatReactionMood = context.combatReactionMood,
         combatPressure = context.combatPressure,
         killerActorKind = context.killerActorKind,
+        combatAttackType = context.combatAttackType,
+        combatWeaponFamily = context.combatWeaponFamily,
+        combatWeaponSkill = context.combatWeaponSkill,
+        combatSkillBand = context.combatSkillBand,
+        combatHitZone = context.combatHitZone,
+        combatWoundType = context.combatWoundType,
+        combatWeaponNamed = context.combatWeaponNamed,
         hordePhase = context.hordePhase,
     }
 end

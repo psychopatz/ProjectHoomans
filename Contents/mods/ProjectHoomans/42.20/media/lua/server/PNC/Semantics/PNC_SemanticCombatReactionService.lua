@@ -26,6 +26,8 @@ local Moment = PNC.Semantics.CombatMoment
     or require "PNC/Semantics/PNC_SemanticCombatMoment"
 local Arbiter = PNC.Semantics.CombatBanterArbiter
     or require "PNC/Semantics/PNC_SemanticCombatBanterArbiter"
+local WeaponContext = PNC.Semantics.CombatWeaponContext
+    or require "PNC/Semantics/PNC_SemanticCombatWeaponContext"
 
 Service.VERSION = 1
 Service.REACTION_RADIUS = tonumber(Const and Const.ZOMBIE_TARGET_RADIUS) or 12
@@ -123,6 +125,13 @@ local function eventFacts(
             nextAction = profile.nextAction,
             actorKind = actorKind,
             killBurstCount = burst,
+            weaponFamily = moment and moment.weaponFamily,
+            weaponSkill = moment and moment.weaponSkill,
+            weaponSkillLevel = moment and moment.weaponSkillLevel,
+            weaponSkillBand = moment and moment.weaponSkillBand,
+            weaponDisplayName = moment and moment.weaponDisplayName,
+            hitZone = moment and moment.hitZone,
+            woundType = moment and moment.woundType,
             combatMomentKind = moment and moment.kind or "kill",
             combatMomentPriority = moment and moment.priority or nil,
         },
@@ -142,6 +151,14 @@ local function ambientPayload(
         combatReactionMood = profile.combatReactionMood,
         combatPressure = profile.combatPressure,
         killerActorKind = profile.killerActorKind,
+        combatAttackType = moment and moment.attackType,
+        combatWeaponFamily = moment and moment.weaponFamily,
+        combatWeaponSkill = moment and moment.weaponSkill,
+        combatSkillBand = moment and moment.weaponSkillBand,
+        combatHitZone = moment and moment.hitZone,
+        combatWoundType = moment and moment.woundType,
+        combatWeaponNamed = moment and moment.weaponNameEligible == true,
+        combatWeaponDisplayName = moment and moment.weaponDisplayName,
         relationshipState = profile.relationshipState,
         relationshipTier = profile.relationshipTier,
         socialStyle = profile.socialStyle,
@@ -164,6 +181,13 @@ local function ambientPayload(
     if not realization or type(realization.fallback) ~= "string"
         or realization.fallback == ""
     then return nil, "semantic_realization_unavailable" end
+    if context.combatWeaponDisplayName then
+        realization.fallback = string.gsub(
+            realization.fallback,
+            "{combatWeaponDisplayName}",
+            function() return context.combatWeaponDisplayName end
+        )
+    end
     context.responsePlanID = realization.responsePlanID
     context.realizationFamily = realization.realizationFamily
     context.realizationID = realization.realizationID
@@ -309,7 +333,10 @@ local function baseKillMoment(eventType, actorKind, actorID, zombie, spec, now)
         weaponFamily = spec.weaponFamily,
         weaponSkill = spec.weaponSkill,
         weaponSkillLevel = spec.weaponSkillLevel,
+        weaponSkillBand = spec.weaponSkillBand,
+        weaponNameEligible = spec.weaponNameEligible == true,
         partID = spec.partID or spec.partId,
+        hitZone = spec.hitZone,
         woundType = spec.woundType,
         exceptional = spec.exceptional == true,
         priority = spec.priority or Service.BANTER_PRIORITY,
@@ -414,6 +441,19 @@ function Service.OnNPCKill(record, zombie, spec)
     local z = coordinate(zombie, "getZ", spec.z or record.z)
     if not x or not y or not z then return 0, "kill_position_unavailable" end
 
+    local weapon = WeaponContext.Build(record, spec)
+    spec.attackType = weapon.attackType
+    spec.attackKind = weapon.attackKind
+    spec.weaponFullType = weapon.weaponFullType
+    spec.weaponDisplayName = weapon.weaponDisplayName
+    spec.weaponFamily = weapon.weaponFamily
+    spec.weaponSkill = weapon.weaponSkill
+    spec.weaponSkillLevel = weapon.weaponSkillLevel
+    spec.weaponSkillBand = weapon.weaponSkillBand
+    spec.weaponNameEligible = weapon.weaponNameEligible
+    spec.partId = weapon.partID
+    spec.hitZone = weapon.hitZone
+    spec.woundType = weapon.woundType
     local baseMoment = baseKillMoment(
         "zombie_kill_self",
         "npc",

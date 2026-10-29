@@ -1,0 +1,382 @@
+{
+  "domain": "combat_banter",
+  "groups": {
+    "events": {
+      "contentOwner": "projecthoomans.dialogue_content.events"
+    }
+  },
+  "kind": "content",
+  "phraseFamilies": [
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.aggressive.firearm_high_named_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "This {combatWeaponDisplayName} still shoots straight.",
+              "TL": "Tuwid pa ring bumaril itong {combatWeaponDisplayName}."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.aggressive.firearm_high_named_02",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Right where I wanted it. Fuck yeah.",
+              "TL": "Eksakto sa gusto ko. Fuck yeah."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.aggressive.blade_head_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Ha! Look at those fucking molars fly.",
+              "TL": "Ha! Tingnan mo, lumilipad ang mga putang inang bagang."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.aggressive.axe_head_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Split that rotten head wide open.",
+              "TL": "Biyak na biyak ang bulok na ulo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.aggressive.blunt_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Felt that one crack.",
+              "TL": "Ramdam ko ang pag-crack no'n."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.aggressive.spear_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "That's why I like the reach.",
+              "TL": "Kaya gusto ko ang abot nito."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.supportive.firearm_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Got it. You good?",
+              "TL": "Nakuha ko. Ayos ka?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.supportive.melee_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "It's down. Keep close.",
+              "TL": "Bagsak na. Dumikit ka lang."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.shaken.firearm_low_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Jesus... I actually hit it.",
+              "TL": "Diyos ko... tinamaan ko talaga."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.shaken.blade_head_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Fuck—there are teeth everywhere.",
+              "TL": "Fuck—nagkalat ang mga ngipin."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.shaken.unarmed_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Oh God. I did that with my hands.",
+              "TL": "Diyos ko. Kamay ko lang ang ginamit ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.brave.firearm_high_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Dead center. Keep moving.",
+              "TL": "Gitnang-gitna. Tuloy lang."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.brave.blade_head_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Clean cut. Next.",
+              "TL": "Malinis na hiwa. Sunod."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.brave.axe_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "One chop. Done.",
+              "TL": "Isang taga. Tapos."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.brave.spear_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Kept it right where I wanted it.",
+              "TL": "Napanatili ko siya sa tamang distansya."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.reserved.firearm_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Hit.",
+              "TL": "Tinamaan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.reserved.blade_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Cut down.",
+              "TL": "Nahati."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.cold.firearm_high_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Clean shot.",
+              "TL": "Malinis na tira."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.cold.blade_head_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Head came apart. Moving on.",
+              "TL": "Nawasak ang ulo. Tuloy."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.cold.heavy_melee_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Crushed it.",
+              "TL": "Dinurog."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.practical.firearm_high_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good shot placement. Check the lane.",
+              "TL": "Maganda ang tama. Suriin ang linya."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.practical.firearm_low_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Hit it. Don't count on luck twice.",
+              "TL": "Tinamaan. Huwag umasa sa swerte nang dalawang beses."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.practical.blade_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Blade did its job. Keep moving.",
+              "TL": "Ginawa ng talim ang trabaho nito. Tuloy."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.practical.axe_spear_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Good reach. Keep the line.",
+              "TL": "Maganda ang abot. Panatilihin ang linya."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.practical.blunt_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "Crushed it. Watch the next one.",
+              "TL": "Dinurog. Bantayan ang susunod."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "group": "events",
+      "semanticTemplateID": "semantic.combat.kill.killer.practical.unarmed_01",
+      "styles": {
+        "neutral": [
+          {
+            "translations": {
+              "EN": "It's down. I need a weapon.",
+              "TL": "Bagsak na. Kailangan ko ng sandata."
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "schema": "pnc.conversation.shard.v1",
+  "source": {
+    "contentLicense": "Project Hoomans authored content",
+    "name": "Project Hoomans Weapon-Aware Zombie Kill Reactions",
+    "version": "1"
+  },
+  "version": 1
+}

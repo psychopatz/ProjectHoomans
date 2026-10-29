@@ -74,7 +74,10 @@ function Moment.Build(spec)
         weaponSkillLevel = spec.weaponSkillLevel ~= nil
             and math.max(0, math.floor(number(spec.weaponSkillLevel, 0)))
             or nil,
+        weaponSkillBand = text(spec.weaponSkillBand, 24),
+        weaponNameEligible = spec.weaponNameEligible == true,
         partID = text(spec.partID or spec.partId, 48),
+        hitZone = text(spec.hitZone, 32),
         woundType = text(spec.woundType, 48),
         pressureBand = text(spec.pressureBand, 48),
         nearbyCount = spec.nearbyCount ~= nil

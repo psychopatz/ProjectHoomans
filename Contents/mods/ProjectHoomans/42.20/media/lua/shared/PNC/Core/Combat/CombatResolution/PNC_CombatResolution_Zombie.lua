@@ -153,6 +153,12 @@ function Resolution.ApplyZombieDamage(attackerRecord, attackerZombie, target, hi
             x = victim:getX(),
             y = victim:getY(),
             z = victim:getZ(),
+            attackType = hit.attackType,
+            attackKind = hit.attackKind,
+            weaponItem = hit.weaponItem,
+            weaponFullType = hit.weaponFullType,
+            partId = hit.partId,
+            woundType = hit.woundType,
             source = "npc_combat_resolution",
         })
     end

@@ -53,16 +53,16 @@ local onKillCall = string.match(
     "reactionService%.OnNPCKill%b()"
 )
 T.truthy(onKillCall, "zombie kill forwards a bounded spec to semantic reaction")
-T.falsy(string.find(onKillCall, "weaponItem", 1, true),
-    "B0 gap: OnNPCKill currently drops weapon item")
-T.falsy(string.find(onKillCall, "weaponFullType", 1, true),
-    "B0 gap: OnNPCKill currently drops weapon type")
-T.falsy(string.find(onKillCall, "partId", 1, true),
-    "B0 gap: OnNPCKill currently drops body-part result")
-T.falsy(string.find(onKillCall, "woundType", 1, true),
-    "B0 gap: OnNPCKill currently drops wound result")
-T.falsy(string.find(onKillCall, "weaponSkill", 1, true),
-    "B0 gap: OnNPCKill currently drops weapon skill")
+T.contains(onKillCall, "weaponItem = hit.weaponItem",
+    "B5 forwards the actual resolved weapon item")
+T.contains(onKillCall, "weaponFullType = hit.weaponFullType",
+    "B5 forwards the actual resolved weapon type")
+T.contains(onKillCall, "partId = hit.partId",
+    "B5 forwards the authoritative hit body part")
+T.contains(onKillCall, "woundType = hit.woundType",
+    "B5 forwards the authoritative wound type")
+T.contains(reactionService, "CombatWeaponContext",
+    "B5 derives skill/family from one canonical weapon context")
 
 T.contains(reactionService, "llmEligible = false",
     "routine kill reaction remains non-LLM")
@@ -73,7 +73,7 @@ T.contains(catalog, "\"camp_rejected\"",
     "combat-adjacent catalog includes offerless companion rejection")
 T.contains(catalog, "\"default\"",
     "catalog contains generic offerless/default families")
-T.falsy(string.find(catalog, "presentationClass", 1, true),
-    "B0 gap: response catalog has no explicit BARK/TACTICAL_PROMPT classification")
+T.contains(catalog, "KILLER_WEAPON_VARIANTS",
+    "weapon-aware combat variants are explicit catalog predicates")
 
 T.finish("pnc_semantic_combat_banter_b0_boundaries_smoke")

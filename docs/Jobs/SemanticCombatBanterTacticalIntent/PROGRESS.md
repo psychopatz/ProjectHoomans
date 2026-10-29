@@ -1,6 +1,6 @@
 # Progress — Semantic Combat Banter & Tactical Intent
 
-**Status:** ACTIVE — B0–B4 accepted; B5 weapon/action-aware zombie kill banter is next.
+**Status:** ACTIVE — B0–B5 accepted; B6 hostile-human kill commentary is next.
 **Planning base:** ProjectHoomans `8632bc30`, existing `main`.
 **Parent foundation:** `docs/Jobs/OpenEndedSemanticCombatAwareness/` is developer-complete and remains accepted unless this job reproduces a regression in an owning layer.
 **Native PZ:** user live regression supplied; new job's developer implementation/acceptance not yet run.
@@ -123,16 +123,38 @@ B4 evidence:
 - static scan finds no production `semanticCombatReaction`, `PlayerReactionState`, `reserveAwarenessPresentation` or `recentAwarenessByPlayer` throttle remnants;
 - `git diff --check`: clean.
 
-## ONE current Next Chunk — B5
+## B5 accepted — weapon/action-aware zombie kill banter
 
-Implement weapon/action-aware zombie kill banter:
-1. pass actual resolved kill weapon/action/body-part/wound facts from `CombatResolution` into the combat moment;
-2. normalize weapon family and combat skill through existing Equipment/Skills authorities;
-3. include real weapon skill level and sanitized optional display name without exposing internal full-type IDs;
-4. add predicate fields needed to distinguish firearm/blade/axe/spear/blunt/unarmed and head/neck vs other outcomes;
-5. author varied EN/TL kill families with high-skill confident vs low-skill nervous firearm behavior and personality-aware melee/gore behavior;
-6. preserve generic fallbacks for unknown/modded weapons;
-7. prove incompatible lines cannot select and routine kill fanout/performance remains bounded.
+Accepted implementation:
+- authoritative zombie resolution forwards the exact hit `weaponItem`, `weaponFullType`, attack type/kind, body part and wound type to the semantic kill service;
+- one runtime `CombatWeaponContext` reuses existing `Skills.ResolveWeaponSkill / GetLevel` and performs no inventory/world scan or item creation;
+- normalized families cover firearm, short/long blade, axe, spear, short/long blunt, unarmed and unknown/other melee;
+- bounded skill bands and hit zones support grounded selection; blade teeth/gore variants require an actual head/neck result;
+- safe actual display names are optional flavor only, reject module-qualified IDs, and are substituted before presentation;
+- high-skill firearm confidence and low-skill shaken/relief variants are distinct;
+- unknown/modded weapons degrade to existing generic safe fallbacks;
+- 26 new EN/TL weapon-aware phrase families live in a dedicated `combat_banter` CodeBuilder ownership domain after the existing `event` index correctly rejected further growth;
+- internal weapon provenance may remain in the bounded combat moment for diagnostics, but raw full-type IDs are never used as visible weapon names.
+
+B5 evidence:
+- focused weapon context/selection/service/resolver/boundary/catalog matrix: **6/6 PASS**;
+- full `pnc_semantic`: **119/119 PASS**;
+- new combat-banter content: **26/26 EN+TL**, including bounded weapon-name token coverage;
+- two consecutive CodeBuilder generations: byte-identical, **184 files / 461 phrase families**;
+- changed/untracked Lua through installed Kahlua compiler: **16/16 PASS**;
+- no new global zombie scan, routine persistence or LLM path;
+- `git diff --check`: clean.
+
+## ONE current Next Chunk — B6
+
+Implement hostile-human NPC kill commentary:
+1. emit one authoritative semantic combat moment when an NPC kill transitions a hostile human NPC to dead;
+2. pass the same actual weapon/action context through `CombatWeaponContext`;
+3. keep existing death/faction/social side-effect owners unchanged and exactly-once;
+4. route human-kill semantics to distinct content families that cannot select zombie-only gore wording;
+5. use grounded personality/relationship/faction context only when already available;
+6. keep routine human-kill chatter transient, non-LLM and non-memory;
+7. prove zombie and hostile-human kill families remain distinct and no duplicate death/relationship/faction mutation occurs.
 
 ## Remaining mandatory phases
 
@@ -151,6 +173,6 @@ B0 baseline -> B1 horde episode/routing -> B2 team tactical intent -> B3 non-mod
 
 ## Evidence status
 
-B0–B4 are developer-accepted with focused and broad evidence above. B5–B9 remain mandatory. Native SP/MP visual/feel acceptance has not been run for this job.
+B0–B5 are developer-accepted with focused and broad evidence above. B6–B9 remain mandatory. Native SP/MP visual/feel acceptance has not been run for this job.
 
 Git history is the implementation diary; keep this file as current truth rather than appending per-commit narratives.

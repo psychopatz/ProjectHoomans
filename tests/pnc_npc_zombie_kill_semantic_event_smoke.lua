@@ -6,6 +6,7 @@ T.addPackagePaths({
 
 local published
 local neutralized
+local semanticKill
 local health = 0.1
 local dead = false
 local victim = {
@@ -39,6 +40,12 @@ PNC = {
             return true
         end,
     },
+    SemanticCombatReactionService = {
+        OnNPCKill = function(record, zombie, spec)
+            semanticKill = { record = record, zombie = zombie, spec = spec }
+            return 0, "captured"
+        end,
+    },
     Semantics = {
         EngineEvents = {
             Publish = function(eventType, payload)
@@ -54,11 +61,23 @@ local Resolution = T.load(
     "PNC/Core/Combat/CombatResolution/PNC_CombatResolution_Zombie.lua"
 )
 
+local weapon = {
+    getFullType = function() return "Base.Machete" end,
+    getDisplayName = function() return "Machete" end,
+}
 local ok = Resolution.ApplyZombieDamage(
     { id = "killer", x = 9, y = 20, z = 0 },
     nil,
     { kind = "zombie", zombieId = "threat-77", worldObject = victim },
-    { attackType = "melee", amount = 20 }
+    {
+        attackType = "melee",
+        attackKind = "swing",
+        amount = 20,
+        weaponItem = weapon,
+        weaponFullType = "Base.Machete",
+        partId = "Head",
+        woundType = "cut",
+    }
 )
 T.truthy(ok, "npc zombie damage applied")
 T.truthy(dead, "test zombie was killed")
@@ -70,5 +89,18 @@ T.equal(published.payload.actorKind, "npc", "npc actor kind")
 T.equal(published.payload.actorKey, "npc:killer", "npc actor key")
 T.equal(published.payload.zombieKey, "threat-77", "stable threat key")
 T.equal(published.payload.source, "npc_combat_resolution", "authoritative source")
+T.truthy(semanticKill, "authoritative zombie kill reaches semantic reaction service")
+T.equal(semanticKill.spec.weaponItem, weapon,
+    "semantic reaction receives the exact hit weapon object")
+T.equal(semanticKill.spec.weaponFullType, "Base.Machete",
+    "semantic reaction receives the exact hit weapon type")
+T.equal(semanticKill.spec.attackType, "melee",
+    "semantic reaction receives actual attack type")
+T.equal(semanticKill.spec.attackKind, "swing",
+    "semantic reaction receives actual attack kind")
+T.equal(semanticKill.spec.partId, "Head",
+    "semantic reaction receives actual resolved body part")
+T.equal(semanticKill.spec.woundType, "cut",
+    "semantic reaction receives actual resolved wound type")
 
 T.finish("pnc_npc_zombie_kill_semantic_event_smoke")

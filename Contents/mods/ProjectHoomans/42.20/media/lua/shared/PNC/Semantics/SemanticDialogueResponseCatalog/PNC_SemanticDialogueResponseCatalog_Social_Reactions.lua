@@ -243,10 +243,132 @@ local KILL_REACTION_STYLES = {
     "aggressive", "supportive", "shaken", "brave",
     "reserved", "cold", "practical",
 }
+local KILLER_WEAPON_VARIANTS = {
+    aggressive = {
+        { id = "firearm_high_named_01", priority = 9, when = {
+            combatWeaponFamily = "firearm",
+            combatSkillBand = { "high", "expert" },
+            combatWeaponNamed = true,
+        } },
+        { id = "firearm_high_named_02", priority = 9, when = {
+            combatWeaponFamily = "firearm",
+            combatSkillBand = { "high", "expert" },
+            combatWeaponNamed = true,
+        } },
+        { id = "blade_head_01", priority = 9, when = {
+            combatWeaponFamily = { "short_blade", "long_blade" },
+            combatHitZone = "head_neck",
+        } },
+        { id = "axe_head_01", priority = 8, when = {
+            combatWeaponFamily = "axe", combatHitZone = "head_neck",
+        } },
+        { id = "blunt_01", priority = 7, when = {
+            combatWeaponFamily = { "short_blunt", "long_blunt" },
+        } },
+        { id = "spear_01", priority = 7, when = {
+            combatWeaponFamily = "spear",
+        } },
+    },
+    supportive = {
+        { id = "firearm_01", priority = 6, when = {
+            combatWeaponFamily = "firearm",
+        } },
+        { id = "melee_01", priority = 5, when = {
+            combatWeaponFamily = {
+                "short_blade", "long_blade", "axe", "spear",
+                "short_blunt", "long_blunt", "other_melee",
+            },
+        } },
+    },
+    shaken = {
+        { id = "firearm_low_01", priority = 9, when = {
+            combatWeaponFamily = "firearm", combatSkillBand = "low",
+        } },
+        { id = "blade_head_01", priority = 9, when = {
+            combatWeaponFamily = { "short_blade", "long_blade" },
+            combatHitZone = "head_neck",
+        } },
+        { id = "unarmed_01", priority = 7, when = {
+            combatWeaponFamily = "unarmed",
+        } },
+    },
+    brave = {
+        { id = "firearm_high_01", priority = 8, when = {
+            combatWeaponFamily = "firearm",
+            combatSkillBand = { "high", "expert" },
+        } },
+        { id = "blade_head_01", priority = 8, when = {
+            combatWeaponFamily = { "short_blade", "long_blade" },
+            combatHitZone = "head_neck",
+        } },
+        { id = "axe_01", priority = 7, when = {
+            combatWeaponFamily = "axe",
+        } },
+        { id = "spear_01", priority = 7, when = {
+            combatWeaponFamily = "spear",
+        } },
+    },
+    reserved = {
+        { id = "firearm_01", priority = 6, when = {
+            combatWeaponFamily = "firearm",
+        } },
+        { id = "blade_01", priority = 6, when = {
+            combatWeaponFamily = { "short_blade", "long_blade" },
+        } },
+    },
+    cold = {
+        { id = "firearm_high_01", priority = 7, when = {
+            combatWeaponFamily = "firearm",
+            combatSkillBand = { "high", "expert" },
+        } },
+        { id = "blade_head_01", priority = 7, when = {
+            combatWeaponFamily = { "short_blade", "long_blade" },
+            combatHitZone = "head_neck",
+        } },
+        { id = "heavy_melee_01", priority = 6, when = {
+            combatWeaponFamily = { "axe", "short_blunt", "long_blunt" },
+        } },
+    },
+    practical = {
+        { id = "firearm_high_01", priority = 8, when = {
+            combatWeaponFamily = "firearm",
+            combatSkillBand = { "high", "expert" },
+        } },
+        { id = "firearm_low_01", priority = 8, when = {
+            combatWeaponFamily = "firearm", combatSkillBand = "low",
+        } },
+        { id = "blade_01", priority = 7, when = {
+            combatWeaponFamily = { "short_blade", "long_blade" },
+        } },
+        { id = "axe_spear_01", priority = 7, when = {
+            combatWeaponFamily = { "axe", "spear" },
+        } },
+        { id = "blunt_01", priority = 7, when = {
+            combatWeaponFamily = { "short_blunt", "long_blunt" },
+        } },
+        { id = "unarmed_01", priority = 7, when = {
+            combatWeaponFamily = "unarmed",
+        } },
+    },
+}
 for _, role in ipairs({ "witness", "killer" }) do
     for _, style in ipairs(KILL_REACTION_STYLES) do
         local poolID = "semantic.combat.kill." .. role .. "." .. style
         local variants = {}
+        if role == "killer" then
+            for _, variant in ipairs(KILLER_WEAPON_VARIANTS[style] or {}) do
+                variants[#variants + 1] = response(
+                    poolID,
+                    variant.id,
+                    variant.when,
+                    variant.priority,
+                    "REACT",
+                    "combat",
+                    FOLLOW_UP_OFFERS.kill,
+                    poolID
+                )
+            end
+        end
         for variantIndex = 1, 3 do
             variants[#variants + 1] = response(
                 poolID,

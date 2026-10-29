@@ -107,9 +107,12 @@ PNC = {
             Resolve = function(spec)
                 local c = spec.context
                 return {
-                    fallback = c.combatReactionStyle == "supportive"
-                        and "Good one. You okay?"
-                        or "Good. Check the area.",
+                    fallback = c.combatReactionRole == "killer"
+                        and c.combatWeaponNamed == true
+                        and "This {combatWeaponDisplayName} works."
+                        or c.combatReactionStyle == "supportive"
+                            and "Good one. You okay?"
+                            or "Good. Check the area.",
                     semanticAct = "REACT",
                     topic = "combat",
                     responsePlanID = "semantic.combat.kill."
@@ -212,9 +215,23 @@ for _, record in ipairs(records) do
     record.runtime.semanticCombatReaction = nil
 end
 sends = {}
+PNC.Skills = {
+    ResolveWeaponSkill = function() return "LongBlade" end,
+    GetLevel = function() return 6 end,
+}
+local machete = {
+    getFullType = function() return "Base.Machete" end,
+    getDisplayName = function() return "Machete" end,
+}
 now = 10000
 local npcListeners, npcReason = Service.OnNPCKill(records[1], zombie, {
     now = now,
+    attackType = "melee",
+    attackKind = "swing",
+    weaponItem = machete,
+    weaponFullType = "Base.Machete",
+    partId = "Head",
+    woundType = "cut",
 })
 T.equal(npcListeners, 1, "NPC self-kill speaks to nearby player")
 T.equal(npcReason, "semantic_reaction_emitted", "NPC kill reaction reason")
@@ -225,5 +242,25 @@ T.equal(
     "killer",
     "NPC kill selects killer-role response family"
 )
+local killContext = sends[1].payload.ambientFlavor.context
+T.equal(killContext.combatWeaponFamily, "long_blade",
+    "NPC kill semantics receive normalized actual weapon family")
+T.equal(killContext.combatWeaponSkill, "LongBlade",
+    "NPC kill semantics reuse existing weapon-skill authority")
+T.equal(killContext.combatSkillBand, "high",
+    "NPC kill semantics receive bounded actual skill band")
+T.equal(killContext.combatHitZone, "head_neck",
+    "NPC kill semantics receive authoritative hit zone")
+T.equal(killContext.combatWeaponDisplayName, "Machete",
+    "safe actual weapon display name is available as optional flavor")
+T.equal(killContext.combatMoment.weaponFullType, "Base.Machete",
+    "bounded internal combat moment retains authoritative weapon provenance")
+T.equal(killContext.combatMoment.woundType, "cut",
+    "bounded combat moment retains authoritative wound type")
+T.equal(sends[1].payload.ambientFlavor.text, "This Machete works.",
+    "safe actual weapon name is substituted before player presentation")
+T.falsy(string.find(
+    sends[1].payload.ambientFlavor.text, "Base.", 1, true
+), "internal item type never leaks through named-weapon flavor")
 
 T.finish("pnc_semantic_combat_reaction_service_smoke")
