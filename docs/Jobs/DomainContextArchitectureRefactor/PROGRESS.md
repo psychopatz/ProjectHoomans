@@ -59,9 +59,9 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
   **34/34**, Health/Identity **11/11**, remaining schemas **19/19**; static Kahlua zero errors. Diff checks clean.
 - Semantic-tooling evidence: original 194-module baseline had 124 pass,
   65 fail, 5 GUI timeouts. Current complete isolated run: 195 modules, 155 pass,
-  40 fail, no timeouts, 786 tests. Focused inspector repairs (15 tests) bring
-  the derived current state to 157 pass / 38 pre-existing failures; this is not
-  claimed a second full run. `P5B_TOOLING_VALIDATION.json` preserves both facts.
+  40 fail, no timeouts, 786 tests. Focused inspector and current-contract fixture repairs bring the derived
+  current state to 160 pass / 35 pre-existing failures; this is not claimed a
+  second full run. `P5B_TOOLING_VALIDATION.json` preserves both facts.
   Fact traffic remains complete; dispatch assertions are explicit. GUI tests
   use a per-process XIM fallback after native backtrace diagnosis, not a skip.
 - No native Project Zomboid launched; no Workshop publication.
@@ -97,6 +97,12 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
   Full Lua 982/982; focused 30/30; semantic/authority/translation Python 16/16;
   installed Kahlua 4/4, static zero errors, dependency guard zero new debt.
 
+- Current-contract fixture alignment: `P5D1_VALIDATION.json`, 16/16 Python
+  tests. The pre-existing combat flow inventory is included; equivalent NEEDS
+  grammar patterns retain the same IR; What’s Up assertions inspect the emitted
+  semantic template ID rather than its generated localization key. Production
+  runtime, generated wording and separate paused authoring work are unchanged.
+
 ## Next mandatory chunk
 
 **Continue P5D — Prove/invert remaining cycle direction and resolve fixtures.**
@@ -109,7 +115,7 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
 3. Migrate foreign implementation access and remove unjustified cross-domain
    cycles; preserve semantic IR, suggestions, social director, observatory,
    optional LLM and SP/MP authority. Consolidate only with retrieval evidence.
-4. Individually repair or prove supersession of the 38 remaining pre-existing
+4. Individually repair or prove supersession of the 35 remaining pre-existing
    tooling failures (old flow/category/realization/lineage fixtures). Preserve
    behavior; never suppress lifecycle facts to satisfy dispatch assertions.
 5. Validate focused/full suites, graph/dependency guards, installed Kahlua,

@@ -38,9 +38,11 @@ class ContextualConversationC3BTests(unittest.TestCase):
                 pending = first["contextAfter"]["dialogue"]["pendingFollowUp"]
                 self.assertTrue(first["accepted"], first.get("reason"))
                 self.assertEqual(first_ir["subject"], "NEEDS")
-                self.assertEqual(
+                # Both registered patterns emit the same NEEDS/follow-up IR;
+                # concept matching may select the higher-ranked general form.
+                self.assertIn(
                     first_ir["provenance"]["pattern"],
-                    "pnc.question.needs_offer_plain",
+                    {"pnc.question.needs_offer", "pnc.question.needs_offer_plain"},
                 )
                 self.assertEqual(
                     first_response["templateID"],

@@ -1,0 +1,56 @@
+{
+  "stage": "P5D first fixture alignment; parent architecture/cycle work active",
+  "source_revision_before": "03b06f3e",
+  "production_changes": false,
+  "focused_python": {
+    "passed": 16,
+    "total": 16
+  },
+  "repairs": [
+    {
+      "module": "test_automatic_flow_generation",
+      "evidence": "Current generated inventory 20, simple-command flows 12; three pre-existing combat flows explain former 17/9 expectations",
+      "generated_actions": [
+        "CAMP",
+        "COMBAT_AVOID",
+        "COMBAT_ENGAGE",
+        "COMBAT_HOLD",
+        "CONSUME",
+        "DRINK",
+        "EAT",
+        "FETCH",
+        "FOLLOW",
+        "GIFT",
+        "GIVE",
+        "GO",
+        "HELP",
+        "QUEST_ACCEPT",
+        "QUEST_STATUS",
+        "QUEST_TURN_IN",
+        "REFILL",
+        "STAY",
+        "STOP",
+        "WAIT_AT"
+      ]
+    },
+    {
+      "module": "test_contextual_conversation_c3b",
+      "evidence": "Two registered NEEDS patterns emit identical meaning/follow-up fields; accept either registered pattern identity while retaining semantic/template/flow/quantity assertions"
+    },
+    {
+      "module": "test_whats_up_semantic_response_p12h",
+      "evidence": "Public emitted semanticTemplateID retains semantic.question.whats_up.*; key is generated Conversation localization identity, not the semantic template identity. Typed and native shortcut assertions retain exact meaning contract."
+    }
+  ],
+  "remaining_tooling_failures": 35,
+  "current_derived_passed_modules": 160,
+  "limitations": [
+    "Derived status combines the complete P5B isolated run with subsequent focused repairs; no new full-run claim.",
+    "No change to paused UnifiedSemanticDialogueAuthority authoring/wording work; generated source remains untouched."
+  ],
+  "runtime_probe_sources_unchanged": 33,
+  "dependency_guard": {
+    "issues": 82,
+    "new_debt": 0
+  }
+}
