@@ -496,6 +496,8 @@ function Presence.Materialize(record, reason, nearest)
     local shellCleanupReason
     local startupBodyBlocked
     local startupBodyBlockReason
+    local lateStreamStatus
+    local lateStreamBody
     local net = Internal.ResolveNetwork()
     if not Core.IsAuthority() or record.alive == false
         or record.presenceState == Const.PRESENCE_LIVE
@@ -522,6 +524,50 @@ function Presence.Materialize(record, reason, nearest)
         end
         return nil, "startup_not_ready"
     end
+
+    now = Core.Now()
+    if PNC.BodyLifecycle
+        and PNC.BodyLifecycle.ReconcileLateStreamRehydrate
+    then
+        lateStreamStatus, lateStreamBody =
+            PNC.BodyLifecycle.ReconcileLateStreamRehydrate(
+                record,
+                now
+            )
+        if lateStreamStatus == "rebound" then
+            return Registry.GetLiveZombie(record.id)
+                or lateStreamBody
+        elseif lateStreamStatus == "pending"
+            or lateStreamStatus == "ambiguous"
+        then
+            scheduleMaterializationRetry(
+                record,
+                now + (
+                    lateStreamStatus == "ambiguous"
+                        and (tonumber(Const.BODY_SHELL_MAINTENANCE_MS)
+                            or 1000)
+                        or (tonumber(Const.MATERIALIZE_CHUNK_RETRY_MS)
+                            or 250)
+                )
+            )
+            markLifecycleFailure(
+                record,
+                "materialize_deferred",
+                "late_stream_rehydration_" .. lateStreamStatus
+            )
+            if PresenceDiagnostics
+                and PresenceDiagnostics.LogMaterializeGate
+            then
+                PresenceDiagnostics.LogMaterializeGate(
+                    record,
+                    "late_stream_rehydration",
+                    lateStreamStatus
+                )
+            end
+            return nil, "late_stream_rehydration_" .. lateStreamStatus
+        end
+    end
+
     if record.runtime
         and record.runtime.startupRehydrateExpected == true
     then
@@ -535,7 +581,6 @@ function Presence.Materialize(record, reason, nearest)
         return nil, "startup_rehydration_pending"
     end
     prepareRecord(record)
-    now = Core.Now()
     if not allowStartupMaterialization(record, now) then
         if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
             PresenceDiagnostics.LogMaterializeGate(record, "startup_spacing",

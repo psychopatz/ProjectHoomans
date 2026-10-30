@@ -57,6 +57,10 @@ Const.BODY_SHELL_REHYDRATE_PUMP_MS = 100
 -- presence resumes. Re-materialization is then spaced so a relog near several
 -- NPCs cannot create a same-frame zombie burst.
 Const.BODY_SHELL_STARTUP_SETTLE_MS = 1500
+-- Dedicated servers start before player-interest chunks exist. Once a saved
+-- NPC's old square first streams, hold only that NPC for this bounded window
+-- so PopMan can restore the former carrier before a replacement is spawned.
+Const.BODY_SHELL_LATE_STREAM_SETTLE_MS = 1500
 Const.BODY_SHELL_STARTUP_MATERIALIZE_SPACING_MS = 250
 Const.BODY_SHELL_STARTUP_BURST_MS = 5000
 -- Startup cleanup is best-effort. A missing/streaming cell must not strand

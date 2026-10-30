@@ -11,8 +11,13 @@ local Internal = Lifecycle.Internal
 local Const = PNC.Const
 
 local function expectsRehydration(record)
-    return record and record.runtime
-        and record.runtime.startupRehydrateExpected == true
+    local runtime = record and record.runtime or nil
+    return runtime
+        and (
+            runtime.startupRehydrateExpected == true
+            or runtime.lateStreamRehydrateExpected == true
+        )
+        or false
 end
 
 local function validSavedIdentity(value)
@@ -42,11 +47,28 @@ function Internal.MatchAnonymousStartupRehydrate(record, zombie, now)
     local hint = record and record.runtime
         and record.runtime.startupBodyHint or nil
     local radius = tonumber(Const.BODY_SHELL_REHYDRATE_ANON_RADIUS) or 1.0
-    local startedAt = Lifecycle.StartupCleanup
-        and tonumber(Lifecycle.StartupCleanup.startedAt)
-        or tonumber(now)
-        or 0
-    local settle = tonumber(Const.BODY_SHELL_REHYDRATE_ANON_SETTLE_MS) or 750
+    local runtime = record and record.runtime or nil
+    local lateStream = runtime
+        and runtime.lateStreamRehydrateExpected == true
+    local startedAt
+    if lateStream then
+        startedAt = tonumber(runtime.lateStreamRehydrateLoadedAt)
+            or tonumber(now)
+            or 0
+    else
+        startedAt = Lifecycle.StartupCleanup
+            and tonumber(Lifecycle.StartupCleanup.startedAt)
+            or tonumber(now)
+            or 0
+    end
+    local settle = lateStream
+        and (
+            tonumber(Const.BODY_SHELL_LATE_STREAM_SETTLE_MS)
+            or tonumber(Const.BODY_SHELL_STARTUP_SETTLE_MS)
+            or 1500
+        )
+        or tonumber(Const.BODY_SHELL_REHYDRATE_ANON_SETTLE_MS)
+        or 750
     local instanceID
     local populationID
     local distance

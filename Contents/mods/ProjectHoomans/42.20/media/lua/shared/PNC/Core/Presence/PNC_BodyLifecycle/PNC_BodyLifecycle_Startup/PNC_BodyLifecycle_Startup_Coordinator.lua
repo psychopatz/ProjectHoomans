@@ -5,27 +5,51 @@ local Const = PNC.Const
 
 local function finalizeRehydrationMisses(now)
     local reg = Internal.registry and Internal.registry() or nil
-    if not reg or not reg.ForEach then return 0 end
+    if not reg or not reg.ForEach then return 0, 0 end
     local missed = 0
+    local lateStream = 0
+    local serverRuntime = isServer and isServer() == true
+
     reg.ForEach(function(record)
         if record and record.alive ~= false
             and record.runtime
             and record.runtime.startupRehydrateExpected == true
             and record.presenceState ~= Const.PRESENCE_LIVE
         then
-            record.runtime.startupRehydrateExpected = nil
-            record.runtime.startupRehydrateMissed = true
-            record.runtime.lifecycle = record.runtime.lifecycle or {}
-            record.runtime.lifecycle.lastReason = "startup_rehydrate_missed"
-            record.runtime.lifecycle.lastTransitionAt = now
-            missed = missed + 1
+            if serverRuntime
+                and Lifecycle.ArmLateStreamRehydrate
+                and Lifecycle.ArmLateStreamRehydrate(record, now)
+            then
+                record.runtime.lifecycle =
+                    record.runtime.lifecycle or {}
+                record.runtime.lifecycle.lastReason =
+                    "startup_rehydrate_late_stream"
+                record.runtime.lifecycle.lastTransitionAt = now
+                lateStream = lateStream + 1
+            else
+                record.runtime.startupRehydrateExpected = nil
+                record.runtime.startupRehydrateMissed = true
+                record.runtime.lifecycle =
+                    record.runtime.lifecycle or {}
+                record.runtime.lifecycle.lastReason =
+                    "startup_rehydrate_missed"
+                record.runtime.lifecycle.lastTransitionAt = now
+                missed = missed + 1
+            end
         end
     end)
+
+    if lateStream > 0 and Core.LogInfo then
+        Core.LogInfo(
+            "PNC startup late-stream rehydration armed count="
+                .. tostring(lateStream)
+        )
+    end
     if missed > 0 and Core.LogInfo then
         Core.LogInfo("PNC startup rehydration fallback count="
             .. tostring(missed))
     end
-    return missed
+    return missed, lateStream
 end
 
 function Lifecycle.BeginStartupBodyCleanup(now, forceReset)

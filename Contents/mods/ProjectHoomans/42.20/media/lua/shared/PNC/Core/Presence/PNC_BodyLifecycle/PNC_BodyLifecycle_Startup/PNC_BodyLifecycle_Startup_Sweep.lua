@@ -2,6 +2,16 @@ local Lifecycle = PNC.BodyLifecycle
 local Internal = Lifecycle.Internal
 local Core = PNC.Core
 
+local function hasRehydrateClaim(record)
+    local runtime = record and record.runtime or nil
+    return runtime
+        and (
+            runtime.startupRehydrateExpected == true
+            or runtime.lateStreamRehydrateExpected == true
+        )
+        or false
+end
+
 local function quarantineRehydrateCandidate(zombie, source)
     if not zombie then return end
     if PNC.LiveBodyControl
@@ -25,6 +35,8 @@ local function quarantineRehydrateCandidate(zombie, source)
         )
     end
 end
+
+Internal.QuarantineRehydrateCandidate = quarantineRehydrateCandidate
 
 function Lifecycle.SweepPersistedLiveShells(now)
     local batch
@@ -296,6 +308,22 @@ function Lifecycle.InterceptLoadedShell(zombie, source)
     end
     npcId, strong, weak = Internal.GetLiveShellIdentity(zombie)
     naked = Internal.IsNakedStartupShell(zombie)
+
+    -- Dedicated restart shells may first become real only when a player
+    -- streams their saved chunk. Give the bounded late-stream claim first
+    -- chance to quarantine/rebind an identity-stripped carrier.
+    if not strong
+        and npcId == nil
+        and Lifecycle.InterceptLateStreamRehydrateBody
+        and Lifecycle.InterceptLateStreamRehydrateBody(
+            zombie,
+            Core.Now(),
+            source
+        )
+    then
+        return false
+    end
+
     if not strong and Lifecycle.FindHuskEntry
         and Lifecycle.IsLegacyAnonymousHusk
     then
@@ -304,8 +332,7 @@ function Lifecycle.InterceptLoadedShell(zombie, source)
             and Lifecycle.IsLegacyAnonymousHusk(legacyEntry, zombie)
         then
             record = reg.Get and reg.Get(legacyEntry.npcId) or nil
-            if record and record.runtime
-                and record.runtime.startupRehydrateExpected == true
+            if hasRehydrateClaim(record)
                 and not Internal.IsCanonicalStartupBody(record, zombie)
             then
                 quarantineRehydrateCandidate(
@@ -345,9 +372,7 @@ function Lifecycle.InterceptLoadedShell(zombie, source)
                     == "ambiguous_")
                 and not Internal.IsCanonicalStartupBody(record, zombie)
             then
-                if record.runtime
-                    and record.runtime.startupRehydrateExpected == true
-                then
+                if hasRehydrateClaim(record) then
                     quarantineRehydrateCandidate(
                         zombie,
                         tostring(source or "early_shell")
@@ -372,9 +397,7 @@ function Lifecycle.InterceptLoadedShell(zombie, source)
         return false
     end
     if record and not Internal.IsCanonicalStartupBody(record, zombie) then
-        if record.runtime
-            and record.runtime.startupRehydrateExpected == true
-        then
+        if hasRehydrateClaim(record) then
             quarantineRehydrateCandidate(
                 zombie,
                 tostring(source or "early_shell") .. "_rehydrate_pending"
