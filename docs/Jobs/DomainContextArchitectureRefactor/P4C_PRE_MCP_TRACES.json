@@ -1,0 +1,132 @@
+{
+  "tier": 2,
+  "project": "project-hoomans",
+  "coverage": {
+    "project": "project-hoomans",
+    "signal": "best_effort",
+    "indexed_at": "2026-10-30T13:14:30Z",
+    "metadata": {
+      "generation": "2026-10-30T13:14:30Z",
+      "index_mode": "full",
+      "recorded_at": "2026-10-30T13:14:34Z",
+      "recording_status": "complete",
+      "ignored_files_stored": 86,
+      "ignored_files_total": 86,
+      "hash_records_complete": true,
+      "coverage_version": 3,
+      "generation_matches": true
+    },
+    "paths": [
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Base/PNC_Types/PNC_Types_Normalization.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Base/PNC_Types/PNC_Types_Normalization.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Base/PNC_Types/PNC_Types_Definition.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Base/PNC_Types/PNC_Types_Definition.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_UniqueNPCs.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_UniqueNPCs.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Skills/PNC_Skills.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Skills/PNC_Skills.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipTypes_Public.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipTypes_Public.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      }
+    ],
+    "scopes": [],
+    "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+  },
+  "traces": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_RecordState.Internal.sanitizeSocial\ndirection: both\ncallees_total: 3\ncallees: 3  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Conduct.PNC_ConductTypes.Types:\n  NewConductRecord 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Relationships.PNC_RelationshipMath.Math:\n  RecalculateRelationship 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Relationships.PNC_RelationshipTypes_Public.Types:\n  NormalizeSocialState 1 heuristic 0.75\ncallers_total: 4\ncallers: 4  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Deserialize.Persistence:\n  DeserializeRecord 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Deserialize:\n  buildDefinition 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_DeserializeFinalization:\n  restoreIdentityAndProgression 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Serialize:\n  serializeSocial 1 heuristic 0.75\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_RecordState.Internal.sanitizeProgression\ndirection: both\ncallees_total: 2\ncallees: 2  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Base.PNC_RecordCodec.Codec:\n  normalizeNumber 1 heuristic 0.75\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.17\ncallers_total: 2\ncallers: 2  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Deserialize.Persistence:\n  DeserializeRecord 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Serialize:\n  prepareProgression 1 heuristic 0.75\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_DeserializeFinalization.restoreBodyHint\ndirection: both\ncallees_total: 3\ncallees: 3  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Base.PNC_RecordCodec.Codec:\n  normalizeNumber 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Inventory.PNC_Inventory.Model.PNC_Inventory_State.Internal:\n  normalizeString 1 heuristic 0.85\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.17\ncallers_total: 1\ncallers: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_DeserializeFinalization.Internal:\n  FinalizeDeserializedRecord 1 heuristic 0.90\n"
+          }
+        ],
+        "isError": false
+      }
+    }
+  ],
+  "obsolete_camp_helper_trace": {
+    "content": [
+      {
+        "type": "text",
+        "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Primitives.Internal.sanitizeCampState\ndirection: both\ncallees_total: 4\ncallees: 4  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Base.PNC_RecordCodec.Codec:\n  normalizeNumber 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Health.PlayerDamage.PNC_PlayerDamage_ReportContract:\n  optionalNumber 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Inventory.PNC_Inventory.Model.PNC_Inventory_State.Internal:\n  normalizeString 1 heuristic 0.85\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.17\ncallers_total: 0\ncallers: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\n"
+      }
+    ],
+    "isError": false
+  },
+  "limitations": [
+    "All sampled depth-one traces fit one page; builtin and alias heuristic errors remain.",
+    "Existing M12 README/architecture/latest progress re-inspected. Body-schema work must preserve identity/lease/wasLive/restart and authority behavior.",
+    "No camp helper callers in MCP; exact literal verification over maintained runtime and tests found only its definition. Save/load already omits/discards campState."
+  ]
+}

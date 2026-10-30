@@ -260,3 +260,5 @@ function Skills.BuildSnapshot(record)
     end
     return levels
 end
+
+Skills.Repository = require "PNC/Core/Skills/PNC_SkillsRepository"

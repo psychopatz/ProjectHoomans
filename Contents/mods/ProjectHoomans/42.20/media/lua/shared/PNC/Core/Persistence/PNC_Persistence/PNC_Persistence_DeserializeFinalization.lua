@@ -2,112 +2,17 @@ PNC = PNC or {}
 PNC.Persistence = PNC.Persistence or {}
 PNC.Persistence.Internal = PNC.Persistence.Internal or {}
 
+local NeedsRecordRepository = require "PNC/Core/Needs/PNC_NeedsRecordRepository"
+local IdentityRestoration = require "PNC/Core/Identity/PNC_IdentityRestoration"
 local HealthRepository = require "PNC/Core/Health/PNC_HealthRepository"
+local RelationshipRepository = require "PNC/Core/Relationships/PNC_RelationshipRepository"
+local CompanionRecordRepository = require "PNC/Core/Commands/PNC_CompanionRecordRepository"
+local BodyRepository = require "PNC/Core/Presence/PNC_BodyRepository"
+local TravelRepository = require "PNC/Core/Travel/PNC_TravelRepository"
 local Persistence = PNC.Persistence
 local Internal = Persistence.Internal
 local InventoryRepository = require "PNC/Core/Inventory/PNC_InventoryRepository"
 local Core = PNC.Core
-local Const = PNC.Const
-local Identity = PNC.Identity
-
-local function staleGeneratedPersonality(raw)
-    local social = type(raw.social) == "table" and raw.social or nil
-    local personality = social and social.personality or nil
-    local version = personality and tonumber(personality.generationVersion)
-        or nil
-    local currentVersion = PNC.SocialProfileConstants
-        and tonumber(PNC.SocialProfileConstants.NPC_GENERATION_VERSION)
-        or nil
-    local generated = personality
-        and (personality.generatedFromSeed == true
-            or (personality.generatedFromSeed == nil
-                and (version or 0) > 0))
-    return generated and currentVersion ~= nil
-        and math.max(0, math.floor(version or 0)) ~= math.max(
-            1, math.floor(currentVersion))
-end
-
-local function restoreTraits(record, raw)
-    if PNC.NPCTraits and PNC.NPCTraits.NormalizeSet then
-        record.npcTraits = PNC.NPCTraits.NormalizeSet(raw.npcTraits)
-        record.npcTraitFingerprint = PNC.NPCTraits.Fingerprint(
-            record.npcTraits)
-    end
-    local vanilla = raw.vanillaTraits
-    local vanillaAuthored = raw.vanillaTraitsAuthored == true
-    if PNC.PlayerNeedsModel
-        and vanillaAuthored
-    then
-        record.vanillaTraits = PNC.PlayerNeedsModel.NormalizeTraits(vanilla)
-        record.vanillaTraitsAuthored = vanillaAuthored
-        record.vanillaTraitsGenerationVersion = 0
-    end
-    if PNC.PlayerNeedsModel and PNC.PlayerNeedsModel.EnsureTraits then
-        PNC.PlayerNeedsModel.EnsureTraits(record)
-    end
-
-    local dynamic = raw.dynamicTraits
-    local dynamicAuthored = raw.dynamicTraitsAuthored == true
-    if PNC.ConditionStats
-        and dynamicAuthored
-    then
-        record.dynamicTraits = PNC.ConditionStats.NormalizeTraits(dynamic)
-        record.dynamicTraitsAuthored = dynamicAuthored
-        record.dynamicTraitsGenerationVersion = 0
-    end
-    if PNC.ConditionStats and PNC.ConditionStats.EnsureTraits then
-        PNC.ConditionStats.EnsureTraits(record)
-    end
-    if PNC.NPCTraits and PNC.NPCTraits.Fingerprint then
-        record.dynamicTraitFingerprint = PNC.NPCTraits.Fingerprint(
-            record.dynamicTraits or {})
-    end
-    if PNC.ConditionStats and type(raw.conditionStats) == "table" then
-        record.conditionStats = PNC.ConditionStats.NormalizeState(
-            raw.conditionStats,
-            0
-        )
-    end
-end
-
-local function restoreIdentityAndProgression(
-    record,
-    raw,
-    identity,
-    progression
-)
-    record.corpse = Internal.sanitizeCorpse(raw.corpse, record)
-    if record.alive == false and not record.corpse then
-        record.corpse = {
-            token = nil,
-            x = record.x,
-            y = record.y,
-            z = record.z,
-            createdWorldHour = 0,
-        }
-    end
-    Identity.ApplyRecordIdentity(record, {
-        archetypeID = raw.archetypeID or record.archetypeID,
-        identitySeed = identity and identity.seed or record.identitySeed,
-        identity = identity,
-        displayName = raw.displayName or raw.name,
-        name = raw.displayName or raw.name,
-        visualProfile = raw.visualProfile,
-        outfit = raw.outfit,
-        isFemale = raw.isFemale == true
-            or (identity and identity.isFemale == true),
-    })
-    record.social = Internal.sanitizeSocial(
-        raw.social,
-        record.identitySeed,
-        record.archetypeID
-    )
-    if staleGeneratedPersonality(raw)
-        and PNC.Registry and PNC.Registry.MarkDirty
-    then
-        PNC.Registry.MarkDirty(record, "social_profile_regenerated")
-    end
-end
 
 local function restoreJournalAndTravel(record, raw)
     if PNC.Journals and PNC.Journals.RemoveNPC then
@@ -125,80 +30,9 @@ local function restoreJournalAndTravel(record, raw)
             Core.LogWarn("Rejected NPC journal id=" .. tostring(record.id))
         end
     end
-    if type(raw.travel) == "table"
-        and PNC.Travel
-        and PNC.Travel.Model
-        and PNC.Travel.Model.Normalize
-    then
-        record.travel = PNC.Travel.Model.Normalize(
-            raw.travel,
-            record,
-            PNC.Travel.Service and PNC.Travel.Service.WorldHour
-                and PNC.Travel.Service.WorldHour()
-                or tonumber(raw.travel.lastAdvancedWorldHour)
-                or 0
-        )
-        -- Follow owns the canonical position through the presence lane. An
-        -- older save may contain a terminal or active home journey beside a
-        -- durable Follow order; retaining that route lets load-time travel
-        -- reconciliation replay the base destination over the follower.
-        -- Keep the saved position/order and retire the stale route instead.
-        if record.travel
-            and tostring(record.orderSpec and record.orderSpec.kind or "")
-                == tostring(Const.ORDER_FOLLOW or "follow")
-        then
-            record.travel = nil
-            if PNC.Registry and PNC.Registry.MarkDirty then
-                PNC.Registry.MarkDirty(record, "follow_travel_reconciled")
-            end
-        elseif record.travel and PNC.Travel.Model.IsActive(record.travel) then
-            record.orderSpec = {
-                kind = Const.ORDER_TRAVEL or "travel",
-                journeyId = record.travel.journeyId,
-            }
-        end
-    end
-end
-
-local function restoreBodyHint(record, raw)
-    local bodyHint = type(raw.bodyHint) == "table"
-        and raw.bodyHint or nil
-    if bodyHint
-        and (bodyHint.instanceID ~= nil
-            or bodyHint.populationId ~= nil
-            or bodyHint.wasLive == true)
-    then
-        local wasLive = bodyHint.wasLive == true
-            or (bodyHint.wasLive == nil
-                and Internal.normalizeString(bodyHint.lease) ~= nil)
-        record.runtime.startupBodyHint = {
-            instanceID = bodyHint.instanceID ~= nil
-                and tostring(bodyHint.instanceID) or nil,
-            onlineID = tonumber(bodyHint.onlineID),
-            lease = Internal.normalizeString(bodyHint.lease),
-            populationId = Internal.normalizeString(bodyHint.populationId),
-            x = Internal.normalizeNumber(bodyHint.x, record.x),
-            y = Internal.normalizeNumber(bodyHint.y, record.y),
-            z = Internal.normalizeNumber(bodyHint.z, record.z),
-            wasLive = wasLive == true,
-        }
-        -- Runtime presence is rebuilt as abstract until the engine body has
-        -- been rediscovered. Preserve whether the save actually owned a live
-        -- body so startup can adopt that body instead of treating it as an
-        -- historical husk and spawning a replacement.
-        record.runtime.startupRehydrateExpected = wasLive == true
-        record.runtime.lastLiveBodyInstanceID =
-            record.runtime.startupBodyHint.instanceID
-        record.runtime.lastLiveBodyPopulationID =
-            record.runtime.startupBodyHint.populationId
-        record.runtime.lastLiveBodyOnlineID =
-            record.runtime.startupBodyHint.onlineID
-        record.runtime.lastLiveBodyLease =
-            record.runtime.startupBodyHint.lease
-        record.runtime.lastLiveBodyX = record.runtime.startupBodyHint.x
-        record.runtime.lastLiveBodyY = record.runtime.startupBodyHint.y
-        record.runtime.lastLiveBodyZ = record.runtime.startupBodyHint.z
-    end
+    local active, journeyID = TravelRepository.RestoreRecord(
+        record, raw, CompanionRecordRepository.IsFollowing(record))
+    if active then CompanionRecordRepository.SetTravelOrder(record, journeyID) end
 end
 
 function Internal.FinalizeDeserializedRecord(
@@ -207,8 +41,11 @@ function Internal.FinalizeDeserializedRecord(
     identity,
     progression
 )
-    restoreTraits(record, raw)
-    restoreIdentityAndProgression(record, raw, identity, progression)
+    IdentityRestoration.RestoreTraits(record, raw)
+    NeedsRecordRepository.RestoreRecord(record, raw)
+    BodyRepository.RestoreCorpse(record, raw.corpse)
+    IdentityRestoration.RestoreRecord(record, raw, identity)
+    RelationshipRepository.RestoreRecord(record, raw)
     HealthRepository.RestoreStamina(raw.stamina, record)
     record = InventoryRepository.RestoreRecord(record, raw.inventory)
     record = Persistence.RebuildRuntime(record)
@@ -220,6 +57,6 @@ function Internal.FinalizeDeserializedRecord(
     end
     restoreJournalAndTravel(record, raw)
     record.persistenceSourceVersion = tonumber(raw.schemaVersion) or 0
-    restoreBodyHint(record, raw)
+    BodyRepository.RestoreHint(record, raw)
     return record
 end

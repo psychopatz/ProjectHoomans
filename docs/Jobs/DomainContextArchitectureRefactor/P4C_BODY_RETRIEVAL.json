@@ -1,0 +1,53 @@
+{
+  "metric": "Supplementary whole-file carrier-proof schema working set. Native rehydration policy remains an unchanged public stopping boundary and is separately regression-tested; this is not a claim that these files alone explain every startup decision.",
+  "before": {
+    "files": 4,
+    "bytes": 32132,
+    "lines": 817,
+    "source": [
+      {
+        "path": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize.lua",
+        "bytes": 13198,
+        "lines": 327,
+        "sha256": "b6c01cf621d9aacbce4cac4d0229790c23a9e484a8a3df9e9a8c94f1334e87a4"
+      },
+      {
+        "path": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_DeserializeFinalization.lua",
+        "bytes": 8696,
+        "lines": 225,
+        "sha256": "8613a5fd6cfdabc1b900720ca9ed0cae9d8bdd935120ebcbbf0c1bceaebf5961"
+      },
+      {
+        "path": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives.lua",
+        "bytes": 8332,
+        "lines": 189,
+        "sha256": "21aedefb43fde57b283fd68ec54718fbc456336bd7d807bbd7567a545c097658"
+      },
+      {
+        "path": "shared/PNC/Core/Base/PNC_RecordCodec.lua",
+        "bytes": 1906,
+        "lines": 76,
+        "sha256": "66b2682660da4c330e68bc8f1450f0593aa94a34265d5b671992eb67921ea431"
+      }
+    ]
+  },
+  "after": {
+    "files": 2,
+    "bytes": 6658,
+    "lines": 196,
+    "source": [
+      {
+        "path": "shared/PNC/Core/Presence/PNC_BodyRepository.lua",
+        "bytes": 4752,
+        "lines": 120,
+        "sha256": "87d839b0ec6e2f74134557020f59c167a49dfd0bd1f8499d67afec77ce6ebf66"
+      },
+      {
+        "path": "shared/PNC/Core/Base/PNC_RecordCodec.lua",
+        "bytes": 1906,
+        "lines": 76,
+        "sha256": "66b2682660da4c330e68bc8f1450f0593aa94a34265d5b671992eb67921ea431"
+      }
+    ]
+  }
+}

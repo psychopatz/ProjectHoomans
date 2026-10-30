@@ -418,9 +418,15 @@ local deserializeSource = T.read(
     "shared",
     "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_DeserializeFinalization.lua"
 )
-T.contains(serializeSource, "wasLive = record.presenceState",
+local bodyRepositorySource = T.read(
+    "ProjectHoomans", "shared", "PNC/Core/Presence/PNC_BodyRepository.lua")
+T.contains(serializeSource, "BodyRepository.BuildHint(record)",
+    "serializer does not delegate carrier-proof schema to its owner")
+T.contains(deserializeSource, "BodyRepository.RestoreHint(record, raw)",
+    "deserializer does not delegate carrier-proof restoration")
+T.contains(bodyRepositorySource, "wasLive = record.presenceState",
     "serializer does not persist saved-live ownership")
-T.contains(deserializeSource, "startupRehydrateExpected = wasLive == true",
+T.contains(bodyRepositorySource, "startupRehydrateExpected = wasLive == true",
     "deserializer does not restore saved-live rehydration claim")
 
 return T.finish("pnc_restart_rehydration_smoke")

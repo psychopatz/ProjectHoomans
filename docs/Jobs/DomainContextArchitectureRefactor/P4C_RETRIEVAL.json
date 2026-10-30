@@ -1,0 +1,460 @@
+{
+  "revision": "fa5b2a2d1bf912b7469184a773be0696a0716d61",
+  "scope": "Contents/mods/ProjectHoomans/42.20/media/lua/",
+  "metric": "Reviewed whole-file working set; exclude engine/Core implementations whose public contracts suffice. Hops are source-reviewed provider/call handoffs, not all transitive imports. Foreign lists are reviewed interactions, including lazy globals. Revisit sets when behavior ownership moves; preserve the same behavior and justify membership changes.",
+  "probes": [
+    {
+      "id": "inventory_transfer",
+      "behavior": "Change existing player-to-NPC transfer authority/revision validation, preserving rollback and gifts.",
+      "entry": "server/PNC/Server/PNC_ServerInventory.lua",
+      "files": [
+        "server/PNC/Server/PNC_ServerInventory.lua",
+        "server/PNC/Server/ServerInventory/PNC_ServerInventory_Context.lua",
+        "server/PNC/Server/ServerInventory/PNC_ServerInventory_Transfer.lua",
+        "server/PNC/Server/ServerInventory/PNC_ServerInventory_PlayerToNPC.lua"
+      ],
+      "foreign": [
+        "Registry",
+        "Networking",
+        "Conversation",
+        "Medical",
+        "Tasking"
+      ],
+      "hops": 2,
+      "tests": [
+        "tests/pnc_inventory_transactions_smoke.lua",
+        "tests/pnc_inventory_transfer_rollback_smoke.lua",
+        "tests/pnc_semantic_gift_idempotency_smoke.lua"
+      ],
+      "source": [
+        {
+          "path": "server/PNC/Server/PNC_ServerInventory.lua",
+          "bytes": 1101,
+          "lines": 24,
+          "sha256": "f91bff96c94e41e57ba0650b88dfa09ebeb65f8593e7f220a689d12c93d34d08"
+        },
+        {
+          "path": "server/PNC/Server/ServerInventory/PNC_ServerInventory_Context.lua",
+          "bytes": 8605,
+          "lines": 229,
+          "sha256": "c2c0ffd1cd63bdd76447aa2e2d7369a61d6cb99a050ecb21e08843d69fc51d8a"
+        },
+        {
+          "path": "server/PNC/Server/ServerInventory/PNC_ServerInventory_Transfer.lua",
+          "bytes": 10457,
+          "lines": 274,
+          "sha256": "57ac47938952a75e6be664b448af1d4e5ba34768ec8d6aa74d13541a848a0087"
+        },
+        {
+          "path": "server/PNC/Server/ServerInventory/PNC_ServerInventory_PlayerToNPC.lua",
+          "bytes": 7102,
+          "lines": 172,
+          "sha256": "68c8c93ad5436963855883c967b44eb5f1526fc6d643f882e51483e08b37f3db"
+        }
+      ],
+      "file_count": 4,
+      "source_bytes": 27265,
+      "source_lines": 699
+    },
+    {
+      "id": "task_lease",
+      "behavior": "Change the one-active-lease-per-NPC eligibility rule at lease creation.",
+      "entry": "server/PNC/Tasking/PNC_Tasking.lua",
+      "files": [
+        "server/PNC/Tasking/PNC_Tasking.lua",
+        "server/PNC/Tasking/Tasking/PNC_Tasking_Assignment.lua",
+        "server/PNC/Tasking/PNC_TaskLeaseService.lua",
+        "server/PNC/Tasking/PNC_TaskLeaseService_Creation.lua",
+        "server/PNC/Tasking/PNC_TaskLeaseService_Context.lua"
+      ],
+      "foreign": [
+        "Core",
+        "Facilities",
+        "Work"
+      ],
+      "hops": 3,
+      "tests": [
+        "tests/pnc_task_cancellation_smoke.lua",
+        "tests/pnc_tasking_event_inbox_smoke.lua",
+        "tests/pnc_tasking_sleep_smoke.lua"
+      ],
+      "source": [
+        {
+          "path": "server/PNC/Tasking/PNC_Tasking.lua",
+          "bytes": 4135,
+          "lines": 91,
+          "sha256": "5542abf888bc34964c923cb02da02a40486f69043d72a83b2f9e267c8bedf775"
+        },
+        {
+          "path": "server/PNC/Tasking/Tasking/PNC_Tasking_Assignment.lua",
+          "bytes": 4849,
+          "lines": 119,
+          "sha256": "32fb6eb32de2d3229b6e53439248b98002d1e165ef8c17c36c6479953f417d6a"
+        },
+        {
+          "path": "server/PNC/Tasking/PNC_TaskLeaseService.lua",
+          "bytes": 1765,
+          "lines": 42,
+          "sha256": "0c37fcabca2e12fced96ea9ae22917e396e2b7f79808c8419f19786227dc4896"
+        },
+        {
+          "path": "server/PNC/Tasking/PNC_TaskLeaseService_Creation.lua",
+          "bytes": 2460,
+          "lines": 56,
+          "sha256": "6f639ed34f7fa22e4eb248248cab2e71f138625b04c5a47e37be59df69dff6c1"
+        },
+        {
+          "path": "server/PNC/Tasking/PNC_TaskLeaseService_Context.lua",
+          "bytes": 2155,
+          "lines": 59,
+          "sha256": "b867211eb05ad7144d6a74accb2aa046a01c0638c26ad4b8ca56b47cf48696eb"
+        }
+      ],
+      "file_count": 5,
+      "source_bytes": 15364,
+      "source_lines": 367
+    },
+    {
+      "id": "conversation_close",
+      "behavior": "Change close outcome delivery and working-context cleanup while preserving SP/MP scene authority.",
+      "entry": "client/PNC/Conversation/PNC_ConversationLifecycle.lua",
+      "files": [
+        "client/PNC/Conversation/PNC_ConversationLifecycle.lua",
+        "client/PNC/Conversation/PNC_ConversationLifecycle_Create.lua",
+        "client/PNC/Conversation/PNC_ConversationLifecycle_Create_Finish.lua",
+        "client/PNC/Conversation/PNC_ConversationFarewell.lua",
+        "client/PNC/Conversation/PNC_ConversationSafety.lua",
+        "shared/PNC/Conversation/PNC_ConversationScene.lua",
+        "shared/PNC/Conversation/PNC_ConversationScene/PNC_ConversationScene_Lease_End.lua"
+      ],
+      "foreign": [
+        "Semantics",
+        "Networking",
+        "Registry",
+        "CoreConversation"
+      ],
+      "hops": 3,
+      "tests": [
+        "tests/pnc_conversation_lifecycle_refresh_smoke.lua"
+      ],
+      "source": [
+        {
+          "path": "client/PNC/Conversation/PNC_ConversationLifecycle.lua",
+          "bytes": 12562,
+          "lines": 327,
+          "sha256": "45175c2802a7dec0ca0f17945f8ed5bd1326e6ad3b48c6b907ed3cc601971528"
+        },
+        {
+          "path": "client/PNC/Conversation/PNC_ConversationLifecycle_Create.lua",
+          "bytes": 839,
+          "lines": 29,
+          "sha256": "7010d008491834ad9f9aae1835ec85b1b9e230cc981b9bc6271952840f5c6d87"
+        },
+        {
+          "path": "client/PNC/Conversation/PNC_ConversationLifecycle_Create_Finish.lua",
+          "bytes": 2313,
+          "lines": 67,
+          "sha256": "38378b4bd76ffe17e22eb503240d6277452162a99ec7c5c8fe131b577f2f89cf"
+        },
+        {
+          "path": "client/PNC/Conversation/PNC_ConversationFarewell.lua",
+          "bytes": 9594,
+          "lines": 287,
+          "sha256": "32efa6237465ff1469bf2731fa7f94ca58d53a44b924308e887a1580b1b60c10"
+        },
+        {
+          "path": "client/PNC/Conversation/PNC_ConversationSafety.lua",
+          "bytes": 14025,
+          "lines": 401,
+          "sha256": "705a64e805b0602dc0070db629865a47cf4d08976ae560b812d5fc1c62c6cfa0"
+        },
+        {
+          "path": "shared/PNC/Conversation/PNC_ConversationScene.lua",
+          "bytes": 1202,
+          "lines": 29,
+          "sha256": "8e483d52c3bd8e658dd6cef800f4811ac730bfe33fcc496edf13a341834e9b2c"
+        },
+        {
+          "path": "shared/PNC/Conversation/PNC_ConversationScene/PNC_ConversationScene_Lease_End.lua",
+          "bytes": 5850,
+          "lines": 171,
+          "sha256": "65927f894c8ec35effbc120537bb84771aa1fe668e339f402306b2d6cd1e6739"
+        }
+      ],
+      "file_count": 7,
+      "source_bytes": 46385,
+      "source_lines": 1311
+    },
+    {
+      "id": "persisted_inventory",
+      "behavior": "Change serialization/restoration of inventory revision in the compact seed/delta field.",
+      "entry": "shared/PNC/Core/Inventory/PNC_InventoryRepository.lua",
+      "files": [
+        "shared/PNC/Core/Inventory/PNC_InventoryRepository.lua",
+        "shared/PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Persistence.lua",
+        "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreDeltaCodec.lua",
+        "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreBridge.lua"
+      ],
+      "foreign": [
+        "Persistence",
+        "Supply"
+      ],
+      "hops": 3,
+      "tests": [
+        "tests/pnc_seed_delta_smoke.lua",
+        "tests/pnc_inventory_persisted_repair_smoke.lua",
+        "tests/pnc_domain_repository_bootstrap_smoke.lua"
+      ],
+      "review_note": "P4: compact inventory revision policy is discoverable through the owning Repository. Unchanged record-envelope host delegates through this seam, so its whole serializer/deserializer and global inventory bootstrap are no longer part of this behavior slice. Caller checks and integration/roundtrip tests retain envelope coverage.",
+      "source": [
+        {
+          "path": "shared/PNC/Core/Inventory/PNC_InventoryRepository.lua",
+          "bytes": 1361,
+          "lines": 38,
+          "sha256": "08d5c8bb5378e59d31553a4a98d48d19be3daed844c96504b4f49fdf1c5aeba9"
+        },
+        {
+          "path": "shared/PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Persistence.lua",
+          "bytes": 4850,
+          "lines": 120,
+          "sha256": "5d8580a86d0c259a606e00823e17e7e6025c647ddb59c500fc7ec82afa18d1af"
+        },
+        {
+          "path": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreDeltaCodec.lua",
+          "bytes": 6794,
+          "lines": 195,
+          "sha256": "aa9406805925b1a92468acc2987e988e6a3333642079c213875c817948554415"
+        },
+        {
+          "path": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreBridge.lua",
+          "bytes": 5903,
+          "lines": 143,
+          "sha256": "f6cded5d73d176f042d8014d27d6c32191a56cd70eab6b987da7f4e54a6a92d2"
+        }
+      ],
+      "file_count": 4,
+      "source_bytes": 18908,
+      "source_lines": 496
+    },
+    {
+      "id": "ui_inventory_rows",
+      "behavior": "Change NPC inventory query-result rows, grouping and virtual identity presentation.",
+      "entry": "client/PNC/UI/Inventory/PNC_InventoryUI_Model.lua",
+      "files": [
+        "client/PNC/UI/Inventory/PNC_InventoryUI_Model.lua",
+        "client/PNC/UI/Inventory/PNC_InventoryUI_Model/_NPCRows.lua",
+        "client/PNC/UI/Inventory/PNC_InventoryUI_Model/_Native.lua",
+        "client/PNC/UI/Inventory/PNC_InventoryUI_Model/_Grouping.lua"
+      ],
+      "foreign": [
+        "Inventory",
+        "Currency",
+        "CoreTooltip"
+      ],
+      "hops": 2,
+      "tests": [
+        "tests/pnc_inventory_ui_smoke.lua",
+        "tests/pnc_inventory_identity_ui_smoke.lua"
+      ],
+      "source": [
+        {
+          "path": "client/PNC/UI/Inventory/PNC_InventoryUI_Model.lua",
+          "bytes": 516,
+          "lines": 12,
+          "sha256": "e2e719b0c497f2f1dd2114a9de6fc30ca58166013ca4fae0caf396a33cf1e00c"
+        },
+        {
+          "path": "client/PNC/UI/Inventory/PNC_InventoryUI_Model/_NPCRows.lua",
+          "bytes": 6284,
+          "lines": 172,
+          "sha256": "cd2c02d1671845c014a184bee3da9f61ed0a6069d390604934649bea73f61d18"
+        },
+        {
+          "path": "client/PNC/UI/Inventory/PNC_InventoryUI_Model/_Native.lua",
+          "bytes": 12106,
+          "lines": 324,
+          "sha256": "b30c8029c8b6ac0366f1643fb216b28523a8e2378fd3cb67782ea02ef5801aa2"
+        },
+        {
+          "path": "client/PNC/UI/Inventory/PNC_InventoryUI_Model/_Grouping.lua",
+          "bytes": 5180,
+          "lines": 151,
+          "sha256": "9f8d34022851126233c78a38189fae529bb434ba265c1b4d5413baa61a4d7a0f"
+        }
+      ],
+      "file_count": 4,
+      "source_bytes": 24086,
+      "source_lines": 659
+    },
+    {
+      "id": "presence_materialization",
+      "behavior": "Change proximity/force-live materialization eligibility without weakening startup, vehicle or body safety.",
+      "entry": "shared/PNC/Core/Presence/PNC_Presence.lua",
+      "files": [
+        "shared/PNC/Core/Presence/PNC_Presence.lua",
+        "shared/PNC/Core/Presence/PNC_Presence/PNC_Presence_Decisions.lua",
+        "shared/PNC/Core/Presence/PNC_Presence/PNC_Presence_Position.lua",
+        "shared/PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Startup/PNC_BodyLifecycle_Startup_Coordinator.lua",
+        "shared/PNC/Core/Travel/PNC_Travel_Model.lua"
+      ],
+      "foreign": [
+        "BodyLifecycle",
+        "Travel",
+        "Registry",
+        "Player"
+      ],
+      "hops": 2,
+      "tests": [
+        "tests/pnc_presence_force_abstract_vehicle_smoke.lua",
+        "tests/pnc_presence_position_recovery_smoke.lua",
+        "tests/pnc_presence_traversal_audit_smoke.lua",
+        "tests/pnc_travel_live_handoff_smoke.lua"
+      ],
+      "source": [
+        {
+          "path": "shared/PNC/Core/Presence/PNC_Presence.lua",
+          "bytes": 642,
+          "lines": 15,
+          "sha256": "407e5432e3a476909d6c99826dd6a59dbe3ff0e09072f9d0c40de1f39104c54f"
+        },
+        {
+          "path": "shared/PNC/Core/Presence/PNC_Presence/PNC_Presence_Decisions.lua",
+          "bytes": 6178,
+          "lines": 149,
+          "sha256": "b47f9e09607977d799bfa0afde3c13ac69ff3117b89ed95a3bc08e729f180371"
+        },
+        {
+          "path": "shared/PNC/Core/Presence/PNC_Presence/PNC_Presence_Position.lua",
+          "bytes": 5182,
+          "lines": 157,
+          "sha256": "abbdf3df8375057f6fe630ec514ea563a40f0ad3ba6cefda1bbd04281d63a5c8"
+        },
+        {
+          "path": "shared/PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Startup/PNC_BodyLifecycle_Startup_Coordinator.lua",
+          "bytes": 10732,
+          "lines": 278,
+          "sha256": "8d30271856415e27164c81b551926868fd1a195eacad1d4d58d7a16846e48f0a"
+        },
+        {
+          "path": "shared/PNC/Core/Travel/PNC_Travel_Model.lua",
+          "bytes": 11456,
+          "lines": 326,
+          "sha256": "75132f879c7a097e8ae2ba2939caa04c195ea7a54d34614eb24f7ba1345845e8"
+        }
+      ],
+      "file_count": 5,
+      "source_bytes": 34190,
+      "source_lines": 925
+    },
+    {
+      "id": "network_inventory",
+      "behavior": "Change inventory transfer command route/payload handoff while retaining domain mutation authority.",
+      "entry": "server/PNC/Networking/PNC_ServerCommandRouter.lua",
+      "files": [
+        "server/PNC/Networking/PNC_ServerCommandRouter.lua",
+        "server/PNC/Networking/Handlers/PNC_ServerInventoryCommandHandler.lua",
+        "client/PNC/Networking/ClientActions/PNC_ClientActions_Inventory.lua",
+        "server/PNC/Server/PNC_ServerInventory.lua",
+        "shared/PNC/Core/Base/PNC_Constants.lua"
+      ],
+      "foreign": [
+        "Inventory",
+        "PlayerContext"
+      ],
+      "hops": 2,
+      "tests": [
+        "tests/pnc_server_command_router_smoke.lua",
+        "tests/pnc_inventory_transactions_smoke.lua"
+      ],
+      "source": [
+        {
+          "path": "server/PNC/Networking/PNC_ServerCommandRouter.lua",
+          "bytes": 1155,
+          "lines": 39,
+          "sha256": "fa59f11a6afd94296adf3abd6c19cffc9698d42280323730c2b0b5942ba45c37"
+        },
+        {
+          "path": "server/PNC/Networking/Handlers/PNC_ServerInventoryCommandHandler.lua",
+          "bytes": 680,
+          "lines": 21,
+          "sha256": "9f4b4b6eacaee6d331b25561c0cad848efe6b616b46c3701a8524a59478c364b"
+        },
+        {
+          "path": "client/PNC/Networking/ClientActions/PNC_ClientActions_Inventory.lua",
+          "bytes": 4208,
+          "lines": 105,
+          "sha256": "7c9b367e12dfb779d76ca6d0d648f0fc14d84fb0c7cafab1d92ec4a882b06b6b"
+        },
+        {
+          "path": "server/PNC/Server/PNC_ServerInventory.lua",
+          "bytes": 1101,
+          "lines": 24,
+          "sha256": "f91bff96c94e41e57ba0650b88dfa09ebeb65f8593e7f220a689d12c93d34d08"
+        },
+        {
+          "path": "shared/PNC/Core/Base/PNC_Constants.lua",
+          "bytes": 595,
+          "lines": 16,
+          "sha256": "b2ac901da159ced8d65b5a474b572a530a6aa183456614914165ef007458a600"
+        }
+      ],
+      "file_count": 5,
+      "source_bytes": 7739,
+      "source_lines": 205
+    }
+  ],
+  "aggregate_unique": {
+    "files": 33,
+    "bytes": 172836,
+    "lines": 4638
+  },
+  "delta": {
+    "inventory_transfer": {
+      "file_count": -1,
+      "source_bytes": -10976,
+      "source_lines": -267,
+      "hops": -1
+    },
+    "task_lease": {
+      "file_count": 0,
+      "source_bytes": 0,
+      "source_lines": 0,
+      "hops": 0
+    },
+    "conversation_close": {
+      "file_count": 0,
+      "source_bytes": 0,
+      "source_lines": 0,
+      "hops": 0
+    },
+    "persisted_inventory": {
+      "file_count": -3,
+      "source_bytes": -25710,
+      "source_lines": -625,
+      "hops": 0
+    },
+    "ui_inventory_rows": {
+      "file_count": 0,
+      "source_bytes": 0,
+      "source_lines": 0,
+      "hops": 0
+    },
+    "presence_materialization": {
+      "file_count": 0,
+      "source_bytes": 0,
+      "source_lines": 0,
+      "hops": 0
+    },
+    "network_inventory": {
+      "file_count": 0,
+      "source_bytes": 71,
+      "source_lines": 1,
+      "hops": 0
+    }
+  },
+  "aggregate_delta": {
+    "files": -4,
+    "bytes": -36686,
+    "lines": -892
+  }
+}

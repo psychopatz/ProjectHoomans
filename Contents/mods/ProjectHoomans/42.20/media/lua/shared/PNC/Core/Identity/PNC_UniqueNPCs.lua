@@ -131,8 +131,8 @@ function Unique.NormalizeDefinition(definition)
         ),
         startingItems = type(source.startingItems) == "table"
             and copy(source.startingItems) or nil,
-        skillLevels = PNC.Types and PNC.Types.Internal
-            and PNC.Types.Internal.NormalizeSkillLevels(
+        skillLevels = PNC.Types and PNC.Types.NormalizeSkillLevels
+            and PNC.Types.NormalizeSkillLevels(
                 source.skillLevels or source.skillBaseLevels
             ) or copy(source.skillLevels or source.skillBaseLevels),
         vanillaTraits = normalizeTraits(

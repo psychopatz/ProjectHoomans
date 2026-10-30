@@ -1,17 +1,12 @@
 local T = require "tests/support/test"
 T.addPackagePaths()
 
-local SHARED = T.path("ProjectHoomans", "shared", "")
-
 PNC = {
-    Persistence = { Internal = {} },
     Core = {},
 }
 
-T.load(SHARED .. "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives.lua")
-T.load(SHARED .. "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState.lua")
-
-local sanitize = PNC.Persistence.Internal.sanitizeFollowerAbandonment
+local Repository = require "PNC/Core/Commands/PNC_CompanionRecordRepository"
+local sanitize = Repository.NormalizeAbandonment
 local marker = sanitize({
     eventID = "social:follow_abandonment:npc-1:2:3000",
     ownerKey = "player:account:character-1",

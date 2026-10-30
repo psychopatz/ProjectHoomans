@@ -99,6 +99,34 @@
   },
   "path_owners": [
     {
+      "pattern": "shared/PNC/Core/Map/PNC_MapPresentation.lua",
+      "owner": "World"
+    },
+    {
+      "pattern": "shared/PNC/Core/Persistence/PNC_Persistence_CoreKnowledge.lua",
+      "owner": "Adapters"
+    },
+    {
+      "pattern": "shared/PNC/Core/Persistence/PNC_Persistence_CoreSocial.lua",
+      "owner": "Adapters"
+    },
+    {
+      "pattern": "shared/PNC/Core/Persistence/PNC_Persistence_CorePresentation.lua",
+      "owner": "Adapters"
+    },
+    {
+      "pattern": "shared/PNC/Core/Persistence/PNC_Persistence_CoreProvider.lua",
+      "owner": "Adapters"
+    },
+    {
+      "pattern": "shared/PNC/Core/Base/PNC_Types/PNC_Types_TacticalClasses.lua",
+      "owner": "Combat"
+    },
+    {
+      "pattern": "shared/PNC/Core/Base/PNC_Types*",
+      "owner": "Registry"
+    },
+    {
       "pattern": "shared/PNC/Core/Persistence/PNC_ModDataStore.lua",
       "owner": "PersistenceStorage"
     },
@@ -321,15 +349,20 @@
         "shared/PNC/Core/Presence/PNC_Presence.lua",
         "shared/PNC/Core/Presence/PNC_BodyLifecycle.lua",
         "shared/PNC/Core/Networking/PNC_MultiplayerBodyBinding.lua",
-        "client/PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime.lua"
+        "client/PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime.lua",
+        "shared/PNC/Core/Presence/PNC_BodyRepository.lua"
       ],
       "commands": [
         "Materialize",
-        "Abstract"
+        "Abstract",
+        "BodyRepository.RestoreCorpse",
+        "BodyRepository.RestoreHint"
       ],
       "queries": [
         "ShouldMaterialize",
-        "ShouldAbstract"
+        "ShouldAbstract",
+        "BodyRepository.NormalizeCorpse",
+        "BodyRepository.BuildHint"
       ],
       "repository": "body hints/leases via existing lifecycle persistence",
       "layers": [
@@ -413,7 +446,8 @@
       ],
       "commands": [
         "existing Health/Treatment/Revive runtime APIs",
-        "Repository.RestoreStamina"
+        "Repository.RestoreStamina",
+        "Repository.RestoreHealth (including saved alive/dead derivation)"
       ],
       "queries": [
         "Repository.Normalize",
@@ -436,11 +470,14 @@
         "shared/PNC/Core/Identity/PNC_PlayerCharacterConstants.lua",
         "shared/PNC/Core/Identity/PNC_PlayerCharacterTypes.lua",
         "shared/PNC/Core/Traits/PNC_NPCTraitContext.lua",
-        "shared/PNC/Core/Traits/PNC_StartingCompanionTraits.lua"
+        "shared/PNC/Core/Traits/PNC_StartingCompanionTraits.lua",
+        "shared/PNC/Core/Identity/PNC_IdentityRestoration.lua"
       ],
       "commands": [
         "existing Identity.ApplyRecordIdentity",
-        "Repository.RestoreVoiceProfile"
+        "Repository.RestoreVoiceProfile",
+        "IdentityRestoration.RestoreTraits",
+        "IdentityRestoration.RestoreRecord"
       ],
       "queries": [
         "Repository.Normalize",
@@ -451,6 +488,205 @@
       "repository": "Identity.Repository owns compact immutable profile schema and provenance",
       "layers": [
         "shared"
+      ]
+    },
+    "Skills": {
+      "owns": "skill progression, recruitment learning gate and authored base levels",
+      "namespace": "PNC.Skills",
+      "entries": [
+        "shared/PNC/Core/Skills/PNC_SkillsRepository.lua",
+        "shared/PNC/Core/Skills/PNC_Skills.lua",
+        "shared/PNC/Core/Skills/PNC_SkillCatalog.lua"
+      ],
+      "commands": [
+        "AddXP",
+        "SyncRecruitment",
+        "Repository.RestoreRecord"
+      ],
+      "queries": [
+        "GetLevel/BuildSnapshot",
+        "Repository.NormalizeBaseLevels",
+        "Repository.NormalizeProgression",
+        "Repository.SerializeRecord",
+        "Repository.SerializeBaseLevels"
+      ],
+      "repository": "Skills/PNC_SkillsRepository",
+      "layers": [
+        "shared",
+        "server",
+        "client"
+      ]
+    },
+    "Social": {
+      "owns": "closed social relationship/conduct schema; services retain authority",
+      "namespace": "PNC.Relationships",
+      "entries": [
+        "shared/PNC/Core/Relationships/PNC_RelationshipRepository.lua",
+        "shared/PNC/Core/Relationships/PNC_Relationships.lua",
+        "shared/PNC/Core/Relationships/PNC_SocialTraits.lua",
+        "shared/PNC/Core/Relationships/PNC_RelationshipKindRegistry.lua",
+        "shared/PNC/Core/Relationships/PNC_SocialProfileMath.lua",
+        "shared/PNC/Core/Social/PNC_SemanticSocialContext.lua"
+      ],
+      "commands": [
+        "existing RelationshipService/SocialEventService APIs",
+        "Repository.RestoreRecord"
+      ],
+      "queries": [
+        "Repository.Normalize",
+        "Repository.SerializeRecord",
+        "Repository.IsStaleGeneratedPersonality",
+        "SemanticSocialContext read projection"
+      ],
+      "repository": "Relationships/PNC_RelationshipRepository",
+      "layers": [
+        "shared",
+        "server",
+        "client"
+      ]
+    },
+    "Companions": {
+      "owns": "companion directives and independent departure/abandonment marker subdomains",
+      "namespace": null,
+      "entries": [
+        "shared/PNC/Core/Commands/PNC_CompanionRecordRepository.lua",
+        "shared/PNC/Core/Orders/PNC_OrderSystem.lua",
+        "client/PNC/Commands/PNC_ClientCompanionAuthority.lua",
+        "client/PNC/Commands/PNC_CompanionTargetResolver.lua",
+        "client/PNC/Commands/PNC_CompanionCommandPresentation.lua",
+        "client/PNC/Commands/PNC_CompanionCommandEmotes.lua"
+      ],
+      "commands": [
+        "existing authoritative companion/order services",
+        "RecordRepository.RestoreDirective",
+        "RecordRepository.RestoreMarkers",
+        "RecordRepository.SetTravelOrder"
+      ],
+      "queries": [
+        "RecordRepository.NormalizeOrder/SerializeOrder",
+        "RecordRepository.SerializePatrolPoints",
+        "RecordRepository.NormalizeAbandonment/NormalizeDeparture",
+        "RecordRepository.IsFollowing"
+      ],
+      "repository": "Commands/PNC_CompanionRecordRepository",
+      "layers": [
+        "shared",
+        "server",
+        "client"
+      ]
+    },
+    "Combat": {
+      "owns": "saved combat intent and combat policy subdomains",
+      "namespace": "PNC.Combat",
+      "entries": [
+        "shared/PNC/Core/Combat/PNC_CombatRecordRepository.lua",
+        "shared/PNC/Core/Combat/PNC_Combat.lua",
+        "shared/PNC/Core/Stealth/PNC_Stealth.lua",
+        "shared/PNC/Core/Base/PNC_Types/PNC_Types_TacticalClasses.lua"
+      ],
+      "commands": [
+        "existing authoritative combat APIs"
+      ],
+      "queries": [
+        "RecordRepository.NormalizeHostility",
+        "RecordRepository.NormalizeAttackType",
+        "existing typed tactical policies"
+      ],
+      "repository": "Combat/PNC_CombatRecordRepository",
+      "layers": [
+        "shared",
+        "server",
+        "client"
+      ]
+    },
+    "Registry": {
+      "owns": "durable NPC identity/directory and aggregate record construction; domain repositories retain schema meaning",
+      "namespace": "PNC.Registry",
+      "entries": [
+        "shared/PNC/Core/Registry/PNC_Registry.lua",
+        "shared/PNC/Core/Registry/PNC_DeathMarkers.lua",
+        "shared/PNC/Core/Base/PNC_Types.lua"
+      ],
+      "commands": [
+        "Registry lifecycle and dirty work"
+      ],
+      "queries": [
+        "Get",
+        "Types.NormalizeDefinition/NewRecord"
+      ],
+      "repository": "registry store; typed construction composes owning domain schemas",
+      "layers": [
+        "shared"
+      ]
+    },
+    "Travel": {
+      "owns": "travel route model and progression; companion directives retain their own owner",
+      "namespace": "PNC.Travel",
+      "entries": [
+        "shared/PNC/Core/Travel/PNC_Travel.lua",
+        "shared/PNC/Core/Travel/PNC_TravelRepository.lua"
+      ],
+      "commands": [
+        "Repository.RestoreRecord",
+        "existing Travel service APIs"
+      ],
+      "queries": [
+        "Model normalization/summary"
+      ],
+      "repository": "Travel.Repository restored through record envelope",
+      "layers": [
+        "shared",
+        "client"
+      ]
+    },
+    "Adapters": {
+      "owns": "optional Hoomans/Core actor interoperability and engine/mod integration adapters; owning Hoomans domains retain gameplay/body authority",
+      "namespace": null,
+      "entries": [
+        "shared/PNC/Core/Persistence/PNC_Persistence_CoreKnowledge.lua",
+        "shared/PNC/Core/Persistence/PNC_Persistence_CoreSocial.lua",
+        "shared/PNC/Core/Persistence/PNC_Persistence_CorePresentation.lua",
+        "shared/PNC/Core/Persistence/PNC_Persistence_CoreProvider.lua",
+        "shared/PNC/Core/Compatibility/PNC_Compatibility_IncomingDamage.lua",
+        "shared/PNC/Integrations/PNC_PsychopatzProfiler.lua",
+        "shared/PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_AnimPathCompat.lua"
+      ],
+      "commands": [
+        "CoreProvider explicit lease/body handoff",
+        "CoreKnowledge.CommitForPlayer (server authority)",
+        "CoreSocial.RecordAuthorizedEvent",
+        "existing integration hooks"
+      ],
+      "queries": [
+        "CoreKnowledge read-only dossier projection",
+        "CorePresentation map/portrait/nearby-talk projection",
+        "CoreProvider.Project"
+      ],
+      "repository": "none; compatibility projections and explicit handoff, not a second Hoomans domain store",
+      "layers": [
+        "shared",
+        "server",
+        "client"
+      ]
+    },
+    "Needs": {
+      "owns": "physiological/dynamic traits and condition model subdomains, plus domain needs stores/evaluation",
+      "namespace": "PNC.NeedsRepository",
+      "entries": [
+        "shared/PNC/Core/Needs/PNC_NeedsRecordRepository.lua",
+        "shared/PNC/Core/Needs/PNC_WorkFatigueGate.lua"
+      ],
+      "commands": [
+        "RecordRepository.RestoreRecord",
+        "existing domain services"
+      ],
+      "queries": [
+        "existing model/evaluation APIs"
+      ],
+      "repository": "shared record restoration; server NeedsRepository retains its distinct persistent store",
+      "layers": [
+        "shared",
+        "server"
       ]
     }
   },
@@ -484,5 +720,43 @@
   "registration_manifest": "REGISTRATIONS.json",
   "private_implementation_scopes": [
     "shared/PNC/Core/Health/Repository/*"
-  ]
+  ],
+  "compatibility_adapters": {
+    "shared/PNC/Core/Persistence/PNC_Persistence_CoreKnowledge.lua": {
+      "owner": "Adapters",
+      "public_namespace": "PNC.Persistence.CoreKnowledge",
+      "classification": "retained public optional adapter; historical namespace/path does not make it persistence schema or lifecycle authority"
+    },
+    "shared/PNC/Core/Persistence/PNC_Persistence_CoreSocial.lua": {
+      "owner": "Adapters",
+      "public_namespace": "PNC.Persistence.CoreSocial",
+      "classification": "retained public optional adapter; historical namespace/path does not make it persistence schema or lifecycle authority"
+    },
+    "shared/PNC/Core/Persistence/PNC_Persistence_CorePresentation.lua": {
+      "owner": "Adapters",
+      "public_namespace": "PNC.Persistence.CorePresentation",
+      "classification": "retained public optional adapter; historical namespace/path does not make it persistence schema or lifecycle authority"
+    },
+    "shared/PNC/Core/Persistence/PNC_Persistence_CoreProvider.lua": {
+      "owner": "Adapters",
+      "public_namespace": "PNC.Persistence.CoreProvider",
+      "classification": "retained public optional adapter; historical namespace/path does not make it persistence schema or lifecycle authority"
+    }
+  },
+  "schema_models": {
+    "shared/PNC/Core/Map/PNC_MapPresentation.lua": {
+      "owner": "World",
+      "namespace": "PNC.MapPresentation",
+      "owns": "record.mapPresentation visibility/knownBy/marker metadata; shared bounded data model, not a UI window",
+      "commands": [
+        "Apply",
+        "SetKnown"
+      ],
+      "queries": [
+        "Normalize",
+        "BuildSummary",
+        "IsVisibleFor"
+      ]
+    }
+  }
 }

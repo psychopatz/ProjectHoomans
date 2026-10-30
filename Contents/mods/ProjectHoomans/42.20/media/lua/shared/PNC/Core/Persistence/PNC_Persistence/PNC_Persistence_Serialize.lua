@@ -1,3 +1,4 @@
+local Codec = require "PNC/Core/Base/PNC_RecordCodec"
 PNC = PNC or {}
 PNC.Persistence = PNC.Persistence or {}
 PNC.Persistence.Internal = PNC.Persistence.Internal or {}
@@ -6,15 +7,17 @@ local InventoryRepository = require "PNC/Core/Inventory/PNC_InventoryRepository"
 
 local HealthRepository = require "PNC/Core/Health/PNC_HealthRepository"
 local IdentityRepository = require "PNC/Core/Identity/PNC_IdentityRepository"
+local RelationshipRepository = require "PNC/Core/Relationships/PNC_RelationshipRepository"
+local SkillsRepository = require "PNC/Core/Skills/PNC_SkillsRepository"
+local CompanionRecordRepository = require "PNC/Core/Commands/PNC_CompanionRecordRepository"
+local CombatRecordRepository = require "PNC/Core/Combat/PNC_CombatRecordRepository"
+local BodyRepository = require "PNC/Core/Presence/PNC_BodyRepository"
 local Persistence = PNC.Persistence
-local Internal = Persistence.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 local Identity = PNC.Identity
 local Types = PNC.Types
 local Inventory = PNC.Inventory
-local RelationshipTypes = PNC.RelationshipTypes
-local RelationshipMath = PNC.RelationshipMath
 local FactionTypes = PNC.FactionTypes
 local function serializeAuthoredTraits(record, field, authoredField, normalize)
     local traits
@@ -22,7 +25,7 @@ local function serializeAuthoredTraits(record, field, authoredField, normalize)
         return nil
     end
     traits = normalize(record[field])
-    return Internal.hasTableEntries(traits) and traits or nil
+    return Codec.hasTableEntries(traits) and traits or nil
 end
 
 local function serializeMapPresentation(record)
@@ -36,7 +39,7 @@ local function serializeMapPresentation(record)
     end
     presentation = PNC.MapPresentation.BuildSummary(record.mapPresentation)
     if presentation.visibility == PNC.MapPresentation.VISIBILITY_ALL
-        and not Internal.hasTableEntries(presentation.knownBy)
+        and not Codec.hasTableEntries(presentation.knownBy)
         and presentation.roleTag == nil
         and presentation.iconID == nil
         and presentation.revision == 0
@@ -44,106 +47,6 @@ local function serializeMapPresentation(record)
         return nil
     end
     return presentation
-end
-
-local function serializeSocial(record)
-    local social = Internal.sanitizeSocial(
-        record and record.social,
-        record and record.identitySeed,
-        record and record.archetypeID
-    )
-    -- Conduct scores are a projection of baseline + evidence. Keep the
-    -- evidence authoritative in the save and rebuild this view on load.
-    if social and social.conduct then
-        social.conduct.scores = nil
-    end
-    return social
-end
-
-local function prepareProgression(record)
-    local progression = Internal.sanitizeProgression(record.progression)
-    progression.recruited = record.recruited == true
-    if not Internal.hasTableEntries(progression.skillLevelDeltas) then
-        progression.skillLevelDeltas = nil
-    end
-    if not Internal.hasTableEntries(progression.skillXP) then
-        progression.skillXP = nil
-    end
-    if progression.recruited ~= true
-        and progression.skillLevelDeltas == nil
-        and progression.skillXP == nil
-    then
-        return nil
-    end
-    return progression
-end
-
-local function serializeSkillBaseLevels(record)
-    local levels
-    if not Types or not Types.Internal
-        or not Types.Internal.NormalizeSkillLevels
-    then
-        return nil
-    end
-    levels = Types.Internal.NormalizeSkillLevels(record.skillBaseLevels)
-    return Internal.hasTableEntries(levels) and levels or nil
-end
-
-local function addBodyHint(payload, record)
-    local runtime = record.runtime or {}
-    local startupBodyHint = runtime.startupBodyHint
-    local instanceID = record.liveBodyInstanceID
-        or startupBodyHint and startupBodyHint.instanceID
-        or runtime.lastLiveBodyInstanceID or nil
-    local populationID = record.liveBodyPopulationID
-        or startupBodyHint and startupBodyHint.populationId
-        or runtime.lastLiveBodyPopulationID or nil
-    local onlineID = record.liveBodyOnlineID
-        or startupBodyHint and startupBodyHint.onlineID
-        or runtime.lastLiveBodyOnlineID or nil
-    local lease = runtime.bodyLease
-        or startupBodyHint and startupBodyHint.lease
-        or runtime.lastLiveBodyLease or nil
-    local wasLive = record.presenceState == Const.PRESENCE_LIVE
-        or runtime.startupRehydrateExpected == true
-        or startupBodyHint and startupBodyHint.wasLive == true
-    if instanceID == nil and populationID == nil
-        and wasLive ~= true
-    then
-        return
-    end
-    payload.bodyHint = {
-        instanceID = instanceID,
-        wasLive = wasLive == true,
-        onlineID = onlineID,
-        lease = lease,
-        populationId = populationID,
-        x = Internal.normalizeNumber(
-            startupBodyHint and startupBodyHint.x
-                or runtime.lastLiveBodyX or record.x,
-            0
-        ),
-        y = Internal.normalizeNumber(
-            startupBodyHint and startupBodyHint.y
-                or runtime.lastLiveBodyY or record.y,
-            0
-        ),
-        z = Internal.normalizeNumber(
-            startupBodyHint and startupBodyHint.z
-                or runtime.lastLiveBodyZ or record.z,
-            0
-        ),
-    }
-end
-
-local function serializeOrderSpec(record)
-    local order = record and record.orderSpec or nil
-    if type(order) ~= "table"
-        or tostring(order.kind or "") == "facility_activity"
-    then
-        return nil
-    end
-    return Internal.sanitizeOrderSpec(order, record)
 end
 
 local function serializeSemanticActionPlan(record)
@@ -185,34 +88,35 @@ function Persistence.SerializeRecord(record)
     appearance = type(record.appearance) == "table"
         and Core.DeepCopy(record.appearance) or nil
     appearanceContract = IdentityRepository.BuildAppearanceContract(record)
-    progression = prepareProgression(record)
+    progression = SkillsRepository.SerializeRecord(record)
     inventoryPayload = InventoryRepository.SerializeRecord(record)
     recipeKnowledge = PNC.RecipeKnowledge
         and PNC.RecipeKnowledge.Serialize(record) or nil
     payload = {
         schemaVersion = Const.PERSISTENCE_VERSION,
-        recordRevision = math.max(0, math.floor(Internal.normalizeNumber(record.recordRevision, 0))),
+        recordRevision = math.max(0, math.floor(Codec.normalizeNumber(record.recordRevision, 0))),
         repairVersions = Persistence.Repairs
             and Persistence.Repairs.CopyVersions(
                 record.persistenceRepairVersions
             ) or nil,
         id = record.id,
-        uniqueDefinitionId = Internal.normalizeString(
+        uniqueDefinitionId = Codec.normalizeString(
             record.uniqueDefinitionId
         ),
         uniqueDefinitionVersion = tonumber(record.uniqueDefinitionVersion)
             and math.max(1, math.floor(tonumber(record.uniqueDefinitionVersion)))
             or nil,
-        inventoryTemplateRef = Internal.normalizeString(
+        inventoryTemplateRef = Codec.normalizeString(
             record.inventoryTemplateRef
         ),
         startingItems = not record.inventoryTemplateRef
-            and Internal.hasTableEntries(record.startingItems)
+            and Codec.hasTableEntries(record.startingItems)
             and Core.DeepCopy(record.startingItems) or nil,
-        skillBaseLevels = serializeSkillBaseLevels(record),
+        skillBaseLevels = Types and Types.NormalizeSkillLevels
+            and SkillsRepository.SerializeBaseLevels(record) or nil,
         tacticalClass = record.tacticalClass,
-        ownerUsername = Internal.normalizeString(record.ownerUsername),
-        ownerCharacterUUID = Internal.normalizeString(
+        ownerUsername = Codec.normalizeString(record.ownerUsername),
+        ownerCharacterUUID = Codec.normalizeString(
             record.ownerCharacterUUID
         ),
         identity = identity,
@@ -220,53 +124,51 @@ function Persistence.SerializeRecord(record)
         appearanceContract = appearanceContract,
         m = MemoryRepository.SerializeRecord(record),
         position = {
-            x = Internal.normalizeNumber(record.x, 0),
-            y = Internal.normalizeNumber(record.y, 0),
-            z = Internal.normalizeNumber(record.z, 0),
+            x = Codec.normalizeNumber(record.x, 0),
+            y = Codec.normalizeNumber(record.y, 0),
+            z = Codec.normalizeNumber(record.z, 0),
         },
         spawn = {
-            x = Internal.normalizeNumber(record.spawnX, record.x),
-            y = Internal.normalizeNumber(record.spawnY, record.y),
-            z = Internal.normalizeNumber(record.spawnZ, record.z),
+            x = Codec.normalizeNumber(record.spawnX, record.x),
+            y = Codec.normalizeNumber(record.spawnY, record.y),
+            z = Codec.normalizeNumber(record.spawnZ, record.z),
         },
         anchor = {
-            x = Internal.normalizeNumber(record.anchorX, record.x),
-            y = Internal.normalizeNumber(record.anchorY, record.y),
-            z = Internal.normalizeNumber(record.anchorZ, record.z),
+            x = Codec.normalizeNumber(record.anchorX, record.x),
+            y = Codec.normalizeNumber(record.anchorY, record.y),
+            z = Codec.normalizeNumber(record.anchorZ, record.z),
         },
-        orderSpec = serializeOrderSpec(record),
-        patrolPoints = Internal.serializePatrolPoints(record),
+        orderSpec = CompanionRecordRepository.SerializeOrder(record),
+        patrolPoints = CompanionRecordRepository.SerializePatrolPoints(record),
         patrolIndex = record.orderSpec
                 and tostring(record.orderSpec.kind or "")
                     == tostring(Const.ORDER_PATROL or "patrol")
-            and math.max(1, math.floor(Internal.normalizeNumber(record.patrolIndex, 1)))
+            and math.max(1, math.floor(Codec.normalizeNumber(record.patrolIndex, 1)))
             or nil,
-        hostility = Internal.sanitizeHostility(record.hostility, record.tacticalClass),
+        hostility = CombatRecordRepository.NormalizeHostility(record.hostility, record.tacticalClass),
         health = HealthRepository.Serialize(record.health, record.health and record.health.max or Const.DEFAULT_HP_MAX),
         stamina = HealthRepository.SerializeStamina(record.stamina),
         weaponMode = tostring(record.weaponMode or "melee"),
-        attackType = PNC.Types and PNC.Types.NormalizeAttackType
-            and PNC.Types.NormalizeAttackType(record.attackType, record.weaponMode)
-            or tostring(record.attackType or record.weaponMode or "melee"),
-        equipmentSpawnMode = Internal.normalizeString(record.equipmentSpawnMode),
-        equipmentPoolID = Internal.normalizeString(record.equipmentPoolID) or "Default",
+        attackType = CombatRecordRepository.NormalizeAttackType(record.attackType, record.weaponMode),
+        equipmentSpawnMode = Codec.normalizeString(record.equipmentSpawnMode),
+        equipmentPoolID = Codec.normalizeString(record.equipmentPoolID) or "Default",
         equipment = {
-            primaryFullType = Internal.normalizeString(record.equipment and record.equipment.primaryFullType),
-            secondaryFullType = Internal.normalizeString(record.equipment and record.equipment.secondaryFullType),
-            worn = Internal.copyStringMap(record.equipment and record.equipment.worn),
+            primaryFullType = Codec.normalizeString(record.equipment and record.equipment.primaryFullType),
+            secondaryFullType = Codec.normalizeString(record.equipment and record.equipment.secondaryFullType),
+            worn = Codec.copyStringMap(record.equipment and record.equipment.worn),
             wornVisuals = record.equipment
                 and record.equipment.wornVisuals
                 and Core.DeepCopy(record.equipment.wornVisuals)
                 or {},
-            attached = Internal.copyStringMap(record.equipment and record.equipment.attached),
+            attached = Codec.copyStringMap(record.equipment and record.equipment.attached),
         },
         allowedJobs = type(record.allowedJobs) == "table"
             and Core.DeepCopy(record.allowedJobs) or {},
         jobPriorities = type(record.jobPriorities) == "table"
-                and Internal.hasTableEntries(record.jobPriorities)
+                and Codec.hasTableEntries(record.jobPriorities)
             and Core.DeepCopy(record.jobPriorities) or nil,
         inventory = inventoryPayload,
-        social = serializeSocial(record),
+        social = RelationshipRepository.SerializeRecord(record),
         semanticCognition = PNC.Semantics
             and PNC.Semantics.CognitionProjection
             and PNC.Semantics.CognitionProjection.Serialize(
@@ -274,10 +176,10 @@ function Persistence.SerializeRecord(record)
                 record.id
             ) or nil,
         semanticActionPlan = serializeSemanticActionPlan(record),
-        followerAbandonment = Internal.sanitizeFollowerAbandonment(
+        followerAbandonment = CompanionRecordRepository.NormalizeAbandonment(
             record.followerAbandonment
         ),
-        colonistDeparture = Internal.sanitizeColonistDeparture(
+        colonistDeparture = CompanionRecordRepository.NormalizeDeparture(
             record.colonistDeparture
         ),
         affiliation = FactionTypes
@@ -286,7 +188,7 @@ function Persistence.SerializeRecord(record)
             ) or nil,
         progression = progression,
         recipeKnowledge = recipeKnowledge,
-        corpse = Internal.sanitizeCorpse(record.corpse, record),
+        corpse = BodyRepository.NormalizeCorpse(record.corpse, record),
         travel = PNC.Travel
             and PNC.Travel.Model
             and PNC.Travel.Model.BuildSummary
@@ -322,6 +224,6 @@ function Persistence.SerializeRecord(record)
         npcJournal = PNC.Journals and PNC.Journals.ExportNPC
             and PNC.Journals.ExportNPC(record) or nil,
     }
-    addBodyHint(payload, record)
+    payload.bodyHint = BodyRepository.BuildHint(record)
     return payload
 end

@@ -2,11 +2,17 @@ PNC = PNC or {}
 PNC.Persistence = PNC.Persistence or {}
 PNC.Persistence.Internal = PNC.Persistence.Internal or {}
 
-require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives"
 require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 require "PNC/Core/Health/PNC_HealthRepository"
 require "PNC/Core/Identity/PNC_IdentityRepository"
-require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState"
+require "PNC/Core/Identity/PNC_IdentityRestoration"
+require "PNC/Core/Needs/PNC_NeedsRecordRepository"
+require "PNC/Core/Relationships/PNC_RelationshipRepository"
+require "PNC/Core/Skills/PNC_SkillsRepository"
+require "PNC/Core/Commands/PNC_CompanionRecordRepository"
+require "PNC/Core/Combat/PNC_CombatRecordRepository"
+require "PNC/Core/Presence/PNC_BodyRepository"
+require "PNC/Core/Travel/PNC_TravelRepository"
 require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Runtime"
 require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Repairs"
 require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize"

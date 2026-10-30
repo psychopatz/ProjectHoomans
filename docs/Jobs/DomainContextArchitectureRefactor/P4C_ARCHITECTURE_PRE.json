@@ -1,0 +1,71 @@
+{
+  "revision": "fa5b2a2d1bf912b7469184a773be0696a0716d61",
+  "source": [
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives.lua",
+      "bytes": 8332,
+      "lines": 189,
+      "sha256": "21aedefb43fde57b283fd68ec54718fbc456336bd7d807bbd7567a545c097658"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState.lua",
+      "bytes": 6905,
+      "lines": 177,
+      "sha256": "41d1507fcd893d27a367cd0dd4bc85fc1c6f0aeb8b728e59711fe2697822465c"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize.lua",
+      "bytes": 13198,
+      "lines": 327,
+      "sha256": "b6c01cf621d9aacbce4cac4d0229790c23a9e484a8a3df9e9a8c94f1334e87a4"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Deserialize.lua",
+      "bytes": 10314,
+      "lines": 251,
+      "sha256": "7f671543a01c57225accc6d86027309bd74c777ec357c66a057750551ee4f30c"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_DeserializeFinalization.lua",
+      "bytes": 8696,
+      "lines": 225,
+      "sha256": "8613a5fd6cfdabc1b900720ca9ed0cae9d8bdd935120ebcbbf0c1bceaebf5961"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Runtime.lua",
+      "bytes": 2713,
+      "lines": 85,
+      "sha256": "b47418d70352ace5e18c55e2b9dc854a25443533e162a8833be15166a5e8e9c3"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Collections.lua",
+      "bytes": 1196,
+      "lines": 47,
+      "sha256": "62f3b657763dd8d0d4c6f43d3093b94a3d189252e2ceb916510565342e266478"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Base/PNC_Types/PNC_Types_Normalization.lua",
+      "bytes": 2741,
+      "lines": 95,
+      "sha256": "14149bd45330da28ec20dea8b21b2d84ce3b99cd614cc595af2de0eadfc749bf"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Base/PNC_Types/PNC_Types_Definition.lua",
+      "bytes": 5516,
+      "lines": 116,
+      "sha256": "0c7306f36f47e7632852377bb9b6f4e63f2960ac0affbe6c52b8bffc4c0ef2ed"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_UniqueNPCs.lua",
+      "bytes": 13080,
+      "lines": 354,
+      "sha256": "e7bae66b013c7444a4a324bbf0b195a5c51396c9ca20a89eec41abda43685fd1"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Skills/PNC_Skills.lua",
+      "bytes": 9050,
+      "lines": 262,
+      "sha256": "de039bce95be5232c79bc7b6c3586af973478df42e11c305865e301a92794730"
+    }
+  ]
+}

@@ -61,7 +61,7 @@ function Types.NormalizeDefinition(definition)
         ),
         startingItems = type(def.startingItems) == "table"
             and PNC.Core.DeepCopy(def.startingItems) or nil,
-        skillBaseLevels = Internal.NormalizeSkillLevels(
+        skillBaseLevels = Types.NormalizeSkillLevels(
             def.skillBaseLevels or def.skillLevels
         ),
         orderSpec = def.orderSpec,

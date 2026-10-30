@@ -6,10 +6,14 @@ local source = T.read(
     "PNC/Core/Persistence/PNC_Persistence.lua"
 )
 local providers = {
-    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives",
     "PNC/Core/Health/PNC_HealthRepository",
     "PNC/Core/Identity/PNC_IdentityRepository",
-    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState",
+    "PNC/Core/Relationships/PNC_RelationshipRepository",
+    "PNC/Core/Skills/PNC_SkillsRepository",
+    "PNC/Core/Commands/PNC_CompanionRecordRepository",
+    "PNC/Core/Combat/PNC_CombatRecordRepository",
+    "PNC/Core/Presence/PNC_BodyRepository",
+    "PNC/Core/Travel/PNC_TravelRepository",
     "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Runtime",
     "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Repairs",
     "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize",

@@ -48,6 +48,9 @@ T.falsy(Health.SerializeStamina({ current = 100, max = 100 }),
 local record = {}
 Health.RestoreStamina({ current = 40, max = 100 }, record)
 T.equal(record.stamina.current, 40, "Health owns stamina restoration")
+Health.RestoreHealth(record, { current = 0, state = "corpse" })
+T.equal(record.alive, false, "Health owns saved alive/dead derivation")
+T.equal(record.health.state, "corpse", "health restoration preserves the saved terminal state")
 
 local Identity = require "PNC/Core/Identity/PNC_IdentityRepository"
 local profile = {

@@ -1,6 +1,6 @@
 # Progress — Domain & Context Architecture Refactor
 
-**Status:** IN PROGRESS — P0–P3 accepted; P4 storage, Memory/Inventory and Health/Identity repositories validated. P4 remains active.
+**Status:** IN PROGRESS — P0–P4 developer gates accepted; P5 Conversation/Semantics is next.
 
 ## Parent objective
 
@@ -12,7 +12,7 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
 - Existing `main` only; planning baseline `15cadee70be11b790ce4c48bfb7bd51badd8233b`.
   Initially clean, origin fetched, ahead 7 / behind 0. No concurrent edits found.
 - Accepted: P0 `4205a1d7`, P1 `24d61abc`, Inventory pilot `b4535421`,
-  tooling-baseline evidence `19749cef`, ordered composition `55049e99`, first persistence slice `034766f9`.
+  tooling-baseline evidence `19749cef`, ordered composition `55049e99`, first persistence slice `034766f9`, Health/Identity `fa5b2a2d`; remaining P4 schema/restoration slice validated against that revision.
 - MCP project `project-hoomans`; explicitly refreshed against actual source.
   Statement-form IMPORTS and heuristic alias/builtin resolution need the
   documented literal-import/source fallback. Matching HEAD alone is insufficient.
@@ -52,11 +52,11 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
   Method bodies match pre-change source; obsolete health paths removed, no shims.
   Health/stamina context: 43,166 → 17,694 bytes at the same four-file count.
   Identity: 21,594 → 14,144 bytes, one additional generic-helper file explained.
-- Latest full isolated Lua: **980/980**, 4 workers, 9.28 seconds.
-  Focused Health/Identity/persistence: **51/51**; prior restart/binding/knowledge
-  matrix **42/42**; diagnostic Python **22/22**. NPC tooling baseline: **6/6**.
+- Latest full isolated Lua: **981/981**, 4 workers, 10.63 seconds.
+  Focused owning-domain/restart/binding matrix: **118/118**; diagnostic Python
+  **22/22**; NPC tooling **6/6**.
 - Changed-runtime installed PZ Kahlua: P2 **36/36**, P3 **54/54**, first P4 slice
-  **34/34**, Health/Identity **11/11**; static Kahlua zero errors. Diff checks clean.
+  **34/34**, Health/Identity **11/11**, remaining schemas **19/19**; static Kahlua zero errors. Diff checks clean.
 - Immutable P1 semantic-tooling baseline: 194 modules, 124 pass, 65 fail,
   5 GUI-related timeouts; 764 reported tests, 2 skips. In-process discovery
   aborted in Tk cleanup (exit 134). These pre-existing failures remain final
@@ -64,23 +64,34 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
   transport and distinguish it from gameplay dispatch before repairing assertions.
 - No native Project Zomboid launched; no Workshop publication.
 
+- P4 completion: `P4C_VALIDATION.json`, `P4C_MCP_TRACES.json` and
+  `PERSISTENCE_OWNERSHIP.md`. Social, progression, companion directives, carrier
+  proof, traits and travel restoration use public owning contracts. Fourteen
+  moved method bodies and carrier/trait conditions retain previous logic.
+  Mixed private Primitives/RecordState providers and unused camp serializer
+  removed; optional Core interfaces retained as explicit public adapters.
+  Carrier-proof context: 4 files / 32,132 bytes → 2 / 6,658; native admission
+  policy is a separate boundary, preserved by the binding/restart matrix.
+
 ## Next mandatory chunk
 
-**Continue P4B/C — Remaining domain codec ownership.**
+**Continue P5 — Conversation and Semantics domain capsules.**
 
-1. Review/migrate remaining social/progression/companion order and body schema
-   helpers through owning public contracts. Classify optional Core adapter
-   namespaces without creating artificial files. Health/Identity are validated.
-2. Preserve exact formats, bounds, lazy hydration, migration/reset policy,
-   startup body hints, Follow travel reconciliation and domain Save ordering.
-3. Remove superseded private imports/aliases where safe; classify retained
-   compatibility paths. Avoid duplicate canonical state and service locators.
-4. Validate owning focused suites, dependencies, installed Kahlua, probes and diff;
-   only accept P4 after its complete roadmap gate is met, then continue P5.
+1. Establish current graph/source ownership, public entry/callers, inbound and
+   outbound dependencies, affected tests and fixed conversation probe evidence.
+2. Confirm durable Lifecycle/Authority/Presentation and interpretation/policy/
+   social/realization/diagnostics subdomains before changing architecture.
+3. Migrate foreign implementation access and remove unjustified cross-domain
+   cycles; preserve semantic IR, suggestions, social director, observatory,
+   optional LLM and SP/MP authority. Consolidate only with retrieval evidence.
+4. Repair/classify semantic-tooling baseline failures and GUI timeouts without
+   suppressing lifecycle fact transport to satisfy gameplay-dispatch assertions.
+5. Validate focused/full suites, graph/dependency guards, installed Kahlua,
+   retrieval probes and diff; update this current state and continue P6–P8.
 
 ## Remaining gates
 
-Remaining P4 work and P5–P8/final acceptance are mandatory, including semantic
+P5–P8/final acceptance are mandatory, including semantic
 Python failures/timeouts. M12 body-binding native acceptance remains user-owned;
 its identity/lease, loaded-envelope, restart and visual-authority contracts must
 be preserved. Historical logs and root `AGENTS.md` remain unchanged.

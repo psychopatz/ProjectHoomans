@@ -2,6 +2,7 @@
 PNC = PNC or {}
 PNC.Health = PNC.Health or {}
 local Health = PNC.Health
+local Const = PNC.Const
 local Body = require "PNC/Core/Health/Repository/PNC_HealthBodyCodec"
 local Compact = require "PNC/Core/Health/Repository/PNC_HealthCompactCodec"
 local Codec = require "PNC/Core/Base/PNC_RecordCodec"
@@ -17,6 +18,13 @@ end
 
 function Repository.NormalizeBody(raw)
     return Body.sanitizeHealthBody(raw)
+end
+
+function Repository.RestoreHealth(record, raw)
+    record.health = Repository.Normalize(raw,
+        record.health and record.health.max or Const.DEFAULT_HP_MAX)
+    record.alive = tostring(record.health.state or "") ~= "dead"
+        and tostring(record.health.state or "") ~= "corpse"
 end
 
 function Repository.RestoreStamina(rawStamina, record)
