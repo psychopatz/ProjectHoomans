@@ -700,6 +700,11 @@
       "legacy_path": "client/PNC/UI/PNC_NPCTypePalette.lua",
       "module": "PNC/Presentation/PNC_NPCTypePalette",
       "reason": "Pure forwarder preserves one public palette object; owner is Presentation, and import execution order is unchanged."
+    },
+    {
+      "legacy_path": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel.lua",
+      "module": "PNC/Identity/PNC_UniqueNPCDraft",
+      "reason": "Permanent stable editor-model require path, same public table and methods; internal providers and storage callers use canonical Identity paths."
     }
   ]
 }

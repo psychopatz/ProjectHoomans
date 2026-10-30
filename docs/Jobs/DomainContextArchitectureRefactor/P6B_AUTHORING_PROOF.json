@@ -1,0 +1,118 @@
+{
+  "stage": "P6B Identity authoring capsule",
+  "source_revision_before": "24b757f30a56285c3bef5fe00d8afef213d15ea8",
+  "preservation": [
+    {
+      "from": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel.lua",
+      "to": "client/PNC/Identity/PNC_UniqueNPCDraft.lua",
+      "bytes_before": 593,
+      "lines_before": 10,
+      "source_sha256_before": "4c8761d34b8053e8c123f5e853a0f78bc0b99f4eaab2f9a324d31ee061c1b421",
+      "only_declared_import_rewrites": true,
+      "source_sha256_after": "b26b8add967ca42216941e46e6e35ceef03ef0e5a78bbed26d4f22398f3e4269"
+    },
+    {
+      "from": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorStorage.lua",
+      "to": "client/PNC/Identity/PNC_UniqueNPCDefinitionStore.lua",
+      "bytes_before": 4105,
+      "lines_before": 126,
+      "source_sha256_before": "c9c19801dfe120481816db3181ec337f835bc7f694bd8b1788cb4a2434b811bd",
+      "only_declared_import_rewrites": true,
+      "source_sha256_after": "5d46e473fdfe12cc3a2781550d939e137a896bb4b8595dabc6b8f9b6d534f001"
+    },
+    {
+      "from": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel_Core.lua",
+      "to": "client/PNC/Identity/UniqueNPCDraft/PNC_UniqueNPCDraft_Core.lua",
+      "bytes_before": 10880,
+      "lines_before": 314,
+      "source_sha256_before": "de70080a4a9cdb242602d5a5ce942ee5645f5b68c5bfe52ae89cf42fe520904c",
+      "only_declared_import_rewrites": true,
+      "source_sha256_after": "de70080a4a9cdb242602d5a5ce942ee5645f5b68c5bfe52ae89cf42fe520904c"
+    },
+    {
+      "from": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel_Definition.lua",
+      "to": "client/PNC/Identity/UniqueNPCDraft/PNC_UniqueNPCDraft_Definition.lua",
+      "bytes_before": 5933,
+      "lines_before": 134,
+      "source_sha256_before": "3eb2aee7661c417282349f8c6c557c8782b134e4b63673a50b683d442e74ffd7",
+      "only_declared_import_rewrites": true,
+      "source_sha256_after": "3eb2aee7661c417282349f8c6c557c8782b134e4b63673a50b683d442e74ffd7"
+    },
+    {
+      "from": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel_Validation.lua",
+      "to": "client/PNC/Identity/UniqueNPCDraft/PNC_UniqueNPCDraft_Validation.lua",
+      "bytes_before": 8644,
+      "lines_before": 249,
+      "source_sha256_before": "f85729e815fa0872282f01d64f5c86d6f14d89dda7ee6211146d73e4a68db4d0",
+      "only_declared_import_rewrites": true,
+      "source_sha256_after": "b588fa8c24ef44b7726d05211a54931585816cd875b2754125bfccf7c6b2df7b"
+    },
+    {
+      "from": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel_Runtime.lua",
+      "to": "client/PNC/Identity/UniqueNPCDraft/PNC_UniqueNPCDraft_Runtime.lua",
+      "bytes_before": 11353,
+      "lines_before": 282,
+      "source_sha256_before": "f6751d4877b6dd1aa96a097e1fca43e0b1ef7e2af7f2b8a3972a35a3643856c7",
+      "only_declared_import_rewrites": true,
+      "source_sha256_after": "f6751d4877b6dd1aa96a097e1fca43e0b1ef7e2af7f2b8a3972a35a3643856c7"
+    },
+    {
+      "from": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel_Presentation.lua",
+      "to": "client/PNC/Identity/UniqueNPCDraft/PNC_UniqueNPCDraft_Presentation.lua",
+      "bytes_before": 3581,
+      "lines_before": 102,
+      "source_sha256_before": "fa3a4ffb798c66c203e05fdaaac450cb71570af06120ac9754ed535189dbb139",
+      "only_declared_import_rewrites": true,
+      "source_sha256_after": "fa3a4ffb798c66c203e05fdaaac450cb71570af06120ac9754ed535189dbb139"
+    }
+  ],
+  "pre_mcp": {
+    "project": "project-hoomans",
+    "generation": "2026-10-30T22:42:55Z",
+    "tier": 2,
+    "coverage": "10 source/test paths metadata-match; no recorded gaps",
+    "trace_limitation": "Save alias heuristic falsely joins telemetry, Opera and its test. Literal fallback confirms Unique NPC window caller; public draft callers are editor window, appearance window and local inventory draft endpoint."
+  },
+  "owner_contract": "Identity owns authored definition meaning, draft validation/preview and local repository. UI owns widgets/interaction and window state. Existing global public model/storage tables remain identical; no duplicate state. Draft runtime records have nil id and _editorDraft=true and never enter authoritative Registry.",
+  "compatibility": "Stable model require entry retained as pure forwarding alias; five old private provider paths and private storage path removed after maintained caller migration.",
+  "retrieval": "One canonical authoring entry with five semantically distinct providers retained. No source-byte reduction claimed; no UI window needed to explain save/validate/preview.",
+  "focused_lua": {
+    "passed": 7,
+    "total": 7
+  },
+  "full_lua": {
+    "passed": 983,
+    "total": 983,
+    "seconds": 12.54
+  },
+  "kahlua": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 11,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  },
+  "static_kahlua": {
+    "files": 11,
+    "errors": 0
+  },
+  "guard": {
+    "issues": 74,
+    "new": 0,
+    "resolved": 119
+  },
+  "bootstrap": "7 expanded roots and barriers unchanged; 3 pure compatibility imports verified",
+  "post_mcp": {
+    "generation": "2026-10-30T22:47:09Z",
+    "material_paths": 13,
+    "coverage": "metadata-match, no recorded gaps",
+    "Save_outbound_unchanged": true,
+    "inbound": "0; dynamic/statement imports need literal fallback. Only window Actions invokes Unique NPC Storage.Save; public namespace unchanged."
+  },
+  "fixed_probe_source_hashes_unchanged": 33
+}

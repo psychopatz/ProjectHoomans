@@ -9,7 +9,7 @@ local EditorModel
 
 local function ensureEditorModel()
     if not EditorModel then
-        EditorModel = require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel"
+        EditorModel = require "PNC/Identity/PNC_UniqueNPCDraft"
     end
     return EditorModel
 end

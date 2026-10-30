@@ -1,6 +1,6 @@
 # Progress — Domain & Context Architecture Refactor
 
-**Status:** IN PROGRESS. P0–P4 developer gates accepted; P5 is active. P6 has begun with a bounded storage slice; P5/P6 review, P7–P8
+**Status:** IN PROGRESS. P0–P4 developer gates accepted; P5 is active. P6 has begun with authoring/storage slices; P5/P6 review, P7–P8
 and final acceptance remain mandatory. Continue automatically after each chunk.
 
 ## Objective and repository
@@ -34,6 +34,10 @@ literal/source fallback; clean coverage is a best-effort signal.
 - NPC type palette queries belong to Presentation. Maintained callers use the
   canonical Presentation entry; the old public UI path is a pure compatibility
   forwarder returning the same palette/color table. Function bytes are unchanged.
+- Identity authoring now exposes draft/definition-store entries outside UI;
+  five cohesive internal providers remain. Preview records stay unregistered.
+  Stable editor-model require is a pure same-table forwarder; old private
+  provider/storage paths are removed. See `UI_OWNERSHIP.md`.
 - Persistence, Storage and Conversation are outside the current owner SCCs.
   Remaining groups: Activities/Production; Companions/Knowledge/Networking/UI;
   Identity/Semantics/Social/World. Review their real paths individually.
@@ -57,14 +61,14 @@ Seven fixed probes: **33 files / 4,501 lines / 167,228 bytes**, versus P0's
 
 ## Current validation and limitations
 
-- Full isolated Lua: **983/983**, 4 workers, 8.81 seconds.
+- Full isolated Lua: **983/983**, 4 workers, 12.54 seconds.
 - Palette/Conversation/composition matrix: **28/28**; debug routes **2/2**;
   current semantic parity/translation Python **6/6**; dependency/bootstrap Python
   **22/22**. Prior session/authority/translation slice: **16/16** Python.
 - Puppet Opera definition storage moved byte-for-byte from UI to its owning
   client domain. Two maintained callers use its public entry; no UI-path shim
   retained. Cold storage/schema/error matrix and Opera suite pass **19/19**.
-- Changed runtime installed-PZ Kahlua: **3/3** for the current Opera slice (prior palette slice 8/8); static zero errors. Bootstrap
+- Changed runtime installed-PZ Kahlua: **11/11** for current Identity slice (Opera 3/3, palette 8/8); static zero errors. Bootstrap
   ordering and diff checks pass. No game execution is implied by compiler checks.
 - Full semantic-tooling evidence remains explicit: P5B's 195 isolated modules
   yielded 155 pass / 40 fail, no timeouts, 786 tests. Focused inspector and
@@ -88,7 +92,7 @@ Seven fixed probes: **33 files / 4,501 lines / 167,228 bytes**, versus P0's
 
 Current contracts: `DOMAIN_CONTRACTS.json`, `SEMANTIC_SURFACES.md`,
 `PERSISTENCE_OWNERSHIP.md`, `COMPOSITION_SEAMS.md`, `INVENTORY_PILOT.md`,
-`OWNERSHIP.md`, `CYCLE_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
+`OWNERSHIP.md`, `UI_OWNERSHIP.md`, `CYCLE_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
 job-local reports and Git. Historical giant logs are not required reading.
 
 ## Next mandatory chunk

@@ -1,7 +1,7 @@
 -- Local, client-only persistence for editor drafts and produced definitions.
 -- JSON keeps these files data-only and safe to share with other clients/mods.
 
-require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel"
+require "PNC/Identity/PNC_UniqueNPCDraft"
 require "PNC/Core/Definitions/PNC_DefinitionDatabase"
 
 PNC = PNC or {}

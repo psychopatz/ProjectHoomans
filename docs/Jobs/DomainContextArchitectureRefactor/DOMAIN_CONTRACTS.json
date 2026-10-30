@@ -100,6 +100,10 @@
   },
   "path_owners": [
     {
+      "pattern": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel.lua",
+      "owner": "Identity"
+    },
+    {
       "pattern": "client/PNC/UI/PNC_NPCTypePalette.lua",
       "owner": "Presentation"
     },
@@ -557,23 +561,31 @@
         "shared/PNC/Core/Identity/PNC_PlayerCharacterTypes.lua",
         "shared/PNC/Core/Traits/PNC_NPCTraitContext.lua",
         "shared/PNC/Core/Traits/PNC_StartingCompanionTraits.lua",
-        "shared/PNC/Core/Identity/PNC_IdentityRestoration.lua"
+        "shared/PNC/Core/Identity/PNC_IdentityRestoration.lua",
+        "client/PNC/Identity/PNC_UniqueNPCDraft.lua",
+        "client/PNC/Identity/PNC_UniqueNPCDefinitionStore.lua",
+        "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel.lua"
       ],
       "commands": [
         "existing Identity.ApplyRecordIdentity",
         "Repository.RestoreVoiceProfile",
         "IdentityRestoration.RestoreTraits",
-        "IdentityRestoration.RestoreRecord"
+        "IdentityRestoration.RestoreRecord",
+        "UniqueNPCEditorModel draft operations (local preview record only)",
+        "UniqueNPCEditorStorage.Save (local authored definition, never registration/spawn)"
       ],
       "queries": [
         "Repository.Normalize",
         "Repository.BuildAppearanceContract",
         "Repository.ValidateRecord",
-        "Repository.NormalizeBackstoryMetadata"
+        "Repository.NormalizeBackstoryMetadata",
+        "UniqueNPCEditorModel.BuildDefinition/Validate/BuildPortraitSpec",
+        "UniqueNPCEditorStorage.LoadFile/List"
       ],
       "repository": "Identity.Repository owns compact immutable profile schema and provenance",
       "layers": [
-        "shared"
+        "shared",
+        "client"
       ]
     },
     "Skills": {
@@ -850,11 +862,13 @@
     "PNC.Semantics.InteractionLifecycle.Internal": "Semantics",
     "PNC.Conversation.Lifecycle.Internal": "Conversation",
     "PNC.ConversationScene.Internal": "Conversation",
-    "PNC.Semantics.DialogueInput.ActiveView": "Semantics"
+    "PNC.Semantics.DialogueInput.ActiveView": "Semantics",
+    "PNC.UniqueNPCEditorModel.Internal": "Identity"
   },
   "registration_manifest": "REGISTRATIONS.json",
   "private_implementation_scopes": [
-    "shared/PNC/Core/Health/Repository/*"
+    "shared/PNC/Core/Health/Repository/*",
+    "client/PNC/Identity/UniqueNPCDraft/*"
   ],
   "compatibility_adapters": {
     "shared/PNC/Core/Persistence/PNC_Persistence_CoreKnowledge.lua": {

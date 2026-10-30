@@ -82,7 +82,10 @@ end
 
 T.load("ProjectHoomans", "shared",
     "PNC/Core/Identity/PNC_Identity_Appearance.lua")
-T.load("ProjectHoomans", "client", "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel.lua")
+T.load("ProjectHoomans", "client", "PNC/Identity/PNC_UniqueNPCDraft.lua")
+T.equal(require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel",
+    PNC.UniqueNPCEditorModel, "stable editor entry must return canonical model")
+T.falsy(PNC.UniqueNPCEditorWindow, "authoring model loaded a window")
 
 local draft = PNC.UniqueNPCEditorModel.New()
 T.equal(draft.appearance.outfit.mode, "none",
@@ -236,4 +239,46 @@ local loaded = PNC.UniqueNPCEditorModel.FromDefinition({
 local loadedDefinition = PNC.UniqueNPCEditorModel.BuildDefinition(loaded)
 T.equal(loadedDefinition.startingItems[1].stack, 1000,
     "loaded authored inventory survives before preview")
+-- Definition persistence uses the same authoring API without a window.
+local files, entries = {}, {}
+local Database = { ROOT = "Hoomans", INDEX_PATH = "Hoomans/UniqueNPCIndex.txt" }
+function Database.GetDirectory() return "Hoomans/NPC Definitions" end
+function Database.SafeFileName(name)
+    return type(name) == "string" and name:match("^[%w%._%-]+%.txt$") or nil
+end
+function Database.WriteFile(kind, name, content)
+    T.equal(kind, "npc")
+    files[name] = content
+    return true
+end
+function Database.Upsert(kind, name, entry)
+    T.equal(kind, "npc")
+    entries[name] = entry
+    return true
+end
+function Database.List()
+    local result = {}
+    for _, entry in pairs(entries) do result[#result + 1] = entry end
+    return result
+end
+function Database.ReadFile(_, name) return files[name], "file_missing" end
+PNC.DefinitionDatabase = Database
+package.loaded["PNC/Core/Definitions/PNC_DefinitionDatabase"] = Database
+local Storage = require "PNC/Identity/PNC_UniqueNPCDefinitionStore"
+local ok, fileName, stored = Storage.Save(loaded, true)
+T.truthy(ok, fileName)
+T.equal(fileName, "LoadedPerson.txt")
+T.equal(stored.id, "unique:loaded")
+local Json = require "PsychopatzCore/Bridge/PsychopatzBridgeJson"
+local payload = Json.Decode(files[fileName])
+T.equal(payload.schemaVersion, 2)
+T.equal(payload.kind, "ProjectHoomans.UniqueNPC")
+T.truthy(payload.produced)
+T.falsy(payload.definition.identitySeed, "preview seed leaked into definition")
+T.equal(Storage.LoadFile(fileName).id, stored.id)
+T.equal(#Storage.List(), 1)
+local rejected, reason = Storage.LoadFile("../bad.txt")
+T.falsy(rejected)
+T.equal(reason, "invalid_file_name")
+T.falsy(PNC.UniqueNPCEditorWindow)
 T.finish("pnc_unique_npc_editor_model_smoke")

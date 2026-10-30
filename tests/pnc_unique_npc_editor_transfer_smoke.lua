@@ -103,7 +103,7 @@ PNC = {
 }
 
 package.preload["PNC/00_PNC_Init"] = function() return PNC end
-package.preload["PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel"] =
+package.preload["PNC/Identity/PNC_UniqueNPCDraft"] =
     function()
         return {
             EnsureRuntimeRecord = function() return draftRecord end,

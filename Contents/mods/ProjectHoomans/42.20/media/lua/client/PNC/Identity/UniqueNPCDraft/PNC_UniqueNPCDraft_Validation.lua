@@ -244,6 +244,6 @@ function Model.Validate(draft)
     return true, normalized
 end
 
-require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel_Runtime"
+require "PNC/Identity/UniqueNPCDraft/PNC_UniqueNPCDraft_Runtime"
 
 return Model

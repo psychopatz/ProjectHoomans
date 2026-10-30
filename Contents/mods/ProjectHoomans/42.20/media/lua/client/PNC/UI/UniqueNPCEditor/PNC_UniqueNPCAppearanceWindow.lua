@@ -4,7 +4,7 @@ require "ISUI/ISComboBox"
 require "RadioCom/ISUIRadio/ISSliderPanel"
 require "PsychopatzCore/UI/PsychopatzUI"
 require "PNC/UI/PNC_AudioDebugModel"
-require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel"
+require "PNC/Identity/PNC_UniqueNPCDraft"
 pcall(require, "PNC/Core/Identity/PNC_Identity_Appearance")
 
 PNC = PNC or {}
