@@ -131,6 +131,7 @@ local function addBodyHint(payload, record)
         or runtime.startupRehydrateExpected == true
         or startupBodyHint and startupBodyHint.wasLive == true
     if instanceID == nil and populationID == nil
+        and wasLive ~= true
     then
         return
     end

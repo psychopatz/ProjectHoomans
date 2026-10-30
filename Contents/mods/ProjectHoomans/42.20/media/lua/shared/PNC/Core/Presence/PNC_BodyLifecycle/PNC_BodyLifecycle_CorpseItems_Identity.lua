@@ -78,7 +78,8 @@ local function managedIdentityArtifact(item)
     local fullType = Internal.itemFullType(item)
     if type(modData) == "table"
         and (modData.PNC_IDCard == true
-            or modData.PNC_FactionDogTag == true)
+            or modData.PNC_FactionDogTag == true
+            or modData.PNC_LiveShellToken == true)
     then
         return true
     end

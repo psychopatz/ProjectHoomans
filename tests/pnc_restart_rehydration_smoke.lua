@@ -235,8 +235,9 @@ T.equal(removed[bodyA], nil, "early callback removed rehydration candidate")
 T.truthy(quarantineCount > 0,
     "early callback did not neutralize rehydration candidate")
 
--- A zero-ID zombie at a saved companion position is indistinguishable from
--- an ordinary zombie. Neither ownership nor a settle delay establishes identity.
+-- Legacy pre-token save: exact current-save live-body ownership plus one
+-- unique zero-ID companion shell gets a bounded settle/rebind migration lane.
+-- It is adoption-only; anonymous bodies never become duplicate-deletion proof.
 entries[bodyA] = nil
 record.presenceState = "abstract"
 record.recruited = true
@@ -259,10 +260,10 @@ PNC.BodyLifecycle.StartupCleanup.lastBatch = nil
 stats = PNC.BodyLifecycle.SweepPersistedLiveShells(now)
 T.equal(stats.rebound, 0,
     "anonymous restored follower was adopted in the frame-zero race window")
-T.equal(stats.unresolvedRehydrate, 0,
-    "anonymous restored follower did not hold rehydration open")
-T.equal(quarantineCount, 0,
-    "anonymous ordinary zombie must not be neutralized by positional coincidence")
+T.equal(stats.unresolvedRehydrate, 1,
+    "unique legacy restored follower did not hold rehydration open")
+T.truthy(quarantineCount > 0,
+    "legacy restored follower was not neutralized during settle")
 T.equal(Registry.LiveByID[record.id], nil,
     "anonymous restored follower bound before settle")
 
@@ -272,16 +273,84 @@ now = now + 800
 bodyIsNaked = false
 PNC.BodyLifecycle.StartupCleanup.lastBatch = nil
 stats = PNC.BodyLifecycle.SweepPersistedLiveShells(now)
-T.equal(stats.rebound, 0, "settle delay cannot invent shell identity")
-T.equal(Registry.LiveByID[record.id], nil, "position-only zombie cannot become a companion")
-T.equal(removed[bodyA], nil, "unidentified zombie remains protected")
+T.equal(stats.rebound, 1,
+    "unique legacy zero-ID follower was not adopted after settle")
+T.equal(Registry.LiveByID[record.id], bodyA,
+    "legacy zero-ID follower did not become the canonical live body")
+T.equal(removed[bodyA], nil,
+    "legacy adoption winner was removed instead of rebound")
+T.equal(record.runtime.startupRehydrateExpected, nil,
+    "legacy adoption did not clear the rehydration claim")
 
--- The same protection applies to a non-owned NPC position.
+-- Legacy migration is role-agnostic. A neutral/hostile/world NPC with the same
+-- current-save live lease proof gets the same unique adoption lane.
+record.presenceState = "abstract"
+record.recruited = false
+record.orderSpec = nil
+record.ownerUsername = nil
+record.runtime.bodyLease = nil
+record.runtime.startupRehydrateExpected = true
+record.runtime.startupBodyHint.wasLive = true
+Registry.LiveByID[record.id] = nil
+bodies = { bodyA }
+removed = {}
+events = {}
+quarantineCount = 0
+bodyIsNaked = false
+now = 6200
+PNC.BodyLifecycle.StartupCleanup.startedAt = now - 2000
+PNC.BodyLifecycle.StartupCleanup.lastBatch = nil
+
+stats = PNC.BodyLifecycle.SweepPersistedLiveShells(now)
+T.equal(stats.rebound, 1,
+    "unique saved-live world NPC was not adopted")
+T.equal(Registry.LiveByID[record.id], bodyA,
+    "role-agnostic legacy migration did not bind world NPC")
+T.equal(removed[bodyA], nil,
+    "role-agnostic legacy adoption deleted its winner")
+
+-- Safety boundary: two anonymous bodies that could both be the saved companion
+-- are ambiguous. Neither may be adopted or deleted.
+entries[bodyB] = nil
+record.presenceState = "abstract"
+record.runtime.bodyLease = nil
+record.runtime.startupRehydrateExpected = true
+record.runtime.startupBodyHint.wasLive = true
+Registry.LiveByID[record.id] = nil
+bodyA.x, bodyA.y = 100.25, 200.25
+bodyB.x, bodyB.y = 100.8, 200.8
+bodies = { bodyA, bodyB }
+removed = {}
+events = {}
+quarantineCount = 0
+bodyIsNaked = false
+now = 6500
+PNC.BodyLifecycle.StartupCleanup.startedAt = now - 2000
+PNC.BodyLifecycle.StartupCleanup.lastBatch = nil
+
+stats = PNC.BodyLifecycle.SweepPersistedLiveShells(now)
+T.equal(stats.rebound, 0,
+    "ambiguous anonymous bodies produced a rehydration winner")
+T.equal(Registry.LiveByID[record.id], nil,
+    "ambiguous anonymous body became canonical")
+T.equal(removed[bodyA], nil,
+    "first ambiguous anonymous body was deleted")
+T.equal(removed[bodyB], nil,
+    "second ambiguous anonymous body was deleted")
+T.truthy((stats.ambiguous or 0) >= 2,
+    "anonymous ambiguity was not surfaced")
+
+-- Without the persisted current-save lease/engine proof, a positional
+-- ordinary zombie remains unknown even for a non-owned NPC record.
+bodies = { bodyA }
 record.presenceState = "abstract"
 record.recruited = false
 record.orderSpec = nil
 record.ownerUsername = nil
 record.runtime.startupRehydrateExpected = true
+record.runtime.startupBodyHint.lease = nil
+record.runtime.startupBodyHint.instanceID = nil
+record.runtime.startupBodyHint.populationId = nil
 bodyIsNaked = true
 Registry.LiveByID[record.id] = nil
 removed = {}
@@ -307,6 +376,8 @@ record.recruited = true
 record.orderSpec = { kind = "follow" }
 record.runtime.startupRehydrateExpected = true
 record.runtime.startupBodyHint.wasLive = true
+record.runtime.startupBodyHint.lease = "saved_lease"
+record.runtime.startupBodyHint.instanceID = "saved_outfit"
 Registry.LiveByID[record.id] = nil
 removed = {}
 events = {}
@@ -324,14 +395,16 @@ local startup = PNC.BodyLifecycle.RunStartupBodyCleanupNow(
     "test_frame_zero",
     true
 )
-T.equal(startup.lastStats.unresolvedRehydrate, 0,
-    "anonymous position cannot hold an identity reconciliation claim")
+T.falsy(startup.complete,
+    "frame-zero unique legacy companion incorrectly completed startup")
+T.equal(startup.lastStats.unresolvedRehydrate, 1,
+    "frame-zero legacy companion did not hold the startup gate")
 now = now + 800
 PNC.BodyLifecycle.OnStartupReconcileTick()
-T.equal(Registry.LiveByID[record.id], nil,
-    "startup must not adopt an anonymous ordinary zombie")
-T.equal(record.presenceState, "abstract",
-    "unidentified candidate must not force live presence")
+T.equal(Registry.LiveByID[record.id], bodyA,
+    "later startup tick did not adopt unique legacy companion")
+T.equal(record.presenceState, "live",
+    "later startup tick did not restore live presence")
 
 -- Persistence must distinguish a body that was live when saved from an old
 -- abstract body hint; this flag is the admission contract used above.

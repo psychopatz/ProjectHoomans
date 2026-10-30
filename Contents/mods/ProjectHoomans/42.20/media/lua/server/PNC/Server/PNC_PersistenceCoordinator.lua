@@ -226,6 +226,45 @@ function Coordinator.Commit(reason)
 end
 
 local function onSave()
+    local retired = 0
+    local deferred = 0
+    local retireReason = "unavailable"
+    local presence = PNC.Presence
+
+    -- GameWindow fires OnSave before cell/PopMan persistence. Remove the
+    -- physical PNC carriers first so the durable registry is what survives
+    -- restart, not a second native zombie-population copy.
+    if presence and presence.RetireLiveBodiesForWorldSave then
+        local callOK
+        callOK, retired, deferred, retireReason = pcall(
+            presence.RetireLiveBodiesForWorldSave,
+            "world_save_retire"
+        )
+        if not callOK then
+            retireReason = tostring(retired)
+            retired = 0
+            deferred = 0
+            if Core and Core.LogWarn then
+                Core.LogWarn("PNC pre-save body retirement failed reason="
+                    .. tostring(retireReason))
+            end
+        elseif (tonumber(deferred) or 0) > 0
+            and Core and Core.LogWarn
+        then
+            Core.LogWarn("PNC pre-save body retirement deferred="
+                .. tostring(deferred)
+                .. " retired=" .. tostring(retired)
+                .. " reason=" .. tostring(retireReason))
+        end
+    end
+
+    Coordinator.LastPreSaveRetirement = {
+        retired = tonumber(retired) or 0,
+        deferred = tonumber(deferred) or 0,
+        reason = tostring(retireReason or "unknown"),
+        at = Core and Core.Now and Core.Now() or 0,
+    }
+
     local ok, reason = Coordinator.Commit("world_save")
     if not ok and Core and Core.LogWarn then
         Core.LogWarn("PNC world-save commit failed reason="

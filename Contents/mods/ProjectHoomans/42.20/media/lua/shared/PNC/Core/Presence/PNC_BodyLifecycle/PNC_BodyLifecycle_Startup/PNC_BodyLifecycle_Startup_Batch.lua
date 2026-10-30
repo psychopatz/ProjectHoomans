@@ -20,10 +20,10 @@ local function expectsRehydration(record)
         and record.runtime.startupRehydrateExpected == true
 end
 
--- Kept as a closed compatibility lane while old batch diagnostics exist.
--- Saved position, gender and companion ownership cannot identify a shell.
-local function anonymousRehydrateMatch(record, zombie, now)
-    return false, false
+if not Internal.MatchAnonymousStartupRehydrate
+    or not Internal.ResolveStartupRehydrateGroup
+then
+    require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Startup/PNC_BodyLifecycle_Startup_AnonymousRehydrate"
 end
 
 local function canonicalBody(reg, record)
@@ -67,35 +67,6 @@ local function addRecordMatch(batch, match)
     if match.rehydrateEligible == true then
         group.rehydrate = group.rehydrate + 1
     end
-end
-
-local function rehydrateDistance(match)
-    local record = match and match.record or nil
-    local body = match and match.body or nil
-    local hint = record and record.runtime
-        and record.runtime.startupBodyHint or nil
-    local x = hint and tonumber(hint.x) or record and tonumber(record.x)
-    local y = hint and tonumber(hint.y) or record and tonumber(record.y)
-    local z = hint and tonumber(hint.z) or record and tonumber(record.z)
-    if not body or not x or not y or not z
-        or not body.getX or not body.getY or not body.getZ
-    then
-        return math.huge
-    end
-    local dz = (tonumber(body:getZ()) or 0) - z
-    local dx = (tonumber(body:getX()) or 0) - x
-    local dy = (tonumber(body:getY()) or 0) - y
-    return dx * dx + dy * dy + dz * dz * 16
-end
-
-local function rehydrateStrength(match)
-    local reason = match and tostring(match.reason or "") or ""
-    if reason == "uuid" then return 4 end
-    if reason == "population_id" then return 3 end
-    if reason == "body_hint" then return 2 end
-    if reason == "legacy_rehydrate" then return 1 end
-    if reason == "anonymous_rehydrate" then return 0 end
-    return 0
 end
 
 local function chooseCandidate(candidates)
@@ -347,23 +318,20 @@ local function buildBatch(now)
                             batch.stats.orphanSignatures + 1
                     end
                 else
-                    -- PZ can restore a saved companion shell before its
-                    -- ModData/outfit identity is available. Its clothing may
-                    -- also appear before the PNC identity does, so the narrow
-                    -- saved-live companion lane applies to any unmarked body;
-                    -- the generic unknown-body guard below remains naked-only.
-                    -- A current-save
-                    -- saved-live follower gets one narrow fallback: exactly
-                    -- one anonymous body, essentially on the saved body
-                    -- position, with matching sex when the engine exposes it.
-                    -- Keep it quarantined across real frames before adoption.
+                    -- PZ can restore a saved live shell before its
+                    -- ModData/outfit identity is available. The role-agnostic
+                    -- current-save lane may adopt exactly one anonymous body
+                    -- at the saved live-body position after a real-frame
+                    -- settle. Generic unknown-body handling stays fail-closed.
                     nearby = nearbyUnmarkedRecords(records, reg, zombie)
                     anonymousRecord = nil
                     anonymousSettled = false
                     if #nearby == 1 then
                         local eligible
                         eligible, anonymousSettled =
-                            anonymousRehydrateMatch(nearby[1], zombie, now)
+                            Internal.MatchAnonymousStartupRehydrate(
+                                nearby[1], zombie, now
+                            )
                         if eligible then
                             anonymousRecord = nearby[1]
                         end
@@ -440,50 +408,29 @@ local function buildBatch(now)
         end
     end
 
-    -- Rehydration is one-to-one. A saved live record may have several proven
-    -- historical shells near the saved position after previous failed
-    -- restarts. Adopt exactly one winner, preferring the closest body to the
-    -- saved live-body position and then the strongest identity proof. The
-    -- remaining proven matches stay actionable as duplicate cleanup.
+    -- Rehydration is one-to-one. The helper owns anonymous-adoption safety
+    -- and winner selection; this batch only records blocking/pending state.
     local id
     local group
     local match
     local winner
-    local winnerDistance
-    local winnerStrength
+    local anonymousAmbiguous
     for id, group in pairs(batch.recordMatches) do
-        if group.rehydrate > 0 then
-            for i = 1, #group.items do
-                match = group.items[i]
-                if match.rehydrateEligible == true then
-                    local distance = rehydrateDistance(match)
-                    local strength = rehydrateStrength(match)
-                    if not winner
-                        or distance < winnerDistance
-                        or (distance == winnerDistance
-                            and strength > winnerStrength)
-                    then
-                        winner = match
-                        winnerDistance = distance
-                        winnerStrength = strength
-                    end
-                end
-            end
-            if winner then
-                winner.rehydrateWinner = true
-                if winner.rehydrateTracked == true then
-                    batch.stats.pendingRehydrate =
-                        batch.stats.pendingRehydrate + 1
-                    markBlocked(batch, winner.record, "rehydration_pending")
-                end
-                for i = 1, #group.items do
-                    match = group.items[i]
-                    if match.rehydrateEligible == true
-                        and match ~= winner
-                    then
-                        match.rehydrateDuplicate = true
-                    end
-                end
+        winner, anonymousAmbiguous =
+            Internal.ResolveStartupRehydrateGroup(group)
+        if anonymousAmbiguous then
+            markBlocked(
+                batch,
+                group.items[1].record,
+                "ambiguous_anonymous_rehydrate"
+            )
+        end
+        if winner then
+            winner.rehydrateWinner = true
+            if winner.rehydrateTracked == true then
+                batch.stats.pendingRehydrate =
+                    batch.stats.pendingRehydrate + 1
+                markBlocked(batch, winner.record, "rehydration_pending")
             end
         end
 
@@ -503,9 +450,6 @@ local function buildBatch(now)
                 end
             end
         end
-        winner = nil
-        winnerDistance = nil
-        winnerStrength = nil
     end
 
     for zombie, match in pairs(batch.matches) do
@@ -514,7 +458,8 @@ local function buildBatch(now)
         else
             batch.stats.ambiguous = batch.stats.ambiguous + 1
             batch.ambiguousBodies[zombie] = {
-                reason = "ambiguous_record_shells",
+                reason = match.ambiguousReason
+                    or "ambiguous_record_shells",
                 candidates = { match },
             }
         end

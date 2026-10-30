@@ -289,6 +289,19 @@ local function configureBody(record, zombie)
         end
     end
     Equipment.Apply(zombie, record)
+    if PNC.BodyLifecycle
+        and PNC.BodyLifecycle.EnsureLiveShellIdentityToken
+    then
+        local _, _, tokenReason =
+            PNC.BodyLifecycle.EnsureLiveShellIdentityToken(record, zombie)
+        if tokenReason ~= "created" and tokenReason ~= "existing"
+            and Core and Core.LogWarn
+        then
+            Core.LogWarn("PNC live shell token unavailable npc="
+                .. tostring(record.id)
+                .. " reason=" .. tostring(tokenReason))
+        end
+    end
     if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
         LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end

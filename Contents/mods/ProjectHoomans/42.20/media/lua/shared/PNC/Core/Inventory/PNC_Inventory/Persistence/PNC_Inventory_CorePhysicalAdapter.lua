@@ -41,6 +41,11 @@ function Adapter.materializeLoose(record, body, bridge)
     return true
 end
 
+local function isLifecycleOnlyItem(item)
+    local data = item and item.getModData and item:getModData() or nil
+    return type(data) == "table" and data.PNC_LiveShellToken == true
+end
+
 local function collectPresentationItems(body)
     local excluded = {}
     local item
@@ -73,7 +78,9 @@ function Adapter.captureLoose(record, body)
     local nativeItems = physical:query(nil)
     for index = 1, #nativeItems do
         local nativeItem = nativeItems[index]
-        if not excluded[nativeItem] then
+        if not excluded[nativeItem]
+            and not isLifecycleOnlyItem(nativeItem)
+        then
             local fullType
             if nativeItem and type(nativeItem.getFullType) == "function" then
                 local typeOK, nativeType = pcall(

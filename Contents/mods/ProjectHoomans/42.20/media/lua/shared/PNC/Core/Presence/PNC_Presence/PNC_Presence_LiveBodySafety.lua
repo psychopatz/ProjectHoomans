@@ -93,6 +93,50 @@ function Presence.EnforceLiveBodyEnvelope(record, zombie)
     return nil
 end
 
+-- Local/SP GameWindow.save fires Events.OnSave before world and PopMan
+-- persistence. Retire authoritative live carriers at that boundary so PZ has
+-- no managed IsoZombie to serialize into zombie-population state. Dedicated
+-- server saves do not fire this authority hook; they use startup rebind.
+function Presence.RetireLiveBodiesForWorldSave(reason)
+    local registry = PNC.Registry
+    local pending = {}
+    local retired = 0
+    local deferred = 0
+    if not Core or not Core.IsAuthority or Core.IsAuthority() ~= true then
+        return 0, 0, "not_authority"
+    end
+    if not registry or not registry.ForEachLive then
+        return 0, 0, "registry_unavailable"
+    end
+
+    registry.ForEachLive(function(record)
+        if record and record.alive ~= false
+            and record.presenceState == Const.PRESENCE_LIVE
+        then
+            pending[#pending + 1] = record
+        end
+    end)
+
+    for index = 1, #pending do
+        local record = pending[index]
+        if record.presenceState == Const.PRESENCE_LIVE then
+            if Presence.Abstract(
+                record,
+                reason or "world_save_retire"
+            ) then
+                retired = retired + 1
+                record.runtime = record.runtime or {}
+                record.runtime.preSaveRetired = true
+                record.runtime.forcePresenceCheck = true
+            else
+                deferred = deferred + 1
+            end
+        end
+    end
+    return retired, deferred, deferred > 0
+        and "body_removal_deferred" or "retired"
+end
+
 -- Runs independently from per-NPC AI cadence. It walks only Registry.LiveByID,
 -- which is already bounded by live-body admission, and never scans world
 -- zombies. Collect first because Presence.Abstract mutates LiveByID.

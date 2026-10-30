@@ -162,7 +162,9 @@ local function restoreBodyHint(record, raw)
     local bodyHint = type(raw.bodyHint) == "table"
         and raw.bodyHint or nil
     if bodyHint
-        and (bodyHint.instanceID ~= nil or bodyHint.populationId ~= nil)
+        and (bodyHint.instanceID ~= nil
+            or bodyHint.populationId ~= nil
+            or bodyHint.wasLive == true)
     then
         local wasLive = bodyHint.wasLive == true
             or (bodyHint.wasLive == nil

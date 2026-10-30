@@ -54,9 +54,9 @@ function Lifecycle.SweepPersistedLiveShells(now)
         return stats
     end
 
-    -- An anonymous saved-position companion candidate is not yet safe to
-    -- adopt, but it is safe to make harmless while the engine finishes
-    -- restoring the body. This closes the hostile-zombie frame gap.
+    -- An anonymous current-save body is not yet safe to adopt, but it is
+    -- safe to make harmless while the engine finishes restoring the shell.
+    -- This closes the hostile-zombie frame gap without role-specific logic.
     for anonymousBody in pairs(batch.anonymousRehydrate or {}) do
         quarantineRehydrateCandidate(
             anonymousBody,
@@ -95,6 +95,16 @@ function Lifecycle.SweepPersistedLiveShells(now)
                 then
                     match.rebound = true
                     stats.rebound = stats.rebound + 1
+                    if Core and Core.LogInfo then
+                        Core.LogInfo(
+                            "PNC startup_rehydrate_rebound npc="
+                                .. tostring(record.id)
+                                .. " reason="
+                                .. tostring(match.reason or "rehydrate")
+                                .. " anonymous="
+                                .. tostring(match.anonymous == true)
+                        )
+                    end
                     record.runtime.startupRehydrateExpected = nil
                     record.runtime.startupRehydrateMissed = nil
                     if match.ledgerEntry and Lifecycle.ConsumeHuskEntry then

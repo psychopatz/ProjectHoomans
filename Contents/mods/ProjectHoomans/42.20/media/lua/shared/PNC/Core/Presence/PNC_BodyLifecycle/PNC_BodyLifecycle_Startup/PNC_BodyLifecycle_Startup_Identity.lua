@@ -93,6 +93,7 @@ end
 local function getLiveShellIdentity(zombie)
     local modData
     local npcId
+    local tokenNpcId
     local strong = false
     local weak = false
     if not zombie or isProtectedBody(zombie) then
@@ -110,6 +111,17 @@ local function getLiveShellIdentity(zombie)
             or modData.PNC_DeathMarkerID ~= nil
         then
             return npcId, false, false
+        end
+    end
+    if Lifecycle.GetLiveShellTokenNPCId then
+        tokenNpcId = Lifecycle.GetLiveShellTokenNPCId(zombie)
+        if tokenNpcId then
+            if npcId and tostring(npcId) ~= tostring(tokenNpcId) then
+                -- Conflicting durable actor identities are never guessed.
+                return nil, false, false
+            end
+            npcId = tostring(tokenNpcId)
+            strong = true
         end
     end
     if zombie.getVariableBoolean then
