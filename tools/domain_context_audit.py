@@ -12,45 +12,15 @@ import json
 from pathlib import Path
 import sqlite3
 import subprocess
+import sys
+
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from tools.domain_contracts import components, inspect, compare_debt
 
 
-def components(graph):
-    """Iterative Kosaraju, including target-only vertices."""
-    reverse = defaultdict(set)
-    for source, targets in graph.items():
-        for target in targets:
-            reverse[target].add(source)
-    nodes = set(graph) | set(reverse)
-    seen, order = set(), []
-    for node in sorted(nodes):
-        stack = [(node, False)]
-        while stack:
-            current, done = stack.pop()
-            if done:
-                order.append(current)
-            elif current not in seen:
-                seen.add(current)
-                stack.append((current, True))
-                stack.extend((n, False) for n in sorted(graph.get(current, ()))
-                             if n not in seen)
-    seen, result = set(), []
-    for node in reversed(order):
-        if node in seen:
-            continue
-        group, stack = [], [node]
-        while stack:
-            current = stack.pop()
-            if current in seen:
-                continue
-            seen.add(current)
-            group.append(current)
-            stack.extend(reverse[current] - seen)
-        if len(group) > 1:
-            result.append(sorted(group))
-    return sorted(result)
-
-
-def collect(root):
+def collect(root, policy=None):
     cache = root / '.architecture-refactor/index.sqlite'
     with sqlite3.connect(f'file:{cache}?mode=ro', uri=True) as connection:
         rows = connection.execute('SELECT path,sha256,facts_json FROM files').fetchall()
@@ -95,7 +65,7 @@ def collect(root):
             'leaf_targets_without_runtime_imports': sum(not graph[t] for t in targets),
             'targets': targets,
         })
-    return {
+    result = {
         'revision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip(),
         'scope': prefix,
         'limitations': [
@@ -125,6 +95,14 @@ def collect(root):
                     for group in components(domains))
         ],
     }
+    if policy:
+        relative = {p: p.removeprefix(prefix) for p in runtime}
+        result['contracts'] = inspect(
+            {relative[p]: f['subsystem'] for p, f in runtime.items()},
+            [{'source': relative[p], 'target': relative[e['target']], 'line': e['line']}
+             for p, f in runtime.items() for e in f['resolved_imports']
+             if e['target'] in runtime], policy)
+    return result
 
 
 def main():
@@ -134,8 +112,20 @@ def main():
     parser.add_argument('--probes', type=Path,
                         help='Fixed reviewed probe definitions; report their current source footprint')
     parser.add_argument('--compare', type=Path, help='Compare probe metrics with a saved baseline')
+    parser.add_argument('--contracts', type=Path, help='Explicit ownership/public-boundary policy')
+    parser.add_argument('--check-debt', type=Path,
+                        help='Fail for new boundary violations beyond this reviewed migration debt')
     args = parser.parse_args()
-    result = collect(args.root)
+    policy = json.loads(args.contracts.read_text()) if args.contracts else None
+    if args.check_debt and not policy:
+        parser.error('--check-debt requires --contracts')
+    result = collect(args.root, policy)
+    failed = False
+    if args.check_debt:
+        debt = json.loads(args.check_debt.read_text())
+        comparison = compare_debt(result['contracts']['issues'], debt['issues'])
+        result['contracts']['debt_comparison'] = comparison
+        failed = bool(comparison['new'])
     if args.probes:
         definitions = json.loads(args.probes.read_text())
         source_root = args.root / result['scope']
@@ -179,6 +169,8 @@ def main():
         args.output.write_text(rendered)
     else:
         print(rendered, end='')
+    if failed:
+        raise SystemExit('New domain boundary violations; inspect report before accepting migration debt')
 
 
 if __name__ == '__main__':

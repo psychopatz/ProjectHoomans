@@ -1,0 +1,374 @@
+{
+  "version": 1,
+  "scope": "Current numeric runtime; common declarations/catalogs are reported separately.",
+  "classification_note": "Ownership groups preserve named subdomains and their own state. They do not authorize cross-subdomain private access or merge state. Explicit paths override analyzer folder labels.",
+  "folder_owners": {
+    "(composition)": "Composition",
+    "API": "Foundation",
+    "ActionProps": "Inventory",
+    "Actions": "UI",
+    "Activities": "Activities",
+    "ActorControl": "Behavior",
+    "Archetypes": "Identity",
+    "Audio": "Presentation",
+    "Base": "Foundation",
+    "Behaviors": "Behavior",
+    "Colonists": "Companions",
+    "Colony": "Colony",
+    "Combat": "Combat",
+    "Commands": "Companions",
+    "Communities": "Communities",
+    "Companions": "Companions",
+    "Compatibility": "Adapters",
+    "Composition": "Composition",
+    "Conduct": "Social",
+    "Conversation": "Conversation",
+    "Debug": "Diagnostics",
+    "Definitions": "Foundation",
+    "Diagnostics": "Diagnostics",
+    "Director": "Director",
+    "Discovery": "World",
+    "Equipment": "Inventory",
+    "Events": "Foundation",
+    "Facilities": "Facilities",
+    "Factions": "Factions",
+    "Farming": "Activities",
+    "FirearmEffects": "Presentation",
+    "FirearmEffectsAudioVisual": "Presentation",
+    "FirearmEffectsLifecycle": "Presentation",
+    "FirearmEffectsPlay": "Presentation",
+    "FirearmEffectsProjectileQueue": "Presentation",
+    "FirearmEffectsResolution": "Presentation",
+    "FirearmEffectsScreenGeometry": "Presentation",
+    "FirearmEffectsSimulation": "Presentation",
+    "FirearmEffectsUIDraw": "Presentation",
+    "Fishing": "Activities",
+    "Generated": "Foundation",
+    "Gifts": "Social",
+    "Health": "Health",
+    "HumanNPCSafeguards": "Presence",
+    "Identity": "Identity",
+    "Integrations": "Adapters",
+    "Inventory": "Inventory",
+    "Jobs": "Activities",
+    "Journals": "Knowledge",
+    "Knowledge": "Knowledge",
+    "Lumber": "Activities",
+    "Map": "UI",
+    "MapCommands": "Companions",
+    "Medical": "Health",
+    "NativeFirearmEffects": "Presentation",
+    "Needs": "Needs",
+    "Networking": "Networking",
+    "Orders": "Companions",
+    "Patches": "Adapters",
+    "Pathing": "Pathing",
+    "Perception": "Perception",
+    "Persistence": "Persistence",
+    "Player": "Player",
+    "Presence": "Presence",
+    "PresenceSync": "Presence",
+    "Production": "Production",
+    "Provision": "Provision",
+    "PuppetOpera": "PuppetOpera",
+    "Quests": "Quests",
+    "Registry": "Registry",
+    "Relationships": "Social",
+    "Scavenge": "Scavenge",
+    "Scheduling": "Foundation",
+    "Semantics": "Semantics",
+    "Server": "Server",
+    "Settlement": "Settlement",
+    "Skills": "Skills",
+    "Social": "Social",
+    "Spatial": "World",
+    "Stamina": "Health",
+    "Stealth": "Combat",
+    "Supply": "Supply",
+    "Tasking": "Tasking",
+    "Traits": "Identity",
+    "Translation": "Foundation",
+    "Travel": "Travel",
+    "UI": "UI",
+    "Vehicles": "Vehicles",
+    "Visuals": "Presentation",
+    "World": "World",
+    "WorldDiscovery": "World",
+    "WorldKnowledge": "Knowledge",
+    "Zombies": "Combat"
+  },
+  "path_owners": [
+    {
+      "pattern": "server/PNC/Server/PNC_ServerInventory.lua",
+      "owner": "Inventory"
+    },
+    {
+      "pattern": "server/PNC/Server/ServerInventory/*",
+      "owner": "Inventory"
+    },
+    {
+      "pattern": "server/PNC/Server/PNC_PersistenceCoordinator.lua",
+      "owner": "Persistence"
+    },
+    {
+      "pattern": "server/PNC/Server/*",
+      "owner": "Composition"
+    },
+    {
+      "pattern": "client/PNC/PNC_Client.lua",
+      "owner": "Composition"
+    },
+    {
+      "pattern": "shared/PNC/Core/Networking/PNC_MultiplayerBodyBinding*",
+      "owner": "Presence"
+    }
+  ],
+  "domains": {
+    "Inventory": {
+      "owns": "record.inventory compact item/container/revision state; equipment subdomain owns native projection, never a second item store",
+      "namespace": "PNC.Inventory",
+      "entries": [
+        "shared/PNC/Core/Inventory/PNC_Inventory.lua",
+        "server/PNC/Server/PNC_ServerInventory.lua",
+        "shared/PNC/Core/Equipment/PNC_Equipment.lua",
+        "shared/PNC/Core/Inventory/InventoryActions/PNC_InventoryActions.lua",
+        "client/PNC/ActionProps/PNC_ClientActionProps.lua"
+      ],
+      "commands": [
+        "ApplyDelta",
+        "AddItems",
+        "RemoveItems",
+        "ServerInventory.Transfer",
+        "ServerInventory.Action"
+      ],
+      "queries": [
+        "CanAccept",
+        "BuildFullPayload",
+        "BuildDeltaPayload",
+        "BuildSummaryPayload"
+      ],
+      "repository": "Inventory.Serialize/Deserialize (seed/delta/full schema)",
+      "layers": [
+        "shared",
+        "server",
+        "client"
+      ]
+    },
+    "Supply": {
+      "owns": "supply request/index/selection and atomic consumption; Inventory retains items",
+      "namespace": "PNC.Supply",
+      "entries": [
+        "server/PNC/Supply/PNC_Supply.lua"
+      ],
+      "commands": [
+        "Commands",
+        "Process"
+      ],
+      "queries": [
+        "Queries"
+      ],
+      "repository": "domain supply request state; no shadow inventory",
+      "layers": [
+        "server"
+      ]
+    },
+    "Provision": {
+      "owns": "provision policy/evaluation scheduling and bounded dirty work",
+      "namespace": "PNC.Provision",
+      "entries": [
+        "server/PNC/Provision/PNC_Provision.lua"
+      ],
+      "commands": [
+        "Policy",
+        "Scheduler"
+      ],
+      "queries": [
+        "Evaluator"
+      ],
+      "repository": "policy state through owning repository",
+      "layers": [
+        "server"
+      ]
+    },
+    "Tasking": {
+      "owns": "task intents, arbitration, active leases and cancellation; providers own work effects",
+      "namespace": "PNC.Tasking",
+      "entries": [
+        "server/PNC/Tasking/PNC_Tasking.lua",
+        "server/PNC/Tasking/PNC_TaskLeaseService.lua"
+      ],
+      "commands": [
+        "Commands",
+        "TaskLeaseService.Create/Release"
+      ],
+      "queries": [
+        "Queries"
+      ],
+      "repository": "transient lease/runtime state; owning task repositories persist task meaning",
+      "layers": [
+        "shared",
+        "server"
+      ]
+    },
+    "Conversation": {
+      "owns": "conversation scene leases, session lifecycle and memory; server authority and client presentation remain distinct subdomains",
+      "namespace": "PNC.Conversation",
+      "entries": [
+        "shared/PNC/Conversation/PNC_ConversationScene.lua",
+        "client/PNC/Conversation/PNC_ConversationLifecycle.lua",
+        "server/PNC/Conversation/PNC_ConversationServer.lua"
+      ],
+      "commands": [
+        "Scene.Begin/End",
+        "Lifecycle.Create"
+      ],
+      "queries": [
+        "Memory public surface"
+      ],
+      "repository": "Conversation.Memory and InteractionLifecyclePersistence",
+      "layers": [
+        "shared",
+        "server",
+        "client"
+      ]
+    },
+    "Semantics": {
+      "owns": "semantic IR interpretation, dialogue policy/flow, realization and observatory subdomains",
+      "namespace": "PNC.Semantics",
+      "entries": [],
+      "commands": [
+        "existing semantic interpreter/dialogue entry surfaces; bounded inventory due P5"
+      ],
+      "queries": [
+        "existing context/evidence projections"
+      ],
+      "repository": "semantic lifecycle domain repository; persistence timing remains coordinator-owned",
+      "layers": [
+        "shared",
+        "server",
+        "client"
+      ]
+    },
+    "Persistence": {
+      "owns": "save/load/reset timing and compatibility coordination; domains retain schema meaning",
+      "namespace": "PNC.Persistence",
+      "entries": [
+        "shared/PNC/Core/Persistence/PNC_Persistence.lua",
+        "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+        "server/PNC/Server/PNC_PersistenceCoordinator.lua"
+      ],
+      "commands": [
+        "SerializeRecord",
+        "DeserializeRecord",
+        "Reset public mechanism"
+      ],
+      "queries": [
+        "reset validity"
+      ],
+      "repository": "coordinates ModData through domain repositories",
+      "layers": [
+        "shared",
+        "server"
+      ]
+    },
+    "UI": {
+      "owns": "windows, local interaction/view state, preferences and row presentation; no gameplay authority",
+      "namespace": null,
+      "entries": [],
+      "commands": [
+        "submit through domain/transport seams"
+      ],
+      "queries": [
+        "view models"
+      ],
+      "repository": "user UI preferences only",
+      "layers": [
+        "client"
+      ]
+    },
+    "Presence": {
+      "owns": "body lifecycle/leases, live binding protocol, materialization and replica reconciliation subdomains; preserves M12",
+      "namespace": "PNC.Presence",
+      "entries": [
+        "shared/PNC/Core/Presence/PNC_Presence.lua",
+        "shared/PNC/Core/Presence/PNC_BodyLifecycle.lua",
+        "shared/PNC/Core/Networking/PNC_MultiplayerBodyBinding.lua",
+        "client/PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime.lua"
+      ],
+      "commands": [
+        "Materialize",
+        "Abstract"
+      ],
+      "queries": [
+        "ShouldMaterialize",
+        "ShouldAbstract"
+      ],
+      "repository": "body hints/leases via existing lifecycle persistence",
+      "layers": [
+        "shared",
+        "server",
+        "client"
+      ]
+    },
+    "Networking": {
+      "owns": "command routing, payload validation and delivery; hands effects to domains",
+      "namespace": "PNC.Network",
+      "entries": [
+        "server/PNC/Networking/PNC_ServerCommandRouter.lua"
+      ],
+      "commands": [
+        "router Handle/Register",
+        "Network delivery APIs"
+      ],
+      "queries": [
+        "payload projections"
+      ],
+      "repository": "none; transport does not own gameplay state",
+      "layers": [
+        "shared",
+        "server",
+        "client"
+      ]
+    },
+    "Composition": {
+      "owns": "explicit ordered startup and bounded tick wiring; no gameplay state",
+      "namespace": null,
+      "entries": [
+        "shared/PNC/Composition/PNC_SharedComposition.lua",
+        "server/PNC/Composition/PNC_ServerComposition.lua",
+        "client/PNC/Composition/PNC_ClientComposition.lua"
+      ],
+      "commands": [
+        "ordered require wiring"
+      ],
+      "queries": [],
+      "repository": "none",
+      "layers": [
+        "shared",
+        "server",
+        "client"
+      ]
+    }
+  },
+  "canonical_states": {
+    "record.inventory": "Inventory",
+    "record.runtime.conversationLease": "Conversation",
+    "TaskLeaseService.ByNPC/ByID/Active": "Tasking",
+    "body leases and bindings": "Presence",
+    "save/load lifecycle": "Persistence",
+    "local window preferences": "UI"
+  },
+  "enforced_public_domains": [
+    "Inventory",
+    "Supply",
+    "Provision"
+  ],
+  "permitted_presentation_consumers": [
+    "UI",
+    "Composition",
+    "Adapters",
+    "Diagnostics",
+    "Presentation"
+  ],
+  "debt_file": "DEPENDENCY_DEBT.json"
+}

@@ -1,6 +1,6 @@
 # Progress — Domain & Context Architecture Refactor
 
-**Status:** IN PROGRESS — P0 source/Lua baseline and fixed retrieval probes established; P1 ownership/enforcement is next.
+**Status:** IN PROGRESS — P0 and P1 ownership/enforcement established; P2 Inventory pilot audit is active.
 
 ## Parent objective
 
@@ -31,7 +31,7 @@ P0 completion does not complete this goal. No production architecture changed ye
 
 - Full isolated Lua baseline: **978/978**, 4 workers, 8.92 seconds.
 - NPC tooling baseline: **6/6** Python tests.
-- New cycle-group diagnostic regression tests: **3/3**.
+- Architecture ownership/cycle/debt regression tests: **11/11**.
 - Probe rerun against P0: zero source/hop deltas.
 - `git diff --check`: clean. Runtime Lua unchanged, so no new runtime compile gate.
 - Full semantic-tooling unittest discovery is still running as an additional
@@ -40,20 +40,38 @@ P0 completion does not complete this goal. No production architecture changed ye
 
 ## Current phase / next mandatory chunk
 
-**P1A — Explicit domain inventory and canonical ownership.**
+**P2A — Inventory + Supply + Provision ownership and behavior freeze.**
 
-1. Map current runtime paths to logical owners and runtime layers; replace
-   misleading analyzer folder ownership (notably ServerInventory and binding).
-2. Record public entries, canonical state, foreign deep imports and real cycle
-   edges for high-pressure domains. Preserve useful internal decomposition.
-3. P1B: add focused dependency regression guards with explicit existing debt;
-   no blanket suppression or arbitrary size limits.
-4. P1C: extend the bounded diagnostic as needed for enforceable ownership and
-   before/after retrieval comparisons.
-5. Continue automatically to P2 Inventory + Supply + Provision pilot.
+P1 tooling is implemented and validated:
+
+- `DOMAIN_CONTRACTS.json`: 3,258 paths / 42 logical owners, runtime layers kept
+  separate; public pilot entries, canonical states and intended high-pressure seams.
+- `OWNERSHIP.md`: current navigation, boundaries and diagnostic limitations.
+- Guard result: no new debt; 208 pre-existing exact-endpoint violations remain:
+  173 cycle edges, 17 composition providers, 14 foreign pilot implementations,
+  4 domain-to-UI imports. These are migration work, not permanent waivers.
+- No literal foreign `Internal` or UI-to-gameplay-persistence imports found by
+  the current rule; lazy namespace writes still require domain-specific review.
+- Probe deltas remain zero. No production Lua changed.
+- MCP refreshed for tooling: 100,094 nodes / 410,733 edges; generation
+  `2026-10-30T08:14:09Z`. New tooling paths now match coverage metadata.
+- Source review rejects cross-language heuristic false callers for the Python
+  diagnostic (e.g. unrelated Lua `inspect`/`collect`); real callers are CLI/tests.
+
+Next required work:
+
+1. Complete Inventory/Supply/Provision public seam/caller/state/rollback review.
+2. Finish recording the still-running additional semantic-tooling baseline
+   before production edits.
+3. Replace actual foreign codec/provider imports with owned public query seams;
+   remove unused provider imports only after exact source evidence.
+4. Preserve Inventory atomicity, native rollback, seed/delta/full persistence,
+   equipment and request payloads. Refine split/merge only with semantic evidence.
+5. Run focused + full Lua + installed-PZ/Kahlua checks for changed runtime,
+   dependency guard and relevant fixed probes; update progress and continue P3.
 
 ## Remaining gates
 
-P1–P8 remain mandatory. Body-binding M12 native acceptance is user-owned and
+P2–P8 remain mandatory; P1 enforcement must evolve with each accepted domain seam. Body-binding M12 native acceptance is user-owned and
 must remain intact; inspect that job before changing its runtime paths.
 Historical refactor logs and root AGENTS remain unchanged.

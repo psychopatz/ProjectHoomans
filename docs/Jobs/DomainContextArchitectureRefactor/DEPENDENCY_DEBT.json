@@ -1,0 +1,1671 @@
+{
+  "source_revision": "4205a1d77f536ad6f8001649c1155ef0252c4256",
+  "status": "Unresolved pre-existing migration debt, not final architecture acceptance. Only shrink this list after evidence-backed migrations. No automatic rebaseline command is provided.",
+  "limitations": "Literal-import rules supplement MCP/source review. Namespace aliases and mutable table writes require domain-specific review.",
+  "issues": [
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "client/PNC/Composition/PNC_ClientComposition.lua",
+      "target": "client/PNC/Conversation/Debug/PNC_ConversationDebugWindow.lua",
+      "line": 92,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "client/PNC/Composition/PNC_ClientComposition.lua",
+      "target": "client/PNC/PNC_ClientHumanNPCSafeguards.lua",
+      "line": 71,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "client/PNC/Composition/PNC_ClientComposition.lua",
+      "target": "client/PNC/PNC_ClientPresenceSync.lua",
+      "line": 87,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "client/PNC/Composition/PNC_ConversationRuntimeComposition.lua",
+      "target": "client/PNC/Conversation/Composition/PNC_ConversationClientComposition.lua",
+      "line": 14,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "client/PNC/Composition/PNC_ConversationRuntimeComposition.lua",
+      "target": "client/PNC/Conversation/PNC_ConversationTalkParity.lua",
+      "line": 7,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "client/PNC/Composition/PNC_ConversationRuntimeComposition.lua",
+      "target": "client/PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime.lua",
+      "line": 15,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "target": "server/PNC/Conversation/PNC_InteractionLifecyclePersistence.lua",
+      "line": 92,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "target": "server/PNC/Networking/PNC_ServerCommandRouting.lua",
+      "line": 125,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "target": "server/PNC/Tasking/PNC_CorpseHaulService.lua",
+      "line": 46,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "target": "server/PNC/Tasking/PNC_TaskRequestService.lua",
+      "line": 47,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "target": "server/PNC/Tasking/PNC_WorkTaskProvider.lua",
+      "line": 45,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "target": "shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua",
+      "line": 91,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "shared/PNC/00_PNC_Conversation_Init.lua",
+      "target": "shared/PNC/Conversation/Composition/PNC_ConversationSharedComposition.lua",
+      "line": 3,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+      "target": "shared/PNC/Core/Presence/PNC_PresenceRuntime.lua",
+      "line": 38,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+      "target": "shared/PNC/Conversation/PNC_ConversationGifts.lua",
+      "line": 4,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+      "target": "shared/PNC/Core/Equipment/PNC_Equipment_Items.lua",
+      "line": 37,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "COMPOSITION_TO_PROVIDER",
+      "source": "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+      "target": "shared/PNC/Core/Equipment/PNC_Equipment_Slots.lua",
+      "line": 38,
+      "detail": "",
+      "required_phase": "P3"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Commands/PNC_CompanionCommandInteractionQueue.lua",
+      "target": "client/PNC/Conversation/PNC_SemanticInteractionPresentationRegistry.lua",
+      "line": 12,
+      "detail": "Companions -> Conversation",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Commands/PNC_CompanionCommandInteractionQueue.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 9,
+      "detail": "Companions -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Commands/PNC_CompanionCommandPresentation.lua",
+      "target": "client/PNC/Conversation/PNC_SemanticInteractionPresentationRegistry.lua",
+      "line": 9,
+      "detail": "Companions -> Conversation",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Commands/PNC_CompanionCommandPresentation.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 6,
+      "detail": "Companions -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Commands/PNC_CompanionCommandPresentation.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 47,
+      "detail": "Companions -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Commands/PNC_CompanionCommandPresentation_PlayerEmoteResult.lua",
+      "target": "client/PNC/Semantics/PNC_SemanticSpeechDelivery.lua",
+      "line": 9,
+      "detail": "Companions -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Commands/PNC_CompanionTargetResolver.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 4,
+      "detail": "Companions -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Context.lua",
+      "target": "shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+      "line": 11,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Conversation/Definition/PNC_ConversationDefinition_Context.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 11,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Conversation/PNC_ConversationDefinition.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 5,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Conversation/PNC_ConversationFarewellContext.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 9,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Conversation/PNC_ConversationTalkParity.lua",
+      "target": "client/PNC/Semantics/PNC_SemanticSpeechDelivery.lua",
+      "line": 18,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Conversation/PNC_ConversationTalkParity_Lifecycle.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua",
+      "line": 272,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Conversation/PNC_ConversationTalkStart.lua",
+      "target": "client/PNC/UI/PNC_NPCTypePalette.lua",
+      "line": 19,
+      "detail": "Conversation -> UI",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Conversation/PNC_SemanticSpeechPresentation.lua",
+      "target": "client/PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua",
+      "line": 11,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Conversation/PNC_SemanticSpeechPresentation_Core.lua",
+      "target": "shared/PNC/Core/Social/PNC_SemanticSocialContext.lua",
+      "line": 13,
+      "detail": "Conversation -> Social",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Conversation/PNC_SemanticSpeechPresentation_Core.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 12,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/ClientActions/PNC_ClientActions_Companion.lua",
+      "target": "client/PNC/Scavenge/PNC_ScavengeController.lua",
+      "line": 123,
+      "detail": "Networking -> Scavenge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/ClientActions/PNC_ClientActions_Debug_Spawn.lua",
+      "target": "shared/PNC/Core/Companions/PNC_DebugCompanionInitialization.lua",
+      "line": 6,
+      "detail": "Networking -> Companions",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Colony.lua",
+      "target": "client/PNC/UI/Shared/PNC_ColonyUIShared.lua",
+      "line": 144,
+      "detail": "Networking -> UI",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_CompanionCommandResult.lua",
+      "target": "client/PNC/UI/Nameplates/PNC_NameplateToolFeedback.lua",
+      "line": 7,
+      "detail": "Networking -> UI",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_InteractionResults.lua",
+      "target": "client/PNC/UI/Factions/PNC_FactionTollWindow.lua",
+      "line": 43,
+      "detail": "Networking -> UI",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_LLMSocialReactionResult.lua",
+      "target": "client/PNC/Conversation/PNC_ConversationDiary.lua",
+      "line": 75,
+      "detail": "Networking -> Conversation",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticDiagnostics.lua",
+      "line": 2,
+      "detail": "Networking -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Semantics.lua",
+      "target": "client/PNC/Conversation/PNC_SemanticInteractionScenePresentation.lua",
+      "line": 43,
+      "detail": "Networking -> Conversation",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Semantics.lua",
+      "target": "client/PNC/Semantics/PNC_SemanticCognitionClient.lua",
+      "line": 9,
+      "detail": "Networking -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/ClientRequests/PNC_ClientRequests_Bootstrap.lua",
+      "target": "client/PNC/Knowledge/PNC_KnowledgeInterest.lua",
+      "line": 12,
+      "detail": "Networking -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/ClientRequests/PNC_ClientRequests_InitialStateTick.lua",
+      "target": "client/PNC/Knowledge/PNC_KnowledgeInterest.lua",
+      "line": 10,
+      "detail": "Networking -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/PNC_ClientRosterCommands_Deltas.lua",
+      "target": "client/PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime.lua",
+      "line": 1,
+      "detail": "Networking -> Presence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/PNC_ClientRosterCommands_Snapshots.lua",
+      "target": "client/PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime.lua",
+      "line": 1,
+      "detail": "Networking -> Presence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Networking/PNC_ColonyManagementClient.lua",
+      "target": "shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "line": 8,
+      "detail": "Networking -> Production",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/PNC_ClientHumanNPCSafeguards.lua",
+      "target": "shared/PNC/Core/Perception/PNC_HumanNPCThreatSafeguards.lua",
+      "line": 8,
+      "detail": "Presence -> Perception",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception_Internal.lua",
+      "target": "client/PNC/Semantics/PNC_SemanticWorldTargetObservationCache.lua",
+      "line": 18,
+      "detail": "Perception -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception_Internal.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 13,
+      "detail": "Perception -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception_Internal.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+      "line": 15,
+      "detail": "Perception -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception_Internal.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticWorldTargetCatalog.lua",
+      "line": 11,
+      "detail": "Perception -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Base/PNC_BaseBuildingPlacement.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_BuildingFootprint.lua",
+      "line": 8,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Base/PNC_BaseBuildingPlacementPolicy.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_BuildingFootprint.lua",
+      "line": 4,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Base/PNC_BaseBuildingPlacementPolicy.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_BuildingQueueCollision.lua",
+      "line": 5,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Base/PNC_BaseBuildingQueueOverlay.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_BuildingFootprint.lua",
+      "line": 6,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Base/PNC_BaseSummary.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "line": 4,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/CharacterWindow/PNC_CharacterWindow.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 4,
+      "detail": "UI -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Info.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 2,
+      "detail": "UI -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Interactions.lua",
+      "target": "client/PNC/Conversation/PNC_ConversationDiary.lua",
+      "line": 5,
+      "detail": "UI -> Conversation",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/CommandHub/PNC_CommandHub_Registry_Gates.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "line": 11,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/CommandHub/PNC_CommandHub_WorkWindow.lua",
+      "target": "shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "line": 13,
+      "detail": "UI -> Production",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/CommandHub/PNC_CommandHub_WorkWindow_Presentation.lua",
+      "target": "shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "line": 7,
+      "detail": "UI -> Production",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Communities/PNC_ColonyJournalWindow.lua",
+      "target": "shared/PNC/Core/Colony/Storage/PNC_ColonyStorageJournal.lua",
+      "line": 4,
+      "detail": "UI -> Colony",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Communities/PNC_ColonyStorageActivityPresentation.lua",
+      "target": "shared/PNC/Core/Colony/Storage/PNC_ColonyStorageJournal.lua",
+      "line": 2,
+      "detail": "UI -> Colony",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Context/PNC_ContextHub.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 10,
+      "detail": "UI -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Context/PNC_NPCSelection.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 10,
+      "detail": "UI -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Context/PNC_StockpileAccessContext.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "line": 4,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Context/Providers/PNC_ContextProvider_Conversation.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticDialogueRuntime.lua",
+      "line": 6,
+      "detail": "UI -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Context/Providers/PNC_ContextProvider_Scavenge.lua",
+      "target": "client/PNC/Scavenge/PNC_ScavengeController.lua",
+      "line": 1,
+      "detail": "UI -> Scavenge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Conversation/PNC_CombatResponseStrip.lua",
+      "target": "client/PNC/Semantics/PNC_SemanticCombatResponseSurface.lua",
+      "line": 9,
+      "detail": "UI -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Discovery/PNC_WorldDiscoveryRadioWindow.lua",
+      "target": "shared/PNC/WorldDiscovery/PNC_WorldDiscoveryPresentation.lua",
+      "line": 4,
+      "detail": "UI -> World",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Factions/PNC_FactionMemberWindow.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 4,
+      "detail": "UI -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Inventory/PNC_InventoryWindow.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 11,
+      "detail": "UI -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 4,
+      "detail": "UI -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Map/Layers/PNC_MapLayer_WorldDiscovery.lua",
+      "target": "shared/PNC/WorldDiscovery/PNC_WorldDiscoveryPresentation.lua",
+      "line": 4,
+      "detail": "UI -> World",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Map/PNC_MapCommandRegistry_Core.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 11,
+      "detail": "UI -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Map/PNC_MapHoverPortrait.lua",
+      "target": "client/PNC/Knowledge/PNC_KnowledgeInterest.lua",
+      "line": 4,
+      "detail": "UI -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Map/PNC_MapHoverPortrait.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 5,
+      "detail": "UI -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Map/PNC_MapHoverPortraitCard.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 6,
+      "detail": "UI -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Nameplates/PNC_NameplateEntries.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 4,
+      "detail": "UI -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Nameplates/PNC_NameplateScopes.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "line": 1,
+      "detail": "UI -> Knowledge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug.lua",
+      "target": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "line": 13,
+      "detail": "UI -> Perception",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug_CoreProvider.lua",
+      "target": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "line": 14,
+      "detail": "UI -> Perception",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Overlay.lua",
+      "target": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "line": 16,
+      "detail": "UI -> Perception",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Window.lua",
+      "target": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "line": 17,
+      "detail": "UI -> Perception",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Window_Actions.lua",
+      "target": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "line": 17,
+      "detail": "UI -> Perception",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Window_Core.lua",
+      "target": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "line": 17,
+      "detail": "UI -> Perception",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Window_Lifecycle.lua",
+      "target": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "line": 17,
+      "detail": "UI -> Perception",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Research/PNC_ResearchModel_Items.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "line": 57,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Scavenge/PNC_ScavengeWindow.lua",
+      "target": "client/PNC/Scavenge/PNC_ScavengeController.lua",
+      "line": 13,
+      "detail": "UI -> Scavenge",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/SettlementManagement/PNC_SettlementLayoutOverlay_Core.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_BuildingFootprint.lua",
+      "line": 2,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/SettlementManagement/PNC_SettlementLayoutOverlay_Core.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "line": 3,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBrowser.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "line": 6,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildCatalog.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "line": 8,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/SettlementManagement/PNC_SettlementManagement_Tab.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "line": 6,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Storage/PNC_StorageJobRequirementsModal_Model.lua",
+      "target": "shared/PNC/Core/Jobs/PNC_JobRequirements.lua",
+      "line": 5,
+      "detail": "UI -> Activities",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel_Core.lua",
+      "target": "shared/PNC/Core/Identity/PNC_UniqueNPCs.lua",
+      "line": 5,
+      "detail": "UI -> Identity",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow.lua",
+      "target": "shared/PNC/Core/Archetypes/Registry/PNC_Archetypes.lua",
+      "line": 7,
+      "detail": "UI -> Identity",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow.lua",
+      "target": "shared/PNC/Core/Traits/PNC_NPCTraitRegistry.lua",
+      "line": 9,
+      "detail": "UI -> Identity",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Workshop/PNC_WorkshopCatalog_Rebuild_Helpers.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "line": 4,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "client/PNC/UI/Workshop/PNC_WorkshopCatalog_Rebuild_Rows.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "line": 9,
+      "detail": "UI -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Colony/ColonyManagement/PNC_ColonyManagement_ActionTasking.lua",
+      "target": "shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "line": 10,
+      "detail": "Colony -> Production",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Colony/ColonyManagement/PNC_ColonyManagement_ColonistActions.lua",
+      "target": "shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "line": 13,
+      "detail": "Colony -> Production",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Colony/ColonyManagement/PNC_ColonyManagement_Core.lua",
+      "target": "shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "line": 13,
+      "detail": "Colony -> Production",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_JobRequirements.lua",
+      "target": "shared/PNC/Core/Jobs/PNC_JobRequirements.lua",
+      "line": 15,
+      "detail": "Colony -> Activities",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Colony/Storage/PNC_ColonyStorageRepository.lua",
+      "target": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "line": 11,
+      "detail": "Colony -> Persistence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Communities/CommunityService/PNC_CommunityService_Persistence.lua",
+      "target": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "line": 22,
+      "detail": "Communities -> Persistence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_BuildContext.lua",
+      "target": "shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+      "line": 12,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Conversation/PNC_InteractionLifecyclePersistence.lua",
+      "target": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "line": 17,
+      "detail": "Conversation -> Persistence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Conversation/PNC_InteractionLifecyclePersistence.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionLifecycle.lua",
+      "line": 15,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Farming/FarmingService/PNC_FarmingService_Context.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "line": 16,
+      "detail": "Activities -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Farming/FarmingService/PNC_FarmingService_Provider.lua",
+      "target": "shared/PNC/Core/Needs/PNC_WorkFatigueGate.lua",
+      "line": 17,
+      "detail": "Activities -> Needs",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Farming/FarmingService/PNC_FarmingService_Provider.lua",
+      "target": "shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "line": 15,
+      "detail": "Activities -> Production",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Farming/PZFarmingAdapter/PNC_PZFarmingAdapter_Cultivation.lua",
+      "target": "shared/PNC/Core/Needs/PNC_WorkFatigueGate.lua",
+      "line": 17,
+      "detail": "Activities -> Needs",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Fishing/PNC_FishingExecutor.lua",
+      "target": "shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "line": 14,
+      "detail": "Activities -> Production",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Fishing/PNC_FishingService.lua",
+      "target": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "line": 14,
+      "detail": "Activities -> Persistence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Journals/PNC_ColonyJournalFeed.lua",
+      "target": "shared/PNC/Core/Networking/PNC_ColonyJournalProtocol.lua",
+      "line": 13,
+      "detail": "Knowledge -> Networking",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Journals/PNC_JournalRoutes.lua",
+      "target": "shared/PNC/Core/Colony/Storage/PNC_ColonyStorageJournal.lua",
+      "line": 10,
+      "detail": "Knowledge -> Colony",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Knowledge/NPCKnowledgeService/PNC_NPCKnowledgeService_Persistence.lua",
+      "target": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "line": 21,
+      "detail": "Knowledge -> Persistence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_Identity.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+      "line": 11,
+      "detail": "Knowledge -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityAdmission.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+      "line": 10,
+      "detail": "Knowledge -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityMutation.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+      "line": 6,
+      "detail": "Knowledge -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityPolicy.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+      "line": 5,
+      "detail": "Knowledge -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityResult.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticDiagnostics.lua",
+      "line": 5,
+      "detail": "Knowledge -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution.lua",
+      "target": "shared/PNC/Core/Needs/PNC_WorkFatigueGate.lua",
+      "line": 13,
+      "detail": "Activities -> Needs",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_State.lua",
+      "target": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "line": 11,
+      "detail": "Activities -> Persistence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Lumber/PNC_LumberExecutor.lua",
+      "target": "shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "line": 13,
+      "detail": "Activities -> Production",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Needs/PNC_NeedsRepository.lua",
+      "target": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "line": 11,
+      "detail": "Needs -> Persistence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Networking/Handlers/PNC_ServerSemanticInteractionLifecycleCommandHandler.lua",
+      "target": "server/PNC/Conversation/PNC_InteractionLifecyclePersistence.lua",
+      "line": 17,
+      "detail": "Networking -> Conversation",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Networking/Handlers/PNC_ServerSemanticInteractionLifecycleCommandHandler.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionLifecycle.lua",
+      "line": 14,
+      "detail": "Networking -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Networking/Handlers/PNC_ServerSemanticInteractionLifecycleCommandHandler.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionProviders.lua",
+      "line": 165,
+      "detail": "Networking -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Networking/Handlers/PNC_ServerSemanticInteractionLifecycleCommandHandler.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua",
+      "line": 164,
+      "detail": "Networking -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Networking/Handlers/PNC_ServerSemanticInteractionLifecycleCommandHandler.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticPragmaticResolver.lua",
+      "line": 166,
+      "detail": "Networking -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Networking/Handlers/PNC_ServerSemanticSceneResponseCommandHandler.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionSceneRuntime.lua",
+      "line": 11,
+      "detail": "Networking -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Networking/Handlers/PNC_ServerSemanticSceneResponseCommandHandler.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionSceneTransport.lua",
+      "line": 12,
+      "detail": "Networking -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Networking/Handlers/ServerDebugCommandHandler/PNC_ServerDebugCommandHandler_Core.lua",
+      "target": "shared/PNC/Core/Companions/PNC_DebugCompanionInitialization.lua",
+      "line": 9,
+      "detail": "Networking -> Companions",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Production/BuildingService/PNC_BuildingService_Context.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_BuildingFootprint.lua",
+      "line": 14,
+      "detail": "Production -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Production/BuildingService/PNC_BuildingService_Context.lua",
+      "target": "shared/PNC/Core/Settlement/PNC_BuildingQueueCollision.lua",
+      "line": 15,
+      "detail": "Production -> Settlement",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Production/PNC_KnowledgeRepository.lua",
+      "target": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "line": 10,
+      "detail": "Production -> Persistence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Production/PNC_ResearchRepository.lua",
+      "target": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "line": 9,
+      "detail": "Production -> Persistence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Production/PNC_WorkItemService_Logistics.lua",
+      "target": "shared/PNC/Core/Jobs/PNC_JobRequirements.lua",
+      "line": 9,
+      "detail": "Production -> Activities",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Production/PNC_WorkItemService_Logistics.lua",
+      "target": "shared/PNC/Core/Jobs/PNC_WorkItemService.lua",
+      "line": 10,
+      "detail": "Production -> Activities",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Production/PNC_WorkRepository.lua",
+      "target": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "line": 9,
+      "detail": "Production -> Persistence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Scavenge/PNC_ScavengePolicy.lua",
+      "target": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "line": 9,
+      "detail": "Scavenge -> Persistence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Semantics/PNC_SemanticCombatTargetCallouts.lua",
+      "target": "shared/PNC/Core/Spatial/PNC_TacticalSpatialProjection.lua",
+      "line": 23,
+      "detail": "Semantics -> World",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Semantics/PNC_SemanticCommunityRoleWhereabouts.lua",
+      "target": "server/PNC/Communities/PNC_CommunityPlaceProjection.lua",
+      "line": 19,
+      "detail": "Semantics -> Communities",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Settlement/PNC_SettlementRepository.lua",
+      "target": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "line": 10,
+      "detail": "Settlement -> Persistence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Social/ConductService/PNC_ConductService_Queries.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua",
+      "line": 14,
+      "detail": "Social -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Social/RelationshipService/PNC_RelationshipService_Queries.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua",
+      "line": 43,
+      "detail": "Social -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "target": "shared/PNC/Core/Spatial/PNC_TacticalSpatialProjection.lua",
+      "line": 31,
+      "detail": "Social -> World",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCombatBanterArbiter.lua",
+      "line": 29,
+      "detail": "Social -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCombatEncounterIntent.lua",
+      "line": 20,
+      "detail": "Social -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCombatMoment.lua",
+      "line": 26,
+      "detail": "Social -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCombatReactionProfile.lua",
+      "line": 23,
+      "detail": "Social -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticTacticalSpatialLanguage.lua",
+      "line": 34,
+      "detail": "Social -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Context.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 13,
+      "detail": "World -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Context.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+      "line": 15,
+      "detail": "World -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Discovery_Capture.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 12,
+      "detail": "World -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Discovery_Capture.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+      "line": 14,
+      "detail": "World -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Discovery_Core.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 16,
+      "detail": "World -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Discovery_Core.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+      "line": 18,
+      "detail": "World -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Targets.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 16,
+      "detail": "World -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/World/PNC_CampZoneService_Core.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 10,
+      "detail": "World -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/World/PNC_CampZoneService_Core.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+      "line": 12,
+      "detail": "World -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/WorldDiscovery/PNC_WorldDiscovery_Storage.lua",
+      "target": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "line": 9,
+      "detail": "World -> Persistence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "server/PNC/WorldDiscovery/WorldDiscoveryRadioBroadcasts/PNC_WorldDiscoveryRadioBroadcasts_Context.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 12,
+      "detail": "World -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Conversation/Blocks/PNC_ConversationRules.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticDialogueRuleProvider.lua",
+      "line": 17,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Conversation/Blocks/PNC_ConversationRules/PNC_ConversationRules_Conditions.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticEngineFacts.lua",
+      "line": 6,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Catalog.lua",
+      "target": "shared/PNC/Core/Relationships/PNC_SocialEventDefinitions.lua",
+      "line": 175,
+      "detail": "Conversation -> Social",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Catalog.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua",
+      "line": 187,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Recorder.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua",
+      "line": 26,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticConversationMemoryProvider.lua",
+      "line": 64,
+      "detail": "Conversation -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Core/Networking/NetworkSnapshots/PNC_NetworkSnapshots_DetailedPayloads_Build.lua",
+      "target": "shared/PNC/Core/Networking/PNC_MultiplayerBodyBinding.lua",
+      "line": 1,
+      "detail": "Networking -> Presence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Core/Networking/NetworkSnapshots/PNC_NetworkSnapshots_PresencePayload_Build.lua",
+      "target": "shared/PNC/Core/Networking/PNC_MultiplayerBodyBinding.lua",
+      "line": 1,
+      "detail": "Networking -> Presence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_Broadcasts.lua",
+      "target": "shared/PNC/Core/Networking/PNC_MultiplayerBodyBinding.lua",
+      "line": 158,
+      "detail": "Networking -> Presence",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Deserialize.lua",
+      "target": "shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua",
+      "line": 4,
+      "detail": "Persistence -> Conversation",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize.lua",
+      "target": "shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua",
+      "line": 4,
+      "detail": "Persistence -> Conversation",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Core/Relationships/PNC_RelationshipPresentation.lua",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua",
+      "line": 207,
+      "detail": "Social -> Semantics",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Core/Traits/PNC_StartingCompanionTraits.lua",
+      "target": "shared/PNC/Core/Relationships/PNC_RelationshipKindRegistry.lua",
+      "line": 10,
+      "detail": "Identity -> Social",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+      "target": "shared/PNC/Core/Relationships/PNC_RelationshipConstants.lua",
+      "line": 10,
+      "detail": "Semantics -> Social",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+      "target": "shared/PNC/Core/Relationships/PNC_RelationshipKindRegistry.lua",
+      "line": 14,
+      "detail": "Semantics -> Social",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+      "target": "shared/PNC/Core/Relationships/PNC_RelationshipStates.lua",
+      "line": 12,
+      "detail": "Semantics -> Social",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "target": "shared/PNC/Core/Identity/PNC_Identity.lua",
+      "line": 12,
+      "detail": "Semantics -> Identity",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Semantics/PNC_SemanticCombatReactionProfile.lua",
+      "target": "shared/PNC/Core/Traits/PNC_NPCTraitContext.lua",
+      "line": 16,
+      "detail": "Semantics -> Identity",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Semantics/PNC_SemanticDialoguePolicy_Core.lua",
+      "target": "shared/PNC/Gifts/PNC_GiftSemanticOffer.lua",
+      "line": 16,
+      "detail": "Semantics -> Social",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Semantics/PNC_SemanticDialogueSuggestions_Core.lua",
+      "target": "shared/PNC/Core/Identity/PNC_Identity.lua",
+      "line": 25,
+      "detail": "Semantics -> Identity",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua",
+      "target": "shared/PNC/Core/Relationships/PNC_SocialEventDefinitions.lua",
+      "line": 83,
+      "detail": "Semantics -> Social",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "CROSS_DOMAIN_CYCLE_EDGE",
+      "source": "shared/PNC/Semantics/PNC_SpeechStyleContext.lua",
+      "target": "shared/PNC/Core/Traits/PNC_NPCTraitRegistry.lua",
+      "line": 18,
+      "detail": "Semantics -> Identity",
+      "required_phase": "P4-P7"
+    },
+    {
+      "rule": "DOMAIN_TO_UI",
+      "source": "client/PNC/Conversation/PNC_ConversationTalkStart.lua",
+      "target": "client/PNC/UI/PNC_NPCTypePalette.lua",
+      "line": 19,
+      "detail": "",
+      "required_phase": "P5/P6"
+    },
+    {
+      "rule": "DOMAIN_TO_UI",
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Colony.lua",
+      "target": "client/PNC/UI/Shared/PNC_ColonyUIShared.lua",
+      "line": 144,
+      "detail": "",
+      "required_phase": "P5/P6"
+    },
+    {
+      "rule": "DOMAIN_TO_UI",
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_CompanionCommandResult.lua",
+      "target": "client/PNC/UI/Nameplates/PNC_NameplateToolFeedback.lua",
+      "line": 7,
+      "detail": "",
+      "required_phase": "P5/P6"
+    },
+    {
+      "rule": "DOMAIN_TO_UI",
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_InteractionResults.lua",
+      "target": "client/PNC/UI/Factions/PNC_FactionTollWindow.lua",
+      "line": 43,
+      "detail": "",
+      "required_phase": "P5/P6"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "client/PNC/Debug/NPCPresentationDebug/PNC_NPCPresentationDebug_HeldItem.lua",
+      "target": "shared/PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_Hands.lua",
+      "line": 17,
+      "detail": "",
+      "required_phase": "P2"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "client/PNC/Debug/NPCPresentationDebug/PNC_NPCPresentationDebug_HeldItem.lua",
+      "target": "shared/PNC/Core/Equipment/PNC_Equipment_Items.lua",
+      "line": 16,
+      "detail": "",
+      "required_phase": "P2"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_AbstractNPC.lua",
+      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
+      "line": 16,
+      "detail": "",
+      "required_phase": "P2"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_LiveNPC.lua",
+      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
+      "line": 16,
+      "detail": "",
+      "required_phase": "P2"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_NPCBulk.lua",
+      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
+      "line": 16,
+      "detail": "",
+      "required_phase": "P2"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_Physical.lua",
+      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
+      "line": 16,
+      "detail": "",
+      "required_phase": "P2"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_Player.lua",
+      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
+      "line": 16,
+      "detail": "",
+      "required_phase": "P2"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_Storage.lua",
+      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
+      "line": 16,
+      "detail": "",
+      "required_phase": "P2"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "server/PNC/Supply/PNC_ItemUtility.lua",
+      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
+      "line": 26,
+      "detail": "",
+      "required_phase": "P2"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_Consumption_Core.lua",
+      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
+      "line": 17,
+      "detail": "",
+      "required_phase": "P2"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_CoreRecords.lua",
+      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
+      "line": 18,
+      "detail": "",
+      "required_phase": "P2"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_NativeMatching.lua",
+      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
+      "line": 18,
+      "detail": "",
+      "required_phase": "P2"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_PersonalQueries.lua",
+      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
+      "line": 18,
+      "detail": "",
+      "required_phase": "P2"
+    },
+    {
+      "rule": "FOREIGN_IMPLEMENTATION",
+      "source": "server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_Removal.lua",
+      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
+      "line": 18,
+      "detail": "",
+      "required_phase": "P2"
+    }
+  ]
+}
