@@ -88,7 +88,7 @@ Do not replace:
 - companion ownership;
 - semantic/dialogue systems.
 
-Keep the existing body-binding seam as the canonical MP identity layer. M9 must change only the physical-carrier lifecycle beneath it: live human carriers must be PNC-owned transient shells rather than native PopMan actors, unless engine proof establishes an equivalent permanent-delete contract.
+Keep the existing body-binding seam as the canonical MP identity layer. M9 changes only the physical-carrier lifecycle beneath it. Installed engine/native proof selected the supported equivalent path: managed live-human carriers keep vanilla real/network admission but must be proactively retired while attached, before native `n_addZombie` virtualization can run.
 
 ## Identity safety
 
@@ -150,7 +150,7 @@ Native SP/MP evidence outranks synthetic acceptance. The 2026-10-30 native test 
 - M0-M8 remain useful historical implementation evidence, not final completion;
 - reopen the smallest owning lifecycle layer rather than weakening identity safeguards;
 - do not add another position/outfit/gender-based husk heuristic;
-- do not mark developer completion again until M9 proves the new shell does not enter native zombie population ownership during its live-human lifetime;
+- do not mark developer completion again until M9 proves managed live-human shells are retired before native `n_addZombie` virtualization during their live-human lifetime;
 - preserve genuine Knox reanimation as a transition into a real vanilla zombie lifecycle.
 
 ## Git/runtime

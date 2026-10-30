@@ -1,10 +1,10 @@
 # Progress — Multiplayer Body Binding Migration
 
-**Status:** REOPENED — native SP/MP acceptance failed; M9 population-detached shell migration mandatory.
+**Status:** Developer M0-M9 accepted; renewed user-owned native SP/MP acceptance pending.
 **Branch:** existing main only.
 **Planning anchor:** 2a24bc59d36c845af51097642c55180434680cb7.
-**Current phase:** M9 — Population-Detached NPC Shell Migration.
-**Parent objective:** M0-M9 complete migration to explicit MP body binding plus population-detached live-human shell ownership, with SP preserved and native husk convergence satisfied.
+**Current phase:** Native SP/MP acceptance handoff.
+**Parent objective:** M0-M9 complete migration to explicit MP body binding plus pre-virtualization live-human carrier retirement, with SP preserved; native husk convergence remains to be verified by the user.
 
 ## Verified starting evidence
 
@@ -32,8 +32,8 @@
 ## Remaining mandatory work
 
 - M0-M8 are implemented historical prerequisites and remain regression constraints.
-- **M9 is mandatory:** replace PopMan-owned live human carriers with population-detached transient PNC shells (or an engine-proven equivalent permanent-retirement path), migrate removal/admission, preserve MP binding, add legacy-save cleanup, and re-run full developer acceptance.
-- Native SP/MP acceptance must then be rerun; persistent old shells after abstraction/rematerialization are a hard failure.
+- M0-M9 developer work is implemented and validated. M9 selected the engine-proven pre-virtualization retirement path rather than an unsupported detached-shell bridge.
+- **Only renewed native SP/MP acceptance remains mandatory.** Persistent old shells after abstraction/rematerialization, chunk streaming, restart or reconnect are still a hard failure and reopen the owning lifecycle gate.
 
 ## Current non-goals
 
@@ -48,7 +48,7 @@
 
 Do not mark complete after M0, a working binding prototype, or a passing focused suite.
 
-Developer completion now requires all M0-M9 gates plus final full-suite/static/compiler evidence. The prior M0-M8 green suite is insufficient because native SP/MP contradicted the physical-shell convergence invariant.
+Developer completion requires all M0-M9 gates plus final full-suite/static/compiler evidence. That developer gate is now met by commit `e1a90335`; parent acceptance still requires renewed native SP/MP proof.
 
 ## M0A local factory restoration — 2026-10-30
 
@@ -187,7 +187,9 @@ Native server logs also showed the same logical NPC IDs materializing again at a
 
 M0-M8 solved cross-network identity/reconciliation but left the physical carrier born through a native population-zombie factory. The shell therefore participates in a lifecycle PNC does not own. A client binding/unbind fix cannot prevent a native population record from later resurfacing as an ordinary zombie, and the SP reproduction proves the defect is below the MP binding layer.
 
-### M9 immediate next chunk
+### Initial M9 hypothesis — superseded by later engine evidence
+
+The following was the first post-native-failure hypothesis and is retained only as audit history. The later M9A-M9C checkpoint disproved `persistentId == 0` as sufficient and selected pre-virtualization retirement instead.
 
 1. Build a focused engine-grounded transient-shell prototype/fixture using `IsoZombie.new(getCell())` or the smallest equivalent PNC-owned factory.
 2. Reproduce only the required vanilla admission steps for a live shell while deliberately omitting `ZombiePopulationManager.registerZombie()`.
@@ -199,4 +201,63 @@ M0-M8 solved cross-network identity/reconciliation but left the physical carrier
 8. Add old-save migration evidence and an explicit diagnostic for any managed live human with `persistentId ~= 0`.
 9. Re-run focused/full Lua, installed-PZ compiler/static verification, and then hand back a revised native SP/MP matrix.
 
-**Next mandatory chunk:** M9A transient shell construction/admission proof. Do not mark the job complete from synthetic success; the final native test must show old locations stay empty through abstraction/rematerialization, restart, reconnect, and chunk streaming.
+**Historical next chunk (superseded):** M9A transient shell construction/admission proof. Later engine evidence selected the pre-virtualization retirement design documented below.
+
+
+## M9A-M9C pre-virtualization retirement implementation — 2026-10-30
+
+Native/Java audit refined the original population-detached-shell hypothesis before a production factory swap:
+
+- A manually constructed `IsoZombie` with `persistentId == 0` is **not sufficient** by itself. Installed 42.22 `ZombiePopulationManager.removeChunkFromWorld(IsoChunk)` serializes every ground-level `IsoZombie` in an unloading chunk through native `n_addZombie(...)` before removing it, regardless of the Java-side persistent ID. `IsoMovingObject` also calls `virtualizeZombie()` for pathing/walk-toward zombies that leave loaded world space.
+- No Lua pre-chunk-unload event exists before that native population serialization. `ReuseGridsquare` is too late.
+- Pure Lua cannot safely build a fully detached MP carrier because `ServerMap`/its zombie map and `NetworkZombiePacker` are not Lua-exposed. Adding a javaagent/launcher dependency would be a larger unsupported deployment change and is not justified while the lifecycle can be closed in Lua.
+- Native `libPZPopMan64.so` disassembly distinguishes `n_registerZombie`, `n_addZombie` and `n_releaseZombie` as separate queues. The dangerous virtual-population handoff is `n_addZombie`; proactive PNC `removeFromWorld()` follows the release queue without first issuing `n_addZombie`.
+
+### Implemented engine-proven equivalent
+
+Rather than letting a managed shell reach native virtualization, Presence now owns a hard physical-carrier safety envelope:
+
+- `forceLive` is an embodiment preference only inside `MATERIALIZE_DISTANCE`; it cannot materialize an `IsoZombie` with no nearby player or outside the player-owned live radius.
+- `ShouldAbstract` applies a hard envelope **before** force-live and combat-target exceptions. A stale target or follow state cannot hold a physical shell beyond all players.
+- `LIVE_BODY_RETIRE_DISTANCE = 40` preserves the existing materialize/abstract hysteresis while staying inside the MP server's minimum 12-chunk loaded grid.
+- Local SP/splitscreen additionally checks the actual `IsoChunkMap` tile bounds and retires one chunk (8 tiles) before the edge, covering small/debug chunk maps where a fixed distance alone could be unsafe.
+- `RetireUnsafeLiveBodies` performs a 100ms bounded sweep over `Registry.LiveByID` only (already capped by live-body admission). It does not scan world zombies.
+- `Server.ProcessRecord` also applies the same cheap fence before behavior/pathing so a due moving follower cannot issue another native route after it crosses the retirement boundary.
+- Successful attached-body retirement uses the existing exact lease/body removal path. It does not arm the husk ledger; the ledger/reaper remains only for already-lost/legacy shells.
+
+This specifically closes the native log sequence where a companion remained embodied hundreds of tiles behind the owner, PZ virtualized the old carrier, and PNC later rematerialized the same logical NPC with a new shell.
+
+### Developer evidence
+
+- New `pnc_presence_live_body_envelope_smoke.lua` covers force-live materialization bounds, no-player retirement, combat-target override ordering, small local chunk-map safety, global live-body sweep cadence, and pre-behavior/path server retirement.
+- Existing follow-combat regression now requires far stale/combat targets to yield to the hard carrier envelope while preserving near-player protection.
+- Existing husk E2E keeps its body-loss grace case inside the live envelope; far/no-player shells are now expected to be proactively retired instead of waiting for loss recovery.
+- Focused presence/husk/follow/travel/body-loss suite: **152/152**.
+- Full isolated Lua suite: **970/970**.
+- Broad body/presence/husk/restart/replica/network/player-damage/movement/combat/infection/corpse/reanimation/follow suite: **221/221**.
+- Installed Project Zomboid Kahlua compiler: **5/5 changed runtime Lua files pass**.
+- `git diff --check`: clean at this checkpoint.
+
+### Remaining M9 work
+
+- run static Kahlua/error and source-performance guards;
+- re-audit death/reanimation and legacy cleanup against the preventive lifecycle (no expected authority change);
+- update ROADMAP/ARCHITECTURE acceptance language from the disproven “persistentId zero alone” hypothesis to the engine-proven pre-virtualization retirement equivalent;
+- commit coherent implementation/docs;
+- hand back the revised native SP/MP matrix. Native confirmation remains mandatory and must test repeated abstraction/rematerialization plus old-location return.
+
+
+## M9F developer acceptance — 2026-10-30
+
+- Implementation committed as `e1a90335 fix: retire npc shells before native virtualization`.
+- Engine audit established the production boundary: managed shells became husks when PZ reached native `n_addZombie` virtualization during chunk/out-of-loaded-area handling; proactive attached-body PNC removal uses the distinct release path.
+- The proposed `persistentId == 0` detached-shell design was rejected after proving chunk unload can still virtualize any IsoZombie and pure Lua cannot safely complete detached MP ServerMap/packer admission.
+- Presence now enforces a hard loaded-space carrier envelope before force-live/combat exceptions, plus a 100ms sweep over the capped live-body registry and a per-record pre-behavior/path fence.
+- SP/splitscreen additionally retires one chunk inside actual local IsoChunkMap bounds; MP uses the conservative 40-tile fence within the minimum server loaded range.
+- Temporary engine-removal failure now fails closed for AI/pathing: the body remains registered for cleanup retry but is not passed to behavior on that tick.
+- Successful attached retirement is confirmed not to arm HuskLedger; reaping remains fallback/legacy recovery.
+- Traversal handoff was split into its own module to keep Presence decision files under the project token threshold.
+- Final validation: **970/970 full Lua**, **221/221 broad lifecycle/network/combat/death**, **152/152 focused presence/husk/follow/travel/body-loss**, **7/7 installed-PZ Kahlua compile**, **7/7 pz_verify Kahlua ERROR clean**, `git diff --check` clean.
+- No native Project Zomboid game was launched and no Workshop content was published.
+
+**Remaining mandatory action:** renewed user-owned native SP and MP acceptance. Repeated abstraction/rematerialization, old-location return, chunk unload/reload, reconnect/relog and restart must show no persistent former NPC shell. Any native husk reproduction reopens M9 despite the green developer suite.

@@ -1,6 +1,6 @@
 # Developer acceptance — Multiplayer Body Binding Migration
 
-> **SUPERSEDED / REOPENED 2026-10-30:** This document records the historical M0-M8 developer evidence. User-owned native SP/MP testing subsequently reproduced persistent old NPC husks in both modes. The parent goal is therefore not accepted; ROADMAP M9 is mandatory before a new developer handoff.
+> **M0-M8 HANDOFF SUPERSEDED; M9 ADDENDUM ACCEPTED 2026-10-30:** User-owned native SP/MP testing reproduced persistent old NPC husks after the original M0-M8 handoff. M9 developer work is now implemented in e1a90335; the parent goal still requires renewed native SP/MP acceptance.
 
 M0-M8 developer implementation was accepted on existing `main`, 2026-10-30, before native testing. Planning baseline: `e3614241`.
 
@@ -66,8 +66,47 @@ Graph coverage metadata is older than this migration and reports changed/untrack
 
 ## Native result and reopened work
 
-Native testing contradicted the M5/M8 convergence claim: old physical NPC husks persisted after legitimate lifecycle transitions in both SP and MP. Installed 42.22 Java inspection then established that the production shell factories register live PNC carriers with `ZombiePopulationManager`, while `IsoZombie.removeFromWorld()` participates in the native release lifecycle. See ROADMAP M9 and PROGRESS for the mandatory population-detached shell migration.
+Native testing contradicted the M5/M8 convergence claim: old physical NPC husks persisted after legitimate lifecycle transitions in both SP and MP. Installed 42.22 Java/native inspection then established the decisive boundary: PZ creates a persistent virtual population record through n_addZombie during chunk/out-of-loaded-area virtualization, while proactive attached-body PNC removal follows the distinct n_releaseZombie path. See ROADMAP M9 and PROGRESS for the implemented preventive lifecycle.
 
 Do not infer zero visual precursor or husk-free retirement from these historical synthetic tests. After M9 developer work, rerun the native checklist: SP restart; fresh MP materialization; two players together; independent range entry/exit; chunk unload/reload; reconnect; server restart; repeated abstraction/rematerialization; companion/neutral/hostile behavior; combat/movement; infected/noninfected death and reanimation.
 
 Developer work has not launched native Project Zomboid or published Workshop content. Any native contradiction reopens the relevant gate; this report does not supersede runtime evidence.
+
+## M9 developer addendum — pre-virtualization carrier retirement
+
+Implementation commit: e1a90335 — fix: retire npc shells before native virtualization.
+
+### Root cause closed developer-side
+
+Native logs showed the same logical companions rematerializing hundreds of tiles away with new carrier IDs while earlier physical shells persisted. The code audit found that forceLive and combat-target exceptions could bypass the normal 40-tile abstraction boundary indefinitely. That allowed a managed IsoZombie to remain physical after every player had left its area, where PZ could virtualize it through native population code and later return it as an ordinary zombie.
+
+Installed 42.22 Java/native evidence also disproved the first M9 prototype assumption: persistentId == 0 alone cannot prevent chunk virtualization, and pure Lua cannot safely reproduce detached MP network admission because the required server zombie-map/packer APIs are not exposed. M9 therefore uses the engine-supported equivalent: proactively retire the attached carrier before PZ can invoke n_addZombie.
+
+### Implemented contracts
+
+- PNC_Presence_LiveBodySafety.lua owns the hard carrier envelope and bounded sweep.
+- forceLive cannot materialize outside MATERIALIZE_DISTANCE or with no nearby player.
+- ShouldAbstract checks the hard envelope before force-live and combat-target exceptions.
+- MP uses a 40-tile retirement fence, inside the server's minimum loaded-cell range.
+- SP/splitscreen additionally uses actual IsoChunkMap bounds with an 8-tile margin.
+- A 100ms sweep walks only Registry.LiveByID, refreshes body positions, collects unsafe records, then abstracts them after iteration.
+- Per-record processing calls the same safety module before conversation/behavior/pathing so a due NPC cannot issue another native route after crossing the fence.
+- If engine body removal is temporarily unverified, the registry handle remains for cleanup retry but the current behavior tick receives no body, so pathing fails closed.
+- Successful attached retirement does not arm HuskLedger; the reaper remains fallback/legacy recovery for bodies already lost or virtualized.
+- Existing M0-M8 incarnation-safe MP binding/removal logic is unchanged.
+- Traversal handoff/audit helpers were split into PNC_Presence_TraversalHandoff.lua, reducing the decision module below the project's token-bloat threshold.
+
+### Final developer validation
+
+- Full isolated Lua suite: **970/970**.
+- Focused body/presence/husk/restart/replica/network/player-damage/movement/combat/infection/corpse/reanimation/follow matrix: **221/221**.
+- Focused presence/husk/follow/travel/body-loss matrix during implementation: **152/152**.
+- Installed Project Zomboid Kahlua compiler: **7/7 changed/new runtime Lua files pass**.
+- pz_verify Kahlua ERROR scan: **7/7 clean, zero errors**.
+- New safety/decision/traversal modules are below the 2k token threshold. The two server orchestration files remain over threshold from the pre-M9 baseline; M9 adds only small call sites there.
+- git diff --check: clean before implementation commit.
+- No native Project Zomboid instance was launched and nothing was published.
+
+### Remaining acceptance
+
+Renewed native testing is mandatory. Synthetic validation cannot prove PZ never virtualizes an old carrier in the live engine. Test both SP and MP with repeated follow movement far enough to trigger abstraction, return to old locations, chunk unload/reload, reconnect/relog and server restart. Any persistent old zombie/husk reopens M9.

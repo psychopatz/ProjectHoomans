@@ -153,21 +153,28 @@ Project A-Life may be cited as external architectural evidence, but Project Hoom
 The migration is accepted only if Project Hoomans works with A-Life absent.
 
 
-## 13. Population-detached live-human carrier (M9)
+## 13. Pre-virtualization live-human carrier retirement (M9)
 
 Required:
-- factory-created managed live human has native `persistentId == 0`;
-- no production live-human path calls a PopMan-registering factory unless immediately converted to a proven detached transient shell before exposure;
-- SP materialize -> abstract -> rematerialize leaves the prior carrier absent and does not create a population-backed ordinary zombie;
-- MP server transient shell has a valid online ID/current binding while remaining `persistentId == 0`;
-- client bind/message ordering behavior from sections 3-6 remains unchanged;
+- `forceLive` cannot create a live shell outside the materialization radius or with no nearby player;
+- a hard retirement envelope runs before force-live and combat-target exceptions;
+- no-player, stale-target, companion and hostile shells all yield to the same envelope;
+- SP/splitscreen uses actual local `IsoChunkMap` bounds with a one-chunk safety margin where available;
+- MP keeps retirement inside the server's minimum loaded-cell range;
+- a 100ms bounded sweep inspects only `Registry.LiveByID`, not the world zombie population;
+- per-record processing repeats the fence before behavior/pathing so a due NPC cannot issue another native route after crossing the boundary;
+- successful attached-body retirement does not arm the husk ledger;
+- already-lost/legacy shells retain exact strong-provenance recovery only;
+- M0-M8 client bind/message ordering remains unchanged;
 - exact server/client retirement removes only the current incarnation;
-- companion, neutral, hostile/raider and faction roles use the same transient provider;
-- uninfected death/corpse path does not register a living zombie carrier;
-- Knox reanimation explicitly transitions to a true vanilla zombie, for which normal native population semantics are allowed;
-- legacy pre-M9 registered shells are cleaned only from strong provenance; anonymous coincident zombies remain untouched;
-- bounded diagnostics surface any live managed shell with `persistentId ~= 0`;
-- no new per-frame full-population scan is introduced.
+- companion, neutral, hostile/raider and faction roles use the same Presence contract;
+- Knox reanimation remains the intentional transition to a true vanilla zombie for which normal population virtualization is allowed;
+- no new per-frame full-population scan or unbounded state is introduced.
+
+Engine-grounded evidence must distinguish:
+- `n_registerZombie` / real-zombie admission;
+- `n_addZombie` / virtual population handoff;
+- `n_releaseZombie` / proactive removal.
 
 Native acceptance must repeat the same scenario in SP and MP:
 

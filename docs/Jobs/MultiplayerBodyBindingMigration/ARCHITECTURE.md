@@ -185,45 +185,61 @@ Forbidden:
 
 ## 8. Server shell lifetime
 
-Server-side `IsoZombie` remains the physical network carrier, but **M9 changes its ownership class**. A live PNC human carrier must not be a normal `ZombiePopulationManager` actor. The target is a PNC-owned transient shell with native `persistentId == 0` while still satisfying world/network admission.
+Server-side `IsoZombie` remains the physical network carrier. M9 no longer requires an unsupported detached-network-shell provider; installed 42.22 evidence instead establishes a hard ownership boundary around **virtualization**. A managed live-human shell may use vanilla real-zombie/network registration while loaded, but PNC must retire it before Project Zomboid can hand it to the native virtual population.
 
 The server must:
-- create/configure one body incarnation through the population-detached carrier provider;
-- assert the managed live-human carrier is not registered with PopMan (`persistentId == 0`);
+- create/configure one body incarnation through the existing proven body factory;
+- keep every managed live-human shell inside the hard player-owned loaded envelope;
+- retire an attached shell before chunk unload/out-of-loaded-area virtualization can issue native `n_addZombie`;
 - obtain/refresh its valid online ID;
 - publish the current binding;
 - invalidate that binding before/when the body is replaced;
 - never consider absence from one stream-scoped census sufficient evidence that an attached lease-matched shell is gone;
 - let Presence/BodyLifecycle decide true shell loss.
 
-## 8A. Population ownership boundary (M9)
+## 8A. Native virtualization boundary (M9)
 
-Installed 42.22 engine inspection proves the old body factory crosses an ownership boundary that PNC did not previously model:
+Installed 42.22 engine and native-library inspection distinguishes three operations:
 
-    addZombiesInOutfit
-        -> VirtualZombieManager.createRealZombieAlways
+    create/real admission
         -> ZombiePopulationManager.registerZombie
-        -> non-zero native persistentId
+        -> native n_registerZombie
 
-Later `IsoZombie.removeFromWorld()` calls `ZombiePopulationManager.releaseZombie()`. That lifecycle is valid for real zombies but is not a sufficient annihilation contract for a disposable human carrier. Native SP/MP testing reproduced old husks after M8, so body binding alone cannot own this problem.
+    engine virtualization
+        -> ZombiePopulationManager.virtualizeZombie
+        -> or removeChunkFromWorld
+        -> native n_addZombie
+        -> removeFromWorld/removeFromSquare
+
+    proactive PNC retirement
+        -> IsoZombie.removeFromWorld
+        -> ZombiePopulationManager.releaseZombie
+        -> native n_releaseZombie
+
+The husk-producing path is the middle one: once `n_addZombie` has serialized the carrier into native population state, PNC has already lost reliable Lua identity continuity. Native SP/MP evidence showed this happening to companions retained physically far beyond all players.
+
+A `persistentId == 0` shell was investigated but rejected as the production solution:
+- chunk unload still virtualizes any `IsoZombie` found in the unloading square;
+- the MP server APIs needed to assign/insert a manually built shell into `ServerMap.zombieMap` are not Lua-exposed;
+- adding a javaagent/launcher dependency would be a larger unsupported deployment change.
 
 Target invariant:
 
     live PNC human:
         durable actor = Registry record
-        physical carrier = transient IsoZombie
+        physical carrier = loaded IsoZombie
         PNC incarnation = runtime.bodyLease
         MP transport identity = onlineId
-        native zombie persistentId = 0
+        must remain inside PNC live-body safety envelope
+        must be proactively removed while still attached
+        must never reach native n_addZombie virtualization
 
     true Knox-reanimated NPC:
-        durable human lifecycle is ended
-        resulting actor is a genuine vanilla zombie
-        normal native zombie/population semantics are allowed
+        human lifecycle ended
+        genuine vanilla zombie
+        normal native population virtualization allowed
 
-The transient factory may reproduce the safe portions of vanilla live-zombie admission (world/square/list membership, emitter, online ID/server map and network transport) only as verified against installed PZ. It must intentionally omit PopMan registration. If Lua cannot safely perform a required admission step, isolate the smallest bridge/provider at BodyLifecycle rather than leaking engine-specific manipulation through gameplay modules.
-
-Removal of a transient live-human shell must never depend on anonymous positional recovery. MP client deletion remains exact `(npcId, incarnation, onlineId)` admission.
+Presence therefore owns a hard carrier-safety envelope above ordinary gameplay requests. `forceLive`, combat targets and follow state are not allowed to bypass it. A bounded live-registry sweep plus the per-record pre-behavior fence provide cadence-independent retirement. MP client deletion remains exact `(npcId, incarnation, onlineId)` admission.
 
 ## 9. Client replica lifetime
 
@@ -252,7 +268,7 @@ Death/reanimation invalidates the live-body incarnation.
 
 ## 11. Husk cleanup after migration
 
-After M9, normal current-session lifecycle must not require a husk reaper. Husk cleanup becomes primarily a legacy migration concern for shells/population records created by pre-M9 factories.
+After M9, normal current-session lifecycle must be preventive: attached managed shells retire before native virtualization. Husk cleanup becomes fallback/legacy recovery for shells that were already lost or virtualized before the preventive fence could act.
 
 Husk cleanup hierarchy:
 1. exact current binding / exact stale incarnation evidence;

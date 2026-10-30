@@ -185,7 +185,7 @@ It is:
 This prevents another migration step from making SP correctness collateral damage.
 
 
-## 13. Native M0-M8 acceptance failure: live carriers are PopMan-owned
+## 13. Native M0-M8 acceptance failure: managed shells reached native virtualization
 
 User-owned native testing on 2026-10-30 reproduced the old NPC husk in both SP and MP after the M0-M8 implementation. This is stronger evidence than the synthetic green suite and reopens the lifecycle architecture.
 
@@ -195,9 +195,9 @@ Installed Project Zomboid 42.22 Java ground truth:
 2. `createRealZombieAlways(...)` adds the `IsoZombie` to live engine lists, assigns server `onlineId`, and calls `ZombiePopulationManager.registerZombie(...)`.
 3. The resulting live PNC carrier receives a native non-zero `persistentId`.
 4. `IsoZombie.removeFromWorld()` calls `ZombiePopulationManager.releaseZombie(...)`.
-5. PZ's real/virtual zombie lifecycle uses population records plus `removeFromWorld()/removeFromSquare()` during virtualization.
-6. `ZombiePopulationManager.INVALID_PERSISTENT_ID == 0`; `releaseZombie()` does nothing for an unregistered (`persistentId == 0`) zombie.
-7. `IsoZombie` is Lua-exposed with a public constructor, so a population-detached carrier is plausible but still requires an engine-grounded admission proof.
+5. PZ's real/virtual zombie lifecycle calls native `n_addZombie(...)` before `removeFromWorld()/removeFromSquare()` during chunk unload or explicit virtualization.
+6. Native `libPZPopMan64.so` inspection shows `n_registerZombie`, `n_addZombie`, and `n_releaseZombie` are distinct operations/queues. Proactive attached-body `removeFromWorld()` reaches release without first calling the add/virtualization path.
+7. A `persistentId == 0` carrier is not sufficient: chunk unload still virtualizes any `IsoZombie` in the unloading square. Pure Lua also cannot complete detached MP network admission because `ServerMap`/`NetworkZombiePacker` are not exposed.
 
 Latest native server logging showed the same logical NPC IDs materialize again far from their earlier shell positions with new carrier IDs. The logical Presence transition therefore occurred, while the former physical zombie carrier survived. That pattern is consistent with the shell being owned by a native zombie-population lifecycle outside the PNC Registry/BodyLifecycle model.
 
@@ -215,11 +215,11 @@ but failed to separate:
         from
     native ZombiePopulationManager ownership
 
-The correct target is a transient `IsoZombie` carrier that remains usable by PNC and vanilla MP zombie transport while `persistentId == 0`. Binding/reconciliation remains necessary and should be preserved above this layer.
+The engine-supported target is therefore preventive rather than a new carrier class: keep the proven vanilla real/network shell, but guarantee that Presence proactively removes it while it is still attached and safely inside player-loaded space, before PZ can invoke native `n_addZombie` virtualization. Binding/reconciliation remains necessary and is preserved above this layer.
 
 ### Explicit non-solution
 
-Do not respond by widening HuskReaper identity heuristics. Position, outfit, gender, companion ownership and stale online IDs remain insufficient identity evidence and risk deleting ordinary zombies. M9 must fix carrier ownership at creation/removal and keep the reaper only for bounded legacy-save cleanup.
+Do not respond by widening HuskReaper identity heuristics. Position, outfit, gender, companion ownership and stale online IDs remain insufficient identity evidence and risk deleting ordinary zombies. M9 must prevent normal carriers from reaching native virtualization; the reaper remains bounded fallback/legacy cleanup for shells already lost before the preventive fence.
 
 ### A-Life comparison correction
 
