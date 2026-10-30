@@ -36,9 +36,12 @@ end
 local Profiles = PNC.VisualProfiles
 local Core = PNC.Core
 
-local function isNetworkedGame()
-    return (isClient and isClient() == true)
-        or (isServer and isServer() == true)
+local function isReplicaRuntime()
+    if Core and Core.IsAuthority then
+        return Core.IsAuthority() ~= true
+    end
+    return isClient and isClient() == true
+        and (not isServer or isServer() ~= true)
 end
 
 local function makeImmutableColor(color)
@@ -87,7 +90,12 @@ function Visuals.MaintainHumanAppearance(zombie, appearance, isFemale, refreshMo
     if not zombie or not appearance then
         return false
     end
-    if zombie.setFemaleEtc then
+    if zombie.setFemaleEtc
+        and (
+            not zombie.isFemale
+            or zombie:isFemale() ~= (isFemale == true)
+        )
+    then
         zombie:setFemaleEtc(isFemale == true)
     end
     if zombie.setNoTeeth then
@@ -332,6 +340,8 @@ function Visuals.ApplyReplicaAppearance(zombie, appearance, isFemale, record)
     return true, "replica_appearance"
 end
 
+require "PNC/Core/Visuals/PNC_Visuals_ReplicaIntegrity"
+
 function Visuals.HasClothingVisuals(zombie)
     local itemVisuals
     if not zombie or not zombie.getItemVisuals then
@@ -350,7 +360,7 @@ function Visuals.ApplyHumanVisuals(zombie, record)
         return
     end
     appearance = Profiles.RollAppearance(record)
-    if isNetworkedGame() then
+    if isReplicaRuntime() then
         Visuals.ApplyReplicaAppearance(
             zombie,
             appearance,

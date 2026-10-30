@@ -12,6 +12,7 @@ local Internal = Sync.Internal
 local Core = PNC.Core
 local Animation = PNC.Animation
 local LiveBodyControl = PNC.LiveBodyControl
+local Visuals = PNC.Visuals
 local AnimationTrace = PNC.AnimationTrace
 local buildRecordView = Internal.BuildRecordView
 local buildMotionKey = Internal.BuildMotionKey
@@ -156,6 +157,17 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
             zombie,
             now,
             engineMovementActive
+        )
+    end
+    if remoteReplica
+        and Visuals
+        and Visuals.RepairReplicaHumanAppearance
+    then
+        Visuals.RepairReplicaHumanAppearance(
+            zombie,
+            snapshot.appearance or {},
+            snapshot.isFemale == true,
+            now
         )
     end
     if AnimationTrace and AnimationTrace.Sample then
