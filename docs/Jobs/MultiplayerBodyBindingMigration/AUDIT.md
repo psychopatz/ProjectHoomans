@@ -224,3 +224,25 @@ Do not respond by widening HuskReaper identity heuristics. Position, outfit, gen
 ### A-Life comparison correction
 
 A-Life's `ShellSimulation.retire()` is useful for explicit MP client replica cleanup, but its server cleanup still ultimately calls `removeFromWorld()/removeFromSquare()`. It is therefore not proof of permanent PopMan detachment and must not be copied as the SP/native-population fix.
+
+
+## M10 restart-shell failure audit
+
+The 2026-10-30 09:44/09:46 native restart log disproved the remaining M9 assumption that runtime pre-virtualization retirement alone was sufficient. Startup saw anonymous restored live `IsoZombie` carriers, reported `ordinaryUnknown` plus blocked records, removed zero shells, and later materialized replacement NPC bodies.
+
+Repository history isolated the direct regression to `df315d65`, which hard-disabled the anonymous current-save rehydration function. The safe repair is not broad positional cleanup. M10 splits proof into three lanes:
+
+- exact identity: UUID/engine identity or the new lifecycle-only live-shell token;
+- bounded current-save adoption: saved live lease, prior nonzero engine identity, tight position, sex when available, real-frame settle, and one-to-one ownership;
+- ambiguity: fail closed, preserve bodies, block replacement materialization.
+
+Anonymous evidence is adoption-only and can never authorize duplicate deletion. True Knox-reanimated zombies remain outside this restart-reclaim path.
+
+Installed Build 42.22 server evidence also shows dedicated saves call `ZombiePopulationManager.updateRealZombies()` immediately before native population save, while Lua exposes no safe server-authority detach/re-admit seam that preserves PopMan and `ServerMap` identity. Therefore:
+- local/SP uses canonical pre-save carrier retirement before PNC persistence;
+- dedicated/MP uses startup reclaim as the supported restart contract;
+- runtime distance fencing remains the normal anti-virtualization guard during play.
+
+Developer validation for the M10 implementation in `ada48d24`: 972/972 full tests, 231/231 broad lifecycle tests, 163/163 focused restart/persistence tests, 14/14 installed-PZ compiler passes, 14/14 static Kahlua-error clean.
+
+Native acceptance remains mandatory. Success requires a `PNC startup_rehydrate_rebound` line before any replacement `spawnPrimary` for the same NPC, with no hostile old live shell remaining.

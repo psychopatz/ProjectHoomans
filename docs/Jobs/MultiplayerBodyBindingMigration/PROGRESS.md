@@ -4,7 +4,7 @@
 **Branch:** existing main only.
 **Planning anchor:** 2a24bc59d36c845af51097642c55180434680cb7.
 **Current phase:** Native restart-shell acceptance handoff.
-**Parent objective:** M0-M9 complete migration to explicit MP body binding plus pre-virtualization live-human carrier retirement, with SP preserved; native husk convergence remains to be verified by the user.
+**Parent objective:** M0-M10 complete migration to explicit MP body binding, pre-virtualization live-human carrier retirement, and restart-shell recovery, with SP preserved; native husk convergence remains to be verified by the user.
 
 ## Verified starting evidence
 
@@ -32,7 +32,7 @@
 ## Remaining mandatory work
 
 - M0-M8 are implemented historical prerequisites and remain regression constraints.
-- M0-M9 developer work is implemented and validated. M9 selected the engine-proven pre-virtualization retirement path rather than an unsupported detached-shell bridge.
+- M0-M10 developer work is implemented and validated. M9 selected the engine-proven pre-virtualization retirement path; M10 adds restart-shell recovery after native restart disproved M9 as sufficient.
 - **Only renewed native SP/MP acceptance remains mandatory.** Persistent old shells after abstraction/rematerialization, chunk streaming, restart or reconnect are still a hard failure and reopen the owning lifecycle gate.
 
 ## Current non-goals
@@ -48,7 +48,7 @@
 
 Do not mark complete after M0, a working binding prototype, or a passing focused suite.
 
-Developer completion requires all M0-M9 gates plus final full-suite/static/compiler evidence. That developer gate is now met by commit `e1a90335`; parent acceptance still requires renewed native SP/MP proof.
+Developer completion requires all M0-M10 gates plus final full-suite/static/compiler evidence. That developer gate is now met by `ada48d24` plus docs reconciliation; parent acceptance still requires renewed native SP/MP restart proof.
 
 ## M0A local factory restoration — 2026-10-30
 
@@ -260,7 +260,7 @@ This specifically closes the native log sequence where a companion remained embo
 - Final validation: **970/970 full Lua**, **221/221 broad lifecycle/network/combat/death**, **152/152 focused presence/husk/follow/travel/body-loss**, **7/7 installed-PZ Kahlua compile**, **7/7 pz_verify Kahlua ERROR clean**, `git diff --check` clean.
 - No native Project Zomboid game was launched and no Workshop content was published.
 
-**Remaining mandatory action:** renewed user-owned native SP and MP acceptance. Repeated abstraction/rematerialization, old-location return, chunk unload/reload, reconnect/relog and restart must show no persistent former NPC shell. Any native husk reproduction reopens M9 despite the green developer suite.
+**Remaining mandatory action:** renewed user-owned native SP and MP acceptance. Repeated abstraction/rematerialization, old-location return, chunk unload/reload, reconnect/relog and restart must show no persistent former NPC shell. Any native husk reproduction reopens M10 despite the green developer suite.
 
 
 ## M10 native restart failure and developer repair — 2026-10-30

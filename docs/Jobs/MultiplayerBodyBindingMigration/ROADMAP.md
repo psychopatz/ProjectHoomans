@@ -4,7 +4,7 @@
 
 **Parent objective:** successfully migrate Project Hoomans from implicit cross-network IsoZombie identity to an explicit, incarnation-safe multiplayer body-binding protocol **and** prevent managed live-human carriers from reaching native zombie virtualization, while preserving SP behavior, durable Registry authority, MP streaming/reconnect, death/reanimation semantics, and exact cleanup.
 
-The full M0-M9 objective is the completion boundary. Phase completion is not goal completion.
+The full M0-M10 objective is the completion boundary. Phase completion is not goal completion.
 
 ## M0 — Restore/freeze single-player baseline and engine truth
 
@@ -277,7 +277,7 @@ Accepted developer evidence for ada48d24:
 
 ### Native user acceptance handoff
 
-After all developer-side M0-M9 gates pass, user-owned native acceptance should verify:
+After all developer-side M0-M10 gates pass, user-owned native acceptance should verify:
 1. SP restart/materialization behavior is restored and no former SP husk regression returns.
 2. Fresh MP materialization does not leave an ordinary zombie precursor or stale zombie after reconciliation.
 3. Two players in the same area see the same one NPC.

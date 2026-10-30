@@ -109,7 +109,7 @@ Installed 42.22 Java/native evidence also disproved the first M9 prototype assum
 
 ### Remaining acceptance
 
-Renewed native testing is mandatory. Synthetic validation cannot prove PZ never virtualizes an old carrier in the live engine. Test both SP and MP with repeated follow movement far enough to trigger abstraction, return to old locations, chunk unload/reload, reconnect/relog and server restart. Any persistent old zombie/husk reopens M9.
+This M9 acceptance statement is superseded by M10 below. Renewed native testing remains mandatory; any persistent old zombie/husk now reopens M10.
 
 
 ## M10 developer addendum — restart-shell recovery

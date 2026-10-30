@@ -29,7 +29,7 @@ Single-player must remain on its proven local-object path and must not inherit M
 
 - AUDIT.md — verified starting evidence and why the current methodology fails in MP.
 - ARCHITECTURE.md — target authority, identity, protocol and lifecycle contracts.
-- ROADMAP.md — mandatory M0-M9 migration phases and gates.
+- ROADMAP.md — mandatory M0-M10 migration phases and gates.
 - HARNESS_ACCEPTANCE.md — deterministic developer-side regression matrix.
 - AGENT_RUNBOOK.md — execution procedure and standing constraints.
 - PROGRESS.md — current phase, evidence and immediate Next Chunk.
