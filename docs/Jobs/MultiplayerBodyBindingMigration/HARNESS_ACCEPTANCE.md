@@ -4,7 +4,7 @@
 
 This matrix proves identity, ordering, lifecycle and regression contracts without pretending a Lua harness can fully reproduce Project Zomboid's native network runtime.
 
-Native SP/MP remains the final user acceptance layer.
+Native SP/MP remains the final user acceptance layer. The prior M0-M8 synthetic matrix passed but native testing still reproduced persistent husks, so M9 adds explicit native-population ownership assertions.
 
 ## 1. SP baseline
 
@@ -151,3 +151,33 @@ Assert:
 Project A-Life may be cited as external architectural evidence, but Project Hoomans tests must not import or require A-Life.
 
 The migration is accepted only if Project Hoomans works with A-Life absent.
+
+
+## 13. Population-detached live-human carrier (M9)
+
+Required:
+- factory-created managed live human has native `persistentId == 0`;
+- no production live-human path calls a PopMan-registering factory unless immediately converted to a proven detached transient shell before exposure;
+- SP materialize -> abstract -> rematerialize leaves the prior carrier absent and does not create a population-backed ordinary zombie;
+- MP server transient shell has a valid online ID/current binding while remaining `persistentId == 0`;
+- client bind/message ordering behavior from sections 3-6 remains unchanged;
+- exact server/client retirement removes only the current incarnation;
+- companion, neutral, hostile/raider and faction roles use the same transient provider;
+- uninfected death/corpse path does not register a living zombie carrier;
+- Knox reanimation explicitly transitions to a true vanilla zombie, for which normal native population semantics are allowed;
+- legacy pre-M9 registered shells are cleaned only from strong provenance; anonymous coincident zombies remain untouched;
+- bounded diagnostics surface any live managed shell with `persistentId ~= 0`;
+- no new per-frame full-population scan is introduced.
+
+Native acceptance must repeat the same scenario in SP and MP:
+
+    materialize NPC
+    move far enough to force legitimate abstraction
+    verify old location has no husk
+    rematerialize same logical NPC elsewhere
+    repeat
+    restart/reconnect/chunk-stream as applicable
+    return to old locations
+    => no old ordinary zombie / no duplicate NPC
+
+A green Lua suite is not sufficient if this native invariant fails.

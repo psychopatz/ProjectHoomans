@@ -1,10 +1,10 @@
 # Roadmap — Multiplayer Body Binding Migration
 
-**Status:** Developer implementation accepted; user-owned native SP/MP acceptance pending. See DEVELOPER_ACCEPTANCE.md for gate evidence.
+**Status:** REOPENED after native SP/MP failure. M0-M8 remain implemented prerequisites; M9 is mandatory. DEVELOPER_ACCEPTANCE.md is historical evidence, not current completion.
 
-**Parent objective:** successfully migrate Project Hoomans from implicit cross-network IsoZombie identity to an explicit, incarnation-safe multiplayer body-binding protocol, while restoring and preserving single-player behavior, keeping the durable PNC record authoritative, making MP shell replacement/reconnect/multi-client streaming robust, and retiring obsolete husk/identity assumptions superseded by the new protocol.
+**Parent objective:** successfully migrate Project Hoomans from implicit cross-network IsoZombie identity to an explicit, incarnation-safe multiplayer body-binding protocol **and** from native PopMan-owned live-human carriers to PNC-owned population-detached transient shells, while preserving SP behavior, durable Registry authority, MP streaming/reconnect, death/reanimation semantics, and exact cleanup.
 
-The full M0-M8 objective is the completion boundary. Phase completion is not goal completion.
+The full M0-M9 objective is the completion boundary. Phase completion is not goal completion.
 
 ## M0 — Restore/freeze single-player baseline and engine truth
 
@@ -141,17 +141,97 @@ Required:
 - no new performance-hot global scans or unbounded pending tables;
 - no new routine persistent client binding state.
 
+## M9 — Population-detached live-human shell migration
+
+Native SP/MP acceptance after M8 reproduced persistent old NPC husks. Installed 42.22 Java ground truth shows the current factory (`addZombiesInOutfit` / `VirtualZombieManager.createRealZombieAlways`) registers every live PNC carrier with `ZombiePopulationManager`. That is now treated as an invalid ownership boundary for a disposable human carrier.
+
+### M9A — Prove a transient shell factory
+
+Required:
+- use installed 42.22 Java ground truth to enumerate the minimum safe admission steps around `IsoZombie.new(getCell())` (or the smallest equivalent factory);
+- create a focused prototype/fixture that yields a usable live `IsoZombie` without `ZombiePopulationManager.registerZombie()`;
+- preserve PNC visual/human initialization, health, movement, combat and managed-body stamping requirements;
+- prove the resulting live human carrier has `persistentId == 0`;
+- prove SP world/square/cell membership is correct and exact removal leaves no object behind;
+- on MP server, prove how online ID allocation, `ServerMap.zombieMap`, emitter/list membership and NetworkZombieManager/NetworkZombiePacker participation are established without PopMan registration;
+- if those members cannot be safely manipulated from Lua, introduce the smallest isolated bridge/provider rather than copying a native population factory.
+
+Gate: a transient carrier can exist and be retired without entering PopMan ownership. No production factory swap before this gate passes.
+
+### M9B — Production materialization migration
+
+Required:
+- route normal live-human materialization through the proven transient factory;
+- keep `runtime.bodyLease` and `PNC_MultiplayerBodyBinding` as the canonical logical/MP incarnation identity;
+- make `persistentId == 0` a runtime invariant for every managed live human shell;
+- fail closed and emit bounded diagnostics when a newly materialized managed human violates that invariant;
+- ensure companion, neutral, hostile/raider, faction-owned and restored live NPCs all use the same carrier path;
+- preserve existing SP direct-object semantics and MP explicit binding semantics;
+- remove no gameplay authority from Registry/Presence/BodyLifecycle.
+
+Gate: focused SP/MP fixtures prove every newly created live human shell is population-detached and all M1-M8 identity tests still pass.
+
+### M9C — Exact transient retirement and client cleanup
+
+Required:
+- retire the server/SP transient shell without PopMan release semantics becoming a persistence source;
+- preserve exact MP bind/unbind/removal ordering and incarnation guards;
+- where Build 42 server networking requires the vanilla `ZombieDeleteOnClient` notification, use the exact online ID/current incarnation path only;
+- never delete an unbound ordinary zombie from online ID, position, outfit, gender or proximity alone;
+- verify abstraction/rematerialization creates one new transient shell and the prior physical shell cannot return as an ordinary zombie.
+
+Gate: repeated same-session materialize -> abstract -> rematerialize cycles converge to one current shell with no old zombie at previous locations.
+
+### M9D — Death, corpse and true-zombie transition
+
+Required:
+- ordinary live-human death/corpse conversion still invalidates the live transient shell exactly once;
+- corpse behavior/inventory/clothing remains correct;
+- Knox reanimation deliberately crosses the boundary from transient human carrier to a **real vanilla zombie** and may then use normal native population semantics;
+- stale M1-M8 binding proof can never repaint that true zombie as a human;
+- uninfected death must not accidentally register a living zombie carrier.
+
+Gate: infected/non-infected death/reanimation matrix passes with an explicit assertion that only a true reanimated zombie may enter the normal zombie-population lifecycle.
+
+### M9E — Legacy registered-shell migration
+
+Existing saves may already contain PNC-originated PopMan records from pre-M9 factories.
+
+Required:
+- classify exact strong provenance that can safely identify an old registered PNC shell/population record;
+- use UUID/lease/population/carrier evidence only when it is truly identifying;
+- retain bounded HuskLedger/HuskReaper behavior only as a migration cleaner for those historical records;
+- preserve the existing fail-closed rule for genuinely anonymous historical zombies;
+- do not restore position/outfit/gender/companion-ownership heuristics as identity;
+- ensure legacy cleanup cannot delete an ordinary zombie.
+
+Gate: migration fixtures distinguish strong old-PNC provenance from ordinary coincident zombies and clean only the former.
+
+### M9F — Re-audit and native handoff
+
+Required developer-side evidence:
+- all M0-M8 regressions remain green;
+- new transient-factory/population-invariant tests pass;
+- full isolated Lua suite passes;
+- focused body/presence/husk/restart/replica/network/player-damage/movement/combat/infection/corpse/reanimation/follow suite passes;
+- installed-PZ Kahlua compilation/static verification passes for every changed runtime Lua file;
+- engine-grounded checks document any Java bridge/API used;
+- no new per-frame global scans, unbounded tables or routine persistent client cache;
+- `git diff --check` clean and intended work committed on existing main.
+
+Gate: developer implementation may hand back to native testing only when the code proves new live humans are not PopMan-owned.
+
 ### Native user acceptance handoff
 
-After all developer-side M0-M8 gates pass, user-owned native acceptance should verify:
+After all developer-side M0-M9 gates pass, user-owned native acceptance should verify:
 1. SP restart/materialization behavior is restored and no former SP husk regression returns.
 2. Fresh MP materialization does not leave an ordinary zombie precursor or stale zombie after reconciliation.
 3. Two players in the same area see the same one NPC.
 4. Players entering/leaving independently do not duplicate the NPC.
 5. Chunk unload/reload and client reconnect reconstruct the same logical NPC.
 6. Server restart rehydrates one canonical NPC without husks.
-7. Legitimate abstraction/rematerialization does not produce persistent old shells.
+7. Legitimate abstraction/rematerialization does not produce persistent old shells, and the managed live human shell reports `persistentId == 0` before abstraction.
 8. Companions, neutrals and hostiles all behave consistently.
 9. Death/infection/reanimation remain correct.
 
-Do not mark the parent goal complete from synthetic evidence alone if native evidence still contradicts a migration invariant.
+Do not mark the parent goal complete from synthetic evidence alone. Native SP and MP must each prove that repeated abstraction/rematerialization and restart/reconnect leave no old husk, while true Knox reanimation remains a genuine vanilla zombie.

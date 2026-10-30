@@ -1,6 +1,8 @@
 # Developer acceptance — Multiplayer Body Binding Migration
 
-Developer implementation accepted on existing `main`, 2026-10-30. Native SP/MP acceptance remains user-owned and unexecuted. Planning baseline: `e3614241`.
+> **SUPERSEDED / REOPENED 2026-10-30:** This document records the historical M0-M8 developer evidence. User-owned native SP/MP testing subsequently reproduced persistent old NPC husks in both modes. The parent goal is therefore not accepted; ROADMAP M9 is mandatory before a new developer handoff.
+
+M0-M8 developer implementation was accepted on existing `main`, 2026-10-30, before native testing. Planning baseline: `e3614241`.
 
 ## Implemented ownership
 
@@ -62,8 +64,10 @@ Graph coverage metadata is older than this migration and reports changed/untrack
 - Arbitrary outfit plus position, zero-ID saved positions, matching gender and companion ownership cannot establish identity. Those recovery/deletion exceptions were removed.
 - Truly anonymous historical shells cannot safely be distinguished from ordinary zombies. They are preserved rather than guessed at. This is an explicit safety limit for old saves, not proof of current-shell duplication.
 
-## User-owned native acceptance
+## Native result and reopened work
 
-Do not infer zero visual precursor from synthetic tests. Run the existing ROADMAP native checklist: SP restart; fresh MP materialization; two players together; independent range entry/exit; chunk unload/reload; reconnect; server restart; abstraction/rematerialization; companion/neutral/hostile behavior; combat/movement; infected/noninfected death and reanimation.
+Native testing contradicted the M5/M8 convergence claim: old physical NPC husks persisted after legitimate lifecycle transitions in both SP and MP. Installed 42.22 Java inspection then established that the production shell factories register live PNC carriers with `ZombiePopulationManager`, while `IsoZombie.removeFromWorld()` participates in the native release lifecycle. See ROADMAP M9 and PROGRESS for the mandatory population-detached shell migration.
+
+Do not infer zero visual precursor or husk-free retirement from these historical synthetic tests. After M9 developer work, rerun the native checklist: SP restart; fresh MP materialization; two players together; independent range entry/exit; chunk unload/reload; reconnect; server restart; repeated abstraction/rematerialization; companion/neutral/hostile behavior; combat/movement; infected/noninfected death and reanimation.
 
 Developer work has not launched native Project Zomboid or published Workshop content. Any native contradiction reopens the relevant gate; this report does not supersede runtime evidence.

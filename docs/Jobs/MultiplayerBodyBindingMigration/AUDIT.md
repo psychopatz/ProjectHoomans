@@ -183,3 +183,44 @@ It is:
 5. only then introduce the body-binding protocol behind explicit SP/MP boundaries.
 
 This prevents another migration step from making SP correctness collateral damage.
+
+
+## 13. Native M0-M8 acceptance failure: live carriers are PopMan-owned
+
+User-owned native testing on 2026-10-30 reproduced the old NPC husk in both SP and MP after the M0-M8 implementation. This is stronger evidence than the synthetic green suite and reopens the lifecycle architecture.
+
+Installed Project Zomboid 42.22 Java ground truth:
+
+1. `LuaManager.addZombiesInOutfit(...)` calls `VirtualZombieManager.createRealZombieAlways(...)`.
+2. `createRealZombieAlways(...)` adds the `IsoZombie` to live engine lists, assigns server `onlineId`, and calls `ZombiePopulationManager.registerZombie(...)`.
+3. The resulting live PNC carrier receives a native non-zero `persistentId`.
+4. `IsoZombie.removeFromWorld()` calls `ZombiePopulationManager.releaseZombie(...)`.
+5. PZ's real/virtual zombie lifecycle uses population records plus `removeFromWorld()/removeFromSquare()` during virtualization.
+6. `ZombiePopulationManager.INVALID_PERSISTENT_ID == 0`; `releaseZombie()` does nothing for an unregistered (`persistentId == 0`) zombie.
+7. `IsoZombie` is Lua-exposed with a public constructor, so a population-detached carrier is plausible but still requires an engine-grounded admission proof.
+
+Latest native server logging showed the same logical NPC IDs materialize again far from their earlier shell positions with new carrier IDs. The logical Presence transition therefore occurred, while the former physical zombie carrier survived. That pattern is consistent with the shell being owned by a native zombie-population lifecycle outside the PNC Registry/BodyLifecycle model.
+
+### Architectural conclusion
+
+The previous migration correctly separated:
+
+    durable npcId/bodyLease
+        from
+    client onlineId replica identity
+
+but failed to separate:
+
+    PNC live-human physical carrier
+        from
+    native ZombiePopulationManager ownership
+
+The correct target is a transient `IsoZombie` carrier that remains usable by PNC and vanilla MP zombie transport while `persistentId == 0`. Binding/reconciliation remains necessary and should be preserved above this layer.
+
+### Explicit non-solution
+
+Do not respond by widening HuskReaper identity heuristics. Position, outfit, gender, companion ownership and stale online IDs remain insufficient identity evidence and risk deleting ordinary zombies. M9 must fix carrier ownership at creation/removal and keep the reaper only for bounded legacy-save cleanup.
+
+### A-Life comparison correction
+
+A-Life's `ShellSimulation.retire()` is useful for explicit MP client replica cleanup, but its server cleanup still ultimately calls `removeFromWorld()/removeFromSquare()`. It is therefore not proof of permanent PopMan detachment and must not be copied as the SP/native-population fix.

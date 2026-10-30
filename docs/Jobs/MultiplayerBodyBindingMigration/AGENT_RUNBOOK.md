@@ -14,7 +14,7 @@ Use current code/tests/runtime evidence as source of truth over historical agent
 
 ## Parent objective
 
-Implement the complete M0-M8 Multiplayer Body Binding Migration.
+Implement the complete M0-M9 Multiplayer Body Binding Migration.
 
 The parent objective is the completion boundary. A phase/chunk passing does not finish the job.
 
@@ -27,7 +27,7 @@ Do not ask for another /goal merely because one phase passes.
 
 ## First principle
 
-Do not assume a server-side IsoZombie and a multiplayer client IsoZombie are the same Java object or share authoritative PNC ModData.
+Do not assume a server-side IsoZombie and a multiplayer client IsoZombie are the same Java object or share authoritative PNC ModData. Also do not assume an IsoZombie created through vanilla population factories is a disposable carrier: installed 42.22 engine inspection proves `createRealZombieAlways()` registers it with `ZombiePopulationManager`.
 
 For MP:
 
@@ -88,7 +88,7 @@ Do not replace:
 - companion ownership;
 - semantic/dialogue systems.
 
-Add one body-binding seam and migrate consumers toward it.
+Keep the existing body-binding seam as the canonical MP identity layer. M9 must change only the physical-carrier lifecycle beneath it: live human carriers must be PNC-owned transient shells rather than native PopMan actors, unless engine proof establishes an equivalent permanent-delete contract.
 
 ## Identity safety
 
@@ -135,14 +135,23 @@ After each coherent chunk:
 - update PROGRESS.md;
 - continue automatically.
 
-Before final M8:
+Before final M9:
 - full isolated Lua suite;
-- focused M0-M8 matrix;
+- focused M0-M9 matrix;
 - static performance/persistence audit;
 - changed-file Kahlua verification;
 - clean diff/status except intended committed work.
 
 Do not launch native Project Zomboid unless explicitly assigned.
+
+## Native contradiction rule
+
+Native SP/MP evidence outranks synthetic acceptance. The 2026-10-30 native test reproduced persistent old NPC husks in both SP and MP after M0-M8. Therefore:
+- M0-M8 remain useful historical implementation evidence, not final completion;
+- reopen the smallest owning lifecycle layer rather than weakening identity safeguards;
+- do not add another position/outfit/gender-based husk heuristic;
+- do not mark developer completion again until M9 proves the new shell does not enter native zombie population ownership during its live-human lifetime;
+- preserve genuine Knox reanimation as a transition into a real vanilla zombie lifecycle.
 
 ## Git/runtime
 
@@ -155,7 +164,7 @@ Do not publish/republish Workshop content without explicit authorization.
 ## Stop conditions
 
 Stop only for:
-- complete M0-M8 developer acceptance and user-owned native SP/MP handoff;
+- complete M0-M9 developer acceptance and user-owned native SP/MP handoff;
 - genuine unsafe concurrent-work conflict;
 - required engine/tool capability unavailable with no accepted fallback;
 - architecture/scope conflict requiring user choice;

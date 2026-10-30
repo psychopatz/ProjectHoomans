@@ -1,10 +1,10 @@
 # Progress — Multiplayer Body Binding Migration
 
-**Status:** Developer M0–M8 accepted; user-owned native acceptance pending.
+**Status:** REOPENED — native SP/MP acceptance failed; M9 population-detached shell migration mandatory.
 **Branch:** existing main only.
 **Planning anchor:** 2a24bc59d36c845af51097642c55180434680cb7.
-**Current phase:** Developer handoff — native SP/MP checklist remains user-owned.
-**Parent objective:** M0-M8 complete migration to explicit MP body binding, with SP preserved and full developer-side acceptance.
+**Current phase:** M9 — Population-Detached NPC Shell Migration.
+**Parent objective:** M0-M9 complete migration to explicit MP body binding plus population-detached live-human shell ownership, with SP preserved and native husk convergence satisfied.
 
 ## Verified starting evidence
 
@@ -31,14 +31,9 @@
 
 ## Remaining mandatory work
 
-- M1 body-incarnation contract;
-- M2 server binding authority;
-- M3 client pending/reconciliation;
-- M4 ClientPresenceSync migration;
-- M5 lifecycle/husk simplification;
-- M6 multi-client + movement/combat interoperability;
-- M7 death/corpse/infection/reanimation;
-- M8 cleanup/full acceptance.
+- M0-M8 are implemented historical prerequisites and remain regression constraints.
+- **M9 is mandatory:** replace PopMan-owned live human carriers with population-detached transient PNC shells (or an engine-proven equivalent permanent-retirement path), migrate removal/admission, preserve MP binding, add legacy-save cleanup, and re-run full developer acceptance.
+- Native SP/MP acceptance must then be rerun; persistent old shells after abstraction/rematerialization are a hard failure.
 
 ## Current non-goals
 
@@ -53,7 +48,7 @@
 
 Do not mark complete after M0, a working binding prototype, or a passing focused suite.
 
-Developer completion requires all M0-M8 gates plus final full-suite/static/compiler evidence. Native SP/MP remains user-owned final acceptance.
+Developer completion now requires all M0-M9 gates plus final full-suite/static/compiler evidence. The prior M0-M8 green suite is insufficient because native SP/MP contradicted the physical-shell convergence invariant.
 
 ## M0A local factory restoration — 2026-10-30
 
@@ -168,3 +163,40 @@ Finish M0 engine-boundary/snapshot fixtures and SP lifecycle evidence; audit bod
 - Requirement-by-requirement developer evidence is in DEVELOPER_ACCEPTANCE.md; roadmap status updated. Remaining work is the user-owned native checklist, including real visual precursor, multiplayer streaming and death/reanimation behavior. No native game was launched or Workshop content published.
 - Anonymous historical saves remain fail-closed: position/outfit/gender/ownership alone cannot safely reclaim an old shell. Current identifiable shells retain lifecycle/lease/population evidence.
 - Next mandatory action belongs to native user acceptance. Any contradictory native result reopens its corresponding implementation gate. No further developer implementation gap is known after this audit.
+
+
+## Native acceptance failure — 2026-10-30
+
+User-owned testing reproduced the persistent NPC husk on both single-player and multiplayer after the M0-M8 developer handoff. This reopens the parent goal.
+
+### Verified engine/lifecycle evidence
+
+Installed Project Zomboid 42.22 Java inspection establishes:
+
+- `LuaManager.addZombiesInOutfit(...)` delegates to `VirtualZombieManager.createRealZombieAlways(...)`.
+- `VirtualZombieManager.createRealZombieAlways(...)` constructs/adopts an `IsoZombie`, adds it to live zombie collections, assigns an MP online ID on server, and then calls `ZombiePopulationManager.registerZombie(...)`.
+- That registration gives the shell a non-zero native `persistentId` and registers it in PopMan's real-zombie map.
+- `IsoZombie.removeFromWorld()` calls `ZombiePopulationManager.releaseZombie(zombie)` before clearing server online identity/world membership.
+- PZ's normal chunk virtualization path writes native zombie population data and then uses the same `removeFromWorld()/removeFromSquare()` lifecycle.
+- `ZombiePopulationManager.INVALID_PERSISTENT_ID` is `0`; `releaseZombie()` is a no-op when `persistentId == 0`.
+- `IsoZombie` is Lua-exposed and has a public `IsoZombie(IsoCell)` constructor, so a transient, non-PopMan carrier is technically plausible but must be proven against world/network admission requirements before production adoption.
+
+Native server logs also showed the same logical NPC IDs materializing again at a distant location with new shell carrier IDs while the former physical husks persisted. This is consistent with logical Presence movement succeeding while the old PopMan-owned carrier survives outside PNC authority.
+
+### Revised root cause
+
+M0-M8 solved cross-network identity/reconciliation but left the physical carrier born through a native population-zombie factory. The shell therefore participates in a lifecycle PNC does not own. A client binding/unbind fix cannot prevent a native population record from later resurfacing as an ordinary zombie, and the SP reproduction proves the defect is below the MP binding layer.
+
+### M9 immediate next chunk
+
+1. Build a focused engine-grounded transient-shell prototype/fixture using `IsoZombie.new(getCell())` or the smallest equivalent PNC-owned factory.
+2. Reproduce only the required vanilla admission steps for a live shell while deliberately omitting `ZombiePopulationManager.registerZombie()`.
+3. Prove the live PNC human invariant `persistentId == 0` in SP and on MP server.
+4. Verify MP online-ID allocation/map membership and vanilla replication still function for an unregistered shell; if pure Lua cannot safely establish that contract, introduce the smallest justified bridge rather than falling back to PopMan ownership.
+5. Change normal live-human materialization/removal to the proven transient path while preserving M1-M8 incarnation binding.
+6. Keep true Knox reanimation on the genuine vanilla zombie lifecycle.
+7. Retain HuskLedger/Reaper only as bounded legacy-save migration for previously registered shells; do not add anonymous positional reclamation.
+8. Add old-save migration evidence and an explicit diagnostic for any managed live human with `persistentId ~= 0`.
+9. Re-run focused/full Lua, installed-PZ compiler/static verification, and then hand back a revised native SP/MP matrix.
+
+**Next mandatory chunk:** M9A transient shell construction/admission proof. Do not mark the job complete from synthetic success; the final native test must show old locations stay empty through abstraction/rematerialization, restart, reconnect, and chunk streaming.
