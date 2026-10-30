@@ -56,10 +56,10 @@ class ContextualConversationC4DTests(unittest.TestCase):
                 self.assertIn("do not know what caused it", turn["messages"][0]["payload"]["fallback"])
                 self.assertEqual(turn["translation"]["language"], language)
                 self.assertTrue(turn["messages"][0]["payload"]["text"])
-                self.assertEqual(turn["transport"], [])
+                self.assertEqual(turn["dispatchTransport"], [])
                 self.assertEqual(turn["toolCalls"], [])
                 self.assertEqual(turn["llmCalls"], 0)
-                self.assertTrue(turn["observation"]["sideEffects"]["none"])
+                self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
     def test_nearby_first_person_negative_abstains_without_dispatch(self) -> None:
         with LuaSemanticWorker(self.scenario("EN")) as worker:
@@ -67,9 +67,9 @@ class ContextualConversationC4DTests(unittest.TestCase):
 
         self.assertIsNone(turn["result"]["ir"].get("intent"))
         self.assertIsNone(turn["result"]["ir"].get("action"))
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
-        self.assertTrue(turn["observation"]["sideEffects"]["none"])
+        self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
 
 if __name__ == "__main__":

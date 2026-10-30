@@ -34,7 +34,7 @@ class GroundedPersonalDialogueB0Tests(unittest.TestCase):
         self.assertEqual(turn["result"]["decision"]["branch"],
                          "COMPLIMENT_RECEIVED")
         self.assertIsNone(turn["result"].get("actionResult"))
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
         self.assertEqual(turn["llmCalls"], 0)
         response = self.response_text(turn).lower()
@@ -57,7 +57,7 @@ class GroundedPersonalDialogueB0Tests(unittest.TestCase):
         self.assertEqual(turn["result"]["decision"]["route"], "deterministic")
         self.assertEqual(turn["llmCalls"], 0)
         self.assertEqual(
-            [entry["command"] for entry in turn["transport"]],
+            [entry["command"] for entry in turn["dispatchTransport"]],
             ["SemanticInventoryQuery", "SemanticInventoryQueryResult"],
         )
         self.assertEqual(turn["result"]["actionResult"]["status"], "empty")
@@ -105,7 +105,7 @@ class GroundedPersonalDialogueB0Tests(unittest.TestCase):
                 self.assertEqual(turn["result"]["decision"]["branch"],
                                  "ASK_CLARIFICATION")
                 self.assertIsNone(turn["result"].get("actionResult"))
-                self.assertEqual(turn["transport"], [])
+                self.assertEqual(turn["dispatchTransport"], [])
                 self.assertEqual(self.response_text(turn),
                                  "I'm not sure what you mean.")
 
@@ -122,13 +122,13 @@ class GroundedPersonalDialogueB0Tests(unittest.TestCase):
                          "pnc.social.compliment_you_got_feature_a")
         self.assertEqual(tl["translation"]["language"], "TL")
         self.assertTrue(self.response_text(tl))
-        self.assertEqual(tl["transport"], [])
+        self.assertEqual(tl["dispatchTransport"], [])
         self.assertEqual(tl["result"].get("actionResult"), None)
 
         inventory = self.run_turn("you got any bandages?", language="TL")
         self.assertEqual(inventory["result"]["ir"]["subject"], "INVENTORY")
         self.assertEqual(
-            [entry["command"] for entry in inventory["transport"]],
+            [entry["command"] for entry in inventory["dispatchTransport"]],
             ["SemanticInventoryQuery", "SemanticInventoryQueryResult"],
         )
 

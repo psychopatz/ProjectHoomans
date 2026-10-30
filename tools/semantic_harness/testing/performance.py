@@ -108,7 +108,7 @@ def _assert_turn_contract(
             raise AssertionError("unknown input did not fail closed to clarification")
         if result.get("actionResult") is not None:
             raise AssertionError("unknown input produced an action result")
-        if turn.get("transport") or turn.get("toolCalls"):
+        if turn.get("dispatchTransport", turn.get("transport")) or turn.get("toolCalls"):
             raise AssertionError("unknown input produced an unauthorized side effect")
         expected_calls = 1 if provider_enabled else 0
         if turn.get("llmCalls") != expected_calls:

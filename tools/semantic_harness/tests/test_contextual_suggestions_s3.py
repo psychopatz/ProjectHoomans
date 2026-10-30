@@ -49,7 +49,7 @@ class ContextualSuggestionsS3Tests(unittest.TestCase):
         self.assertTrue(clicked["accepted"])
         self.assertEqual(len(clicked["messages"]), 1)
         self.assertEqual(clicked["messages"][0]["speaker"], "npc")
-        self.assertEqual(clicked["transport"], [])
+        self.assertEqual(clicked["dispatchTransport"], [])
         new_transcript = after["transcript"][len(before["transcript"]):]
         self.assertEqual(new_transcript[0]["speaker"], "player")
         self.assertEqual(new_transcript[1]["speaker"], "npc")
@@ -110,7 +110,7 @@ class ContextualSuggestionsS3Tests(unittest.TestCase):
         )
         self.assertIsNone(click["result"].get("actionResult"))
         self.assertEqual(click["toolCalls"], [])
-        self.assertEqual(click["transport"], [])
+        self.assertEqual(click["dispatchTransport"], [])
         self.assertIn(
             "You're welcome. Take care.",
             [message["payload"]["text"] for message in click["messages"]],
@@ -134,7 +134,7 @@ class ContextualSuggestionsS3Tests(unittest.TestCase):
         self.assertEqual(click["result"]["ir"]["intent"], "THANK")
         self.assertEqual(click["result"]["flow"]["toNodeId"], "complete")
         self.assertEqual(click["toolCalls"], [])
-        self.assertEqual(click["transport"], [])
+        self.assertEqual(click["dispatchTransport"], [])
 
     def test_stale_click_is_rejected_without_mutation(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
@@ -192,8 +192,8 @@ class ContextualSuggestionsS3Tests(unittest.TestCase):
             follow["result"]["actionResult"]["capabilityID"],
             "pnc:companion.follow",
         )
-        self.assertEqual(len(follow["transport"]), 1)
-        self.assertEqual(follow["transport"][0]["command"], "CompanionCommand")
+        self.assertEqual(len(follow["dispatchTransport"]), 1)
+        self.assertEqual(follow["dispatchTransport"][0]["command"], "CompanionCommand")
 
         wait_scenario = deepcopy(DEFAULT_SCENARIO)
         with LuaSemanticWorker(wait_scenario) as worker:

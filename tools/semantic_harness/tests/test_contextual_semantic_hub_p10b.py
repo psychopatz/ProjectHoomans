@@ -85,7 +85,7 @@ class ContextualSemanticHubP10BTests(unittest.TestCase):
             clicked["result"]["ir"]["provenance"]["parser"],
             "semantic_click_frame",
         )
-        self.assertEqual(clicked["transport"], [])
+        self.assertEqual(clicked["dispatchTransport"], [])
 
     def test_owned_companion_and_contextual_health_or_needs_ranking(self) -> None:
         companion = apply_npc_profile(deepcopy(DEFAULT_SCENARIO), "companion")
@@ -264,9 +264,9 @@ class ContextualSemanticHubP10BTests(unittest.TestCase):
         self.assertNotIn("dynamictrading.trade", self._candidate_map(suggestions))
 
         self.assertTrue(clicked["accepted"], clicked.get("reason"))
-        self.assertEqual(clicked["transport"][0]["command"], "ConversationBlock")
+        self.assertEqual(clicked["dispatchTransport"][0]["command"], "ConversationBlock")
         self.assertEqual(
-            clicked["transport"][0]["payload"]["blockID"],
+            clicked["dispatchTransport"][0]["payload"]["blockID"],
             "dthoomans:trade_basic",
         )
 

@@ -65,7 +65,7 @@ class CoherentConversationC3C4Tests(unittest.TestCase):
         self.assertEqual(risk["riskClass"], "mutating")
         self.assertEqual(risk["reason"], "unresolved_action_reference")
         self.assertEqual(risk["unresolvedField"], "object")
-        self.assertFalse(result["observation"]["sideEffects"]["transportCount"])
+        self.assertFalse(result["observation"]["sideEffects"]["dispatchTransportCount"])
 
     def test_resolved_exact_mutation_remains_admitted(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:

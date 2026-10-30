@@ -230,7 +230,7 @@ class SocialApologyWordingShardTests(unittest.TestCase):
                         social_style,
                     )
                     self.assertEqual(turn["llmCalls"], 0)
-                    self.assertEqual(turn["transport"], [])
+                    self.assertEqual(turn["dispatchTransport"], [])
                     self.assertEqual(turn["toolCalls"], [])
                     self.assertIsNone(turn["result"].get("actionResult"))
                     self.assertEqual(turn["relationshipBefore"], turn["relationshipAfter"])

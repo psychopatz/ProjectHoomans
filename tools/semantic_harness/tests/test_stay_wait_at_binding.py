@@ -50,8 +50,8 @@ class StayWaitAtBindingTests(unittest.TestCase):
                 preview["observation"]["capabilityBinding"]["id"],
                 "pnc:task.wait_at",
             )
-            self.assertTrue(preview["observation"]["sideEffects"]["none"])
-            self.assertEqual(preview["transport"], [])
+            self.assertTrue(preview["observation"]["sideEffects"]["noGameplayEffects"])
+            self.assertEqual(preview["dispatchTransport"], [])
             self.assertEqual(preview["toolCalls"], [])
 
         stay_result = stay["result"]
@@ -64,10 +64,10 @@ class StayWaitAtBindingTests(unittest.TestCase):
             stay_result["actionResult"]["capabilityID"], "pnc:companion.stay"
         )
         self.assertEqual(
-            stay["transport"][0]["command"], "CompanionCommand"
+            stay["dispatchTransport"][0]["command"], "CompanionCommand"
         )
         self.assertNotIn(
-            "SemanticTaskRequest", [event["command"] for event in stay["transport"]]
+            "SemanticTaskRequest", [event["command"] for event in stay["dispatchTransport"]]
         )
         self.assertEqual(
             stay["messages"][0]["payload"]["text"],
@@ -95,11 +95,11 @@ class StayWaitAtBindingTests(unittest.TestCase):
             wait_result["actionResult"]["details"]["status"], "admitted"
         )
         self.assertEqual(
-            wait_at["transport"][0]["command"], "SemanticTaskRequest"
+            wait_at["dispatchTransport"][0]["command"], "SemanticTaskRequest"
         )
         self.assertNotIn(
             "CompanionCommand",
-            [event["command"] for event in wait_at["transport"]],
+            [event["command"] for event in wait_at["dispatchTransport"]],
         )
         self.assertTrue(wait_at["result"]["flow"]["generated"])
         self.assertEqual(
@@ -126,7 +126,7 @@ class StayWaitAtBindingTests(unittest.TestCase):
                 "Okay, I'll wait there.",
             )
             self.assertEqual(
-                reference_turn["transport"][0]["command"],
+                reference_turn["dispatchTransport"][0]["command"],
                 "SemanticTaskRequest",
             )
             self.assertTrue(
@@ -143,13 +143,13 @@ class StayWaitAtBindingTests(unittest.TestCase):
             "I can't find that place nearby.",
         )
         self.assertEqual(
-            unresolved["transport"][0]["command"], "SemanticTaskRequest"
+            unresolved["dispatchTransport"][0]["command"], "SemanticTaskRequest"
         )
 
         self.assertEqual(
             question["result"]["decision"]["branch"], "ASK_CLARIFICATION"
         )
-        self.assertEqual(question["transport"], [])
+        self.assertEqual(question["dispatchTransport"], [])
         self.assertEqual(question["toolCalls"], [])
 
     def test_unresolved_location_reference_cannot_dispatch(self) -> None:
@@ -170,7 +170,7 @@ class StayWaitAtBindingTests(unittest.TestCase):
             turn["messages"][0]["payload"]["text"],
             "I can't wait there right now.",
         )
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"][0]["reason"], "clarification_required")
 
 

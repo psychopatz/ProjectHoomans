@@ -1,0 +1,1433 @@
+{
+  "source_revision": "2ad53120",
+  "method": "freshness-verified literal import edges supplement MCP statement-form IMPORTS gap; public top-level hubs, not automatic promotion of private providers",
+  "foreign_imports": [
+    {
+      "source": "client/PNC/Commands/PNC_CompanionCommandPresentation.lua",
+      "owner": "Companions",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 47
+    },
+    {
+      "source": "client/PNC/Commands/PNC_CompanionCommandPresentation_PlayerEmoteResult.lua",
+      "owner": "Companions",
+      "target": "client/PNC/Semantics/PNC_SemanticSpeechDelivery.lua",
+      "line": 9
+    },
+    {
+      "source": "client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Context.lua",
+      "owner": "Conversation",
+      "target": "shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+      "line": 11
+    },
+    {
+      "source": "client/PNC/Conversation/Definition/PNC_ConversationDefinition_Context.lua",
+      "owner": "Conversation",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 11
+    },
+    {
+      "source": "client/PNC/Conversation/PNC_ConversationDefinition.lua",
+      "owner": "Conversation",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 5
+    },
+    {
+      "source": "client/PNC/Conversation/PNC_ConversationFarewellContext.lua",
+      "owner": "Conversation",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 9
+    },
+    {
+      "source": "client/PNC/Conversation/PNC_ConversationTalkParity.lua",
+      "owner": "Conversation",
+      "target": "client/PNC/Semantics/PNC_SemanticSpeechDelivery.lua",
+      "line": 18
+    },
+    {
+      "source": "client/PNC/Conversation/PNC_ConversationTalkParity_Lifecycle.lua",
+      "owner": "Conversation",
+      "target": "shared/PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua",
+      "line": 272
+    },
+    {
+      "source": "client/PNC/Conversation/PNC_SemanticSpeechPresentation.lua",
+      "owner": "Conversation",
+      "target": "client/PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua",
+      "line": 11
+    },
+    {
+      "source": "client/PNC/Conversation/PNC_SemanticSpeechPresentation_Core.lua",
+      "owner": "Conversation",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 12
+    },
+    {
+      "source": "client/PNC/Integrations/PBrainZ/PNC_PBrainZ.lua",
+      "owner": "Adapters",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 7
+    },
+    {
+      "source": "client/PNC/Integrations/PBrainZ/PNC_PBrainZ.lua",
+      "owner": "Adapters",
+      "target": "shared/PNC/Semantics/PNC_SemanticToolResultRealization.lua",
+      "line": 9
+    },
+    {
+      "source": "client/PNC/Integrations/PBrainZ/PNC_PBrainZ_ActorIdentity.lua",
+      "owner": "Adapters",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 3
+    },
+    {
+      "source": "client/PNC/Integrations/PBrainZ/PNC_PBrainZ_AmbientContext.lua",
+      "owner": "Adapters",
+      "target": "client/PNC/Semantics/PNC_SemanticWorldContext.lua",
+      "line": 8
+    },
+    {
+      "source": "client/PNC/Integrations/PBrainZ/PNC_PBrainZ_ContextPayload.lua",
+      "owner": "Adapters",
+      "target": "shared/PNC/Semantics/PNC_SemanticDialogueSituation.lua",
+      "line": 20
+    },
+    {
+      "source": "client/PNC/Integrations/PBrainZ/PNC_PBrainZ_ContextPayload.lua",
+      "owner": "Adapters",
+      "target": "shared/PNC/Semantics/PNC_SemanticLLMResult.lua",
+      "line": 18
+    },
+    {
+      "source": "client/PNC/Integrations/PBrainZ/PNC_PBrainZ_ContextPayload.lua",
+      "owner": "Adapters",
+      "target": "client/PNC/Semantics/PNC_SemanticWorldContext.lua",
+      "line": 19
+    },
+    {
+      "source": "client/PNC/Integrations/PBrainZ/PNC_PBrainZ_Memory.lua",
+      "owner": "Adapters",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 8
+    },
+    {
+      "source": "client/PNC/Integrations/PBrainZ/PNC_PBrainZ_ResponseDelivery.lua",
+      "owner": "Adapters",
+      "target": "client/PNC/Semantics/PNC_SemanticTelemetryPrompt.lua",
+      "line": 17
+    },
+    {
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua",
+      "owner": "Networking",
+      "target": "shared/PNC/Semantics/PNC_SemanticDiagnostics.lua",
+      "line": 2
+    },
+    {
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Semantics.lua",
+      "owner": "Networking",
+      "target": "client/PNC/Semantics/PNC_SemanticCognitionClient.lua",
+      "line": 9
+    },
+    {
+      "source": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception_Internal.lua",
+      "owner": "Perception",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 13
+    },
+    {
+      "source": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception_Internal.lua",
+      "owner": "Perception",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+      "line": 15
+    },
+    {
+      "source": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception_Internal.lua",
+      "owner": "Perception",
+      "target": "shared/PNC/Semantics/PNC_SemanticWorldTargetCatalog.lua",
+      "line": 11
+    },
+    {
+      "source": "client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception_Internal.lua",
+      "owner": "Perception",
+      "target": "client/PNC/Semantics/PNC_SemanticWorldTargetObservationCache.lua",
+      "line": 18
+    },
+    {
+      "source": "client/PNC/UI/Context/Providers/PNC_ContextProvider_Conversation.lua",
+      "owner": "UI",
+      "target": "shared/PNC/Semantics/PNC_SemanticDialogueRuntime.lua",
+      "line": 6
+    },
+    {
+      "source": "client/PNC/UI/Conversation/PNC_CombatResponseStrip.lua",
+      "owner": "UI",
+      "target": "client/PNC/Semantics/PNC_SemanticCombatResponseSurface.lua",
+      "line": 9
+    },
+    {
+      "source": "server/PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_BuildContext.lua",
+      "owner": "Conversation",
+      "target": "shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+      "line": 12
+    },
+    {
+      "source": "server/PNC/Conversation/PNC_InteractionLifecyclePersistence.lua",
+      "owner": "Conversation",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionLifecycle.lua",
+      "line": 15
+    },
+    {
+      "source": "server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_Identity.lua",
+      "owner": "Knowledge",
+      "target": "shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+      "line": 11
+    },
+    {
+      "source": "server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityAdmission.lua",
+      "owner": "Knowledge",
+      "target": "shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+      "line": 10
+    },
+    {
+      "source": "server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityMutation.lua",
+      "owner": "Knowledge",
+      "target": "shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+      "line": 6
+    },
+    {
+      "source": "server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityPolicy.lua",
+      "owner": "Knowledge",
+      "target": "shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+      "line": 5
+    },
+    {
+      "source": "server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityResult.lua",
+      "owner": "Knowledge",
+      "target": "shared/PNC/Semantics/PNC_SemanticDiagnostics.lua",
+      "line": 5
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerSemanticInteractionLifecycleCommandHandler.lua",
+      "owner": "Networking",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionLifecycle.lua",
+      "line": 14
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerSemanticInteractionLifecycleCommandHandler.lua",
+      "owner": "Networking",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionProviders.lua",
+      "line": 165
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerSemanticInteractionLifecycleCommandHandler.lua",
+      "owner": "Networking",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua",
+      "line": 164
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerSemanticInteractionLifecycleCommandHandler.lua",
+      "owner": "Networking",
+      "target": "shared/PNC/Semantics/PNC_SemanticPragmaticResolver.lua",
+      "line": 166
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerSemanticSceneResponseCommandHandler.lua",
+      "owner": "Networking",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionSceneRuntime.lua",
+      "line": 11
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerSemanticSceneResponseCommandHandler.lua",
+      "owner": "Networking",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionSceneTransport.lua",
+      "line": 12
+    },
+    {
+      "source": "server/PNC/Social/ConductService/PNC_ConductService_Queries.lua",
+      "owner": "Social",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua",
+      "line": 14
+    },
+    {
+      "source": "server/PNC/Social/RelationshipService/PNC_RelationshipService_Queries.lua",
+      "owner": "Social",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua",
+      "line": 43
+    },
+    {
+      "source": "server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "owner": "Social",
+      "target": "shared/PNC/Semantics/PNC_SemanticCombatBanterArbiter.lua",
+      "line": 29
+    },
+    {
+      "source": "server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "owner": "Social",
+      "target": "shared/PNC/Semantics/PNC_SemanticCombatEncounterIntent.lua",
+      "line": 20
+    },
+    {
+      "source": "server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "owner": "Social",
+      "target": "shared/PNC/Semantics/PNC_SemanticCombatMoment.lua",
+      "line": 26
+    },
+    {
+      "source": "server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "owner": "Social",
+      "target": "shared/PNC/Semantics/PNC_SemanticCombatReactionProfile.lua",
+      "line": 23
+    },
+    {
+      "source": "server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "owner": "Social",
+      "target": "shared/PNC/Semantics/PNC_SemanticTacticalSpatialLanguage.lua",
+      "line": 34
+    },
+    {
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Context.lua",
+      "owner": "World",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 13
+    },
+    {
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Context.lua",
+      "owner": "World",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+      "line": 15
+    },
+    {
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Discovery_Capture.lua",
+      "owner": "World",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 12
+    },
+    {
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Discovery_Capture.lua",
+      "owner": "World",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+      "line": 14
+    },
+    {
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Discovery_Core.lua",
+      "owner": "World",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 16
+    },
+    {
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Discovery_Core.lua",
+      "owner": "World",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+      "line": 18
+    },
+    {
+      "source": "server/PNC/World/CampResourceService/PNC_CampResourceService_Targets.lua",
+      "owner": "World",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 16
+    },
+    {
+      "source": "server/PNC/World/PNC_CampZoneService_Core.lua",
+      "owner": "World",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 10
+    },
+    {
+      "source": "server/PNC/World/PNC_CampZoneService_Core.lua",
+      "owner": "World",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+      "line": 12
+    },
+    {
+      "source": "server/PNC/WorldDiscovery/WorldDiscoveryRadioBroadcasts/PNC_WorldDiscoveryRadioBroadcasts_Context.lua",
+      "owner": "World",
+      "target": "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "line": 12
+    },
+    {
+      "source": "shared/PNC/Conversation/Blocks/PNC_ConversationRules.lua",
+      "owner": "Conversation",
+      "target": "shared/PNC/Semantics/PNC_SemanticDialogueRuleProvider.lua",
+      "line": 17
+    },
+    {
+      "source": "shared/PNC/Conversation/Blocks/PNC_ConversationRules/PNC_ConversationRules_Conditions.lua",
+      "owner": "Conversation",
+      "target": "shared/PNC/Semantics/PNC_SemanticEngineFacts.lua",
+      "line": 6
+    },
+    {
+      "source": "shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Catalog.lua",
+      "owner": "Conversation",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua",
+      "line": 187
+    },
+    {
+      "source": "shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Recorder.lua",
+      "owner": "Conversation",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua",
+      "line": 26
+    },
+    {
+      "source": "shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua",
+      "owner": "Conversation",
+      "target": "shared/PNC/Semantics/PNC_SemanticConversationMemoryProvider.lua",
+      "line": 8
+    },
+    {
+      "source": "shared/PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Camp.lua",
+      "owner": "Facilities",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 6
+    },
+    {
+      "source": "shared/PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Camp.lua",
+      "owner": "Facilities",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+      "line": 8
+    },
+    {
+      "source": "shared/PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_State.lua",
+      "owner": "Facilities",
+      "target": "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "line": 8
+    },
+    {
+      "source": "shared/PNC/Core/Relationships/PNC_RelationshipPresentation.lua",
+      "owner": "Social",
+      "target": "shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua",
+      "line": 207
+    }
+  ],
+  "mcp": {
+    "tier": "Verify (Tier 2)",
+    "publicCoverage": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"project\":\"project-hoomans\",\"signal\":\"best_effort\",\"indexed_at\":\"2026-10-30T15:21:07Z\",\"metadata\":{\"generation\":\"2026-10-30T15:21:07Z\",\"index_mode\":\"full\",\"recorded_at\":\"2026-10-30T15:21:11Z\",\"recording_status\":\"complete\",\"ignored_files_stored\":98,\"ignored_files_total\":98,\"hash_records_complete\":true,\"coverage_version\":3,\"generation_matches\":true},\"paths\":[{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCognitionClient.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCognitionClient.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCombatResponseSurface.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCombatResponseSurface.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueInput.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueInput.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticSpeechDelivery.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticSpeechDelivery.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticTelemetryPrompt.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticTelemetryPrompt.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticWorldContext.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticWorldContext.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticWorldTargetObservationCache.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticWorldTargetObservationCache.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_ActorConversationContext.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_ActorConversationContext.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticAddressResolver.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticAddressResolver.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCampSite.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCampSite.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCatalog.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCatalog.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatBanterArbiter.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatBanterArbiter.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatEncounterIntent.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatEncounterIntent.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatMoment.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatMoment.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatReactionProfile.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatReactionProfile.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticConversationMemoryProvider.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticConversationMemoryProvider.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDiagnostics.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDiagnostics.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialoguePolicy.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialoguePolicy.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRuleProvider.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRuleProvider.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRuntime.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRuntime.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueSituation.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueSituation.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueSuggestions.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueSuggestions.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticEngineFacts.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticEngineFacts.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionLifecycle.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionLifecycle.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionProviders.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionProviders.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionSceneRuntime.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionSceneRuntime.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionSceneTransport.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionSceneTransport.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInventoryQuery.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInventoryQuery.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticLLMResult.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticLLMResult.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticPragmaticResolver.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticPragmaticResolver.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticTacticalSpatialLanguage.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticTacticalSpatialLanguage.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticTaskRequest.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticTaskRequest.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticToolResultRealization.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticToolResultRealization.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticWorldTargetCatalog.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticWorldTargetCatalog.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]}],\"scopes\":[],\"caveat\":\"Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable.\"}"
+        }
+      ],
+      "structuredContent": {
+        "project": "project-hoomans",
+        "signal": "best_effort",
+        "indexed_at": "2026-10-30T15:21:07Z",
+        "metadata": {
+          "generation": "2026-10-30T15:21:07Z",
+          "index_mode": "full",
+          "recorded_at": "2026-10-30T15:21:11Z",
+          "recording_status": "complete",
+          "ignored_files_stored": 98,
+          "ignored_files_total": 98,
+          "hash_records_complete": true,
+          "coverage_version": 3,
+          "generation_matches": true
+        },
+        "paths": [
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCognitionClient.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCognitionClient.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCombatResponseSurface.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCombatResponseSurface.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueInput.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueInput.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticSpeechDelivery.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticSpeechDelivery.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticTelemetryPrompt.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticTelemetryPrompt.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticWorldContext.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticWorldContext.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticWorldTargetObservationCache.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticWorldTargetObservationCache.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCatalog.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCatalog.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatBanterArbiter.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatBanterArbiter.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatEncounterIntent.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatEncounterIntent.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatMoment.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatMoment.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatReactionProfile.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatReactionProfile.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticConversationMemoryProvider.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticConversationMemoryProvider.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDiagnostics.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDiagnostics.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialoguePolicy.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialoguePolicy.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRuleProvider.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRuleProvider.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRuntime.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRuntime.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueSituation.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueSituation.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueSuggestions.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueSuggestions.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticEngineFacts.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticEngineFacts.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionLifecycle.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionLifecycle.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionProviders.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionProviders.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionSceneRuntime.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionSceneRuntime.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionSceneTransport.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionSceneTransport.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInventoryQuery.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInventoryQuery.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticLLMResult.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticLLMResult.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticPragmaticResolver.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticPragmaticResolver.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticTacticalSpatialLanguage.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticTacticalSpatialLanguage.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticTaskRequest.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticTaskRequest.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticToolResultRealization.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticToolResultRealization.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticWorldTargetCatalog.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticWorldTargetCatalog.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          }
+        ],
+        "scopes": [],
+        "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+      },
+      "isError": false
+    },
+    "extraCoverage": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"project\":\"project-hoomans\",\"signal\":\"best_effort\",\"indexed_at\":\"2026-10-30T15:21:07Z\",\"metadata\":{\"generation\":\"2026-10-30T15:21:07Z\",\"index_mode\":\"full\",\"recorded_at\":\"2026-10-30T15:21:11Z\",\"recording_status\":\"complete\",\"ignored_files_stored\":98,\"ignored_files_total\":98,\"hash_records_complete\":true,\"coverage_version\":3,\"generation_matches\":true},\"paths\":[{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticGiftLifecycle.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticGiftLifecycle.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticGiftContext.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticGiftContext.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityNetwork.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityNetwork.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]}],\"scopes\":[],\"caveat\":\"Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable.\"}"
+        }
+      ],
+      "structuredContent": {
+        "project": "project-hoomans",
+        "signal": "best_effort",
+        "indexed_at": "2026-10-30T15:21:07Z",
+        "metadata": {
+          "generation": "2026-10-30T15:21:07Z",
+          "index_mode": "full",
+          "recorded_at": "2026-10-30T15:21:11Z",
+          "recording_status": "complete",
+          "ignored_files_stored": 98,
+          "ignored_files_total": 98,
+          "hash_records_complete": true,
+          "coverage_version": 3,
+          "generation_matches": true
+        },
+        "paths": [
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticGiftLifecycle.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticGiftLifecycle.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticGiftContext.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticGiftContext.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityNetwork.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityNetwork.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          }
+        ],
+        "scopes": [],
+        "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+      },
+      "isError": false
+    },
+    "changedCoverage": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"project\":\"project-hoomans\",\"signal\":\"best_effort\",\"indexed_at\":\"2026-10-30T15:47:03Z\",\"metadata\":{\"generation\":\"2026-10-30T15:47:03Z\",\"index_mode\":\"full\",\"recorded_at\":\"2026-10-30T15:47:06Z\",\"recording_status\":\"complete\",\"ignored_files_stored\":102,\"ignored_files_total\":102,\"hash_records_complete\":true,\"coverage_version\":3,\"generation_matches\":true},\"paths\":[{\"requested_path\":\"tools/semantic_harness/codebuilder/c7f_holdout.py\",\"path\":\"tools/semantic_harness/codebuilder/c7f_holdout.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/inspection/conversation_inspector_authority.py\",\"path\":\"tools/semantic_harness/inspection/conversation_inspector_authority.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/lua/worker/CommandRouter.lua\",\"path\":\"tools/semantic_harness/lua/worker/CommandRouter.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/lua/worker/Conversation_Click_Response.lua\",\"path\":\"tools/semantic_harness/lua/worker/Conversation_Click_Response.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/lua/worker/Conversation_Turn.lua\",\"path\":\"tools/semantic_harness/lua/worker/Conversation_Turn.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/lua/worker/OutputProjection.lua\",\"path\":\"tools/semantic_harness/lua/worker/OutputProjection.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/lua/worker/OutputProjection_ObservationBounds.lua\",\"path\":\"tools/semantic_harness/lua/worker/OutputProjection_ObservationBounds.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/lua/worker/TransportEvidence.lua\",\"path\":\"tools/semantic_harness/lua/worker/TransportEvidence.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/testing/conversation_fuzz.py\",\"path\":\"tools/semantic_harness/testing/conversation_fuzz.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/testing/performance.py\",\"path\":\"tools/semantic_harness/testing/performance.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_automatic_flow_generation.py\",\"path\":\"tools/semantic_harness/tests/test_automatic_flow_generation.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_coherent_conversation_c3_c4.py\",\"path\":\"tools/semantic_harness/tests/test_coherent_conversation_c3_c4.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_companion_orders_hub_p12e.py\",\"path\":\"tools/semantic_harness/tests/test_companion_orders_hub_p12e.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_acceptance_c6b.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_acceptance_c6b.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_baseline_matrix.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_baseline_matrix.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_choice_provider_p8c.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_choice_provider_p8c.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_choice_registry_p1.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_choice_registry_p1.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_conversation_c0.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_conversation_c0.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_conversation_c1.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_conversation_c1.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_conversation_c3.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_conversation_c3.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_conversation_c3b.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_conversation_c3b.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_conversation_c3c.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_conversation_c3c.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_conversation_c3d.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_conversation_c3d.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_conversation_c4a.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_conversation_c4a.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_conversation_c4b.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_conversation_c4b.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_conversation_c4c.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_conversation_c4c.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_conversation_c4d.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_conversation_c4d.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_dialogue_persona_choices_p0.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_dialogue_persona_choices_p0.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_dynamic_trading_p5.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_dynamic_trading_p5.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_provider_parity_c6c.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_provider_parity_c6c.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_scale_isolation.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_scale_isolation.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_semantic_hub_p10b.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_semantic_hub_p10b.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_social_reactions.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_social_reactions.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_suggestions_followup.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_suggestions_followup.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_suggestions_s1.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_suggestions_s1.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_suggestions_s2.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_suggestions_s2.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_suggestions_s3.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_suggestions_s3.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_contextual_weather_gate.py\",\"path\":\"tools/semantic_harness/tests/test_contextual_weather_gate.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_conversation_content_authority.py\",\"path\":\"tools/semantic_harness/tests/test_conversation_content_authority.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_conversation_inspector.py\",\"path\":\"tools/semantic_harness/tests/test_conversation_inspector.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_conversational_competence_c7a.py\",\"path\":\"tools/semantic_harness/tests/test_conversational_competence_c7a.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_conversational_competence_c7b.py\",\"path\":\"tools/semantic_harness/tests/test_conversational_competence_c7b.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_conversational_competence_c7c.py\",\"path\":\"tools/semantic_harness/tests/test_conversational_competence_c7c.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_conversational_competence_c7d.py\",\"path\":\"tools/semantic_harness/tests/test_conversational_competence_c7d.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_conversational_competence_c7g.py\",\"path\":\"tools/semantic_harness/tests/test_conversational_competence_c7g.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_dynamic_camp_destinations_p12f.py\",\"path\":\"tools/semantic_harness/tests/test_dynamic_camp_destinations_p12f.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_follow_action_binding.py\",\"path\":\"tools/semantic_harness/tests/test_follow_action_binding.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_gift_capability_binding.py\",\"path\":\"tools/semantic_harness/tests/test_gift_capability_binding.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_grounded_personal_dialogue_b0.py\",\"path\":\"tools/semantic_harness/tests/test_grounded_personal_dialogue_b0.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_grounded_world_knowledge_gossip.py\",\"path\":\"tools/semantic_harness/tests/test_grounded_world_knowledge_gossip.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_p11b_health_migration.py\",\"path\":\"tools/semantic_harness/tests/test_p11b_health_migration.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_p11b_needs_migration.py\",\"path\":\"tools/semantic_harness/tests/test_p11b_needs_migration.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_p11b_social_apology_migration.py\",\"path\":\"tools/semantic_harness/tests/test_p11b_social_apology_migration.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_p11b_wellbeing_migration.py\",\"path\":\"tools/semantic_harness/tests/test_p11b_wellbeing_migration.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_p12h_native_effect_acceptance.py\",\"path\":\"tools/semantic_harness/tests/test_p12h_native_effect_acceptance.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_portable_c6_matrix.py\",\"path\":\"tools/semantic_harness/tests/test_portable_c6_matrix.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_quest_flow_binding.py\",\"path\":\"tools/semantic_harness/tests/test_quest_flow_binding.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_response_observatory_matrix.py\",\"path\":\"tools/semantic_harness/tests/test_response_observatory_matrix.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_semantic_dialogue_flows.py\",\"path\":\"tools/semantic_harness/tests/test_semantic_dialogue_flows.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_semantic_identity_wellbeing_collision.py\",\"path\":\"tools/semantic_harness/tests/test_semantic_identity_wellbeing_collision.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_semantic_paraphrases.py\",\"path\":\"tools/semantic_harness/tests/test_semantic_paraphrases.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_semantic_provider_parity.py\",\"path\":\"tools/semantic_harness/tests/test_semantic_provider_parity.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_shared_actor_conversation_service.py\",\"path\":\"tools/semantic_harness/tests/test_shared_actor_conversation_service.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_stay_wait_at_binding.py\",\"path\":\"tools/semantic_harness/tests/test_stay_wait_at_binding.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_transport_evidence.py\",\"path\":\"tools/semantic_harness/tests/test_transport_evidence.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/tests/test_wellbeing_projection.py\",\"path\":\"tools/semantic_harness/tests/test_wellbeing_projection.py\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]}],\"scopes\":[],\"caveat\":\"Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable.\"}"
+        }
+      ],
+      "structuredContent": {
+        "project": "project-hoomans",
+        "signal": "best_effort",
+        "indexed_at": "2026-10-30T15:47:03Z",
+        "metadata": {
+          "generation": "2026-10-30T15:47:03Z",
+          "index_mode": "full",
+          "recorded_at": "2026-10-30T15:47:06Z",
+          "recording_status": "complete",
+          "ignored_files_stored": 102,
+          "ignored_files_total": 102,
+          "hash_records_complete": true,
+          "coverage_version": 3,
+          "generation_matches": true
+        },
+        "paths": [
+          {
+            "requested_path": "tools/semantic_harness/codebuilder/c7f_holdout.py",
+            "path": "tools/semantic_harness/codebuilder/c7f_holdout.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/inspection/conversation_inspector_authority.py",
+            "path": "tools/semantic_harness/inspection/conversation_inspector_authority.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/lua/worker/CommandRouter.lua",
+            "path": "tools/semantic_harness/lua/worker/CommandRouter.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/lua/worker/Conversation_Click_Response.lua",
+            "path": "tools/semantic_harness/lua/worker/Conversation_Click_Response.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/lua/worker/Conversation_Turn.lua",
+            "path": "tools/semantic_harness/lua/worker/Conversation_Turn.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/lua/worker/OutputProjection.lua",
+            "path": "tools/semantic_harness/lua/worker/OutputProjection.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/lua/worker/OutputProjection_ObservationBounds.lua",
+            "path": "tools/semantic_harness/lua/worker/OutputProjection_ObservationBounds.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/lua/worker/TransportEvidence.lua",
+            "path": "tools/semantic_harness/lua/worker/TransportEvidence.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/testing/conversation_fuzz.py",
+            "path": "tools/semantic_harness/testing/conversation_fuzz.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/testing/performance.py",
+            "path": "tools/semantic_harness/testing/performance.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_automatic_flow_generation.py",
+            "path": "tools/semantic_harness/tests/test_automatic_flow_generation.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_coherent_conversation_c3_c4.py",
+            "path": "tools/semantic_harness/tests/test_coherent_conversation_c3_c4.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_companion_orders_hub_p12e.py",
+            "path": "tools/semantic_harness/tests/test_companion_orders_hub_p12e.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_acceptance_c6b.py",
+            "path": "tools/semantic_harness/tests/test_contextual_acceptance_c6b.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_baseline_matrix.py",
+            "path": "tools/semantic_harness/tests/test_contextual_baseline_matrix.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_choice_provider_p8c.py",
+            "path": "tools/semantic_harness/tests/test_contextual_choice_provider_p8c.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_choice_registry_p1.py",
+            "path": "tools/semantic_harness/tests/test_contextual_choice_registry_p1.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_conversation_c0.py",
+            "path": "tools/semantic_harness/tests/test_contextual_conversation_c0.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_conversation_c1.py",
+            "path": "tools/semantic_harness/tests/test_contextual_conversation_c1.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_conversation_c3.py",
+            "path": "tools/semantic_harness/tests/test_contextual_conversation_c3.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_conversation_c3b.py",
+            "path": "tools/semantic_harness/tests/test_contextual_conversation_c3b.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_conversation_c3c.py",
+            "path": "tools/semantic_harness/tests/test_contextual_conversation_c3c.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_conversation_c3d.py",
+            "path": "tools/semantic_harness/tests/test_contextual_conversation_c3d.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_conversation_c4a.py",
+            "path": "tools/semantic_harness/tests/test_contextual_conversation_c4a.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_conversation_c4b.py",
+            "path": "tools/semantic_harness/tests/test_contextual_conversation_c4b.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_conversation_c4c.py",
+            "path": "tools/semantic_harness/tests/test_contextual_conversation_c4c.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_conversation_c4d.py",
+            "path": "tools/semantic_harness/tests/test_contextual_conversation_c4d.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_dialogue_persona_choices_p0.py",
+            "path": "tools/semantic_harness/tests/test_contextual_dialogue_persona_choices_p0.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_dynamic_trading_p5.py",
+            "path": "tools/semantic_harness/tests/test_contextual_dynamic_trading_p5.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_provider_parity_c6c.py",
+            "path": "tools/semantic_harness/tests/test_contextual_provider_parity_c6c.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_scale_isolation.py",
+            "path": "tools/semantic_harness/tests/test_contextual_scale_isolation.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_semantic_hub_p10b.py",
+            "path": "tools/semantic_harness/tests/test_contextual_semantic_hub_p10b.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_social_reactions.py",
+            "path": "tools/semantic_harness/tests/test_contextual_social_reactions.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_suggestions_followup.py",
+            "path": "tools/semantic_harness/tests/test_contextual_suggestions_followup.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_suggestions_s1.py",
+            "path": "tools/semantic_harness/tests/test_contextual_suggestions_s1.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_suggestions_s2.py",
+            "path": "tools/semantic_harness/tests/test_contextual_suggestions_s2.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_suggestions_s3.py",
+            "path": "tools/semantic_harness/tests/test_contextual_suggestions_s3.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_contextual_weather_gate.py",
+            "path": "tools/semantic_harness/tests/test_contextual_weather_gate.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_conversation_content_authority.py",
+            "path": "tools/semantic_harness/tests/test_conversation_content_authority.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_conversation_inspector.py",
+            "path": "tools/semantic_harness/tests/test_conversation_inspector.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_conversational_competence_c7a.py",
+            "path": "tools/semantic_harness/tests/test_conversational_competence_c7a.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_conversational_competence_c7b.py",
+            "path": "tools/semantic_harness/tests/test_conversational_competence_c7b.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_conversational_competence_c7c.py",
+            "path": "tools/semantic_harness/tests/test_conversational_competence_c7c.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_conversational_competence_c7d.py",
+            "path": "tools/semantic_harness/tests/test_conversational_competence_c7d.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_conversational_competence_c7g.py",
+            "path": "tools/semantic_harness/tests/test_conversational_competence_c7g.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_dynamic_camp_destinations_p12f.py",
+            "path": "tools/semantic_harness/tests/test_dynamic_camp_destinations_p12f.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_follow_action_binding.py",
+            "path": "tools/semantic_harness/tests/test_follow_action_binding.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_gift_capability_binding.py",
+            "path": "tools/semantic_harness/tests/test_gift_capability_binding.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_grounded_personal_dialogue_b0.py",
+            "path": "tools/semantic_harness/tests/test_grounded_personal_dialogue_b0.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_grounded_world_knowledge_gossip.py",
+            "path": "tools/semantic_harness/tests/test_grounded_world_knowledge_gossip.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_p11b_health_migration.py",
+            "path": "tools/semantic_harness/tests/test_p11b_health_migration.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_p11b_needs_migration.py",
+            "path": "tools/semantic_harness/tests/test_p11b_needs_migration.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_p11b_social_apology_migration.py",
+            "path": "tools/semantic_harness/tests/test_p11b_social_apology_migration.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_p11b_wellbeing_migration.py",
+            "path": "tools/semantic_harness/tests/test_p11b_wellbeing_migration.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_p12h_native_effect_acceptance.py",
+            "path": "tools/semantic_harness/tests/test_p12h_native_effect_acceptance.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_portable_c6_matrix.py",
+            "path": "tools/semantic_harness/tests/test_portable_c6_matrix.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_quest_flow_binding.py",
+            "path": "tools/semantic_harness/tests/test_quest_flow_binding.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_response_observatory_matrix.py",
+            "path": "tools/semantic_harness/tests/test_response_observatory_matrix.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_semantic_dialogue_flows.py",
+            "path": "tools/semantic_harness/tests/test_semantic_dialogue_flows.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_semantic_identity_wellbeing_collision.py",
+            "path": "tools/semantic_harness/tests/test_semantic_identity_wellbeing_collision.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_semantic_paraphrases.py",
+            "path": "tools/semantic_harness/tests/test_semantic_paraphrases.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_semantic_provider_parity.py",
+            "path": "tools/semantic_harness/tests/test_semantic_provider_parity.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_shared_actor_conversation_service.py",
+            "path": "tools/semantic_harness/tests/test_shared_actor_conversation_service.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_stay_wait_at_binding.py",
+            "path": "tools/semantic_harness/tests/test_stay_wait_at_binding.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_transport_evidence.py",
+            "path": "tools/semantic_harness/tests/test_transport_evidence.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tools/semantic_harness/tests/test_wellbeing_projection.py",
+            "path": "tools/semantic_harness/tests/test_wellbeing_projection.py",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          }
+        ],
+        "scopes": [],
+        "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+      },
+      "isError": false
+    },
+    "submissionTrace": {
+      "content": [
+        {
+          "type": "text",
+          "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueInput_SubmissionFrames.Input.SubmitSemanticFrame\ndirection: both\ncallees_total: 8\ncallees: 8  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueInput_Lifecycle_Submission_Single.Internal:\n  SubmitSingle 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueInput_SceneHandoff.Internal:\n  SubmitSceneHandoffFrame 1 heuristic 0.17\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueInput_SubmissionFrames_Conversation.Internal:\n  SubmitConversationFrame 1 heuristic 0.75\n  SubmitCoreAuthoredFrame 1 heuristic 0.17\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueInput_SubmissionFrames_Navigation.Internal:\n  SubmitNavigationFrame 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Semantics.PNC_SemanticDialogueRuntime.Runtime:\n  IsEnabled 1 heuristic 0.85\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Semantics.PNC_SemanticDialogueSuggestions_Branches_IR.Suggestions:\n  ResolveFrameText 1 heuristic 0.17\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.17\ncallers_total: 5\ncallers: 5  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticCombatResponseSurface.Surface:\n  Submit 1 heuristic 0.85\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueInput_Lifecycle_Presentation_Choices.lua:\n  __file__ 1 heuristic 0.85\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueInput_Lifecycle_Submission_Single_Commit.Internal:\n  CommitSingleSubmission 1 heuristic 0.85\nproject-hoomans.tools.semantic_harness.lua.worker.Conversation_Click_Refresh.Refresh:\n  apply 1 heuristic 0.85\nproject-hoomans.tools.semantic_harness.lua.worker.Conversation_Turn.Turn:\n  run 1 heuristic 0.55\n"
+        }
+      ],
+      "isError": false
+    },
+    "evidenceBefore": {
+      "content": [
+        {
+          "type": "text",
+          "text": "function: project-hoomans.tools.semantic_harness.lua.worker.OutputProjection_ObservationBounds.Bounds.sideEffects\ndirection: both\ncallees_total: 2\ncallees: 2  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.17\nproject-hoomans.tools.semantic_harness.lua.worker.Values.Values:\n  copy 1 heuristic 0.90\ncallers_total: 1\ncallers: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.tools.semantic_harness.lua.worker.OutputProjection_Observation.Observation:\n  build 1 heuristic 0.90\n"
+        }
+      ],
+      "isError": false
+    },
+    "evidenceAfter": {
+      "content": [
+        {
+          "type": "text",
+          "text": "function: project-hoomans.tools.semantic_harness.lua.worker.TransportEvidence.Evidence.partition\ndirection: both\ncallees_total: 1\ncallees: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.17\ncallers_total: 2\ncallers: 2  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.tools.semantic_harness.lua.worker.OutputProjection_ObservationBounds.Bounds:\n  sideEffects 1 heuristic 0.85\nproject-hoomans.tools.semantic_harness.lua.worker.TransportEvidence.Evidence:\n  annotate 1 heuristic 0.90\n"
+        }
+      ],
+      "isError": false
+    },
+    "evidenceSnippet": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"name\":\"Evidence.partition\",\"qualified_name\":\"project-hoomans.tools.semantic_harness.lua.worker.TransportEvidence.Evidence.partition\",\"label\":\"Function\",\"file_path\":\"/home/psychopatz/Zomboid/Workshop/ProjectHoomans/tools/semantic_harness/lua/worker/TransportEvidence.lua\",\"start_line\":4,\"end_line\":20,\"source\":\"function Evidence.partition(transport)\\n    local dispatches = {}\\n    local facts = {}\\n    local factCommand = PNC and PNC.Const\\n        and PNC.Const.CMD_SEMANTIC_INTERACTION_LIFECYCLE\\n        or \\\"SemanticInteractionLifecycle\\\"\\n    for _, event in ipairs(transport or {}) do\\n        -- Unknown commands remain in dispatch evidence (fail closed). This\\n        -- exception is the explicit accepted-interaction fact protocol only.\\n        if type(event) == \\\"table\\\" and event.command == factCommand then\\n            facts[#facts + 1] = event\\n        else\\n            dispatches[#dispatches + 1] = event\\n        end\\n    end\\n    return dispatches, facts\\nend\\n\",\"callers\":2,\"callees\":1}"
+        }
+      ],
+      "structuredContent": {
+        "name": "Evidence.partition",
+        "qualified_name": "project-hoomans.tools.semantic_harness.lua.worker.TransportEvidence.Evidence.partition",
+        "label": "Function",
+        "file_path": "/home/psychopatz/Zomboid/Workshop/ProjectHoomans/tools/semantic_harness/lua/worker/TransportEvidence.lua",
+        "start_line": 4,
+        "end_line": 20,
+        "source": "function Evidence.partition(transport)\n    local dispatches = {}\n    local facts = {}\n    local factCommand = PNC and PNC.Const\n        and PNC.Const.CMD_SEMANTIC_INTERACTION_LIFECYCLE\n        or \"SemanticInteractionLifecycle\"\n    for _, event in ipairs(transport or {}) do\n        -- Unknown commands remain in dispatch evidence (fail closed). This\n        -- exception is the explicit accepted-interaction fact protocol only.\n        if type(event) == \"table\" and event.command == factCommand then\n            facts[#facts + 1] = event\n        else\n            dispatches[#dispatches + 1] = event\n        end\n    end\n    return dispatches, facts\nend\n",
+        "callers": 2,
+        "callees": 1
+      },
+      "isError": false
+    },
+    "limitations": [
+      "Statement-form require IMPORTS incomplete; source-hash-verified literal edges cover public import inventory.",
+      "Heuristic type/builtin targets and some alias edges false; exact source controls.",
+      "Public surface discovery is bounded to these entries/callers, not every semantic behavior."
+    ]
+  },
+  "composition_review": {
+    "additional_semantic_entries": [
+      "GiftLifecycle",
+      "GiftContext",
+      "DialogueBackstoryFactSource"
+    ],
+    "typed_identity_transport_owner": "Networking (existing semantic require path retained; Network.SendSemanticIdentityResult body unchanged)",
+    "namespace_guards": "Foreign DialogueInput/DialoguePolicy/InteractionLifecycle and Conversation Lifecycle/Scene Internal roots are rejected"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "stage": "P5B public subdomain and CQS tooling slice validated; P5C/D and remaining tooling gates active",
+  "source_revision_before": "2ad53120",
+  "public_semantic_entries": 43,
+  "foreign_literal_import_edges_reviewed": 66,
+  "production_runtime_changes": "None in this slice; identity transport ownership classified at unchanged public path",
+  "full_lua": {
+    "passed": 981,
+    "total": 981,
+    "seconds": 13.43
+  },
+  "focused_semantic_python": {
+    "passed": 29,
+    "total": 29,
+    "modules": [
+      "test_c7f_dataset_precision",
+      "test_coherent_conversation_c10",
+      "test_contextual_conversation_c1",
+      "test_follow_action_binding",
+      "test_transport_evidence",
+      "test_response_observatory",
+      "test_conversation_inspector"
+    ]
+  },
+  "guard_python": {
+    "passed": 22,
+    "total": 22
+  },
+  "tooling_lua_syntax": {
+    "files": 6,
+    "passed": true
+  },
+  "installed_kahlua": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 6,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  },
+  "dependency_guard": {
+    "issues": 82,
+    "new_debt": 0,
+    "domain_sccs": [
+      [
+        "Activities",
+        "Production"
+      ],
+      [
+        "Companions",
+        "Conversation",
+        "Knowledge",
+        "Networking",
+        "UI"
+      ],
+      [
+        "Identity",
+        "Semantics",
+        "Social",
+        "World"
+      ]
+    ]
+  },
+  "bootstrap": "47 registrations; expanded order unchanged in all seven roots",
+  "compatibility": "Complete transport and sideEffects.none/count retained; explicit fact/dispatch evidence added. No temporary runtime shim. Networking owns the existing typed identity transport entry.",
+  "remaining": "P5B_TOOLING_VALIDATION.json retains full isolated results and subsequent focused repairs; 38 pre-existing semantic-tooling failures require individual resolution/classification. No parent completion claim."
+}

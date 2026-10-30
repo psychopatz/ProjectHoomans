@@ -1,0 +1,1704 @@
+{
+  "stage": "P5B developer tooling evidence, full parent still active",
+  "full_isolated_run": {
+    "modules": 195,
+    "passed_modules": 155,
+    "failed_modules": 40,
+    "timeouts": 0,
+    "reported_tests": 786,
+    "skips": 2,
+    "source_revision_before": "2ad53120",
+    "source_kind": "checked out P5B working sources",
+    "environment": {
+      "XMODIFIERS": "@im=none",
+      "reason": "native backtrace proved desktop XIM CreateIC wait; per-process fallback verified GUI layout regression"
+    }
+  },
+  "modules": [
+    {
+      "module": "tools.semantic_harness.tests.test_activity_log",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 0.09
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_actor_inspectors_p13c",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 22.11
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_app",
+      "exit_code": 0,
+      "tests": 9,
+      "skipped": 0,
+      "seconds": 4.15
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_automatic_flow_generation",
+      "exit_code": 1,
+      "tests": 11,
+      "skipped": 0,
+      "seconds": 58.59,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_all_dispatchable_registered_capabilities_use_existing_handlers (tools.semantic_harness.tests.test_automatic_flow_generation.AutomaticFlowGenerationTests.test_all_dispatchable_registered_capabilities_use_existing_handlers)",
+        "AssertionError: 20 != 17",
+        "FAIL: test_live_coverage_generates_follow_and_stay_from_one_template (tools.semantic_harness.tests.test_automatic_flow_generation.AutomaticFlowGenerationTests.test_live_coverage_generates_follow_and_stay_from_one_template)",
+        "AssertionError: 20 != 17"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_c0a_baseline",
+      "exit_code": 0,
+      "tests": 9,
+      "skipped": 0,
+      "seconds": 0.71
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_c7f_dataset_precision",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 38.88
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_catalog_naming",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 0.1
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_cli_parity_p13f",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 45.17
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_codeblocks",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 8.07
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_codebuilder_consolidation",
+      "exit_code": 0,
+      "tests": 9,
+      "skipped": 0,
+      "seconds": 1.34
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c10",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 24.75
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c1_c2",
+      "exit_code": 0,
+      "tests": 8,
+      "skipped": 0,
+      "seconds": 36.31
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c3_c4",
+      "exit_code": 0,
+      "tests": 7,
+      "skipped": 0,
+      "seconds": 15.55
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c6_c7",
+      "exit_code": 0,
+      "tests": 8,
+      "skipped": 0,
+      "seconds": 27.47
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c8",
+      "exit_code": 0,
+      "tests": 6,
+      "skipped": 0,
+      "seconds": 22.3
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_companion_orders_hub_p12e",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 11.11
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_acceptance_c6b",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 11.68
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_actor_context_p2",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 7.67
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_baseline_matrix",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 16.65
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_bonds_p8a",
+      "exit_code": 0,
+      "tests": 6,
+      "skipped": 0,
+      "seconds": 40.86
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_choice_provider_p8c",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 9.13
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_choice_registry_p1",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 9.38
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c0",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 5.1
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c1",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 8.77
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c2",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 3.22
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 8.04
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3b",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 9.61,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_needs_question_opens_quantity_obligation_and_resolves_en_tl (tools.semantic_harness.tests.test_contextual_conversation_c3b.ContextualConversationC3BTests.test_needs_question_opens_quantity_obligation_and_resolves_en_tl) (language='EN')",
+        "AssertionError: 'pnc.question.needs_offer' != 'pnc.question.needs_offer_plain'",
+        "FAIL: test_needs_question_opens_quantity_obligation_and_resolves_en_tl (tools.semantic_harness.tests.test_contextual_conversation_c3b.ContextualConversationC3BTests.test_needs_question_opens_quantity_obligation_and_resolves_en_tl) (language='TL')",
+        "AssertionError: 'pnc.question.needs_offer' != 'pnc.question.needs_offer_plain'"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3c",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 6.0
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3d",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 7.81
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4a",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 8.5
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4b",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 7.28
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4c",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 9.2
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4d",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 6.6
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_dialogue_persona_choices_p0",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 16.05
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_dynamic_trading_p5",
+      "exit_code": 1,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 14.69,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "ERROR: test_trade_click_uses_existing_category_authority_and_dt_block (tools.semantic_harness.tests.test_contextual_dynamic_trading_p5.ContextualDynamicTradingP5Tests.test_trade_click_uses_existing_category_authority_and_dt_block)",
+        "StopIteration"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_provider_parity_c6c",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 15.39
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_ranking_p4",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 10.52
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_graph_p11f",
+      "exit_code": 1,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 94.28,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_authored_conversation_block_keeps_existing_graph_adapter (tools.semantic_harness.tests.test_contextual_runtime_graph_p11f.ContextualRuntimeGraphP11FTests.test_authored_conversation_block_keeps_existing_graph_adapter)",
+        "AssertionError: 'semantic_hub' != 'conversation_block'"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11a",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 16.75
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11b",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 91.19
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11c",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 136.5
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11d",
+      "exit_code": 0,
+      "tests": 7,
+      "skipped": 0,
+      "seconds": 188.38
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11e",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 161.59
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_speech_p11g",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 6.76,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_one_registry_exposes_domain_pack_families (tools.semantic_harness.tests.test_contextual_runtime_speech_p11g.ContextualRuntimeSpeechP11GTests.test_one_registry_exposes_domain_pack_families)",
+        "AssertionError: 'semantic.flow.greeting.opening.default' not found in {'semantic.task.drink.completed', 'semantic.interaction.scene.horde_reply_brave', 'semantic.combat.reaction.kill_witness_practical_02', 'semantic.compat.bandits.hooman_hurt.lover', 'semantic.question.needs.offer.fatigue', 'semantic.command.stop_following.queued.trusted', 'semantic.tool_reply.order_generic.2', 'semantic.companion.reaction.camp_rejected', 'semantic.question.needs.proposal.hunger', 'semantic.question.wellbeing.da"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_scale_isolation",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 6.94
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_semantic_hub_p10b",
+      "exit_code": 1,
+      "tests": 7,
+      "skipped": 0,
+      "seconds": 23.38,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_dynamic_trading_joins_the_hub_only_through_its_registered_provider (tools.semantic_harness.tests.test_contextual_semantic_hub_p10b.ContextualSemanticHubP10BTests.test_dynamic_trading_joins_the_hub_only_through_its_registered_provider)",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_enemy_hub_keeps_only_public_context_avenue (tools.semantic_harness.tests.test_contextual_semantic_hub_p10b.ContextualSemanticHubP10BTests.test_enemy_hub_keeps_only_public_context_avenue)",
+        "AssertionError: Items in the first set but not the second:",
+        "FAIL: test_neutral_survivor_gets_safe_semantic_avenues_and_clicks_on_one_lane (tools.semantic_harness.tests.test_contextual_semantic_hub_p10b.ContextualSemanticHubP10BTests.test_neutral_survivor_gets_safe_semantic_avenues_and_clicks_on_one_lane)",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_owned_companion_and_contextual_health_or_needs_ranking (tools.semantic_harness.tests.test_contextual_semantic_hub_p10b.ContextualSemanticHubP10BTests.test_owned_companion_and_contextual_health_or_needs_ranking)",
+        "AssertionError: 7 != 1"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p6",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 6.67
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p8d",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 171.44
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_social_reactions",
+      "exit_code": 1,
+      "tests": 12,
+      "skipped": 0,
+      "seconds": 50.07,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.apology.friendly'",
+        "FAIL: test_apology_uses_relationship_emotion_and_explicit_precedence (tools.semantic_harness.tests.test_contextual_social_reactions.ContextualSocialReactionTests.test_apology_uses_relationship_emotion_and_explicit_precedence) (case='manual_state_is_not_authority')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.apology.default'",
+        "FAIL: test_apology_uses_relationship_emotion_and_explicit_precedence (tools.semantic_harness.tests.test_contextual_social_reactions.ContextualSocialReactionTests.test_apology_uses_relationship_emotion_and_explicit_precedence) (case='stressed')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.apology.stressed'",
+        "FAIL: test_apology_uses_relationship_emotion_and_explicit_precedence (tools.semantic_harness.tests.test_contextual_social_reactions.ContextualSocialReactionTests.test_apology_uses_relationship_emotion_and_explicit_precedence) (case='stress_precedes_friendly')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.apology.stressed'",
+        "FAIL: test_dispute_uses_guarded_context_and_preserves_pending_authority (tools.semantic_harness.tests.test_contextual_social_reactions.ContextualSocialReactionTests.test_dispute_uses_guarded_context_and_preserves_pending_authority) (case='friendly')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.dispute_friendly'",
+        "FAIL: test_dispute_uses_guarded_context_and_preserves_pending_authority (tools.semantic_harness.tests.test_contextual_social_reactions.ContextualSocialReactionTests.test_dispute_uses_guarded_context_and_preserves_pending_authority) (case='withdrawn')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.dispute_withdrawn'",
+        "FAIL: test_dispute_uses_guarded_context_and_preserves_pending_authority (tools.semantic_harness.tests.test_contextual_social_reactions.ContextualSocialReactionTests.test_dispute_uses_guarded_context_and_preserves_pending_authority) (case='stressed')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.dispute_stressed'",
+        "FAIL: test_dispute_uses_guarded_context_and_preserves_pending_authority (tools.semantic_harness.tests.test_contextual_social_reactions.ContextualSocialReactionTests.test_dispute_uses_guarded_context_and_preserves_pending_authority)",
+        "AssertionError: 'semantic.social.acknowledged' != 'semantic.social.refuse_request'",
+        "FAIL: test_existing_social_reactions_remain_local_and_contextual (tools.semantic_harness.tests.test_contextual_social_reactions.ContextualSocialReactionTests.test_existing_social_reactions_remain_local_and_contextual) (case='threat_busy')",
+        "AssertionError: 'semantic.social.hostile_boundary' != 'semantic.social.threat_busy'",
+        "FAIL: test_insults_use_the_authoritative_social_boundary_and_visible_response (tools.semantic_harness.tests.test_contextual_social_reactions.ContextualSocialReactionTests.test_insults_use_the_authoritative_social_boundary_and_visible_response) (text='fuck you')",
+        "AssertionError: 'utterance_plan' != 'semantic.social.hostile_boundary'",
+        "FAIL: test_insults_use_the_authoritative_social_boundary_and_visible_response (tools.semantic_harness.tests.test_contextual_social_reactions.ContextualSocialReactionTests.test_insults_use_the_authoritative_social_boundary_and_visible_response) (text='you are useless')"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_speech_behavior_p8b",
+      "exit_code": 1,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 48.85,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "ERROR: test_bond_terms_are_whole_phrase_arguments_and_standing_independent (tools.semantic_harness.tests.test_contextual_speech_behavior_p8b.ContextualSpeechBehaviorP8BTests.test_bond_terms_are_whole_phrase_arguments_and_standing_independent)",
+        "KeyError: 'familyAddress'",
+        "ERROR: test_tl_keeps_semantic_identity_and_localizes_bond_term (tools.semantic_harness.tests.test_contextual_speech_behavior_p8b.ContextualSpeechBehaviorP8BTests.test_tl_keeps_semantic_identity_and_localizes_bond_term)",
+        "KeyError: 'familyAddress'",
+        "FAIL: test_non_greeting_production_families_have_visible_variants (tools.semantic_harness.tests.test_contextual_speech_behavior_p8b.ContextualSpeechBehaviorP8BTests.test_non_greeting_production_families_have_visible_variants) (text='okay')",
+        "AssertionError: 'What are you referring to?' == 'What are you referring to?'",
+        "FAIL: test_non_greeting_production_families_have_visible_variants (tools.semantic_harness.tests.test_contextual_speech_behavior_p8b.ContextualSpeechBehaviorP8BTests.test_non_greeting_production_families_have_visible_variants) (text='sorry')",
+        "AssertionError: 'What are you referring to?' == 'What are you referring to?'",
+        "FAIL: test_non_greeting_production_families_have_visible_variants (tools.semantic_harness.tests.test_contextual_speech_behavior_p8b.ContextualSpeechBehaviorP8BTests.test_non_greeting_production_families_have_visible_variants) (text='I disagree')",
+        "AssertionError: 'What are you referring to?' == 'What are you referring to?'",
+        "FAIL: test_non_greeting_production_families_have_visible_variants (tools.semantic_harness.tests.test_contextual_speech_behavior_p8b.ContextualSpeechBehaviorP8BTests.test_non_greeting_production_families_have_visible_variants) (text='back off')",
+        "AssertionError: 'construction.en.social.warn_direct' not found in {'guarded', 'warm', 'neutral', 'terse'}",
+        "FAIL: test_refusal_reuse_does_not_turn_authoritative_no_into_acknowledgement (tools.semantic_harness.tests.test_contextual_speech_behavior_p8b.ContextualSpeechBehaviorP8BTests.test_refusal_reuse_does_not_turn_authoritative_no_into_acknowledgement)",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.dispute_withdrawn'"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_speech_style_p3",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 13.69
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_followup",
+      "exit_code": 1,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 8.6,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_time_topic_is_grouped_without_generic_social_questions (tools.semantic_harness.tests.test_contextual_suggestions_followup.ContextualSuggestionsFollowupTests.test_time_topic_is_grouped_without_generic_social_questions)",
+        "AssertionError: 'conversation_branch' != 'topic:time'"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_hub_presentation",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 6.52,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_accepted_hub_choice_is_hidden_for_one_npc_until_next_day (tools.semantic_harness.tests.test_contextual_suggestions_hub_presentation.ContextualSuggestionsHubPresentationTests.test_accepted_hub_choice_is_hidden_for_one_npc_until_next_day)",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_rejected_stale_click_does_not_suppress_hub_choice (tools.semantic_harness.tests.test_contextual_suggestions_hub_presentation.ContextualSuggestionsHubPresentationTests.test_rejected_stale_click_does_not_suppress_hub_choice)",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_suppression_is_scoped_to_the_npc (tools.semantic_harness.tests.test_contextual_suggestions_hub_presentation.ContextualSuggestionsHubPresentationTests.test_suppression_is_scoped_to_the_npc)",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s1",
+      "exit_code": 0,
+      "tests": 6,
+      "skipped": 0,
+      "seconds": 18.29
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s2",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 24.83
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s3",
+      "exit_code": 0,
+      "tests": 8,
+      "skipped": 0,
+      "seconds": 24.9
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s4",
+      "exit_code": 1,
+      "tests": 7,
+      "skipped": 0,
+      "seconds": 47.56,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "ERROR: test_existing_lab_renders_inspects_and_clicks_production_suggestions (tools.semantic_harness.tests.test_contextual_suggestions_s4.ContextualSuggestionsS4Tests.test_existing_lab_renders_inspects_and_clicks_production_suggestions)",
+        "StopIteration",
+        "FAIL: test_identity_lie_choice_stays_in_inspect_until_native_session (tools.semantic_harness.tests.test_contextual_suggestions_s4.ContextualSuggestionsS4Tests.test_identity_lie_choice_stays_in_inspect_until_native_session)",
+        "AssertionError: False is not true",
+        "FAIL: test_whats_up_gui_activates_hub_without_a_conversation_graph (tools.semantic_harness.tests.test_contextual_suggestions_s4.ContextualSuggestionsS4Tests.test_whats_up_gui_activates_hub_without_a_conversation_graph)",
+        "AssertionError: 'generated.accept' != 'question.health'"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_whats_up",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 32.38,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_reviewed_aliases_activate_hub_without_conversation_block (tools.semantic_harness.tests.test_contextual_suggestions_whats_up.WhatsUpSemanticHubTests.test_reviewed_aliases_activate_hub_without_conversation_block) (utterance=\"what's up\")",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_reviewed_aliases_activate_hub_without_conversation_block (tools.semantic_harness.tests.test_contextual_suggestions_whats_up.WhatsUpSemanticHubTests.test_reviewed_aliases_activate_hub_without_conversation_block) (utterance='whats up')",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_reviewed_aliases_activate_hub_without_conversation_block (tools.semantic_harness.tests.test_contextual_suggestions_whats_up.WhatsUpSemanticHubTests.test_reviewed_aliases_activate_hub_without_conversation_block) (utterance='what is up')",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_reviewed_aliases_activate_hub_without_conversation_block (tools.semantic_harness.tests.test_contextual_suggestions_whats_up.WhatsUpSemanticHubTests.test_reviewed_aliases_activate_hub_without_conversation_block) (utterance='what up')",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_reviewed_aliases_activate_hub_without_conversation_block (tools.semantic_harness.tests.test_contextual_suggestions_whats_up.WhatsUpSemanticHubTests.test_reviewed_aliases_activate_hub_without_conversation_block) (utterance='whatsup')",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_reviewed_aliases_activate_hub_without_conversation_block (tools.semantic_harness.tests.test_contextual_suggestions_whats_up.WhatsUpSemanticHubTests.test_reviewed_aliases_activate_hub_without_conversation_block) (utterance=\"what's new\")",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_reviewed_aliases_activate_hub_without_conversation_block (tools.semantic_harness.tests.test_contextual_suggestions_whats_up.WhatsUpSemanticHubTests.test_reviewed_aliases_activate_hub_without_conversation_block) (utterance='whats new')",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_reviewed_aliases_activate_hub_without_conversation_block (tools.semantic_harness.tests.test_contextual_suggestions_whats_up.WhatsUpSemanticHubTests.test_reviewed_aliases_activate_hub_without_conversation_block) (utterance='anything new')",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_reviewed_aliases_activate_hub_without_conversation_block (tools.semantic_harness.tests.test_contextual_suggestions_whats_up.WhatsUpSemanticHubTests.test_reviewed_aliases_activate_hub_without_conversation_block) (utterance=\"what's happening\")",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_reviewed_aliases_activate_hub_without_conversation_block (tools.semantic_harness.tests.test_contextual_suggestions_whats_up.WhatsUpSemanticHubTests.test_reviewed_aliases_activate_hub_without_conversation_block) (utterance='whats happening')",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_talk_parity_p11j",
+      "exit_code": 1,
+      "tests": 22,
+      "skipped": 0,
+      "seconds": 94.26,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_landing_projection_keeps_shortcut_and_back_target_after_hub_turn (tools.semantic_harness.tests.test_contextual_talk_parity_p11j.ContextualTalkParityP11JTests.test_landing_projection_keeps_shortcut_and_back_target_after_hub_turn)",
+        "AssertionError: 'conversation_branch' != 'semantic_hub.whats_up'",
+        "FAIL: test_matrix_uses_native_target_facts_and_restores_base_scenario (tools.semantic_harness.tests.test_contextual_talk_parity_p11j.ContextualTalkParityP11JTests.test_matrix_uses_native_target_facts_and_restores_base_scenario)",
+        "AssertionError: 'conversation.root:menu:ceasefire' not found in {'generated.wellbeing_neutral', 'generated.wellbeing_negative', 'generated.wellbeing_positive', 'semantic.back_to_root:conversation_branch'}"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_weather_gate",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 11.06
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversation_compiler_p11b0",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 2.31
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversation_content_authority",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 20.74
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversation_context_health_c5",
+      "exit_code": 0,
+      "tests": 8,
+      "skipped": 0,
+      "seconds": 1.72
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversation_inspector",
+      "exit_code": 1,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 10.81,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_conversation_first_projection_separates_understanding_and_authority (tools.semantic_harness.tests.test_conversation_inspector.ConversationInspectorTests.test_conversation_first_projection_separates_understanding_and_authority)",
+        "AssertionError: 1 != 0"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversation_semantic_composition",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 1.69
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7a",
+      "exit_code": 1,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 23.87,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_preview_and_tl_response_are_effect_free_and_localized (tools.semantic_harness.tests.test_conversational_competence_c7a.ConversationalCompetenceC7ATests.test_preview_and_tl_response_are_effect_free_and_localized)",
+        "AssertionError: 'UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral01' != 'UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative'"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7b",
+      "exit_code": 1,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 23.39,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_natural_question_variants_answer_unknown_truthfully (tools.semantic_harness.tests.test_conversational_competence_c7b.ConversationalCompetenceC7BTests.test_natural_question_variants_answer_unknown_truthfully) (text='do you know about the radio tower')",
+        "AssertionError: \"i don't have reliable information about the radio tower\" not found in \"i don't have reliable information about that.\"",
+        "FAIL: test_natural_question_variants_answer_unknown_truthfully (tools.semantic_harness.tests.test_conversational_competence_c7b.ConversationalCompetenceC7BTests.test_natural_question_variants_answer_unknown_truthfully) (text='have you heard of the radio tower')",
+        "AssertionError: \"i don't have reliable information about the radio tower\" not found in \"i don't have reliable information about that.\""
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7c",
+      "exit_code": 1,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 34.57,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_acknowledgements_preserve_context_without_authorizing_actions (tools.semantic_harness.tests.test_conversational_competence_c7c.ConversationalCompetenceC7CTests.test_acknowledgements_preserve_context_without_authorizing_actions)",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.question.relationship_status.acknowledged.alternate'"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7d",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 17.91
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7g",
+      "exit_code": 1,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 50.88,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_long_dialogue_turn_latency_and_context_remain_bounded (tools.semantic_harness.tests.test_conversational_competence_c7g.ConversationalCompetenceC7GTests.test_long_dialogue_turn_latency_and_context_remain_bounded)",
+        "AssertionError: 0.5130394456646172 not less than or equal to 0.3"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_dataset_adapters",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 0.13
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_dialogue_dataset",
+      "exit_code": 0,
+      "tests": 8,
+      "skipped": 0,
+      "seconds": 0.11
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_dynamic_camp_destinations_p12f",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 11.2,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_stale_server_result_rejects_without_mutating_order_state (tools.semantic_harness.tests.test_dynamic_camp_destinations_p12f.DynamicCampDestinationsP12FTests.test_stale_server_result_rejects_without_mutating_order_state)",
+        "AssertionError: 'camp' not found in \"i couldn't do that right now.\""
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_f4_semantic_lab_acceptance",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 21.25
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_faction_community_workbench_p13d",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 12.01
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_fixture_provider_p12f",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 2.66
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_flow_editor",
+      "exit_code": 1,
+      "tests": 11,
+      "skipped": 0,
+      "seconds": 15.19,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_editor_validates_registers_and_runs_a_new_flow_in_lua (tools.semantic_harness.tests.test_flow_editor.FlowEditorTests.test_editor_validates_registers_and_runs_a_new_flow_in_lua)",
+        "AssertionError: Lists differ: ['ide[568 chars]nion.combat.avoid', 'pnc.generated.simple_comm[604 chars]fer'] != ['ide[568 chars]nion.follow', 'pnc.generated.simple_command.pn[427 chars]fer']",
+        "FAIL: test_semantic_lab_coverage_view_keeps_exact_live_reasons (tools.semantic_harness.tests.test_flow_editor.FlowEditorTests.test_semantic_lab_coverage_view_keeps_exact_live_reasons)",
+        "AssertionError: 23 != 20"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_follow_action_binding",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 9.13
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_gift_capability_binding",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 9.21,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_generated_gift_authorization_gate_and_lifecycle_template (tools.semantic_harness.tests.test_gift_capability_binding.GiftCapabilityBindingTests.test_generated_gift_authorization_gate_and_lifecycle_template)",
+        "AssertionError: 20 != 17"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_b0",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 23.41
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_b2",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 2.96
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_b3",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 3.96
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_h3",
+      "exit_code": 1,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 13.45,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_personality_changes_willingness_without_bypassing_knowledge (tools.semantic_harness.tests.test_grounded_personal_dialogue_h3.GroundedPersonalDialogueH3Tests.test_personality_changes_willingness_without_bypassing_knowledge)",
+        "AssertionError: 'I worked as farmer before all this.' != \"I'm not ready to talk about that yet.\""
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_h4",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 12.31
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_grounded_world_knowledge_gossip",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 5.49
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_gui_saved_pair_entrypoint",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 28.81
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_harness",
+      "exit_code": 0,
+      "tests": 24,
+      "skipped": 0,
+      "seconds": 80.86
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_hub_diagnostics_graph_history_p10f",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 7.47
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_interaction_spec",
+      "exit_code": 0,
+      "tests": 12,
+      "skipped": 0,
+      "seconds": 10.56
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_inventory_gift_workbench_p13e",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 12.1
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_kahlua_verifier",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 2,
+      "seconds": 0.07
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_legacy_category_ownership",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 4.12
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_legacy_semantic_authority_p11",
+      "exit_code": 1,
+      "tests": 11,
+      "skipped": 0,
+      "seconds": 0.32,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_canonical_en_tl_dialogue_content_is_the_only_pnc_wording_catalog (tools.semantic_harness.tests.test_legacy_semantic_authority_p11.LegacySemanticAuthorityP11Tests.test_canonical_en_tl_dialogue_content_is_the_only_pnc_wording_catalog)",
+        "AssertionError: False is not true : /home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/DialogueContent.json"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_lexicon_compiler",
+      "exit_code": 0,
+      "tests": 9,
+      "skipped": 0,
+      "seconds": 0.1
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_live_profiler_provider_p12g",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 2.2
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_live_regression_l1",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 15.53
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_live_regression_l2",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 10.94
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_live_regression_l3",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 20.09
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_live_regression_l4",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 24.41
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_live_regression_l5",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 12.89
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_missing_state_audit_p14e",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 1.73
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_modular_dataset_authoring",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 3.45
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_open_ended_semantic_combat_awareness",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 14.37
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_operational_acceptance_p13g",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 46.07,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "ERROR: test_real_saved_categories_use_production_talk_routes (tools.semantic_harness.tests.test_operational_acceptance_p13g.OperationalAcceptanceP13GTests.test_real_saved_categories_use_production_talk_routes) (category='Companions', actor='npcKentLangley_OWOJ')",
+        "ERROR: test_real_saved_categories_use_production_talk_routes (tools.semantic_harness.tests.test_operational_acceptance_p13g.OperationalAcceptanceP13GTests.test_real_saved_categories_use_production_talk_routes) (category='Neutral NPCs', actor='npcAdamBloom_48G5')",
+        "ERROR: test_real_saved_categories_use_production_talk_routes (tools.semantic_harness.tests.test_operational_acceptance_p13g.OperationalAcceptanceP13GTests.test_real_saved_categories_use_production_talk_routes) (category='Hostile NPCs', actor='npcBarneyYamamoto_2OXA')",
+        "ERROR: test_real_saved_categories_use_production_talk_routes (tools.semantic_harness.tests.test_operational_acceptance_p13g.OperationalAcceptanceP13GTests.test_real_saved_categories_use_production_talk_routes) (category='Known Traders', actor='npcBrendonOakes_2ZOW')"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_operational_world_browser_p13a",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 25.98
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p11b_health_migration",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 16.08,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_generated_health_translation_is_complete_and_legacy_keys_are_retired (tools.semantic_harness.tests.test_p11b_health_migration.HealthWordingShardTests.test_generated_health_translation_is_complete_and_legacy_keys_are_retired) (language='EN')",
+        "AssertionError: {'UI_[1256 chars]ing.\", 'UI_PNC_Conversation_Content_SemanticQu[1282 chars]ng.\"} != {'UI_[1256 chars]ing.\"}",
+        "FAIL: test_generated_health_translation_is_complete_and_legacy_keys_are_retired (tools.semantic_harness.tests.test_p11b_health_migration.HealthWordingShardTests.test_generated_health_translation_is_complete_and_legacy_keys_are_retired) (language='TL')",
+        "AssertionError: {'UI_[1296 chars]ong.', 'UI_PNC_Conversation_Content_SemanticQu[1256 chars]ri.'} != {'UI_[1296 chars]ong.'}"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p11b_needs_migration",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 5.98,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "ERROR: test_compiler_owns_needs_families_by_needs_shard (tools.semantic_harness.tests.test_p11b_needs_migration.NeedsWordingShardTests.test_compiler_owns_needs_families_by_needs_shard)",
+        "KeyError: 'semantic.question.needs.offer.hunger'"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p11b_social_apology_migration",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 15.67,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_generated_apology_translation_is_complete_and_legacy_fixed_keys_retired (tools.semantic_harness.tests.test_p11b_social_apology_migration.SocialApologyWordingShardTests.test_generated_apology_translation_is_complete_and_legacy_fixed_keys_retired)",
+        "AssertionError: {'UI_[48 chars]faultGuarded01': 'What are you apologizing for[1536 chars]ow.\"} != {'UI_[48 chars]faultNeutral01': \"Noted. Let's move on.\", 'UI_[1517 chars]re.'}",
+        "FAIL: test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl (tools.semantic_harness.tests.test_p11b_social_apology_migration.SocialApologyWordingShardTests.test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl) (language='EN', family='default')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.apology.default'",
+        "FAIL: test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl (tools.semantic_harness.tests.test_p11b_social_apology_migration.SocialApologyWordingShardTests.test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl) (language='EN', family='friendly')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.apology.friendly'",
+        "FAIL: test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl (tools.semantic_harness.tests.test_p11b_social_apology_migration.SocialApologyWordingShardTests.test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl) (language='EN', family='stressed')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.apology.stressed'",
+        "FAIL: test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl (tools.semantic_harness.tests.test_p11b_social_apology_migration.SocialApologyWordingShardTests.test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl) (language='EN', family='withdrawn')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.apology.withdrawn'",
+        "FAIL: test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl (tools.semantic_harness.tests.test_p11b_social_apology_migration.SocialApologyWordingShardTests.test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl) (language='TL', family='default')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.apology.default'",
+        "FAIL: test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl (tools.semantic_harness.tests.test_p11b_social_apology_migration.SocialApologyWordingShardTests.test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl) (language='TL', family='friendly')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.apology.friendly'",
+        "FAIL: test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl (tools.semantic_harness.tests.test_p11b_social_apology_migration.SocialApologyWordingShardTests.test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl) (language='TL', family='stressed')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.apology.stressed'",
+        "FAIL: test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl (tools.semantic_harness.tests.test_p11b_social_apology_migration.SocialApologyWordingShardTests.test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl) (language='TL', family='withdrawn')",
+        "AssertionError: 'semantic.interaction.context.clarify' != 'semantic.social.apology.withdrawn'"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p11b_wellbeing_migration",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 7.98,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "ERROR: test_compiler_owns_wellbeing_families_by_wellbeing_shard (tools.semantic_harness.tests.test_p11b_wellbeing_migration.WellbeingWordingShardTests.test_compiler_owns_wellbeing_families_by_wellbeing_shard)",
+        "KeyError: 'semantic.question.wellbeing.default'",
+        "FAIL: test_generated_wellbeing_translation_is_complete_and_legacy_keys_are_retired (tools.semantic_harness.tests.test_p11b_wellbeing_migration.WellbeingWordingShardTests.test_generated_wellbeing_translation_is_complete_and_legacy_keys_are_retired) (language='EN')",
+        "AssertionError: {'UI_[46 chars]eingDatasetGettingByGuarded01': \"I'm getting b[2170 chars]er?\"} != {'UI_[46 chars]eingDefaultNeutral01': \"I'm okay. How about yo[1706 chars]lp.\"}",
+        "FAIL: test_generated_wellbeing_translation_is_complete_and_legacy_keys_are_retired (tools.semantic_harness.tests.test_p11b_wellbeing_migration.WellbeingWordingShardTests.test_generated_wellbeing_translation_is_complete_and_legacy_keys_are_retired) (language='TL')",
+        "AssertionError: {'UI_[46 chars]eingDatasetGettingByGuarded01': 'Kinakaya ko. [2191 chars]ig?'} != {'UI_[46 chars]eingDefaultNeutral01': 'Okay naman ako. Ikaw, [1733 chars]ga.'}"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p12h_native_effect_acceptance",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 4.58
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p3b_startup_session_parity",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 36.03
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p3c_test_isolation",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 8.08
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_package_boundaries",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 0.09
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_package_entrypoint",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 0.21
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_phase6_performance",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 0.15
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_phase6_static_boundaries",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 0.09
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_player_engine_state_p13b",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 2.79
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_portable_c6_matrix",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 10.98
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p1",
+      "exit_code": 1,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 1.0,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_beats_and_behaviors_compile_as_modular_structural_records (tools.semantic_harness.tests.test_pragmatic_interaction_p1.PragmaticInteractionCompilerTests.test_beats_and_behaviors_compile_as_modular_structural_records)",
+        "AssertionError: Items in the first set but not the second:"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p2",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 12.76
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p3",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 6.15
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p4",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 4.82,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_catalog_validate_preview_register_and_run_draft (tools.semantic_harness.tests.test_pragmatic_interaction_p4.PragmaticInteractionP4WorkerTests.test_catalog_validate_preview_register_and_run_draft)",
+        "AssertionError: 30 != 14"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p5",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 4.41
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p6",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 15.03
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_r6",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 7.64
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_r9",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 4.45
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_recovery_r2",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 3.62
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_production_faction_rehydration_p14c",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 9.39
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_production_inventory_rehydration_p14b",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 15.4
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_production_leave_group_p4a",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 19.21
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_production_mutations_p12h",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 2.35
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_production_rehydration_p14a",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 8.29
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_production_social_context_p14d",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 5.35
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_protocol",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 0.07
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_python_acceptance_runner",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 1.17
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_quest_flow_binding",
+      "exit_code": 1,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 19.25,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_quest_operations_are_generated_from_registered_metadata (tools.semantic_harness.tests.test_quest_flow_binding.QuestFlowBindingTests.test_quest_operations_are_generated_from_registered_metadata)",
+        "AssertionError: 20 != 17"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_real_save_production_runtime_p14f",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 18.3,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "ERROR: test_real_saved_actor_matrix_and_reset (tools.semantic_harness.tests.test_real_save_production_runtime_p14f.RealSaveProductionRuntimeP14FTests.test_real_saved_actor_matrix_and_reset)"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_response_observatory",
+      "exit_code": 1,
+      "tests": 10,
+      "skipped": 0,
+      "seconds": 18.19,
+      "preexisting_at_p0": false,
+      "failure_summary": [
+        "FAIL: test_observed_lookup_does_not_invent_generated_selection (tools.semantic_harness.tests.test_response_observatory.ResponseObservatoryTests.test_observed_lookup_does_not_invent_generated_selection)",
+        "AssertionError: 0 != 2"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_response_observatory_matrix",
+      "exit_code": 1,
+      "tests": 20,
+      "skipped": 0,
+      "seconds": 135.57,
+      "preexisting_at_p0": false,
+      "failure_summary": [
+        "FAIL: test_command_rejections_are_server_declared_not_accepted_effects (tools.semantic_harness.tests.test_response_observatory_matrix.ResponseQualityMatrixTests.test_command_rejections_are_server_declared_not_accepted_effects)",
+        "AssertionError: False is not true : {'ok': False, 'type': 'response_quality_matrix', 'schemaVersion': 1, 'sourceKind': 'FIXTURE', 'totalRequested': 4, 'caseCount': 4, 'truncated': False, 'passed': 0, 'failed': 4, 'observedOnly': 0, 'cases': [{'index': 0, 'label': 'Follow server-declared rejection EN', 'language': 'EN', 'sourceKind': 'FIXTURE', 'workerKind': 'production_lua', 'utterances': ['follow me'], 'interaction': None, 'conversationClosed': False, 'responseKeys': ['semantic.command.follow.r",
+        "FAIL: test_greeting_and_companion_actions_en_tl (tools.semantic_harness.tests.test_response_observatory_matrix.ResponseQualityMatrixTests.test_greeting_and_companion_actions_en_tl)",
+        "AssertionError: 0 != 2"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_runner",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 0.13
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_runtime_config",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 0.09
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_runtime_package",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 0.11
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_save_backed_conversation_p12j",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 13.84
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_save_backed_snapshot_p12a",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 3.74
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_save_browser_p12d",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 4.27
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_save_catalog_p12b",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 0.08
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_save_import_p12c",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 3.63
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_saved_world_relationship_lens_p15b",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 16.77
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_blocks",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 3.93
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_combat_observatory",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 4.6
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_definition_compiler",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 0.08
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_dialogue_flows",
+      "exit_code": 0,
+      "tests": 8,
+      "skipped": 0,
+      "seconds": 24.72
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_identity_wellbeing_collision",
+      "exit_code": 1,
+      "tests": 13,
+      "skipped": 0,
+      "seconds": 36.88,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "ERROR: test_native_conversation_identity_choice_submits_canonical_name (tools.semantic_harness.tests.test_semantic_identity_wellbeing_collision.SemanticIdentityWellbeingCollisionTests.test_native_conversation_identity_choice_submits_canonical_name)",
+        "StopIteration",
+        "ERROR: test_real_name_choice_submits_canonical_name_for_authoritative_check (tools.semantic_harness.tests.test_semantic_identity_wellbeing_collision.SemanticIdentityWellbeingCollisionTests.test_real_name_choice_submits_canonical_name_for_authoritative_check)",
+        "StopIteration",
+        "FAIL: test_pending_identity_presents_three_deterministic_choice_frames (tools.semantic_harness.tests.test_semantic_identity_wellbeing_collision.SemanticIdentityWellbeingCollisionTests.test_pending_identity_presents_three_deterministic_choice_frames)",
+        "AssertionError: Lists differ: ['generated.disclose_name', 'generated.refuse_identity'] != ['identity.choice.real_name', 'identity.cho[40 chars]ame']",
+        "FAIL: test_real_worker_rejects_fuzzy_mutating_candidate (tools.semantic_harness.tests.test_semantic_identity_wellbeing_collision.SemanticIdentityWellbeingCollisionTests.test_real_worker_rejects_fuzzy_mutating_candidate)",
+        "AssertionError: 'COMMAND_ACCEPTED' != 'ASK_CLARIFICATION'"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_interaction_continuation_contract",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 0.09
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_interaction_lifecycle_acceptance",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 8.38
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_interaction_lifecycle_p1",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 13.51
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_lab_npc_profiles",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 8.9
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_live_parity",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 0.08
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_observatory_codebuilder_lineage",
+      "exit_code": 1,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 15.28,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_gui_review_displays_verified_and_unknown_owners (tools.semantic_harness.tests.test_semantic_observatory_codebuilder_lineage.ObservatoryLineageTkTests.test_gui_review_displays_verified_and_unknown_owners)",
+        "AssertionError: 'common_responses.json' not found in 'Verified CodeBuilder variant sources: semantic.accept\\nCanonical matches: 2/4\\nOnly per-variant compiler+loaded-Lua matches are authoritative.\\nNot verified does not prove missing or broken sources.\\nNo source files are written; explicit approval still required.\\n\\nsemantic.accept.request: no_verified_canonical_match\\n  Source: UNKNOWN\\n  Generator parity: UNKNOWN\\n\\nsemantic.accept.default: no_verified_canonical_match\\n  Source: UNKNOWN\\n  G"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_observatory_p7_scale",
+      "exit_code": 1,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 4.84,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "ERROR: test_repeated_inspection_is_read_only_across_actor_state_and_source (tools.semantic_harness.tests.test_semantic_observatory_p7_scale.ObservatoryP7ScaleTests.test_repeated_inspection_is_read_only_across_actor_state_and_source)",
+        "FAIL: test_catalog_paging_exhaustive_worker_registry_no_duplication (tools.semantic_harness.tests.test_semantic_observatory_p7_scale.ObservatoryP7ScaleTests.test_catalog_paging_exhaustive_worker_registry_no_duplication)",
+        "AssertionError: 37150 not less than 32768"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_observatory_translation_coverage",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 6.93
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_paraphrases",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 21.81
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_provider_parity",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 7.98
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_scene_observatory",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 9.51
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_scene_runtime_s8_acceptance",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 3.33
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_simulation_ux_p10c",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 8.66
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_translation_integration",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 7.69
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_tree_projection_p10e",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 0.07
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_shared_actor_conversation_service",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 4.34
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_simulation_workbench_p10e",
+      "exit_code": 1,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 25.1,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_tk_workbench_applies_and_replays_latest_hub_utterance (tools.semantic_harness.tests.test_simulation_workbench_p10e.SimulationWorkbenchP10ETests.test_tk_workbench_applies_and_replays_latest_hub_utterance)",
+        "AssertionError: ['semantic.back_to_root:conversation_branch', 'generated.accept', 'generated.acknowledge', 'generated.agree', 'generated.disagree', 'generated.refuse', 'generated.ask_followup'] == ['semantic.back_to_root:conversation_branch', 'generated.accept', 'generated.acknowledge', 'generated.agree', 'generated.disagree', 'generated.refuse', 'generated.ask_followup']"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_stateful_capability_refresh_p12g",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 4.61
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_stay_wait_at_binding",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 8.51
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_structured_inventory_p10d",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 8.33
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_suite",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 0.52
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_surface_consolidation",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 23.79
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_tool_call_formatting",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 0.07
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_transcript",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 0.06
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_transport_evidence",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 2.46
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_ui_organization",
+      "exit_code": 0,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 21.87
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_ui_state_persistence",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 11.85
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_authority_p2_event_followup",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 14.86
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e0",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 11.43
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e1",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 1.95
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e2",
+      "exit_code": 1,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 1.56,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_all_social_types_derive_canonical_registration (tools.semantic_harness.tests.test_unified_evidence_e2.UnifiedEvidenceE2Tests.test_all_social_types_derive_canonical_registration)",
+        "AssertionError: 26 != 23"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e3",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 11.18
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e4",
+      "exit_code": 0,
+      "tests": 4,
+      "skipped": 0,
+      "seconds": 27.71
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e5",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 26.55
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e6",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 7.15
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e7",
+      "exit_code": 0,
+      "tests": 5,
+      "skipped": 0,
+      "seconds": 21.86
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_v1_visual_authoring",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 15.14
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_wellbeing_projection",
+      "exit_code": 0,
+      "tests": 12,
+      "skipped": 0,
+      "seconds": 34.78
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_whats_up_semantic_response_p12h",
+      "exit_code": 1,
+      "tests": 2,
+      "skipped": 0,
+      "seconds": 4.15,
+      "preexisting_at_p0": true,
+      "failure_summary": [
+        "FAIL: test_landing_shortcut_preserves_typed_semantic_route (tools.semantic_harness.tests.test_whats_up_semantic_response_p12h.WhatsUpSemanticResponseP12HTests.test_landing_shortcut_preserves_typed_semantic_route)",
+        "AssertionError: False is not true",
+        "FAIL: test_whats_up_uses_grounded_semantic_realization (tools.semantic_harness.tests.test_whats_up_semantic_response_p12h.WhatsUpSemanticResponseP12HTests.test_whats_up_uses_grounded_semantic_realization)",
+        "AssertionError: False is not true"
+      ]
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_worker_session",
+      "exit_code": 0,
+      "tests": 3,
+      "skipped": 0,
+      "seconds": 0.18
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_world_knowledge_gui",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 4.18
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_world_knowledge_inspector",
+      "exit_code": 0,
+      "tests": 1,
+      "skipped": 0,
+      "seconds": 1.92
+    }
+  ],
+  "focused_repairs_after_full_run": {
+    "response_observatory": "Inspector explicit bounded side-effect projection retains original raw count instead of losing it to generic map-key truncation; 10 tests pass",
+    "conversation_inspector": "Gameplay-authority assertions use dispatch counts; original raw/fact counts asserted separately; 5/5 tests pass"
+  },
+  "limitations": [
+    "Full isolated run is not claimed all-green. Remaining pre-existing fixture/presentation/lineage failures need individual repair or supersession evidence in P5\u2013P8.",
+    "Per-process XMODIFIERS fallback removes the proven desktop XIM initialization stall; no desktop setting changed."
+  ],
+  "current_derived_status": {
+    "passed_modules": 157,
+    "remaining_failed_modules": 38,
+    "timeouts": 0,
+    "basis": "195-module isolated run plus focused repairs of two modules; not represented as a new full run"
+  }
+}

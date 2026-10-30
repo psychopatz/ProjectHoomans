@@ -12,7 +12,7 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
 - Existing `main` only; planning baseline `15cadee70be11b790ce4c48bfb7bd51badd8233b`.
   Initially clean, origin fetched, ahead 7 / behind 0. No concurrent edits found.
 - Accepted: P0 `4205a1d7`, P1 `24d61abc`, Inventory pilot `b4535421`,
-  tooling-baseline evidence `19749cef`, ordered composition `55049e99`, first persistence slice `034766f9`, Health/Identity `fa5b2a2d`; remaining P4 schema/restoration `0f7f326e`.
+  tooling-baseline evidence `19749cef`, ordered composition `55049e99`, first persistence slice `034766f9`, Health/Identity `fa5b2a2d`; remaining P4 schema/restoration `0f7f326e`, public conversation close `2ad53120`.
 - MCP project `project-hoomans`; explicitly refreshed against actual source.
   Statement-form IMPORTS and heuristic alias/builtin resolution need the
   documented literal-import/source fallback. Matching HEAD alone is insufficient.
@@ -52,16 +52,18 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
   Method bodies match pre-change source; obsolete health paths removed, no shims.
   Health/stamina context: 43,166 → 17,694 bytes at the same four-file count.
   Identity: 21,594 → 14,144 bytes, one additional generic-helper file explained.
-- Latest full isolated Lua: **981/981**, 4 workers, 10.63 seconds.
+- Latest full isolated Lua: **981/981**, 4 workers, 13.43 seconds.
   Focused owning-domain/restart/binding matrix: **118/118**; diagnostic Python
   **22/22**; NPC tooling **6/6**.
 - Changed-runtime installed PZ Kahlua: P2 **36/36**, P3 **54/54**, first P4 slice
   **34/34**, Health/Identity **11/11**, remaining schemas **19/19**; static Kahlua zero errors. Diff checks clean.
-- Immutable P1 semantic-tooling baseline: 194 modules, 124 pass, 65 fail,
-  5 GUI-related timeouts; 764 reported tests, 2 skips. In-process discovery
-  aborted in Tk cleanup (exit 134). These pre-existing failures remain final
-  gates, bounded in `P0_TOOLING_BASELINE.json`. P5 must preserve lifecycle fact
-  transport and distinguish it from gameplay dispatch before repairing assertions.
+- Semantic-tooling evidence: original 194-module baseline had 124 pass,
+  65 fail, 5 GUI timeouts. Current complete isolated run: 195 modules, 155 pass,
+  40 fail, no timeouts, 786 tests. Focused inspector repairs (15 tests) bring
+  the derived current state to 157 pass / 38 pre-existing failures; this is not
+  claimed a second full run. `P5B_TOOLING_VALIDATION.json` preserves both facts.
+  Fact traffic remains complete; dispatch assertions are explicit. GUI tests
+  use a per-process XIM fallback after native backtrace diagnosis, not a skip.
 - No native Project Zomboid launched; no Workshop publication.
 
 - P4 completion: `P4C_VALIDATION.json`, `P4C_MCP_TRACES.json` and
@@ -79,25 +81,35 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
   Conversation close: 7 → 6 files, 3 → 2 handoffs; 981/981 Lua, 24/24 owning
   regressions, 3/3 installed Kahlua, zero new debt. P5 is not yet accepted.
 
+- P5 public-subdomain/tooling slice: `SEMANTIC_SURFACES.md` and
+  `P5B_MCP_TRACES.json`. 43 supported semantic entry paths; foreign implementation
+  and Internal namespaces are guarded. Typed identity-result transport is owned
+  by Networking at its existing path. Raw wire traffic and lifecycle facts stay
+  observable separately from gameplay dispatch. Six changed tooling Lua files
+  compile with installed Kahlua; owning diagnostic Python 22/22; focused semantic
+  evidence 29 tests pass. P5C/D and its remaining failures are not accepted yet.
+
 ## Next mandatory chunk
 
-**Continue P5B–D — Public semantic subdomains and dependency inversion.**
+**Continue P5C/D — Semantic cycle direction and remaining tooling fixtures.**
 
-1. Establish current graph/source ownership, public entry/callers, inbound and
-   outbound dependencies, affected tests and fixed conversation probe evidence.
-2. Confirm durable Lifecycle/Authority/Presentation and interpretation/policy/
-   social/realization/diagnostics subdomains before changing architecture.
+1. Use the established public subdomain map to review remaining Social/World/
+   Identity and Conversation/Knowledge/UI dependency cycles with exact source
+   and caller evidence; retain only separately justified composition relations.
+2. Preserve useful catalogs, authority boundaries and independent test seams;
+   consolidate artificial provider chains only where retrieval evidence warrants.
 3. Migrate foreign implementation access and remove unjustified cross-domain
    cycles; preserve semantic IR, suggestions, social director, observatory,
    optional LLM and SP/MP authority. Consolidate only with retrieval evidence.
-4. Repair/classify semantic-tooling baseline failures and GUI timeouts without
-   suppressing lifecycle fact transport to satisfy gameplay-dispatch assertions.
+4. Individually repair or prove supersession of the 38 remaining pre-existing
+   tooling failures (old flow/category/realization/lineage fixtures). Preserve
+   behavior; never suppress lifecycle facts to satisfy dispatch assertions.
 5. Validate focused/full suites, graph/dependency guards, installed Kahlua,
    retrieval probes and diff; update this current state and continue P6–P8.
 
 ## Remaining gates
 
-P5–P8/final acceptance are mandatory, including semantic
-Python failures/timeouts. M12 body-binding native acceptance remains user-owned;
+P5–P8/final acceptance are mandatory, including the remaining semantic
+Python failures. M12 body-binding native acceptance remains user-owned;
 its identity/lease, loaded-envelope, restart and visual-authority contracts must
 be preserved. Historical logs and root `AGENTS.md` remain unchanged.

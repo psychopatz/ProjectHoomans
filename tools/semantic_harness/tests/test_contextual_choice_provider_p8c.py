@@ -44,7 +44,7 @@ class ContextualChoiceProviderP8CTests(unittest.TestCase):
             self.assertTrue(clicked["accepted"], clicked.get("reason"))
             self.assertEqual(clicked["result"]["ir"]["intent"], "QUESTION")
             self.assertEqual(clicked["result"]["ir"]["subject"], "WELLBEING")
-            self.assertEqual(clicked["transport"], [])
+            self.assertEqual(clicked["dispatchTransport"], [])
 
     def test_generic_discovery_keeps_dynamic_trading_in_same_lane(self) -> None:
         scenario = apply_npc_profile(deepcopy(DEFAULT_SCENARIO), "trader")

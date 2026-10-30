@@ -220,9 +220,9 @@ class HealthWordingShardTests(unittest.TestCase):
                     )
                     self.assertEqual(payload["translationKey"], key)
                     self.assertEqual(payload["text"], text)
-                    self.assertEqual(turn["transport"], [])
+                    self.assertEqual(turn["dispatchTransport"], [])
                     self.assertEqual(turn["toolCalls"], [])
-                    self.assertTrue(turn["observation"]["sideEffects"]["none"])
+                    self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
 
 if __name__ == "__main__":

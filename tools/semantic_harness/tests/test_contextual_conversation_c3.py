@@ -64,7 +64,7 @@ class ContextualConversationC3Tests(unittest.TestCase):
                 self.assertEqual(len(observation["queued"]), 1)
                 self.assertEqual(len(observation["queued"][0]["translationKeys"]), 2)
                 self.assertEqual(turn["llmCalls"], 0)
-                self.assertEqual(turn["transport"], [])
+                self.assertEqual(turn["dispatchTransport"], [])
                 self.assertEqual(turn["toolCalls"], [])
                 self.assertTrue(observation["queued"][0]["text"])
                 if language == "TL":
@@ -91,9 +91,9 @@ class ContextualConversationC3Tests(unittest.TestCase):
             turn["messages"][0]["payload"]["text"],
             "I took a bad hit, but I'm steady enough to keep moving. Thanks for checking in.",
         )
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
-        self.assertTrue(turn["observation"]["sideEffects"]["none"])
+        self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
     def test_unknown_health_does_not_select_grounded_plan(self) -> None:
         scenario = merge(
@@ -116,7 +116,7 @@ class ContextualConversationC3Tests(unittest.TestCase):
         )
         self.assertEqual(response["plan"]["groundedFactRefs"], [])
         self.assertNotIn("hurt", turn["messages"][0]["payload"]["fallback"])
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
 
 

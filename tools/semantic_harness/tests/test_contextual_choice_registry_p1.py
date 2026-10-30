@@ -71,7 +71,7 @@ class ContextualChoiceRegistryP1Tests(unittest.TestCase):
         self.assertTrue(clicked["accepted"])
         self.assertEqual(clicked["result"]["ir"]["provenance"]["parser"], "semantic_click_frame")
         self.assertEqual(clicked["toolCalls"], [])
-        self.assertEqual(clicked["transport"], [])
+        self.assertEqual(clicked["dispatchTransport"], [])
 
 
 if __name__ == "__main__":

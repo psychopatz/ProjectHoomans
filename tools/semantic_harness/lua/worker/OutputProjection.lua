@@ -1,6 +1,8 @@
 -- Convert production traces and state into the harness response contract.
 
 local OutputProjection = {}
+local TransportEvidence = require "worker/TransportEvidence"
+OutputProjection.annotateTransport = TransportEvidence.annotate
 
 local Observation = require "worker/OutputProjection_Observation"
 

@@ -84,7 +84,7 @@ class ContextualSuggestionsFollowupTests(unittest.TestCase):
         self.assertTrue(clicked["accepted"])
         self.assertEqual(clicked["result"]["ir"]["subject"], "TIME")
         self.assertEqual(clicked["messages"][-1]["payload"]["text"], "It's 1:30 PM.")
-        self.assertEqual(clicked["transport"], [])
+        self.assertEqual(clicked["dispatchTransport"], [])
 
     def test_accepted_follow_refreshes_current_state_and_action_surface(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
@@ -99,7 +99,7 @@ class ContextualSuggestionsFollowupTests(unittest.TestCase):
             clicked = worker.suggestion_click(follow["frame"])
 
         self.assertTrue(clicked["accepted"])
-        self.assertEqual(len(clicked["transport"]), 1)
+        self.assertEqual(len(clicked["dispatchTransport"]), 1)
         statuses = {
             row["action"]: row["status"]
             for row in clicked["observation"]["suggestions"][

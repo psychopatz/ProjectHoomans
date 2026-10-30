@@ -136,7 +136,7 @@ class CompanionOrdersHubP12ETests(unittest.TestCase):
         self.assertEqual(action["commandID"], "return_home")
         self.assertEqual(action["capabilityID"], "pnc:companion.go_home")
         self.assertEqual(action["handlerID"], "PNC.Client.SendCompanionCommand")
-        self.assertEqual(result["transport"][0]["payload"]["commandID"],
+        self.assertEqual(result["dispatchTransport"][0]["payload"]["commandID"],
                          "return_home")
         self.assertEqual(result["scenario"]["npc"]["activeBehavior"],
                          "AtHome:returning")

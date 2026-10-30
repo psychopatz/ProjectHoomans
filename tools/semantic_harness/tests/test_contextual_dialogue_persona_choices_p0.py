@@ -144,7 +144,7 @@ class ContextualDialoguePersonaChoicesP0Tests(unittest.TestCase):
             accepted["result"]["actionResult"]["capabilityID"],
             "pnc:companion.follow",
         )
-        self.assertEqual(len(accepted["transport"]), 1)
+        self.assertEqual(len(accepted["dispatchTransport"]), 1)
         self.assertFalse(duplicate["accepted"])
         self.assertEqual(duplicate["reason"], "duplicate_suggestion")
 

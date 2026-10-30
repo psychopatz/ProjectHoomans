@@ -39,7 +39,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
     @staticmethod
     def identity_requests(turn: dict, kind: str | None = None) -> list[dict]:
         requests = [
-            event for event in turn["transport"]
+            event for event in turn["dispatchTransport"]
             if event.get("command") == "SemanticIdentityRequest"
         ]
         if kind is not None:
@@ -50,7 +50,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         return requests
 
     def assert_no_identity_effect(self, turn: dict) -> None:
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
         self.assertEqual(turn["relationshipBefore"], turn["relationshipAfter"])
         self.assertEqual(turn["relationshipAfter"]["identityTrust"], "unknown")
@@ -209,12 +209,12 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
 
         request = next(
             event
-            for event in result["transport"]
+            for event in result["dispatchTransport"]
             if event.get("command") == "SemanticIdentityRequest"
         )
         identity_result = next(
             event
-            for event in result["transport"]
+            for event in result["dispatchTransport"]
             if event.get("command") == "SemanticIdentityResult"
         )
         self.assertTrue(result["accepted"])
@@ -241,12 +241,12 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
 
         request = next(
             event
-            for event in result["transport"]
+            for event in result["dispatchTransport"]
             if event.get("command") == "SemanticIdentityRequest"
         )
         identity_result = next(
             event
-            for event in result["transport"]
+            for event in result["dispatchTransport"]
             if event.get("command") == "SemanticIdentityResult"
         )
         self.assertTrue(asked["accepted"])
@@ -349,7 +349,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
                 "SELF_STATE_RECEIVED",
             )
             self.assertEqual(preview["contextBefore"], preview["contextAfter"])
-            self.assertEqual(preview["transport"], [])
+            self.assertEqual(preview["dispatchTransport"], [])
             self.assertEqual(preview["toolCalls"], [])
             self.assertEqual(preview["messages"], [])
             self.assertEqual(
@@ -404,7 +404,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
                 "semantic.question.identity."
             )
         )
-        self.assertEqual(first["transport"], [])
+        self.assertEqual(first["dispatchTransport"], [])
         self.assertEqual(first["toolCalls"], [])
         self.assertEqual(first["relationshipBefore"], first["relationshipAfter"])
         self.assertEqual(
@@ -471,7 +471,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         self.assertEqual(
             [
                 event["command"]
-                for event in identity_claim["transport"]
+                for event in identity_claim["dispatchTransport"]
                 if event.get("direction") in {"client_to_server", "server_to_client"}
             ],
             ["SemanticIdentityRequest", "SemanticIdentityResult"],
@@ -518,7 +518,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
             diagnostics["rejections"][0]["patternID"],
             "pnc.command.follow",
         )
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
         self.assertIsNone(result.get("actionResult"))
         self.assertEqual(

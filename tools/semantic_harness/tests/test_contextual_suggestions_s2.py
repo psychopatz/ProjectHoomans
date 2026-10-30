@@ -99,7 +99,7 @@ class ContextualSuggestionsS2Tests(unittest.TestCase):
                     )
                 else:
                     self.assertNotIn("CAMP", capabilities)
-                self.assertTrue(result["observation"]["sideEffects"]["none"])
+                self.assertTrue(result["observation"]["sideEffects"]["noGameplayEffects"])
 
         unknown_scenario = deepcopy(DEFAULT_SCENARIO)
         unknown_scenario["npc"].pop("activeBehavior")

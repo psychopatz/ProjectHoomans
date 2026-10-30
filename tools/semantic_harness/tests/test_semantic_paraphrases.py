@@ -37,7 +37,7 @@ class SemanticParaphraseTests(unittest.TestCase):
             )
         )
         self.assertEqual(turn["llmCalls"], 0)
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
         self.assertIsNone(result.get("actionResult"))
         self.assertEqual(turn["relationshipBefore"], turn["relationshipAfter"])
@@ -53,7 +53,7 @@ class SemanticParaphraseTests(unittest.TestCase):
             existing["result"]["decision"]["branch"],
             "QUESTION_RECEIVED",
         )
-        self.assertEqual(existing["transport"], [])
+        self.assertEqual(existing["dispatchTransport"], [])
         self.assertEqual(existing["toolCalls"], [])
         self.assertEqual(existing["llmCalls"], 0)
 
@@ -68,7 +68,7 @@ class SemanticParaphraseTests(unittest.TestCase):
                     "ASK_CLARIFICATION",
                 )
                 self.assertIsNone(result.get("actionResult"))
-                self.assertEqual(turn["transport"], [])
+                self.assertEqual(turn["dispatchTransport"], [])
                 self.assertEqual(turn["toolCalls"], [])
                 self.assertEqual(turn["llmCalls"], 0)
                 self.assertEqual(
@@ -91,7 +91,7 @@ class SemanticParaphraseTests(unittest.TestCase):
             "QUESTION_RECEIVED",
         )
         self.assertEqual(second["llmCalls"], 0)
-        self.assertEqual(second["transport"], [])
+        self.assertEqual(second["dispatchTransport"], [])
         self.assertEqual(second["toolCalls"], [])
 
     def test_contextual_fuzzy_question_recovers_paraphrase_and_typo(self) -> None:
@@ -127,7 +127,7 @@ class SemanticParaphraseTests(unittest.TestCase):
                     "semantic.question.wellbeing.follow_up.injured",
                 )
                 self.assertEqual(second["llmCalls"], 0)
-                self.assertEqual(second["transport"], [])
+                self.assertEqual(second["dispatchTransport"], [])
                 self.assertEqual(second["toolCalls"], [])
 
     def test_contextual_fuzzy_question_requires_conversation_topic(self) -> None:
@@ -140,7 +140,7 @@ class SemanticParaphraseTests(unittest.TestCase):
         self.assertTrue(result["ir"]["diagnostics"]["noMatch"])
         self.assertIsNone(result.get("actionResult"))
         self.assertEqual(turn["llmCalls"], 0)
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
 
 

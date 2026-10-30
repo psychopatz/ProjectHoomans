@@ -37,7 +37,7 @@ class SemanticProviderParityTests(unittest.TestCase):
                 self.assertEqual(result["actionResult"]["commandID"], "follow")
                 self.assertTrue(result["actionResult"]["accepted"])
                 self.assertEqual(turn["llmCalls"], 0)
-                self.assertEqual(len(turn["transport"]), 1)
+                self.assertEqual(len(turn["dispatchTransport"]), 1)
                 self.assertEqual(len(turn["toolCalls"]), 1)
                 self.assertEqual(
                     turn["relationshipBefore"], turn["relationshipAfter"]
@@ -67,7 +67,7 @@ class SemanticProviderParityTests(unittest.TestCase):
                 )
                 self.assertEqual(result["decision"]["route"], "deterministic")
                 self.assertIsNone(result.get("actionResult"))
-                self.assertEqual(turn["transport"], [])
+                self.assertEqual(turn["dispatchTransport"], [])
                 self.assertEqual(turn["toolCalls"], [])
                 self.assertEqual(
                     turn["relationshipBefore"], turn["relationshipAfter"]

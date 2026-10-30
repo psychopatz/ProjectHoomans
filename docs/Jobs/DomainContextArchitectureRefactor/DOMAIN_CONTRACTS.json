@@ -99,6 +99,10 @@
   },
   "path_owners": [
     {
+      "pattern": "shared/PNC/Semantics/PNC_SemanticIdentityNetwork.lua",
+      "owner": "Networking"
+    },
+    {
       "pattern": "shared/PNC/Core/Map/PNC_MapPresentation.lua",
       "owner": "World"
     },
@@ -299,19 +303,81 @@
     "Semantics": {
       "owns": "semantic IR interpretation, dialogue policy/flow, realization and observatory subdomains",
       "namespace": "PNC.Semantics",
-      "entries": [],
+      "entries": [
+        "client/PNC/Semantics/PNC_SemanticCognitionClient.lua",
+        "client/PNC/Semantics/PNC_SemanticCombatResponseSurface.lua",
+        "client/PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua",
+        "client/PNC/Semantics/PNC_SemanticDialogueInput.lua",
+        "client/PNC/Semantics/PNC_SemanticGiftContext.lua",
+        "client/PNC/Semantics/PNC_SemanticGiftLifecycle.lua",
+        "client/PNC/Semantics/PNC_SemanticSpeechDelivery.lua",
+        "client/PNC/Semantics/PNC_SemanticTelemetryPrompt.lua",
+        "client/PNC/Semantics/PNC_SemanticWorldContext.lua",
+        "client/PNC/Semantics/PNC_SemanticWorldTargetObservationCache.lua",
+        "shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+        "shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+        "shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+        "shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+        "shared/PNC/Semantics/PNC_SemanticCatalog.lua",
+        "shared/PNC/Semantics/PNC_SemanticCombatBanterArbiter.lua",
+        "shared/PNC/Semantics/PNC_SemanticCombatEncounterIntent.lua",
+        "shared/PNC/Semantics/PNC_SemanticCombatMoment.lua",
+        "shared/PNC/Semantics/PNC_SemanticCombatReactionProfile.lua",
+        "shared/PNC/Semantics/PNC_SemanticConversationMemoryProvider.lua",
+        "shared/PNC/Semantics/PNC_SemanticDiagnostics.lua",
+        "shared/PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource.lua",
+        "shared/PNC/Semantics/PNC_SemanticDialoguePolicy.lua",
+        "shared/PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua",
+        "shared/PNC/Semantics/PNC_SemanticDialogueRuleProvider.lua",
+        "shared/PNC/Semantics/PNC_SemanticDialogueRuntime.lua",
+        "shared/PNC/Semantics/PNC_SemanticDialogueSituation.lua",
+        "shared/PNC/Semantics/PNC_SemanticDialogueSuggestions.lua",
+        "shared/PNC/Semantics/PNC_SemanticEngineFacts.lua",
+        "shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+        "shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua",
+        "shared/PNC/Semantics/PNC_SemanticInteractionLifecycle.lua",
+        "shared/PNC/Semantics/PNC_SemanticInteractionProviders.lua",
+        "shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua",
+        "shared/PNC/Semantics/PNC_SemanticInteractionSceneRuntime.lua",
+        "shared/PNC/Semantics/PNC_SemanticInteractionSceneTransport.lua",
+        "shared/PNC/Semantics/PNC_SemanticInventoryQuery.lua",
+        "shared/PNC/Semantics/PNC_SemanticLLMResult.lua",
+        "shared/PNC/Semantics/PNC_SemanticPragmaticResolver.lua",
+        "shared/PNC/Semantics/PNC_SemanticTacticalSpatialLanguage.lua",
+        "shared/PNC/Semantics/PNC_SemanticTaskRequest.lua",
+        "shared/PNC/Semantics/PNC_SemanticToolResultRealization.lua",
+        "shared/PNC/Semantics/PNC_SemanticWorldTargetCatalog.lua"
+      ],
       "commands": [
-        "existing semantic interpreter/dialogue entry surfaces; bounded inventory due P5"
+        "Catalog.Register (definition composition)",
+        "DialogueInput.Submit/SubmitSemanticFrame (application entry; adapters own effects)",
+        "DialoguePolicy.CommitFlow (bounded working-context state only)",
+        "InteractionLifecycle.Apply (accepted semantic facts)",
+        "SemanticDiagnostics.SetEnabled/Record (bounded optional diagnostics)",
+        "GiftLifecycle bounded pending/receipt lifecycle; GiftContext authoritative-result projection",
+        "DialogueBackstoryFactSource public server-side provider registration (after Memory, before consumers)"
       ],
       "queries": [
-        "existing context/evidence projections"
+        "DialoguePolicy decision/candidate queries",
+        "DialogueSuggestions public candidate projection",
+        "RealizationAuthority.Resolve/AttachProvenance",
+        "TaskRequest/InventoryQuery normalization contracts",
+        "InteractionEvidence/Relations bounded fact projections"
       ],
       "repository": "semantic lifecycle domain repository; persistence timing remains coordinator-owned",
       "layers": [
         "shared",
         "server",
         "client"
-      ]
+      ],
+      "subdomains": {
+        "Interpretation": "Catalog, TaskRequest/InventoryQuery, bounded reference/context resolvers; Core owns reusable parser/IR mechanisms",
+        "Policy and flow": "DialoguePolicy, DialogueSuggestions; no gameplay effects",
+        "Client application": "DialogueInput typed/structured submission, adapters, pending result lifecycle",
+        "Interaction facts": "InteractionLifecycle is the canonical bounded state owner; transport validates and hands off",
+        "Social realization": "RealizationAuthority and speech delivery; Social owns relationships and conduct",
+        "Observatory": "SemanticDiagnostics and optional telemetry; tooling retains all wire traffic separately from executable-dispatch evidence"
+      }
     },
     "Persistence": {
       "owns": "save/load/reset timing and compatibility coordination; domains retain schema meaning",
@@ -382,14 +448,19 @@
       "owns": "command routing, payload validation and delivery; hands effects to domains",
       "namespace": "PNC.Network",
       "entries": [
-        "server/PNC/Networking/PNC_ServerCommandRouter.lua"
+        "server/PNC/Networking/PNC_ServerCommandRouter.lua",
+        "shared/PNC/Semantics/PNC_SemanticIdentityNetwork.lua",
+        "shared/PNC/Core/Networking/PNC_Network.lua",
+        "shared/PNC/Core/Networking/PNC_ColonyJournalProtocol.lua"
       ],
       "commands": [
         "router Handle/Register",
-        "Network delivery APIs"
+        "Network delivery APIs",
+        "SendSemanticIdentityResult (public typed transport adapter; stable semantic path)"
       ],
       "queries": [
-        "payload projections"
+        "payload projections",
+        "ColonyJournalProtocol shared typed payload contract; Network public composition entry"
       ],
       "repository": "none; transport does not own gameplay state",
       "layers": [
@@ -708,7 +779,8 @@
   "enforced_public_domains": [
     "Inventory",
     "Supply",
-    "Provision"
+    "Provision",
+    "Semantics"
   ],
   "permitted_presentation_consumers": [
     "UI",
@@ -722,7 +794,12 @@
     "PNC.Inventory.Internal": "Inventory",
     "PNC.Equipment.Internal": "Inventory",
     "PNC.ServerInventory.Internal": "Inventory",
-    "PNC.SupplyInventoryInternal": "Supply"
+    "PNC.SupplyInventoryInternal": "Supply",
+    "PNC.Semantics.DialogueInput.Internal": "Semantics",
+    "PNC.Semantics.DialoguePolicy.Internal": "Semantics",
+    "PNC.Semantics.InteractionLifecycle.Internal": "Semantics",
+    "PNC.Conversation.Lifecycle.Internal": "Conversation",
+    "PNC.ConversationScene.Internal": "Conversation"
   },
   "registration_manifest": "REGISTRATIONS.json",
   "private_implementation_scopes": [

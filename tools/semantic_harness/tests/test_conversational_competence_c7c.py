@@ -22,7 +22,7 @@ class ConversationalCompetenceC7CTests(unittest.TestCase):
         assert turn["accepted"], turn.get("reason")
         assert turn["result"]["decision"]["route"] == "deterministic"
         assert turn["result"].get("actionResult") is None
-        assert turn["transport"] == []
+        assert turn["dispatchTransport"] == []
         assert turn["toolCalls"] == []
         assert turn["llmCalls"] == 0
 
@@ -82,7 +82,7 @@ class ConversationalCompetenceC7CTests(unittest.TestCase):
             negative_ir.get("extensions", {}).get("dialogueFollowUp"),
             "CONVERSATION_CONTINUATION",
         )
-        self.assertEqual(negative["transport"], [])
+        self.assertEqual(negative["dispatchTransport"], [])
         self.assertEqual(negative["toolCalls"], [])
 
     def test_acknowledgements_preserve_context_without_authorizing_actions(self) -> None:
@@ -100,7 +100,7 @@ class ConversationalCompetenceC7CTests(unittest.TestCase):
         )
         self.assertIn("appreciate", self.message_text(acknowledged).lower())
         self.assert_no_effects(acknowledged)
-        self.assertEqual(relationship["transport"], [])
+        self.assertEqual(relationship["dispatchTransport"], [])
 
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             question = worker.input("are you hurt")

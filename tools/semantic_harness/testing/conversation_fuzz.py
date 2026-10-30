@@ -82,7 +82,9 @@ def _row(case: dict[str, Any], turn: dict[str, Any]) -> dict[str, Any]:
         else None
     )
     risk = risk if isinstance(risk, dict) else {}
-    transport = turn.get("transport")
+    # Case transportCount historically means executable dispatch count.
+    # The turn still retains every lifecycle fact in its raw transport.
+    transport = turn.get("dispatchTransport", turn.get("transport"))
     transport_count = len(transport) if isinstance(transport, list) else 0
 
     actual = {

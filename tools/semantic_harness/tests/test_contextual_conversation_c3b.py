@@ -97,12 +97,12 @@ class ContextualConversationC3BTests(unittest.TestCase):
                 )
                 self.assertEqual(second["translation"]["language"], language)
                 self.assertTrue(second["messages"][0]["payload"]["text"])
-                self.assertEqual(second["transport"], [])
+                self.assertEqual(second["dispatchTransport"], [])
                 self.assertEqual(second["toolCalls"], [])
 
                 for turn in (first, second):
                     self.assertEqual(turn["llmCalls"], 0)
-                    self.assertTrue(turn["observation"]["sideEffects"]["none"])
+                    self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
     def test_unknown_need_quantity_clarifies_without_inventing_or_committing(self) -> None:
         with LuaSemanticWorker(self.scenario("EN", {})) as worker:
@@ -119,14 +119,14 @@ class ContextualConversationC3BTests(unittest.TestCase):
         self.assertEqual(plan["groundedFactRefs"], [])
         self.assertIn("exact amount", second["messages"][0]["payload"]["text"])
         self.assertNotIn("two", second["messages"][0]["payload"]["text"].lower())
-        self.assertEqual(second["transport"], [])
+        self.assertEqual(second["dispatchTransport"], [])
         self.assertEqual(second["toolCalls"], [])
-        self.assertTrue(second["observation"]["sideEffects"]["none"])
+        self.assertTrue(second["observation"]["sideEffects"]["noGameplayEffects"])
         self.assertEqual(
             second["contextAfter"]["dialogue"]["lastFollowUp"]["status"],
             "fulfilled",
         )
-        self.assertEqual(first["transport"], [])
+        self.assertEqual(first["dispatchTransport"], [])
         self.assertEqual(first["toolCalls"], [])
 
     def test_standalone_how_many_remains_clarification_without_pending_context(self) -> None:
@@ -140,7 +140,7 @@ class ContextualConversationC3BTests(unittest.TestCase):
             "ASK_CLARIFICATION",
         )
         self.assertIsNone(turn["contextAfter"]["dialogue"].get("pendingFollowUp"))
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
 
 

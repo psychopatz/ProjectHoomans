@@ -1,6 +1,7 @@
 -- Bounded projections used by the observation envelope.
 
 local Bounds = {}
+local TransportEvidence = require "worker/TransportEvidence"
 
 local MAX_CANDIDATES = 8
 local MAX_LOOKUPS = 32
@@ -281,6 +282,20 @@ function Bounds.sideEffects(context, transport, toolCalls)
     local Values = context.Values
     transport = type(transport) == "table" and transport or {}
     toolCalls = type(toolCalls) == "table" and toolCalls or {}
+    local dispatches, facts = TransportEvidence.partition(transport)
+    local function boundedEvents(events)
+        local rows = {}
+        for index = 1, math.min(#events, MAX_ACTIONS) do
+            local event = events[index]
+            if type(event) == "table" then
+                rows[#rows + 1] = {
+                    direction = event.direction, command = event.command,
+                    eventName = event.eventName, mode = event.mode,
+                }
+            end
+        end
+        return rows
+    end
     local commands = {}
     local limit = math.min(#transport, MAX_ACTIONS)
     for index = 1, limit do
@@ -301,12 +316,17 @@ function Bounds.sideEffects(context, transport, toolCalls)
     end
     return {
         none = #transport == 0 and #toolCalls == 0,
+        noGameplayEffects = #dispatches == 0 and #toolCalls == 0,
+        factTransportCount = #facts,
+        dispatchTransportCount = #dispatches,
         actionCount = #toolCalls,
         transportCount = #transport,
         actionsTruncated = #toolCalls > actionLimit,
         transportTruncated = #transport > limit,
         actions = actions,
         transport = commands,
+        dispatchTransport = boundedEvents(dispatches),
+        factTransport = boundedEvents(facts),
     }
 end
 

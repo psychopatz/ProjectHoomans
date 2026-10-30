@@ -37,7 +37,7 @@ class SharedActorConversationServiceTests(unittest.TestCase):
         self.assertEqual(service["turnCount"], 2)
         self.assertEqual(len(turn["result"]["compound"]["parts"]), 2)
         self.assertEqual(turn["llmCalls"], 0)
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
 
 
 if __name__ == "__main__":

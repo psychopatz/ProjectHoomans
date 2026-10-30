@@ -63,9 +63,9 @@ class ContextualConversationC0Tests(unittest.TestCase):
             "fulfilled",
         )
         self.assertEqual(
-            turns[2]["transport"], []
+            turns[2]["dispatchTransport"], []
         )
-        self.assertEqual(turns[3]["transport"], [])
+        self.assertEqual(turns[3]["dispatchTransport"], [])
         self.assertEqual(turns[3]["toolCalls"], [])
         self.assertEqual(turns[3]["llmCalls"], 0)
         self.assertEqual(turns[4]["result"]["ir"]["intent"], "PROMISE")
@@ -135,7 +135,7 @@ class ContextualConversationC0Tests(unittest.TestCase):
             ["confirmation"],
         )
         for turn in turns[4:]:
-            self.assertEqual(turn["transport"], [])
+            self.assertEqual(turn["dispatchTransport"], [])
             self.assertEqual(turn["toolCalls"], [])
             self.assertEqual(turn["llmCalls"], 0)
 

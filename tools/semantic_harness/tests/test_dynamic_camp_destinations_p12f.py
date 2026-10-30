@@ -97,7 +97,7 @@ class DynamicCampDestinationsP12FTests(unittest.TestCase):
 
             result = worker.suggestion_click(selected["frame"])
             action = result["result"]["actionResult"]
-            payload = result["transport"][0]["payload"]
+            payload = result["dispatchTransport"][0]["payload"]
             self.assertTrue(action["accepted"])
             self.assertEqual(len(result["messages"]), 1)
             self.assertEqual(result["messages"][0]["speaker"], "npc")
@@ -128,7 +128,7 @@ class DynamicCampDestinationsP12FTests(unittest.TestCase):
 
             result = worker.suggestion_click(selected["frame"])
             action = result["result"]["actionResult"]
-            payload = result["transport"][0]["payload"]
+            payload = result["dispatchTransport"][0]["payload"]
             self.assertFalse(action["accepted"])
             self.assertEqual(len(result["messages"]), 1)
             self.assertEqual(result["messages"][0]["speaker"], "npc")

@@ -291,7 +291,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                 )
                 self.assertEqual(response["sourceFlowID"], "greeting")
                 self.assertEqual(response["flowTransition"], "start")
-                self.assertEqual(turn["transport"], [])
+                self.assertEqual(turn["dispatchTransport"], [])
                 self.assertIsNone(result.get("actionResult"))
 
     def test_rejects_generated_owner_as_edit_source(self):

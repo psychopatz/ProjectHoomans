@@ -22,7 +22,7 @@ class ConversationalCompetenceC7BTests(unittest.TestCase):
         self.assertEqual(turn["result"]["decision"]["route"], "deterministic")
         self.assertEqual(turn["result"]["ir"]["subject"], subject)
         self.assertEqual(turn["result"].get("actionResult"), None)
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
         self.assertEqual(turn["llmCalls"], 0)
         self.assertEqual(len(turn["messages"]), 1)
@@ -162,7 +162,7 @@ class ConversationalCompetenceC7BTests(unittest.TestCase):
         )
         self.assertTrue(inventory["result"]["actionResult"]["accepted"])
         self.assertEqual(inventory["result"]["actionResult"]["status"], "found")
-        self.assertGreaterEqual(len(inventory["transport"]), 1)
+        self.assertGreaterEqual(len(inventory["dispatchTransport"]), 1)
 
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
             relationship = worker.input("are you single")
@@ -170,7 +170,7 @@ class ConversationalCompetenceC7BTests(unittest.TestCase):
             relationship["result"]["ir"]["subject"],
             "RELATIONSHIP_STATUS",
         )
-        self.assertEqual(relationship["transport"], [])
+        self.assertEqual(relationship["dispatchTransport"], [])
         self.assertEqual(relationship["toolCalls"], [])
         self.assertTrue(self.message_text(relationship))
 
@@ -179,7 +179,7 @@ class ConversationalCompetenceC7BTests(unittest.TestCase):
         self.assertEqual(stay["result"]["ir"]["action"], "STAY")
         self.assertEqual(stay["result"]["decision"]["branch"], "COMMAND_ACCEPTED")
         self.assertTrue(stay["result"]["actionResult"]["accepted"])
-        self.assertEqual(len(stay["transport"]), 1)
+        self.assertEqual(len(stay["dispatchTransport"]), 1)
         self.assertEqual(stay["result"]["actionResult"]["capabilityID"], "pnc:companion.stay")
 
     def test_social_and_gossip_inputs_do_not_become_factual_actions(self) -> None:
@@ -189,10 +189,10 @@ class ConversationalCompetenceC7BTests(unittest.TestCase):
 
         self.assertEqual(gossip["result"]["ir"]["intent"], "GOSSIP")
         self.assertEqual(gossip["result"]["ir"]["subject"], "GOSSIP")
-        self.assertEqual(gossip["transport"], [])
+        self.assertEqual(gossip["dispatchTransport"], [])
         self.assertEqual(negative["result"]["ir"]["diagnostics"]["noMatch"], True)
         self.assertEqual(negative["trace"][0]["data"]["classification"], "unrecognized_language")
-        self.assertEqual(negative["transport"], [])
+        self.assertEqual(negative["dispatchTransport"], [])
         self.assertEqual(negative["toolCalls"], [])
 
     def test_tl_residence_translation_and_preview_are_effect_free(self) -> None:
@@ -209,7 +209,7 @@ class ConversationalCompetenceC7BTests(unittest.TestCase):
         self.assertTrue(preview["accepted"], preview.get("reason"))
         self.assertEqual(preview["result"]["ir"]["subject"], "NPC_RESIDENCE")
         self.assertEqual(preview["messages"], [])
-        self.assertEqual(preview["transport"], [])
+        self.assertEqual(preview["dispatchTransport"], [])
         self.assertEqual(preview["toolCalls"], [])
         self.assertEqual(preview["llmCalls"], 0)
         self.assertEqual(
@@ -222,7 +222,7 @@ class ConversationalCompetenceC7BTests(unittest.TestCase):
             "UI_PNC_Conversation_Semantic_QuestionResidenceKnown",
         )
         self.assertIn("Nakatira ako sa Riverside Camp", self.message_text(tl_turn))
-        self.assertEqual(tl_turn["transport"], [])
+        self.assertEqual(tl_turn["dispatchTransport"], [])
         self.assertEqual(tl_turn["toolCalls"], [])
 
 

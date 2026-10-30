@@ -53,7 +53,7 @@ class ConversationalCompetenceC7GTests(unittest.TestCase):
         assert turn["accepted"], turn.get("reason")
         assert turn["result"]["decision"]["route"] == "deterministic"
         assert turn["result"].get("actionResult") is None
-        assert turn["transport"] == []
+        assert turn["dispatchTransport"] == []
         assert turn["toolCalls"] == []
         assert turn["llmCalls"] == 0
 
@@ -142,7 +142,7 @@ class ConversationalCompetenceC7GTests(unittest.TestCase):
                 self.assertTrue(preview["accepted"], preview.get("reason"))
                 self.assertEqual(preview["result"]["ir"]["action"], "STAY")
                 self.assertEqual(preview["messages"], [])
-                self.assertEqual(preview["transport"], [])
+                self.assertEqual(preview["dispatchTransport"], [])
                 self.assertEqual(preview["toolCalls"], [])
                 self.assertEqual(
                     {key: value for key, value in before_preview.items() if key != "id"},
@@ -150,7 +150,7 @@ class ConversationalCompetenceC7GTests(unittest.TestCase):
                 )
                 self.assertEqual(action["result"]["ir"]["action"], "STAY")
                 self.assertTrue(action["result"]["actionResult"]["accepted"])
-                self.assertEqual(len(action["transport"]), 1)
+                self.assertEqual(len(action["dispatchTransport"]), 1)
                 self.assertEqual(
                     action["result"]["actionResult"]["capabilityID"],
                     "pnc:companion.stay",
@@ -245,7 +245,7 @@ class ConversationalCompetenceC7GTests(unittest.TestCase):
             )
             self.assertEqual(offline["contextAfter"]["dialogue"], provider["contextAfter"]["dialogue"])
             self.assertEqual(offline["messages"], provider["messages"])
-            self.assertEqual(offline["transport"], provider["transport"])
+            self.assertEqual(offline["dispatchTransport"], provider["dispatchTransport"])
             self.assertEqual(offline["toolCalls"], provider["toolCalls"])
             self.assertEqual(offline["llmCalls"], 0)
             self.assertEqual(provider["llmCalls"], 0)

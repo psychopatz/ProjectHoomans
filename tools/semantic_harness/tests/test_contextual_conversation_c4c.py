@@ -81,9 +81,9 @@ class ContextualConversationC4CTests(unittest.TestCase):
                 self.assertEqual(resumed_context["pendingFollowUp"]["status"], "open")
                 for turn in (weather, resumed):
                     self.assertEqual(turn["llmCalls"], 0)
-                    self.assertEqual(turn["transport"], [])
+                    self.assertEqual(turn["dispatchTransport"], [])
                     self.assertEqual(turn["toolCalls"], [])
-                    self.assertTrue(turn["observation"]["sideEffects"]["none"])
+                    self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
     def test_nearby_negative_abstains_without_dispatch(self) -> None:
         with LuaSemanticWorker(self.scenario("EN")) as worker:
@@ -91,9 +91,9 @@ class ContextualConversationC4CTests(unittest.TestCase):
 
         self.assertIsNone(turn["result"]["ir"].get("intent"))
         self.assertIsNone(turn["result"]["ir"].get("action"))
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
-        self.assertTrue(turn["observation"]["sideEffects"]["none"])
+        self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
 
 if __name__ == "__main__":

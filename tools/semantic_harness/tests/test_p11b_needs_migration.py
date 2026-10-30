@@ -221,9 +221,9 @@ class NeedsWordingShardTests(unittest.TestCase):
                     ))
                     self.assertEqual(payload["translationKey"], contract[index * 2])
                     self.assertEqual(payload["text"], contract[index * 2 + 1])
-                    self.assertEqual(turn["transport"], [])
+                    self.assertEqual(turn["dispatchTransport"], [])
                     self.assertEqual(turn["toolCalls"], [])
-                    self.assertTrue(turn["observation"]["sideEffects"]["none"])
+                    self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
 
 if __name__ == "__main__":

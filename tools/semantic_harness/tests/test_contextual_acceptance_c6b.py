@@ -43,9 +43,9 @@ class ContextualAcceptanceC6BTests(unittest.TestCase):
                     self.assertTrue(turn["messages"][0]["payload"]["text"])
                     self.assertEqual(turn["translation"]["language"], language)
                     self.assertEqual(turn["llmCalls"], 0)
-                    self.assertEqual(turn["transport"], [])
+                    self.assertEqual(turn["dispatchTransport"], [])
                     self.assertEqual(turn["toolCalls"], [])
-                    self.assertTrue(turn["observation"]["sideEffects"]["none"])
+                    self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
                 wellbeing, happened, needs, quantity, promise, weather, resumed = turns
                 self.assertEqual(wellbeing["result"]["ir"]["subject"], "WELLBEING")
@@ -110,10 +110,10 @@ class ContextualAcceptanceC6BTests(unittest.TestCase):
             self.assertIsNone(turn["result"]["ir"].get("intent"))
             self.assertIsNone(turn["result"]["ir"].get("action"))
             self.assertTrue(turn["messages"][0]["payload"]["text"])
-            self.assertEqual(turn["transport"], [])
+            self.assertEqual(turn["dispatchTransport"], [])
             self.assertEqual(turn["toolCalls"], [])
             self.assertEqual(turn["llmCalls"], 0)
-            self.assertTrue(turn["observation"]["sideEffects"]["none"])
+            self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
 
 if __name__ == "__main__":

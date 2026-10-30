@@ -57,10 +57,10 @@ class ContextualConversationC4BTests(unittest.TestCase):
                 self.assertEqual(pending["requiredSlots"], ["quantity"])
                 self.assertEqual(turn["translation"]["language"], language)
                 self.assertTrue(turn["messages"][0]["payload"]["text"])
-                self.assertEqual(turn["transport"], [])
+                self.assertEqual(turn["dispatchTransport"], [])
                 self.assertEqual(turn["toolCalls"], [])
                 self.assertEqual(turn["llmCalls"], 0)
-                self.assertTrue(turn["observation"]["sideEffects"]["none"])
+                self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
     def test_nearby_negative_abstains_without_dispatch(self) -> None:
         with LuaSemanticWorker(self.scenario("EN")) as worker:
@@ -70,9 +70,9 @@ class ContextualConversationC4BTests(unittest.TestCase):
         ir = turn["result"]["ir"]
         self.assertIsNone(ir.get("intent"))
         self.assertIsNone(ir.get("action"))
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
-        self.assertTrue(turn["observation"]["sideEffects"]["none"])
+        self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
 
 if __name__ == "__main__":

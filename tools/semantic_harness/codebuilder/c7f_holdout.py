@@ -94,7 +94,7 @@ def _has_gameplay_effects(turn: dict[str, Any]) -> bool:
     result = turn.get("result", {})
     action_result = result.get("actionResult") if isinstance(result, dict) else None
     return bool(
-        turn.get("transport")
+        turn.get("dispatchTransport", turn.get("transport"))
         or turn.get("toolCalls")
         or action_result is not None
     )

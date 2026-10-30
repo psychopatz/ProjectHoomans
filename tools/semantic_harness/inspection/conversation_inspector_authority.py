@@ -42,14 +42,32 @@ def project(
     selected_binding = selected.get("binding")
     if not isinstance(selected_binding, dict):
         selected_binding = action_result.get("binding")
+    # This is a fixed evidence contract, not an arbitrary map. Bound each
+    # value independently so adding fact/dispatch counts cannot hide the
+    # original wire count behind the generic eight-key dictionary limit.
+    raw_effects = observation.get("sideEffects", {})
+    side_effects = {
+        name: bounded(raw_effects[name])
+        for name in (
+            "none", "actionCount", "transportCount", "actionsTruncated",
+            "transportTruncated", "actions", "transport", "noGameplayEffects",
+            "factTransportCount", "dispatchTransportCount", "dispatchTransport",
+            "factTransport",
+        )
+        if isinstance(raw_effects, dict) and name in raw_effects
+    }
+    dispatches = record.get("dispatchTransport", record.get("transport", []))
+    facts = record.get("factTransport", [])
     effects = {
+        "dispatchTransportCount": len(dispatches) if isinstance(dispatches, list) else 0,
+        "factTransportCount": len(facts) if isinstance(facts, list) else 0,
         "transportCount": len(record.get("transport", []))
         if isinstance(record.get("transport", []), list)
         else 0,
         "toolCallCount": len(record.get("toolCalls", []))
         if isinstance(record.get("toolCalls", []), list)
         else 0,
-        "sideEffects": bounded(observation.get("sideEffects", {})),
+        "sideEffects": side_effects,
     }
     is_gameplay_action = bool(
         ir.get("action") or action_result or selected_binding
@@ -90,13 +108,11 @@ def project(
     return {
         "execution": execution,
         "effects": effects,
-        "effects_output": bounded(
-            {
-                "transport": record.get("transport", []),
-                "toolCalls": record.get("toolCalls", []),
-                "sideEffects": observation.get("sideEffects", {}),
-            }
-        ),
+        "effects_output": {
+            "transport": bounded(record.get("transport", [])),
+            "toolCalls": bounded(record.get("toolCalls", [])),
+            "sideEffects": side_effects,
+        },
         "command_authority": command_authority,
         "acceptance_chain": acceptance_chain,
     }

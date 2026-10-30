@@ -51,7 +51,7 @@ class ContextualProviderParityC6CTests(unittest.TestCase):
             )
             self.assertEqual(offline["contextAfter"]["dialogue"], provider["contextAfter"]["dialogue"])
             self.assertEqual(offline["messages"], provider["messages"])
-            self.assertEqual(offline["transport"], provider["transport"])
+            self.assertEqual(offline["dispatchTransport"], provider["dispatchTransport"])
             self.assertEqual(offline["toolCalls"], provider["toolCalls"])
             self.assertEqual(offline["llmCalls"], 0)
             self.assertEqual(provider["llmCalls"], 0)
@@ -65,11 +65,11 @@ class ContextualProviderParityC6CTests(unittest.TestCase):
         self.assertEqual(offline["result"]["ir"], provider["result"]["ir"])
         self.assertEqual(offline["result"]["decision"], provider["result"]["decision"])
         self.assertEqual(offline["messages"], provider["messages"])
-        self.assertEqual(offline["transport"], provider["transport"])
+        self.assertEqual(offline["dispatchTransport"], provider["dispatchTransport"])
         self.assertEqual(offline["toolCalls"], provider["toolCalls"])
         self.assertEqual(offline["llmCalls"], 0)
         self.assertEqual(provider["llmCalls"], 1)
-        self.assertTrue(provider["observation"]["sideEffects"]["none"])
+        self.assertTrue(provider["observation"]["sideEffects"]["noGameplayEffects"])
         self.assertIsNone(provider["result"].get("actionResult"))
 
 

@@ -95,8 +95,8 @@ class ContextualScaleIsolationTests(unittest.TestCase):
             dialogue = turn["contextAfter"]["dialogue"]
             self.assertIn(key, [session["key"] for session in dialogue["flowSessions"]])
             self.assertEqual(dialogue["pendingFollowUp"]["status"], "open")
-        self.assertEqual(alpha_follow["transport"][0]["payload"]["id"], "npc_alpha")
-        self.assertEqual(bravo_follow["transport"][0]["payload"]["id"], "npc_bravo")
+        self.assertEqual(alpha_follow["dispatchTransport"][0]["payload"]["id"], "npc_alpha")
+        self.assertEqual(bravo_follow["dispatchTransport"][0]["payload"]["id"], "npc_bravo")
         self.assertEqual(alpha_commitment["result"]["characterUUID"], "char_alpha")
         self.assertEqual(alpha_commitment["result"]["commitment"]["ownerNPCID"], "npc_alpha")
         self.assertEqual(bravo_memory["commitments"], [])

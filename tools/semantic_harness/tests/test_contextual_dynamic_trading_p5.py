@@ -74,8 +74,8 @@ class ContextualDynamicTradingP5Tests(unittest.TestCase):
         self.assertEqual(clicked["reason"], "accepted")
         self.assertEqual(clicked["result"]["ir"]["kind"], "semantic_click_frame")
         self.assertEqual(clicked["toolCalls"], [])
-        self.assertEqual(clicked["transport"][0]["command"], "ConversationBlock")
-        payload = clicked["transport"][0]["payload"]
+        self.assertEqual(clicked["dispatchTransport"][0]["command"], "ConversationBlock")
+        payload = clicked["dispatchTransport"][0]["payload"]
         self.assertEqual(payload["blockID"], "dthoomans:trade_basic")
         self.assertEqual(payload["nodeID"], "opening_trade")
 

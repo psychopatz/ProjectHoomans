@@ -120,6 +120,7 @@ function Turn.run(context, text, Conversation)
             Conversation.graphProjection(view)
         ),
     }
+    context.OutputProjection.annotateTransport(response)
     response.observation = context.OutputProjection.observation(
         context, response, view.spec and view.spec.context
     )

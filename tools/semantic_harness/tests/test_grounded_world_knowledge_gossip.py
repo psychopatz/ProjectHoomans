@@ -81,7 +81,7 @@ class GroundedWorldKnowledgeGossipTests(unittest.TestCase):
             self.assertIn("I saw", response["messages"][0]["payload"]["text"])
             world_packet = next(
                 event["payload"]
-                for event in response["transport"]
+                for event in response["dispatchTransport"]
                 if event.get("command") == "SemanticCognition"
             )
             fact_id = world_packet["wk"]["factRefs"][0]

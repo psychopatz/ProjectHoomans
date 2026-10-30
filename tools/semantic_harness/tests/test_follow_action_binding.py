@@ -41,8 +41,8 @@ class FollowActionBindingTests(unittest.TestCase):
                 preview["observation"]["capabilityBinding"]["id"],
                 "pnc:companion.follow",
             )
-            self.assertTrue(preview["observation"]["sideEffects"]["none"])
-            self.assertEqual(preview["transport"], [])
+            self.assertTrue(preview["observation"]["sideEffects"]["noGameplayEffects"])
+            self.assertEqual(preview["dispatchTransport"], [])
             self.assertEqual(preview["toolCalls"], [])
 
         result = committed["result"]
@@ -65,7 +65,7 @@ class FollowActionBindingTests(unittest.TestCase):
         self.assertEqual(result["actionResult"]["request"]["npcID"], "npc_mara")
         self.assertEqual(result["actionResult"]["request"]["requestID"], 1)
         self.assertEqual(
-            [event["payload"]["commandID"] for event in committed["transport"]],
+            [event["payload"]["commandID"] for event in committed["dispatchTransport"]],
             ["follow"],
         )
         self.assertEqual(len(committed["toolCalls"]), 1)
@@ -81,16 +81,16 @@ class FollowActionBindingTests(unittest.TestCase):
         self.assertEqual(negated["result"]["ir"]["action"], "STOP")
         self.assertNotIn(
             "follow",
-            [event["payload"]["commandID"] for event in negated["transport"]],
+            [event["payload"]["commandID"] for event in negated["dispatchTransport"]],
         )
         self.assertEqual(
             negated["result"]["actionResult"]["commandID"], "stay"
         )
 
         for safe_negative in (question, ambiguous):
-            self.assertEqual(safe_negative["transport"], [])
+            self.assertEqual(safe_negative["dispatchTransport"], [])
             self.assertEqual(safe_negative["toolCalls"], [])
-            self.assertEqual(safe_negative["observation"]["sideEffects"]["none"], True)
+            self.assertEqual(safe_negative["observation"]["sideEffects"]["noGameplayEffects"], True)
         self.assertEqual(question["result"]["decision"]["branch"], "ASK_CLARIFICATION")
         self.assertEqual(ambiguous["result"]["decision"]["branch"], "ASK_CLARIFICATION")
 
@@ -115,8 +115,8 @@ class FollowActionBindingTests(unittest.TestCase):
         self.assertFalse(action["accepted"])
         self.assertEqual(action["status"], "rejected")
         self.assertEqual(action["reason"], "unauthorized_companion")
-        self.assertEqual(len(denied["transport"]), 1)
-        self.assertEqual(denied["transport"][0]["payload"]["commandID"], "follow")
+        self.assertEqual(len(denied["dispatchTransport"]), 1)
+        self.assertEqual(denied["dispatchTransport"][0]["payload"]["commandID"], "follow")
         self.assertEqual(len(denied["toolCalls"]), 1)
         self.assertFalse(denied["toolCalls"][0]["accepted"])
         self.assertEqual(denied["toolCalls"][0]["capabilityID"], "pnc:companion.follow")

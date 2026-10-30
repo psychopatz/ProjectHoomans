@@ -1,6 +1,7 @@
 -- JSON-lines command routing for one semantic worker session.
 
 local CommandRouter = {}
+local TransportEvidence = require "worker/TransportEvidence"
 local Session = require "worker/CommandRouter_Session"
 local Conversation = require "worker/CommandRouter_Conversation"
 local Projection = require "worker/CommandRouter_Projection"
@@ -42,6 +43,9 @@ function CommandRouter.dispatch(context, request)
             payload
         )
         if result ~= false then
+            if type(result) == "table" and type(result.transport) == "table" then
+                TransportEvidence.annotate(result)
+            end
             return result, failure, shouldQuit
         end
     end

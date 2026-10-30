@@ -22,7 +22,7 @@ class ConversationalCompetenceC7DTests(unittest.TestCase):
         assert turn["accepted"], turn.get("reason")
         assert turn["result"]["decision"]["route"] == "deterministic"
         assert turn["result"].get("actionResult") is None
-        assert turn["transport"] == []
+        assert turn["dispatchTransport"] == []
         assert turn["toolCalls"] == []
         assert turn["llmCalls"] == 0
 
@@ -193,7 +193,7 @@ class ConversationalCompetenceC7DTests(unittest.TestCase):
             "flow:needs:proposal_pending",
         )
         self.assertEqual(weather["result"].get("actionResult"), None)
-        self.assertEqual(weather["transport"], [])
+        self.assertEqual(weather["dispatchTransport"], [])
         self.assertEqual(
             acknowledgement["result"]["ir"]["extensions"]["contextualFollowUp"][
                 "status"
@@ -207,7 +207,7 @@ class ConversationalCompetenceC7DTests(unittest.TestCase):
             "open",
         )
         self.assertEqual(acknowledgement["result"].get("actionResult"), None)
-        self.assertEqual(acknowledgement["transport"], [])
+        self.assertEqual(acknowledgement["dispatchTransport"], [])
 
     def test_participant_context_isolation_and_preview_are_effect_free(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)
@@ -232,7 +232,7 @@ class ConversationalCompetenceC7DTests(unittest.TestCase):
             {key: value for key, value in after.items() if key != "id"},
         )
         self.assertEqual(preview["messages"], [])
-        self.assertEqual(preview["transport"], [])
+        self.assertEqual(preview["dispatchTransport"], [])
         self.assertEqual(preview["toolCalls"], [])
         self.assertEqual(preview["llmCalls"], 0)
         self.assertEqual(
@@ -240,7 +240,7 @@ class ConversationalCompetenceC7DTests(unittest.TestCase):
             "UI_PNC_Conversation_Semantic_ContextReferenceLocationSafetyUnknown",
         )
         self.assertIn("ligtas", self.message_text(tl_turn))
-        self.assertEqual(tl_turn["transport"], [])
+        self.assertEqual(tl_turn["dispatchTransport"], [])
         self.assertEqual(tl_turn["toolCalls"], [])
 
 

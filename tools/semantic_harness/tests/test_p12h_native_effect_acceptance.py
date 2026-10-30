@@ -12,7 +12,7 @@ from tools.semantic_harness.tests.test_companion_orders_hub_p12e import open_ord
 
 def action_signature(result: dict) -> tuple[str, str, str, str]:
     action = result["result"]["actionResult"]
-    payload = result["transport"][0]["payload"]
+    payload = result["dispatchTransport"][0]["payload"]
     return (
         action["commandID"],
         action["capabilityID"],

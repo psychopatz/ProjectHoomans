@@ -26,7 +26,7 @@ class ConversationalCompetenceC7ATests(unittest.TestCase):
         self.assertTrue(turn["accepted"], turn.get("reason"))
         self.assertEqual(turn["result"]["decision"]["route"], "deterministic")
         self.assertEqual(turn["result"].get("actionResult"), None)
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
         self.assertEqual(turn["llmCalls"], 0)
         self.assertEqual(turn["relationshipBefore"], turn["relationshipAfter"])
@@ -70,7 +70,7 @@ class ConversationalCompetenceC7ATests(unittest.TestCase):
             residence["trace"][0]["data"]["classification"],
             "recognized_question_unknown_fact",
         )
-        self.assertEqual(residence["transport"], [])
+        self.assertEqual(residence["dispatchTransport"], [])
 
         self.assertEqual(bite["result"]["ir"]["subject"], "NPC_BITE_STATUS")
         self.assertEqual(bite["result"]["ir"]["diagnostics"]["factStatus"], "known")
@@ -81,7 +81,7 @@ class ConversationalCompetenceC7ATests(unittest.TestCase):
             "recognized_question",
         )
         self.assertEqual(bite["trace"][0]["data"]["responseClassification"], "grounded_npc_response")
-        self.assertEqual(bite["transport"], [])
+        self.assertEqual(bite["dispatchTransport"], [])
         self.assertEqual(bite["toolCalls"], [])
 
         self.assertEqual(compliment["result"]["ir"]["intent"], "COMPLIMENT")
@@ -95,7 +95,7 @@ class ConversationalCompetenceC7ATests(unittest.TestCase):
             compliment["trace"][0]["data"]["classification"],
             "recognized_social_interaction",
         )
-        self.assertEqual(compliment["transport"], [])
+        self.assertEqual(compliment["dispatchTransport"], [])
         self.assertEqual(compliment["toolCalls"], [])
         self.assertEqual(compliment["llmCalls"], 0)
 
@@ -125,7 +125,7 @@ class ConversationalCompetenceC7ATests(unittest.TestCase):
         self.assertEqual(negative["result"]["decision"]["branch"], "ASK_CLARIFICATION")
         self.assertEqual(negative["trace"][0]["data"]["classification"], "unrecognized_language")
         self.assertIsNone(negative["result"].get("actionResult"))
-        self.assertEqual(negative["transport"], [])
+        self.assertEqual(negative["dispatchTransport"], [])
         self.assertEqual(negative["toolCalls"], [])
 
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
@@ -134,7 +134,7 @@ class ConversationalCompetenceC7ATests(unittest.TestCase):
         self.assertEqual(gossip["result"]["ir"]["subject"], "GOSSIP")
         self.assertEqual(gossip["result"]["ir"]["provenance"]["pattern"], "pnc.social.gossip_event")
         self.assertNotEqual(gossip["result"]["ir"]["subject"], "NPC_BITE_STATUS")
-        self.assertEqual(gossip["transport"], [])
+        self.assertEqual(gossip["dispatchTransport"], [])
 
     def test_bite_status_uses_authoritative_projection_or_stays_unknown(self) -> None:
         cases = (
@@ -213,7 +213,7 @@ class ConversationalCompetenceC7ATests(unittest.TestCase):
         self.assertTrue(preview["accepted"], preview.get("reason"))
         self.assertEqual(preview["result"]["ir"]["subject"], "NPC_BITE_STATUS")
         self.assertEqual(preview["messages"], [])
-        self.assertEqual(preview["transport"], [])
+        self.assertEqual(preview["dispatchTransport"], [])
         self.assertEqual(preview["toolCalls"], [])
         self.assertEqual(preview["llmCalls"], 0)
         self.assertEqual(
@@ -227,14 +227,14 @@ class ConversationalCompetenceC7ATests(unittest.TestCase):
             "UI_PNC_Conversation_Semantic_ComplimentAlternate",
         )
         self.assertIn("Pinahahalagahan", self.message_text(tl_turn))
-        self.assertEqual(tl_turn["transport"], [])
+        self.assertEqual(tl_turn["dispatchTransport"], [])
         self.assertEqual(tl_turn["toolCalls"], [])
         self.assertEqual(
             tl_bite["messages"][0]["payload"]["translationKey"],
             "UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative",
         )
         self.assertIn("naitalang kagat", self.message_text(tl_bite))
-        self.assertEqual(tl_bite["transport"], [])
+        self.assertEqual(tl_bite["dispatchTransport"], [])
         self.assertEqual(tl_bite["toolCalls"], [])
 
 

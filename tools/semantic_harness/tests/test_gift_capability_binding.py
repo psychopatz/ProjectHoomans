@@ -43,8 +43,8 @@ class GiftCapabilityBindingTests(unittest.TestCase):
                 preview["observation"]["capabilityBinding"]["id"],
                 "pnc:gift.offer",
             )
-            self.assertTrue(preview["observation"]["sideEffects"]["none"])
-            self.assertEqual(preview["transport"], [])
+            self.assertTrue(preview["observation"]["sideEffects"]["noGameplayEffects"])
+            self.assertEqual(preview["dispatchTransport"], [])
             self.assertEqual(preview["toolCalls"], [])
 
         result = committed["result"]
@@ -75,14 +75,14 @@ class GiftCapabilityBindingTests(unittest.TestCase):
             result["actionResult"]["request"]["itemIDs"], ["player_apple_1"]
         )
         self.assertEqual(
-            [event["command"] for event in committed["transport"]].count(
+            [event["command"] for event in committed["dispatchTransport"]].count(
                 "InventoryTransfer"
             ),
             1,
         )
         self.assertIn(
             "InventoryResult",
-            [event["command"] for event in committed["transport"]],
+            [event["command"] for event in committed["dispatchTransport"]],
         )
         self.assertEqual(committed["messages"][0]["payload"]["text"],
                          "Thank you for the Apple.")
@@ -94,7 +94,7 @@ class GiftCapabilityBindingTests(unittest.TestCase):
         self.assertEqual(
             vague["result"]["decision"]["branch"], "GIFT_SELECTION_REQUIRED"
         )
-        self.assertEqual(vague["transport"], [])
+        self.assertEqual(vague["dispatchTransport"], [])
         self.assertEqual(vague["toolCalls"][0]["name"], "GIFT")
         self.assertFalse(vague["toolCalls"][0]["accepted"])
         self.assertEqual(vague["toolCalls"][0]["reason"],
@@ -134,7 +134,7 @@ class GiftCapabilityBindingTests(unittest.TestCase):
             result["result"]["actionResult"]["status"],
             "semantic_dispatch_blocked",
         )
-        self.assertEqual(result["transport"], [])
+        self.assertEqual(result["dispatchTransport"], [])
         self.assertEqual(
             result["messages"][0]["payload"]["text"],
             "I can't accept that gift right now.",

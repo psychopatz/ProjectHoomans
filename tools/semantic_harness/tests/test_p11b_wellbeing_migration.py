@@ -229,7 +229,7 @@ class WellbeingWordingShardTests(unittest.TestCase):
                 self.assertEqual(payload["semanticTemplateID"], contract[0])
                 self.assertEqual(payload["translationKey"], contract[1])
                 self.assertEqual(payload["text"], contract[2])
-                self.assertEqual(turn["transport"], [])
+                self.assertEqual(turn["dispatchTransport"], [])
                 self.assertEqual(turn["toolCalls"], [])
 
 

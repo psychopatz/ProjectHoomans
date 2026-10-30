@@ -38,9 +38,9 @@ class ContextualWeatherGateTests(unittest.TestCase):
                 self.assertEqual(flow["status"], "retired")
                 self.assertEqual(flow["activeAfter"], [])
                 self.assertEqual(observation["sideEffects"]["actions"], [])
-                self.assertEqual(observation["sideEffects"]["transport"], [])
-                self.assertTrue(observation["sideEffects"]["none"])
-                self.assertEqual(turn["transport"], [])
+                self.assertEqual(observation["sideEffects"]["dispatchTransport"], [])
+                self.assertTrue(observation["sideEffects"]["noGameplayEffects"])
+                self.assertEqual(turn["dispatchTransport"], [])
                 self.assertEqual(turn["toolCalls"], [])
                 self.assertEqual(
                     observation["response"]["sourceFlowID"],
@@ -78,7 +78,7 @@ class ContextualWeatherGateTests(unittest.TestCase):
         self.assertEqual(flow["gateReason"], "weather_rain_unknown")
         self.assertEqual(flow["toNodeId"], "unknown")
         self.assertEqual(preview["messages"], [])
-        self.assertEqual(preview["transport"], [])
+        self.assertEqual(preview["dispatchTransport"], [])
         self.assertEqual(preview["toolCalls"], [])
         self.assertEqual(preview["contextBefore"], preview["contextAfter"])
         self.assertEqual(

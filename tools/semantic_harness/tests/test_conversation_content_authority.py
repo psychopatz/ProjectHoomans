@@ -159,9 +159,9 @@ class ConversationContentAuthorityTests(unittest.TestCase):
             for row in rows:
                 self.assertEqual(row["result"]["ir"]["intent"], "GREET")
                 self.assertIsNone(row["result"].get("actionResult"))
-                self.assertEqual(row["transport"], [])
+                self.assertEqual(row["dispatchTransport"], [])
                 self.assertEqual(row["toolCalls"], [])
-                self.assertTrue(row["observation"]["sideEffects"]["none"])
+                self.assertTrue(row["observation"]["sideEffects"]["noGameplayEffects"])
 
         # The hash selection is deterministic for the same actor/family/style,
         # including across isolated worker processes.

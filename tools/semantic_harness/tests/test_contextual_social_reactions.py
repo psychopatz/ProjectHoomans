@@ -39,7 +39,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
         )
         self.assertEqual(turn["routedSituation"]["social"]["style"], social_style)
         self.assertEqual(turn["llmCalls"], 0)
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
         self.assertIsNone(turn["result"].get("actionResult"))
         self.assertEqual(turn["relationshipBefore"], turn["relationshipAfter"])
@@ -147,7 +147,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     template,
                 )
                 self.assertEqual(result["llmCalls"], 0)
-                self.assertEqual(result["transport"], [])
+                self.assertEqual(result["dispatchTransport"], [])
                 self.assertEqual(result["toolCalls"], [])
                 self.assertEqual(
                     result["relationshipBefore"], result["relationshipAfter"]
@@ -257,7 +257,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
             missing_transport["messages"][0]["payload"]["key"],
             "semantic.social.interaction.unavailable",
         )
-        self.assertEqual(missing_transport["transport"], [])
+        self.assertEqual(missing_transport["dispatchTransport"], [])
         self.assertEqual(missing_transport["relationshipBefore"],
                          missing_transport["relationshipAfter"])
 
@@ -270,7 +270,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
             "SELF_REFLECTION_RECEIVED",
         )
         self.assertIsNone(result["result"].get("actionResult"))
-        self.assertEqual(result["transport"], [])
+        self.assertEqual(result["dispatchTransport"], [])
 
     def test_social_rejection_translation_is_available_in_tl(self) -> None:
         scenario = merge(
@@ -344,7 +344,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     result["routedSituation"]["social"]["style"], social_style
                 )
                 self.assertEqual(result["llmCalls"], 0)
-                self.assertEqual(result["transport"], [])
+                self.assertEqual(result["dispatchTransport"], [])
                 self.assertEqual(result["toolCalls"], [])
                 action = result["result"]["actionResult"]
                 self.assertTrue(action["accepted"], action)
@@ -422,7 +422,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     result["routedSituation"]["social"]["style"], social_style
                 )
                 self.assertEqual(result["llmCalls"], 0)
-                self.assertEqual(result["transport"], [])
+                self.assertEqual(result["dispatchTransport"], [])
                 self.assertEqual(result["toolCalls"], [])
                 self.assertIsNone(result["result"].get("actionResult"))
                 self.assertEqual(
@@ -481,7 +481,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     result["routedSituation"]["social"]["style"], social_style
                 )
                 self.assertEqual(result["llmCalls"], 0)
-                self.assertEqual(result["transport"], [])
+                self.assertEqual(result["dispatchTransport"], [])
                 self.assertEqual(result["toolCalls"], [])
                 self.assertIsNone(result["result"].get("actionResult"))
                 self.assertEqual(
@@ -502,7 +502,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
             pending_dispute["messages"][0]["payload"]["translationKey"],
             "UI_PNC_Conversation_Semantic_RefuseRequest",
         )
-        self.assertEqual(pending_dispute["transport"], [])
+        self.assertEqual(pending_dispute["dispatchTransport"], [])
         self.assertEqual(pending_dispute["toolCalls"], [])
         self.assertEqual(pending_dispute["llmCalls"], 0)
         self.assertEqual(
@@ -525,7 +525,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
         self.assertEqual(preview_one["result"], preview_two["result"])
         self.assertEqual(preview_one["contextBefore"], preview_one["contextAfter"])
         self.assertEqual(preview_one["messages"], [])
-        self.assertEqual(preview_one["transport"], [])
+        self.assertEqual(preview_one["dispatchTransport"], [])
         self.assertEqual(preview_one["toolCalls"], [])
         self.assertEqual(preview_one["llmCalls"], 0)
         self.assertEqual(
@@ -546,7 +546,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
         )
         self.assertIsNone(preview["result"].get("actionResult"))
         self.assertEqual(preview["messages"], [])
-        self.assertEqual(preview["transport"], [])
+        self.assertEqual(preview["dispatchTransport"], [])
         self.assertEqual(preview["toolCalls"], [])
         self.assertEqual(preview["llmCalls"], 0)
         self.assertEqual(preview["contextBefore"], preview["contextAfter"])

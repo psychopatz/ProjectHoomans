@@ -110,7 +110,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             self.assertEqual(flow["resultOutcome"], node)
             self.assertEqual(flow["dispatchCount"], 1)
             self.assertEqual(result["result"]["actionResult"]["handlerID"], "PNC.Client.RequestSemanticTask")
-            self.assertEqual(len(result["transport"]), 1)
+            self.assertEqual(len(result["dispatchTransport"]), 1)
             self.assertEqual(result["messages"][0]["payload"]["text"], text)
 
     def test_all_dispatchable_registered_capabilities_use_existing_handlers(self) -> None:
@@ -154,7 +154,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             self.assertTrue(flow["generated"], action)
             self.assertEqual(flow["dispatchCount"], 1, action)
             self.assertEqual(action_result["handlerID"], expected_handlers[action])
-            self.assertEqual(len(result["transport"]), 1, action)
+            self.assertEqual(len(result["dispatchTransport"]), 1, action)
             self.assertTrue(result["messages"], action)
 
     def test_parameterized_task_result_branches_and_gate_are_truthful(self) -> None:
@@ -200,7 +200,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             "I couldn't wait there.",
         )
         self.assertEqual(gated["result"]["flow"]["toNodeId"], "rejected")
-        self.assertEqual(gated["transport"], [])
+        self.assertEqual(gated["dispatchTransport"], [])
         self.assertEqual(
             gated["result"]["actionResult"]["status"],
             "semantic_dispatch_blocked",
@@ -222,7 +222,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             self.assertEqual(flow["dispatchCount"], 1)
             self.assertEqual(result["result"]["actionResult"]["status"], "accepted")
             self.assertEqual(result["result"]["actionResult"]["commandID"], action)
-            self.assertEqual(len(result["transport"]), 1)
+            self.assertEqual(len(result["dispatchTransport"]), 1)
             self.assertEqual(result["messages"][0]["payload"]["translationKey"], response_key)
 
     def test_generated_simple_command_uses_relationship_and_personality_context(self) -> None:
@@ -276,7 +276,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             self.assertTrue(result["result"]["flow"]["generated"])
             self.assertEqual(result["result"]["flow"]["resultOutcome"], "queued")
             self.assertEqual(result["result"]["flow"]["dispatchCount"], 1)
-            self.assertEqual(len(result["transport"]), 1)
+            self.assertEqual(len(result["dispatchTransport"]), 1)
 
     def test_generated_simple_command_uses_bounded_previous_action_memory(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
@@ -293,7 +293,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         )
         self.assertEqual(repeated["result"]["flow"]["resultOutcome"], "queued")
         self.assertEqual(repeated["result"]["flow"]["dispatchCount"], 1)
-        self.assertEqual(len(repeated["transport"]), 1)
+        self.assertEqual(len(repeated["dispatchTransport"]), 1)
 
     def test_denied_failed_and_context_gate_are_truthful(self) -> None:
         denied_scenario = merge(
@@ -329,7 +329,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         self.assertEqual(failed["messages"][0]["payload"]["text"], "I couldn't start following you.")
         self.assertEqual(gated["result"]["flow"]["toNodeId"], "rejected")
         self.assertEqual(gated["result"]["actionResult"]["status"], "semantic_dispatch_blocked")
-        self.assertEqual(gated["transport"], [])
+        self.assertEqual(gated["dispatchTransport"], [])
         self.assertEqual(gated["messages"][0]["payload"]["text"], "I can't follow you right now.")
 
     def test_preview_is_pure_and_generation_survives_restart(self) -> None:
@@ -344,7 +344,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         for preview in (first, second):
             self.assertTrue(preview["result"]["flow"]["generated"])
             self.assertEqual(preview["result"]["flow"]["toNodeId"], "request")
-            self.assertEqual(preview["transport"], [])
+            self.assertEqual(preview["dispatchTransport"], [])
             self.assertEqual(preview["messages"], [])
         self.assertEqual(
             generated["generation"]["templateFingerprint"],
@@ -390,7 +390,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
                 self.assertEqual(
                     [
                         event["command"]
-                        for event in result["transport"]
+                        for event in result["dispatchTransport"]
                         if event.get("command") == "SemanticCognitionRequest"
                     ],
                     ["SemanticCognitionRequest"],
@@ -398,7 +398,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
                 self.assertTrue(any(
                     event.get("eventName") == "OnServerCommand"
                     and event.get("command") == "SemanticCognition"
-                    for event in result["transport"]
+                    for event in result["dispatchTransport"]
                 ))
 
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
@@ -409,7 +409,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         )
         self.assertFalse(any(
             event.get("command") == "SemanticCognitionRequest"
-            for event in unavailable["transport"]
+            for event in unavailable["dispatchTransport"]
         ))
 
     def test_authoritative_gossip_is_target_scoped_across_repeated_renamed_and_unavailable_targets(self) -> None:
@@ -458,12 +458,12 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             "Morgan has been looking out for people.",
         )
         second_request = next(
-            event for event in second["transport"]
+            event for event in second["dispatchTransport"]
             if event.get("command") == "SemanticCognitionRequest"
         )
         self.assertEqual(second_request["payload"]["targetID"], "npc_mara")
         second_response = next(
-            event for event in second["transport"]
+            event for event in second["dispatchTransport"]
             if event.get("eventName") == "OnServerCommand"
             and event.get("command") == "SemanticCognition"
         )
@@ -490,7 +490,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         )
         self.assertFalse(any(
             event.get("command") == "SemanticCognitionRequest"
-            for event in unavailable["transport"]
+            for event in unavailable["dispatchTransport"]
         ))
 
         stale_scenario = merge(
@@ -514,7 +514,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             "semantic.gossip.unknown",
         )
         stale_response = next(
-            event for event in stale["transport"]
+            event for event in stale["dispatchTransport"]
             if event.get("eventName") == "OnServerCommand"
             and event.get("command") == "SemanticCognition"
         )

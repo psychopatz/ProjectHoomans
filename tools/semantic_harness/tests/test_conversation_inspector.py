@@ -58,7 +58,7 @@ class ConversationInspectorTests(unittest.TestCase):
             "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch",
         )
         self.assertTrue(view["workerTrace"])
-        self.assertTrue(view["effects"]["sideEffects"]["none"])
+        self.assertTrue(view["effects"]["sideEffects"]["noGameplayEffects"])
 
     def test_snapshot_uses_authoritative_context_and_bounds_trace(self) -> None:
         with LuaSemanticWorker(self.scenario()) as worker:
@@ -141,7 +141,7 @@ class ConversationInspectorTests(unittest.TestCase):
         )
         self.assertFalse(reference_view["commandAuthority"]["isGameplayAction"])
         self.assertEqual(
-            reference_view["commandAuthority"]["effects"]["transportCount"],
+            reference_view["commandAuthority"]["effects"]["dispatchTransportCount"],
             0,
         )
 
@@ -153,9 +153,13 @@ class ConversationInspectorTests(unittest.TestCase):
             "pnc:companion.stay",
         )
         self.assertEqual(
-            command_view["commandAuthority"]["effects"]["transportCount"],
+            command_view["commandAuthority"]["effects"]["dispatchTransportCount"],
             1,
         )
+
+        self.assertEqual(command_view["commandAuthority"]["effects"]["transportCount"], 2)
+        self.assertEqual(command_view["commandAuthority"]["effects"]["factTransportCount"], 1)
+        self.assertEqual(command_view["effects"]["sideEffects"]["transportCount"], 2)
 
         rendered = conversation_first(reference_view)
         self.assertLess(

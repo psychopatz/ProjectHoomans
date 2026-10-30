@@ -59,7 +59,7 @@ class ContextualConversationC1Tests(unittest.TestCase):
         )
         for turn in (residence, cause, greeting, compound):
             self.assertEqual(turn["llmCalls"], 0)
-            self.assertEqual(turn["transport"], [])
+            self.assertEqual(turn["dispatchTransport"], [])
             self.assertEqual(turn["toolCalls"], [])
 
     def test_compound_reciprocal_turn_localizes_in_tagalog(self) -> None:
@@ -157,9 +157,9 @@ class ContextualConversationC1Tests(unittest.TestCase):
 
         for turn in (wellbeing, weather, resumed):
             self.assertEqual(turn["llmCalls"], 0)
-            self.assertEqual(turn["transport"], [])
+            self.assertEqual(turn["dispatchTransport"], [])
             self.assertEqual(turn["toolCalls"], [])
-            self.assertTrue(turn["observation"]["sideEffects"]["none"])
+            self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
 
 if __name__ == "__main__":

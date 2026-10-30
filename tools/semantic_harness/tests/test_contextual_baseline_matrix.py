@@ -31,7 +31,7 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
         self.assertIsInstance(turn["contextAfter"]["state"], dict)
         self.assertIsInstance(turn["routedSituation"], dict)
         self.assertEqual(turn["llmCalls"], 0)
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
         expected_messages = 2 if response_prefix == "semantic.flow.greeting.opening" else 1
         self.assertEqual(len(turn["messages"]), expected_messages)
@@ -130,12 +130,12 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
         self.assertTrue(any(
             event.get("command") == "SemanticIdentityRequest"
             and event.get("direction") == "client_to_server"
-            for event in second["transport"]
+            for event in second["dispatchTransport"]
         ))
         self.assertTrue(any(
             event.get("command") == "SemanticIdentityResult"
             and event.get("direction") == "server_to_client"
-            for event in second["transport"]
+            for event in second["dispatchTransport"]
         ))
         self.assertEqual(
             {call["name"] for call in second["toolCalls"]},
@@ -193,7 +193,7 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
         self.assertEqual(after_dialogue["currentTopic"], "wellbeing")
         self.assertLessEqual(len(after_dialogue["recentTurns"]), 12)
         self.assertEqual(second["llmCalls"], 0)
-        self.assertEqual(second["transport"], [])
+        self.assertEqual(second["dispatchTransport"], [])
         self.assertEqual(second["toolCalls"], [])
 
     def test_wellbeing_follow_up_preview_is_idempotent(self) -> None:
@@ -230,7 +230,7 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
             {key: value for key, value in after.items() if key != "id"},
         )
         self.assertEqual(preview_one["messages"], [])
-        self.assertEqual(preview_one["transport"], [])
+        self.assertEqual(preview_one["dispatchTransport"], [])
         self.assertEqual(preview_one["toolCalls"], [])
         self.assertEqual(preview_one["llmCalls"], 0)
 

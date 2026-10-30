@@ -26,9 +26,9 @@ class ContextualSuggestionsS1Tests(unittest.TestCase):
             self.assertLessEqual(len(suggestions["candidates"]), 24)
             self.assertTrue(suggestions["candidates"])
             self.assertEqual(preview["messages"], [])
-            self.assertEqual(preview["transport"], [])
+            self.assertEqual(preview["dispatchTransport"], [])
             self.assertEqual(preview["toolCalls"], [])
-            self.assertTrue(preview["observation"]["sideEffects"]["none"])
+            self.assertTrue(preview["observation"]["sideEffects"]["noGameplayEffects"])
 
         first_suggestions = first["observation"]["suggestions"]
         second_suggestions = second["observation"]["suggestions"]
@@ -101,7 +101,7 @@ class ContextualSuggestionsS1Tests(unittest.TestCase):
             wellbeing_detail["frame"]["patternID"],
             "pnc.question.wellbeing_follow_up_what_is_wrong",
         )
-        self.assertTrue(result["observation"]["sideEffects"]["none"])
+        self.assertTrue(result["observation"]["sideEffects"]["noGameplayEffects"])
 
     def test_greeting_response_plan_exposes_wellbeing_follow_up(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:

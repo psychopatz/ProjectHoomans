@@ -132,7 +132,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         self.assertTrue(opening_observation["response"]["composed"])
         self.assertEqual(opening_observation["response"]["queueCount"], 2)
         self.assertEqual(opening_observation["response"]["planTurnCount"], 2)
-        self.assertTrue(opening_observation["sideEffects"]["none"])
+        self.assertTrue(opening_observation["sideEffects"]["noGameplayEffects"])
 
         followup_observation = followup["observation"]
         self.assertEqual(followup_observation["ir"]["intent"], "THANK")
@@ -156,7 +156,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         )
         self.assertTrue(followup_observation["response"]["translated"])
         self.assertGreater(followup_observation["translation"]["lookupCount"], 0)
-        self.assertTrue(followup_observation["sideEffects"]["none"])
+        self.assertTrue(followup_observation["sideEffects"]["noGameplayEffects"])
 
     def test_composed_flow_plan_renders_and_queues_in_en_and_tl(self) -> None:
         for language in ("EN", "TL"):
@@ -194,7 +194,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
                     opening["observation"]["response"]["planTurnCount"],
                     2,
                 )
-                self.assertTrue(opening["observation"]["sideEffects"]["none"])
+                self.assertTrue(opening["observation"]["sideEffects"]["noGameplayEffects"])
                 if language == "TL":
                     self.assertTrue(all(
                         payload["text"] != payload["fallback"]
@@ -231,7 +231,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         self.assertTrue(first["response"]["translated"])
         self.assertEqual(first["translation"]["language"], "TL")
         self.assertGreater(first["translation"]["lookupCount"], 0)
-        self.assertTrue(first["sideEffects"]["none"])
+        self.assertTrue(first["sideEffects"]["noGameplayEffects"])
 
         interrupted = wellbeing["observation"]
         self.assertEqual(interrupted["flow"]["transition"], "interrupt_start")
@@ -242,7 +242,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         )
         self.assertEqual(interrupted["response"]["selectionSource"], "flow")
         self.assertEqual(interrupted["response"]["sourceFlowID"], "wellbeing")
-        self.assertTrue(interrupted["sideEffects"]["none"])
+        self.assertTrue(interrupted["sideEffects"]["noGameplayEffects"])
 
         resumed = status["observation"]
         self.assertEqual(
@@ -252,7 +252,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         self.assertEqual(resumed["flow"]["transition"], "match")
         self.assertEqual(resumed["flow"]["activeAfter"][0]["flowId"], "identity")
         self.assertNotEqual(resumed["response"].get("selectionSource"), "flow")
-        self.assertTrue(resumed["sideEffects"]["none"])
+        self.assertTrue(resumed["sideEffects"]["noGameplayEffects"])
 
         completed = name["observation"]
         self.assertEqual(completed["flow"]["status"], "retired")
@@ -266,7 +266,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
             completed["response"]["text"],
             name["messages"][0]["payload"]["text"],
         )
-        self.assertFalse(completed["sideEffects"]["none"])
+        self.assertFalse(completed["sideEffects"]["noGameplayEffects"])
 
     def test_response_plan_crosses_real_en_and_tl_presentation(self) -> None:
         for language in ("EN", "TL"):
@@ -307,9 +307,9 @@ class SemanticDialogueFlowTests(unittest.TestCase):
             )
             self.assertEqual(preview["contextBefore"], preview["contextAfter"])
             self.assertEqual(preview["messages"], [])
-            self.assertEqual(preview["transport"], [])
+            self.assertEqual(preview["dispatchTransport"], [])
             self.assertEqual(preview["toolCalls"], [])
-            self.assertTrue(preview["observation"]["sideEffects"]["none"])
+            self.assertTrue(preview["observation"]["sideEffects"]["noGameplayEffects"])
             self.assertEqual(
                 preview["observation"]["flow"]["transition"],
                 "interrupt_start",
@@ -329,7 +329,7 @@ class SemanticDialogueFlowTests(unittest.TestCase):
             refusal["contextAfter"]["dialogue"]["flowSessions"],
             [],
         )
-        self.assertEqual(refusal["transport"], [])
+        self.assertEqual(refusal["dispatchTransport"], [])
         self.assertEqual(refusal["toolCalls"], [])
         self.assertEqual(
             refusal["relationshipBefore"], refusal["relationshipAfter"]

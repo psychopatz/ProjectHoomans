@@ -73,10 +73,10 @@ class ContextualConversationC3CTests(unittest.TestCase):
                 self.assertEqual(last["status"], "fulfilled")
                 self.assertEqual(last["nodeID"], "quantity_answer")
                 self.assertEqual(last["requiredSlots"], ["offer"])
-                self.assertEqual(turn["transport"], [])
+                self.assertEqual(turn["dispatchTransport"], [])
                 self.assertEqual(turn["toolCalls"], [])
                 self.assertEqual(turn["llmCalls"], 0)
-                self.assertTrue(turn["observation"]["sideEffects"]["none"])
+                self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
                 self.assertEqual(turn["translation"]["language"], language)
                 self.assertTrue(turn["messages"][0]["payload"]["text"])
 

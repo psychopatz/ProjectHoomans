@@ -32,7 +32,7 @@ class WellbeingProjectionTests(unittest.TestCase):
         self.assertEqual(turn["result"]["ir"]["subject"], "WELLBEING")
         self.assertEqual(turn["result"]["decision"]["route"], "deterministic")
         self.assertEqual(turn["llmCalls"], 0)
-        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])
         self.assertIn("PNC/Semantics/PNC_SemanticDialogueInput.lua", turn["loadedModules"])
         self.assertIn("PNC/Semantics/PNC_SemanticDialoguePolicy.lua", turn["loadedModules"])
@@ -312,7 +312,7 @@ class WellbeingProjectionTests(unittest.TestCase):
         self.assertEqual(second["contextBefore"]["dialogue"]["currentTopic"], "wellbeing")
         self.assertEqual(second["contextBefore"]["dialogue"]["lastSpeaker"], "npc")
         self.assertEqual(second["contextAfter"]["dialogue"]["sequence"], 4)
-        self.assertEqual(second["transport"], [])
+        self.assertEqual(second["dispatchTransport"], [])
         self.assertEqual(second["toolCalls"], [])
 
     def test_wellbeing_follow_up_selects_current_strongest_fact(self) -> None:
@@ -353,7 +353,7 @@ class WellbeingProjectionTests(unittest.TestCase):
                     expected_template,
                 )
                 self.assertEqual(second["llmCalls"], 0)
-                self.assertEqual(second["transport"], [])
+                self.assertEqual(second["dispatchTransport"], [])
                 self.assertEqual(second["toolCalls"], [])
 
     def test_invalid_state_shapes_rejected(self) -> None:

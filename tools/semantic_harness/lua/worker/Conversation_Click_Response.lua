@@ -87,6 +87,7 @@ function Response.build(context, state)
         Runtime.transcript,
         state.transcriptBefore + 1
     )
+    context.OutputProjection.annotateTransport(response)
     response.observation = context.OutputProjection.observation(
         context,
         response,

@@ -95,9 +95,9 @@ class ContextualConversationC3DTests(unittest.TestCase):
 
                 for turn in (weather, resumed):
                     self.assertEqual(turn["llmCalls"], 0)
-                    self.assertEqual(turn["transport"], [])
+                    self.assertEqual(turn["dispatchTransport"], [])
                     self.assertEqual(turn["toolCalls"], [])
-                    self.assertTrue(turn["observation"]["sideEffects"]["none"])
+                    self.assertTrue(turn["observation"]["sideEffects"]["noGameplayEffects"])
 
 
 if __name__ == "__main__":

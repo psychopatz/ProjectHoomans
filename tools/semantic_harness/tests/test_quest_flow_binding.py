@@ -72,7 +72,7 @@ class QuestFlowBindingTests(unittest.TestCase):
                         "PNC.Client.RequestSemanticQuest",
                     )
                     self.assertEqual(
-                        [event["command"] for event in result["transport"]],
+                        [event["command"] for event in result["dispatchTransport"]],
                         ["SemanticQuestRequest", "SemanticQuestResult"],
                     )
                     self.assertEqual(
@@ -111,7 +111,7 @@ class QuestFlowBindingTests(unittest.TestCase):
             failed = worker.input("Can you help me?")
 
         self.assertTrue(preview["result"]["flow"]["generated"])
-        self.assertEqual(preview["transport"], [])
+        self.assertEqual(preview["dispatchTransport"], [])
         self.assertEqual(preview["messages"], [])
         self.assertEqual(first["result"]["flow"]["dispatchCount"], 1)
         self.assertEqual(repeated["result"]["actionResult"]["status"], "available")
@@ -169,7 +169,7 @@ class QuestFlowBindingTests(unittest.TestCase):
             self.assertEqual(first["result"]["flow"]["resultNodeId"], "queued")
             self.assertEqual(
                 [(event["direction"], event["command"])
-                 for event in first["transport"]],
+                 for event in first["dispatchTransport"]],
                 [
                     ("client_to_server", "SemanticQuestRequest"),
                     ("server_to_client", "SemanticQuestResult"),
@@ -182,7 +182,7 @@ class QuestFlowBindingTests(unittest.TestCase):
 
             request = next(
                 event["payload"]
-                for event in first["transport"]
+                for event in first["dispatchTransport"]
                 if event["command"] == "SemanticQuestRequest"
             )
             before = worker.snapshot()
@@ -206,7 +206,7 @@ class QuestFlowBindingTests(unittest.TestCase):
             second = worker.input("Can you help me?")
             self.assertEqual(
                 [(event["direction"], event["command"])
-                 for event in second["transport"]],
+                 for event in second["dispatchTransport"]],
                 [
                     ("client_to_server", "SemanticQuestRequest"),
                     ("server_to_client", "SemanticQuestResult"),
