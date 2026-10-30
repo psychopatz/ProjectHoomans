@@ -12,6 +12,10 @@ T.contains(entry, "PNC_Server_SafePhase",
     "server entry loads the fault-containment boundary")
 T.contains(pumps, "H.SafePhase",
     "subsystem phases use the fault-containment boundary")
+T.contains(pumps, "server_prepare.live_body_safety",
+    "prepare tick lost the live-body virtualization safety phase")
+T.contains(pumps, "RetireUnsafeLiveBodies",
+    "prepare tick no longer invokes the bounded live-body safety sweep")
 T.contains(tick, "server_tick.process_record",
     "record failures are isolated from the tick")
 T.contains(safePhase, "function H.SafePhase",

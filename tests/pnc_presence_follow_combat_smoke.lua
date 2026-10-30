@@ -2,6 +2,7 @@ local T = require "tests/support/test"
 T.addPackagePaths()
 
 local SHARED = T.path("ProjectHoomans", "shared", "")
+local nearestDistSq = 400
 
 PNC = {
     Core = { Now = function() return 100 end },
@@ -14,7 +15,7 @@ PNC = {
     BehaviorCommon = {},
     Presence = { Internal = {
         FindNearestPlayer = function()
-            return { distSq = 400 }
+            return { distSq = nearestDistSq }
         end,
     } },
 }
@@ -55,13 +56,25 @@ T.equal(
 )
 T.equal(
     Decisions.ShouldAbstract(followMoving),
+    true,
+    "stale follow target bypassed the hard live-body envelope"
+)
+T.equal(
+    Decisions.ShouldAbstract(workCombat),
+    true,
+    "non-follow combat bypassed the hard live-body envelope"
+)
+
+nearestDistSq = 25
+T.equal(
+    Decisions.ShouldAbstract(followMoving),
     false,
-    "follow targets without active combat remain protected from abstraction"
+    "near follow target lost live-body protection"
 )
 T.equal(
     Decisions.ShouldAbstract(workCombat),
     false,
-    "non-follow combat keeps the existing live-body protection"
+    "near non-follow combat lost live-body protection"
 )
 
 return T.finish("pnc_presence_follow_combat_smoke")

@@ -21,6 +21,7 @@ local BODY_ROOT = SHARED .. "PNC/Core/Presence/PNC_BodyLifecycle/"
 
 local records = {}
 local nowMs = 10000
+local nearestDistSq = 10 * 10
 local bodyRemovalBroadcasts = {}
 
 PNC = {
@@ -69,9 +70,11 @@ PNC = {
         Materialize = nil,
         Internal = {
             FindNearestPlayer = function()
-                -- Far beyond both the materialize and abstract distances so the
-                -- ordinary distance lane would keep the body either way.
-                return { distSq = 100000 }
+                -- Keep this legacy-reaper scenario inside the hard live-body
+                -- envelope. The first square-less frame still deserves the
+                -- body-loss grace window; far/no-player shells are now retired
+                -- immediately by the safety envelope before PZ can virtualize.
+                return { distSq = nearestDistSq }
             end,
             ResolveNetwork = function() return nil end,
         },

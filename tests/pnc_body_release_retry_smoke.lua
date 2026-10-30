@@ -168,6 +168,8 @@ T.equal(body.getCurrentSquare(), nil,
     "verified retry left the body in a square")
 T.equal(record.runtime.bodyReleasePending, nil,
     "verified retry left the retry marker armed")
+T.equal(Lifecycle.HuskLedgerCount(), 0,
+    "verified attached release incorrectly armed the husk ledger")
 
 -- The periodic loaded-body audit must use the same retry lane. It must not
 -- clear the registry/lease merely because a direct engine removal failed.

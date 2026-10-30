@@ -124,6 +124,12 @@ function H.PrepareTick(now)
         "PumpStartupBodyCleanup", nil, now, false)
     safeOptional("server_prepare.body_audit", BodyLifecycle,
         "AuditLoadedBodies", nil, now, false)
+    -- Hard carrier fence runs independently from per-record AI/presence cadence.
+    -- It only walks the capped live-body registry and retires bodies that have
+    -- left every player's safe loaded envelope before PZ chunk virtualization
+    -- can turn them into anonymous population zombies.
+    safeOptional("server_prepare.live_body_safety", Presence,
+        "RetireUnsafeLiveBodies", nil, now, false)
     -- Deletes husks the engine virtualized out of the loaded world and handed
     -- back as anonymous population bodies. Must run after the body audit so a
     -- lease that just went missing is already in the ledger.

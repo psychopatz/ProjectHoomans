@@ -105,6 +105,9 @@ function H.ProcessRecord(record, now)
     if zombie and Registry.RefreshLivePosition then
         Registry.RefreshLivePosition(record, zombie, false)
     end
+    if Presence and Presence.EnforceLiveBodyEnvelope then
+        zombie = Presence.EnforceLiveBodyEnvelope(record, zombie)
+    end
     if ConversationScene and ConversationScene.Pump then
         ConversationScene.Pump(record, zombie, now)
     end

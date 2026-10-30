@@ -31,6 +31,17 @@ Const.LIVE_POSITION_SAFETY_REFRESH_MS = 1000
 
 Const.MATERIALIZE_DISTANCE = 28
 Const.ABSTRACT_DISTANCE = 40
+-- Hard physical-carrier safety fence. No forceLive/combat/order exception may
+-- keep a managed IsoZombie beyond this radius from every player: PZ can feed
+-- an IsoZombie in an unloading chunk into ZombiePopulationManager before PNC
+-- receives any Lua unload callback. Keep this no larger than ABSTRACT_DISTANCE.
+Const.LIVE_BODY_RETIRE_DISTANCE = 40
+-- In local SP/splitscreen, remain one chunk inside the actual IsoChunkMap edge
+-- so even small/debug chunk maps retire PNC shells before native unload.
+Const.LIVE_BODY_CHUNK_MARGIN = 8
+-- Independent of per-NPC AI cadence. A player in a vehicle can cross the hard
+-- envelope faster than an idle NPC's one-second think/presence schedule.
+Const.LIVE_BODY_SAFETY_SWEEP_MS = 100
 Const.ABSTRACT_NEAR_DISTANCE = 80
 Const.PRESENCE_INTEREST_REFRESH_MS = 250
 Const.MATERIALIZE_MAX_PER_TICK = 2

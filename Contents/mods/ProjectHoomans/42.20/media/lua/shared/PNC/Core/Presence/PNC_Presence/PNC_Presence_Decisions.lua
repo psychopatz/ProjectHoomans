@@ -3,7 +3,13 @@ local Internal = Presence.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 local Common = PNC.BehaviorCommon
-local Diagnostics = PNC.PerformanceScalingDiagnostics
+
+if not Presence.IsOutsideLiveBodyEnvelope then
+    require "PNC/Core/Presence/PNC_Presence/PNC_Presence_LiveBodySafety"
+end
+if not Presence.RequestTraversalHandoff then
+    require "PNC/Core/Presence/PNC_Presence/PNC_Presence_TraversalHandoff"
+end
 
 -- A live journey that the embodied movement lane cannot serve asks for the
 -- elapsed-time abstract lane instead. Resolved lazily so Presence keeps no
@@ -23,104 +29,6 @@ local function withinDistance(nearest, distance)
     distance = tonumber(distance) or 0
     if not nearest or not nearest.distSq then return false end
     return nearest.distSq <= (distance * distance)
-end
-
--- One bounded audit helper is shared by presence, body, and pathing modules.
--- It performs no body reads or string assembly while the channel is disabled.
-function Internal.LogTraversal(record, eventName, body, extra)
-    local navigation
-    local fields
-    if not Diagnostics
-        or not Diagnostics.IsPresenceTraversalAuditEnabled
-        or Diagnostics.IsPresenceTraversalAuditEnabled() ~= true
-        or not Diagnostics.LogPresenceTraversal
-    then
-        return false
-    end
-    navigation = record and record.runtime
-        and record.runtime.localNavigation or nil
-    fields = {
-        "npc=" .. tostring(record and record.id or "nil"),
-        "name=" .. tostring(record and record.name or "nil"),
-        "presence=" .. tostring(record and record.presenceState or "nil"),
-        "bodyLease=" .. tostring(record and record.runtime
-            and record.runtime.bodyLease or "nil"),
-        "presenceRevision=" .. tostring(record
-            and record.presenceRevision or "nil"),
-        "recordPos=" .. tostring(record and record.x or "nil") .. ","
-            .. tostring(record and record.y or "nil") .. ","
-            .. tostring(record and record.z or "nil"),
-        "nearestDistSq=" .. tostring(record and record.runtime
-            and record.runtime.nearestPlayerDistSq or "nil"),
-        "provider=" .. tostring(navigation and navigation.provider or "nil"),
-        "owner=" .. tostring(navigation and navigation.ownerMode or "nil"),
-        "nativeActive=" .. tostring(navigation
-            and navigation.nativeActive == true),
-        "requestRevision=" .. tostring(navigation
-            and navigation.requestRevision or "nil"),
-        "at=" .. tostring(Core and Core.Now and Core.Now() or 0),
-    }
-    if body then
-        fields[#fields + 1] = "bodyPos=" .. tostring(body.getX
-            and body:getX() or "nil") .. "," .. tostring(body.getY
-            and body:getY() or "nil") .. "," .. tostring(body.getZ
-            and body:getZ() or "nil")
-        fields[#fields + 1] = "action=" .. tostring(body.getActionStateName
-            and body:getActionStateName() or "nil")
-        fields[#fields + 1] = "path2=" .. tostring(body.getPath2
-            and body:getPath2() ~= nil or false)
-        fields[#fields + 1] = "moving=" .. tostring(body.isMoving
-            and body:isMoving() == true or false)
-    end
-    for _, field in ipairs(extra or {}) do
-        fields[#fields + 1] = tostring(field)
-    end
-    return Diagnostics.LogPresenceTraversal(eventName, fields)
-end
-
-function Presence.RequestTraversalHandoff(record, reason)
-    local nearest
-    local runtime
-    local now
-    if not record or record.presenceState ~= Const.PRESENCE_LIVE then
-        return false
-    end
-    nearest = Internal.FindNearestPlayer and Internal.FindNearestPlayer(record)
-        or nil
-    if nearest and withinDistance(nearest, Const.MATERIALIZE_DISTANCE) then
-        -- Keep a visible NPC embodied. The live watchdog will continue its
-        -- bounded local fallback and expose the blocked state to the player.
-        return false
-    end
-    runtime = record.runtime or {}
-    record.runtime = runtime
-    if runtime.presenceHandoffRequested == true then return false end
-    now = Core and Core.Now and Core.Now() or 0
-    runtime.presenceHandoffRequested = true
-    runtime.presenceHandoffReason = tostring(
-        reason or "movement_stall"
-    )
-    runtime.presenceHandoffAt = now
-    runtime.forcePresenceCheck = true
-    if PNC.SimulationClock and PNC.SimulationClock.Wake then
-        PNC.SimulationClock.Wake(record, "presence", now)
-    end
-    Internal.LogTraversal(record, "handoff_requested", nil, {
-        "reason=" .. tostring(reason or "movement_stall"),
-    })
-    return true
-end
-
-function Presence.ClearTraversalHandoff(record, reason)
-    local runtime = record and record.runtime or nil
-    if not runtime or runtime.presenceHandoffRequested ~= true then
-        return false
-    end
-    runtime.presenceHandoffRequested = nil
-    runtime.presenceHandoffReason = nil
-    runtime.presenceHandoffAt = nil
-    runtime.presenceHandoffClearReason = reason
-    return true
 end
 
 function Presence.ShouldMaterialize(record, nearest)
@@ -168,13 +76,14 @@ function Presence.ShouldMaterialize(record, nearest)
         return false, "presence_handoff_out_of_range"
     end
     if runtime.forceLive == true then
-        if travelHandoffRequired(record)
-            and not withinDistance(nearest, Const.MATERIALIZE_DISTANCE)
-        then
-            -- A forced-live record keeps its body while a player can see it.
-            -- With nobody near, a journey that cannot be walked stays on the
-            -- abstract lane instead of thrashing the body every presence pass.
-            return false, "travel_handoff_out_of_range"
+        -- forceLive is an embodiment preference, not permission to create an
+        -- IsoZombie in unloaded world space. Abstract followers, debug spawns,
+        -- incapacitation and director requests all have to wait until a player
+        -- owns the materialization radius.
+        if not withinDistance(nearest, Const.MATERIALIZE_DISTANCE) then
+            return false, travelHandoffRequired(record)
+                and "travel_handoff_out_of_range"
+                or "explicit_live_out_of_range"
         end
         return true, "explicit_live"
     end
@@ -209,9 +118,15 @@ function Presence.ShouldAbstract(record, nearest)
     then
         return true
     end
+    -- This hard fence must run before forceLive and target exceptions. Those
+    -- flags used to keep companions/hostiles embodied hundreds of tiles behind
+    -- all players; PZ then virtualized the carrier during chunk unload and the
+    -- old body later resurfaced as an ordinary zombie husk.
+    if Presence.IsOutsideLiveBodyEnvelope(record, nearest) then
+        return true
+    end
     handoff = travelHandoffRequired(record)
-    -- forceLive keeps an NPC embodied for gameplay, but it must not bind it to
-    -- a movement lane that cannot serve its journey.
+    -- forceLive keeps an NPC embodied only inside the safe live envelope.
     if record.runtime and record.runtime.forceLive and not handoff then
         return false
     end
