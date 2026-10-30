@@ -9,7 +9,9 @@
 | NPC record envelope/version, record collection | Persistence Serialize/Deserialize/Collections | Persistence envelope |
 | Domain compact item schema and seed/delta/full modes | Inventory Persistence/CoreBridge/CoreDeltaCodec | Inventory |
 | Event arrays, backstory selection metadata | Conversation Memory | Conversation memory repository |
-| NPC health, traits/social/progression schema | currently embedded Persistence codecs plus domain normalizers | owning domain; migrate incrementally |
+| NPC health/body and stamina schema | Health.Repository; private Body/Compact codecs | Health |
+| Immutable identity, voice and appearance provenance | Identity.Repository | Identity |
+| Traits/social/progression/order/body envelope fields | remaining Persistence helpers plus public domain normalizers | remaining P4 ownership review |
 | Exact-version validation, ModData read/write/reset diagnostics | Persistence Reset | schema-neutral storage mechanism |
 | Domain stores (knowledge, world discovery, work, needs, etc.) | each existing repository/service Load/Save | each owning domain |
 | Portable Core migration/import plan | CoreMigration / ImportPlan providers | explicit compatibility adapter |
@@ -98,3 +100,35 @@ statement-form imports still require source/literal-import supplementation.
 Remaining domain codec ownership and optional Core adapter aliases must be
 resolved/classified before P4 acceptance. P4 remains active; this first slice
 does not satisfy the whole phase or the parent objective.
+
+## Health and Identity schema boundaries
+
+Persistence now invokes `PNC_HealthRepository` and `PNC_IdentityRepository`.
+Health retains the useful distinction between body normalization and compact
+encoding in private owned modules. Its public entry exposes normalized health,
+compact serialization and stamina restoration. Identity keeps its cohesive
+immutable profile/voice/provenance codec together behind five explicit public
+functions. Neither repository loads envelope coordination or dialogue.
+
+The shared scalar/map/point helpers are a stateless Hoomans Foundation utility;
+domain-specific defaults, bounds and versions stay in their owning codecs.
+The old Persistence health provider paths were removed after caller review;
+no shims were added. Moved method bodies and generic helpers compare exactly
+with revision `034766f9`. Runtime/repair/collection initialization order remains
+asserted with the new public entries in place of their old providers.
+
+MCP now discovers and traces the public functions before their implementation.
+Health-and-stamina schema context remains four files, shrinking from 1,111
+lines / 43,166 bytes to 455 / 17,694. Identity changes move from one mixed
+583-line / 21,594-byte file to two cohesive files totaling 425 / 14,144.
+The extra generic-helper file/public handoff is an explicit ownership boundary;
+file count alone did not drive this choice. The seven fixed gameplay probes
+remain unchanged at the first P4 slice's improved footprint.
+
+Validation: full isolated Lua **980/980**, focused **51/51**, diagnostic Python
+**22/22**, installed Kahlua **11/11**, static Kahlua zero errors. Zero new debt;
+82 manifestations remain. A private implementation-scope guard prevents foreign
+imports into Health's codecs. Standalone repository tests cover restart clock
+reset, compact body/stamina behavior, profile copying and fail-closed voice
+validation. See `P4B_VALIDATION.json`, `P4B_MCP_TRACES.json` and
+`P4B_CODEC_RETRIEVAL.json`. Remaining P4 work is still mandatory.

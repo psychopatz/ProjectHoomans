@@ -1,0 +1,355 @@
+{
+  "tier": 2,
+  "project": "project-hoomans",
+  "pre": {
+    "coverage": {
+      "project": "project-hoomans",
+      "signal": "best_effort",
+      "indexed_at": "2026-10-30T12:56:14Z",
+      "metadata": {
+        "generation": "2026-10-30T12:56:14Z",
+        "index_mode": "full",
+        "recorded_at": "2026-10-30T12:56:18Z",
+        "recording_status": "complete",
+        "ignored_files_stored": 81,
+        "ignored_files_total": 81,
+        "hash_records_complete": true,
+        "coverage_version": 3,
+        "generation_matches": true
+      },
+      "paths": [
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthBody.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthBody.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthCodec.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthCodec.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "tests/pnc_persistence_presence_boundary_smoke.lua",
+          "path": "tests/pnc_persistence_presence_boundary_smoke.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        }
+      ],
+      "scopes": [],
+      "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+    },
+    "traces": [
+      {
+        "status": "fulfilled",
+        "value": {
+          "content": [
+            {
+              "type": "text",
+              "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_HealthCodec.Internal.serializeHealth\ndirection: both\ncallees_total: 2\ncallees: 2  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_HealthCodec.Internal:\n  buildCompactHealthBody 1 heuristic 0.90\n  sanitizeHealth 1 heuristic 0.90\ncallers_total: 1\ncallers: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Serialize.Persistence:\n  SerializeRecord 1 heuristic 0.75\n"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "status": "fulfilled",
+        "value": {
+          "content": [
+            {
+              "type": "text",
+              "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Primitives.Internal.sanitizeIdentity\ndirection: both\ncallees_total: 8\ncallees: 8  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Base.PNC_Core.Core:\n  DeepCopy 1 heuristic 0.17\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Identity.PNC_Identity.Identity:\n  NormalizeBirthDate 1 heuristic 0.75\n  NormalizeSeed 1 heuristic 0.85\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Primitives.Internal:\n  normalizeString 1 heuristic 0.90\n  sanitizeBackstoryMetadata 1 heuristic 0.17\n  sanitizeColor 1 heuristic 0.17\n  sanitizeVoiceProfile 1 heuristic 0.17\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.17\ncallers_total: 1\ncallers: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Serialize.Persistence:\n  SerializeRecord 1 heuristic 0.75\n"
+            }
+          ],
+          "isError": false
+        }
+      }
+    ]
+  },
+  "post": {
+    "coverage": {
+      "project": "project-hoomans",
+      "signal": "best_effort",
+      "indexed_at": "2026-10-30T13:14:30Z",
+      "metadata": {
+        "generation": "2026-10-30T13:14:30Z",
+        "index_mode": "full",
+        "recorded_at": "2026-10-30T13:14:34Z",
+        "recording_status": "complete",
+        "ignored_files_stored": 86,
+        "ignored_files_total": 86,
+        "hash_records_complete": true,
+        "coverage_version": 3,
+        "generation_matches": true
+      },
+      "paths": [
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Base/PNC_RecordCodec.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Base/PNC_RecordCodec.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/PNC_HealthRepository.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/PNC_HealthRepository.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/Repository/PNC_HealthBodyCodec.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/Repository/PNC_HealthBodyCodec.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/Repository/PNC_HealthCompactCodec.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/Repository/PNC_HealthCompactCodec.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_IdentityRepository.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_IdentityRepository.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Deserialize.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Deserialize.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_DeserializeFinalization.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_DeserializeFinalization.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "tests/pnc_domain_codec_ownership_smoke.lua",
+          "path": "tests/pnc_domain_codec_ownership_smoke.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "tests/pnc_persistence_presence_boundary_smoke.lua",
+          "path": "tests/pnc_persistence_presence_boundary_smoke.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "tests/test_domain_context_audit.py",
+          "path": "tests/test_domain_context_audit.py",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "tools/domain_contracts.py",
+          "path": "tools/domain_contracts.py",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        }
+      ],
+      "scopes": [],
+      "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+    },
+    "removed_paths": {
+      "project": "project-hoomans",
+      "signal": "best_effort",
+      "indexed_at": "2026-10-30T13:14:30Z",
+      "metadata": {
+        "generation": "2026-10-30T13:14:30Z",
+        "index_mode": "full",
+        "recorded_at": "2026-10-30T13:14:34Z",
+        "recording_status": "complete",
+        "ignored_files_stored": 86,
+        "ignored_files_total": 86,
+        "hash_records_complete": true,
+        "coverage_version": 3,
+        "generation_matches": true
+      },
+      "paths": [
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthBody.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthBody.lua",
+          "status": "no_recorded_issue",
+          "freshness": "missing",
+          "recommended_action": "read_source_and_reindex",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthCodec.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthCodec.lua",
+          "status": "no_recorded_issue",
+          "freshness": "missing",
+          "recommended_action": "read_source_and_reindex",
+          "coverage": []
+        }
+      ],
+      "scopes": [
+        {
+          "requested_scope": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/Repository",
+          "scope": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/Repository",
+          "total": 0,
+          "has_more": false,
+          "entries": [],
+          "status": "no_recorded_issue"
+        }
+      ],
+      "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+    },
+    "traces": [
+      {
+        "status": "fulfilled",
+        "value": {
+          "qn": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Health.PNC_HealthRepository.Repository.Serialize",
+          "trace": {
+            "content": [
+              {
+                "type": "text",
+                "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Health.PNC_HealthRepository.Repository.Serialize\ndirection: both\ncallees_total: 1\ncallees: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Health.Repository.PNC_HealthCompactCodec.Internal:\n  serializeHealth 1 heuristic 0.75\ncallers_total: 2\ncallers: 2  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Serialize.Persistence:\n  SerializeRecord 1 heuristic 0.85\nproject-hoomans.tests:\n  pnc_domain_codec_ownership_smoke 1 heuristic 0.85\n"
+              }
+            ],
+            "isError": false
+          },
+          "snippet": {
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"name\":\"Repository.Serialize\",\"qualified_name\":\"project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Health.PNC_HealthRepository.Repository.Serialize\",\"label\":\"Function\",\"file_path\":\"/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/PNC_HealthRepository.lua\",\"start_line\":14,\"end_line\":16,\"source\":\"function Repository.Serialize(raw, fallbackMax)\\n    return Compact.serializeHealth(raw, fallbackMax)\\nend\\n\",\"callers\":2,\"callees\":1}"
+              }
+            ],
+            "structuredContent": {
+              "name": "Repository.Serialize",
+              "qualified_name": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Health.PNC_HealthRepository.Repository.Serialize",
+              "label": "Function",
+              "file_path": "/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/PNC_HealthRepository.lua",
+              "start_line": 14,
+              "end_line": 16,
+              "source": "function Repository.Serialize(raw, fallbackMax)\n    return Compact.serializeHealth(raw, fallbackMax)\nend\n",
+              "callers": 2,
+              "callees": 1
+            },
+            "isError": false
+          }
+        }
+      },
+      {
+        "status": "fulfilled",
+        "value": {
+          "qn": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Identity.PNC_IdentityRepository.Repository.Normalize",
+          "trace": {
+            "content": [
+              {
+                "type": "text",
+                "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Identity.PNC_IdentityRepository.Repository.Normalize\ndirection: both\ncallees_total: 1\ncallees: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Identity.PNC_IdentityRepository.Internal:\n  sanitizeIdentity 1 heuristic 0.90\ncallers_total: 2\ncallers: 2  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Serialize.Persistence:\n  SerializeRecord 1 heuristic 0.85\nproject-hoomans.tests:\n  pnc_domain_codec_ownership_smoke 1 heuristic 0.85\n"
+              }
+            ],
+            "isError": false
+          },
+          "snippet": {
+            "content": [
+              {
+                "type": "text",
+                "text": "{\"name\":\"Repository.Normalize\",\"qualified_name\":\"project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Identity.PNC_IdentityRepository.Repository.Normalize\",\"label\":\"Function\",\"file_path\":\"/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_IdentityRepository.lua\",\"start_line\":330,\"end_line\":332,\"source\":\"function Repository.Normalize(raw, record)\\n    return Internal.sanitizeIdentity(raw, record)\\nend\\n\",\"callers\":2,\"callees\":1}"
+              }
+            ],
+            "structuredContent": {
+              "name": "Repository.Normalize",
+              "qualified_name": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Identity.PNC_IdentityRepository.Repository.Normalize",
+              "label": "Function",
+              "file_path": "/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_IdentityRepository.lua",
+              "start_line": 330,
+              "end_line": 332,
+              "source": "function Repository.Normalize(raw, record)\n    return Internal.sanitizeIdentity(raw, record)\nend\n",
+              "callers": 2,
+              "callees": 1
+            },
+            "isError": false
+          }
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "All selected depth-one traces fit one page. Statement-form IMPORTS remain incomplete; fresh literal imports and direct source supplement them.",
+    "Removed providers were read from immutable 034766f9 and their moved method bodies compared exactly. Private codec scopes are checked by the dependency guard."
+  ]
+}

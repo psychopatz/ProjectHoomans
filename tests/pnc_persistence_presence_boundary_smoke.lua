@@ -6,22 +6,21 @@ local source = T.read(
     "PNC/Core/Persistence/PNC_Persistence.lua"
 )
 local providers = {
-    "PNC_Persistence_Primitives",
-    "PNC_Persistence_HealthBody",
-    "PNC_Persistence_HealthCodec",
-    "PNC_Persistence_RecordState",
-    "PNC_Persistence_Runtime",
-    "PNC_Persistence_Repairs",
-    "PNC_Persistence_Serialize",
-    "PNC_Persistence_DeserializeFinalization",
-    "PNC_Persistence_Deserialize",
-    "PNC_Persistence_Collections",
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives",
+    "PNC/Core/Health/PNC_HealthRepository",
+    "PNC/Core/Identity/PNC_IdentityRepository",
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState",
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Runtime",
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Repairs",
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize",
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_DeserializeFinalization",
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Deserialize",
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Collections",
 }
 
 local previous = 0
 for index = 1, #providers do
-    local needle = "require \"PNC/Core/Persistence/PNC_Persistence/"
-        .. providers[index] .. "\""
+    local needle = "require \"" .. providers[index] .. "\""
     local position = assert(source:find(needle, 1, true), needle)
     T.truthy(position > previous, providers[index] .. " load order")
     previous = position

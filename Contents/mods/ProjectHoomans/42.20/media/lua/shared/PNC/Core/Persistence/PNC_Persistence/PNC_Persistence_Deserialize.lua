@@ -3,6 +3,8 @@ PNC.Persistence = PNC.Persistence or {}
 PNC.Persistence.Internal = PNC.Persistence.Internal or {}
 local MemoryRepository = require "PNC/Conversation/Memory/PNC_ConversationMemoryRepository"
 
+local HealthRepository = require "PNC/Core/Health/PNC_HealthRepository"
+local IdentityRepository = require "PNC/Core/Identity/PNC_IdentityRepository"
 local Persistence = PNC.Persistence
 local Internal = Persistence.Internal
 local Core = PNC.Core
@@ -121,8 +123,8 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     if reason ~= nil then
         return nil
     end
-    if Internal.ValidateAppearancePersistence then
-        reason = Internal.ValidateAppearancePersistence(raw)
+    if IdentityRepository.ValidateRecord then
+        reason = IdentityRepository.ValidateRecord(raw)
         if reason ~= nil then
             return nil
         end
@@ -132,10 +134,10 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     anchor = raw.anchor or raw
     identity = type(raw.identity) == "table"
         and Core.DeepCopy(raw.identity) or nil
-    identity = Internal.RestoreVoiceProfile
-        and Internal.RestoreVoiceProfile(identity) or identity
-    if identity and Internal.sanitizeBackstoryMetadata then
-        identity.backstory = Internal.sanitizeBackstoryMetadata(
+    identity = IdentityRepository.RestoreVoiceProfile
+        and IdentityRepository.RestoreVoiceProfile(identity) or identity
+    if identity and IdentityRepository.NormalizeBackstoryMetadata then
+        identity.backstory = IdentityRepository.NormalizeBackstoryMetadata(
             identity.backstory
         )
     end
@@ -200,7 +202,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     -- save cannot recreate one copy of the resource table per NPC.
     record.campState = nil
     record.hostility = Internal.sanitizeHostility(raw.hostility, record.tacticalClass)
-    record.health = Internal.sanitizeHealth(raw.health or raw, record.health and record.health.max or Const.DEFAULT_HP_MAX)
+    record.health = HealthRepository.Normalize(raw.health or raw, record.health and record.health.max or Const.DEFAULT_HP_MAX)
     record.alive = tostring(record.health.state or "") ~= "dead"
         and tostring(record.health.state or "") ~= "corpse"
     progression = Internal.sanitizeProgression(raw.progression)

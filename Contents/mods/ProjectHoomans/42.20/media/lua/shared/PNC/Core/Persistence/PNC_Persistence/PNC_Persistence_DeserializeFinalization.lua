@@ -2,6 +2,7 @@ PNC = PNC or {}
 PNC.Persistence = PNC.Persistence or {}
 PNC.Persistence.Internal = PNC.Persistence.Internal or {}
 
+local HealthRepository = require "PNC/Core/Health/PNC_HealthRepository"
 local Persistence = PNC.Persistence
 local Internal = Persistence.Internal
 local InventoryRepository = require "PNC/Core/Inventory/PNC_InventoryRepository"
@@ -208,7 +209,7 @@ function Internal.FinalizeDeserializedRecord(
 )
     restoreTraits(record, raw)
     restoreIdentityAndProgression(record, raw, identity, progression)
-    Internal.sanitizeStamina(raw.stamina, record)
+    HealthRepository.RestoreStamina(raw.stamina, record)
     record = InventoryRepository.RestoreRecord(record, raw.inventory)
     record = Persistence.RebuildRuntime(record)
     if Persistence.Repairs and Persistence.Repairs.Apply then

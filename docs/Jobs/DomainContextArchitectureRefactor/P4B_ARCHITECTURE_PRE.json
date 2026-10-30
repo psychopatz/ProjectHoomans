@@ -1,0 +1,8 @@
+{
+  "revision_before": "034766f98c0b3a2abcb80e007eccd124d4388d26",
+  "body_codec_body_sha256": "e2c77377648ee8777f5049329ef54259ae33a2548475d9d740f372073cb7b305",
+  "compact_codec_body_sha256": "b82e2d2ecb9fb21be0f43d08b26929fd05c9a03a90713e53a5d9c8a24d65c23b",
+  "identity_codec_body_sha256": "f6070eb583727a328c7be13efe076c4296b28503f6943261819f65c72e5f0d50",
+  "generic_helpers_body_sha256": "1571d6ec3ec86cde2fea99aeebdc1eb6e2bd0962b22b58dbf2ecd2bd034fc65d",
+  "note": "Moved method bodies preserve their text; only module initialization, ownership and public call sites change. Stamina methods retain bodies with namespace rebinding."
+}

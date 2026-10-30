@@ -1,6 +1,6 @@
 # Progress — Domain & Context Architecture Refactor
 
-**Status:** IN PROGRESS — P0–P3 accepted; P4 classification and first repository slice validated. P4 remains active.
+**Status:** IN PROGRESS — P0–P3 accepted; P4 storage, Memory/Inventory and Health/Identity repositories validated. P4 remains active.
 
 ## Parent objective
 
@@ -12,7 +12,7 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
 - Existing `main` only; planning baseline `15cadee70be11b790ce4c48bfb7bd51badd8233b`.
   Initially clean, origin fetched, ahead 7 / behind 0. No concurrent edits found.
 - Accepted: P0 `4205a1d7`, P1 `24d61abc`, Inventory pilot `b4535421`,
-  tooling-baseline evidence `19749cef`, ordered composition `55049e99`.
+  tooling-baseline evidence `19749cef`, ordered composition `55049e99`, first persistence slice `034766f9`.
 - MCP project `project-hoomans`; explicitly refreshed against actual source.
   Statement-form IMPORTS and heuristic alias/builtin resolution need the
   documented literal-import/source fallback. Matching HEAD alone is insufficient.
@@ -47,11 +47,16 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
   versus P0. Persisted inventory: 7 → 4 files, same depth, -25,710 bytes; removed
   envelope/bootstrap context is explained in `RETRIEVAL.md` and caller-tested.
   Memory's supplementary owned import closure: 83,367 → 55,416 bytes.
-- Latest full isolated Lua: **979/979**, 4 workers, 8.90 seconds.
-  Focused persistence/restart/binding/knowledge: **42/42**; diagnostic Python
-  **21/21**. NPC tooling P0 baseline: **6/6**.
+- Health/Identity slice: `P4B_VALIDATION.json`, `P4B_MCP_TRACES.json`. Health
+  body/compact modules remain separate; immutable identity codec stays cohesive.
+  Method bodies match pre-change source; obsolete health paths removed, no shims.
+  Health/stamina context: 43,166 → 17,694 bytes at the same four-file count.
+  Identity: 21,594 → 14,144 bytes, one additional generic-helper file explained.
+- Latest full isolated Lua: **980/980**, 4 workers, 9.28 seconds.
+  Focused Health/Identity/persistence: **51/51**; prior restart/binding/knowledge
+  matrix **42/42**; diagnostic Python **22/22**. NPC tooling baseline: **6/6**.
 - Changed-runtime installed PZ Kahlua: P2 **36/36**, P3 **54/54**, first P4 slice
-  **34/34**; static Kahlua zero errors. Diff checks clean.
+  **34/34**, Health/Identity **11/11**; static Kahlua zero errors. Diff checks clean.
 - Immutable P1 semantic-tooling baseline: 194 modules, 124 pass, 65 fail,
   5 GUI-related timeouts; 764 reported tests, 2 skips. In-process discovery
   aborted in Tk cleanup (exit 134). These pre-existing failures remain final
@@ -63,9 +68,9 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
 
 **Continue P4B/C — Remaining domain codec ownership.**
 
-1. Use the established graph/source classification to move health and identity
-   schema meaning behind owning repositories; review social/progression/command
-   codecs and optional Core adapter namespaces without creating artificial files.
+1. Review/migrate remaining social/progression/companion order and body schema
+   helpers through owning public contracts. Classify optional Core adapter
+   namespaces without creating artificial files. Health/Identity are validated.
 2. Preserve exact formats, bounds, lazy hydration, migration/reset policy,
    startup body hints, Follow travel reconciliation and domain Save ordering.
 3. Remove superseded private imports/aliases where safe; classify retained

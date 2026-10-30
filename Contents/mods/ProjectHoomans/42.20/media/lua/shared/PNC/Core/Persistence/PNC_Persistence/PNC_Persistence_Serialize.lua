@@ -4,6 +4,8 @@ PNC.Persistence.Internal = PNC.Persistence.Internal or {}
 local MemoryRepository = require "PNC/Conversation/Memory/PNC_ConversationMemoryRepository"
 local InventoryRepository = require "PNC/Core/Inventory/PNC_InventoryRepository"
 
+local HealthRepository = require "PNC/Core/Health/PNC_HealthRepository"
+local IdentityRepository = require "PNC/Core/Identity/PNC_IdentityRepository"
 local Persistence = PNC.Persistence
 local Internal = Persistence.Internal
 local Core = PNC.Core
@@ -179,10 +181,10 @@ function Persistence.SerializeRecord(record)
         return nil
     end
     MemoryRepository.PrepareRecord(record)
-    identity = Internal.sanitizeIdentity(record.identity, record)
+    identity = IdentityRepository.Normalize(record.identity, record)
     appearance = type(record.appearance) == "table"
         and Core.DeepCopy(record.appearance) or nil
-    appearanceContract = Internal.BuildAppearanceContract(record)
+    appearanceContract = IdentityRepository.BuildAppearanceContract(record)
     progression = prepareProgression(record)
     inventoryPayload = InventoryRepository.SerializeRecord(record)
     recipeKnowledge = PNC.RecipeKnowledge
@@ -240,8 +242,8 @@ function Persistence.SerializeRecord(record)
             and math.max(1, math.floor(Internal.normalizeNumber(record.patrolIndex, 1)))
             or nil,
         hostility = Internal.sanitizeHostility(record.hostility, record.tacticalClass),
-        health = Internal.serializeHealth(record.health, record.health and record.health.max or Const.DEFAULT_HP_MAX),
-        stamina = Internal.serializeStamina(record.stamina),
+        health = HealthRepository.Serialize(record.health, record.health and record.health.max or Const.DEFAULT_HP_MAX),
+        stamina = HealthRepository.SerializeStamina(record.stamina),
         weaponMode = tostring(record.weaponMode or "melee"),
         attackType = PNC.Types and PNC.Types.NormalizeAttackType
             and PNC.Types.NormalizeAttackType(record.attackType, record.weaponMode)

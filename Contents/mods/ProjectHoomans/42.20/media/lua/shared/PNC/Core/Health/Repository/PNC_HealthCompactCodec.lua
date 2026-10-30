@@ -1,9 +1,13 @@
-PNC = PNC or {}
-PNC.Persistence = PNC.Persistence or {}
-PNC.Persistence.Internal = PNC.Persistence.Internal or {}
-
-local Persistence = PNC.Persistence
-local Internal = Persistence.Internal
+-- Health-owned compact save format. Body normalization is a direct owned dependency.
+local Codec = require "PNC/Core/Base/PNC_RecordCodec"
+local Body = require "PNC/Core/Health/Repository/PNC_HealthBodyCodec"
+local Internal = {
+    normalizeString = Codec.normalizeString,
+    normalizeNumber = Codec.normalizeNumber,
+    hasTableEntries = Codec.hasTableEntries,
+    HEALTH_PART_IDS = Body.HEALTH_PART_IDS,
+    sanitizeHealthBody = Body.sanitizeHealthBody,
+}
 local Core = PNC.Core
 local Const = PNC.Const
 
@@ -163,3 +167,5 @@ function Internal.serializeHealth(rawHealth, fallbackMax)
     }
     return output
 end
+
+return Internal

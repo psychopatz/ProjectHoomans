@@ -95,33 +95,6 @@ function Internal.sanitizeColonistDeparture(raw)
     }
 end
 
-function Internal.sanitizeStamina(rawStamina, record)
-    local output
-    if type(rawStamina) ~= "table" then
-        return nil
-    end
-    output = {
-        current = Internal.normalizeNumber(rawStamina.current, 0),
-        max = rawStamina.max ~= nil
-            and math.max(1, Internal.normalizeNumber(rawStamina.max, 1)) or nil,
-    }
-    if record then
-        record.stamina = output
-    end
-    return output
-end
-
-function Internal.serializeStamina(rawStamina)
-    local current
-    local maximum
-    if type(rawStamina) ~= "table" then return nil end
-    current = tonumber(rawStamina.current)
-    maximum = tonumber(rawStamina.max)
-    if current == nil then return nil end
-    if maximum and math.abs(current - maximum) < 0.01 then return nil end
-    return { current = current }
-end
-
 function Internal.sanitizeProgression(rawProgression)
     local output = {
         recruited = false,

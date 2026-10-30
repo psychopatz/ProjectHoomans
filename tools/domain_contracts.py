@@ -144,6 +144,9 @@ def inspect(paths, edges, policy):
         line = edge['line']
         if is_private(target):
             issue('FOREIGN_INTERNAL', source, target, line)
+        elif any(fnmatchcase(target, scope)
+                 for scope in policy.get('private_implementation_scopes', ())):
+            issue('FOREIGN_IMPLEMENTATION', source, target, line)
         if b == 'UI' and a not in policy['permitted_presentation_consumers']:
             issue('DOMAIN_TO_UI', source, target, line)
         if a == 'UI' and b == 'Persistence' and target not in entries.get(b, ()):

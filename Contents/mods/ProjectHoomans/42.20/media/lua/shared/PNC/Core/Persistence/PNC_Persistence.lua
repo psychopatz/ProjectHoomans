@@ -4,8 +4,8 @@ PNC.Persistence.Internal = PNC.Persistence.Internal or {}
 
 require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives"
 require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
-require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthBody"
-require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthCodec"
+require "PNC/Core/Health/PNC_HealthRepository"
+require "PNC/Core/Identity/PNC_IdentityRepository"
 require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState"
 require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Runtime"
 require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Repairs"

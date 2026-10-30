@@ -48,6 +48,13 @@ class ContractBoundaryTests(unittest.TestCase):
             self.assertIn('FOREIGN_INTERNAL', self.rules('Supply/A.lua', target, 'Supply', 'Inventory'))
             self.assertNotIn('FOREIGN_INTERNAL', self.rules('Inventory/A.lua', target, 'Inventory', 'Inventory'))
 
+    def test_owned_codec_scope_is_private_without_folder_name_internal(self):
+        self.policy['enforced_public_domains'] = []
+        self.policy['private_implementation_scopes'] = ['Inventory/Repository/*']
+        target = 'Inventory/Repository/BodyCodec.lua'
+        self.assertIn('FOREIGN_IMPLEMENTATION', self.rules('Supply/A.lua', target, 'Supply', 'Inventory'))
+        self.assertNotIn('FOREIGN_IMPLEMENTATION', self.rules('Inventory/A.lua', target, 'Inventory', 'Inventory'))
+
     def test_legacy_runtime_location_does_not_override_domain_owner(self):
         self.assertNotIn('FOREIGN_IMPLEMENTATION', self.rules(
             'server/Legacy/A.lua', 'Inventory/Mutation.lua', 'Composition', 'Inventory'))

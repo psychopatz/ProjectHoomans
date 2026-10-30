@@ -1,0 +1,101 @@
+{
+  "metric": "Supplementary whole-file schema working sets; unchanged envelope hosts are caller-reviewed, not included. Bodies are source-identical. Public facade adds one explicit in-domain handoff.",
+  "health_and_stamina": {
+    "before": {
+      "files": 4,
+      "bytes": 43166,
+      "lines": 1111,
+      "source": [
+        {
+          "path": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives.lua",
+          "bytes": 21594,
+          "lines": 583,
+          "sha256": "5bf04e35e466495a30fccc1dbced48654fa7d7804fcb29f51f116faf68018019"
+        },
+        {
+          "path": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthBody.lua",
+          "bytes": 6659,
+          "lines": 159,
+          "sha256": "f0d2a86b6b379d409ed582efd28fd8e90310591e4ec7bc79fb066f6981fcae2b"
+        },
+        {
+          "path": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthCodec.lua",
+          "bytes": 7209,
+          "lines": 165,
+          "sha256": "79a379dc2bdc024171de011ecea931e35f5bcc46fa9f12874639e107d0fc9566"
+        },
+        {
+          "path": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState.lua",
+          "bytes": 7704,
+          "lines": 204,
+          "sha256": "3e627823dd5506f02f986c879413204ef6be2b5bd4b8932cb56b69b5b55d42ce"
+        }
+      ]
+    },
+    "after": {
+      "files": 4,
+      "bytes": 17694,
+      "lines": 455,
+      "source": [
+        {
+          "path": "shared/PNC/Core/Health/PNC_HealthRepository.lua",
+          "bytes": 1536,
+          "lines": 49,
+          "sha256": "6d5ac1296d226c26f07c566d8f9202c6133f614a37db33fc23f300022743e1c8"
+        },
+        {
+          "path": "shared/PNC/Core/Health/Repository/PNC_HealthBodyCodec.lua",
+          "bytes": 6755,
+          "lines": 159,
+          "sha256": "83808eba972ff38ac95609aa1158f385e511bb25a8dc2f73ca6128a851b784d8"
+        },
+        {
+          "path": "shared/PNC/Core/Health/Repository/PNC_HealthCompactCodec.lua",
+          "bytes": 7497,
+          "lines": 171,
+          "sha256": "63aac625cb85fa7188c54b025a363407d92f2a60dcca650d7813c6f88a742717"
+        },
+        {
+          "path": "shared/PNC/Core/Base/PNC_RecordCodec.lua",
+          "bytes": 1906,
+          "lines": 76,
+          "sha256": "66b2682660da4c330e68bc8f1450f0593aa94a34265d5b671992eb67921ea431"
+        }
+      ]
+    }
+  },
+  "immutable_identity": {
+    "before": {
+      "files": 1,
+      "bytes": 21594,
+      "lines": 583,
+      "source": [
+        {
+          "path": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives.lua",
+          "bytes": 21594,
+          "lines": 583,
+          "sha256": "5bf04e35e466495a30fccc1dbced48654fa7d7804fcb29f51f116faf68018019"
+        }
+      ]
+    },
+    "after": {
+      "files": 2,
+      "bytes": 14144,
+      "lines": 425,
+      "source": [
+        {
+          "path": "shared/PNC/Core/Identity/PNC_IdentityRepository.lua",
+          "bytes": 12238,
+          "lines": 349,
+          "sha256": "272f056e979d93ac0183fbed9804c1cc61d91490e564360beb6b6a5709c2b6cd"
+        },
+        {
+          "path": "shared/PNC/Core/Base/PNC_RecordCodec.lua",
+          "bytes": 1906,
+          "lines": 76,
+          "sha256": "66b2682660da4c330e68bc8f1450f0593aa94a34265d5b671992eb67921ea431"
+        }
+      ]
+    }
+  }
+}

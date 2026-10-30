@@ -398,6 +398,60 @@
       "layers": [
         "shared"
       ]
+    },
+    "Health": {
+      "owns": "NPC health/body and stamina schema; medical/treatment subdomains retain runtime effects",
+      "namespace": "PNC.Health",
+      "entries": [
+        "shared/PNC/Core/Health/PNC_Health.lua",
+        "shared/PNC/Core/Health/PNC_NPCWounds.lua",
+        "shared/PNC/Core/Health/PNC_Treatment.lua",
+        "shared/PNC/Core/Health/PNC_Revive.lua",
+        "shared/PNC/Core/Health/PNC_PlayerDamage.lua",
+        "shared/PNC/Core/Health/PNC_HealthRepository.lua",
+        "shared/PNC/Core/Stamina/PNC_Stamina.lua"
+      ],
+      "commands": [
+        "existing Health/Treatment/Revive runtime APIs",
+        "Repository.RestoreStamina"
+      ],
+      "queries": [
+        "Repository.Normalize",
+        "Repository.Serialize",
+        "Repository.NormalizeBody",
+        "Repository.SerializeStamina"
+      ],
+      "repository": "Health.Repository; private body normalization and compact codec providers",
+      "layers": [
+        "shared",
+        "server"
+      ]
+    },
+    "Identity": {
+      "owns": "immutable NPC identity, appearance/voice provenance, authored traits and profile schema; player identity remains its own subdomain",
+      "namespace": "PNC.Identity",
+      "entries": [
+        "shared/PNC/Core/Identity/PNC_Identity.lua",
+        "shared/PNC/Core/Identity/PNC_IdentityRepository.lua",
+        "shared/PNC/Core/Identity/PNC_PlayerCharacterConstants.lua",
+        "shared/PNC/Core/Identity/PNC_PlayerCharacterTypes.lua",
+        "shared/PNC/Core/Traits/PNC_NPCTraitContext.lua",
+        "shared/PNC/Core/Traits/PNC_StartingCompanionTraits.lua"
+      ],
+      "commands": [
+        "existing Identity.ApplyRecordIdentity",
+        "Repository.RestoreVoiceProfile"
+      ],
+      "queries": [
+        "Repository.Normalize",
+        "Repository.BuildAppearanceContract",
+        "Repository.ValidateRecord",
+        "Repository.NormalizeBackstoryMetadata"
+      ],
+      "repository": "Identity.Repository owns compact immutable profile schema and provenance",
+      "layers": [
+        "shared"
+      ]
     }
   },
   "canonical_states": {
@@ -427,5 +481,8 @@
     "PNC.ServerInventory.Internal": "Inventory",
     "PNC.SupplyInventoryInternal": "Supply"
   },
-  "registration_manifest": "REGISTRATIONS.json"
+  "registration_manifest": "REGISTRATIONS.json",
+  "private_implementation_scopes": [
+    "shared/PNC/Core/Health/Repository/*"
+  ]
 }

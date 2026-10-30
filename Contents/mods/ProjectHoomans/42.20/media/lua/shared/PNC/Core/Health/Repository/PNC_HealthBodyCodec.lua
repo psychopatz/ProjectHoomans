@@ -1,17 +1,15 @@
-PNC = PNC or {}
-PNC.Persistence = PNC.Persistence or {}
-PNC.Persistence.Internal = PNC.Persistence.Internal or {}
-
-local Persistence = PNC.Persistence
-local Internal = Persistence.Internal
+-- Health-owned body schema normalization; no lifecycle or engine authority.
+local Codec = require "PNC/Core/Base/PNC_RecordCodec"
+local Internal = { normalizeString = Codec.normalizeString, normalizeNumber = Codec.normalizeNumber }
 local Core = PNC.Core
 local Const = PNC.Const
-local Identity = PNC.Identity
-local Types = PNC.Types
-local Inventory = PNC.Inventory
-local RelationshipTypes = PNC.RelationshipTypes
-local RelationshipMath = PNC.RelationshipMath
-local FactionTypes = PNC.FactionTypes
+
+Internal.HEALTH_PART_IDS = {
+    "Head", "Neck", "Torso_Upper", "Torso_Lower", "Groin",
+    "UpperArm_L", "UpperArm_R", "ForeArm_L", "ForeArm_R",
+    "Hand_L", "Hand_R", "UpperLeg_L", "UpperLeg_R",
+    "LowerLeg_L", "LowerLeg_R", "Foot_L", "Foot_R",
+}
 
 function Internal.sanitizeHealthBody(rawBody)
     local source = type(rawBody) == "table" and rawBody or {}
@@ -157,3 +155,5 @@ function Internal.sanitizeHealthBody(rawBody)
         lastBleedAt = 0,
     }
 end
+
+return Internal
