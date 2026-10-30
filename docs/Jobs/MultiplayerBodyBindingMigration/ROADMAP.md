@@ -1,6 +1,6 @@
 # Roadmap — Multiplayer Body Binding Migration
 
-**Status:** M0-M9 developer implementation accepted; renewed user-owned native SP/MP acceptance pending. DEVELOPER_ACCEPTANCE.md records both the superseded M0-M8 handoff and the M9 developer addendum.
+**Status:** M9 native restart acceptance failed; M10 restart-shell recovery is developer-accepted in ada48d24; renewed user-owned native SP/MP restart acceptance pending.
 
 **Parent objective:** successfully migrate Project Hoomans from implicit cross-network IsoZombie identity to an explicit, incarnation-safe multiplayer body-binding protocol **and** prevent managed live-human carriers from reaching native zombie virtualization, while preserving SP behavior, durable Registry authority, MP streaming/reconnect, death/reanimation semantics, and exact cleanup.
 
@@ -218,6 +218,62 @@ Required developer-side evidence:
 - `git diff --check` clean and intended work committed on existing main.
 
 Gate: developer implementation may hand back to native testing only when source/runtime evidence proves managed live humans are proactively retired before native virtualization.
+
+
+## M10 — Restart shell identity recovery after M9 native failure
+
+Native restart logs on 2026-10-30 disproved the remaining M9 assumption that runtime pre-virtualization retirement alone was sufficient. Startup reported ordinaryUnknown=6 blockedRecords=5 and later ordinaryUnknown=4 blockedRecords=4, removed zero shells, then spawned replacement NPC bodies while the anonymous old IsoZombie carriers remained.
+
+### M10A — Safe current-save rehydration
+
+Required:
+- the durable Registry record remains restart authority;
+- zero-identity restored bodies may be adopted only when the current save proves a live leased shell with a prior real engine identity;
+- require tight saved position, matching sex when available, a real-frame settle window, and one-to-one record/body ownership;
+- keep the lane role-agnostic across companion, neutral, hostile and faction NPCs;
+- anonymous evidence may authorize adoption only, never duplicate deletion;
+- multiple anonymous bodies or anonymous plus exact proof are ambiguous and delete nothing.
+
+Gate: the ordinaryUnknown plus blockedRecords restart shape holds startup open, quarantines the shell, and rebinds the unique restored body before Presence can spawn a replacement.
+
+### M10B — Exact live-shell identity token
+
+Required:
+- stamp live shells with one lifecycle-only engine-saved item carrying the durable NPC id;
+- exclude the token from logical inventory and strip it before corpse conversion;
+- startup treats a surviving token as strong identity;
+- conflicting token/ModData identity fails closed;
+- normal materialization and restored-body rebind both ensure the token.
+
+### M10C — SP pre-save retirement
+
+Required:
+- use the real Events.OnSave ordering before local world and PopMan persistence;
+- retire bounded live PNC carriers through canonical Presence/BodyLifecycle before the PNC registry commit;
+- persist abstract logical state so the subsequent PZ save has no live PNC IsoZombie to serialize;
+- surface removal deferrals instead of claiming success.
+
+### M10D — Dedicated/MP restart contract
+
+Installed 42.22 server save code calls ZombiePopulationManager.updateRealZombies immediately before native n_save and exposes no safe Lua authority pre-save detach/re-admit seam that preserves ServerMap/online-id membership. MP restart recovery is therefore an explicit startup-rebind contract.
+
+Required:
+- startup gate remains open through settle/rebind;
+- recovered body is humanized/quarantined before adoption;
+- successful rebind emits one PNC startup_rehydrate_rebound log line;
+- failure or ambiguity never falls through to replacement materialization beside an unresolved shell;
+- true Knox-reanimated zombies remain outside this path.
+
+### M10E — Developer validation
+
+Accepted developer evidence for ada48d24:
+- full isolated Lua suite: 972/972;
+- broad lifecycle/network/persistence/combat/death matrix: 231/231;
+- focused restart/husk/body/presence/reanimation/infection/network/replica/persistence matrix: 163/163;
+- installed Project Zomboid Kahlua compiler: 14/14 changed/new runtime Lua files pass;
+- static Kahlua ERROR scan: 14/14 clean;
+- Startup_Batch is smaller than the pre-M10 baseline after extracting the anonymous-rehydrate helper;
+- git diff --check clean before commit.
 
 ### Native user acceptance handoff
 

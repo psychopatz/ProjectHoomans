@@ -1,6 +1,6 @@
 # Developer acceptance — Multiplayer Body Binding Migration
 
-> **M0-M8 HANDOFF SUPERSEDED; M9 ADDENDUM ACCEPTED 2026-10-30:** User-owned native SP/MP testing reproduced persistent old NPC husks after the original M0-M8 handoff. M9 developer work is now implemented in e1a90335; the parent goal still requires renewed native SP/MP acceptance.
+> **M9 NATIVE HANDOFF FAILED; M10 DEVELOPER REPAIR ACCEPTED 2026-10-30:** The 09:44/09:46 native restart logs still reproduced anonymous old NPC husks after M9. M10 restart-shell recovery is implemented in ada48d24; the parent goal still requires renewed native SP/MP restart acceptance.
 
 M0-M8 developer implementation was accepted on existing `main`, 2026-10-30, before native testing. Planning baseline: `e3614241`.
 
@@ -110,3 +110,25 @@ Installed 42.22 Java/native evidence also disproved the first M9 prototype assum
 ### Remaining acceptance
 
 Renewed native testing is mandatory. Synthetic validation cannot prove PZ never virtualizes an old carrier in the live engine. Test both SP and MP with repeated follow movement far enough to trigger abstraction, return to old locations, chunk unload/reload, reconnect/relog and server restart. Any persistent old zombie/husk reopens M9.
+
+
+## M10 developer addendum — restart-shell recovery
+
+Implementation commit: ada48d24 fix: reclaim anonymous npc shells on restart.
+
+The previous M9 handoff did not solve restart ownership. The latest native log proved that the old carrier returned as a live anonymous IsoZombie, startup classified it as ordinaryUnknown, the 48-entry HuskLedger could not prove-match it, and Presence later materialized a replacement NPC. The direct code regression was the hard-disabled anonymousRehydrateMatch introduced by df315d65.
+
+M10 restores restart recovery with stricter safety than the old implementation:
+- current-save live lease plus saved engine identity is required;
+- tight saved position, sex and settle are required;
+- one unique anonymous body may be adopted for any NPC role;
+- anonymous bodies can never become duplicate-deletion authority;
+- ambiguity preserves bodies and blocks replacement spawn;
+- a successful rebind is explicitly logged;
+- exact live-shell item tokens provide strong identity where direct object persistence preserves inventory;
+- local/SP saves proactively retire carriers before world/PopMan persistence;
+- Knox reanimation remains a separate genuine-zombie path.
+
+Validation: 972/972 full, 231/231 broad, 163/163 focused, 14/14 installed-PZ compile, 14/14 static Kahlua ERROR clean.
+
+Native SP/MP restart acceptance remains mandatory. Do not mark the parent goal complete unless the next restart shows rebound before replacement materialization and no hostile former-NPC husk remains.

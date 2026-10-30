@@ -1,9 +1,9 @@
 # Progress — Multiplayer Body Binding Migration
 
-**Status:** Developer M0-M9 accepted; renewed user-owned native SP/MP acceptance pending.
+**Status:** M10 restart-shell recovery implemented and developer-validated; renewed native SP/MP restart acceptance pending.
 **Branch:** existing main only.
 **Planning anchor:** 2a24bc59d36c845af51097642c55180434680cb7.
-**Current phase:** Native SP/MP acceptance handoff.
+**Current phase:** Native restart-shell acceptance handoff.
 **Parent objective:** M0-M9 complete migration to explicit MP body binding plus pre-virtualization live-human carrier retirement, with SP preserved; native husk convergence remains to be verified by the user.
 
 ## Verified starting evidence
@@ -261,3 +261,30 @@ This specifically closes the native log sequence where a companion remained embo
 - No native Project Zomboid game was launched and no Workshop content was published.
 
 **Remaining mandatory action:** renewed user-owned native SP and MP acceptance. Repeated abstraction/rematerialization, old-location return, chunk unload/reload, reconnect/relog and restart must show no persistent former NPC shell. Any native husk reproduction reopens M9 despite the green developer suite.
+
+
+## M10 native restart failure and developer repair — 2026-10-30
+
+Native evidence from /home/psychopatz/Zomboid/Logs/2026-10-30_09-42_DebugLog.txt reopened the restart gate after M9:
+- 09:44:18 startup fallback count=10; cleanup removed=0 ordinaryUnknown=6 blockedRecords=5;
+- 09:44:22 HuskReaper active with ledgerEntries=48 but unable to prove-match the anonymous restored shells;
+- 09:46:24 second startup again completed with removed=0 ordinaryUnknown=4 blockedRecords=4;
+- 09:46:38 Carey Carrington was freshly materialized, proving replacement spawn still occurred while the prior anonymous carrier remained unmanaged.
+
+Repository history identified the direct regression: df315d65 had replaced anonymousRehydrateMatch with an unconditional false result, disabling the bounded settle/rebind lane added by 75983f6c.
+
+M10 repairs this without restoring unsafe positional deletion:
+- current-save anonymous recovery requires startupRehydrateExpected, bodyHint.wasLive, a saved lease, a saved nonzero engine identity, tight saved position, sex match when available, and the real-frame settle window;
+- it is role-agnostic, but anonymous evidence is adoption-only;
+- competing anonymous bodies or anonymous plus proven competition is ambiguous and deletes nothing;
+- startup keeps the gate open and quarantines the shell until rebind succeeds or remains blocked;
+- successful rebind emits PNC startup_rehydrate_rebound npc=<id> reason=<proof> anonymous=<bool>;
+- a lifecycle-only live-shell token provides exact identity when the engine preserves object inventory, is excluded from logical inventory, and is stripped before corpse conversion;
+- local/SP OnSave retires live carriers before the PNC persistence commit so the subsequent world/PopMan save cannot serialize a live PNC shell;
+- dedicated/MP startup reclaim remains mandatory because installed 42.22 server save code snapshots registered real zombies through updateRealZombies plus native n_save and exposes no safe Lua pre-save detach/re-admit seam.
+
+Implementation commit: ada48d24 fix: reclaim anonymous npc shells on restart.
+
+Final developer evidence: 972/972 full, 231/231 broad, 163/163 focused restart/persistence, 14/14 installed-PZ compile, 14/14 static Kahlua ERROR clean, git diff --check clean.
+
+Remaining mandatory action: native SP and MP restart/relog testing. The decisive next-log success signal is PNC startup_rehydrate_rebound before any spawnPrimary for the same NPC. Any ordinaryUnknown/blockedRecords followed by replacement materialization without a rebound reopens M10.

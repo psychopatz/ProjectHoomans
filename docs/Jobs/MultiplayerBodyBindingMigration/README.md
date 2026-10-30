@@ -1,6 +1,6 @@
 # Multiplayer Body Binding Migration
 
-**Current status:** native SP/MP acceptance failed after M0-M8. M9 native-virtualization prevention is implemented and developer-validated; renewed native SP/MP acceptance is the remaining completion gate.
+**Current status:** M9 native restart acceptance failed again on 2026-10-30. M10 restart-shell recovery is implemented and developer-validated in ada48d24; renewed native SP/MP restart acceptance is the remaining completion gate.
 
 This job replaces Project Hoomans' fragile multiplayer assumption that a server-side managed IsoZombie remains the same identity-bearing object on clients, and hardens the physical carrier lifecycle so a managed live-human shell is proactively retired before Project Zomboid can virtualize it into native zombie-population state.
 
