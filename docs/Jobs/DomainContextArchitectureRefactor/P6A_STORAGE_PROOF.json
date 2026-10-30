@@ -1,0 +1,70 @@
+{
+  "stage": "P6A/P6B local definition repository seam",
+  "source_revision_before": "b39e770e8c1bc174d7fad524c09ad8d92733e91a",
+  "from": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PuppetOpera/PNC_PuppetOperaStorage.lua",
+  "to": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PuppetOpera/PNC_PuppetOperaStorage.lua",
+  "implementation_bytes_equal": true,
+  "sha256": "cbe501544f6902f56481f1001630e60afe8f226fccf5e0b38b3f5f1fa8f1a627",
+  "callers": [
+    "client/PNC/UI/PuppetOpera/PNC_PuppetOperaDebugModel_State.lua",
+    "client/PNC/UI/PuppetOpera/PNC_PuppetOperaDebugModel_Drafts_Persistence.lua"
+  ],
+  "compatibility": "PNC.PuppetOpera.Storage table and methods unchanged; old private UI require path removed after both maintained callers migrate. No forwarding shim.",
+  "pre_mcp": {
+    "project": "project-hoomans",
+    "generation": "2026-10-30T22:37:22Z",
+    "tier": 2,
+    "Save_outbound": [
+      "encode",
+      "fileNameFor",
+      "safeID",
+      "DefinitionDatabase.WriteFile",
+      "DefinitionDatabase.Upsert",
+      "Blueprints.Normalize"
+    ],
+    "inbound": "Graph reports zero; statement-form/dynamic imports are incomplete. Literal fallback finds two maintained callers.",
+    "coverage": "four material paths metadata-match; no recorded gaps"
+  },
+  "retrieval": "Storage behavior is 1 file / 152 lines, with schema and mechanism contracts. Canonical discovery no longer begins in a UI editor. No byte/count reduction claimed.",
+  "focused_lua": {
+    "passed": 19,
+    "total": 19
+  },
+  "full_lua": {
+    "passed": 983,
+    "total": 983,
+    "seconds": 8.81
+  },
+  "diagnostic_python": {
+    "passed": 22,
+    "total": 22
+  },
+  "kahlua": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 3,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  },
+  "static_kahlua": {
+    "files": 1,
+    "errors": 0
+  },
+  "guard": {
+    "issues": 74,
+    "new": 0,
+    "resolved": 119
+  },
+  "post_mcp": {
+    "generation": "2026-10-30T22:42:55Z",
+    "coverage": "4 material source/test paths metadata-match; no recorded gaps",
+    "Save_outbound_unchanged": true,
+    "inbound_limitation_unchanged": true
+  },
+  "fixed_probe_source_hashes_unchanged": 33
+}

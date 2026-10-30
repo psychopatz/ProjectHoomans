@@ -795,6 +795,27 @@
         "shared",
         "server"
       ]
+    },
+    "PuppetOpera": {
+      "owns": "Blueprint schema/normalization and playback; client local definition repository is separate from UI draft state and authoritative server playback",
+      "namespace": "PNC.PuppetOpera",
+      "entries": [
+        "client/PNC/PuppetOpera/PNC_PuppetOperaStorage.lua",
+        "client/PNC/PuppetOpera/PNC_PuppetOpera_Client.lua"
+      ],
+      "commands": [
+        "Storage.Save (local definition + shared kind index; does not start playback)"
+      ],
+      "queries": [
+        "Storage.FileName",
+        "Storage.LoadFile",
+        "Storage.List",
+        "Storage.LoadAll"
+      ],
+      "repository": "Storage owns opera definition envelope; DefinitionDatabase owns generic file/index mechanism",
+      "layers": [
+        "client"
+      ]
     }
   },
   "canonical_states": {

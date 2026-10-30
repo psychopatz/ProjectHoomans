@@ -48,7 +48,7 @@ local function loadPersistentBlueprints()
     -- client storage module there, while the live game still discovers saved
     -- Opera Definitions through the same root database as Unique NPCs.
     if type(getFileReader) ~= "function" then return end
-    local storage = require "PNC/UI/PuppetOpera/PNC_PuppetOperaStorage"
+    local storage = require "PNC/PuppetOpera/PNC_PuppetOperaStorage"
     for _, item in ipairs(storage.List()) do
         if item.draft and item.draft.id then
             Internal.Blueprints.Register(item.draft.id, item.draft)

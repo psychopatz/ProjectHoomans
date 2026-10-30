@@ -20,7 +20,7 @@ function Model.SaveDraft()
         return false, reason
     end
     if type(getFileWriter) == "function" then
-        local storage = require "PNC/UI/PuppetOpera/PNC_PuppetOperaStorage"
+        local storage = require "PNC/PuppetOpera/PNC_PuppetOperaStorage"
         local stored, storeReason, storedDefinition = storage.Save(normalized)
         if not stored then
             State.editorError = storeReason
