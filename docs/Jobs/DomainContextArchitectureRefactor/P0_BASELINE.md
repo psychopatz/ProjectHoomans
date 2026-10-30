@@ -117,11 +117,12 @@ source hashes; rerun the architecture scan first to discover added/deleted files
 - Full in-process semantic tooling discovery aborted before a summary with
   `Tcl_AsyncDelete: async handler deleted by the wrong thread` after repeated
   Tk Variable cleanup errors, with production source unchanged. Exit 134.
-- Retry uses one Python process per module against an immutable P1 archive
-  (production identical to P0), not the migrating worktree. It already exposes
-  pre-existing assertions counting `SemanticInteractionLifecycle` fact traffic
-  as gameplay dispatch, plus stale category/choice fixtures. Record its complete
-  result and classify every failure before final acceptance; none are waived.
+- Isolated retry against an immutable P1 archive (production identical to P0):
+  **194 modules: 124 passed, 65 failed, 5 GUI-related timeouts**; 764 reported
+  tests, 2 skips. Timeout-module case counts are unreported. The bounded result
+  is `P0_TOOLING_BASELINE.json`. Many failures count lifecycle fact transport as
+  gameplay dispatch; other legacy fixture/choice expectations need individual
+  review. These failures are pre-existing and remain unaccepted final gates.
 - No runtime Lua changed in P0; installed-PZ compile is required when runtime
   changes begin. No native game launched or Workshop publication performed.
 

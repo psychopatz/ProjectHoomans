@@ -61,9 +61,10 @@ P2 accepted evidence (`INVENTORY_PILOT.md`, `P2_VALIDATION.json`):
   versus P0. Transfer probe: 5 -> 4 files, 3 -> 2 handoffs, -10,976 bytes.
 - Small hub increases are explained in the pilot document; file count was not
   used as a standalone acceptance target.
-- Existing semantic-tooling baseline is immutable at P1; isolated retry has
-  exposed pre-existing fact-transport/legacy-fixture failures. Complete/classify
-  its report and close those gates during Semantics/final acceptance.
+- Immutable P1 semantic-tooling baseline completed: 194 modules, 124 pass,
+  65 fail, 5 GUI-related timeouts; 764 reported tests, 2 skips. These pre-existing
+  failures remain unaccepted final gates. `P0_TOOLING_BASELINE.json` records
+  bounded IDs/messages; P5/final must classify and resolve them.
 
 Next required work:
 
