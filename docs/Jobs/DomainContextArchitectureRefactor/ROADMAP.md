@@ -1,6 +1,6 @@
 # Roadmap — Domain & Context Architecture Refactor
 
-**Status:** Planning accepted; implementation not started.
+**Status:** In progress; see `PROGRESS.md` for the current responsibility.
 
 ## Parent objective
 

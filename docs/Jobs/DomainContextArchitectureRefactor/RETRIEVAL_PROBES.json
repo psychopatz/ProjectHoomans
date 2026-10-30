@@ -1,0 +1,170 @@
+{
+  "runtime_relative_to": "current numeric ProjectHoomans runtime media/lua",
+  "metric": "Reviewed whole-file working set; exclude engine/Core implementations whose public contracts suffice. Hops are source-reviewed provider/call handoffs, not all transitive imports. Foreign lists are reviewed interactions, including lazy globals. Revisit sets when behavior ownership moves; preserve the same behavior and justify membership changes.",
+  "probes": [
+    {
+      "id": "inventory_transfer",
+      "behavior": "Change existing player-to-NPC transfer authority/revision validation, preserving rollback and gifts.",
+      "entry": "server/PNC/Server/PNC_ServerInventory.lua",
+      "files": [
+        "server/PNC/Server/PNC_ServerInventory.lua",
+        "server/PNC/Server/ServerInventory/PNC_ServerInventory_Context.lua",
+        "server/PNC/Server/ServerInventory/PNC_ServerInventory_Transfer.lua",
+        "server/PNC/Server/ServerInventory/PNC_ServerInventory_Transfer_Handle.lua",
+        "server/PNC/Server/ServerInventory/PNC_ServerInventory_PlayerToNPC.lua"
+      ],
+      "foreign": [
+        "Registry",
+        "Networking",
+        "Conversation",
+        "Medical",
+        "Tasking"
+      ],
+      "hops": 3,
+      "tests": [
+        "tests/pnc_inventory_transactions_smoke.lua",
+        "tests/pnc_inventory_transfer_rollback_smoke.lua",
+        "tests/pnc_semantic_gift_idempotency_smoke.lua"
+      ]
+    },
+    {
+      "id": "task_lease",
+      "behavior": "Change the one-active-lease-per-NPC eligibility rule at lease creation.",
+      "entry": "server/PNC/Tasking/PNC_Tasking.lua",
+      "files": [
+        "server/PNC/Tasking/PNC_Tasking.lua",
+        "server/PNC/Tasking/Tasking/PNC_Tasking_Assignment.lua",
+        "server/PNC/Tasking/PNC_TaskLeaseService.lua",
+        "server/PNC/Tasking/PNC_TaskLeaseService_Creation.lua",
+        "server/PNC/Tasking/PNC_TaskLeaseService_Context.lua"
+      ],
+      "foreign": [
+        "Core",
+        "Facilities",
+        "Work"
+      ],
+      "hops": 3,
+      "tests": [
+        "tests/pnc_task_cancellation_smoke.lua",
+        "tests/pnc_tasking_event_inbox_smoke.lua",
+        "tests/pnc_tasking_sleep_smoke.lua"
+      ]
+    },
+    {
+      "id": "conversation_close",
+      "behavior": "Change close outcome delivery and working-context cleanup while preserving SP/MP scene authority.",
+      "entry": "client/PNC/Conversation/PNC_ConversationLifecycle.lua",
+      "files": [
+        "client/PNC/Conversation/PNC_ConversationLifecycle.lua",
+        "client/PNC/Conversation/PNC_ConversationLifecycle_Create.lua",
+        "client/PNC/Conversation/PNC_ConversationLifecycle_Create_Finish.lua",
+        "client/PNC/Conversation/PNC_ConversationFarewell.lua",
+        "client/PNC/Conversation/PNC_ConversationSafety.lua",
+        "shared/PNC/Conversation/PNC_ConversationScene.lua",
+        "shared/PNC/Conversation/PNC_ConversationScene/PNC_ConversationScene_Lease_End.lua"
+      ],
+      "foreign": [
+        "Semantics",
+        "Networking",
+        "Registry",
+        "CoreConversation"
+      ],
+      "hops": 3,
+      "tests": [
+        "tests/pnc_conversation_lifecycle_refresh_smoke.lua"
+      ]
+    },
+    {
+      "id": "persisted_inventory",
+      "behavior": "Change serialization/restoration of inventory revision in the compact seed/delta field.",
+      "entry": "shared/PNC/Core/Persistence/PNC_Persistence.lua",
+      "files": [
+        "shared/PNC/Core/Persistence/PNC_Persistence.lua",
+        "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize.lua",
+        "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Deserialize.lua",
+        "shared/PNC/Core/Inventory/PNC_Inventory.lua",
+        "shared/PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Persistence.lua",
+        "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreDeltaCodec.lua",
+        "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreBridge.lua"
+      ],
+      "foreign": [
+        "Persistence",
+        "Inventory",
+        "Conversation",
+        "Supply"
+      ],
+      "hops": 3,
+      "tests": [
+        "tests/pnc_seed_delta_smoke.lua",
+        "tests/pnc_inventory_persisted_repair_smoke.lua"
+      ]
+    },
+    {
+      "id": "ui_inventory_rows",
+      "behavior": "Change NPC inventory query-result rows, grouping and virtual identity presentation.",
+      "entry": "client/PNC/UI/Inventory/PNC_InventoryUI_Model.lua",
+      "files": [
+        "client/PNC/UI/Inventory/PNC_InventoryUI_Model.lua",
+        "client/PNC/UI/Inventory/PNC_InventoryUI_Model/_NPCRows.lua",
+        "client/PNC/UI/Inventory/PNC_InventoryUI_Model/_Native.lua",
+        "client/PNC/UI/Inventory/PNC_InventoryUI_Model/_Grouping.lua"
+      ],
+      "foreign": [
+        "Inventory",
+        "Currency",
+        "CoreTooltip"
+      ],
+      "hops": 2,
+      "tests": [
+        "tests/pnc_inventory_ui_smoke.lua",
+        "tests/pnc_inventory_identity_ui_smoke.lua"
+      ]
+    },
+    {
+      "id": "presence_materialization",
+      "behavior": "Change proximity/force-live materialization eligibility without weakening startup, vehicle or body safety.",
+      "entry": "shared/PNC/Core/Presence/PNC_Presence.lua",
+      "files": [
+        "shared/PNC/Core/Presence/PNC_Presence.lua",
+        "shared/PNC/Core/Presence/PNC_Presence/PNC_Presence_Decisions.lua",
+        "shared/PNC/Core/Presence/PNC_Presence/PNC_Presence_Position.lua",
+        "shared/PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Startup/PNC_BodyLifecycle_Startup_Coordinator.lua",
+        "shared/PNC/Core/Travel/PNC_Travel_Model.lua"
+      ],
+      "foreign": [
+        "BodyLifecycle",
+        "Travel",
+        "Registry",
+        "Player"
+      ],
+      "hops": 2,
+      "tests": [
+        "tests/pnc_presence_force_abstract_vehicle_smoke.lua",
+        "tests/pnc_presence_position_recovery_smoke.lua",
+        "tests/pnc_presence_traversal_audit_smoke.lua",
+        "tests/pnc_travel_live_handoff_smoke.lua"
+      ]
+    },
+    {
+      "id": "network_inventory",
+      "behavior": "Change inventory transfer command route/payload handoff while retaining domain mutation authority.",
+      "entry": "server/PNC/Networking/PNC_ServerCommandRouter.lua",
+      "files": [
+        "server/PNC/Networking/PNC_ServerCommandRouter.lua",
+        "server/PNC/Networking/Handlers/PNC_ServerInventoryCommandHandler.lua",
+        "client/PNC/Networking/ClientActions/PNC_ClientActions_Inventory.lua",
+        "server/PNC/Server/PNC_ServerInventory.lua",
+        "shared/PNC/Core/Base/PNC_Constants.lua"
+      ],
+      "foreign": [
+        "Inventory",
+        "PlayerContext"
+      ],
+      "hops": 2,
+      "tests": [
+        "tests/pnc_server_command_router_smoke.lua",
+        "tests/pnc_inventory_transactions_smoke.lua"
+      ]
+    }
+  ]
+}

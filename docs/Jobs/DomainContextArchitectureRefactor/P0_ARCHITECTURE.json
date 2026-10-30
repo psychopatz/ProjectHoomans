@@ -1,0 +1,2024 @@
+{
+  "revision": "15cadee70be11b790ce4c48bfb7bd51badd8233b",
+  "scope": "Contents/mods/ProjectHoomans/42.20/media/lua/",
+  "limitations": [
+    "Literal import graph excludes lazy global-table calls and callback wiring.",
+    "Folder-level SCCs may join unrelated files; inspect file edges before classifying architectural cycles.",
+    "A leaf target has no resolved maintained-runtime imports; this is not a judgment about semantic value.",
+    "Cache freshness checks indexed files, not unindexed additions; rerun scan before every report."
+  ],
+  "analyzer_summary": {
+    "health": 75.8,
+    "coverage": 76.5,
+    "confidence": 62.2,
+    "pressure": 100,
+    "files": 5113,
+    "production_files": 3387,
+    "test_files": 1265,
+    "tooling_files": 287,
+    "generated_files": 174,
+    "loc": 437546,
+    "subsystems": 96,
+    "findings": 285,
+    "test_findings": 11,
+    "scoring_scope": "production"
+  },
+  "roles": {
+    "production": 3387,
+    "generated": 174,
+    "test": 1265,
+    "tooling": 287
+  },
+  "common_lua_roles": {
+    "production": 110,
+    "generated": 172
+  },
+  "runtime_layers": {
+    "client": 985,
+    "server": 1008,
+    "shared": 1265
+  },
+  "maintained_runtime_files": 3258,
+  "literal_runtime_import_edges": 4172,
+  "cycle_manifestations": {
+    "(composition) -> Composition -> (composition)": 2,
+    "Colony -> Persistence -> Conversation -> UI -> Colony": 4,
+    "Colony -> Production -> Persistence -> Conversation -> UI -> Colony": 5,
+    "Colony -> Production -> Settlement -> Persistence -> Conversation -> UI -> Colony": 6,
+    "Communities -> Persistence -> Conversation -> Relationships -> Semantics -> Communities": 5,
+    "Conversation -> Persistence -> Conversation": 2,
+    "Conversation -> UI -> Conversation": 2,
+    "Conversation -> UI -> Knowledge -> Persistence -> Conversation": 4,
+    "Conversation -> UI -> Scavenge -> Persistence -> Conversation": 4,
+    "Conversation -> UI -> WorldDiscovery -> Persistence -> Conversation": 4,
+    "Networking -> PresenceSync -> Networking": 2,
+    "Relationships -> Semantics -> Relationships": 2,
+    "Relationships -> Semantics -> Traits -> Relationships": 3
+  },
+  "folder_domain_sccs": [
+    [
+      "(composition)",
+      "Composition"
+    ],
+    [
+      "Colony",
+      "Communities",
+      "Conversation",
+      "Knowledge",
+      "Perception",
+      "Persistence",
+      "Production",
+      "Relationships",
+      "Scavenge",
+      "Semantics",
+      "Settlement",
+      "Social",
+      "Traits",
+      "UI",
+      "WorldDiscovery"
+    ],
+    [
+      "Networking",
+      "PresenceSync"
+    ]
+  ],
+  "file_import_sccs": [
+    [
+      "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug.lua",
+      "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow.lua",
+      "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow_Actions.lua"
+    ]
+  ],
+  "composition": [
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ClientComposition.lua",
+      "literal_requires": 118,
+      "resolved_runtime_targets": 116,
+      "analyzer_domain_count": 18,
+      "analyzer_domains": [
+        "(composition)",
+        "Actions",
+        "Audio",
+        "Commands",
+        "Compatibility",
+        "Conversation",
+        "FirearmEffects",
+        "HumanNPCSafeguards",
+        "Integrations",
+        "Knowledge",
+        "Networking",
+        "Patches",
+        "Perception",
+        "PresenceSync",
+        "PuppetOpera",
+        "Scavenge",
+        "Travel",
+        "UI"
+      ],
+      "leaf_targets_without_runtime_imports": 44,
+      "targets": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Actions/PNC_BandageAction.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Audio/PNC_NPCCombatAudio.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Audio/PNC_NPCVoice.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Audio/PNC_NPCVoiceCatalog.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Audio/PNC_NPCVoiceTriggers.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Audio/PNC_PlayerSpeech.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Audio/PNC_PlayerVoice.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Commands/PNC_ClientCompanionAuthority.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Commands/PNC_CompanionCommandEmotes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Commands/PNC_CompanionCommandPresentation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Commands/PNC_CompanionTargetResolver.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Compatibility/Mods/Necroa/PNC_Necroa_ZombieCaptionAdapter.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_EventClient.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Debug/PNC_ConversationDebugWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PNC_PsychopatzCoreDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PNC_PsychopatzCoreRadio.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PNC_PsychopatzCoreRadioOS.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_KnowledgeInterest.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ColonyManagementClient.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_Client.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_ClientFirearmEffects.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_ClientHumanNPCSafeguards.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_ClientPresenceSync.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Patches/PNC_FishingPatch.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Patches/PNC_HumanNPCSleepPatch.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Patches/PNC_InventoryBackpackPatch.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Patches/PNC_InventoryDragPatch.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Patches/PNC_SocialTraitCharacterCreationPatch.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Patches/PNC_VehicleSeatPatch.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Patches/PNC_WashMedicalMaterialPatch.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PuppetOpera/PNC_PuppetOpera_Client.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Scavenge/PNC_ScavengeController.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Travel/PNC_TravelDirectory.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Dossier.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Health.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Info.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Interactions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Protection.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Shared.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Skills.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Temperature.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Colonist/PNC_Colonist.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CommandHub/PNC_CommandHub.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Communities/PNC_ColonyJournalButton.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Communities/PNC_ColonyJournalWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Communities/PNC_ColonyNamePrompt.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Communities/PNC_CommunityDebugWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_BandageMenu.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_ColonyManagementContext.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_ContextHub.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_DebugSpawnMenu.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_NPCSelection.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_SinkCompanionContext.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_StockpileAccessContext.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/Providers/PNC_ContextProvider_Bandage.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/Providers/PNC_ContextProvider_Commands.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/Providers/PNC_ContextProvider_Debug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/Providers/PNC_ContextProvider_Inventory.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/Providers/PNC_ContextProvider_Knowledge.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/Providers/PNC_ContextProvider_Revive.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/Providers/PNC_ContextProvider_Scavenge.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Director/PNC_DirectorDebugWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Discovery/PNC_WorldDiscoveryRadioWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/FactionDebugWindow/PNC_FactionDebugWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionEmblemEditor.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionEmblemRenderer.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionMemberModal.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionMemberWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionPresentation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Inventory/PNC_InventoryWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Knowledge/PNC_KnowledgeDebugWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Knowledge/PNC_KnowledgePresentation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Knowledge/PNC_NPCDossierWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Commands/PNC_MapCommand_Lumber.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Commands/PNC_MapCommand_Travel.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_AbstractGroups.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_PlayerSettlement.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_WorldDiscovery.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapCommandRegistry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapDisplaySettings.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapHoomansMenu.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapHoverPortrait.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapHoverPortraitCard.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapLayerRegistry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapMarkerIconRegistry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapTracking.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapTrackingUI.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_WorldDiscoveryDebugMap.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Mobile/PNC_MobileGroupDebugModel.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AudioDebugWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_NPCMonitor.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_NPCTraitDebugWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_Nameplates.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_Settings.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_SkillsWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Provision/PNC_ProvisionSettingsWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PuppetOpera/PNC_PuppetOperaDebugWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Relationships/PNC_RelationshipDebugWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Relationships/PNC_RelationshipGraphPanel.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Research/PNC_ResearchWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Scavenge/PNC_ScavengeNotifications.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Scavenge/PNC_ScavengeWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/SettlementManagement/PNC_SettlementManagement_FishingZoneOverlay.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Storage/PNC_Storage.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/UniqueNPC/PNC_UniqueNPCDebugWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Workshop/PNC_Workshop.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/WorldEffects/PNC_WorldEffectDebugWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/WorldKnowledge/PNC_WorldKnowledgeDebugWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/00_PNC_Init.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ConversationRuntimeComposition.lua",
+      "literal_requires": 17,
+      "resolved_runtime_targets": 17,
+      "analyzer_domain_count": 5,
+      "analyzer_domains": [
+        "Conversation",
+        "Integrations",
+        "Knowledge",
+        "Semantics",
+        "UI"
+      ],
+      "leaf_targets_without_runtime_imports": 4,
+      "targets": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Composition/PNC_ConversationClientComposition.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkParity.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PBrainZ/PNC_PBrainZ.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PBrainZ/PNC_PBrainZ_Bridge.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PBrainZ/PNC_PBrainZ_InlineChat.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PNC_VoiceGateway.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCombatResponseSurface.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticGiftContext.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticGiftLifecycle.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_ContextHub.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/Providers/PNC_ContextProvider_Conversation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Conversation/PNC_CombatResponseStrip.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionPresentation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_NPCTypePalette.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Relationships/PNC_RelationshipGraphPanel.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Composition/PNC_ConversationClientComposition.lua",
+      "literal_requires": 1,
+      "resolved_runtime_targets": 1,
+      "analyzer_domain_count": 1,
+      "analyzer_domains": [
+        "Conversation"
+      ],
+      "leaf_targets_without_runtime_imports": 0,
+      "targets": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_Conversation.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Composition/PNC_ServerComposition.lua",
+      "literal_requires": 125,
+      "resolved_runtime_targets": 125,
+      "analyzer_domain_count": 32,
+      "analyzer_domains": [
+        "(composition)",
+        "Colonists",
+        "Colony",
+        "Communities",
+        "Companions",
+        "Compatibility",
+        "Conversation",
+        "Director",
+        "Factions",
+        "Farming",
+        "Fishing",
+        "Journals",
+        "Knowledge",
+        "Lumber",
+        "Medical",
+        "Needs",
+        "Networking",
+        "Persistence",
+        "Player",
+        "Production",
+        "Provision",
+        "Quests",
+        "Scavenge",
+        "Semantics",
+        "Server",
+        "Settlement",
+        "Social",
+        "Stealth",
+        "Supply",
+        "Tasking",
+        "World",
+        "WorldKnowledge"
+      ],
+      "leaf_targets_without_runtime_imports": 29,
+      "targets": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colonists/PNC_ColonistDepartureService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/PNC_ColonyManagement.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Research/PNC_ColonyResearchService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/PNC_ColonyStorageRepository.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityDirector.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityExcursionService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunitySiteResolver.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityValidation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Companions/PNC_DebugCompanionRecruit.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Companions/PNC_StartingCompanionService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Compatibility/Mods/Necroa/PNC_Necroa_ExposureServer.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_EventObservers.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_RelationPersistence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/PNC_ConversationServer.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/PNC_InteractionLifecyclePersistence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/PNC_CommercialMobilityService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/PNC_Director.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/PNC_MobileGroupDirector.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/PNC_MobileSettlementVisitService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionBehavior.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionCore.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionIncidentService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionTollService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionValidation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Farming/PNC_FarmingService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Farming/PNC_PZFarmingAdapter.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Fishing/PNC_FishingExecutor.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Fishing/PNC_FishingService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Journals/PNC_JournalRoutes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/PNC_KnowledgeSocialEventAdapter.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/PNC_NPCKnowledgeService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/PNC_PlayerKnowledgeCommands.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Lumber/PNC_LumberExecutor.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Lumber/PNC_LumberService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Lumber/PNC_LumberWorkAdapter.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Medical/PNC_MedicalCareExecutor.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Medical/PNC_MedicalCareRepository.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Medical/PNC_MedicalCareService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_GroupNeeds.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_IndividualNeeds.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_NeedHealthConsequences.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_NeedSupplyBridge.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_NeedsDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_NeedsEvaluator.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_NeedsRepository.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_NeedsScheduler.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/PNC_ServerCommandRouting.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Player/PNC_PlayerCharacterDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Player/PNC_PlayerCharacterLifecycle.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Player/PNC_PlayerCharacterService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_Production.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Provision/PNC_Provision.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Quests/PNC_QuestRepository.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Quests/PNC_QuestService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/PNC_ScavengeExecutor.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/PNC_ScavengePolicy.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/PNC_ScavengeService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanCampProvider.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanItemProvider.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanPathProvider.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanWaitProvider.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/Inventory/PNC_SemanticInventoryQueryService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/Inventory/PNC_SemanticItemSelector.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticActionPlanService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticActionPlanTaskHandler.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticCampSiteResolver.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticCampTaskHandler.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticCognitionEvidence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticCognitionService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticCombatReactionService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticCombatTargetCallouts.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticCommunityRoleWhereabouts.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticEngineEvents_Server.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticGiveItemTaskHandler.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticInteractionSceneAdopters.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticTaskRequestService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticWaterTargetResolver.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticWorldTargetResolver.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/SemanticConsumptionTaskHandler/PNC_SemanticConsumptionTaskHandler.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Server/PNC_PersistenceCoordinator.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Server/PNC_Server.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Server/PNC_ServerInventory.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/FacilityJobs/PNC_FacilityJobs_Service.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/FacilityJobs/PNC_LivingRoomService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/FacilityJobs/PNC_RoamAmbientService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/FacilityJobs/PNC_RoamingSeatService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/PNC_Settlement.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_ConductDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_ConductService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_FollowerAbandonmentService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_RelationshipDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_RelationshipService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_SocialEncounterTracker.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_SocialEventDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_SocialEventHooks.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_SocialEventService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_SocialGreetingService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_SocialMeetingService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_SocialProfileDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_SocialProfileService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Stealth/PNC_ServerStealthDiscovery.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/PNC_Supply.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Tasking/PNC_CorpseHaulService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Tasking/PNC_TaskRequestService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Tasking/PNC_Tasking.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Tasking/PNC_WorkTaskProvider.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_AmbientVisitService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_CampMovementCoordinator.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_CampResourceService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_CampZoneService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_NearbyResourceLocator.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_NearbyWaterService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_WaterContainerService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/WorldKnowledge/PNC_WorldKnowledge_Debug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/WorldKnowledge/PNC_WorldKnowledge_Server.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/00_PNC_Init.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Needs/PNC_WorkFatigueGate.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Quests/PNC_QuestDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition.lua",
+      "literal_requires": 5,
+      "resolved_runtime_targets": 5,
+      "analyzer_domain_count": 1,
+      "analyzer_domains": [
+        "Composition"
+      ],
+      "leaf_targets_without_runtime_imports": 0,
+      "targets": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_Final.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+      "literal_requires": 42,
+      "resolved_runtime_targets": 42,
+      "analyzer_domain_count": 19,
+      "analyzer_domains": [
+        "Activities",
+        "Behaviors",
+        "Combat",
+        "Discovery",
+        "Facilities",
+        "Fishing",
+        "Jobs",
+        "Lumber",
+        "MapCommands",
+        "Networking",
+        "Orders",
+        "Presence",
+        "Production",
+        "Scavenge",
+        "Scheduling",
+        "Spatial",
+        "Travel",
+        "Vehicles",
+        "Zombies"
+      ],
+      "leaf_targets_without_runtime_imports": 27,
+      "targets": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Activities/PNC_ActivityStatus.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Behaviors/PNC_BehaviorSystem.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/AttackExecution/PNC_AttackExecution.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/CombatResolution/PNC_CombatResolution.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/CombatTactics/PNC_Combat_Tactics.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Audio.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Defense.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_FirearmEffects.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Firearms.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Melee.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Ranged.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Stance.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Unarmed.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_ZombieReaction.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Discovery/PNC_RadioDiscoveryChannel.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Discovery/PNC_WorldDiscoveryTypes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Fishing/PNC_FishingAnimationScenes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Jobs/PNC_JobRequirements.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Jobs/PNC_JobSystem.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Jobs/PNC_WorkItemService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Lumber/PNC_LumberAnimationScenes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/MapCommands/PNC_MapCommandService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/MapCommands/PNC_MapCommand_Fishing.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/MapCommands/PNC_MapCommand_Lumber.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/MapCommands/PNC_MapCommand_Travel.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Networking/PNC_Network.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Orders/PNC_OrderSystem.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Presence/PNC_PresenceRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/PNC_WorkAnimationScenes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/PNC_WorkBehavior.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/PNC_WorkSequence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Scavenge/PNC_ScavengeAnimationScenes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Scheduling/PNC_Scheduler.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Scheduling/PNC_SimulationClock.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Scheduling/PNC_SimulationLOD.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Spatial/PNC_ActorFacing.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Spatial/PNC_TacticalSpatialProjection.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Travel/PNC_Travel.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Vehicles/PNC_CompanionVehicle.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Zombies/PNC_ZombieAggro.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_Final.lua",
+      "literal_requires": 16,
+      "resolved_runtime_targets": 16,
+      "analyzer_domain_count": 7,
+      "analyzer_domains": [
+        "API",
+        "Commands",
+        "Generated",
+        "Health",
+        "Integrations",
+        "PuppetOpera",
+        "Semantics"
+      ],
+      "leaf_targets_without_runtime_imports": 8,
+      "targets": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/API/PNC_API.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Commands/PNC_CompanionCommandDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Commands/PNC_CompanionCommandRegistry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Commands/PNC_CompanionCommandRelayGate.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Commands/PNC_VanillaEmoteInteractions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/PNC_PlayerDamage.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/PNC_Revive.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/PNC_Treatment.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/PuppetOpera/PNC_PuppetOpera.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/PuppetOpera/PNC_PuppetOpera_Anchors.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/PuppetOpera/PNC_PuppetOpera_Blueprints.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/PuppetOpera/PNC_PuppetOpera_Trace.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Generated/UniqueNPC/PNC_UniqueNPCDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Integrations/PNC_PsychopatzProfiler.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityNetwork.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+      "literal_requires": 76,
+      "resolved_runtime_targets": 76,
+      "analyzer_domain_count": 19,
+      "analyzer_domains": [
+        "ActorControl",
+        "Base",
+        "Compatibility",
+        "Diagnostics",
+        "Events",
+        "Facilities",
+        "Farming",
+        "Identity",
+        "Needs",
+        "Networking",
+        "Perception",
+        "Production",
+        "Semantics",
+        "Settlement",
+        "Tasking",
+        "Traits",
+        "Translation",
+        "World",
+        "WorldKnowledge"
+      ],
+      "leaf_targets_without_runtime_imports": 47,
+      "targets": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/ActorControl/PNC_ActorControl.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Base/PNC_Constants.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Base/PNC_Core.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Base/PNC_Sandbox.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_Adapter.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/Mods/CompanionDogs/PNC_CompanionDogs_Adapter.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/Mods/Necroa/PNC_Necroa_Adapter.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/Mods/ProjectALife/PNC_ProjectALife_Adapter.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/PNC_ActorOwnership.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/PNC_Compatibility_API.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/PNC_Compatibility_ActorRef.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/PNC_Compatibility_DamageContext.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/PNC_Compatibility_Targeting.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Diagnostics/PNC_PerformanceScalingDiagnostics.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Events/PNC_EventDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Facilities/PNC_FacilityJobs_Definitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Farming/PNC_Farming.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Farming/PNC_FarmingResearch.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Farming/PNC_PlantingCatalog.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_PlayerCharacterConstants.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Needs/PNC_ConditionStats.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Needs/PNC_MoraleModifierDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Needs/PNC_NeedsDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Needs/PNC_NeedsStateCodec.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Needs/PNC_NeedsUtils.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Needs/PNC_PlayerNeedsModel.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Networking/PNC_ColonyJournalProtocol.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Perception/PNC_HumanNPCThreatSafeguards.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/PNC_BuildRecipeCatalog.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/PNC_RecipeCatalog.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/PNC_RecipeKnowledge.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/PNC_RecipeKnowledgeRegistry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_FacilityComponentPolicy.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_FacilityDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_SettlementDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Tasking/PNC_TaskRequestDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Traits/PNC_NPCTraitContext.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Traits/PNC_NPCTraitDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Traits/PNC_NPCTraitEffects.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Traits/PNC_NPCTraitRegistry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/World/PNC_WorldCensus.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticActionPlan.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCapabilityCatalog.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCatalog.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCognitionProjection.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatEncounterIntent.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCompanionSpeech.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticConsumptionCatalog.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticContextConstraints.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticContextResolver.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticConversationCategoryOwnership.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDiagnostics.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueContextState.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueFacts.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialoguePolicy.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueSituation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticEngineEvents.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticEngineFacts.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionLifecycle.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInventoryQuery.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticLLMResult.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticMarketSenseAdapter.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticSocialReaction.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticTaskRequest.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticTopicCatalog.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticWorldTargetCatalog.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Translation/PNC_TranslationBootstrap.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/WorldKnowledge/PNC_WorldKnowledge.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/WorldKnowledge/PNC_WorldKnowledge_PZ.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+      "literal_requires": 67,
+      "resolved_runtime_targets": 66,
+      "analyzer_domain_count": 14,
+      "analyzer_domains": [
+        "Archetypes",
+        "Base",
+        "Communities",
+        "Conduct",
+        "Director",
+        "Factions",
+        "Gifts",
+        "Identity",
+        "Knowledge",
+        "Map",
+        "Provision",
+        "Relationships",
+        "Semantics",
+        "Traits"
+      ],
+      "leaf_targets_without_runtime_imports": 54,
+      "targets": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Archetypes/Registry/PNC_ArchetypeLoader.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Archetypes/Registry/PNC_Archetypes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Base/PNC_Types.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Communities/PNC_CommunityConstants.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Communities/PNC_CommunityMath.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Communities/PNC_CommunityProfiles.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Communities/PNC_CommunityTypes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Conduct/PNC_ConductConstants.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Conduct/PNC_ConductDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Conduct/PNC_ConductMath.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Conduct/PNC_ConductTypes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Director/PNC_AbstractWorldTypes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Director/PNC_DirectorConfig.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionArchetypes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionBalance.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionConstants.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionDiplomacyMath.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionEmblems.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionIncidentDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionIntent.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionNameGenerator.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionTypes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_Identity.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_IdentityAlias.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_Identity_Appearance.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_Identity_Factory.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_Identity_ID.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_Identity_Names.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_Identity_Portrait.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_Identity_Profile.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_Identity_Verifier.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_PlayerCharacterTypes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_UniqueNPCs.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Knowledge/PNC_KnowledgeRegistry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Map/PNC_MapPresentation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Provision/PNC_ProvisionPolicy.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Provision/PNC_ProvisionRuleRegistry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Provision/Rules/PNC_BandageProvisionRule.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Provision/Rules/PNC_FoodProvisionRule.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Provision/Rules/PNC_HydrationProvisionRule.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_ColonistDeparturePolicy.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_EntityRef.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RecruitmentPersonalityPolicy.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipConstants.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipGraph.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipKindRegistry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipMath.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipPresentation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipProposalPolicy.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipStates.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipTypes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_Relationships.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialEventDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialProfileConstants.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialProfileGenerator.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialProfileMath.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialProfileTypes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialTraits.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Traits/PNC_StartingCompanionTraits.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Gifts/PNC_GiftContract.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Gifts/PNC_GiftEvaluator.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Gifts/PNC_GiftMarketSenseAdapter.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Gifts/PNC_GiftPreferenceProfile.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Gifts/PNC_GiftRuntimeEvaluator.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Gifts/PNC_GiftSemanticOffer.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticAddressResolver.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+      "literal_requires": 44,
+      "resolved_runtime_targets": 44,
+      "analyzer_domain_count": 19,
+      "analyzer_domains": [
+        "Compatibility",
+        "Conversation",
+        "Debug",
+        "Equipment",
+        "Fishing",
+        "Health",
+        "Inventory",
+        "Knowledge",
+        "Pathing",
+        "Perception",
+        "Persistence",
+        "Presence",
+        "Registry",
+        "Skills",
+        "Social",
+        "Spatial",
+        "Stamina",
+        "Stealth",
+        "Visuals"
+      ],
+      "leaf_targets_without_runtime_imports": 20,
+      "targets": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/PNC_ConversationGifts.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/PNC_Compatibility_IncomingDamage.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Debug/PNC_AnimationSceneDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Equipment/PNC_Equipment.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Equipment/PNC_Equipment_Items.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Equipment/PNC_Equipment_Slots.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Fishing/PNC_Fishing.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/PNC_Health.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Health/PNC_NPCWounds.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Inventory/InventoryActions/PNC_InventoryActions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Inventory/PNC_Inventory.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Knowledge/PNC_KnowledgeBuiltins.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_EnginePathPlanner.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_EnginePathPlanner_Context.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_FakeLocomotion.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_LiveBodyControl.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_LocomotionProfiles.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_MotionHints.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_NavigationRouter.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_PathService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_TraversalProfiles.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_TraversalQuery.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_VehicleAvoidance.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Perception/PNC_Perception.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Perception/PNC_Perception_Frame.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Perception/PNC_ZombieObservation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Presence/PNC_BodyLifecycle.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Registry/PNC_DeathMarkers.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Registry/PNC_Registry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Skills/PNC_SkillCatalog.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Skills/PNC_Skills.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Social/PNC_SemanticSocialContext.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Spatial/PNC_SpatialIndex.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Stamina/PNC_Stamina.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Stealth/PNC_Stealth.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_ActionProps.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_Animation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_AnimationSceneDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_AnimationScenes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_AnimationTrace.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_PresentationAnimations.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_VisualProfiles.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_Visuals.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Composition/PNC_ConversationSharedComposition.lua",
+      "literal_requires": 7,
+      "resolved_runtime_targets": 6,
+      "analyzer_domain_count": 1,
+      "analyzer_domains": [
+        "Conversation"
+      ],
+      "leaf_targets_without_runtime_imports": 0,
+      "targets": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Blocks/PNC_ConversationRegistry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Blocks/PNC_ConversationRules.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Blocks/PNC_ConversationSelector.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/PNC_ConversationLLMTools.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/PNC_ConversationScene.lua"
+      ]
+    }
+  ],
+  "domain_edges": {
+    "(composition)": [
+      "Compatibility",
+      "Composition",
+      "Conversation",
+      "Networking"
+    ],
+    "ActionProps": [
+      "Equipment"
+    ],
+    "Behaviors": [
+      "Combat"
+    ],
+    "Colony": [
+      "Diagnostics",
+      "Events",
+      "Inventory",
+      "Jobs",
+      "Persistence",
+      "Production"
+    ],
+    "Commands": [
+      "Audio",
+      "Conversation",
+      "Knowledge",
+      "Semantics"
+    ],
+    "Communities": [
+      "Persistence"
+    ],
+    "Compatibility": [
+      "Persistence"
+    ],
+    "Composition": [
+      "(composition)",
+      "API",
+      "Actions",
+      "Activities",
+      "ActorControl",
+      "Archetypes",
+      "Audio",
+      "Base",
+      "Behaviors",
+      "Colonists",
+      "Colony",
+      "Combat",
+      "Commands",
+      "Communities",
+      "Companions",
+      "Compatibility",
+      "Conduct",
+      "Conversation",
+      "Debug",
+      "Diagnostics",
+      "Director",
+      "Discovery",
+      "Equipment",
+      "Events",
+      "Facilities",
+      "Factions",
+      "Farming",
+      "FirearmEffects",
+      "Fishing",
+      "Generated",
+      "Gifts",
+      "Health",
+      "HumanNPCSafeguards",
+      "Identity",
+      "Integrations",
+      "Inventory",
+      "Jobs",
+      "Journals",
+      "Knowledge",
+      "Lumber",
+      "Map",
+      "MapCommands",
+      "Medical",
+      "Needs",
+      "Networking",
+      "Orders",
+      "Patches",
+      "Pathing",
+      "Perception",
+      "Persistence",
+      "Player",
+      "Presence",
+      "PresenceSync",
+      "Production",
+      "Provision",
+      "PuppetOpera",
+      "Quests",
+      "Registry",
+      "Relationships",
+      "Scavenge",
+      "Scheduling",
+      "Semantics",
+      "Server",
+      "Settlement",
+      "Skills",
+      "Social",
+      "Spatial",
+      "Stamina",
+      "Stealth",
+      "Supply",
+      "Tasking",
+      "Traits",
+      "Translation",
+      "Travel",
+      "UI",
+      "Vehicles",
+      "Visuals",
+      "World",
+      "WorldKnowledge",
+      "Zombies"
+    ],
+    "Conversation": [
+      "Audio",
+      "Persistence",
+      "Relationships",
+      "Semantics",
+      "Social",
+      "UI"
+    ],
+    "Debug": [
+      "ActionProps",
+      "Equipment"
+    ],
+    "Director": [
+      "Persistence",
+      "WorldDiscovery"
+    ],
+    "Facilities": [
+      "ActorControl",
+      "Semantics"
+    ],
+    "Factions": [
+      "Persistence"
+    ],
+    "Farming": [
+      "Needs",
+      "Production",
+      "Settlement"
+    ],
+    "FirearmEffects": [
+      "FirearmEffectsAudioVisual",
+      "FirearmEffectsLifecycle",
+      "FirearmEffectsPlay",
+      "FirearmEffectsProjectileQueue",
+      "FirearmEffectsResolution",
+      "FirearmEffectsScreenGeometry",
+      "FirearmEffectsSimulation",
+      "FirearmEffectsUIDraw",
+      "NativeFirearmEffects"
+    ],
+    "Fishing": [
+      "Persistence",
+      "Production"
+    ],
+    "Generated": [
+      "API"
+    ],
+    "Health": [
+      "Events"
+    ],
+    "HumanNPCSafeguards": [
+      "Perception"
+    ],
+    "Integrations": [
+      "Audio",
+      "Commands",
+      "Conversation",
+      "Persistence",
+      "Semantics",
+      "UI"
+    ],
+    "Inventory": [
+      "Events"
+    ],
+    "Journals": [
+      "Colony",
+      "Events",
+      "Networking"
+    ],
+    "Knowledge": [
+      "Persistence",
+      "Semantics"
+    ],
+    "Lumber": [
+      "Jobs",
+      "Needs",
+      "Persistence",
+      "Production"
+    ],
+    "Medical": [
+      "Persistence",
+      "Production"
+    ],
+    "Needs": [
+      "Events",
+      "Persistence"
+    ],
+    "Networking": [
+      "Companions",
+      "Conversation",
+      "Diagnostics",
+      "Events",
+      "Knowledge",
+      "PresenceSync",
+      "Production",
+      "PuppetOpera",
+      "Scavenge",
+      "Semantics",
+      "UI"
+    ],
+    "Patches": [
+      "HumanNPCSafeguards"
+    ],
+    "Pathing": [
+      "Combat"
+    ],
+    "Perception": [
+      "Semantics"
+    ],
+    "Persistence": [
+      "Conversation"
+    ],
+    "Player": [
+      "Persistence"
+    ],
+    "PresenceSync": [
+      "ActionProps",
+      "Networking",
+      "Pathing"
+    ],
+    "Production": [
+      "Diagnostics",
+      "Jobs",
+      "Persistence",
+      "Settlement"
+    ],
+    "Provision": [
+      "Events"
+    ],
+    "PuppetOpera": [
+      "ActorControl",
+      "Debug"
+    ],
+    "Quests": [
+      "Persistence"
+    ],
+    "Registry": [
+      "Persistence"
+    ],
+    "Relationships": [
+      "Semantics"
+    ],
+    "Scavenge": [
+      "Behaviors",
+      "Persistence"
+    ],
+    "Semantics": [
+      "Communities",
+      "Gifts",
+      "Identity",
+      "Relationships",
+      "Spatial",
+      "Traits"
+    ],
+    "Server": [
+      "Events"
+    ],
+    "Settlement": [
+      "ActorControl",
+      "Persistence"
+    ],
+    "Skills": [
+      "Events"
+    ],
+    "Social": [
+      "Semantics",
+      "Spatial"
+    ],
+    "Supply": [
+      "Colony",
+      "Communities",
+      "Events",
+      "Inventory"
+    ],
+    "Tasking": [
+      "Needs",
+      "Production",
+      "Settlement"
+    ],
+    "Traits": [
+      "Relationships"
+    ],
+    "Travel": [
+      "Knowledge"
+    ],
+    "UI": [
+      "Archetypes",
+      "Audio",
+      "Colony",
+      "Conversation",
+      "Debug",
+      "Definitions",
+      "Diagnostics",
+      "Events",
+      "Identity",
+      "Inventory",
+      "Jobs",
+      "Knowledge",
+      "Perception",
+      "Production",
+      "PuppetOpera",
+      "Scavenge",
+      "Semantics",
+      "Settlement",
+      "Skills",
+      "Traits",
+      "WorldDiscovery"
+    ],
+    "World": [
+      "Events",
+      "Semantics"
+    ],
+    "WorldDiscovery": [
+      "Persistence",
+      "Semantics"
+    ]
+  },
+  "cycle_edge_evidence": [
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/00_PNC_Client_Init.lua",
+      "line": 2,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ClientComposition.lua",
+      "from": "(composition)",
+      "to": "Composition"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/00_PNC_Conversation_Init.lua",
+      "line": 2,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ConversationRuntimeComposition.lua",
+      "from": "(composition)",
+      "to": "Composition"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ClientComposition.lua",
+      "line": 2,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/00_PNC_Init.lua",
+      "from": "Composition",
+      "to": "(composition)"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ClientComposition.lua",
+      "line": 75,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_Client.lua",
+      "from": "Composition",
+      "to": "(composition)"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Context.lua",
+      "line": 11,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Definition/PNC_ConversationDefinition_Context.lua",
+      "line": 11,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationDefinition.lua",
+      "line": 5,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationFarewellContext.lua",
+      "line": 9,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkParity.lua",
+      "line": 18,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticSpeechDelivery.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkParity_Lifecycle.lua",
+      "line": 272,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkStart.lua",
+      "line": 19,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_NPCTypePalette.lua",
+      "from": "Conversation",
+      "to": "UI"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_SemanticSpeechPresentation.lua",
+      "line": 11,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_SemanticSpeechPresentation_Core.lua",
+      "line": 13,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Social/PNC_SemanticSocialContext.lua",
+      "from": "Conversation",
+      "to": "Social"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_SemanticSpeechPresentation_Core.lua",
+      "line": 12,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientRosterCommands_Deltas.lua",
+      "line": 1,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime.lua",
+      "from": "Networking",
+      "to": "PresenceSync"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientRosterCommands_Snapshots.lua",
+      "line": 1,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime.lua",
+      "from": "Networking",
+      "to": "PresenceSync"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception_Internal.lua",
+      "line": 13,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCampSite.lua",
+      "from": "Perception",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception_Internal.lua",
+      "line": 15,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua",
+      "from": "Perception",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception_Internal.lua",
+      "line": 11,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticWorldTargetCatalog.lua",
+      "from": "Perception",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception_Internal.lua",
+      "line": 18,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticWorldTargetObservationCache.lua",
+      "from": "Perception",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/PNC_MultiplayerBodyBinding_Client.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Networking/PNC_MultiplayerBodyBinding.lua",
+      "from": "PresenceSync",
+      "to": "Networking"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Base/PNC_BaseBuildingPlacement.lua",
+      "line": 8,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_BuildingFootprint.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Base/PNC_BaseBuildingPlacementPolicy.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_BuildingFootprint.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Base/PNC_BaseBuildingPlacementPolicy.lua",
+      "line": 5,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_BuildingQueueCollision.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Base/PNC_BaseBuildingQueueOverlay.lua",
+      "line": 6,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_BuildingFootprint.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Base/PNC_BaseSummary.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Info.lua",
+      "line": 2,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Interactions.lua",
+      "line": 5,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationDiary.lua",
+      "from": "UI",
+      "to": "Conversation"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CommandHub/PNC_CommandHub_Registry_Gates.lua",
+      "line": 11,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CommandHub/PNC_CommandHub_WorkWindow.lua",
+      "line": 13,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "from": "UI",
+      "to": "Production"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CommandHub/PNC_CommandHub_WorkWindow_Presentation.lua",
+      "line": 7,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "from": "UI",
+      "to": "Production"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Communities/PNC_ColonyJournalWindow.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Colony/Storage/PNC_ColonyStorageJournal.lua",
+      "from": "UI",
+      "to": "Colony"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Communities/PNC_ColonyStorageActivityPresentation.lua",
+      "line": 2,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Colony/Storage/PNC_ColonyStorageJournal.lua",
+      "from": "UI",
+      "to": "Colony"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_ContextHub.lua",
+      "line": 10,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_NPCSelection.lua",
+      "line": 10,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_StockpileAccessContext.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/Providers/PNC_ContextProvider_Conversation.lua",
+      "line": 6,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRuntime.lua",
+      "from": "UI",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/Providers/PNC_ContextProvider_Scavenge.lua",
+      "line": 1,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Scavenge/PNC_ScavengeController.lua",
+      "from": "UI",
+      "to": "Scavenge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Conversation/PNC_CombatResponseStrip.lua",
+      "line": 9,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCombatResponseSurface.lua",
+      "from": "UI",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Discovery/PNC_WorldDiscoveryRadioWindow.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/WorldDiscovery/PNC_WorldDiscoveryPresentation.lua",
+      "from": "UI",
+      "to": "WorldDiscovery"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionMemberWindow.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Inventory/PNC_InventoryWindow.lua",
+      "line": 11,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_WorldDiscovery.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/WorldDiscovery/PNC_WorldDiscoveryPresentation.lua",
+      "from": "UI",
+      "to": "WorldDiscovery"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapCommandRegistry_Core.lua",
+      "line": 11,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapHoverPortrait.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_KnowledgeInterest.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapHoverPortrait.lua",
+      "line": 5,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapHoverPortraitCard.lua",
+      "line": 6,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Nameplates/PNC_NameplateEntries.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Nameplates/PNC_NameplateScopes.lua",
+      "line": 1,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug.lua",
+      "line": 13,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "from": "UI",
+      "to": "Perception"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug_CoreProvider.lua",
+      "line": 14,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "from": "UI",
+      "to": "Perception"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Overlay.lua",
+      "line": 16,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "from": "UI",
+      "to": "Perception"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Window.lua",
+      "line": 17,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "from": "UI",
+      "to": "Perception"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Window_Actions.lua",
+      "line": 17,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "from": "UI",
+      "to": "Perception"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Window_Core.lua",
+      "line": 17,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "from": "UI",
+      "to": "Perception"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Window_Lifecycle.lua",
+      "line": 17,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception.lua",
+      "from": "UI",
+      "to": "Perception"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Research/PNC_ResearchModel_Items.lua",
+      "line": 57,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Scavenge/PNC_ScavengeWindow.lua",
+      "line": 13,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Scavenge/PNC_ScavengeController.lua",
+      "from": "UI",
+      "to": "Scavenge"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/SettlementManagement/PNC_SettlementLayoutOverlay_Core.lua",
+      "line": 2,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_BuildingFootprint.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/SettlementManagement/PNC_SettlementLayoutOverlay_Core.lua",
+      "line": 3,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBrowser.lua",
+      "line": 6,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildCatalog.lua",
+      "line": 8,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/SettlementManagement/PNC_SettlementManagement_Tab.lua",
+      "line": 6,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorWindow.lua",
+      "line": 9,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Traits/PNC_NPCTraitRegistry.lua",
+      "from": "UI",
+      "to": "Traits"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Workshop/PNC_WorkshopCatalog_Rebuild_Helpers.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Workshop/PNC_WorkshopCatalog_Rebuild_Rows.lua",
+      "line": 9,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_FacilityState.lua",
+      "from": "UI",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/00_PNC_Server_Init.lua",
+      "line": 2,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Composition/PNC_ServerComposition.lua",
+      "from": "(composition)",
+      "to": "Composition"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/ColonyManagement/PNC_ColonyManagement_ActionTasking.lua",
+      "line": 10,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "from": "Colony",
+      "to": "Production"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/ColonyManagement/PNC_ColonyManagement_ColonistActions.lua",
+      "line": 13,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "from": "Colony",
+      "to": "Production"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/ColonyManagement/PNC_ColonyManagement_Core.lua",
+      "line": 13,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+      "from": "Colony",
+      "to": "Production"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/PNC_ColonyStorageRepository.lua",
+      "line": 11,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "from": "Colony",
+      "to": "Persistence"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/CommunityService/PNC_CommunityService_Persistence.lua",
+      "line": 22,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "from": "Communities",
+      "to": "Persistence"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Composition/PNC_ServerComposition.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/00_PNC_Init.lua",
+      "from": "Composition",
+      "to": "(composition)"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_BuildContext.lua",
+      "line": 12,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/PNC_InteractionLifecyclePersistence.lua",
+      "line": 17,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "from": "Conversation",
+      "to": "Persistence"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/PNC_InteractionLifecyclePersistence.lua",
+      "line": 15,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionLifecycle.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/NPCKnowledgeService/PNC_NPCKnowledgeService_Persistence.lua",
+      "line": 21,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "from": "Knowledge",
+      "to": "Persistence"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_Identity.lua",
+      "line": 11,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+      "from": "Knowledge",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityAdmission.lua",
+      "line": 10,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+      "from": "Knowledge",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityMutation.lua",
+      "line": 6,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+      "from": "Knowledge",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityPolicy.lua",
+      "line": 5,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+      "from": "Knowledge",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityResult.lua",
+      "line": 5,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDiagnostics.lua",
+      "from": "Knowledge",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/BuildingService/PNC_BuildingService_Context.lua",
+      "line": 14,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_BuildingFootprint.lua",
+      "from": "Production",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/BuildingService/PNC_BuildingService_Context.lua",
+      "line": 15,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Settlement/PNC_BuildingQueueCollision.lua",
+      "from": "Production",
+      "to": "Settlement"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_KnowledgeRepository.lua",
+      "line": 10,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "from": "Production",
+      "to": "Persistence"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_ResearchRepository.lua",
+      "line": 9,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "from": "Production",
+      "to": "Persistence"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_WorkRepository.lua",
+      "line": 9,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "from": "Production",
+      "to": "Persistence"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/PNC_ScavengePolicy.lua",
+      "line": 9,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "from": "Scavenge",
+      "to": "Persistence"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticCommunityRoleWhereabouts.lua",
+      "line": 19,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityPlaceProjection.lua",
+      "from": "Semantics",
+      "to": "Communities"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/PNC_SettlementRepository.lua",
+      "line": 10,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "from": "Settlement",
+      "to": "Persistence"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/ConductService/PNC_ConductService_Queries.lua",
+      "line": 14,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua",
+      "from": "Social",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/RelationshipService/PNC_RelationshipService_Queries.lua",
+      "line": 43,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua",
+      "from": "Social",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "line": 29,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatBanterArbiter.lua",
+      "from": "Social",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "line": 20,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatEncounterIntent.lua",
+      "from": "Social",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "line": 26,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatMoment.lua",
+      "from": "Social",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "line": 23,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatReactionProfile.lua",
+      "from": "Social",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua",
+      "line": 34,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticTacticalSpatialLanguage.lua",
+      "from": "Social",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/WorldDiscovery/PNC_WorldDiscovery_Storage.lua",
+      "line": 9,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "from": "WorldDiscovery",
+      "to": "Persistence"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/WorldDiscovery/WorldDiscoveryRadioBroadcasts/PNC_WorldDiscoveryRadioBroadcasts_Context.lua",
+      "line": 12,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticAddressResolver.lua",
+      "from": "WorldDiscovery",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/00_PNC_Init.lua",
+      "line": 3,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition.lua",
+      "from": "(composition)",
+      "to": "Composition"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Blocks/PNC_ConversationRules.lua",
+      "line": 17,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueRuleProvider.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Blocks/PNC_ConversationRules/PNC_ConversationRules_Conditions.lua",
+      "line": 6,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticEngineFacts.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Catalog.lua",
+      "line": 175,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialEventDefinitions.lua",
+      "from": "Conversation",
+      "to": "Relationships"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Catalog.lua",
+      "line": 187,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Recorder.lua",
+      "line": 26,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua",
+      "line": 64,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticConversationMemoryProvider.lua",
+      "from": "Conversation",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Deserialize.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua",
+      "from": "Persistence",
+      "to": "Conversation"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize.lua",
+      "line": 4,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua",
+      "from": "Persistence",
+      "to": "Conversation"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipPresentation.lua",
+      "line": 207,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua",
+      "from": "Relationships",
+      "to": "Semantics"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Traits/PNC_StartingCompanionTraits.lua",
+      "line": 10,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipKindRegistry.lua",
+      "from": "Traits",
+      "to": "Relationships"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+      "line": 10,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipConstants.lua",
+      "from": "Semantics",
+      "to": "Relationships"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+      "line": 14,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipKindRegistry.lua",
+      "from": "Semantics",
+      "to": "Relationships"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_ActorConversationContext.lua",
+      "line": 12,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipStates.lua",
+      "from": "Semantics",
+      "to": "Relationships"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticCombatReactionProfile.lua",
+      "line": 16,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Traits/PNC_NPCTraitContext.lua",
+      "from": "Semantics",
+      "to": "Traits"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua",
+      "line": 83,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialEventDefinitions.lua",
+      "from": "Semantics",
+      "to": "Relationships"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SpeechStyleContext.lua",
+      "line": 18,
+      "target": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Traits/PNC_NPCTraitRegistry.lua",
+      "from": "Semantics",
+      "to": "Traits"
+    }
+  ]
+}

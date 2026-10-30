@@ -1,0 +1,100 @@
+{
+  "inventory_transfer": {
+    "symbol": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Server.ServerInventory.PNC_ServerInventory_Transfer_Handle.Service.Transfer",
+    "pages": [
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Server.ServerInventory.PNC_ServerInventory_Transfer_Handle.Service.Transfer\ndirection: both\ncallees_total: 16\ncallees: 16  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Colonist.PNC_ColonistRegistry.Registry:\n  Get 1 heuristic 0.85\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Medical.MedicalCareExecutor.PNC_MedicalCareExecutor_SupplyActions.Executor:\n  FulfillBandageSupport 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Server.ServerInventory.PNC_ServerInventory_Transfer_Handle:\n  applyGiftEffect 1 heuristic 0.90\n  auditInventoryRequest 1 heuristic 0.90\n  canGift 1 heuristic 0.90\n  canManage 1 heuristic 0.90\n  checkRevision 1 heuristic 0.90\n  emitCommittedTransfer 1 heuristic 0.17\n  medicalSupplyGiftTask 1 heuristic 0.90\n  notify 1 heuristic 0.90\n  processedGiftCache 1 heuristic 0.90\n  rememberGift 1 heuristic 0.90\n  transferNPCToPlayer 1 heuristic 0.90\n  transferPlayerToNPC 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Networking.PNC_Network_Server.PNC_Network_Server_Character.Network:\n  SendCharacterPayload 1 heuristic 0.85\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.17\ncallers_total: 5\ncallers: 5  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientActions.PNC_ClientActions_Inventory.Client:\n  SendInventoryTransfer 1 heuristic 0.41\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Networking.Handlers:\n  PNC_ServerInventoryCommandHandler 1 heuristic 0.85\nproject-hoomans.tests:\n  pnc_inventory_transactions_smoke 1 heuristic 0.90\n  pnc_inventory_transfer_rollback_smoke 1 heuristic 0.90\n  pnc_semantic_gift_idempotency_smoke 1 heuristic 0.90\n"
+          }
+        ],
+        "isError": false
+      }
+    ]
+  },
+  "task_lease": {
+    "symbol": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Tasking.PNC_TaskLeaseService_Creation.Leases.Create",
+    "pages": [
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Tasking.PNC_TaskLeaseService_Creation.Leases.Create\ndirection: both\ncallees_total: 3\ncallees: 3  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Communities.CommunityService.PNC_CommunityService_Persistence.Communities:\n  GenerateID 1 heuristic 0.55\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Fishing.PNC_FishingService.Internal:\n  Now 1 heuristic 0.09\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Tasking.Tasking.PNC_Tasking_EventInbox.Events:\n  Emit 1 heuristic 0.15\ncallers_total: 5\ncallers: 5  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Tasking.Tasking.PNC_Tasking_Assignment.H:\n  Assign 1 heuristic 0.90\nproject-hoomans.tests:\n  pnc_corpse_haul_work_pipeline_smoke 1 heuristic 0.90\n  pnc_task_cancellation_smoke 1 heuristic 0.90\n  pnc_tasking_event_inbox_smoke 1 heuristic 0.90\n  pnc_tasking_sleep_smoke 1 heuristic 0.90\n"
+          }
+        ],
+        "isError": false
+      }
+    ]
+  },
+  "conversation_close": {
+    "symbol": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Create_Finish.finish",
+    "pages": [
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Create_Finish.finish\ndirection: both\ncallees_total: 10\ncallees: 10  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationFarewell.Farewell:\n  Schedule 1 heuristic 0.08\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Create_Finish:\n  clearWorkingContext 1 heuristic 0.90\n  conversationTopicMask 1 heuristic 0.90\n  isNetworkClient 1 heuristic 0.90\n  presentSafetyFeedback 1 heuristic 0.90\n  send 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationSafety.Safety:\n  ResolveActors 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Conversation.PNC_ConversationScene.PNC_ConversationScene_Lease_End.Scene:\n  End 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Base.PNC_Core.Core:\n  LogInfo 1 heuristic 0.41\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.08\ncallers_total: 0\ncallers: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\n"
+          }
+        ],
+        "isError": false
+      }
+    ]
+  },
+  "persisted_inventory": {
+    "symbol": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Inventory.PNC_Inventory.PNC_Inventory_Persistence.Inventory.Serialize",
+    "pages": [
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Inventory.PNC_Inventory.PNC_Inventory_Persistence.Inventory.Serialize\ndirection: both\ncallees_total: 11\ncallees: 11  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Diagnostics.PNC_PerformanceScalingDiagnostics.Diagnostics:\n  Increment 1 heuristic 0.55\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Inventory.PNC_Inventory.Equipment.PNC_Inventory_Hydration.Inventory:\n  EnsureRecordInventory 1 heuristic 0.08\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Inventory.PNC_Inventory.Model.PNC_Inventory_FoodLifecycle.Inventory:\n  AdvanceFoodLifecycle 1 heuristic 0.85\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Inventory.PNC_Inventory.PNC_Inventory_Persistence:\n  baseline 1 heuristic 0.90\n  supportsBaseline 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Inventory.PNC_Inventory.Persistence.PNC_Inventory_CoreBridge.Bridge:\n  serialize 1 heuristic 0.85\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Inventory.PNC_Inventory.Persistence.PNC_Inventory_CoreDeltaCodec.Delta:\n  build 1 heuristic 0.90\n  isEmpty 1 heuristic 0.08\nproject-hoomans.tests.pnc_faction_toll_smoke:\n  isServer 1 heuristic 0.02\nproject-hoomans.tests.pnc_restart_rehydration_smoke.PNC.Core:\n  LogWarn 1 heuristic 0.90\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.08\ncallers_total: 7\ncallers: 7  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Needs.NeedsDebug.PNC_NeedsDebug_Summaries.H:\n  IndividualSummary 1 heuristic 0.33\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Serialize.Persistence:\n  SerializeRecord 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Persistence.PNC_Persistence.PNC_Persistence_Serialize:\n  serializeInventory 1 heuristic 0.90\nproject-hoomans.tests:\n  pnc_equipment_generation_smoke 1 heuristic 0.17\n  pnc_npc_foundation_p0b_gap_characterization_smoke 1 heuristic 0.17\n  pnc_npc_foundation_parity_baseline_smoke 1 heuristic 0.17\n  pnc_seed_delta_smoke 1 heuristic 0.17\n"
+          }
+        ],
+        "isError": false
+      }
+    ]
+  },
+  "ui_inventory_rows": {
+    "symbol": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Inventory.PNC_InventoryUI_Model._NPCRows.Model.BuildNPCRows",
+    "pages": [
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Inventory.PNC_InventoryUI_Model._NPCRows.Model.BuildNPCRows\ndirection: both\ncallees_total: 8\ncallees: 8  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Inventory.PNC_InventoryUI_Model._Grouping.Model:\n  GroupRows 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Inventory.PNC_InventoryUI_Model._NPCRows:\n  appendVirtualIdentityRows 1 heuristic 0.90\n  isNPCDepositForbidden 1 heuristic 0.90\n  probe 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Inventory.PNC_InventoryUI_Model._Native:\n  addCurrencyValue 1 heuristic 0.75\n  newCurrencyRow 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.PNC_PlayerAnimationDebugWindow_Setup:\n  lower 1 heuristic 0.03\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Visuals.PNC_AnimationTrace.PNC_AnimationTrace_Capture.Internal:\n  StateSignature 1 heuristic 0.38\ncallers_total: 5\ncallers: 5  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Inventory.PNC_InventoryTransferEndpoint._LocalDraft.lua:\n  __file__ 1 heuristic 0.38\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Inventory.PNC_InventoryTransferEndpoint._NPC.lua:\n  __file__ 1 heuristic 0.38\nproject-hoomans.tests:\n  pnc_inventory_identity_ui_smoke 1 heuristic 0.38\n  pnc_inventory_ui_smoke 1 heuristic 0.38\n  pnc_unique_npc_editor_transfer_smoke 1 heuristic 0.38\n"
+          }
+        ],
+        "isError": false
+      }
+    ]
+  },
+  "presence_materialization": {
+    "symbol": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Presence.PNC_Presence.PNC_Presence_Decisions.Presence.ShouldMaterialize",
+    "pages": [
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Presence.PNC_Presence.PNC_Presence_Decisions.Presence.ShouldMaterialize\ndirection: both\ncallees_total: 5\ncallees: 5  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Compatibility.Mods.CompanionDogs.PNC_CompanionDogs_Access.Internal:\n  Now 1 heuristic 0.85\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Presence.PNC_BodyLifecycle.PNC_BodyLifecycle_Startup.PNC_BodyLifecycle_Startup_Coordinator.Lifecycle:\n  IsStartupBodyCleanupComplete 1 heuristic 0.38\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Presence.PNC_Presence.PNC_Presence_Decisions:\n  travelHandoffRequired 1 heuristic 0.90\n  withinDistance 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Presence.PNC_Presence.PNC_Presence_Position.Internal:\n  FindNearestPlayer 1 heuristic 0.85\ncallers_total: 7\ncallers: 7  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Presence.PNC_Presence.PNC_Presence_Reconcile.Presence:\n  Reconcile 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Vehicles.PNC_CompanionVehicle.PNC_CompanionVehicle_Boarding.Internal:\n  Disembark 1 heuristic 0.75\nproject-hoomans.tests:\n  pnc_presence_force_abstract_vehicle_smoke 1 heuristic 0.38\n  pnc_presence_live_body_envelope_smoke 1 heuristic 0.38\n  pnc_presence_position_recovery_smoke 1 heuristic 0.38\n  pnc_presence_traversal_audit_smoke 1 heuristic 0.38\n  pnc_travel_live_handoff_smoke 1 heuristic 0.38\n"
+          }
+        ],
+        "isError": false
+      }
+    ]
+  },
+  "network_inventory": {
+    "symbol": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Networking.Handlers.PNC_ServerInventoryCommandHandler",
+    "pages": [
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Networking.Handlers.PNC_ServerInventoryCommandHandler\ndirection: both\ncallees_total: 4\ncallees: 4  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Networking.PNC_ServerCommandRouter.Router:\n  Register 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Server.ServerInventory.PNC_ServerInventory_Actions.Service:\n  Action 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Server.ServerInventory.PNC_ServerInventory_Transfer_Handle.Service:\n  Transfer 1 heuristic 0.85\nproject-hoomans.tests.pnc_mp_server_file_guard_smoke.PsychopatzCore.RuntimeRole:\n  AllowsServerCode 1 heuristic 0.75\ncallers_total: 0\ncallers: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\n"
+          }
+        ],
+        "isError": false
+      }
+    ]
+  }
+}
