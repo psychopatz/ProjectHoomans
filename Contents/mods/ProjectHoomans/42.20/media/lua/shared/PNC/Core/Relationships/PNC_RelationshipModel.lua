@@ -1,0 +1,11 @@
+-- Domain registration: Social. Ordered startup only; no gameplay policy.
+require "PNC/Core/Relationships/PNC_RelationshipConstants"
+require "PNC/Core/Relationships/PNC_RelationshipProposalPolicy"
+require "PNC/Core/Relationships/PNC_RelationshipStates"
+require "PNC/Core/Relationships/PNC_RelationshipTypes"
+require "PNC/Core/Relationships/PNC_RelationshipMath"
+require "PNC/Core/Relationships/PNC_RecruitmentPersonalityPolicy"
+require "PNC/Core/Relationships/PNC_ColonistDeparturePolicy"
+require "PNC/Core/Relationships/PNC_RelationshipGraph"
+require "PNC/Core/Relationships/PNC_RelationshipPresentation"
+require "PNC/Core/Relationships/PNC_SocialEventDefinitions"

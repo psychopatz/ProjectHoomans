@@ -1,0 +1,12 @@
+-- Domain registration: Identity. Ordered startup only; no gameplay policy.
+require "PNC/Core/Identity/PNC_Identity_Verifier"
+require "PNC/Core/Archetypes/Registry/PNC_Archetypes"
+require "PNC/Core/Archetypes/Registry/PNC_ArchetypeLoader"
+require "PNC/Core/Identity/PNC_Identity_Names"
+require "PNC/Core/Identity/PNC_IdentityAlias"
+require "PNC/Core/Identity/PNC_Identity_Factory"
+require "PNC/Core/Identity/PNC_Identity_ID"
+require "PNC/Core/Identity/PNC_Identity_Appearance"
+require "PNC/Core/Identity/PNC_Identity_Profile"
+require "PNC/Core/Identity/PNC_UniqueNPCs"
+require "PNC/Core/Identity/PNC_Identity_Portrait"

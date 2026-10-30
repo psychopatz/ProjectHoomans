@@ -390,5 +390,6 @@
     "PNC.Equipment.Internal": "Inventory",
     "PNC.ServerInventory.Internal": "Inventory",
     "PNC.SupplyInventoryInternal": "Supply"
-  }
+  },
+  "registration_manifest": "REGISTRATIONS.json"
 }

@@ -1,4 +1,5 @@
 local T = require "tests/support/test"
+local registrationPath = require "tests/support/domain_bootstrap"
 
 local ROOT = T.path("ProjectHoomans", "root", "")
 
@@ -20,6 +21,12 @@ local function capture(path, setup)
     local originalRequire = require
     require = function(name)
         local segment = SHARED_SEGMENTS[name]
+        if not segment then
+            -- Expand only policy-free domain registrations. Keep existing
+            -- assertions about real providers and executable hooks unchanged.
+            local layer = path:match('/(client)/') or path:match('/(server)/') or 'shared'
+            segment = registrationPath(ROOT, layer, name)
+        end
         if segment then
             T.load(ROOT .. segment)
         else

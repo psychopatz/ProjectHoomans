@@ -1,0 +1,11 @@
+-- Domain registration: Pathing. Ordered startup only; no gameplay policy.
+require "PNC/Core/Pathing/PNC_LiveBodyControl"
+require "PNC/Core/Pathing/PNC_LocomotionProfiles"
+require "PNC/Core/Pathing/PNC_MotionHints"
+require "PNC/Core/Pathing/PNC_VehicleAvoidance"
+require "PNC/Core/Pathing/PNC_TraversalQuery"
+require "PNC/Core/Pathing/PNC_FakeLocomotion"
+require "PNC/Core/Pathing/PNC_EnginePathPlanner_Context"
+require "PNC/Core/Pathing/PNC_EnginePathPlanner"
+require "PNC/Core/Pathing/PNC_NavigationRouter"
+require "PNC/Core/Pathing/PNC_TraversalProfiles"

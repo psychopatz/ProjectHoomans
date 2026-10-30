@@ -1,0 +1,236 @@
+{
+  "runtime_revision_before": "19749cef881c618917f59da35090a5c5494148fd",
+  "production_provider_bodies_unchanged": true,
+  "registrations": 47,
+  "roots": [
+    {
+      "path": "client/PNC/Composition/PNC_ClientComposition.lua",
+      "expanded_order_equal": true,
+      "before": {
+        "bytes": 6041,
+        "lines": 120,
+        "requires": 118
+      },
+      "after": {
+        "bytes": 3951,
+        "lines": 79,
+        "requires": 77
+      }
+    },
+    {
+      "path": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "expanded_order_equal": true,
+      "before": {
+        "bytes": 6550,
+        "lines": 131,
+        "requires": 125
+      },
+      "after": {
+        "bytes": 4275,
+        "lines": 88,
+        "requires": 82
+      }
+    },
+    {
+      "path": "shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+      "expanded_order_equal": true,
+      "before": {
+        "bytes": 2123,
+        "lines": 43,
+        "requires": 42
+      },
+      "after": {
+        "bytes": 1190,
+        "lines": 24,
+        "requires": 23
+      }
+    },
+    {
+      "path": "shared/PNC/Composition/PNC_SharedComposition_Final.lua",
+      "expanded_order_equal": true,
+      "before": {
+        "bytes": 1005,
+        "lines": 19,
+        "requires": 16
+      },
+      "after": {
+        "bytes": 664,
+        "lines": 13,
+        "requires": 10
+      }
+    },
+    {
+      "path": "shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+      "expanded_order_equal": true,
+      "before": {
+        "bytes": 4055,
+        "lines": 77,
+        "requires": 76
+      },
+      "after": {
+        "bytes": 1448,
+        "lines": 29,
+        "requires": 28
+      }
+    },
+    {
+      "path": "shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+      "expanded_order_equal": true,
+      "before": {
+        "bytes": 3499,
+        "lines": 68,
+        "requires": 67
+      },
+      "after": {
+        "bytes": 1187,
+        "lines": 24,
+        "requires": 23
+      }
+    },
+    {
+      "path": "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+      "expanded_order_equal": true,
+      "before": {
+        "bytes": 2117,
+        "lines": 45,
+        "requires": 44
+      },
+      "after": {
+        "bytes": 1296,
+        "lines": 28,
+        "requires": 27
+      }
+    }
+  ],
+  "local_registration_probes": [
+    {
+      "registration": "client/PNC/UI/CharacterWindow/PNC_CharacterWindowRuntime.lua",
+      "before_root": "client/PNC/Composition/PNC_ClientComposition.lua",
+      "before": {
+        "bytes": 6041,
+        "lines": 120,
+        "requires": 118
+      },
+      "after": {
+        "files": 1,
+        "bytes": 617,
+        "lines": 10,
+        "requires": 9
+      },
+      "assembly_hops_before": 1,
+      "assembly_hops_after": 2,
+      "provider_owner_count_after": 1
+    },
+    {
+      "registration": "shared/PNC/Core/Identity/PNC_IdentityProfiles.lua",
+      "before_root": "shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+      "before": {
+        "bytes": 3499,
+        "lines": 68,
+        "requires": 67
+      },
+      "after": {
+        "files": 1,
+        "bytes": 619,
+        "lines": 12,
+        "requires": 11
+      },
+      "assembly_hops_before": 1,
+      "assembly_hops_after": 2,
+      "provider_owner_count_after": 1
+    },
+    {
+      "registration": "server/PNC/Semantics/PNC_SemanticTaskRuntime.lua",
+      "before_root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "before": {
+        "bytes": 6550,
+        "lines": 131,
+        "requires": 125
+      },
+      "after": {
+        "files": 1,
+        "bytes": 781,
+        "lines": 11,
+        "requires": 9
+      },
+      "assembly_hops_before": 1,
+      "assembly_hops_after": 2,
+      "provider_owner_count_after": 1
+    }
+  ],
+  "full_lua": {
+    "passed": 978,
+    "total": 978,
+    "seconds": 9.03
+  },
+  "diagnostic_python": {
+    "passed": 20,
+    "total": 20
+  },
+  "kahlua": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 54,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  },
+  "static_kahlua": {
+    "checked": 54,
+    "failures": []
+  },
+  "debt": {
+    "new": 0,
+    "resolved": [
+      {
+        "rule": "COMPOSITION_TO_PROVIDER",
+        "source": "server/PNC/Composition/PNC_ServerComposition.lua",
+        "target": "server/PNC/Tasking/PNC_CorpseHaulService.lua",
+        "line": 46,
+        "detail": "",
+        "required_phase": "P3"
+      },
+      {
+        "rule": "COMPOSITION_TO_PROVIDER",
+        "source": "server/PNC/Composition/PNC_ServerComposition.lua",
+        "target": "server/PNC/Tasking/PNC_TaskRequestService.lua",
+        "line": 47,
+        "detail": "",
+        "required_phase": "P3"
+      },
+      {
+        "rule": "COMPOSITION_TO_PROVIDER",
+        "source": "server/PNC/Composition/PNC_ServerComposition.lua",
+        "target": "server/PNC/Tasking/PNC_WorkTaskProvider.lua",
+        "line": 45,
+        "detail": "",
+        "required_phase": "P3"
+      },
+      {
+        "rule": "COMPOSITION_TO_PROVIDER",
+        "source": "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+        "target": "shared/PNC/Core/Equipment/PNC_Equipment_Slots.lua",
+        "line": 38,
+        "detail": "",
+        "required_phase": "P3"
+      }
+    ],
+    "remaining": 189
+  },
+  "file_import_sccs": [
+    [
+      "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug.lua",
+      "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow.lua",
+      "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow_Actions.lua"
+    ]
+  ],
+  "limitations": [
+    "Registration adds one explicit assembly hop, headers and files. Complete expanded bootstrap source is not smaller; owning-domain startup edits retrieve a bounded registration instead of the global root.",
+    "Seven fixed gameplay probes unchanged from P2; these three assembly probes supplement them.",
+    "Installed Kahlua compiler only; native PZ not launched."
+  ]
+}

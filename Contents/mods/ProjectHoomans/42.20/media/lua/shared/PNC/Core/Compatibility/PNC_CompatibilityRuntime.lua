@@ -1,0 +1,10 @@
+-- Domain registration: Adapters. Ordered startup only; no gameplay policy.
+require "PNC/Core/Compatibility/PNC_Compatibility_API"
+require "PNC/Core/Compatibility/PNC_Compatibility_ActorRef"
+require "PNC/Core/Compatibility/PNC_ActorOwnership"
+require "PNC/Core/Compatibility/PNC_Compatibility_Targeting"
+require "PNC/Core/Compatibility/PNC_Compatibility_DamageContext"
+require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_Adapter"
+require "PNC/Core/Compatibility/Mods/CompanionDogs/PNC_CompanionDogs_Adapter"
+require "PNC/Core/Compatibility/Mods/Necroa/PNC_Necroa_Adapter"
+require "PNC/Core/Compatibility/Mods/ProjectALife/PNC_ProjectALife_Adapter"

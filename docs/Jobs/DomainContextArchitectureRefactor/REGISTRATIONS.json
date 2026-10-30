@@ -1,0 +1,693 @@
+{
+  "version": 1,
+  "registrations": [
+    {
+      "owner": "Adapters",
+      "path": "shared/PNC/Core/Compatibility/PNC_CompatibilityRuntime.lua",
+      "module": "PNC/Core/Compatibility/PNC_CompatibilityRuntime",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+      "providers": [
+        "PNC/Core/Compatibility/PNC_Compatibility_API",
+        "PNC/Core/Compatibility/PNC_Compatibility_ActorRef",
+        "PNC/Core/Compatibility/PNC_ActorOwnership",
+        "PNC/Core/Compatibility/PNC_Compatibility_Targeting",
+        "PNC/Core/Compatibility/PNC_Compatibility_DamageContext",
+        "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_Adapter",
+        "PNC/Core/Compatibility/Mods/CompanionDogs/PNC_CompanionDogs_Adapter",
+        "PNC/Core/Compatibility/Mods/Necroa/PNC_Necroa_Adapter",
+        "PNC/Core/Compatibility/Mods/ProjectALife/PNC_ProjectALife_Adapter"
+      ],
+      "responsibility": "CompatibilityRuntime"
+    },
+    {
+      "owner": "Semantics",
+      "path": "shared/PNC/Semantics/PNC_SemanticFoundation.lua",
+      "module": "PNC/Semantics/PNC_SemanticFoundation",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+      "providers": [
+        "PNC/Semantics/PNC_SemanticDiagnostics",
+        "PNC/Semantics/PNC_SemanticWorldTargetCatalog",
+        "PNC/Semantics/PNC_SemanticCampSite",
+        "PNC/Semantics/PNC_SemanticCampSiteGeometry",
+        "PNC/Semantics/PNC_SemanticCatalog",
+        "PNC/Semantics/PNC_SemanticConsumptionCatalog",
+        "PNC/Semantics/PNC_SemanticMarketSenseAdapter",
+        "PNC/Semantics/PNC_SemanticTopicCatalog",
+        "PNC/Semantics/PNC_SemanticConversationCategoryOwnership",
+        "PNC/Semantics/PNC_SemanticDialogueContextState",
+        "PNC/Semantics/PNC_SemanticContextConstraints",
+        "PNC/Semantics/PNC_SemanticContextResolver",
+        "PNC/Semantics/PNC_SemanticCognitionProjection",
+        "PNC/Semantics/PNC_SemanticDialogueFacts",
+        "PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource",
+        "PNC/Semantics/PNC_SemanticEngineFacts",
+        "PNC/Semantics/PNC_SemanticEngineEvents",
+        "PNC/Semantics/PNC_SemanticInteractionLifecycle",
+        "PNC/Semantics/PNC_SemanticDialogueSituation",
+        "PNC/Semantics/PNC_SemanticDialogueResponseCatalog",
+        "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority",
+        "PNC/Semantics/PNC_SemanticCompanionSpeech",
+        "PNC/Semantics/PNC_SemanticCombatEncounterIntent",
+        "PNC/Semantics/PNC_SemanticSocialReaction",
+        "PNC/Semantics/PNC_SemanticDialoguePolicy",
+        "PNC/Semantics/PNC_SemanticCapabilityCatalog",
+        "PNC/Semantics/PNC_SemanticTaskRequest",
+        "PNC/Semantics/PNC_SemanticInventoryQuery",
+        "PNC/Semantics/PNC_SemanticActionPlan",
+        "PNC/Semantics/PNC_SemanticLLMResult"
+      ],
+      "responsibility": "SemanticFoundation"
+    },
+    {
+      "owner": "Activities",
+      "path": "shared/PNC/Core/Farming/PNC_FarmingRuntime.lua",
+      "module": "PNC/Core/Farming/PNC_FarmingRuntime",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+      "providers": [
+        "PNC/Core/Farming/PNC_Farming",
+        "PNC/Core/Farming/PNC_PlantingCatalog",
+        "PNC/Core/Farming/PNC_FarmingResearch"
+      ],
+      "responsibility": "FarmingRuntime"
+    },
+    {
+      "owner": "Production",
+      "path": "shared/PNC/Core/Production/PNC_ProductionCatalogs.lua",
+      "module": "PNC/Core/Production/PNC_ProductionCatalogs",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+      "providers": [
+        "PNC/Core/Production/PNC_RecipeCatalog",
+        "PNC/Core/Production/PNC_RecipeKnowledgeRegistry",
+        "PNC/Core/Production/PNC_RecipeKnowledge",
+        "PNC/Core/Production/PNC_BuildRecipeCatalog"
+      ],
+      "responsibility": "ProductionCatalogs"
+    },
+    {
+      "owner": "Needs",
+      "path": "shared/PNC/Core/Needs/PNC_NeedsSchema.lua",
+      "module": "PNC/Core/Needs/PNC_NeedsSchema",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+      "providers": [
+        "PNC/Core/Needs/PNC_NeedsDefinitions",
+        "PNC/Core/Needs/PNC_MoraleModifierDefinitions",
+        "PNC/Core/Needs/PNC_NeedsStateCodec"
+      ],
+      "responsibility": "NeedsSchema"
+    },
+    {
+      "owner": "Identity",
+      "path": "shared/PNC/Core/Traits/PNC_NPCTraits.lua",
+      "module": "PNC/Core/Traits/PNC_NPCTraits",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+      "providers": [
+        "PNC/Core/Traits/PNC_NPCTraitRegistry",
+        "PNC/Core/Traits/PNC_NPCTraitEffects",
+        "PNC/Core/Traits/PNC_NPCTraitDefinitions"
+      ],
+      "responsibility": "NPCTraits"
+    },
+    {
+      "owner": "Needs",
+      "path": "shared/PNC/Core/Needs/PNC_NeedsModels.lua",
+      "module": "PNC/Core/Needs/PNC_NeedsModels",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+      "providers": [
+        "PNC/Core/Needs/PNC_ConditionStats",
+        "PNC/Core/Needs/PNC_PlayerNeedsModel",
+        "PNC/Core/Needs/PNC_NeedsUtils"
+      ],
+      "responsibility": "NeedsModels"
+    },
+    {
+      "owner": "Social",
+      "path": "shared/PNC/Gifts/PNC_GiftRuntime.lua",
+      "module": "PNC/Gifts/PNC_GiftRuntime",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+      "providers": [
+        "PNC/Gifts/PNC_GiftContract",
+        "PNC/Gifts/PNC_GiftMarketSenseAdapter",
+        "PNC/Gifts/PNC_GiftPreferenceProfile",
+        "PNC/Gifts/PNC_GiftEvaluator",
+        "PNC/Gifts/PNC_GiftRuntimeEvaluator",
+        "PNC/Gifts/PNC_GiftSemanticOffer"
+      ],
+      "responsibility": "GiftRuntime"
+    },
+    {
+      "owner": "Identity",
+      "path": "shared/PNC/Core/Identity/PNC_IdentityProfiles.lua",
+      "module": "PNC/Core/Identity/PNC_IdentityProfiles",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+      "providers": [
+        "PNC/Core/Identity/PNC_Identity_Verifier",
+        "PNC/Core/Archetypes/Registry/PNC_Archetypes",
+        "PNC/Core/Archetypes/Registry/PNC_ArchetypeLoader",
+        "PNC/Core/Identity/PNC_Identity_Names",
+        "PNC/Core/Identity/PNC_IdentityAlias",
+        "PNC/Core/Identity/PNC_Identity_Factory",
+        "PNC/Core/Identity/PNC_Identity_ID",
+        "PNC/Core/Identity/PNC_Identity_Appearance",
+        "PNC/Core/Identity/PNC_Identity_Profile",
+        "PNC/Core/Identity/PNC_UniqueNPCs",
+        "PNC/Core/Identity/PNC_Identity_Portrait"
+      ],
+      "responsibility": "IdentityProfiles"
+    },
+    {
+      "owner": "Social",
+      "path": "shared/PNC/Core/Relationships/PNC_SocialProfiles.lua",
+      "module": "PNC/Core/Relationships/PNC_SocialProfiles",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+      "providers": [
+        "PNC/Core/Relationships/PNC_EntityRef",
+        "PNC/Core/Relationships/PNC_SocialProfileConstants",
+        "PNC/Core/Relationships/PNC_SocialProfileGenerator",
+        "PNC/Core/Relationships/PNC_SocialProfileTypes"
+      ],
+      "responsibility": "SocialProfiles"
+    },
+    {
+      "owner": "Social",
+      "path": "shared/PNC/Core/Conduct/PNC_ConductModel.lua",
+      "module": "PNC/Core/Conduct/PNC_ConductModel",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+      "providers": [
+        "PNC/Core/Conduct/PNC_ConductConstants",
+        "PNC/Core/Conduct/PNC_ConductTypes",
+        "PNC/Core/Conduct/PNC_ConductMath",
+        "PNC/Core/Conduct/PNC_ConductDefinitions"
+      ],
+      "responsibility": "ConductModel"
+    },
+    {
+      "owner": "Factions",
+      "path": "shared/PNC/Core/Factions/PNC_FactionModel.lua",
+      "module": "PNC/Core/Factions/PNC_FactionModel",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+      "providers": [
+        "PNC/Core/Factions/PNC_FactionConstants",
+        "PNC/Core/Factions/PNC_FactionBalance",
+        "PNC/Core/Factions/PNC_FactionArchetypes",
+        "PNC/Core/Factions/PNC_FactionNameGenerator",
+        "PNC/Core/Factions/PNC_FactionEmblems",
+        "PNC/Core/Factions/PNC_FactionDiplomacyMath",
+        "PNC/Core/Factions/PNC_FactionIncidentDefinitions",
+        "PNC/Core/Factions/PNC_FactionIntent"
+      ],
+      "responsibility": "FactionModel"
+    },
+    {
+      "owner": "Provision",
+      "path": "shared/PNC/Core/Provision/PNC_ProvisionRules.lua",
+      "module": "PNC/Core/Provision/PNC_ProvisionRules",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+      "providers": [
+        "PNC/Core/Provision/PNC_ProvisionRuleRegistry",
+        "PNC/Core/Provision/Rules/PNC_FoodProvisionRule",
+        "PNC/Core/Provision/Rules/PNC_HydrationProvisionRule",
+        "PNC/Core/Provision/Rules/PNC_BandageProvisionRule",
+        "PNC/Core/Provision/PNC_ProvisionPolicy"
+      ],
+      "responsibility": "ProvisionRules"
+    },
+    {
+      "owner": "Communities",
+      "path": "shared/PNC/Core/Communities/PNC_CommunityModel.lua",
+      "module": "PNC/Core/Communities/PNC_CommunityModel",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+      "providers": [
+        "PNC/Core/Communities/PNC_CommunityConstants",
+        "PNC/Core/Communities/PNC_CommunityProfiles",
+        "PNC/Core/Communities/PNC_CommunityMath",
+        "PNC/Core/Communities/PNC_CommunityTypes"
+      ],
+      "responsibility": "CommunityModel"
+    },
+    {
+      "owner": "Social",
+      "path": "shared/PNC/Core/Relationships/PNC_RelationshipModel.lua",
+      "module": "PNC/Core/Relationships/PNC_RelationshipModel",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+      "providers": [
+        "PNC/Core/Relationships/PNC_RelationshipConstants",
+        "PNC/Core/Relationships/PNC_RelationshipProposalPolicy",
+        "PNC/Core/Relationships/PNC_RelationshipStates",
+        "PNC/Core/Relationships/PNC_RelationshipTypes",
+        "PNC/Core/Relationships/PNC_RelationshipMath",
+        "PNC/Core/Relationships/PNC_RecruitmentPersonalityPolicy",
+        "PNC/Core/Relationships/PNC_ColonistDeparturePolicy",
+        "PNC/Core/Relationships/PNC_RelationshipGraph",
+        "PNC/Core/Relationships/PNC_RelationshipPresentation",
+        "PNC/Core/Relationships/PNC_SocialEventDefinitions"
+      ],
+      "responsibility": "RelationshipModel"
+    },
+    {
+      "owner": "Perception",
+      "path": "shared/PNC/Core/Perception/PNC_PerceptionRuntime.lua",
+      "module": "PNC/Core/Perception/PNC_PerceptionRuntime",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+      "providers": [
+        "PNC/Core/Perception/PNC_Perception",
+        "PNC/Core/Perception/PNC_Perception_Frame",
+        "PNC/Core/Perception/PNC_ZombieObservation"
+      ],
+      "responsibility": "PerceptionRuntime"
+    },
+    {
+      "owner": "Pathing",
+      "path": "shared/PNC/Core/Pathing/PNC_PathingRuntime.lua",
+      "module": "PNC/Core/Pathing/PNC_PathingRuntime",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+      "providers": [
+        "PNC/Core/Pathing/PNC_LiveBodyControl",
+        "PNC/Core/Pathing/PNC_LocomotionProfiles",
+        "PNC/Core/Pathing/PNC_MotionHints",
+        "PNC/Core/Pathing/PNC_VehicleAvoidance",
+        "PNC/Core/Pathing/PNC_TraversalQuery",
+        "PNC/Core/Pathing/PNC_FakeLocomotion",
+        "PNC/Core/Pathing/PNC_EnginePathPlanner_Context",
+        "PNC/Core/Pathing/PNC_EnginePathPlanner",
+        "PNC/Core/Pathing/PNC_NavigationRouter",
+        "PNC/Core/Pathing/PNC_TraversalProfiles"
+      ],
+      "responsibility": "PathingRuntime"
+    },
+    {
+      "owner": "Presentation",
+      "path": "shared/PNC/Core/Visuals/PNC_AnimationRuntime.lua",
+      "module": "PNC/Core/Visuals/PNC_AnimationRuntime",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+      "providers": [
+        "PNC/Core/Visuals/PNC_AnimationTrace",
+        "PNC/Core/Visuals/PNC_Animation",
+        "PNC/Core/Visuals/PNC_AnimationScenes",
+        "PNC/Core/Visuals/PNC_AnimationSceneDefinitions",
+        "PNC/Core/Visuals/PNC_PresentationAnimations"
+      ],
+      "responsibility": "AnimationRuntime"
+    },
+    {
+      "owner": "Inventory",
+      "path": "shared/PNC/Core/Equipment/PNC_EquipmentRuntime.lua",
+      "module": "PNC/Core/Equipment/PNC_EquipmentRuntime",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+      "providers": [
+        "PNC/Core/Equipment/PNC_Equipment_Items",
+        "PNC/Core/Equipment/PNC_Equipment_Slots",
+        "PNC/Core/Equipment/PNC_Equipment"
+      ],
+      "responsibility": "EquipmentRuntime"
+    },
+    {
+      "owner": "Companions",
+      "path": "shared/PNC/Core/MapCommands/PNC_MapCommands.lua",
+      "module": "PNC/Core/MapCommands/PNC_MapCommands",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+      "providers": [
+        "PNC/Core/MapCommands/PNC_MapCommandService",
+        "PNC/Core/MapCommands/PNC_MapCommand_Travel",
+        "PNC/Core/MapCommands/PNC_MapCommand_Lumber",
+        "PNC/Core/MapCommands/PNC_MapCommand_Fishing"
+      ],
+      "responsibility": "MapCommands"
+    },
+    {
+      "owner": "Combat",
+      "path": "shared/PNC/Core/Combat/PNC_CombatRuntime.lua",
+      "module": "PNC/Core/Combat/PNC_CombatRuntime",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+      "providers": [
+        "PNC/Core/Combat/CombatResolution/PNC_CombatResolution",
+        "PNC/Core/Combat/PNC_Combat",
+        "PNC/Core/Combat/PNC_Combat_Audio",
+        "PNC/Core/Combat/PNC_Combat_Firearms",
+        "PNC/Core/Combat/PNC_Combat_FirearmEffects",
+        "PNC/Core/Combat/PNC_Combat_ZombieReaction",
+        "PNC/Core/Combat/PNC_Combat_Unarmed",
+        "PNC/Core/Combat/PNC_Combat_Defense",
+        "PNC/Core/Combat/CombatTactics/PNC_Combat_Tactics"
+      ],
+      "responsibility": "CombatRuntime"
+    },
+    {
+      "owner": "Combat",
+      "path": "shared/PNC/Core/Combat/PNC_AttackRuntime.lua",
+      "module": "PNC/Core/Combat/PNC_AttackRuntime",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+      "providers": [
+        "PNC/Core/Zombies/PNC_ZombieAggro",
+        "PNC/Core/Combat/AttackExecution/PNC_AttackExecution",
+        "PNC/Core/Combat/PNC_Combat_Melee",
+        "PNC/Core/Combat/PNC_Combat_Ranged",
+        "PNC/Core/Combat/PNC_Combat_Stance"
+      ],
+      "responsibility": "AttackRuntime"
+    },
+    {
+      "owner": "Activities",
+      "path": "shared/PNC/Core/Jobs/PNC_JobsRuntime.lua",
+      "module": "PNC/Core/Jobs/PNC_JobsRuntime",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+      "providers": [
+        "PNC/Core/Jobs/PNC_JobSystem",
+        "PNC/Core/Jobs/PNC_JobRequirements",
+        "PNC/Core/Jobs/PNC_WorkItemService"
+      ],
+      "responsibility": "JobsRuntime"
+    },
+    {
+      "owner": "Foundation",
+      "path": "shared/PNC/Core/Scheduling/PNC_SimulationRuntime.lua",
+      "module": "PNC/Core/Scheduling/PNC_SimulationRuntime",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+      "providers": [
+        "PNC/Core/Scheduling/PNC_SimulationClock",
+        "PNC/Core/Scheduling/PNC_SimulationLOD",
+        "PNC/Core/Scheduling/PNC_Scheduler"
+      ],
+      "responsibility": "SimulationRuntime"
+    },
+    {
+      "owner": "Companions",
+      "path": "shared/PNC/Core/Commands/PNC_CompanionCommands.lua",
+      "module": "PNC/Core/Commands/PNC_CompanionCommands",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_Final.lua",
+      "providers": [
+        "PNC/Core/Commands/PNC_CompanionCommandRelayGate",
+        "PNC/Core/Commands/PNC_CompanionCommandRegistry",
+        "PNC/Core/Commands/PNC_CompanionCommandDefinitions",
+        "PNC/Core/Commands/PNC_VanillaEmoteInteractions"
+      ],
+      "responsibility": "CompanionCommands"
+    },
+    {
+      "owner": "PuppetOpera",
+      "path": "shared/PNC/Core/PuppetOpera/PNC_PuppetOperaRuntime.lua",
+      "module": "PNC/Core/PuppetOpera/PNC_PuppetOperaRuntime",
+      "root": "shared/PNC/Composition/PNC_SharedComposition_Final.lua",
+      "providers": [
+        "PNC/Core/PuppetOpera/PNC_PuppetOpera_Blueprints",
+        "PNC/Core/PuppetOpera/PNC_PuppetOpera_Anchors",
+        "PNC/Core/PuppetOpera/PNC_PuppetOpera_Trace",
+        "PNC/Core/PuppetOpera/PNC_PuppetOpera"
+      ],
+      "responsibility": "PuppetOperaRuntime"
+    },
+    {
+      "owner": "Needs",
+      "path": "server/PNC/Needs/PNC_IndividualNeedsRuntime.lua",
+      "module": "PNC/Needs/PNC_IndividualNeedsRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/Needs/PNC_NeedsRepository",
+        "PNC/Needs/PNC_NeedsEvaluator",
+        "PNC/Needs/PNC_IndividualNeeds"
+      ],
+      "responsibility": "IndividualNeedsRuntime"
+    },
+    {
+      "owner": "Settlement",
+      "path": "server/PNC/Settlement/FacilityJobs/PNC_FacilityJobsRuntime.lua",
+      "module": "PNC/Settlement/FacilityJobs/PNC_FacilityJobsRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/Settlement/FacilityJobs/PNC_FacilityJobs_Service",
+        "PNC/Settlement/FacilityJobs/PNC_RoamingSeatService",
+        "PNC/Settlement/FacilityJobs/PNC_RoamAmbientService"
+      ],
+      "responsibility": "FacilityJobsRuntime"
+    },
+    {
+      "owner": "World",
+      "path": "server/PNC/World/PNC_ResourceRuntime.lua",
+      "module": "PNC/World/PNC_ResourceRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/World/PNC_NearbyResourceLocator",
+        "PNC/World/PNC_NearbyWaterService",
+        "PNC/World/PNC_WaterContainerService",
+        "PNC/World/PNC_CampResourceService"
+      ],
+      "responsibility": "ResourceRuntime"
+    },
+    {
+      "owner": "Health",
+      "path": "server/PNC/Medical/PNC_MedicalCareRuntime.lua",
+      "module": "PNC/Medical/PNC_MedicalCareRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/Medical/PNC_MedicalCareRepository",
+        "PNC/Medical/PNC_MedicalCareService",
+        "PNC/Medical/PNC_MedicalCareExecutor"
+      ],
+      "responsibility": "MedicalCareRuntime"
+    },
+    {
+      "owner": "Quests",
+      "path": "server/PNC/Quests/PNC_QuestRuntime.lua",
+      "module": "PNC/Quests/PNC_QuestRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/Quests/PNC_QuestDefinitions",
+        "PNC/Quests/PNC_QuestRepository",
+        "PNC/Quests/PNC_QuestService"
+      ],
+      "responsibility": "QuestRuntime"
+    },
+    {
+      "owner": "Tasking",
+      "path": "server/PNC/Tasking/PNC_TaskProviders.lua",
+      "module": "PNC/Tasking/PNC_TaskProviders",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/Tasking/PNC_WorkTaskProvider",
+        "PNC/Tasking/PNC_CorpseHaulService",
+        "PNC/Tasking/PNC_TaskRequestService"
+      ],
+      "responsibility": "TaskProviders"
+    },
+    {
+      "owner": "World",
+      "path": "server/PNC/World/PNC_CampRuntime.lua",
+      "module": "PNC/World/PNC_CampRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/World/PNC_CampZoneService",
+        "PNC/World/PNC_CampMovementCoordinator",
+        "PNC/World/PNC_AmbientVisitService"
+      ],
+      "responsibility": "CampRuntime"
+    },
+    {
+      "owner": "Semantics",
+      "path": "server/PNC/Semantics/PNC_SemanticTaskRuntime.lua",
+      "module": "PNC/Semantics/PNC_SemanticTaskRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/Semantics/PNC_SemanticWaterTargetResolver",
+        "PNC/Semantics/Inventory/PNC_SemanticItemSelector",
+        "PNC/Semantics/Inventory/PNC_SemanticInventoryQueryService",
+        "PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanPathProvider",
+        "PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanWaitProvider",
+        "PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanCampProvider",
+        "PNC/Semantics/PNC_SemanticTaskRequestService",
+        "PNC/Semantics/PNC_SemanticActionPlanTaskHandler",
+        "PNC/Semantics/PNC_SemanticCampTaskHandler"
+      ],
+      "responsibility": "SemanticTaskRuntime"
+    },
+    {
+      "owner": "Scavenge",
+      "path": "server/PNC/Scavenge/PNC_ScavengeRuntime.lua",
+      "module": "PNC/Scavenge/PNC_ScavengeRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/Scavenge/PNC_ScavengePolicy",
+        "PNC/Scavenge/PNC_ScavengeService",
+        "PNC/Scavenge/PNC_ScavengeExecutor"
+      ],
+      "responsibility": "ScavengeRuntime"
+    },
+    {
+      "owner": "Activities",
+      "path": "server/PNC/Lumber/PNC_LumberRuntime.lua",
+      "module": "PNC/Lumber/PNC_LumberRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/Lumber/PNC_LumberService",
+        "PNC/Lumber/PNC_LumberWorkAdapter",
+        "PNC/Lumber/PNC_LumberExecutor"
+      ],
+      "responsibility": "LumberRuntime"
+    },
+    {
+      "owner": "Needs",
+      "path": "server/PNC/Needs/PNC_GroupNeedsRuntime.lua",
+      "module": "PNC/Needs/PNC_GroupNeedsRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/Needs/PNC_GroupNeeds",
+        "PNC/Needs/PNC_NeedHealthConsequences",
+        "PNC/Needs/PNC_NeedSupplyBridge"
+      ],
+      "responsibility": "GroupNeedsRuntime"
+    },
+    {
+      "owner": "Director",
+      "path": "server/PNC/Director/PNC_DirectorRuntime.lua",
+      "module": "PNC/Director/PNC_DirectorRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/Director/PNC_Director",
+        "PNC/Director/PNC_MobileSettlementVisitService",
+        "PNC/Director/PNC_CommercialMobilityService"
+      ],
+      "responsibility": "DirectorRuntime"
+    },
+    {
+      "owner": "Semantics",
+      "path": "server/PNC/Semantics/PNC_SemanticEventRuntime.lua",
+      "module": "PNC/Semantics/PNC_SemanticEventRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/Semantics/PNC_SemanticCognitionEvidence",
+        "PNC/Semantics/PNC_SemanticEngineEvents_Server",
+        "PNC/Semantics/PNC_SemanticCombatReactionService",
+        "PNC/Semantics/PNC_SemanticCombatTargetCallouts",
+        "PNC/Semantics/PNC_SemanticInteractionSceneAdopters"
+      ],
+      "responsibility": "SemanticEventRuntime"
+    },
+    {
+      "owner": "Social",
+      "path": "server/PNC/Social/PNC_SocialEventRuntime.lua",
+      "module": "PNC/Social/PNC_SocialEventRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/Social/PNC_SocialEventDebug",
+        "PNC/Social/PNC_SocialEventService",
+        "PNC/Social/PNC_SocialEncounterTracker",
+        "PNC/Social/PNC_SocialMeetingService",
+        "PNC/Social/PNC_SocialGreetingService",
+        "PNC/Social/PNC_FollowerAbandonmentService",
+        "PNC/Social/PNC_SocialEventHooks"
+      ],
+      "responsibility": "SocialEventRuntime"
+    },
+    {
+      "owner": "Semantics",
+      "path": "server/PNC/Semantics/PNC_SemanticItemTaskRuntime.lua",
+      "module": "PNC/Semantics/PNC_SemanticItemTaskRuntime",
+      "root": "server/PNC/Composition/PNC_ServerComposition.lua",
+      "providers": [
+        "PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanItemProvider",
+        "PNC/Semantics/PNC_SemanticGiveItemTaskHandler",
+        "PNC/Semantics/SemanticConsumptionTaskHandler/PNC_SemanticConsumptionTaskHandler"
+      ],
+      "responsibility": "SemanticItemTaskRuntime"
+    },
+    {
+      "owner": "UI",
+      "path": "client/PNC/UI/Map/PNC_MapRuntime.lua",
+      "module": "PNC/UI/Map/PNC_MapRuntime",
+      "root": "client/PNC/Composition/PNC_ClientComposition.lua",
+      "providers": [
+        "PNC/UI/Map/PNC_MapLayerRegistry",
+        "PNC/UI/Map/PNC_MapHoomansMenu",
+        "PNC/UI/Map/PNC_MapDisplaySettings",
+        "PNC/UI/Factions/PNC_FactionEmblemRenderer",
+        "PNC/UI/Factions/PNC_FactionPresentation",
+        "PNC/UI/Mobile/PNC_MobileGroupDebugModel",
+        "PNC/UI/Map/PNC_MapHoverPortraitCard",
+        "PNC/UI/Map/PNC_MapHoverPortrait",
+        "PNC/UI/Map/PNC_MapMarkerIconRegistry",
+        "PNC/UI/SettlementManagement/PNC_SettlementManagement_FishingZoneOverlay",
+        "PNC/UI/Map/PNC_MapCommandRegistry",
+        "PNC/UI/Map/Commands/PNC_MapCommand_Travel",
+        "PNC/UI/Map/Commands/PNC_MapCommand_Lumber",
+        "PNC/UI/Map/Layers/PNC_MapLayer_Travel",
+        "PNC/UI/Map/Layers/PNC_MapLayer_Communities",
+        "PNC/UI/Map/Layers/PNC_MapLayer_PlayerSettlement",
+        "PNC/UI/Map/Layers/PNC_MapLayer_AbstractGroups",
+        "PNC/UI/Map/Layers/PNC_MapLayer_WorldDiscovery"
+      ],
+      "responsibility": "MapRuntime"
+    },
+    {
+      "owner": "UI",
+      "path": "client/PNC/UI/Context/PNC_ContextSurfaces.lua",
+      "module": "PNC/UI/Context/PNC_ContextSurfaces",
+      "root": "client/PNC/Composition/PNC_ClientComposition.lua",
+      "providers": [
+        "PNC/UI/Context/PNC_NPCSelection",
+        "PNC/UI/Context/PNC_ContextHub",
+        "PNC/UI/Context/PNC_StockpileAccessContext",
+        "PNC/UI/Context/PNC_SinkCompanionContext",
+        "PNC/UI/Context/PNC_BandageMenu",
+        "PNC/UI/Context/PNC_DebugSpawnMenu",
+        "PNC/UI/Knowledge/PNC_KnowledgePresentation",
+        "PNC/UI/Knowledge/PNC_NPCDossierWindow"
+      ],
+      "responsibility": "ContextSurfaces"
+    },
+    {
+      "owner": "UI",
+      "path": "client/PNC/UI/Context/Providers/PNC_ContextNPCProviders.lua",
+      "module": "PNC/UI/Context/Providers/PNC_ContextNPCProviders",
+      "root": "client/PNC/Composition/PNC_ClientComposition.lua",
+      "providers": [
+        "PNC/UI/Context/Providers/PNC_ContextProvider_Knowledge",
+        "PNC/UI/Context/Providers/PNC_ContextProvider_Revive",
+        "PNC/UI/Context/Providers/PNC_ContextProvider_Bandage"
+      ],
+      "responsibility": "ContextNPCProviders"
+    },
+    {
+      "owner": "UI",
+      "path": "client/PNC/UI/CharacterWindow/PNC_CharacterWindowRuntime.lua",
+      "module": "PNC/UI/CharacterWindow/PNC_CharacterWindowRuntime",
+      "root": "client/PNC/Composition/PNC_ClientComposition.lua",
+      "providers": [
+        "PNC/UI/CharacterWindow/PNC_CharacterWindow_Shared",
+        "PNC/UI/CharacterWindow/PNC_CharacterWindow_Info",
+        "PNC/UI/CharacterWindow/PNC_CharacterWindow_Dossier",
+        "PNC/UI/CharacterWindow/PNC_CharacterWindow_Interactions",
+        "PNC/UI/CharacterWindow/PNC_CharacterWindow_Skills",
+        "PNC/UI/CharacterWindow/PNC_CharacterWindow_Health",
+        "PNC/UI/CharacterWindow/PNC_CharacterWindow_Protection",
+        "PNC/UI/CharacterWindow/PNC_CharacterWindow_Temperature",
+        "PNC/UI/CharacterWindow/PNC_CharacterWindow"
+      ],
+      "responsibility": "CharacterWindowRuntime"
+    },
+    {
+      "owner": "UI",
+      "path": "client/PNC/UI/Map/PNC_MapTrackingRuntime.lua",
+      "module": "PNC/UI/Map/PNC_MapTrackingRuntime",
+      "root": "client/PNC/Composition/PNC_ClientComposition.lua",
+      "providers": [
+        "PNC/UI/Map/PNC_WorldDiscoveryDebugMap",
+        "PNC/UI/Map/PNC_MapTracking",
+        "PNC/UI/Map/PNC_MapTrackingUI"
+      ],
+      "responsibility": "MapTrackingRuntime"
+    },
+    {
+      "owner": "Presentation",
+      "path": "client/PNC/Audio/PNC_VoiceRuntime.lua",
+      "module": "PNC/Audio/PNC_VoiceRuntime",
+      "root": "client/PNC/Composition/PNC_ClientComposition.lua",
+      "providers": [
+        "PNC/Audio/PNC_NPCVoice",
+        "PNC/Audio/PNC_NPCVoiceCatalog",
+        "PNC/Audio/PNC_NPCVoiceTriggers",
+        "PNC/Audio/PNC_NPCCombatAudio",
+        "PNC/Audio/PNC_PlayerVoice",
+        "PNC/Audio/PNC_PlayerSpeech"
+      ],
+      "responsibility": "VoiceRuntime"
+    }
+  ]
+}

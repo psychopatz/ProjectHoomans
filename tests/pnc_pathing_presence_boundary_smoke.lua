@@ -1,4 +1,5 @@
 local T = require "tests/support/test"
+local registrationPath = require "tests/support/domain_bootstrap"
 
 local ROOT = T.path("ProjectHoomans", "root", "")
 
@@ -19,7 +20,7 @@ local function capture(path)
     local calls = {}
     local originalRequire = require
     require = function(name)
-        local segment = SHARED_SEGMENTS[name]
+        local segment = SHARED_SEGMENTS[name] or registrationPath(ROOT, 'shared', name)
         if segment then
             T.load(ROOT .. segment)
         else

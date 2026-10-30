@@ -1,0 +1,716 @@
+{
+  "tier": 2,
+  "project": "project-hoomans",
+  "coverage": {
+    "project": "project-hoomans",
+    "signal": "best_effort",
+    "indexed_at": "2026-10-30T09:47:56Z",
+    "metadata": {
+      "generation": "2026-10-30T09:47:56Z",
+      "index_mode": "full",
+      "recorded_at": "2026-10-30T09:47:59Z",
+      "recording_status": "complete",
+      "ignored_files_stored": 76,
+      "ignored_files_total": 76,
+      "hash_records_complete": true,
+      "coverage_version": 3,
+      "generation_matches": true
+    },
+    "paths": [
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Audio/PNC_VoiceRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Audio/PNC_VoiceRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ClientComposition.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ClientComposition.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindowRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindowRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_ContextSurfaces.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_ContextSurfaces.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/Providers/PNC_ContextNPCProviders.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/Providers/PNC_ContextNPCProviders.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapTrackingRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapTrackingRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Composition/PNC_ServerComposition.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Composition/PNC_ServerComposition.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/PNC_DirectorRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/PNC_DirectorRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Lumber/PNC_LumberRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Lumber/PNC_LumberRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Medical/PNC_MedicalCareRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Medical/PNC_MedicalCareRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_GroupNeedsRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_GroupNeedsRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_IndividualNeedsRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_IndividualNeedsRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Quests/PNC_QuestRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Quests/PNC_QuestRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/PNC_ScavengeRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/PNC_ScavengeRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticEventRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticEventRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticItemTaskRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticItemTaskRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticTaskRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticTaskRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/FacilityJobs/PNC_FacilityJobsRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/FacilityJobs/PNC_FacilityJobsRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_SocialEventRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_SocialEventRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Tasking/PNC_TaskProviders.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Tasking/PNC_TaskProviders.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_CampRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_CampRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_ResourceRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_ResourceRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_Final.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_Final.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_AttackRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_AttackRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_CombatRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_CombatRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Commands/PNC_CompanionCommands.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Commands/PNC_CompanionCommands.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Communities/PNC_CommunityModel.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Communities/PNC_CommunityModel.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/PNC_CompatibilityRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/PNC_CompatibilityRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Conduct/PNC_ConductModel.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Conduct/PNC_ConductModel.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Equipment/PNC_EquipmentRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Equipment/PNC_EquipmentRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionModel.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionModel.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Farming/PNC_FarmingRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Farming/PNC_FarmingRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_IdentityProfiles.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_IdentityProfiles.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Jobs/PNC_JobsRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Jobs/PNC_JobsRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/MapCommands/PNC_MapCommands.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/MapCommands/PNC_MapCommands.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Needs/PNC_NeedsModels.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Needs/PNC_NeedsModels.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Needs/PNC_NeedsSchema.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Needs/PNC_NeedsSchema.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_PathingRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_PathingRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Perception/PNC_PerceptionRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Perception/PNC_PerceptionRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/PNC_ProductionCatalogs.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Production/PNC_ProductionCatalogs.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Provision/PNC_ProvisionRules.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Provision/PNC_ProvisionRules.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/PuppetOpera/PNC_PuppetOperaRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/PuppetOpera/PNC_PuppetOperaRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipModel.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_RelationshipModel.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialProfiles.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialProfiles.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Scheduling/PNC_SimulationRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Scheduling/PNC_SimulationRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Traits/PNC_NPCTraits.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Traits/PNC_NPCTraits.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_AnimationRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_AnimationRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Gifts/PNC_GiftRuntime.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Gifts/PNC_GiftRuntime.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticFoundation.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticFoundation.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_composition_bootstrap_smoke.lua",
+        "path": "tests/pnc_composition_bootstrap_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_mp_server_file_guard_smoke.lua",
+        "path": "tests/pnc_mp_server_file_guard_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_pathing_presence_boundary_smoke.lua",
+        "path": "tests/pnc_pathing_presence_boundary_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/support/domain_bootstrap.lua",
+        "path": "tests/support/domain_bootstrap.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/test_domain_bootstrap.py",
+        "path": "tests/test_domain_bootstrap.py",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/test_domain_context_audit.py",
+        "path": "tests/test_domain_context_audit.py",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tools/domain_bootstrap.py",
+        "path": "tools/domain_bootstrap.py",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tools/domain_contracts.py",
+        "path": "tools/domain_contracts.py",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      }
+    ],
+    "scopes": [],
+    "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+  },
+  "searches": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "total: 3\nresults: 3  (rows: name label lines in out; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Equipment (Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Equipment/PNC_EquipmentRuntime.lua):\n  PNC_EquipmentRuntime Module 1-5 0 0\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Equipment.PNC_EquipmentRuntime.lua (Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Equipment/PNC_EquipmentRuntime.lua):\n  __file__ File  0 0\nproject-hoomans.docs.Jobs.DomainContextArchitectureRefactor.DOMAIN_CONTRACTS.shared/PNC/Core/Equipment/PNC_EquipmentRuntime (docs/Jobs/DomainContextArchitectureRefactor/DOMAIN_CONTRACTS.json):\n  lua Variable 628-636 0 0\nhas_more: false\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "total: 3\nresults: 3  (rows: name label lines in out; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Semantics (Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticTaskRuntime.lua):\n  PNC_SemanticTaskRuntime Module 1-12 0 3\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Semantics.PNC_SemanticTaskRuntime.lua (Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticTaskRuntime.lua):\n  __file__ File  0 0\nproject-hoomans.docs.Jobs.DomainContextArchitectureRefactor.DOMAIN_CONTRACTS.server/PNC/Semantics/PNC_SemanticTaskRuntime (docs/Jobs/DomainContextArchitectureRefactor/DOMAIN_CONTRACTS.json):\n  lua Variable 775-789 0 0\nhas_more: false\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "total: 3\nresults: 3  (rows: name label lines in out; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.CharacterWindow (Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindowRuntime.lua):\n  PNC_CharacterWindowRuntime Module 1-11 0 0\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.CharacterWindow.PNC_CharacterWindowRuntime.lua (Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindowRuntime.lua):\n  __file__ File  0 0\nproject-hoomans.docs.Jobs.DomainContextArchitectureRefactor.DOMAIN_CONTRACTS.client/PNC/UI/CharacterWindow/PNC_CharacterWindowRuntime (docs/Jobs/DomainContextArchitectureRefactor/DOMAIN_CONTRACTS.json):\n  lua Variable 906-920 0 0\nhas_more: false\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "total: 3\nresults: 3  (rows: name label lines in out; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Identity (Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_IdentityProfiles.lua):\n  PNC_IdentityProfiles Module 1-13 0 0\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Identity.PNC_IdentityProfiles.lua (Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_IdentityProfiles.lua):\n  __file__ File  0 0\nproject-hoomans.docs.Jobs.DomainContextArchitectureRefactor.DOMAIN_CONTRACTS.shared/PNC/Core/Identity/PNC_IdentityProfiles (docs/Jobs/DomainContextArchitectureRefactor/DOMAIN_CONTRACTS.json):\n  lua Variable 504-520 0 0\nhas_more: false\n"
+          }
+        ],
+        "isError": false
+      }
+    }
+  ],
+  "samples": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "qn": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Equipment.PNC_EquipmentRuntime",
+        "trace": {
+          "content": [
+            {
+              "type": "text",
+              "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Equipment.PNC_EquipmentRuntime\ndirection: both\ncallees_total: 0\ncallees: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\ncallers_total: 0\ncallers: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\n"
+            }
+          ],
+          "isError": false
+        },
+        "snippet": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"name\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Equipment/PNC_EquipmentRuntime.lua\",\"qualified_name\":\"project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Equipment.PNC_EquipmentRuntime\",\"label\":\"Module\",\"file_path\":\"/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Equipment/PNC_EquipmentRuntime.lua\",\"start_line\":1,\"end_line\":5,\"source\":\"-- Domain registration: Inventory. Ordered startup only; no gameplay policy.\\nrequire \\\"PNC/Core/Equipment/PNC_Equipment_Items\\\"\\nrequire \\\"PNC/Core/Equipment/PNC_Equipment_Slots\\\"\\nrequire \\\"PNC/Core/Equipment/PNC_Equipment\\\"\\n\",\"callers\":0,\"callees\":0}"
+            }
+          ],
+          "structuredContent": {
+            "name": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Equipment/PNC_EquipmentRuntime.lua",
+            "qualified_name": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Equipment.PNC_EquipmentRuntime",
+            "label": "Module",
+            "file_path": "/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Equipment/PNC_EquipmentRuntime.lua",
+            "start_line": 1,
+            "end_line": 5,
+            "source": "-- Domain registration: Inventory. Ordered startup only; no gameplay policy.\nrequire \"PNC/Core/Equipment/PNC_Equipment_Items\"\nrequire \"PNC/Core/Equipment/PNC_Equipment_Slots\"\nrequire \"PNC/Core/Equipment/PNC_Equipment\"\n",
+            "callers": 0,
+            "callees": 0
+          },
+          "isError": false
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "qn": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Semantics.PNC_SemanticTaskRuntime",
+        "trace": {
+          "content": [
+            {
+              "type": "text",
+              "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Semantics.PNC_SemanticTaskRuntime\ndirection: both\ncallees_total: 1\ncallees: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.tests.pnc_mp_server_file_guard_smoke.PsychopatzCore.RuntimeRole:\n  AllowsServerCode 1 heuristic 0.38\ncallers_total: 0\ncallers: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\n"
+            }
+          ],
+          "isError": false
+        },
+        "snippet": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"name\":\"Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticTaskRuntime.lua\",\"qualified_name\":\"project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Semantics.PNC_SemanticTaskRuntime\",\"label\":\"Module\",\"file_path\":\"/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticTaskRuntime.lua\",\"start_line\":1,\"end_line\":12,\"source\":\"-- Domain registration: Semantics. Ordered startup only; no gameplay policy.\\nif PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end\\nrequire \\\"PNC/Semantics/PNC_SemanticWaterTargetResolver\\\"\\nrequire \\\"PNC/Semantics/Inventory/PNC_SemanticItemSelector\\\"\\nrequire \\\"PNC/Semantics/Inventory/PNC_SemanticInventoryQueryService\\\"\\nrequire \\\"PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanPathProvider\\\"\\nrequire \\\"PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanWaitProvider\\\"\\nrequire \\\"PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanCampProvider\\\"\\nrequire \\\"PNC/Semantics/PNC_SemanticTaskRequestService\\\"\\nrequire \\\"PNC/Semantics/PNC_SemanticActionPlanTaskHandler\\\"\\nrequire \\\"PNC/Semantics/PNC_SemanticCampTaskHandler\\\"\\n\",\"callers\":0,\"callees\":1}"
+            }
+          ],
+          "structuredContent": {
+            "name": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticTaskRuntime.lua",
+            "qualified_name": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Semantics.PNC_SemanticTaskRuntime",
+            "label": "Module",
+            "file_path": "/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticTaskRuntime.lua",
+            "start_line": 1,
+            "end_line": 12,
+            "source": "-- Domain registration: Semantics. Ordered startup only; no gameplay policy.\nif PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end\nrequire \"PNC/Semantics/PNC_SemanticWaterTargetResolver\"\nrequire \"PNC/Semantics/Inventory/PNC_SemanticItemSelector\"\nrequire \"PNC/Semantics/Inventory/PNC_SemanticInventoryQueryService\"\nrequire \"PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanPathProvider\"\nrequire \"PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanWaitProvider\"\nrequire \"PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanCampProvider\"\nrequire \"PNC/Semantics/PNC_SemanticTaskRequestService\"\nrequire \"PNC/Semantics/PNC_SemanticActionPlanTaskHandler\"\nrequire \"PNC/Semantics/PNC_SemanticCampTaskHandler\"\n",
+            "callers": 0,
+            "callees": 1
+          },
+          "isError": false
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "qn": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.CharacterWindow.PNC_CharacterWindowRuntime",
+        "trace": {
+          "content": [
+            {
+              "type": "text",
+              "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.CharacterWindow.PNC_CharacterWindowRuntime\ndirection: both\ncallees_total: 0\ncallees: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\ncallers_total: 0\ncallers: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\n"
+            }
+          ],
+          "isError": false
+        },
+        "snippet": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"name\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindowRuntime.lua\",\"qualified_name\":\"project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.CharacterWindow.PNC_CharacterWindowRuntime\",\"label\":\"Module\",\"file_path\":\"/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindowRuntime.lua\",\"start_line\":1,\"end_line\":11,\"source\":\"-- Domain registration: UI. Ordered startup only; no gameplay policy.\\nrequire \\\"PNC/UI/CharacterWindow/PNC_CharacterWindow_Shared\\\"\\nrequire \\\"PNC/UI/CharacterWindow/PNC_CharacterWindow_Info\\\"\\nrequire \\\"PNC/UI/CharacterWindow/PNC_CharacterWindow_Dossier\\\"\\nrequire \\\"PNC/UI/CharacterWindow/PNC_CharacterWindow_Interactions\\\"\\nrequire \\\"PNC/UI/CharacterWindow/PNC_CharacterWindow_Skills\\\"\\nrequire \\\"PNC/UI/CharacterWindow/PNC_CharacterWindow_Health\\\"\\nrequire \\\"PNC/UI/CharacterWindow/PNC_CharacterWindow_Protection\\\"\\nrequire \\\"PNC/UI/CharacterWindow/PNC_CharacterWindow_Temperature\\\"\\nrequire \\\"PNC/UI/CharacterWindow/PNC_CharacterWindow\\\"\\n\",\"callers\":0,\"callees\":0}"
+            }
+          ],
+          "structuredContent": {
+            "name": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindowRuntime.lua",
+            "qualified_name": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.CharacterWindow.PNC_CharacterWindowRuntime",
+            "label": "Module",
+            "file_path": "/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindowRuntime.lua",
+            "start_line": 1,
+            "end_line": 11,
+            "source": "-- Domain registration: UI. Ordered startup only; no gameplay policy.\nrequire \"PNC/UI/CharacterWindow/PNC_CharacterWindow_Shared\"\nrequire \"PNC/UI/CharacterWindow/PNC_CharacterWindow_Info\"\nrequire \"PNC/UI/CharacterWindow/PNC_CharacterWindow_Dossier\"\nrequire \"PNC/UI/CharacterWindow/PNC_CharacterWindow_Interactions\"\nrequire \"PNC/UI/CharacterWindow/PNC_CharacterWindow_Skills\"\nrequire \"PNC/UI/CharacterWindow/PNC_CharacterWindow_Health\"\nrequire \"PNC/UI/CharacterWindow/PNC_CharacterWindow_Protection\"\nrequire \"PNC/UI/CharacterWindow/PNC_CharacterWindow_Temperature\"\nrequire \"PNC/UI/CharacterWindow/PNC_CharacterWindow\"\n",
+            "callers": 0,
+            "callees": 0
+          },
+          "isError": false
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "qn": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Identity.PNC_IdentityProfiles",
+        "trace": {
+          "content": [
+            {
+              "type": "text",
+              "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Identity.PNC_IdentityProfiles\ndirection: both\ncallees_total: 0\ncallees: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\ncallers_total: 0\ncallers: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\n"
+            }
+          ],
+          "isError": false
+        },
+        "snippet": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"name\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_IdentityProfiles.lua\",\"qualified_name\":\"project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Identity.PNC_IdentityProfiles\",\"label\":\"Module\",\"file_path\":\"/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_IdentityProfiles.lua\",\"start_line\":1,\"end_line\":13,\"source\":\"-- Domain registration: Identity. Ordered startup only; no gameplay policy.\\nrequire \\\"PNC/Core/Identity/PNC_Identity_Verifier\\\"\\nrequire \\\"PNC/Core/Archetypes/Registry/PNC_Archetypes\\\"\\nrequire \\\"PNC/Core/Archetypes/Registry/PNC_ArchetypeLoader\\\"\\nrequire \\\"PNC/Core/Identity/PNC_Identity_Names\\\"\\nrequire \\\"PNC/Core/Identity/PNC_IdentityAlias\\\"\\nrequire \\\"PNC/Core/Identity/PNC_Identity_Factory\\\"\\nrequire \\\"PNC/Core/Identity/PNC_Identity_ID\\\"\\nrequire \\\"PNC/Core/Identity/PNC_Identity_Appearance\\\"\\nrequire \\\"PNC/Core/Identity/PNC_Identity_Profile\\\"\\nrequire \\\"PNC/Core/Identity/PNC_UniqueNPCs\\\"\\nrequire \\\"PNC/Core/Identity/PNC_Identity_Portrait\\\"\\n\",\"callers\":0,\"callees\":0}"
+            }
+          ],
+          "structuredContent": {
+            "name": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_IdentityProfiles.lua",
+            "qualified_name": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Identity.PNC_IdentityProfiles",
+            "label": "Module",
+            "file_path": "/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_IdentityProfiles.lua",
+            "start_line": 1,
+            "end_line": 13,
+            "source": "-- Domain registration: Identity. Ordered startup only; no gameplay policy.\nrequire \"PNC/Core/Identity/PNC_Identity_Verifier\"\nrequire \"PNC/Core/Archetypes/Registry/PNC_Archetypes\"\nrequire \"PNC/Core/Archetypes/Registry/PNC_ArchetypeLoader\"\nrequire \"PNC/Core/Identity/PNC_Identity_Names\"\nrequire \"PNC/Core/Identity/PNC_IdentityAlias\"\nrequire \"PNC/Core/Identity/PNC_Identity_Factory\"\nrequire \"PNC/Core/Identity/PNC_Identity_ID\"\nrequire \"PNC/Core/Identity/PNC_Identity_Appearance\"\nrequire \"PNC/Core/Identity/PNC_Identity_Profile\"\nrequire \"PNC/Core/Identity/PNC_UniqueNPCs\"\nrequire \"PNC/Core/Identity/PNC_Identity_Portrait\"\n",
+            "callers": 0,
+            "callees": 0
+          },
+          "isError": false
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Statement-form require IMPORTS remain incomplete. Empty traces are not evidence of no callers; fresh literal import analysis supplies caller/dependency/affected-test edges.",
+    "RuntimeRole resolves to a test fixture heuristically; it is not an authoritative implementation edge."
+  ]
+}

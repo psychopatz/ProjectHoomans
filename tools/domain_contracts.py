@@ -98,6 +98,20 @@ def inspect(paths, edges, policy):
 
     entries = {name: set(domain['entries'])
                for name, domain in policy['domains'].items()}
+    registrations = policy.get('registrations', {})
+    public_entries = {name: set(paths) for name, paths in entries.items()}
+    for path, registration in registrations.items():
+        name = registration['owner']
+        public_entries.setdefault(name, set()).add(path)
+        if path not in paths:
+            issue('MISSING_ENTRY', path, detail=name)
+        elif ownership[path] != name:
+            issue('COMPETING_AUTHORITY', path, detail=f'{name} registration owned by {ownership[path]}')
+        for provider in registration['providers']:
+            if provider not in paths:
+                issue('MISSING_ENTRY', provider, detail=path)
+            elif ownership[provider] != name:
+                issue('COMPETING_AUTHORITY', path, provider, detail='registration crosses ownership')
     for name, public in entries.items():
         for path in public:
             if path not in paths:
@@ -137,10 +151,15 @@ def inspect(paths, edges, policy):
         # A server entry cannot replace a shared/client provider at bootstrap.
         layer = target.split('/', 1)[0]
         compatible_entries = [p for p in entries.get(b, ()) if p.startswith(layer + '/')]
-        if a == 'Composition' and compatible_entries and target not in entries[b]:
+        if a == 'Composition' and compatible_entries and target not in public_entries.get(b, ()):
             issue('COMPOSITION_TO_PROVIDER', source, target, line)
+        if a == 'Composition' and any(
+                target in registration['providers'] and
+                registration.get('root', source) == source
+                for registration in registrations.values()):
+            issue('COMPOSITION_TO_REGISTERED_PROVIDER', source, target, line)
         if (a != 'Composition' and b in policy['enforced_public_domains']
-                and target not in entries.get(b, ())):
+                and target not in public_entries.get(b, ())):
             issue('FOREIGN_IMPLEMENTATION', source, target, line)
         if (a, b) in cycle_pairs:
             issue('CROSS_DOMAIN_CYCLE_EDGE', source, target, line, f'{a} -> {b}')

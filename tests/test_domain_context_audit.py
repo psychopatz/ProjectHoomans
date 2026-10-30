@@ -84,6 +84,32 @@ class ContractBoundaryTests(unittest.TestCase):
         self.assertEqual(result['new'], [added])
         self.assertEqual(result['resolved'], [])
 
+    def test_registration_owns_assembly_without_exporting_all_providers(self):
+        self.policy['registrations'] = {
+            'Inventory/Register.lua': {'owner': 'Inventory',
+                                       'root': 'Composition/A.lua',
+                                       'providers': ['Inventory/Mutation.lua']}}
+        paths = {'Inventory/Public.lua': 'Inventory', 'Inventory/Register.lua': 'Inventory',
+                 'Inventory/Mutation.lua': 'Inventory', 'Composition/A.lua': 'Composition',
+                 'Supply/A.lua': 'Supply'}
+        edges = [{'source': a, 'target': b, 'line': 1} for a, b in [
+            ('Composition/A.lua', 'Inventory/Register.lua'),
+            ('Inventory/Register.lua', 'Inventory/Mutation.lua'),
+            ('Composition/A.lua', 'Inventory/Mutation.lua'),
+            ('Supply/A.lua', 'Inventory/Mutation.lua')]]
+        issues = inspect(paths, edges, self.policy)['issues']
+        self.assertIn('COMPOSITION_TO_REGISTERED_PROVIDER', {v['rule'] for v in issues})
+        self.assertIn('FOREIGN_IMPLEMENTATION', {v['rule'] for v in issues})
+        self.assertFalse(any(v['target'] == 'Inventory/Register.lua' for v in issues))
+
+    def test_registration_cannot_claim_another_domain_provider(self):
+        self.policy['registrations'] = {
+            'Inventory/Register.lua': {'owner': 'Inventory', 'providers': ['Supply/A.lua']}}
+        result = inspect({'Inventory/Public.lua': 'Inventory',
+                          'Inventory/Register.lua': 'Inventory', 'Supply/A.lua': 'Supply'},
+                         [], self.policy)
+        self.assertIn('COMPETING_AUTHORITY', {v['rule'] for v in result['issues']})
+
     def test_two_declared_authorities_for_same_namespace_fail(self):
         self.policy['domains']['Supply'] = {'entries': [], 'namespace': 'PNC.Inventory'}
         result = inspect({'Inventory/Public.lua': 'Inventory'}, [], self.policy)

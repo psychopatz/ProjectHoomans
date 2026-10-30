@@ -97,6 +97,21 @@ def collect(root, policy=None):
     }
     if policy:
         relative = {p: p.removeprefix(prefix) for p in runtime}
+        # Keep the ownership orientation small; ordered assembly has one
+        # machine-readable manifest, shared with the bootstrap equivalence guard.
+        policy = dict(policy)
+        if policy.get('registration_definitions'):
+            known = set(relative.values())
+            policy['registrations'] = {}
+            for registration in policy['registration_definitions']:
+                layer = registration['path'].split('/', 1)[0]
+                providers = []
+                for module in registration['providers']:
+                    candidate = f'{layer}/{module}.lua'
+                    providers.append(candidate if candidate in known else f'shared/{module}.lua')
+                policy['registrations'][registration['path']] = {
+                    'owner': registration['owner'], 'root': registration['root'],
+                    'providers': providers}
         result['contracts'] = inspect(
             {relative[p]: f['subsystem'] for p, f in runtime.items()},
             [{'source': relative[p], 'target': relative[e['target']], 'line': e['line']}
@@ -122,6 +137,9 @@ def main():
                         help='Fail for new boundary violations beyond this reviewed migration debt')
     args = parser.parse_args()
     policy = json.loads(args.contracts.read_text()) if args.contracts else None
+    if policy and policy.get('registration_manifest'):
+        manifest = args.contracts.parent / policy['registration_manifest']
+        policy['registration_definitions'] = json.loads(manifest.read_text())['registrations']
     if args.check_debt and not policy:
         parser.error('--check-debt requires --contracts')
     result = collect(args.root, policy)

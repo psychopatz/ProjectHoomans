@@ -1,0 +1,10 @@
+-- Domain registration: Combat. Ordered startup only; no gameplay policy.
+require "PNC/Core/Combat/CombatResolution/PNC_CombatResolution"
+require "PNC/Core/Combat/PNC_Combat"
+require "PNC/Core/Combat/PNC_Combat_Audio"
+require "PNC/Core/Combat/PNC_Combat_Firearms"
+require "PNC/Core/Combat/PNC_Combat_FirearmEffects"
+require "PNC/Core/Combat/PNC_Combat_ZombieReaction"
+require "PNC/Core/Combat/PNC_Combat_Unarmed"
+require "PNC/Core/Combat/PNC_Combat_Defense"
+require "PNC/Core/Combat/CombatTactics/PNC_Combat_Tactics"

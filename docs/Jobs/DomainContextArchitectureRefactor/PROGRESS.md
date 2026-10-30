@@ -1,84 +1,75 @@
 # Progress — Domain & Context Architecture Refactor
 
-**Status:** IN PROGRESS — P2 Inventory capsule pilot developer-validated; P3 composition seams are next.
+**Status:** IN PROGRESS — P0–P3 developer-validated; P4 persistence ownership is next.
 
 ## Parent objective
 
 Complete P0–P8 in `ROADMAP.md` and every developer gate in `ACCEPTANCE.md`.
-P0 completion does not complete this goal. No production architecture changed yet.
+A phase completion does not complete this parent goal. Continue automatically.
 
-## Verified current state
+## Current repository and architecture
 
-- Existing `main`, source baseline `15cadee70be11b790ce4c48bfb7bd51badd8233b`.
-- Initially clean; origin fetched; ahead 7 / behind 0. No concurrent edits observed.
-- MCP `project-hoomans` explicitly refreshed: 99,748 nodes / 409,550 edges;
-  3,260 current runtime Lua files. Matching HEAD had hidden stale graph contents.
-- Tier 2 coverage: 600 composition/cycle paths plus 53 probe/test paths checked;
-  no recorded gaps, metadata matched. Excluded caches/venv classified separately.
-- Fresh analyzer: 285 findings, 45 cycle manifestations / 13 paths; three folder
-  SCC groups and one UI/debug file-import SCC. See `P0_BASELINE.md` and
-  `P0_ARCHITECTURE.json`; these are not 45 independent architectural defects.
-- Maintained executable runtime: 3,258 files; generated runtime catalogs: 2;
-  common Lua declarations/catalogs: 282, reported separately from runtime policy.
-- Seven fixed probes: 37 unique source files / 5,530 lines / 209,522 bytes.
-  Definitions, affected tests, foreign interactions, reviewed hops and cycle
-  interpretation: `RETRIEVAL.md`, `RETRIEVAL_PROBES.json`, `P0_RETRIEVAL.json`.
-  Saved both-direction MCP traces: `P0_MCP_TRACES.json`.
-- Known MCP heuristic alias errors and incomplete statement-form IMPORTS are
-  explicitly documented. Source/literal-import evidence supplements graph data.
+- Existing `main` only; planning baseline `15cadee70be11b790ce4c48bfb7bd51badd8233b`.
+  Initially clean, origin fetched, ahead 7 / behind 0. No concurrent edits found.
+- Accepted commits before current P3 chunk: P0 `4205a1d7`, P1 `24d61abc`,
+  Inventory pilot `b4535421`, tooling-baseline evidence `19749cef`.
+- MCP project `project-hoomans`; explicitly refreshed against actual source.
+  Matching Git HEAD alone had hidden stale content. Statement-form IMPORTS and
+  heuristic alias resolution need the documented literal-import/source fallback.
+- P0 maintained runtime: 3,258 executable Lua files, 2 generated runtime catalogs;
+  282 common declarations/catalogs separately classified. P3 adds 47 policy-free
+  registrations; no provider moves or provider body changes in that phase.
+- P0 analyzer: 45 cycle manifestations / 13 paths, not 45 independent defects.
+  Existing three-file UI/debug import SCC remains. Explicit ownership currently
+  has one broad logical SCC; its real edges require P4–P7 review/inversion.
+- Boundary debt: zero new; P2 resolved fifteen, P3 resolved four; 189 remain.
+  The original debt list is unchanged, never an acceptance waiver.
 
-## Validation
+## Accepted evidence and current validation
 
-- Full isolated Lua baseline: **978/978**, 4 workers, 8.92 seconds.
-- NPC tooling baseline: **6/6** Python tests.
-- Architecture ownership/cycle/debt regression tests: **11/11**.
-- Probe rerun against P0: zero source/hop deltas.
-- `git diff --check`: clean. Runtime Lua unchanged, so no new runtime compile gate.
-- Full in-process semantic-tooling baseline aborted with a pre-existing Tk
-  cleanup/thread failure (exit 134), before any production changes. An isolated
-  per-module retry runs against an immutable P1 archive; current baseline failures
-  are being collected and remain unaccepted final gates.
-- No native PZ launched; no Workshop publication.
+- P0: `P0_BASELINE.md`, `P0_ARCHITECTURE.json`, `RETRIEVAL.md` and fixed probe
+  definitions. Original seven probes: 37 files / 5,530 lines / 209,522 bytes.
+- P1: `OWNERSHIP.md`, compact `DOMAIN_CONTRACTS.json`, dependency/context guards.
+- P2: `INVENTORY_PILOT.md`, `P2_VALIDATION.json`. Public item-state/rollback and
+  Equipment/Supply seams; obsolete transfer handler removed with command bodies
+  preserved. Transfer probe: 5 → 4 files, 3 → 2 handoffs, -10,976 bytes.
+- P3: `COMPOSITION_SEAMS.md`, `REGISTRATIONS.json`, `P3_VALIDATION.json`.
+  Ordered domain entries reduce root knowledge: 488 → 270 direct imports,
+  25,390 → 14,011 bytes. Expanded import/code-barrier trace is identical.
+  Registrations add an assembly hop; their domain-local startup surfaces are
+  smaller. Complete expanded source/file count is not claimed to shrink.
+- Current fixed probes: **36 files / 5,269 lines / 198,850 bytes**; -10,672 bytes
+  versus P0, unchanged by P3. Source increases in two P2 hubs are documented.
+- Latest full isolated Lua: **978/978**, 4 workers, 9.03 seconds.
+  Diagnostic Python: **20/20**. NPC tooling P0 baseline: **6/6**.
+- Changed-runtime installed PZ Kahlua: P2 **36/36**, P3 **54/54**;
+  static Kahlua zero errors; `git diff --check` clean.
+- Immutable P1 semantic-tooling baseline: 194 modules, 124 pass, 65 fail,
+  5 GUI-related timeouts; 764 reported tests, 2 skips. In-process discovery
+  previously aborted in Tk cleanup (exit 134). These pre-existing failures
+  remain unaccepted final gates, bounded in `P0_TOOLING_BASELINE.json`.
+  Many assertions count lifecycle fact transport as gameplay dispatch; P5 must
+  preserve actual facts and distinguish observability before repairing assertions.
+- No native Project Zomboid launched; no Workshop publication.
 
-## Current phase / next mandatory chunk
+## Next mandatory chunk
 
-**P3 — Composition roots depend on domain registration seams.**
+**P4 — Persistence ownership and cycle inversion.**
 
-P2 accepted evidence (`INVENTORY_PILOT.md`, `P2_VALIDATION.json`):
-
-- Inventory owns snapshot restoration and public item-state interop; foreign
-  codec imports removed (four real users migrated; eight unused bindings removed).
-- Equipment/Inventory/Supply queries and commands replace foreign private table
-  accesses in combat, authoring, scavenge, production, refill and compatibility.
-- Generic transfer owns gift replay; medical sharing stays independent. Deleted
-  the obsolete handler/handoff; both public command bodies match P0 exactly.
-- Full Lua **978/978**; focused **109/109**; diagnostics **13/13**;
-  installed PZ Kahlua **36/36**, static Kahlua **zero errors**, diff check clean.
-- Guard: zero new debt, fifteen resolved import/composition issues. Declared
-  foreign pilot private-root accesses: zero. Namespace alias coverage remains
-  bounded; source/MCP review is still required for arbitrary dynamic data flow.
-- Fixed probes now 36 unique files / 5,269 lines / 198,850 bytes: **-10,672 bytes**
-  versus P0. Transfer probe: 5 -> 4 files, 3 -> 2 handoffs, -10,976 bytes.
-- Small hub increases are explained in the pilot document; file count was not
-  used as a standalone acceptance target.
-- Immutable P1 semantic-tooling baseline completed: 194 modules, 124 pass,
-  65 fail, 5 GUI-related timeouts; 764 reported tests, 2 skips. These pre-existing
-  failures remain unaccepted final gates. `P0_TOOLING_BASELINE.json` records
-  bounded IDs/messages; P5/final must classify and resolve them.
-
-Next required work:
-
-1. Establish small registration entries for coherent ordered domain segments.
-2. Preserve exact expanded bootstrap order and partial SP/MP loader behavior;
-   do not collect interleaved providers early or add service-locator indirection.
-3. Migrate composition away from leaf knowledge using the proven pilot rules.
-4. Run composition/bootstrap, relevant focused tests, dependency/context guards
-   and changed-runtime installed-PZ/Kahlua checks, then continue P4 automatically.
-5. Before Presence/binding-related composition edits, preserve the inspected M12
-   identity/incarnation, loaded-envelope, restart and visual-authority contracts.
+1. Graph/source map coordinator/lifecycle, domain schemas and repositories,
+   migrations, UI/debug consumers and Conversation/Knowledge/WorldDiscovery edges.
+2. Record pre-change callers/dependencies/tests and persistence retrieval evidence.
+3. Move schema meaning behind owning repositories; keep save/load timing in
+   Persistence. Remove deserialization-driven UI/conversation callbacks through
+   owned state commits and normal later application paths; preserve behavior.
+4. Eliminate real persistence-driven cycles or prove a required composition
+   relation. Do not duplicate canonical state to remove imports.
+5. Run focused persistence/restart/roundtrip tests, full guards, installed Kahlua,
+   fixed probes and diff checks; update this file and continue P5 automatically.
 
 ## Remaining gates
 
-P3–P8 remain mandatory; enforcement evolves with each accepted domain seam. Body-binding M12 native acceptance is user-owned and
-must remain intact; inspect that job before changing its runtime paths.
-Historical refactor logs and root AGENTS remain unchanged.
+P4–P8 and all final developer gates remain mandatory, including semantic-tooling
+failures/timeouts. M12 body-binding native acceptance remains user-owned; its
+identity/lease, loaded-envelope, restart and visual-authority contracts must be
+preserved. Historical refactor logs and root `AGENTS.md` remain unchanged.
