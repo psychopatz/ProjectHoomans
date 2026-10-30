@@ -8,33 +8,52 @@ local function finalizeRehydrationMisses(now)
     if not reg or not reg.ForEach then return 0, 0 end
     local missed = 0
     local lateStream = 0
+    local legacyStrong = 0
     local serverRuntime = isServer and isServer() == true
 
     reg.ForEach(function(record)
         if record and record.alive ~= false
             and record.runtime
-            and record.runtime.startupRehydrateExpected == true
             and record.presenceState ~= Const.PRESENCE_LIVE
         then
-            if serverRuntime
+            if record.runtime.startupRehydrateExpected == true then
+                if serverRuntime
+                    and Lifecycle.ArmLateStreamRehydrate
+                    and Lifecycle.ArmLateStreamRehydrate(record, now)
+                then
+                    record.runtime.lifecycle =
+                        record.runtime.lifecycle or {}
+                    record.runtime.lifecycle.lastReason =
+                        "startup_rehydrate_late_stream"
+                    record.runtime.lifecycle.lastTransitionAt = now
+                    lateStream = lateStream + 1
+                else
+                    record.runtime.startupRehydrateExpected = nil
+                    record.runtime.startupRehydrateMissed = true
+                    record.runtime.lifecycle =
+                        record.runtime.lifecycle or {}
+                    record.runtime.lifecycle.lastReason =
+                        "startup_rehydrate_missed"
+                    record.runtime.lifecycle.lastTransitionAt = now
+                    missed = missed + 1
+                end
+            elseif serverRuntime
+                and Internal.IsLegacyStrongLateStreamHint
+                and Internal.IsLegacyStrongLateStreamHint(record)
                 and Lifecycle.ArmLateStreamRehydrate
                 and Lifecycle.ArmLateStreamRehydrate(record, now)
             then
+                -- M11-era clean host shutdowns could serialize a detached live
+                -- carrier with wasLive=false even though its exact engine id,
+                -- lease and position survived. Migrate only that strong shape;
+                -- anonymous position-only bodies remain ineligible.
                 record.runtime.lifecycle =
                     record.runtime.lifecycle or {}
                 record.runtime.lifecycle.lastReason =
-                    "startup_rehydrate_late_stream"
+                    "startup_legacy_carrier_late_stream"
                 record.runtime.lifecycle.lastTransitionAt = now
                 lateStream = lateStream + 1
-            else
-                record.runtime.startupRehydrateExpected = nil
-                record.runtime.startupRehydrateMissed = true
-                record.runtime.lifecycle =
-                    record.runtime.lifecycle or {}
-                record.runtime.lifecycle.lastReason =
-                    "startup_rehydrate_missed"
-                record.runtime.lifecycle.lastTransitionAt = now
-                missed = missed + 1
+                legacyStrong = legacyStrong + 1
             end
         end
     end)
@@ -43,6 +62,7 @@ local function finalizeRehydrationMisses(now)
         Core.LogInfo(
             "PNC startup late-stream rehydration armed count="
                 .. tostring(lateStream)
+                .. " legacyStrong=" .. tostring(legacyStrong)
         )
     end
     if missed > 0 and Core.LogInfo then

@@ -15,15 +15,36 @@ local function validSavedIdentity(value)
         and tostring(value) ~= "0"
 end
 
-function Internal.ValidLateStreamHint(record)
-    local hint = hintOf(record)
+local function hasLateStreamBaseProof(hint)
     return hint ~= nil
-        and hint.wasLive == true
         and tostring(hint.lease or "") ~= ""
+        and tonumber(hint.x) ~= nil
+        and tonumber(hint.y) ~= nil
+        and tonumber(hint.z) ~= nil
+end
+
+local function hasSavedEngineIdentity(hint)
+    return hint ~= nil
         and (
             validSavedIdentity(hint.instanceID)
             or validSavedIdentity(hint.populationId)
         )
+end
+
+function Internal.ValidLateStreamHint(record)
+    local hint = hintOf(record)
+    return hasLateStreamBaseProof(hint)
+        and (
+            hint.wasLive == true
+            or hasSavedEngineIdentity(hint)
+        )
+end
+
+function Internal.IsLegacyStrongLateStreamHint(record)
+    local hint = hintOf(record)
+    return hasLateStreamBaseProof(hint)
+        and hint.wasLive ~= true
+        and hasSavedEngineIdentity(hint)
 end
 
 function Internal.LateStreamSavedPosition(record)

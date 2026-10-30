@@ -233,62 +233,9 @@ function Lifecycle.StampLiveBody(record, zombie)
     return runtime.bodyLease
 end
 
-local function captureDetachedBodyHint(record)
-    local runtime
-    local previous
-    local instanceID
-    local populationID
-    local onlineID
-    local lease
-    local x
-    local y
-    local z
-    if not record then
-        return nil
-    end
-    runtime = record.runtime or {}
-    record.runtime = runtime
-    previous = runtime.startupBodyHint
-    instanceID = record.liveBodyInstanceID
-        or runtime.lastLiveBodyInstanceID
-        or previous and previous.instanceID or nil
-    populationID = record.liveBodyPopulationID
-        or runtime.lastLiveBodyPopulationID
-        or previous and previous.populationId or nil
-    onlineID = record.liveBodyOnlineID
-        or runtime.lastLiveBodyOnlineID
-        or previous and previous.onlineID or nil
-    lease = runtime.bodyLease
-        or runtime.lastLiveBodyLease
-        or previous and previous.lease or nil
-    x = record.x
-    y = record.y
-    z = record.z
-    if x == nil and previous then x = previous.x end
-    if y == nil and previous then y = previous.y end
-    if z == nil and previous then z = previous.z end
-    runtime.lastLiveBodyInstanceID = instanceID
-    runtime.lastLiveBodyPopulationID = populationID
-    runtime.lastLiveBodyOnlineID = onlineID
-    runtime.lastLiveBodyLease = lease
-    runtime.lastLiveBodyX = x
-    runtime.lastLiveBodyY = y
-    runtime.lastLiveBodyZ = z
-    if instanceID ~= nil or populationID ~= nil then
-        runtime.startupBodyHint = {
-            instanceID = instanceID,
-            onlineID = onlineID,
-            lease = lease,
-            populationId = populationID,
-            x = x,
-            y = y,
-            z = z,
-        }
-    end
-    return runtime.startupBodyHint
+if not Internal.CaptureDetachedBodyHint then
+    require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_DetachedHint"
 end
-
-Internal.CaptureDetachedBodyHint = captureDetachedBodyHint
 
 function Internal.detachLiveBody(record, reason)
     local reg = Internal.registry()
@@ -297,7 +244,7 @@ function Internal.detachLiveBody(record, reason)
         -- Keep the last engine identity alive long enough for the record
         -- serializer to persist it. PZ may restore the removed shell after a
         -- relog even when removeZombie() reported a successful detach.
-        captureDetachedBodyHint(record)
+        Internal.CaptureDetachedBodyHint(record)
         record.runtime.bodyReleasePending = nil
         record.runtime.bodyReleaseAttempts = nil
         record.runtime.bodyReleaseLastAt = nil
