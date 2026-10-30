@@ -7,8 +7,8 @@ local Internal = Service.Internal
 local Core = Internal.Core
 local GridRegion = Internal.GridRegion
 local Zones = Internal.Zones
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 local function now()
     if Core and type(Core.Now) == "function" then return Core.Now() end

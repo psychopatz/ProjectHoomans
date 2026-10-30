@@ -10,8 +10,8 @@ PNC.FishingService = PNC.FishingService or {}
 local Service = PNC.FishingService
 local Const = PNC.Const or {}
 local Core = PNC.Core or {}
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 local Internal = Service.Internal or {}
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"

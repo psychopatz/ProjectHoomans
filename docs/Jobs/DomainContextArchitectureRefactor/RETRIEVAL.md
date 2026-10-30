@@ -38,6 +38,19 @@ The seven entry paths and explicit test lists are in the definitions. Entry
 does not imply `require` returns a table: several existing hubs populate `PNC`
 and return Lua's default `true`. Follow the actual namespace contract.
 
+The current persisted-inventory entry is `InventoryRepository`, with the same
+fixed behavior and ID. Its reviewed set is four files / 496 lines / 18,908 bytes
+at P4B's first slice. The record-envelope hub and whole Serialize/Deserialize
+hosts no longer own deferred item policy; they delegate to this repository.
+The global Inventory bootstrap is also unnecessary to explain a compact revision
+change because the independent repository and existing codec facade expose that
+contract directly. Those four old files are replaced by one public repository;
+the existing compact codec, delta and Core bridge remain in the set. Envelope
+callers are still traced and integration/roundtrip-tested; their omission from
+the working set is not a claim that they have no dependency or load behavior.
+The source-reviewed entry-to-codec handoff depth remains three. Baseline source
+sets and metrics in `P0_RETRIEVAL.json` remain unchanged.
+
 ## Cycle participation
 
 - Inventory transfer and lease creation: no literal cross-domain SCC for their
@@ -47,8 +60,8 @@ and return Lua's default `true`. Follow the actual namespace contract.
   The selected close slice itself does not need a UI window or Persistence
   implementation. P5 must retain this locality while clarifying the domain seam.
 - Inventory field persistence: crosses Persistence -> Inventory; the coordinator
-  additionally imports Conversation memory even when changing an inventory field.
-  P4 must disentangle that ownership without duplicating record state.
+  now invokes owning Inventory and Memory repositories. Schema-neutral ModData
+  access has its own public storage seam; it cannot load record policy or UI.
 - UI rows: UI belongs to the large folder SCC, while this query projection is
   already local. Retain its fine-grained grouping/native metadata seam.
 - Presence eligibility: no literal SCC for Presence. BodyLifecycle startup and

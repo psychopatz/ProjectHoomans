@@ -9,8 +9,8 @@ local Constants = PNC.FactionConstants
 local Types = PNC.FactionTypes
 local Archetypes = PNC.FactionArchetypes
 local EntityRef = PNC.EntityRef
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 function Factions.Load()
     local raw
     local normalized

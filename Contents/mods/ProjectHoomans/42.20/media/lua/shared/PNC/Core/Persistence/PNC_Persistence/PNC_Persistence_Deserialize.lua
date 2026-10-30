@@ -1,7 +1,7 @@
 PNC = PNC or {}
 PNC.Persistence = PNC.Persistence or {}
 PNC.Persistence.Internal = PNC.Persistence.Internal or {}
-require "PNC/Conversation/Memory/PNC_ConversationMemory"
+local MemoryRepository = require "PNC/Conversation/Memory/PNC_ConversationMemoryRepository"
 
 local Persistence = PNC.Persistence
 local Internal = Persistence.Internal
@@ -13,11 +13,8 @@ local Inventory = PNC.Inventory
 local RelationshipTypes = PNC.RelationshipTypes
 local RelationshipMath = PNC.RelationshipMath
 local FactionTypes = PNC.FactionTypes
-local MemoryEvents = PNC.Conversation
-    and PNC.Conversation.Memory
-    and PNC.Conversation.Memory.Events or nil
 local Reset = Persistence.Reset
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 local function buildDefinition(
     raw,
@@ -240,11 +237,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         identity,
         progression
     )
-    if record and MemoryEvents
-        and type(MemoryEvents.Normalize) == "function"
-    then
-        record.memory = MemoryEvents.Normalize(raw.m or raw.memory)
-    end
+    record = MemoryRepository.RestoreRecord(record, raw)
     if record and record.identity
         and record.identity.birth ~= identityBirthBefore
         and PNC.Registry

@@ -9,8 +9,8 @@ PNC.QuestRepository = PNC.QuestRepository or {}
 
 local Repository = PNC.QuestRepository
 local Core = PNC.Core
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 local Definitions = PNC.QuestDefinitions
     or require "PNC/Quests/PNC_QuestDefinitions"
 

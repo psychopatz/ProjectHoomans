@@ -7,8 +7,8 @@ local Repository = PNC.ColonyStorageRepository
 local Definitions = require "PNC/Core/Colony/Storage/PNC_ColonyStorageDefinitions"
 local Journal = require "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
 local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 Repository.ByID = Repository.ByID or {}
 Repository.PrimaryByFaction = Repository.PrimaryByFaction or {}

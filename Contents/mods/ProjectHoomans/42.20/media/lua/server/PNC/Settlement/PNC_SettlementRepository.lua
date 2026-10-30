@@ -6,8 +6,8 @@ PNC.SettlementRepository = PNC.SettlementRepository or {}
 local Repository = PNC.SettlementRepository
 local CoreZones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 Repository.SCHEMA_VERSION = 1
 Repository.MODDATA_KEY = "PNC_Settlements_V1"

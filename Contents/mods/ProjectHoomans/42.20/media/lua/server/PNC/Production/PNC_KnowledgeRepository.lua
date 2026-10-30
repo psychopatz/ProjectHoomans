@@ -6,8 +6,8 @@ PNC.KnowledgeRepository = PNC.KnowledgeRepository or {}
 
 local Repository = PNC.KnowledgeRepository
 local Registry = PNC.RecipeKnowledgeRegistry
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 Repository.MODDATA_KEY = "PNC_RecipeKnowledge_V1"
 Repository.SCHEMA_VERSION = Registry.SCHEMA_VERSION
 Repository.Loaded = Repository.Loaded == true

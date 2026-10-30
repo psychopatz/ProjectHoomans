@@ -5,8 +5,8 @@ PNC = PNC or {}
 PNC.ScavengePolicy = PNC.ScavengePolicy or {}
 
 local Policy = PNC.ScavengePolicy
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 local MODDATA_KEY = "PNC_ScavengePolicy"
 local SCHEMA_VERSION = 1
 local MAX_AUTO_TYPES = 512

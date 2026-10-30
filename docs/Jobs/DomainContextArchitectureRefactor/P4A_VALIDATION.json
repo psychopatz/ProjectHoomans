@@ -1,0 +1,197 @@
+{
+  "stage": "P4A classification and first P4B/C persistence seam slice; not full P4 acceptance",
+  "source_revision_before": "55049e99c0a9e73b0d0edb89db409d47d8344ded",
+  "full_lua": {
+    "passed": 979,
+    "total": 979,
+    "seconds": 8.9
+  },
+  "focused_lua": {
+    "passed": 42,
+    "total": 42,
+    "seconds": 2.69
+  },
+  "diagnostic_python": {
+    "passed": 21,
+    "total": 21
+  },
+  "kahlua": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 34,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  },
+  "static_kahlua": {
+    "checked": 34,
+    "failures": []
+  },
+  "store_method_bodies_unchanged": true,
+  "body_hint_and_journal_travel_bodies_unchanged": true,
+  "bootstrap": {
+    "registrations": 47,
+    "roots": [
+      {
+        "path": "client/PNC/Composition/PNC_ClientComposition.lua",
+        "expanded_order_equal": true,
+        "before": {
+          "bytes": 6041,
+          "lines": 120,
+          "requires": 118
+        },
+        "after": {
+          "bytes": 3951,
+          "lines": 79,
+          "requires": 77
+        }
+      },
+      {
+        "path": "server/PNC/Composition/PNC_ServerComposition.lua",
+        "expanded_order_equal": true,
+        "before": {
+          "bytes": 6550,
+          "lines": 131,
+          "requires": 125
+        },
+        "after": {
+          "bytes": 4254,
+          "lines": 88,
+          "requires": 82
+        }
+      },
+      {
+        "path": "shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+        "expanded_order_equal": true,
+        "before": {
+          "bytes": 2123,
+          "lines": 43,
+          "requires": 42
+        },
+        "after": {
+          "bytes": 1190,
+          "lines": 24,
+          "requires": 23
+        }
+      },
+      {
+        "path": "shared/PNC/Composition/PNC_SharedComposition_Final.lua",
+        "expanded_order_equal": true,
+        "before": {
+          "bytes": 1005,
+          "lines": 19,
+          "requires": 16
+        },
+        "after": {
+          "bytes": 664,
+          "lines": 13,
+          "requires": 10
+        }
+      },
+      {
+        "path": "shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+        "expanded_order_equal": true,
+        "before": {
+          "bytes": 4055,
+          "lines": 77,
+          "requires": 76
+        },
+        "after": {
+          "bytes": 1448,
+          "lines": 29,
+          "requires": 28
+        }
+      },
+      {
+        "path": "shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+        "expanded_order_equal": true,
+        "before": {
+          "bytes": 3499,
+          "lines": 68,
+          "requires": 67
+        },
+        "after": {
+          "bytes": 1187,
+          "lines": 24,
+          "requires": 23
+        }
+      },
+      {
+        "path": "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+        "expanded_order_equal": true,
+        "before": {
+          "bytes": 2117,
+          "lines": 45,
+          "requires": 44
+        },
+        "after": {
+          "bytes": 1296,
+          "lines": 28,
+          "requires": 27
+        }
+      }
+    ]
+  },
+  "debt": {
+    "new": 0,
+    "resolved_against_current_ratchet": 111,
+    "fewer_manifestations_since_P3": 107,
+    "remaining": 82,
+    "domain_sccs": [
+      [
+        "Activities",
+        "Production"
+      ],
+      [
+        "Companions",
+        "Conversation",
+        "Knowledge",
+        "Networking",
+        "UI"
+      ],
+      [
+        "Identity",
+        "Semantics",
+        "Social",
+        "World"
+      ]
+    ],
+    "file_import_sccs": [
+      [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow_Actions.lua"
+      ]
+    ]
+  },
+  "retrieval": {
+    "aggregate_unique": {
+      "files": 33,
+      "bytes": 172836,
+      "lines": 4638
+    },
+    "aggregate_delta": {
+      "files": -4,
+      "bytes": -36686,
+      "lines": -892
+    },
+    "persisted_inventory_delta": {
+      "file_count": -3,
+      "source_bytes": -25710,
+      "source_lines": -625,
+      "hops": 0
+    }
+  },
+  "retained_compatibility": [
+    "Legacy PNC_Persistence_Reset import is a pure forwarder; PNC.Persistence.Reset aliases PNC.ModDataStore, the identical table.",
+    "Full Memory facade retains public realization/recording/gossip APIs and semantic binding; storage repository shares its registry."
+  ],
+  "remaining": [
+    "Health/identity/social/progression/command codec ownership review and migration; optional Core adapter namespace classification.",
+    "P5-P8 and pre-existing semantic-tooling failures/timeouts."
+  ]
+}

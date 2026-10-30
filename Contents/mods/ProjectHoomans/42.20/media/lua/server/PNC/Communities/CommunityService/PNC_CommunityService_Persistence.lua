@@ -18,8 +18,8 @@ local assignTable = Internal.assignTable
 local rebuildDerivedIndexes = Internal.rebuildDerivedIndexes
 local reconcileLeaders = Internal.reconcileLeaders
 local reconcileNPCReferences = Internal.reconcileNPCReferences
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 function Communities.Load()
     local raw

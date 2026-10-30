@@ -37,3 +37,5 @@ Inventory.Commands.RestoreSnapshot = Inventory.RestoreSnapshot
 Inventory.Commands.SetWaterContainer = Inventory.SetWaterContainer
 Inventory.Commands.ClearWaterContainer = Inventory.ClearWaterContainer
 Inventory.Commands.AdvanceFoodLifecycle = Inventory.AdvanceFoodLifecycle
+
+require "PNC/Core/Inventory/PNC_InventoryRepository"

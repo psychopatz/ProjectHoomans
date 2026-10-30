@@ -5,7 +5,7 @@ local Const = PNC.Const
 local Persistence = PNC.Persistence or {}
 PNC.Persistence = Persistence
 local Reset = Persistence.Reset
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 local function directoryReason(raw)
     return Reset.Check(raw, Const.PERSISTENCE_VERSION, nil,

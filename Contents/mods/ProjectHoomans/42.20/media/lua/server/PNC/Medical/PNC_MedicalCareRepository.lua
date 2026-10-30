@@ -9,8 +9,8 @@ PNC.MedicalCareRepository = PNC.MedicalCareRepository or {}
 
 local Repository = PNC.MedicalCareRepository
 local Core = PNC.Core
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 Repository.SCHEMA_VERSION = 1
 Repository.MODDATA_KEY = "PNC_MedicalCare_V1"

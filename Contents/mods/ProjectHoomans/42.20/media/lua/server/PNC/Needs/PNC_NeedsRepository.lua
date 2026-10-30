@@ -7,8 +7,8 @@ PNC.NeedsRepository = PNC.NeedsRepository or {}
 local Repository = PNC.NeedsRepository
 local Codec = PNC.NeedsStateCodec
 local Definitions = PNC.NeedsDefinitions
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 Repository.MODDATA_KEY = "PNC_PlayerOwnedNeeds_V1"
 Repository.Records = Repository.Records or {}
 Repository.EvaluatedAt = Repository.EvaluatedAt or {}

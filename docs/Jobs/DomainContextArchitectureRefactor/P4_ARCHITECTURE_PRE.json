@@ -1,0 +1,903 @@
+{
+  "revision": "55049e99c0a9e73b0d0edb89db409d47d8344ded",
+  "paths": [
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PBrainZ/PNC_PBrainZ_Outbox.lua",
+      "sha256": "a5097789f2c6be5d4d5531a1b6ea98837775f56834bab24ab6f03f9c5dac570b",
+      "bytes": 5014,
+      "lines": 147,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PBrainZ/PNC_PBrainZ.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PBrainZ/PNC_PBrainZ_ConversationMemorySync.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PBrainZ/PNC_PBrainZ_Memory.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/PNC_ColonyStorageRepository.lua",
+      "sha256": "edd446ce96610dcf569a278658f3fd1e0ee8a49118fd95b2c70be06ad80a41b0",
+      "bytes": 7161,
+      "lines": 188,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Colony/Storage/PNC_ColonyStorageDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Colony/Storage/PNC_ColonyStorageJournal.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_Internal.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Composition/PNC_ServerComposition.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/NPCSupplyService/PNC_NPCSupplyService_Acquisition.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/NPCSupplyService/PNC_NPCSupplyService_Context.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/PNC_StorageAccessPolicy.lua",
+        "tests/pnc_colony_storage_smoke.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/CommunityService/PNC_CommunityService_Persistence.lua",
+      "sha256": "041ee327d2376f7c43471e02e57365bd5eb001f4ebf472dc2082a4e16038fd76",
+      "bytes": 3581,
+      "lines": 102,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityService.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_RelationPersistence.lua",
+      "sha256": "f8a350da75ca265566a7f3b034465f09ae9a05decb6126433736194c1fbf65f0",
+      "bytes": 7115,
+      "lines": 212,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Composition/PNC_ServerComposition.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Composition/PNC_ServerComposition.lua",
+      "sha256": "50292f92f16e9f035500174e744e1f187852efb5819b531ceb752077e4fb32c5",
+      "bytes": 4275,
+      "lines": 88,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colonists/PNC_ColonistDepartureService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/PNC_ColonyManagement.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Research/PNC_ColonyResearchService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/PNC_ColonyStorageRepository.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityDirector.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityExcursionService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunitySiteResolver.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityValidation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Companions/PNC_DebugCompanionRecruit.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Companions/PNC_StartingCompanionService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Compatibility/Mods/Necroa/PNC_Necroa_ExposureServer.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_EventObservers.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_RelationPersistence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/PNC_ConversationServer.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/PNC_InteractionLifecyclePersistence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/PNC_DirectorRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/PNC_MobileGroupDirector.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionBehavior.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionCore.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionIncidentService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionTollService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionValidation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Farming/PNC_FarmingService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Farming/PNC_PZFarmingAdapter.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Fishing/PNC_FishingExecutor.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Fishing/PNC_FishingService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Journals/PNC_JournalRoutes.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/PNC_KnowledgeSocialEventAdapter.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/PNC_NPCKnowledgeService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/PNC_PlayerKnowledgeCommands.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Lumber/PNC_LumberRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Medical/PNC_MedicalCareRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_GroupNeedsRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_IndividualNeedsRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_NeedsDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_NeedsScheduler.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/PNC_ServerCommandRouting.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Player/PNC_PlayerCharacterDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Player/PNC_PlayerCharacterLifecycle.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Player/PNC_PlayerCharacterService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_Production.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Provision/PNC_Provision.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Quests/PNC_QuestRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/PNC_ScavengeRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticActionPlanService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticCampSiteResolver.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticCognitionService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticCommunityRoleWhereabouts.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticEventRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticItemTaskRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticTaskRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Semantics/PNC_SemanticWorldTargetResolver.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Server/PNC_PersistenceCoordinator.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Server/PNC_Server.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Server/PNC_ServerInventory.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/FacilityJobs/PNC_FacilityJobsRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/FacilityJobs/PNC_LivingRoomService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/PNC_Settlement.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_ConductDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_ConductService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_RelationshipDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_RelationshipService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_SocialEventRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_SocialProfileDebug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/PNC_SocialProfileService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Stealth/PNC_ServerStealthDiscovery.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/PNC_Supply.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Tasking/PNC_TaskProviders.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Tasking/PNC_Tasking.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_CampRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_ResourceRuntime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/WorldKnowledge/PNC_WorldKnowledge_Debug.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/WorldKnowledge/PNC_WorldKnowledge_Server.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/00_PNC_Init.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Needs/PNC_WorkFatigueGate.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/00_PNC_Server_Init.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/PNC_InteractionLifecyclePersistence.lua",
+      "sha256": "f580dedb56e5c5d3fa04a1af694b927bff6e99685a64b6ad7f5e1613db7ab29b",
+      "bytes": 5439,
+      "lines": 166,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionLifecycle.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Composition/PNC_ServerComposition.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/PNC_ServerSemanticInteractionLifecycleCommandHandler.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/PNC_AbstractWorldStore.lua",
+      "sha256": "efa42570172e4c9ea92e692cf146b99e0f5700d536525dea553f5819b4e2ebfb",
+      "bytes": 3617,
+      "lines": 101,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/PNC_Director.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/FactionService/PNC_FactionService_RegistryPersistence.lua",
+      "sha256": "2ced498e4fb149b47d0b945be1c2edac5c23ff1e18b573beeccf69d7176f9758",
+      "bytes": 3669,
+      "lines": 104,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionService.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Fishing/PNC_FishingService.lua",
+      "sha256": "168a5d454da428284d6c5fac501b218b7596699df679990d182a65a1a2547ce6",
+      "bytes": 7327,
+      "lines": 192,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Fishing/PNC_FishingService_Diagnostics.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Fishing/PNC_FishingService_Job.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Fishing/PNC_FishingService_Lifecycle.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Fishing/PNC_FishingService_Work.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Fishing/PNC_FishingService_Zone.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Fishing/PNC_FishingService_ZoneWorld.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Composition/PNC_ServerComposition.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/NPCKnowledgeService/PNC_NPCKnowledgeService_Persistence.lua",
+      "sha256": "b5896eaab50ccc72bb41a8a344a6fea99afbfb4c6418c028c9a8440070a3e496",
+      "bytes": 6441,
+      "lines": 178,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/PNC_NPCKnowledgeService.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Lumber/LumberService/PNC_LumberService_State.lua",
+      "sha256": "ebbfafe31dd63b8b245abcae6f723fa4f8ab61fe825d40db84af73429c3e80ba",
+      "bytes": 11421,
+      "lines": 340,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Lumber/PNC_LumberService.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Medical/PNC_MedicalCareRepository.lua",
+      "sha256": "e0df4b61db90e44e672551a9a5e1bdd2c2e5e4855a7620690c87a64544dda5b0",
+      "bytes": 9193,
+      "lines": 266,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Medical/PNC_MedicalCareRuntime.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_NeedsRepository.lua",
+      "sha256": "d5328edd21c148f64d2edacdf255febd5423085f50d1885be36e409abf3d0a10",
+      "bytes": 6873,
+      "lines": 176,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_IndividualNeedsRuntime.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Player/PlayerCharacterService/PNC_PlayerCharacterService_Persistence.lua",
+      "sha256": "678c843608e5d1d71742c9295534fd1b1eb758f3ee57becc8249405505363a7e",
+      "bytes": 3629,
+      "lines": 103,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Player/PNC_PlayerCharacterService.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_KnowledgeRepository.lua",
+      "sha256": "08d2318ea5b07ba658879117812a619057b73b254db632eaa5990b577e00d041",
+      "bytes": 1921,
+      "lines": 52,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_Production.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_ResearchRepository.lua",
+      "sha256": "b6612e4544504f06356013cbcc35290e451ad6604dff1e3cc3d6218880b56e15",
+      "bytes": 5179,
+      "lines": 144,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_Production.lua",
+        "tests/pnc_production_lifecycle_smoke.lua",
+        "tests/pnc_production_scale_smoke.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_WorkRepository.lua",
+      "sha256": "4bec85b418d59eaa6d0d879f3f7b247cfd92f203e22ac1e2e7b5c4121504b05c",
+      "bytes": 7337,
+      "lines": 192,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_Production.lua",
+        "tests/pnc_camp_work_exclusion_smoke.lua",
+        "tests/pnc_production_lifecycle_smoke.lua",
+        "tests/pnc_provision_live_workflow_smoke.lua",
+        "tests/pnc_workstation_work_smoke.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Quests/PNC_QuestRepository.lua",
+      "sha256": "9c24eae6ecfc68f91dd8ce9b01b74be3107be27e07a58f4f65065a6853c90727",
+      "bytes": 6779,
+      "lines": 196,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Quests/PNC_QuestDefinitions.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Quests/PNC_QuestRuntime.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/PNC_ScavengePolicy.lua",
+      "sha256": "ca484575f990084a3e38c7b26b7a7859568614a086b2f6919153d4dab0da41da",
+      "bytes": 5727,
+      "lines": 172,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/PNC_ScavengeRuntime.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/PNC_SettlementRepository.lua",
+      "sha256": "d48566eac72d2f984095449f20f532ada88f18d55b1016f2f997518859218ae4",
+      "bytes": 5900,
+      "lines": 174,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/PNC_Settlement.lua",
+        "tests/pnc_settlement_foundation_smoke.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/WorldDiscovery/PNC_WorldDiscovery_Storage.lua",
+      "sha256": "671c827cde8312f5b5e4fe22b0d48f70b720d8b03529dd9d4a76c1a015d50425",
+      "bytes": 6575,
+      "lines": 173,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/WorldDiscovery/PNC_WorldDiscovery.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Catalog.lua",
+      "sha256": "fba14e02837123e4462dc65acacc7e1ebab7ded4f644c0ab8f8f345a2f667aaa",
+      "bytes": 6569,
+      "lines": 190,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialEventDefinitions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionRelations.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Gossip.lua",
+      "sha256": "019d75ca6e588b234c489b43d227ab362eaf4fa96b1c1ca26daa93d891ef4b4f",
+      "bytes": 3992,
+      "lines": 140,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Recorder.lua",
+      "sha256": "f4cb560dbbed7738556e20163a46d57f99caa371eb678fc4d5d78557900b9258",
+      "bytes": 5877,
+      "lines": 152,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionEvidence.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Registry.lua",
+      "sha256": "277da6e13091a62eed4e41236487e55e6eab0830691bae77398741f38833e9ea",
+      "bytes": 4121,
+      "lines": 150,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Storage.lua",
+      "sha256": "8426c730f8fc5c769c144b613daee07ea51715f552527dc8b3f76b4364719a00",
+      "bytes": 7779,
+      "lines": 253,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Targets.lua",
+      "sha256": "c8275fe68f0240e9b9f096e5bb40b2ddfaf5b988657b7c4f96cca1de9429f727",
+      "bytes": 2232,
+      "lines": 72,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_TopicMemory.lua",
+      "sha256": "f89c537bfb0d8bb5db1d9ca8d0737f1229f66169f8b6f63e284da2517c72033f",
+      "bytes": 5392,
+      "lines": 164,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_TopicRegistry.lua",
+      "sha256": "feac9e80bcc51e34dfdba4523a1e5582b9a49f037e42a97caa720e3065253f39",
+      "bytes": 5347,
+      "lines": 172,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Topics.lua",
+      "sha256": "3dc1448de7f72a151af932deda70487768cb45b248fbcd2d4fed487479f26f38",
+      "bytes": 6732,
+      "lines": 209,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua",
+      "sha256": "0f847a908583ed5fa7f7e0a8ec900c7cfbdb6815dfc12656ef7a9ba49ee72a93",
+      "bytes": 2350,
+      "lines": 68,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Blocks/PNC_ConversationTextLoader.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Backstories.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_BackstoryContext.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Gossip.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Text.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticConversationMemoryProvider.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PBrainZ/PNC_PBrainZ_ContextPayload_DialogueFacts.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Composition/PNC_ServerComposition.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Composition/PNC_ConversationSharedComposition.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Deserialize.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Backstories.lua",
+      "sha256": "06ff1d140f5824acca724e3a2be26b4176b6e9b4ae19ffb09a854f1e6b7c05fe",
+      "bytes": 14312,
+      "lines": 492,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_BackstoryContext.lua",
+      "sha256": "91442ae1c3249e4dd2d8c0cb6ba23c07a9f59ee0832697950de9e1d3a76c3a22",
+      "bytes": 4912,
+      "lines": 141,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua",
+      "sha256": "5308ad396d392b10e8edb3a85926ca29998cf2dc896c160a562d4a27311c8a4e",
+      "bytes": 1084,
+      "lines": 21,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Catalog.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Gossip.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Recorder.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Registry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Storage.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Targets.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_TopicMemory.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_TopicRegistry.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Topics.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Gossip.lua",
+      "sha256": "7057f8b245eddde2745dc81acae67edb8fb5ccd49ba2cf33b08a30e1f615a906",
+      "bytes": 8003,
+      "lines": 262,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Text.lua",
+      "sha256": "e7ddb4ca49df27168dd8864bee986098eb4d098110c6d83fd9878b47c31468d3",
+      "bytes": 4665,
+      "lines": 147,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Persistence.lua",
+      "sha256": "5d8580a86d0c259a606e00823e17e7e6025c647ddb59c500fc7ec82afa18d1af",
+      "bytes": 4850,
+      "lines": 120,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreBridge.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreDeltaCodec.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Inventory/PNC_Inventory.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua",
+      "sha256": "b33595f5480f551c924ae8403b3e565c83c5f323a15f6ca26e4e00081cc2b18f",
+      "bytes": 1312,
+      "lines": 21,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Collections.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Deserialize.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_DeserializeFinalization.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthBody.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthCodec.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Repairs.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Runtime.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence_CoreKnowledge.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence_CoreMigration.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence_CorePresentation.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence_CoreProvider.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence_CoreSocial.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Collections.lua",
+      "sha256": "62f3b657763dd8d0d4c6f43d3093b94a3d189252e2ceb916510565342e266478",
+      "bytes": 1196,
+      "lines": 47,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Deserialize.lua",
+      "sha256": "53f7b44fb50aacfa950db149b0059add267b067c539e8074f761214bb42b7271",
+      "bytes": 10345,
+      "lines": 256,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_DeserializeFinalization.lua",
+      "sha256": "35a9e84096fa33f414daac22b394bae5a14832e67ac94ed948c8057af347d542",
+      "bytes": 8604,
+      "lines": 225,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthBody.lua",
+      "sha256": "f0d2a86b6b379d409ed582efd28fd8e90310591e4ec7bc79fb066f6981fcae2b",
+      "bytes": 6659,
+      "lines": 159,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthCodec.lua",
+      "sha256": "79a379dc2bdc024171de011ecea931e35f5bcc46fa9f12874639e107d0fc9566",
+      "bytes": 7209,
+      "lines": 165,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan.lua",
+      "sha256": "f4d3cbb5745ea8530d6f440e34423784b9e03eebe6245f64df7b310c8755b356",
+      "bytes": 6167,
+      "lines": 178,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Source.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Utils.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Fields.lua",
+      "sha256": "fa0f8ef2daf0b276c9a484f0df5d741222f029c489ccf37f167368c477b88f3b",
+      "bytes": 7056,
+      "lines": 185,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Utils.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Source.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Generator.lua",
+      "sha256": "ea0625b029996b9feace59cf1006877a697e40766d3bf36750872c97af3b7aa2",
+      "bytes": 4668,
+      "lines": 130,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Utils.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Source.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Journey.lua",
+      "sha256": "fc7d577232772119f7e95935b0c098a437d5172c78697f7da5f343b614d3e54e",
+      "bytes": 6021,
+      "lines": 157,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Utils.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Source.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Opaque.lua",
+      "sha256": "67a7c27d8dfeefc3409957e7d6872a87dd800dfee8903d97b71fbdfbe192499d",
+      "bytes": 1384,
+      "lines": 50,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Utils.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Source.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Social.lua",
+      "sha256": "4b2ebf92894ea2de23cc87e1e8e590732b32aebd6b822b6a284ba0ba7f7e066a",
+      "bytes": 3478,
+      "lines": 93,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Utils.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Source.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Source.lua",
+      "sha256": "2e0406b8ec03aee5fbd3cc0f3ede8894a90d80682c9eeecbd9d635b850dad2db",
+      "bytes": 4106,
+      "lines": 112,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Fields.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Generator.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Journey.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Opaque.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Social.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Utils.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Utils.lua",
+      "sha256": "33153c98645da1ccb500f2832290c667b8b6c26a4d617c9f9902119da4e2387d",
+      "bytes": 2334,
+      "lines": 86,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Fields.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Generator.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Journey.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Opaque.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Social.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Source.lua",
+        "tests/pnc_npc_foundation_import_plan_continuity_smoke.lua",
+        "tests/pnc_npc_foundation_import_plan_generator_smoke.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives.lua",
+      "sha256": "5bf04e35e466495a30fccc1dbced48654fa7d7804fcb29f51f116faf68018019",
+      "bytes": 21594,
+      "lines": 583,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState.lua",
+      "sha256": "3e627823dd5506f02f986c879413204ef6be2b5bd4b8932cb56b69b5b55d42ce",
+      "bytes": 7704,
+      "lines": 204,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Repairs.lua",
+      "sha256": "87444c8745ed96e0e862ddeb84200d86b1f99dd9c2e0d505046a089329d0d6c1",
+      "bytes": 9067,
+      "lines": 260,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "sha256": "0134ad2f1adc9ce2d6702186398887dbccdd6a889d80675e6807002c1c6c02f9",
+      "bytes": 3182,
+      "lines": 95,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PBrainZ/PNC_PBrainZ_Outbox.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/PNC_ColonyStorageRepository.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/CommunityService/PNC_CommunityService_Persistence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_RelationPersistence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Composition/PNC_ServerComposition.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/PNC_InteractionLifecyclePersistence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/PNC_AbstractWorldStore.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/FactionService/PNC_FactionService_RegistryPersistence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Fishing/PNC_FishingService.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Knowledge/NPCKnowledgeService/PNC_NPCKnowledgeService_Persistence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Lumber/LumberService/PNC_LumberService_State.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Medical/PNC_MedicalCareRepository.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Needs/PNC_NeedsRepository.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Player/PlayerCharacterService/PNC_PlayerCharacterService_Persistence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_KnowledgeRepository.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_ResearchRepository.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_WorkRepository.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Quests/PNC_QuestRepository.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/PNC_ScavengePolicy.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Settlement/PNC_SettlementRepository.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/WorldDiscovery/PNC_WorldDiscovery_Storage.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Deserialize.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Registry/PNC_Registry/PNC_Registry_LoadDirty.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Registry/PNC_Registry/PNC_Registry_StorageCore.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Runtime.lua",
+      "sha256": "b47418d70352ace5e18c55e2b9dc854a25443533e162a8833be15166a5e8e9c3",
+      "bytes": 2713,
+      "lines": 85,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize.lua",
+      "sha256": "64d2af375cb31f6073d5c17640a67061ed57ad98e6523b028c7e44e1c7350d95",
+      "bytes": 13865,
+      "lines": 353,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence_CoreKnowledge.lua",
+      "sha256": "b695e836841ea7ce5abd7398f45b54bb2ec30f39cd47e2a3318125a40ff90895",
+      "bytes": 8619,
+      "lines": 223,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence_CoreMigration.lua",
+      "sha256": "461d0a1bd570a451d6c8c813f54bb488c92131758f387ee33264e73b54a36f51",
+      "bytes": 1572,
+      "lines": 39,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence_CorePresentation.lua",
+      "sha256": "f5ace179a8f65914686b0d390e683555162c692ed0b2c237ee559905cb309330",
+      "bytes": 1856,
+      "lines": 53,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence_CoreProvider.lua",
+      "sha256": "c13cedb5f85a86097f6b4483e3f68978b05d37673cb3a48710f81a39988c2395",
+      "bytes": 9798,
+      "lines": 288,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence_CoreSocial.lua",
+      "sha256": "83d85ef08e0e185d55beb324ac073f15b94128fd5729b24fae4483dc0789ed11",
+      "bytes": 1069,
+      "lines": 34,
+      "outbound": [],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Registry/PNC_Registry/PNC_Registry_LoadDirty.lua",
+      "sha256": "aaf64ee5a7b686505252ed011656e383460804c103fc574f858d11adb2e6d9e1",
+      "bytes": 8352,
+      "lines": 231,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Registry/PNC_Registry.lua"
+      ]
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Registry/PNC_Registry/PNC_Registry_StorageCore.lua",
+      "sha256": "872012e8805ddaaccabeb414cefc23f20a9bf8a82755d197dbe4727d15e59319",
+      "bytes": 5239,
+      "lines": 148,
+      "outbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "inbound": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Registry/PNC_Registry.lua"
+      ]
+    }
+  ]
+}

@@ -11,8 +11,8 @@ local Internal = PNC.PBrainZ.Internal
 local Outbox = Internal.Outbox or {}
 Internal.Outbox = Outbox
 
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 function Outbox.New(config)
     config = config or {}

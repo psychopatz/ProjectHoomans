@@ -15,8 +15,8 @@ local Core = PNC.Core
 local deepEqual = Internal.deepEqual
 local copy = Internal.copy
 local assignTable = Internal.assignTable
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 function PlayerCharacters.Load()
     local raw

@@ -11,8 +11,8 @@ PNC.Compatibility = PNC.Compatibility or {}
 local Policy = PNC.Compatibility.ProjectALifePolicy
 if not Policy then return false end
 
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 local MODDATA_KEY = "PNC_ProjectALifeRelations"
 local SCHEMA_VERSION = 1

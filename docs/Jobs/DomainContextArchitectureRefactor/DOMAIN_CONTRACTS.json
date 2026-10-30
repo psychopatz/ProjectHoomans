@@ -99,6 +99,14 @@
   },
   "path_owners": [
     {
+      "pattern": "shared/PNC/Core/Persistence/PNC_ModDataStore.lua",
+      "owner": "PersistenceStorage"
+    },
+    {
+      "pattern": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "owner": "PersistenceStorage"
+    },
+    {
       "pattern": "server/PNC/Server/PNC_ServerInventory.lua",
       "owner": "Inventory"
     },
@@ -134,7 +142,8 @@
         "shared/PNC/Core/Inventory/InventoryActions/PNC_InventoryActions.lua",
         "client/PNC/ActionProps/PNC_ClientActionProps.lua",
         "shared/PNC/Core/Inventory/PNC_InventoryItemState.lua",
-        "shared/PNC/Core/Equipment/PNC_Equipment_Items.lua"
+        "shared/PNC/Core/Equipment/PNC_Equipment_Items.lua",
+        "shared/PNC/Core/Inventory/PNC_InventoryRepository.lua"
       ],
       "commands": [
         "ApplyDelta",
@@ -145,7 +154,9 @@
         "RestoreSnapshot",
         "Equipment.CreateItem",
         "Equipment.ApplyPrimaryInventoryState",
-        "Equipment.ApplyItemVisualState"
+        "Equipment.ApplyItemVisualState",
+        "Repository.SerializeRecord (save checkpoint may promote/advance existing item state)",
+        "Repository.RestoreRecord"
       ],
       "queries": [
         "CanAccept",
@@ -159,7 +170,7 @@
         "Equipment.DescribeWeapon",
         "Equipment.IsNetworkedGame"
       ],
-      "repository": "Inventory.Serialize/Deserialize (seed/delta/full schema)",
+      "repository": "Inventory.Repository.SerializeRecord/RestoreRecord (lazy snapshot interop); Inventory.Serialize/Deserialize owns seed/delta/full schema",
       "layers": [
         "shared",
         "server",
@@ -230,16 +241,20 @@
       "entries": [
         "shared/PNC/Conversation/PNC_ConversationScene.lua",
         "client/PNC/Conversation/PNC_ConversationLifecycle.lua",
-        "server/PNC/Conversation/PNC_ConversationServer.lua"
+        "server/PNC/Conversation/PNC_ConversationServer.lua",
+        "shared/PNC/Conversation/Memory/PNC_ConversationMemoryRepository.lua"
       ],
       "commands": [
         "Scene.Begin/End",
-        "Lifecycle.Create"
+        "Lifecycle.Create",
+        "Memory.Repository.PrepareRecord",
+        "Memory.Repository.RestoreRecord"
       ],
       "queries": [
-        "Memory public surface"
+        "Memory public surface",
+        "Memory.Repository.SerializeRecord"
       ],
-      "repository": "Conversation.Memory and InteractionLifecyclePersistence",
+      "repository": "Memory.Repository compact event arrays/selection metadata; History and InteractionLifecyclePersistence retain their own state",
       "layers": [
         "shared",
         "server",
@@ -268,7 +283,6 @@
       "namespace": "PNC.Persistence",
       "entries": [
         "shared/PNC/Core/Persistence/PNC_Persistence.lua",
-        "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
         "server/PNC/Server/PNC_PersistenceCoordinator.lua"
       ],
       "commands": [
@@ -361,6 +375,28 @@
         "shared",
         "server",
         "client"
+      ]
+    },
+    "PersistenceStorage": {
+      "owns": "schema-neutral ModData access and exact-version validation/reset diagnostics; domains supply schema/version/validator",
+      "namespace": "PNC.ModDataStore",
+      "entries": [
+        "shared/PNC/Core/Persistence/PNC_ModDataStore.lua",
+        "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua"
+      ],
+      "commands": [
+        "Write",
+        "Mark"
+      ],
+      "queries": [
+        "Read",
+        "Check",
+        "IsEmpty",
+        "Info"
+      ],
+      "repository": "mechanism only; no domain state or lifecycle orchestration",
+      "layers": [
+        "shared"
       ]
     }
   },

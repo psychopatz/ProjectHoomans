@@ -13,8 +13,8 @@ PNC.Conversation = PNC.Conversation or {}
 local Lifecycle = PNC.Semantics
     and PNC.Semantics.InteractionLifecycle
     or require "PNC/Semantics/PNC_SemanticInteractionLifecycle"
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 local Persistence = PNC.Conversation.InteractionLifecyclePersistence
     or {}

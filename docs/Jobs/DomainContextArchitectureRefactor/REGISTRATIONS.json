@@ -689,5 +689,12 @@
       ],
       "responsibility": "VoiceRuntime"
     }
+  ],
+  "compatibility_imports": [
+    {
+      "legacy_path": "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua",
+      "module": "PNC/Core/Persistence/PNC_ModDataStore",
+      "reason": "Schema-neutral store owns the identical Reset table; legacy import is a policy-free forwarder."
+    }
   ]
 }

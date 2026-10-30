@@ -1,7 +1,8 @@
 PNC = PNC or {}
 PNC.Persistence = PNC.Persistence or {}
 PNC.Persistence.Internal = PNC.Persistence.Internal or {}
-require "PNC/Conversation/Memory/PNC_ConversationMemory"
+local MemoryRepository = require "PNC/Conversation/Memory/PNC_ConversationMemoryRepository"
+local InventoryRepository = require "PNC/Core/Inventory/PNC_InventoryRepository"
 
 local Persistence = PNC.Persistence
 local Internal = Persistence.Internal
@@ -13,12 +14,6 @@ local Inventory = PNC.Inventory
 local RelationshipTypes = PNC.RelationshipTypes
 local RelationshipMath = PNC.RelationshipMath
 local FactionTypes = PNC.FactionTypes
-local Memory = PNC.Conversation
-    and PNC.Conversation.Memory or nil
-local MemoryEvents = PNC.Conversation
-    and PNC.Conversation.Memory
-    and PNC.Conversation.Memory.Events or nil
-
 local function serializeAuthoredTraits(record, field, authoredField, normalize)
     local traits
     if type(record) ~= "table" or record[authoredField] ~= true then
@@ -79,26 +74,6 @@ local function prepareProgression(record)
         return nil
     end
     return progression
-end
-
-local function serializeInventory(record)
-    if record.inventory and Inventory and Inventory.Serialize then
-        return Inventory.Serialize(record)
-    end
-    if type(record.persistedInventory) ~= "table" then
-        return nil
-    end
-    if tonumber(record.persistenceSourceVersion)
-            and tonumber(record.persistenceSourceVersion)
-                < tonumber(Const.PERSISTENCE_VERSION)
-        and Inventory
-        and Inventory.EnsureRecordInventory
-        and Inventory.Serialize
-    then
-        Inventory.EnsureRecordInventory(record)
-        return Inventory.Serialize(record)
-    end
-    return Core.DeepCopy(record.persistedInventory)
 end
 
 local function serializeSkillBaseLevels(record)
@@ -203,15 +178,13 @@ function Persistence.SerializeRecord(record)
     then
         return nil
     end
-    if Memory and type(Memory.EnsureBackstoryMetadata) == "function" then
-        Memory.EnsureBackstoryMetadata(record)
-    end
+    MemoryRepository.PrepareRecord(record)
     identity = Internal.sanitizeIdentity(record.identity, record)
     appearance = type(record.appearance) == "table"
         and Core.DeepCopy(record.appearance) or nil
     appearanceContract = Internal.BuildAppearanceContract(record)
     progression = prepareProgression(record)
-    inventoryPayload = serializeInventory(record)
+    inventoryPayload = InventoryRepository.SerializeRecord(record)
     recipeKnowledge = PNC.RecipeKnowledge
         and PNC.RecipeKnowledge.Serialize(record) or nil
     payload = {
@@ -243,8 +216,7 @@ function Persistence.SerializeRecord(record)
         identity = identity,
         appearance = appearance,
         appearanceContract = appearanceContract,
-        m = MemoryEvents
-            and MemoryEvents.Serialize(record.memory) or nil,
+        m = MemoryRepository.SerializeRecord(record),
         position = {
             x = Internal.normalizeNumber(record.x, 0),
             y = Internal.normalizeNumber(record.y, 0),

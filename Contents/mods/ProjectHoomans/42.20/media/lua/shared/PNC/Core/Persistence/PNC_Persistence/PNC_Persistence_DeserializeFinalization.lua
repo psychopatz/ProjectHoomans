@@ -4,6 +4,7 @@ PNC.Persistence.Internal = PNC.Persistence.Internal or {}
 
 local Persistence = PNC.Persistence
 local Internal = Persistence.Internal
+local InventoryRepository = require "PNC/Core/Inventory/PNC_InventoryRepository"
 local Core = PNC.Core
 local Const = PNC.Const
 local Identity = PNC.Identity
@@ -208,9 +209,7 @@ function Internal.FinalizeDeserializedRecord(
     restoreTraits(record, raw)
     restoreIdentityAndProgression(record, raw, identity, progression)
     Internal.sanitizeStamina(raw.stamina, record)
-    record.inventory = nil
-    record.persistedInventory = type(raw.inventory) == "table"
-        and Core.DeepCopy(raw.inventory) or nil
+    record = InventoryRepository.RestoreRecord(record, raw.inventory)
     record = Persistence.RebuildRuntime(record)
     if Persistence.Repairs and Persistence.Repairs.Apply then
         Persistence.Repairs.Apply("npc_record", record, {

@@ -5,8 +5,8 @@ PNC = PNC or {}
 PNC.WorkRepository = PNC.WorkRepository or {}
 
 local Repository = PNC.WorkRepository
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 Repository.SCHEMA_VERSION = 1
 Repository.MODDATA_KEY = "PNC_WorkOrders_V1"
 Repository.State = Repository.State or { schemaVersion = 1, nextId = 1, byId = {} }

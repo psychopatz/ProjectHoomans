@@ -5,8 +5,8 @@ PNC = PNC or {}
 PNC.ResearchRepository = PNC.ResearchRepository or {}
 
 local Repository = PNC.ResearchRepository
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 Repository.SCHEMA_VERSION = 1
 Repository.MODDATA_KEY = "PNC_Research_V1"
 Repository.ByColony = Repository.ByColony or {}

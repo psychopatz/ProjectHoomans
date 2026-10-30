@@ -5,8 +5,8 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeR
 local Discovery = PNC.WorldDiscovery
 local Internal = Discovery.Internal
 local Types = PNC.WorldDiscoveryTypes
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 local function copy(value, seen)
     if type(value) ~= "table" then return value end

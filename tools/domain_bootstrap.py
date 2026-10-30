@@ -38,6 +38,22 @@ def trace(base, path, registrations, stack=()):
 
 
 def verify(base, manifest, baseline):
+    aliases = {}
+    for compatibility in manifest.get('compatibility_imports', []):
+        legacy = compatibility['legacy_path']
+        target = compatibility['module']
+        if code_lines(base / legacy) != [f'return require "{target}"']:
+            raise ValueError('Compatibility import is not a pure forwarder: ' + legacy)
+        aliases[legacy.split('/', 1)[1].removesuffix('.lua')] = target
+
+    def canonical(events):
+        result = []
+        for event in events:
+            match = REQUIRE.fullmatch(event)
+            result.append(f'require "{aliases[match[1]]}"'
+                          if match and match[1] in aliases else event)
+        return result
+
     registrations = {}
     for registration in manifest['registrations']:
         path = registration['path']
@@ -54,7 +70,7 @@ def verify(base, manifest, baseline):
     results = []
     for path, before in baseline['roots'].items():
         after = trace(base, path, registrations)
-        if after != before['trace']:
+        if canonical(after) != canonical(before['trace']):
             raise ValueError('Expanded bootstrap changed: ' + path)
         data = (base / path).read_bytes()
         results.append({'path': path, 'expanded_order_equal': True,

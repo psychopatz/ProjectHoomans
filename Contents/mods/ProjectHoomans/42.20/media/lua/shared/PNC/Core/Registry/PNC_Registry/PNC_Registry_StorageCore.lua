@@ -8,7 +8,7 @@ local Const = PNC.Const
 local Persistence = PNC.Persistence or {}
 PNC.Persistence = Persistence
 local Reset = Persistence.Reset
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 Registry.Data = Registry.Data or {}
 Registry.LiveByID = Registry.LiveByID or {}

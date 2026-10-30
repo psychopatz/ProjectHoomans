@@ -9,8 +9,8 @@ local Store = PNC.AbstractWorldStore
 local Types = PNC.AbstractWorldTypes
 local Config = PNC.DirectorConfig
 local Core = PNC.Core
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 Store.Registry = Store.Registry or Types.NewRegistry()
 Store.Loaded = Store.Loaded or false

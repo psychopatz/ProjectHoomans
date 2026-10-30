@@ -196,7 +196,7 @@ local conversationMemoryIndex = indexOf(
 )
 local persistenceResetIndex = indexOf(
     serverCalls,
-    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+    "PNC/Core/Persistence/PNC_ModDataStore"
 )
 local relationshipServiceIndex = indexOf(
     serverCalls,

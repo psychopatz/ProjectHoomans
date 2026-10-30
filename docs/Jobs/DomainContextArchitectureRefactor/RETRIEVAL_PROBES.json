@@ -76,27 +76,24 @@
     {
       "id": "persisted_inventory",
       "behavior": "Change serialization/restoration of inventory revision in the compact seed/delta field.",
-      "entry": "shared/PNC/Core/Persistence/PNC_Persistence.lua",
+      "entry": "shared/PNC/Core/Inventory/PNC_InventoryRepository.lua",
       "files": [
-        "shared/PNC/Core/Persistence/PNC_Persistence.lua",
-        "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Serialize.lua",
-        "shared/PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Deserialize.lua",
-        "shared/PNC/Core/Inventory/PNC_Inventory.lua",
+        "shared/PNC/Core/Inventory/PNC_InventoryRepository.lua",
         "shared/PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Persistence.lua",
         "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreDeltaCodec.lua",
         "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreBridge.lua"
       ],
       "foreign": [
         "Persistence",
-        "Inventory",
-        "Conversation",
         "Supply"
       ],
       "hops": 3,
       "tests": [
         "tests/pnc_seed_delta_smoke.lua",
-        "tests/pnc_inventory_persisted_repair_smoke.lua"
-      ]
+        "tests/pnc_inventory_persisted_repair_smoke.lua",
+        "tests/pnc_domain_repository_bootstrap_smoke.lua"
+      ],
+      "review_note": "P4: compact inventory revision policy is discoverable through the owning Repository. Unchanged record-envelope host delegates through this seam, so its whole serializer/deserializer and global inventory bootstrap are no longer part of this behavior slice. Caller checks and integration/roundtrip tests retain envelope coverage."
     },
     {
       "id": "ui_inventory_rows",

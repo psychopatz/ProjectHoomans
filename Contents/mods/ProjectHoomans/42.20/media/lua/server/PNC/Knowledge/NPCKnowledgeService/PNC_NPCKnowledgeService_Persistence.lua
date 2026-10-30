@@ -17,8 +17,8 @@ local Providers = PNC.KnowledgeProviders
 local Resolvers = PNC.KnowledgeResolvers
 local Sources = PNC.KnowledgeEvidenceSources
 local Shared = PNC.KnowledgeRegistry
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.ModDataStore
+    or require "PNC/Core/Persistence/PNC_ModDataStore"
 local deepCopy = Internal.deepCopy
 local safeString = Internal.safeString
 local now = Internal.now
