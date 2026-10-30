@@ -1,5 +1,6 @@
 -- Client presentation for authoritative identity-claim outcomes.
 require "PNC/Semantics/PNC_SemanticDiagnostics"
+local DialogueSession = require "PNC/Semantics/PNC_SemanticDialogueSession"
 
 PNC = PNC or {}
 PNC.Client = PNC.Client or {}
@@ -68,9 +69,7 @@ local function auditIdentityResultApplied(args, npcID, disclosedName)
 end
 
 local function activeViewFor(npcID)
-    local semanticInput = PNC.Semantics
-        and PNC.Semantics.DialogueInput or nil
-    local active = semanticInput and semanticInput.ActiveView or nil
+    local active = DialogueSession.GetActiveView()
     if active and active.session
         and tostring(active.spec and active.spec.npcID or "")
             == tostring(npcID or "")

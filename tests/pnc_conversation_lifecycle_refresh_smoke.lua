@@ -141,7 +141,10 @@ end } } }
 local resetCount = 0
 local session = {
     namespace = "ProjectHoomans", npcID = spec.npcID,
-    semanticDialogueContext = { Reset = function() resetCount = resetCount + 1 end },
+    semanticDialogueContext = { Reset = function()
+        T.equal(closeOrder[#closeOrder], "clear", "history is cleared before semantic reset")
+        resetCount = resetCount + 1
+    end },
     semanticDialoguePending = {}, semanticDialogueRouter = {},
     semanticActorConversationService = {}, semanticDialogueState = {},
     queue = { "pending" }, busy = true, llmPending = true,
@@ -151,7 +154,13 @@ view.lastSemanticDialogueResult = {}
 view.lastSemanticActionResult = {}
 view.historyPart = {
     messages = { { source = { eventType = "conversation_safety" } }, { text = "old" } },
-    setMessages = function(self, messages) self.messages = messages end,
+    setMessages = function(self, messages)
+        T.equal(view.session.semanticDialogueContext, nil,
+            "semantic state is cleared before history presentation")
+        T.equal(PNC.Semantics.DialogueInput.ActiveView, view,
+            "active semantic view remains until presentation cleanup finishes")
+        self.messages = messages
+    end,
     setTyping = function(self, speaker) self.typingSpeaker = speaker end,
 }
 PNC.Semantics = { DialogueInput = { ActiveView = view } }
@@ -177,6 +186,7 @@ isClient = function() return true end
 sendClientCommand = function(module, command, payload) sent = { module, command, payload } end
 PNC.ConversationScene.CMD_END = "conversationEnd"
 PNC.SemanticSpeechPresentation = { EnqueueConversationSafety = function() return true end }
+PNC.Semantics.DialogueInput.ActiveView = view
 view.historyPart.messages = {
     { source = { eventType = "conversation_safety" } }, { text = "old" },
 }

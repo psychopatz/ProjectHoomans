@@ -1,0 +1,9 @@
+{
+  "source_revision_before": "cded0881",
+  "semantic_state_write_block_equal": true,
+  "active_view_and_result_release_body_equal_after_alias_rebinding": true,
+  "phase_order": "History.Clear -> Conversation flags -> Semantic working state -> Conversation queue/memory flags -> history presentation -> Semantic view release; focused callback assertions preserve order",
+  "query_behavior": "Existing active-view lookup delegates to owner; group/Core-view fallbacks remain in their original callers",
+  "state": "Same session/input/view objects; no canonical state copy or new store",
+  "after_sha256": "76139a3d25536af1c2554c0e419967e278655843534ad246e5de9d187413ed0c"
+}

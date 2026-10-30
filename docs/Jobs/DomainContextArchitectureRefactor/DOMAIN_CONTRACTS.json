@@ -346,7 +346,8 @@
         "shared/PNC/Semantics/PNC_SemanticTacticalSpatialLanguage.lua",
         "shared/PNC/Semantics/PNC_SemanticTaskRequest.lua",
         "shared/PNC/Semantics/PNC_SemanticToolResultRealization.lua",
-        "shared/PNC/Semantics/PNC_SemanticWorldTargetCatalog.lua"
+        "shared/PNC/Semantics/PNC_SemanticWorldTargetCatalog.lua",
+        "client/PNC/Semantics/PNC_SemanticDialogueSession.lua"
       ],
       "commands": [
         "Catalog.Register (definition composition)",
@@ -355,14 +356,16 @@
         "InteractionLifecycle.Apply (accepted semantic facts)",
         "SemanticDiagnostics.SetEnabled/Record (bounded optional diagnostics)",
         "GiftLifecycle bounded pending/receipt lifecycle; GiftContext authoritative-result projection",
-        "DialogueBackstoryFactSource public server-side provider registration (after Memory, before consumers)"
+        "DialogueBackstoryFactSource public server-side provider registration (after Memory, before consumers)",
+        "DialogueSession.ClearWorkingState/ReleaseView (canonical working state; no parser bootstrap)"
       ],
       "queries": [
         "DialoguePolicy decision/candidate queries",
         "DialogueSuggestions public candidate projection",
         "RealizationAuthority.Resolve/AttachProvenance",
         "TaskRequest/InventoryQuery normalization contracts",
-        "InteractionEvidence/Relations bounded fact projections"
+        "InteractionEvidence/Relations bounded fact projections",
+        "DialogueSession.GetActiveView"
       ],
       "repository": "semantic lifecycle domain repository; persistence timing remains coordinator-owned",
       "layers": [
@@ -799,7 +802,8 @@
     "PNC.Semantics.DialoguePolicy.Internal": "Semantics",
     "PNC.Semantics.InteractionLifecycle.Internal": "Semantics",
     "PNC.Conversation.Lifecycle.Internal": "Conversation",
-    "PNC.ConversationScene.Internal": "Conversation"
+    "PNC.ConversationScene.Internal": "Conversation",
+    "PNC.Semantics.DialogueInput.ActiveView": "Semantics"
   },
   "registration_manifest": "REGISTRATIONS.json",
   "private_implementation_scopes": [

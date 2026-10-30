@@ -1,0 +1,234 @@
+{
+  "tier": "Verify (Tier 2)",
+  "source_revision_before": "cded0881",
+  "before": {
+    "coverage": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"project\":\"project-hoomans\",\"signal\":\"best_effort\",\"indexed_at\":\"2026-10-30T15:47:03Z\",\"metadata\":{\"generation\":\"2026-10-30T15:47:03Z\",\"index_mode\":\"full\",\"recorded_at\":\"2026-10-30T15:50:51Z\",\"recording_status\":\"complete\",\"ignored_files_stored\":103,\"ignored_files_total\":103,\"hash_records_complete\":true,\"coverage_version\":3,\"generation_matches\":true},\"paths\":[{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Runtime.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Runtime.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_conversation_lifecycle_refresh_smoke.lua\",\"path\":\"tests/pnc_conversation_lifecycle_refresh_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_conversation_smoke.lua\",\"path\":\"tests/pnc_conversation_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]}],\"scopes\":[],\"caveat\":\"Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable.\"}"
+        }
+      ],
+      "structuredContent": {
+        "project": "project-hoomans",
+        "signal": "best_effort",
+        "indexed_at": "2026-10-30T15:47:03Z",
+        "metadata": {
+          "generation": "2026-10-30T15:47:03Z",
+          "index_mode": "full",
+          "recorded_at": "2026-10-30T15:50:51Z",
+          "recording_status": "complete",
+          "ignored_files_stored": 103,
+          "ignored_files_total": 103,
+          "hash_records_complete": true,
+          "coverage_version": 3,
+          "generation_matches": true
+        },
+        "paths": [
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Runtime.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Runtime.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tests/pnc_conversation_lifecycle_refresh_smoke.lua",
+            "path": "tests/pnc_conversation_lifecycle_refresh_smoke.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tests/pnc_conversation_smoke.lua",
+            "path": "tests/pnc_conversation_smoke.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          }
+        ],
+        "scopes": [],
+        "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+      },
+      "isError": false
+    },
+    "trace": {
+      "content": [
+        {
+          "type": "text",
+          "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Close.clearWorkingContext\ndirection: both\ncallees_total: 2\ncallees: 2  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationDiary.Diary:\n  Clear 1 heuristic 0.07\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.17\ncallers_total: 1\ncallers: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Close.Lifecycle:\n  Finish 1 heuristic 0.90\n"
+        }
+      ],
+      "isError": false
+    },
+    "snippet": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"name\":\"clearWorkingContext\",\"qualified_name\":\"project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Close.clearWorkingContext\",\"label\":\"Function\",\"file_path\":\"/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua\",\"start_line\":35,\"end_line\":117,\"source\":\"local function clearWorkingContext(view, spec, preserveSafetyFeedback)\\n    local session = view and view.session or nil\\n    local historyPart = view and view.historyPart or nil\\n    local preservedMessages = {}\\n    local namespace = session and session.namespace\\n        or spec and spec.namespace or \\\"ProjectHoomans\\\"\\n    local npcID = session and session.npcID\\n        or spec and spec.npcID or \\\"unknown\\\"\\n    local characterUUID = session and session.characterUUID\\n        or spec and spec.characterUUID or \\\"unbound\\\"\\n    local coreConversation = PsychopatzCore\\n        and PsychopatzCore.Conversation or nil\\n    local history = coreConversation and coreConversation.History or nil\\n    local dialogueInput = PNC.Semantics\\n        and PNC.Semantics.DialogueInput or nil\\n\\n    if history and type(history.Clear) == \\\"function\\\" then\\n        history.Clear(namespace, npcID, characterUUID)\\n    end\\n    if session then\\n        session.closed = true\\n        session.conversationMemoryClosed = true\\n        session.semanticDialoguePending = nil\\n        session.semanticDialogueRouter = nil\\n        session.semanticActorConversationService = nil\\n        if session.semanticDialogueContext\\n            and type(session.semanticDialogueContext.Reset) == \\\"function\\\"\\n        then\\n            session.semanticDialogueContext:Reset()\\n        end\\n        session.semanticDialogueContext = nil\\n        session.semanticDialogueState = nil\\n        session.conversationTopicMask = nil\\n        session.queue = {}\\n        session.busy = false\\n        session.llmPending = false\\n    end\\n    if historyPart then\\n        local messagesCleared = false\\n        local typingCleared = false\\n        if preserveSafetyFeedback == true\\n            and type(historyPart.messages) == \\\"table\\\"\\n        then\\n            for _, message in ipairs(historyPart.messages) do\\n                local source = message and message.source\\n                if type(source) == \\\"table\\\"\\n                    and source.eventType == \\\"conversation_safety\\\"\\n                then\\n                    preservedMessages[#preservedMessages + 1] = message\\n                end\\n            end\\n        end\\n        -- Optional addon-owned widget callbacks may fail independently of\\n        -- authoritative scene close; preserve the fallback presentation state.\\n        if type(historyPart.setMessages) == \\\"function\\\" then\\n            messagesCleared = pcall(\\n                historyPart.setMessages,\\n                historyPart,\\n                preservedMessages\\n            )\\n        end\\n        if not messagesCleared then\\n            historyPart.messages = preservedMessages\\n        end\\n        if type(historyPart.setTyping) == \\\"function\\\" then\\n            typingCleared = pcall(\\n                historyPart.setTyping,\\n                historyPart,\\n                nil\\n            )\\n        end\\n        if not typingCleared then\\n            historyPart.typingSpeaker = nil\\n        end\\n    end\\n    if dialogueInput and dialogueInput.ActiveView == view then\\n        dialogueInput.ActiveView = nil\\n    end\\n    if view then\\n        view.lastSemanticDialogueResult = nil\\n        view.lastSemanticActionResult = nil\\n    end\\nend\\n\",\"callers\":1,\"callees\":2}"
+        }
+      ],
+      "structuredContent": {
+        "name": "clearWorkingContext",
+        "qualified_name": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Close.clearWorkingContext",
+        "label": "Function",
+        "file_path": "/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua",
+        "start_line": 35,
+        "end_line": 117,
+        "source": "local function clearWorkingContext(view, spec, preserveSafetyFeedback)\n    local session = view and view.session or nil\n    local historyPart = view and view.historyPart or nil\n    local preservedMessages = {}\n    local namespace = session and session.namespace\n        or spec and spec.namespace or \"ProjectHoomans\"\n    local npcID = session and session.npcID\n        or spec and spec.npcID or \"unknown\"\n    local characterUUID = session and session.characterUUID\n        or spec and spec.characterUUID or \"unbound\"\n    local coreConversation = PsychopatzCore\n        and PsychopatzCore.Conversation or nil\n    local history = coreConversation and coreConversation.History or nil\n    local dialogueInput = PNC.Semantics\n        and PNC.Semantics.DialogueInput or nil\n\n    if history and type(history.Clear) == \"function\" then\n        history.Clear(namespace, npcID, characterUUID)\n    end\n    if session then\n        session.closed = true\n        session.conversationMemoryClosed = true\n        session.semanticDialoguePending = nil\n        session.semanticDialogueRouter = nil\n        session.semanticActorConversationService = nil\n        if session.semanticDialogueContext\n            and type(session.semanticDialogueContext.Reset) == \"function\"\n        then\n            session.semanticDialogueContext:Reset()\n        end\n        session.semanticDialogueContext = nil\n        session.semanticDialogueState = nil\n        session.conversationTopicMask = nil\n        session.queue = {}\n        session.busy = false\n        session.llmPending = false\n    end\n    if historyPart then\n        local messagesCleared = false\n        local typingCleared = false\n        if preserveSafetyFeedback == true\n            and type(historyPart.messages) == \"table\"\n        then\n            for _, message in ipairs(historyPart.messages) do\n                local source = message and message.source\n                if type(source) == \"table\"\n                    and source.eventType == \"conversation_safety\"\n                then\n                    preservedMessages[#preservedMessages + 1] = message\n                end\n            end\n        end\n        -- Optional addon-owned widget callbacks may fail independently of\n        -- authoritative scene close; preserve the fallback presentation state.\n        if type(historyPart.setMessages) == \"function\" then\n            messagesCleared = pcall(\n                historyPart.setMessages,\n                historyPart,\n                preservedMessages\n            )\n        end\n        if not messagesCleared then\n            historyPart.messages = preservedMessages\n        end\n        if type(historyPart.setTyping) == \"function\" then\n            typingCleared = pcall(\n                historyPart.setTyping,\n                historyPart,\n                nil\n            )\n        end\n        if not typingCleared then\n            historyPart.typingSpeaker = nil\n        end\n    end\n    if dialogueInput and dialogueInput.ActiveView == view then\n        dialogueInput.ActiveView = nil\n    end\n    if view then\n        view.lastSemanticDialogueResult = nil\n        view.lastSemanticActionResult = nil\n    end\nend\n",
+        "callers": 1,
+        "callees": 2
+      },
+      "isError": false
+    }
+  },
+  "after": {
+    "coverage": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"project\":\"project-hoomans\",\"signal\":\"best_effort\",\"indexed_at\":\"2026-10-30T21:06:22Z\",\"metadata\":{\"generation\":\"2026-10-30T21:06:22Z\",\"index_mode\":\"full\",\"recorded_at\":\"2026-10-30T21:06:25Z\",\"recording_status\":\"complete\",\"ignored_files_stored\":106,\"ignored_files_total\":106,\"hash_records_complete\":true,\"coverage_version\":3,\"generation_matches\":true},\"paths\":[{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueSession.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueSession.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Runtime.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Runtime.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_conversation_lifecycle_refresh_smoke.lua\",\"path\":\"tests/pnc_conversation_lifecycle_refresh_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_semantic_session_boundary_smoke.lua\",\"path\":\"tests/pnc_semantic_session_boundary_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]}],\"scopes\":[],\"caveat\":\"Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable.\"}"
+        }
+      ],
+      "structuredContent": {
+        "project": "project-hoomans",
+        "signal": "best_effort",
+        "indexed_at": "2026-10-30T21:06:22Z",
+        "metadata": {
+          "generation": "2026-10-30T21:06:22Z",
+          "index_mode": "full",
+          "recorded_at": "2026-10-30T21:06:25Z",
+          "recording_status": "complete",
+          "ignored_files_stored": 106,
+          "ignored_files_total": 106,
+          "hash_records_complete": true,
+          "coverage_version": 3,
+          "generation_matches": true
+        },
+        "paths": [
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueSession.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueSession.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Runtime.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Runtime.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tests/pnc_conversation_lifecycle_refresh_smoke.lua",
+            "path": "tests/pnc_conversation_lifecycle_refresh_smoke.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "tests/pnc_semantic_session_boundary_smoke.lua",
+            "path": "tests/pnc_semantic_session_boundary_smoke.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          }
+        ],
+        "scopes": [],
+        "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+      },
+      "isError": false
+    },
+    "ClearWorkingState": {
+      "content": [
+        {
+          "type": "text",
+          "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueSession.Session.ClearWorkingState\ndirection: both\ncallees_total: 1\ncallees: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.17\ncallers_total: 2\ncallers: 2  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Close:\n  clearWorkingContext 1 heuristic 0.75\nproject-hoomans.tests:\n  pnc_semantic_session_boundary_smoke 1 heuristic 0.38\n"
+        }
+      ],
+      "isError": false
+    },
+    "ReleaseView": {
+      "content": [
+        {
+          "type": "text",
+          "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueSession.Session.ReleaseView\ndirection: both\ncallees_total: 1\ncallees: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueSession:\n  dialogueInput 1 heuristic 0.90\ncallers_total: 2\ncallers: 2  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Close:\n  clearWorkingContext 1 heuristic 0.75\nproject-hoomans.tests:\n  pnc_semantic_session_boundary_smoke 1 heuristic 0.38\n"
+        }
+      ],
+      "isError": false
+    },
+    "GetActiveView": {
+      "content": [
+        {
+          "type": "text",
+          "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueSession.Session.GetActiveView\ndirection: both\ncallees_total: 1\ncallees: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueSession:\n  dialogueInput 1 heuristic 0.90\ncallers_total: 3\ncallers: 3  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.Blocks.ConversationComposer.PNC_ConversationComposer_Runtime:\n  activeView 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_SemanticIdentity:\n  activeViewFor 1 heuristic 0.38\nproject-hoomans.tests:\n  pnc_semantic_session_boundary_smoke 1 heuristic 0.38\n"
+        }
+      ],
+      "isError": false
+    },
+    "snippet": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"name\":\"Session.ClearWorkingState\",\"qualified_name\":\"project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueSession.Session.ClearWorkingState\",\"label\":\"Function\",\"file_path\":\"/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueSession.lua\",\"start_line\":14,\"end_line\":26,\"source\":\"function Session.ClearWorkingState(session)\\n    if not session then return end\\n    session.semanticDialoguePending = nil\\n    session.semanticDialogueRouter = nil\\n    session.semanticActorConversationService = nil\\n    if session.semanticDialogueContext\\n        and type(session.semanticDialogueContext.Reset) == \\\"function\\\"\\n    then\\n        session.semanticDialogueContext:Reset()\\n    end\\n    session.semanticDialogueContext = nil\\n    session.semanticDialogueState = nil\\nend\\n\",\"callers\":2,\"callees\":1}"
+        }
+      ],
+      "structuredContent": {
+        "name": "Session.ClearWorkingState",
+        "qualified_name": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Semantics.PNC_SemanticDialogueSession.Session.ClearWorkingState",
+        "label": "Function",
+        "file_path": "/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueSession.lua",
+        "start_line": 14,
+        "end_line": 26,
+        "source": "function Session.ClearWorkingState(session)\n    if not session then return end\n    session.semanticDialoguePending = nil\n    session.semanticDialogueRouter = nil\n    session.semanticActorConversationService = nil\n    if session.semanticDialogueContext\n        and type(session.semanticDialogueContext.Reset) == \"function\"\n    then\n        session.semanticDialogueContext:Reset()\n    end\n    session.semanticDialogueContext = nil\n    session.semanticDialogueState = nil\nend\n",
+        "callers": 2,
+        "callees": 1
+      },
+      "isError": false
+    }
+  },
+  "limitations": [
+    "Heuristic type target is false; Reset is a dynamic context method not resolved in the call graph, so exact source and phase-order tests supplement it.",
+    "Private-field guard covers declared direct roots and simple aliases, not arbitrary Lua data flow."
+  ]
+}

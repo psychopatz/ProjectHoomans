@@ -14,6 +14,7 @@ in `DOMAIN_CONTRACTS.json`; provider filenames are implementation details.
 | Register Hoomans language definitions | `shared/PNC/Semantics/PNC_SemanticCatalog` | `Catalog.Register`; useful phrase/concept catalogs stay fine-grained. No gameplay mutation. |
 | Select dialogue policy and flow | `shared/PNC/Semantics/PNC_SemanticDialoguePolicy` | Policy decisions/candidates; `CommitFlow` changes bounded dialogue working context, not inventory/orders. |
 | Obtain generated suggestions | `shared/PNC/Semantics/PNC_SemanticDialogueSuggestions` | Candidate/frame projection. Typed and clicked input converge on existing submission/authority contracts. |
+| Release/query semantic working state | `client/PNC/Semantics/PNC_SemanticDialogueSession` | `ClearWorkingState`, `ReleaseView`, `GetActiveView`; no parser/UI bootstrap. Conversation retains its history, queue and scene-close flags. |
 | Observe accepted interaction facts | `shared/PNC/Semantics/PNC_SemanticInteractionLifecycle` | Canonical bounded interaction state/envelope. The existing server handler validates facts and hands off; facts do not replace gameplay commands. |
 | Query social evidence | `shared/PNC/Semantics/PNC_SemanticInteractionEvidence`, `PNC_SemanticInteractionRelations` | Read bounded accepted facts; Social services own relationship/conduct mutations. |
 | Realize response wording | `shared/PNC/Semantics/PNC_SemanticDialogueRealizationAuthority` | `Resolve` / `AttachProvenance`; preserve response-plan provenance and existing queue/TTS delivery. No hidden action dispatch. |
@@ -53,12 +54,14 @@ retain complete-wire assertions. Gameplay-dispatch tests use the new view.
 
 ## Current migration scope
 
-The close working set is 6 files / 1,151 lines / 40,190 bytes, versus P0's
-7 / 1,311 / 46,385; handoffs are 2 rather than 3. Begin/heartbeat implementation
+The P5A close working set was 6 files / 1,151 lines / 40,190 bytes, versus
+P0's 7 / 1,311 / 46,385. P5C adds the small semantic-session owner seam;
+that extra file removes foreign working-state writes and supports independent
+retrieval/testing. Handoffs remain 2 rather than P0's 3. Begin/heartbeat implementation
 is outside that coherent slice. The factory returns the public Finish callback
 directly; obsolete private factory/finish files have no retained shim.
 
-The 43 supported semantic paths and 66 foreign literal-import edges are reviewed
+The 44 supported semantic paths and 66 foreign literal-import edges are reviewed
 in `P5B_MCP_TRACES.json`, plus the typed identity transport entry owned by Networking, with graph coverage and statement-form import
 limitations recorded. This establishes subdomain navigation/public boundaries;
 it does not claim P5's remaining cycle and legacy-fixture work is complete.

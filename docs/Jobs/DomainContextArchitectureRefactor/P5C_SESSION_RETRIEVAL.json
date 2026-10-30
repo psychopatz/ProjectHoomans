@@ -1,0 +1,19 @@
+{
+  "behavior": "Change semantic router/context teardown and active-view release without closing scenes or changing conversation delivery state",
+  "source_revision_before": "cded0881",
+  "before": {
+    "files": [
+      "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua"
+    ],
+    "bytes": 7115,
+    "lines": 186
+  },
+  "after": {
+    "files": [
+      "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueSession.lua"
+    ],
+    "bytes": 1164,
+    "lines": 39
+  },
+  "justification": "Independent Semantics owner seam; full close probe includes it and explicitly records the extra file. No claim that total file count falls."
+}

@@ -1,4 +1,5 @@
 -- Close delivery and working-session cleanup. No start/heartbeat policy.
+local DialogueSession = require "PNC/Semantics/PNC_SemanticDialogueSession"
 local Lifecycle = PNC.Conversation.Lifecycle
 local H = Lifecycle.Internal
 local Safety = H.Safety
@@ -45,8 +46,6 @@ local function clearWorkingContext(view, spec, preserveSafetyFeedback)
     local coreConversation = PsychopatzCore
         and PsychopatzCore.Conversation or nil
     local history = coreConversation and coreConversation.History or nil
-    local dialogueInput = PNC.Semantics
-        and PNC.Semantics.DialogueInput or nil
 
     if history and type(history.Clear) == "function" then
         history.Clear(namespace, npcID, characterUUID)
@@ -54,16 +53,7 @@ local function clearWorkingContext(view, spec, preserveSafetyFeedback)
     if session then
         session.closed = true
         session.conversationMemoryClosed = true
-        session.semanticDialoguePending = nil
-        session.semanticDialogueRouter = nil
-        session.semanticActorConversationService = nil
-        if session.semanticDialogueContext
-            and type(session.semanticDialogueContext.Reset) == "function"
-        then
-            session.semanticDialogueContext:Reset()
-        end
-        session.semanticDialogueContext = nil
-        session.semanticDialogueState = nil
+        DialogueSession.ClearWorkingState(session)
         session.conversationTopicMask = nil
         session.queue = {}
         session.busy = false
@@ -107,13 +97,7 @@ local function clearWorkingContext(view, spec, preserveSafetyFeedback)
             historyPart.typingSpeaker = nil
         end
     end
-    if dialogueInput and dialogueInput.ActiveView == view then
-        dialogueInput.ActiveView = nil
-    end
-    if view then
-        view.lastSemanticDialogueResult = nil
-        view.lastSemanticActionResult = nil
-    end
+    DialogueSession.ReleaseView(view)
 end
 
 local function presentSafetyFeedback(spec, state, reason)

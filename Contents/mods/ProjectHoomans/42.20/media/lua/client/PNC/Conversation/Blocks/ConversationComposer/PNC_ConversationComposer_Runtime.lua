@@ -1,4 +1,5 @@
 require "PNC/Conversation/Blocks/PNC_ConversationTextLoader"
+local DialogueSession = require "PNC/Semantics/PNC_SemanticDialogueSession"
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
@@ -22,8 +23,7 @@ local SYSTEM_SOURCE = {
     domain = "pnc.system.shared.categories",
 }
 local function activeView(npcID)
-    local semantic = PNC.Semantics and PNC.Semantics.DialogueInput
-        and PNC.Semantics.DialogueInput.ActiveView or nil
+    local semantic = DialogueSession.GetActiveView()
     if semantic and tostring(semantic.spec and semantic.spec.npcID or "")
         == tostring(npcID or "")
     then

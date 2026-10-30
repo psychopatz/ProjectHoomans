@@ -1,0 +1,59 @@
+{
+  "stage": "P5C semantic working-session ownership slice validated; P5D cycle/fixture work remains",
+  "source_revision_before": "cded0881",
+  "full_lua": {
+    "passed": 982,
+    "total": 982,
+    "seconds": 7.99
+  },
+  "focused_lua": {
+    "passed": 30,
+    "total": 30
+  },
+  "focused_semantic_python": {
+    "passed": 16,
+    "total": 16
+  },
+  "guard_python": {
+    "passed": 22,
+    "total": 22
+  },
+  "installed_kahlua": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 4,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  },
+  "static_kahlua": [
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Runtime.lua",
+      "errors": 0
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua",
+      "errors": 0
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua",
+      "errors": 0
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueSession.lua",
+      "errors": 0
+    }
+  ],
+  "dependency_guard": {
+    "issues": 82,
+    "new_debt": 0
+  },
+  "ownership": "Semantics clears working state and owns active-view query/release; Conversation coordinates scene, history, queue and memory close flags",
+  "source_equivalence": "P5C_ARCHITECTURE_PROOF.json verifies both moved write blocks; callback phase order explicitly tested",
+  "retrieval": "P5C_RETRIEVAL.json records the additional owning seam in full close context; P5C_SESSION_RETRIEVAL.json records smaller independent semantic cleanup context",
+  "compatibility": "Existing scene payloads, callback signatures, group/Core-view fallback and late unrelated-view protection retained. No shim introduced."
+}

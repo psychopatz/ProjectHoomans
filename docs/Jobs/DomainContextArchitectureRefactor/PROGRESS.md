@@ -43,7 +43,7 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
   Public ModData mechanism; identical Reset compatibility object/body semantics;
   Memory repository loads bounded schemas/catalogs; Inventory owns lazy snapshot
   interop. Body hints, journal/travel and save coordinator behavior preserved.
-- Current seven probes: **32 files / 4,478 lines / 166,641 bytes**, -42,881 bytes
+- Current seven probes: **33 files / 4,501 lines / 167,228 bytes**, -42,294 bytes
   versus P0. Persisted inventory: 7 → 4 files, same depth, -25,710 bytes; removed
   envelope/bootstrap context is explained in `RETRIEVAL.md` and caller-tested.
   Memory's supplementary owned import closure: 83,367 → 55,416 bytes.
@@ -52,7 +52,7 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
   Method bodies match pre-change source; obsolete health paths removed, no shims.
   Health/stamina context: 43,166 → 17,694 bytes at the same four-file count.
   Identity: 21,594 → 14,144 bytes, one additional generic-helper file explained.
-- Latest full isolated Lua: **981/981**, 4 workers, 13.43 seconds.
+- Latest full isolated Lua: **982/982**, 4 workers, 7.99 seconds.
   Focused owning-domain/restart/binding matrix: **118/118**; diagnostic Python
   **22/22**; NPC tooling **6/6**.
 - Changed-runtime installed PZ Kahlua: P2 **36/36**, P3 **54/54**, first P4 slice
@@ -82,16 +82,24 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
   regressions, 3/3 installed Kahlua, zero new debt. P5 is not yet accepted.
 
 - P5 public-subdomain/tooling slice: `SEMANTIC_SURFACES.md` and
-  `P5B_MCP_TRACES.json`. 43 supported semantic entry paths; foreign implementation
+  `P5B_MCP_TRACES.json`. 44 supported semantic entry paths; foreign implementation
   and Internal namespaces are guarded. Typed identity-result transport is owned
   by Networking at its existing path. Raw wire traffic and lifecycle facts stay
   observable separately from gameplay dispatch. Six changed tooling Lua files
   compile with installed Kahlua; owning diagnostic Python 22/22; focused semantic
   evidence 29 tests pass. P5C/D and its remaining failures are not accepted yet.
 
+- Semantic-session ownership slice: `P5C_VALIDATION.json`. Public cold-load
+  query/cleanup seam owns active view and semantic working fields. Conversation
+  and identity-result presentation use that seam. Phase order and exact moved
+  statements preserved. Owning cleanup context: 7,115 → 1,164 bytes at one file;
+  full close context gains one justified file, remains 5,608 bytes below P0.
+  Full Lua 982/982; focused 30/30; semantic/authority/translation Python 16/16;
+  installed Kahlua 4/4, static zero errors, dependency guard zero new debt.
+
 ## Next mandatory chunk
 
-**Continue P5C/D — Semantic cycle direction and remaining tooling fixtures.**
+**Continue P5D — Prove/invert remaining cycle direction and resolve fixtures.**
 
 1. Use the established public subdomain map to review remaining Social/World/
    Identity and Conversation/Knowledge/UI dependency cycles with exact source

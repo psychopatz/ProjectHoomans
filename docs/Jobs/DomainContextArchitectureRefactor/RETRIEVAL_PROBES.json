@@ -56,6 +56,7 @@
       "files": [
         "client/PNC/Conversation/PNC_ConversationLifecycle.lua",
         "client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua",
+        "client/PNC/Semantics/PNC_SemanticDialogueSession.lua",
         "client/PNC/Conversation/PNC_ConversationFarewell.lua",
         "client/PNC/Conversation/PNC_ConversationSafety.lua",
         "shared/PNC/Conversation/PNC_ConversationScene.lua",
@@ -71,7 +72,7 @@
       "tests": [
         "tests/pnc_conversation_lifecycle_refresh_smoke.lua"
       ],
-      "review_note": "P5A: Lifecycle.Create directly binds the public Finish operation. Close owns outcome delivery, bounded topic handoff and working-session cleanup; start/heartbeat/availability support is a separate implementation slice. Safety, Farewell and authoritative Scene.End remain reviewed dependencies."
+      "review_note": "P5A: Lifecycle.Create directly binds the public Finish operation. Close owns outcome delivery, bounded topic handoff and working-session cleanup; start/heartbeat/availability support is a separate implementation slice. Safety, Farewell and authoritative Scene.End remain reviewed dependencies. P5C adds the small owning semantic-session contract; Conversation no longer knows or writes its private working fields. The extra file is an independently testable domain boundary, not a provider fragment."
     },
     {
       "id": "persisted_inventory",
