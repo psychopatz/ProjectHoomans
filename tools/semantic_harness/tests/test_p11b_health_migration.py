@@ -43,57 +43,57 @@ LEGACY_KEYS = {
 }
 EXPECTED = {
     "EN": {
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded01":
-            "I'm fine. Don't make a thing of it.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral01":
-            "I'm doing okay.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse01":
-            "I'm okay.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm01":
-            "I'm doing okay. Thanks for checking in.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded01":
-            "I'm hurt. Give me space.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral01":
-            "I'm hurt, but I'm managing.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse01":
-            "I'm hurt.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm01":
-            "I'm hurt, but I'm managing. Thanks for asking.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded01":
-            "I can't confirm that.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral01":
-            "I can't confirm my health status right now.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse01":
-            "Can't confirm.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01":
-            "I can't confirm it right now, but thanks for asking.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded01": "I'm fine. Don't make a thing of it.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral01": "I'm doing okay.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse01": "I'm okay.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm01": "I'm doing okay. Thanks for checking in.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded01": "I'm hurt. Give me space.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral01": "I'm hurt, but I'm managing.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse01": "I'm hurt.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm01": "I'm hurt, but I'm managing. Thanks for asking.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded01": "I can't confirm that.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral01": "I can't confirm my health status right now.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse01": "Can't confirm.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01": "I can't confirm it right now, but thanks for asking.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded01": "No bite. Leave it there.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral01": "No, I don't have a recorded bite.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse01": "No bite.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm01": "No, I don't have a recorded bite. Thanks for checking.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded01": "Yes. I've been bitten. That's all.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral01": "Yes, I've been bitten.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse01": "Yes. I've been bitten.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm01": "Yes. I've been bitten, and I appreciate you checking.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded01": "I can't confirm that. Don't press me.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral01": "I can't confirm whether I've been bitten.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse01": "Can't confirm.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm01": "I can't confirm it, but thanks for checking."
     },
     "TL": {
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded01":
-            "Mabuti ako. Huwag mo nang palakihin.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral01":
-            "Ayos lang ako.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse01":
-            "Ayos lang.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm01":
-            "Ayos lang ako. Salamat sa pagsuri.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded01":
-            "Nasaktan ako. Bigyan mo ako ng espasyo.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral01":
-            "Nasaktan ako, pero kinakaya ko.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse01":
-            "Nasaktan ako.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm01":
-            "Nasaktan ako, pero kinakaya ko. Salamat sa pagtatanong.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded01":
-            "Hindi ko makumpirma iyon.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral01":
-            "Hindi ko makumpirma ang kalagayan ko ngayon.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse01":
-            "Hindi makumpirma.",
-        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01":
-            "Hindi ko makumpirma ngayon, pero salamat sa pagtatanong.",
-    },
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded01": "Mabuti ako. Huwag mo nang palakihin.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral01": "Ayos lang ako.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse01": "Ayos lang.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm01": "Ayos lang ako. Salamat sa pagsuri.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded01": "Nasaktan ako. Bigyan mo ako ng espasyo.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral01": "Nasaktan ako, pero kinakaya ko.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse01": "Nasaktan ako.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm01": "Nasaktan ako, pero kinakaya ko. Salamat sa pagtatanong.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded01": "Hindi ko makumpirma iyon.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral01": "Hindi ko makumpirma ang kalagayan ko ngayon.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse01": "Hindi makumpirma.",
+        "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01": "Hindi ko makumpirma ngayon, pero salamat sa pagtatanong.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded01": "Walang kagat. Tama na.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral01": "Hindi, wala akong naitalang kagat.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse01": "Walang kagat.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm01": "Hindi, wala akong naitalang kagat. Salamat sa pagsuri.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded01": "Oo. Nakagat ako. Tama na.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral01": "Oo, nakagat ako.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse01": "Oo. Nakagat ako.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm01": "Oo. Nakagat ako, at salamat sa pagsuri.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded01": "Hindi ko makumpirma. Huwag mo nang ipilit.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral01": "Hindi ko makumpirma kung nakagat ako.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse01": "Hindi makumpirma.",
+        "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm01": "Hindi ko makumpirma, pero salamat sa pagsuri."
+    }
 }
 
 

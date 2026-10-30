@@ -52,6 +52,11 @@ records lifecycle facts. The new views neither suppress events nor create a
 second state store. Snapshot/no-change comparisons and explicit fact checks
 retain complete-wire assertions. Gameplay-dispatch tests use the new view.
 
+Authoring and presentation IDs have distinct contracts: `semanticTemplateID`
+identifies meaning; an emitted `key` may be a generated locale key; compiler
+`locations` uses `phrase.<semanticTemplateID>` for wording-family source ownership.
+Do not substitute one ID space for another in fixtures or diagnostic consumers.
+
 ## Current migration scope
 
 The P5A close working set was 6 files / 1,151 lines / 40,190 bytes, versus

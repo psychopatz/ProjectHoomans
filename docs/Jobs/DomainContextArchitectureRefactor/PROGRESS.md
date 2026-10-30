@@ -65,9 +65,11 @@ Seven fixed probes: **33 files / 4,501 lines / 167,228 bytes**, versus P0's
   ordering and diff checks pass. No game execution is implied by compiler checks.
 - Full semantic-tooling evidence remains explicit: P5B's 195 isolated modules
   yielded 155 pass / 40 fail, no timeouts, 786 tests. Focused inspector and
-  contract-fixture repairs yield a derived **161 pass / 34 remaining failures**;
+  contract-fixture repairs yield a derived **164 pass / 31 remaining failures**;
   this is not a second full run. A fresh run of those 35 completed: one additional module passed, 34 still fail,
-  and none timed out. These remain open individual gates.
+  and none timed out. Three further wording-ownership modules now pass 9/9 tests
+  after typed source-location and pre-existing locale snapshot alignment. The
+  remaining 31 are open individual gates.
 - Tooling retains complete wire traffic and lifecycle facts separately from
   executable dispatch evidence. Unknown commands remain dispatches. GUI tests
   use the proven per-process XIM fallback; no desktop setting was changed.

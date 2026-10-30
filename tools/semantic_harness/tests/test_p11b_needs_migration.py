@@ -119,7 +119,7 @@ class NeedsWordingShardTests(unittest.TestCase):
         self.assertEqual(entry["domain"], "needs")
         self.assertEqual(
             {
-                model["locations"][template_id]["sourceShard"]
+                model["locations"]["phrase." + template_id]["sourceShard"]
                 for template_id in NEEDS_IDS
             },
             {"content/needs.json"},

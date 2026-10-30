@@ -1,0 +1,59 @@
+{
+  "stage": "P5D authoring-location and published locale fixture alignment",
+  "source_revision_before": "d7d77425",
+  "production_or_generated_changes": false,
+  "focused_python": {
+    "passed": 9,
+    "total": 9
+  },
+  "compiler_contract": "Source locations use phrase.<semanticTemplateID>; producer and consumer in conversation_compiler.py use the same typed ID, while phrase families retain their logical semanticTemplateID.",
+  "locale_evidence": [
+    {
+      "path": "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Wellbeing.json",
+      "preexisting_source_revision": "24d61abc",
+      "sha256": "4184fb2282a9b110475dd55f57291356cd8d4eff4fcdb0b2a74eb72ed8e8ba9d",
+      "original_rows_preserved": 16,
+      "additional_preexisting_rows": 4
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Wellbeing.json",
+      "preexisting_source_revision": "24d61abc",
+      "sha256": "6f78b994e5176bfbf0783243b86b9b301be3da9b166f4723d9d3476a44cff17f",
+      "original_rows_preserved": 16,
+      "additional_preexisting_rows": 4
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Health.json",
+      "preexisting_source_revision": "24d61abc",
+      "sha256": "28b6adcf82548e20a25d2b758567534731254912954cbbd11345c2fb1fa9e9df",
+      "original_rows_preserved": 12,
+      "additional_preexisting_rows": 12
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Health.json",
+      "preexisting_source_revision": "24d61abc",
+      "sha256": "22f7ea8854e67b15c3613976aabd42adfb4a5b20959d50e3fa90b8a53b58dcda",
+      "original_rows_preserved": 12,
+      "additional_preexisting_rows": 12
+    }
+  ],
+  "assertion_strength": "Exact complete locale snapshots retained; every previously expected row/value preserved, plus missing already-published rows. Family ownership and retired-key assertions remain.",
+  "derived_tooling_status": {
+    "passed_modules": 164,
+    "remaining_failed_modules": 31,
+    "basis": "Complete P5B isolated run plus bounded focused repairs and the selected-module refresh; no new full-run claim"
+  },
+  "scope": "Needs/Wellbeing/Health tests only. Apology has separate context and locale expectations and remains an open gate.",
+  "fixed_probe_sources_unchanged": 33,
+  "dependency_guard": {
+    "issues": 74,
+    "new_debt": 0
+  },
+  "mcp_review": {
+    "tier": "Verify (Tier 2)",
+    "project": "project-hoomans",
+    "generation": "2026-10-30T22:15:54Z",
+    "paths_checked": 4,
+    "status": "metadata_match, no recorded coverage gaps; compiler source and focused tests confirm the typed contract"
+  }
+}
