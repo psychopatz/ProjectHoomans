@@ -65,11 +65,16 @@ Seven fixed probes: **33 files / 4,501 lines / 167,228 bytes**, versus P0's
   ordering and diff checks pass. No game execution is implied by compiler checks.
 - Full semantic-tooling evidence remains explicit: P5B's 195 isolated modules
   yielded 155 pass / 40 fail, no timeouts, 786 tests. Focused inspector and
-  contract-fixture repairs yield a derived **164 pass / 31 remaining failures**;
+  contract-fixture repairs yield a derived **167 pass / 28 remaining failures**;
   this is not a second full run. A fresh run of those 35 completed: one additional module passed, 34 still fail,
   and none timed out. Three further wording-ownership modules now pass 9/9 tests
   after typed source-location and pre-existing locale snapshot alignment. The
-  remaining 31 are open individual gates.
+  remaining 28 are open individual gates. The apology module now passes 4/4,
+  including eight EN/TL family cases and a cold no-antecedent clarification check;
+  catalog selection and final authored utterance are checked separately. Two
+  further modules pass 9/9 after published locale-key and registered-flow-count
+  alignment. C7G still fails alone at 0.403s mean against 0.30s; keep this
+  pre-existing performance finding open rather than blaming only contention.
 - Tooling retains complete wire traffic and lifecycle facts separately from
   executable dispatch evidence. Unknown commands remain dispatches. GUI tests
   use the proven per-process XIM fallback; no desktop setting was changed.

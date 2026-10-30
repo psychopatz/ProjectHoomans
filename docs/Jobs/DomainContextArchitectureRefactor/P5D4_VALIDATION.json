@@ -1,0 +1,146 @@
+{
+  "stage": "P5D apology semantic/utterance fixture alignment",
+  "source_revision_before": "d253294c",
+  "production_or_generated_changes": false,
+  "focused_python": {
+    "passed": 4,
+    "total": 4,
+    "language_family_cases": 8
+  },
+  "locale_evidence": [
+    {
+      "path": "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Apology.json",
+      "sha256": "35af2d9a0bc491700d03e713683b280d567df19fddcb6a32b27c5fc31eb54c85",
+      "preexisting_source_revision": "24d61abc"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Apology.json",
+      "sha256": "3cb60d10c549c32fac030fc949e922503f43e904689218628bba068ad02a7b5f",
+      "preexisting_source_revision": "24d61abc"
+    }
+  ],
+  "authority_evidence": [
+    {
+      "path": "tools/semantic_harness/codebuilder/sources/conversation/behaviors/social/reconcile.json",
+      "sha256": "c524df9098a54c8ea64097e5e8aa42bc144be58cc568420b3bc318c52f697fb8",
+      "unchanged_since": "24d61abc"
+    },
+    {
+      "path": "tools/semantic_harness/codebuilder/sources/conversation/beats/social/reconciliation.json",
+      "sha256": "c55678ff59b617deb2db9728262d6fe0cb38a62c25e1e7c5f2f248537a19f1ab",
+      "unchanged_since": "24d61abc"
+    }
+  ],
+  "assertion_strength": "Exact locale snapshots retained. Four catalog selection IDs and routed social styles remain asserted in EN/TL. Admitted reconciliation uses its authored friendly semantic template and locale-specific utterance construction; cold apology must clarify. Gameplay dispatch/tools/relationship mutation/LLM remain forbidden.",
+  "matrix": [
+    [
+      "EN",
+      "default",
+      "semantic.apology.default",
+      "semantic.social.apology.friendly",
+      "I hear you.",
+      "neutral",
+      "construction.en.social.acknowledge"
+    ],
+    [
+      "EN",
+      "friendly",
+      "semantic.apology.friendly",
+      "semantic.social.apology.friendly",
+      "I hear you.",
+      "friendly",
+      "construction.en.social.acknowledge"
+    ],
+    [
+      "EN",
+      "stressed",
+      "semantic.apology.stressed",
+      "semantic.social.apology.friendly",
+      "I hear you.",
+      "neutral",
+      "construction.en.social.acknowledge"
+    ],
+    [
+      "EN",
+      "withdrawn",
+      "semantic.apology.withdrawn",
+      "semantic.social.apology.friendly",
+      "I hear you.",
+      "withdrawn",
+      "construction.en.social.acknowledge"
+    ],
+    [
+      "TL",
+      "default",
+      "semantic.apology.default",
+      "semantic.social.apology.friendly",
+      "Naiintindihan ko.",
+      "neutral",
+      "construction.tl.social.acknowledge"
+    ],
+    [
+      "TL",
+      "friendly",
+      "semantic.apology.friendly",
+      "semantic.social.apology.friendly",
+      "Naiintindihan ko.",
+      "friendly",
+      "construction.tl.social.acknowledge"
+    ],
+    [
+      "TL",
+      "stressed",
+      "semantic.apology.stressed",
+      "semantic.social.apology.friendly",
+      "Naiintindihan ko.",
+      "neutral",
+      "construction.tl.social.acknowledge"
+    ],
+    [
+      "TL",
+      "withdrawn",
+      "semantic.apology.withdrawn",
+      "semantic.social.apology.friendly",
+      "Naiintindihan ko.",
+      "withdrawn",
+      "construction.tl.social.acknowledge"
+    ]
+  ],
+  "mcp_review": {
+    "project": "project-hoomans",
+    "generation": "2026-10-30T22:15:54Z",
+    "tier": 2,
+    "source_fallback": "Changed test fully read; unchanged catalog, social profile, context, declarative behavior and beat reviewed. Metadata-match coverage has no recorded gap; test metadata changed as expected."
+  },
+  "derived_tooling_status": {
+    "passed_modules": 167,
+    "remaining_failed_modules": 28,
+    "fresh_full_run": false
+  },
+  "additional_focused_python": {
+    "passed": 9,
+    "total": 9,
+    "modules": [
+      "test_conversational_competence_c7a",
+      "test_quest_flow_binding"
+    ],
+    "repairs": [
+      "Published TL bite locale key; meaning/text/dispatch checks preserved",
+      "20 registered flows, including 3 preexisting Combat actions; quest metadata assertions preserved"
+    ]
+  },
+  "performance_probe": {
+    "module": "test_conversational_competence_c7g",
+    "isolated_no_heavy_concurrent_job": true,
+    "passed": 4,
+    "failed": 1,
+    "mean_seconds": 0.4032939098397037,
+    "limit_seconds": 0.3,
+    "status": "Open; same test fails baseline, contention alone does not explain current result"
+  },
+  "dependency_guard": {
+    "issues": 74,
+    "new_debt": 0,
+    "resolved_debt": 119
+  }
+}

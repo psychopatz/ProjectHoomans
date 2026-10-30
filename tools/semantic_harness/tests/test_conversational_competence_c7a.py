@@ -231,7 +231,7 @@ class ConversationalCompetenceC7ATests(unittest.TestCase):
         self.assertEqual(tl_turn["toolCalls"], [])
         self.assertEqual(
             tl_bite["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative",
+            "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral01",
         )
         self.assertIn("naitalang kagat", self.message_text(tl_bite))
         self.assertEqual(tl_bite["dispatchTransport"], [])

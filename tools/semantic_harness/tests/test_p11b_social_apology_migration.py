@@ -34,56 +34,56 @@ FAMILY_NAMES = {
 TRANSLATIONS = {
     "EN": {
         "default": {
-            "neutral": "Noted. Let's move on.",
-            "warm": "I appreciate the apology. Let's move on.",
-            "terse": "Noted.",
-            "guarded": "Apology heard. Leave it there.",
+            "neutral": "What are you apologizing for?",
+            "warm": "What are you apologizing for?",
+            "terse": "What are you apologizing for?",
+            "guarded": "What are you apologizing for?"
         },
         "friendly": {
             "neutral": "It's okay. We can put that behind us.",
             "warm": "It's okay. I appreciate you saying that.",
             "terse": "It's okay.",
-            "guarded": "I heard you. Leave it there.",
+            "guarded": "I heard you. Leave it there."
         },
         "stressed": {
             "neutral": "I know things are tense. Let's keep it calm.",
             "warm": "I know things are tense. Thanks for saying that.",
             "terse": "Keep it calm.",
-            "guarded": "Things are tense. Leave it there.",
+            "guarded": "Things are tense. Leave it there."
         },
         "withdrawn": {
             "neutral": "All right. Let's leave it there.",
             "warm": "All right. Let's leave it there for now.",
             "terse": "Leave it.",
-            "guarded": "All right. Leave it there.",
-        },
+            "guarded": "All right. Leave it there."
+        }
     },
     "TL": {
         "default": {
-            "neutral": "Naitala ko. Magpatuloy tayo.",
-            "warm": "Pinahahalagahan ko ang paghingi mo ng tawad. Magpatuloy tayo.",
-            "terse": "Naitala ko.",
-            "guarded": "Narinig ko ang paghingi ng tawad. Tama na.",
+            "neutral": "Ano ang hinihingi mo ng tawad?",
+            "warm": "Ano ang hinihingi mo ng tawad?",
+            "terse": "Ano ang hinihingi mo ng tawad?",
+            "guarded": "Ano ang hinihingi mo ng tawad?"
         },
         "friendly": {
             "neutral": "Ayos lang. Kalimutan na natin iyon.",
             "warm": "Ayos lang. Pinahahalagahan ko ang sinabi mo.",
             "terse": "Ayos lang.",
-            "guarded": "Narinig kita. Tama na.",
+            "guarded": "Narinig kita. Tama na."
         },
         "stressed": {
             "neutral": "Alam kong tensiyonado tayo. Panatilihin nating mahinahon.",
             "warm": "Alam kong tensiyonado tayo. Salamat sa pagsabi niyan.",
             "terse": "Maging mahinahon.",
-            "guarded": "Tensiyonado tayo. Tama na iyon.",
+            "guarded": "Tensiyonado tayo. Tama na iyon."
         },
         "withdrawn": {
             "neutral": "Sige. Tama na iyon.",
             "warm": "Sige. Tama na muna iyon.",
             "terse": "Tama na.",
-            "guarded": "Sige. Tama na iyon.",
-        },
-    },
+            "guarded": "Sige. Tama na iyon."
+        }
+    }
 }
 RETIRED_KEYS = {
     f"UI_PNC_Conversation_Semantic_Apology{name}"
@@ -97,6 +97,20 @@ RETIRED_KEYS.update(
 
 
 class SocialApologyWordingShardTests(unittest.TestCase):
+    def test_apology_without_an_antecedent_requests_context_without_dispatch(self) -> None:
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            turn = worker.input("sorry")
+        self.assertTrue(turn["accepted"])
+        self.assertEqual(turn["result"]["ir"]["intent"], "APOLOGIZE")
+        self.assertEqual(
+            turn["result"]["decision"]["response"]["templateID"],
+            "semantic.interaction.context.clarify",
+        )
+        self.assertEqual(turn["dispatchTransport"], [])
+        self.assertEqual(turn["toolCalls"], [])
+        self.assertEqual(turn["relationshipBefore"], turn["relationshipAfter"])
+        self.assertEqual(turn["llmCalls"], 0)
+
     def test_compiler_owns_fixed_apology_families_by_apology_shard(self) -> None:
         model = compile_conversation_sources(
             REPOSITORY,
@@ -197,18 +211,17 @@ class SocialApologyWordingShardTests(unittest.TestCase):
                 "terse",
             ),
         )
-        for language, families in TRANSLATIONS.items():
-            for family, npc, social_style, style in cases:
+        for language in TRANSLATIONS:
+            for family, npc, social_style, _style in cases:
                 with self.subTest(language=language, family=family):
-                    key = (
-                        "UI_PNC_Conversation_Content_SemanticSocialApology"
-                        f"{FAMILY_NAMES[family]}{style.title()}01"
-                    )
                     scenario = merge(
                         DEFAULT_SCENARIO,
                         {"runtime": {"language": language}, "npc": npc},
                     )
                     with LuaSemanticWorker(scenario) as worker:
+                        # An apology must refer to an accepted prior offense;
+                        # the current relation resolver never invents one.
+                        worker.input("You're an idiot")
                         turn = worker.input("sorry")
                     response = turn["result"]["decision"]["response"]
                     payload = turn["messages"][0]["payload"]
@@ -219,12 +232,25 @@ class SocialApologyWordingShardTests(unittest.TestCase):
                         "SOCIAL_ACKNOWLEDGED",
                     )
                     self.assertEqual(
-                        response["templateID"],
-                        f"semantic.social.apology.{family}",
+                        response["selectionID"],
+                        f"semantic.apology.{family}",
                     )
                     self.assertEqual(response["sourcePoolID"], "semantic.apology")
-                    self.assertEqual(payload["translationKey"], key)
-                    self.assertEqual(payload["text"], families[family][style])
+                    # The catalog still selects the personality/emotion family.
+                    # The admitted reconciliation behavior owns the final speech
+                    # plan; current utterance construction realizes its meaning.
+                    self.assertEqual(response["templateID"], "semantic.social.apology.friendly")
+                    self.assertEqual(payload["semanticTemplateID"], response["templateID"])
+                    realization = payload["utteranceRealization"]
+                    self.assertEqual(realization["locale"], language)
+                    self.assertEqual(
+                        realization["constructionID"],
+                        f"construction.{language.lower()}.social.acknowledge",
+                    )
+                    self.assertEqual(
+                        payload["text"],
+                        {"EN": "I hear you.", "TL": "Naiintindihan ko."}[language],
+                    )
                     self.assertEqual(
                         turn["routedSituation"]["social"]["style"],
                         social_style,

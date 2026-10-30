@@ -15,7 +15,7 @@ class QuestFlowBindingTests(unittest.TestCase):
 
         generation = catalog["generation"]
         rows = {row["id"]: row for row in generation["coverage"]}
-        self.assertEqual(generation["summary"]["generated"], 17)
+        self.assertEqual(generation["summary"]["generated"], 20)
         self.assertEqual(generation["summary"]["metadata_incomplete"], 0)
         self.assertEqual(generation["summary"]["unsupported_workflow"], 0)
         for action, capability in (
