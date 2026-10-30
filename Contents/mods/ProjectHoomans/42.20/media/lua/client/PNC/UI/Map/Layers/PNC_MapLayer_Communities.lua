@@ -3,7 +3,7 @@
 
 require "ISUI/Maps/ISWorldMap"
 require "ISUI/ISContextMenu"
-require "PNC/UI/PNC_NPCTypePalette"
+require "PNC/Presentation/PNC_NPCTypePalette"
 require "PNC/UI/Factions/PNC_FactionEmblemRenderer"
 
 PNC = PNC or {}

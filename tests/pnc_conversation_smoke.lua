@@ -67,7 +67,7 @@ T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationTextLoader.lua")
 T.load(CLIENT .. "PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
 T.load(CLIENT .. "PNC/Conversation/PNC_ConversationTime.lua")
 T.load(CLIENT .. "PNC/Conversation/PNC_ConversationBackgrounds.lua")
-T.load(CLIENT .. "PNC/UI/PNC_NPCTypePalette.lua")
+T.load(CLIENT .. "PNC/Presentation/PNC_NPCTypePalette.lua")
 PNC.Conversation.Lifecycle = {
     Create = function() return { kind = "conversation_lifecycle" } end,
     RequestCeasefire = function() return true end,

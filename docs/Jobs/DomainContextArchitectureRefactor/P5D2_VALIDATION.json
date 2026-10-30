@@ -1,0 +1,68 @@
+{
+  "stage": "P5D Presentation palette direction and deferred-UI-cycle review accepted; parent remains active",
+  "source_revision_before": "0a4c401e",
+  "maintained_runtime_files": 3321,
+  "dependency_guard": {
+    "issues": 74,
+    "new_debt": 0,
+    "resolved_ratchet_entries": 119,
+    "domain_sccs": [
+      [
+        "Activities",
+        "Production"
+      ],
+      [
+        "Companions",
+        "Knowledge",
+        "Networking",
+        "UI"
+      ],
+      [
+        "Identity",
+        "Semantics",
+        "Social",
+        "World"
+      ]
+    ]
+  },
+  "full_lua": {
+    "passed": 982,
+    "total": 982,
+    "seconds": 8.06
+  },
+  "focused_palette_conversation_composition_lua": {
+    "passed": 28,
+    "total": 28
+  },
+  "focused_debug_route_lua": {
+    "passed": 2,
+    "total": 2
+  },
+  "semantic_parity_translation_python": {
+    "passed": 6,
+    "total": 6
+  },
+  "guard_python": {
+    "passed": 22,
+    "total": 22
+  },
+  "installed_kahlua": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 8,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  },
+  "static_kahlua_errors": 0,
+  "bootstrap": "47 registrations, all seven expanded roots unchanged after verified compatibility canonicalization",
+  "implementation": "Palette bytes equal prior implementation; old public UI require returns same table through a pure forwarder",
+  "cycle_result": "Conversation leaves the UI-related owner SCC. All-phase UI window SCC retained as documented same-owner deferred navigation; no runtime code changed for it.",
+  "scope_limits": "Remaining owner SCCs and semantic tooling fixtures still require P5/P6/P7 review. No full-parent completion claim.",
+  "current_tooling_status": "Selected 35-module rerun: 1 pass, 34 fail, no timeout; current derived whole-tooling status 161/195 passing. Individual remaining gates are not waived.",
+  "fixed_probe_sources_unchanged": 33
+}

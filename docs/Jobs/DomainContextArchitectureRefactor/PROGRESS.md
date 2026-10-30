@@ -1,129 +1,103 @@
 # Progress — Domain & Context Architecture Refactor
 
-**Status:** IN PROGRESS — P0–P4 developer gates accepted; P5 Conversation/Semantics is active.
+**Status:** IN PROGRESS. P0–P4 developer gates accepted; P5 is active. P6–P8
+and final acceptance remain mandatory. Continue automatically after each chunk.
 
-## Parent objective
+## Objective and repository
 
-Complete P0–P8 in `ROADMAP.md` and every developer gate in `ACCEPTANCE.md`.
-A phase/chunk completion does not complete this parent goal. Continue automatically.
+Complete the entire `ROADMAP.md` and `ACCEPTANCE.md` on existing `main`.
+Planning baseline: `15cadee70be11b790ce4c48bfb7bd51badd8233b`.
+Fresh upstream/worktree review found no unsafe concurrent conflict. Preserve the
+unrelated DynamicTrading edit and other worktrees. No native PZ launch or
+Workshop publication has occurred.
 
-## Current repository and architecture
+MCP project: `project-hoomans`, explicitly refreshed against current source.
+Statement-form imports and heuristic alias/builtin CALLS need the recorded
+literal/source fallback; clean coverage is a best-effort signal.
 
-- Existing `main` only; planning baseline `15cadee70be11b790ce4c48bfb7bd51badd8233b`.
-  Initially clean, origin fetched, ahead 7 / behind 0. No concurrent edits found.
-- Accepted: P0 `4205a1d7`, P1 `24d61abc`, Inventory pilot `b4535421`,
-  tooling-baseline evidence `19749cef`, ordered composition `55049e99`, first persistence slice `034766f9`, Health/Identity `fa5b2a2d`; remaining P4 schema/restoration `0f7f326e`, public conversation close `2ad53120`.
-- MCP project `project-hoomans`; explicitly refreshed against actual source.
-  Statement-form IMPORTS and heuristic alias/builtin resolution need the
-  documented literal-import/source fallback. Matching HEAD alone is insufficient.
-- P0 runtime: 3,258 maintained executable Lua files, 2 generated runtime catalogs;
-  282 common declarations/catalogs separately classified. P3 added 47 policy-free
-  registrations without moving providers or changing their bodies.
-- Current boundary/cycle manifestations: 82, zero new debt. P4 separates the
-  schema-neutral storage mechanism from envelope coordination; Persistence is
-  outside the three smaller owner SCCs. Existing three-file UI/debug import SCC
-  remains. These counts are manifestations, not independent architectural cycles.
-- Ratchet: 193 entries after P2 removed fifteen resolved endpoints from P1's 208.
-  P3/P4 have added no debt endpoints; 111 entries in that ratchet now resolve
-  (four in P3 and 107 further manifestations in the first P4 slice).
+## Current architecture
 
-## Accepted evidence and validation
+- Inventory/Supply/Provision pilot uses public item-state, rollback, Equipment
+  visual and Supply candidate contracts. Obsolete transfer fragment removed.
+- Forty-seven policy-free domain registrations preserve all seven expanded
+  composition roots and their executable barriers. Domains retain internal
+  providers; roots no longer enumerate the same leaf detail.
+- Persistence coordinates envelopes/timing; domain repositories own schema and
+  restoration. Storage is schema-neutral. One canonical NPC record remains;
+  saved-live/body-lease proof and Follow travel reconciliation are preserved.
+- Conversation Lifecycle exposes Create/Finish. Close delivery is independent
+  of start/heartbeat support. Semantics owns working-state cleanup and active
+  view query/release through a cold-load public session seam.
+- Forty-four semantic entry paths expose interpretation, policy/flow, client
+  application, interaction facts, realization and diagnostics subdomains.
+  Foreign implementation/private namespace access is guarded.
+- NPC type palette queries belong to Presentation. Maintained callers use the
+  canonical Presentation entry; the old public UI path is a pure compatibility
+  forwarder returning the same palette/color table. Function bytes are unchanged.
+- Persistence, Storage and Conversation are outside the current owner SCCs.
+  Remaining groups: Activities/Production; Companions/Knowledge/Networking/UI;
+  Identity/Semantics/Social/World. Review their real paths individually.
+- The one three-file UI SCC is retained same-owner deferred window navigation,
+  evidenced in `CYCLE_REVIEW.md`. Its all-phase diagnostic remains visible.
+- Maintained runtime: 3,321 files versus P0's 3,258; file count is not a target.
+  Boundary/cycle manifestations: 74, zero new debt. The 193-entry ratchet has
+  119 resolved entries; these are manifestations, not independent cycle counts.
 
-- P0: `P0_BASELINE.md`, `P0_ARCHITECTURE.json`, `RETRIEVAL.md` and fixed behavior
-  probes. Original set: 37 files / 5,530 lines / 209,522 bytes.
-- P1: `OWNERSHIP.md`, `DOMAIN_CONTRACTS.json`, dependency/context guards.
-- P2: `INVENTORY_PILOT.md`, `P2_VALIDATION.json`. Public item-state/rollback and
-  Equipment/Supply seams; obsolete transfer handler removed with command bodies
-  preserved. Transfer: 5 → 4 files, 3 → 2 handoffs, -10,976 bytes.
-- P3: `COMPOSITION_SEAMS.md`, `REGISTRATIONS.json`, `P3_VALIDATION.json`.
-  Roots: 488 → 270 imports, 25,390 → 14,011 bytes; expanded ordering identical.
-  Registration adds an assembly hop and a bounded domain-local startup surface;
-  complete expanded source/file count is not claimed to shrink.
-- P4 first slice: `PERSISTENCE_OWNERSHIP.md`, `P4A_VALIDATION.json`.
-  Public ModData mechanism; identical Reset compatibility object/body semantics;
-  Memory repository loads bounded schemas/catalogs; Inventory owns lazy snapshot
-  interop. Body hints, journal/travel and save coordinator behavior preserved.
-- Current seven probes: **33 files / 4,501 lines / 167,228 bytes**, -42,294 bytes
-  versus P0. Persisted inventory: 7 → 4 files, same depth, -25,710 bytes; removed
-  envelope/bootstrap context is explained in `RETRIEVAL.md` and caller-tested.
-  Memory's supplementary owned import closure: 83,367 → 55,416 bytes.
-- Health/Identity slice: `P4B_VALIDATION.json`, `P4B_MCP_TRACES.json`. Health
-  body/compact modules remain separate; immutable identity codec stays cohesive.
-  Method bodies match pre-change source; obsolete health paths removed, no shims.
-  Health/stamina context: 43,166 → 17,694 bytes at the same four-file count.
-  Identity: 21,594 → 14,144 bytes, one additional generic-helper file explained.
-- Latest full isolated Lua: **982/982**, 4 workers, 7.99 seconds.
-  Focused owning-domain/restart/binding matrix: **118/118**; diagnostic Python
-  **22/22**; NPC tooling **6/6**.
-- Changed-runtime installed PZ Kahlua: P2 **36/36**, P3 **54/54**, first P4 slice
-  **34/34**, Health/Identity **11/11**, remaining schemas **19/19**; static Kahlua zero errors. Diff checks clean.
-- Semantic-tooling evidence: original 194-module baseline had 124 pass,
-  65 fail, 5 GUI timeouts. Current complete isolated run: 195 modules, 155 pass,
-  40 fail, no timeouts, 786 tests. Focused inspector and current-contract fixture repairs bring the derived
-  current state to 160 pass / 35 pre-existing failures; this is not claimed a
-  second full run. `P5B_TOOLING_VALIDATION.json` preserves both facts.
-  Fact traffic remains complete; dispatch assertions are explicit. GUI tests
-  use a per-process XIM fallback after native backtrace diagnosis, not a skip.
-- No native Project Zomboid launched; no Workshop publication.
+## Current retrieval evidence
 
-- P4 completion: `P4C_VALIDATION.json`, `P4C_MCP_TRACES.json` and
-  `PERSISTENCE_OWNERSHIP.md`. Social, progression, companion directives, carrier
-  proof, traits and travel restoration use public owning contracts. Fourteen
-  moved method bodies and carrier/trait conditions retain previous logic.
-  Mixed private Primitives/RecordState providers and unused camp serializer
-  removed; optional Core interfaces retained as explicit public adapters.
-  Carrier-proof context: 4 files / 32,132 bytes → 2 / 6,658; native admission
-  policy is a separate boundary, preserved by the binding/restart matrix.
+Seven fixed probes: **33 files / 4,501 lines / 167,228 bytes**, versus P0's
+37 / 5,530 / 209,522: **-42,294 bytes**. No unexplained individual regression.
 
-- First P5 slice: `P5A_VALIDATION.json`. Public Lifecycle.Finish owns close
-  delivery/cleanup; lifecycle entry directly binds callbacks. Start/heartbeat
-  support remains separate; obsolete private factory/finish chain removed.
-  Conversation close: 7 → 6 files, 3 → 2 handoffs; 981/981 Lua, 24/24 owning
-  regressions, 3/3 installed Kahlua, zero new debt. P5 is not yet accepted.
+- Transfer: 5 → 4 files, 3 → 2 handoffs, -10,976 bytes.
+- Persisted inventory: 7 → 4 files, same depth, -25,710 bytes.
+- Close: same seven-file count as P0, 3 → 2 handoffs, -5,608 bytes. Its owning
+  semantic-session seam explains the extra file relative to the P5A slice.
+- Semantic cleanup alone: one file, 7,115 → 1,164 bytes. Health/stamina and Memory
+  supplementary slices also shrink; machine reports retain membership reasons.
 
-- P5 public-subdomain/tooling slice: `SEMANTIC_SURFACES.md` and
-  `P5B_MCP_TRACES.json`. 44 supported semantic entry paths; foreign implementation
-  and Internal namespaces are guarded. Typed identity-result transport is owned
-  by Networking at its existing path. Raw wire traffic and lifecycle facts stay
-  observable separately from gameplay dispatch. Six changed tooling Lua files
-  compile with installed Kahlua; owning diagnostic Python 22/22; focused semantic
-  evidence 29 tests pass. P5C/D and its remaining failures are not accepted yet.
+## Current validation and limitations
 
-- Semantic-session ownership slice: `P5C_VALIDATION.json`. Public cold-load
-  query/cleanup seam owns active view and semantic working fields. Conversation
-  and identity-result presentation use that seam. Phase order and exact moved
-  statements preserved. Owning cleanup context: 7,115 → 1,164 bytes at one file;
-  full close context gains one justified file, remains 5,608 bytes below P0.
-  Full Lua 982/982; focused 30/30; semantic/authority/translation Python 16/16;
-  installed Kahlua 4/4, static zero errors, dependency guard zero new debt.
+- Full isolated Lua: **982/982**, 4 workers, 8.06 seconds.
+- Palette/Conversation/composition matrix: **28/28**; debug routes **2/2**;
+  current semantic parity/translation Python **6/6**; dependency/bootstrap Python
+  **22/22**. Prior session/authority/translation slice: **16/16** Python.
+- Changed runtime installed-PZ Kahlua: **8/8**; static zero errors. Bootstrap
+  ordering and diff checks pass. No game execution is implied by compiler checks.
+- Full semantic-tooling evidence remains explicit: P5B's 195 isolated modules
+  yielded 155 pass / 40 fail, no timeouts, 786 tests. Focused inspector and
+  contract-fixture repairs yield a derived **161 pass / 34 remaining failures**;
+  this is not a second full run. A fresh run of those 35 completed: one additional module passed, 34 still fail,
+  and none timed out. These remain open individual gates.
+- Tooling retains complete wire traffic and lifecycle facts separately from
+  executable dispatch evidence. Unknown commands remain dispatches. GUI tests
+  use the proven per-process XIM fallback; no desktop setting was changed.
+- Remaining fixture failures require individual repair or supersession proof;
+  no blanket waiver. Separate paused wording-authoring work is not resumed.
 
-- Current-contract fixture alignment: `P5D1_VALIDATION.json`, 16/16 Python
-  tests. The pre-existing combat flow inventory is included; equivalent NEEDS
-  grammar patterns retain the same IR; What’s Up assertions inspect the emitted
-  semantic template ID rather than its generated localization key. Production
-  runtime, generated wording and separate paused authoring work are unchanged.
+## Navigation
+
+Current contracts: `DOMAIN_CONTRACTS.json`, `SEMANTIC_SURFACES.md`,
+`PERSISTENCE_OWNERSHIP.md`, `COMPOSITION_SEAMS.md`, `INVENTORY_PILOT.md`,
+`OWNERSHIP.md`, `CYCLE_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
+job-local reports and Git. Historical giant logs are not required reading.
 
 ## Next mandatory chunk
 
-**Continue P5D — Prove/invert remaining cycle direction and resolve fixtures.**
+**Continue P5D, then P6–P8.**
 
-1. Use the established public subdomain map to review remaining Social/World/
-   Identity and Conversation/Knowledge/UI dependency cycles with exact source
-   and caller evidence; retain only separately justified composition relations.
-2. Preserve useful catalogs, authority boundaries and independent test seams;
-   consolidate artificial provider chains only where retrieval evidence warrants.
-3. Migrate foreign implementation access and remove unjustified cross-domain
-   cycles; preserve semantic IR, suggestions, social director, observatory,
-   optional LLM and SP/MP authority. Consolidate only with retrieval evidence.
-4. Individually repair or prove supersession of the 35 remaining pre-existing
-   tooling failures (old flow/category/realization/lineage fixtures). Preserve
-   behavior; never suppress lifecycle facts to satisfy dispatch assertions.
-5. Validate focused/full suites, graph/dependency guards, installed Kahlua,
-   retrieval probes and diff; update this current state and continue P6–P8.
+1. Inspect the refreshed remaining-tooling results. Repair assertions against
+   current public meaning/presentation/authoring contracts; preserve gameplay,
+   semantic IR, suggestions, queued tasks, optional LLM and SP/MP authority.
+2. Finish source/caller review of the remaining semantic/domain cycles. Migrate
+   real foreign-private coupling; justify retained protocol/composition relations
+   with exact paths, phases and canonical owners rather than analyzer counts.
+3. Complete P6 UI authority/persistence classification and owning public seams.
+4. Complete P7's mandatory domain/transport/performance review, including Tasking
+   foreign BodyLifecycle implementation access. Re-read the M12 migration before
+   touching body/presence/network authority and preserve its current contracts.
+5. Complete every P8 cleanup and final validation gate, including a current full
+   isolated suite, focused matrices, retrieval comparison, installed Kahlua,
+   performance/persistence audit, compatibility classification and Git review.
 
-## Remaining gates
-
-P5–P8/final acceptance are mandatory, including the remaining semantic
-Python failures. M12 body-binding native acceptance remains user-owned;
-its identity/lease, loaded-envelope, restart and visual-authority contracts must
-be preserved. Historical logs and root `AGENTS.md` remain unchanged.
+Only after all developer work is complete may renewed M12 hosted/dedicated
+native acceptance remain user-owned. Keep root AGENTS and historical logs unchanged.

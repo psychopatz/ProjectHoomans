@@ -3,7 +3,7 @@ local T = require "tests/support/test"
 local FILE = T.path("ProjectHoomans", "client", "PNC/UI/Map/")
     .. "Layers/PNC_MapLayer_Travel.lua"
 local PALETTE =
-    T.path("ProjectHoomans", "client", "PNC/UI/")
+    T.path("ProjectHoomans", "client", "PNC/Presentation/")
     .. "PNC_NPCTypePalette.lua"
 
 local layer
@@ -141,7 +141,7 @@ PNC = {
 }
 
 T.load(PALETTE)
-package.preload["PNC/UI/PNC_NPCTypePalette"] =
+package.preload["PNC/Presentation/PNC_NPCTypePalette"] =
     function() return PNC.NPCTypePalette end
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end

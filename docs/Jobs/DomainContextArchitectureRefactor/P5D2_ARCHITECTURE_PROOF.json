@@ -1,0 +1,15 @@
+{
+  "source_revision_before": "0a4c401e",
+  "palette_bytes_equal": true,
+  "palette_sha256": "b0b504d5c3f5346c5f17b4bbe930a05912706d76cde3dffc1ec57f31aa36e6ff",
+  "legacy_forwarder": "return require \"PNC/Presentation/PNC_NPCTypePalette\"",
+  "navigation_source_sha256": {
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug.lua": "bfaa78cc614bfc9be10760592773f6554a04ed0dcc926f82d2e0fdaccd88c2e6",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow.lua": "fb6dde4164f3f27bd5b1481e73458dfc6064a487ac85c984d751603317b64f70",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow_Actions.lua": "6503f810a50e0074f9d1679539b17896415d8229960b06c1519f91188fbf17df",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow_Core.lua": "3654a3a14a7a7df463e9b89b07a85a2965d84cdc9134c1cc1df5da207e6658fc",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug_AnimationTab.lua": "c23342fc6e15b60b77095b3960e4b63520138827292151ce14ae9dcaae0e7cf0"
+  },
+  "navigation_classification": "retained intra-domain deferred window navigation; all-phase import SCC remains reported",
+  "bootstrap": "pure compatibility alias canonicalization preserves expanded order"
+}

@@ -1,6 +1,6 @@
 -- Named, locally extrapolated NPC journey dots for the vanilla world map.
 
-require "PNC/UI/PNC_NPCTypePalette"
+require "PNC/Presentation/PNC_NPCTypePalette"
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
 PNC = PNC or {}

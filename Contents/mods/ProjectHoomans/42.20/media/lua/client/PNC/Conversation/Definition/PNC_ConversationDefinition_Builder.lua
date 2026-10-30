@@ -48,7 +48,7 @@ if type(PNC.NPCTypePalette) ~= "table"
     or type(PNC.NPCTypePalette.ResolveType) ~= "function"
     or type(PNC.NPCTypePalette.BuildConversationTheme) ~= "function"
 then
-    pcall(require, "PNC/UI/PNC_NPCTypePalette")
+    pcall(require, "PNC/Presentation/PNC_NPCTypePalette")
 end
 
 local Relationship = Conversation.Relationship

@@ -29,7 +29,7 @@ package.preload["ISUI/Maps/ISWorldMap"] =
     function() return ISWorldMap end
 package.preload["ISUI/ISContextMenu"] =
     function() return ISContextMenu end
-package.preload["PNC/UI/PNC_NPCTypePalette"] =
+package.preload["PNC/Presentation/PNC_NPCTypePalette"] =
     function() return true end
 package.preload["PNC/UI/Factions/PNC_FactionEmblemRenderer"] =
     function() return true end

@@ -95,9 +95,14 @@
     "World": "World",
     "WorldDiscovery": "World",
     "WorldKnowledge": "Knowledge",
-    "Zombies": "Combat"
+    "Zombies": "Combat",
+    "Presentation": "Presentation"
   },
   "path_owners": [
+    {
+      "pattern": "client/PNC/UI/PNC_NPCTypePalette.lua",
+      "owner": "Presentation"
+    },
     {
       "pattern": "shared/PNC/Semantics/PNC_SemanticIdentityNetwork.lua",
       "owner": "Networking"
@@ -769,6 +774,27 @@
         "shared",
         "server"
       ]
+    },
+    "Presentation": {
+      "owns": "NPC type palette/theme read projection; existing audio/VFX remain distinct presentation responsibilities",
+      "namespace": null,
+      "entries": [
+        "client/PNC/Presentation/PNC_NPCTypePalette.lua",
+        "client/PNC/UI/PNC_NPCTypePalette.lua",
+        "client/PNC/PNC_ClientFirearmEffects.lua"
+      ],
+      "commands": [
+        "ClientFirearmEffects existing public audiovisual/preview facade; server damage authority unchanged"
+      ],
+      "queries": [
+        "NPCTypePalette.ResolveType/Get/Resolve/BuildConversationTheme"
+      ],
+      "repository": "none; reads current entry/snapshot/record facts without mutation",
+      "layers": [
+        "client",
+        "shared",
+        "server"
+      ]
     }
   },
   "canonical_states": {
@@ -846,5 +872,13 @@
         "IsVisibleFor"
       ]
     }
-  }
+  },
+  "public_path_aliases": [
+    {
+      "legacy": "client/PNC/UI/PNC_NPCTypePalette.lua",
+      "canonical": "client/PNC/Presentation/PNC_NPCTypePalette.lua",
+      "classification": "permanent public require compatibility",
+      "reason": "Published UI require path retains the identical public palette/color table; maintained callers use the owned Presentation entry."
+    }
+  ]
 }

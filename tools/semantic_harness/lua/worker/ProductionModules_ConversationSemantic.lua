@@ -7,7 +7,7 @@ local function loadConversationSemantic(load, registerEntryPointModule)
         "translation"
     )
     load(
-        "ProjectHoomans", "client", "PNC/UI/PNC_NPCTypePalette.lua",
+        "ProjectHoomans", "client", "PNC/Presentation/PNC_NPCTypePalette.lua",
         "conversation_target_projection"
     )
     load(

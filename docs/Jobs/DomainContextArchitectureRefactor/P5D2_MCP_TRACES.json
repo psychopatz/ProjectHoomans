@@ -1,0 +1,398 @@
+{
+  "tier": "Verify (Tier 2)",
+  "source_revision_before": "0a4c401e",
+  "palette": {
+    "before": {
+      "coverage": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"project\":\"project-hoomans\",\"signal\":\"best_effort\",\"indexed_at\":\"2026-10-30T21:21:20Z\",\"metadata\":{\"generation\":\"2026-10-30T21:21:20Z\",\"index_mode\":\"full\",\"recorded_at\":\"2026-10-30T21:21:28Z\",\"recording_status\":\"complete\",\"ignored_files_stored\":111,\"ignored_files_total\":111,\"hash_records_complete\":true,\"coverage_version\":3,\"generation_matches\":true},\"paths\":[{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_NPCTypePalette.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_NPCTypePalette.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkStart.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkStart.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Definition/PNC_ConversationDefinition_Builder.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Definition/PNC_ConversationDefinition_Builder.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ConversationRuntimeComposition.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ConversationRuntimeComposition.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities_Core.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities_Core.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/lua/worker/ProductionModules_ConversationSemantic.lua\",\"path\":\"tools/semantic_harness/lua/worker/ProductionModules_ConversationSemantic.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_npc_type_palette_smoke.lua\",\"path\":\"tests/pnc_npc_type_palette_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_map_travel_layer_smoke.lua\",\"path\":\"tests/pnc_map_travel_layer_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_community_map_layer_smoke.lua\",\"path\":\"tests/pnc_community_map_layer_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_composition_bootstrap_smoke.lua\",\"path\":\"tests/pnc_composition_bootstrap_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_conversation_smoke.lua\",\"path\":\"tests/pnc_conversation_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]}],\"scopes\":[],\"caveat\":\"Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable.\"}"
+          }
+        ],
+        "structuredContent": {
+          "project": "project-hoomans",
+          "signal": "best_effort",
+          "indexed_at": "2026-10-30T21:21:20Z",
+          "metadata": {
+            "generation": "2026-10-30T21:21:20Z",
+            "index_mode": "full",
+            "recorded_at": "2026-10-30T21:21:28Z",
+            "recording_status": "complete",
+            "ignored_files_stored": 111,
+            "ignored_files_total": 111,
+            "hash_records_complete": true,
+            "coverage_version": 3,
+            "generation_matches": true
+          },
+          "paths": [
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_NPCTypePalette.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_NPCTypePalette.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkStart.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkStart.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Definition/PNC_ConversationDefinition_Builder.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Definition/PNC_ConversationDefinition_Builder.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ConversationRuntimeComposition.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ConversationRuntimeComposition.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities_Core.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities_Core.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "tools/semantic_harness/lua/worker/ProductionModules_ConversationSemantic.lua",
+              "path": "tools/semantic_harness/lua/worker/ProductionModules_ConversationSemantic.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "tests/pnc_npc_type_palette_smoke.lua",
+              "path": "tests/pnc_npc_type_palette_smoke.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "tests/pnc_map_travel_layer_smoke.lua",
+              "path": "tests/pnc_map_travel_layer_smoke.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "tests/pnc_community_map_layer_smoke.lua",
+              "path": "tests/pnc_community_map_layer_smoke.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "tests/pnc_composition_bootstrap_smoke.lua",
+              "path": "tests/pnc_composition_bootstrap_smoke.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "tests/pnc_conversation_smoke.lua",
+              "path": "tests/pnc_conversation_smoke.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            }
+          ],
+          "scopes": [],
+          "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+        },
+        "isError": false
+      },
+      "trace": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.PNC_NPCTypePalette.Palette.BuildConversationTheme\ndirection: both\ncallees_total: 2\ncallees: 2  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.PNC_NPCTypePalette.Palette:\n  Get 1 heuristic 0.90\n  ResolveType 1 heuristic 0.90\ncallers_total: 3\ncallers: 3  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.Debug.PNC_ConversationDebugModel_Sandbox_Definition.SandboxDefinition:\n  Build 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.Definition.PNC_ConversationDefinition_Builder.Conversation:\n  BuildDefinition 1 heuristic 0.38\nproject-hoomans.tests:\n  pnc_npc_type_palette_smoke 1 heuristic 0.38\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    "after": {
+      "coverage": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"project\":\"project-hoomans\",\"signal\":\"best_effort\",\"indexed_at\":\"2026-10-30T21:31:53Z\",\"metadata\":{\"generation\":\"2026-10-30T21:31:53Z\",\"index_mode\":\"full\",\"recorded_at\":\"2026-10-30T21:31:57Z\",\"recording_status\":\"complete\",\"ignored_files_stored\":111,\"ignored_files_total\":111,\"hash_records_complete\":true,\"coverage_version\":3,\"generation_matches\":true},\"paths\":[{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_NPCTypePalette.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_NPCTypePalette.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Presentation/PNC_NPCTypePalette.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Presentation/PNC_NPCTypePalette.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkStart.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkStart.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Definition/PNC_ConversationDefinition_Builder.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Definition/PNC_ConversationDefinition_Builder.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ConversationRuntimeComposition.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ConversationRuntimeComposition.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities_Core.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities_Core.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tools/semantic_harness/lua/worker/ProductionModules_ConversationSemantic.lua\",\"path\":\"tools/semantic_harness/lua/worker/ProductionModules_ConversationSemantic.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_npc_type_palette_smoke.lua\",\"path\":\"tests/pnc_npc_type_palette_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_map_travel_layer_smoke.lua\",\"path\":\"tests/pnc_map_travel_layer_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_community_map_layer_smoke.lua\",\"path\":\"tests/pnc_community_map_layer_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_composition_bootstrap_smoke.lua\",\"path\":\"tests/pnc_composition_bootstrap_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_conversation_smoke.lua\",\"path\":\"tests/pnc_conversation_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]}],\"scopes\":[],\"caveat\":\"Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable.\"}"
+          }
+        ],
+        "structuredContent": {
+          "project": "project-hoomans",
+          "signal": "best_effort",
+          "indexed_at": "2026-10-30T21:31:53Z",
+          "metadata": {
+            "generation": "2026-10-30T21:31:53Z",
+            "index_mode": "full",
+            "recorded_at": "2026-10-30T21:31:57Z",
+            "recording_status": "complete",
+            "ignored_files_stored": 111,
+            "ignored_files_total": 111,
+            "hash_records_complete": true,
+            "coverage_version": 3,
+            "generation_matches": true
+          },
+          "paths": [
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_NPCTypePalette.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_NPCTypePalette.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Presentation/PNC_NPCTypePalette.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Presentation/PNC_NPCTypePalette.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkStart.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationTalkStart.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Definition/PNC_ConversationDefinition_Builder.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Definition/PNC_ConversationDefinition_Builder.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ConversationRuntimeComposition.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Composition/PNC_ConversationRuntimeComposition.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities_Core.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities_Core.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Communities.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua",
+              "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "tools/semantic_harness/lua/worker/ProductionModules_ConversationSemantic.lua",
+              "path": "tools/semantic_harness/lua/worker/ProductionModules_ConversationSemantic.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "tests/pnc_npc_type_palette_smoke.lua",
+              "path": "tests/pnc_npc_type_palette_smoke.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "tests/pnc_map_travel_layer_smoke.lua",
+              "path": "tests/pnc_map_travel_layer_smoke.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "tests/pnc_community_map_layer_smoke.lua",
+              "path": "tests/pnc_community_map_layer_smoke.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "tests/pnc_composition_bootstrap_smoke.lua",
+              "path": "tests/pnc_composition_bootstrap_smoke.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            },
+            {
+              "requested_path": "tests/pnc_conversation_smoke.lua",
+              "path": "tests/pnc_conversation_smoke.lua",
+              "status": "no_recorded_issue",
+              "freshness": "metadata_match",
+              "recommended_action": "use_graph_with_best_effort_caveat",
+              "coverage": []
+            }
+          ],
+          "scopes": [],
+          "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+        },
+        "isError": false
+      },
+      "trace": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Presentation.PNC_NPCTypePalette.Palette.BuildConversationTheme\ndirection: both\ncallees_total: 2\ncallees: 2  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Presentation.PNC_NPCTypePalette.Palette:\n  Get 1 heuristic 0.90\n  ResolveType 1 heuristic 0.90\ncallers_total: 3\ncallers: 3  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.Debug.PNC_ConversationDebugModel_Sandbox_Definition.SandboxDefinition:\n  Build 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.Definition.PNC_ConversationDefinition_Builder.Conversation:\n  BuildDefinition 1 heuristic 0.38\nproject-hoomans.tests:\n  pnc_npc_type_palette_smoke 1 heuristic 0.38\n"
+          }
+        ],
+        "isError": false
+      }
+    }
+  },
+  "ui_navigation": {
+    "coverage": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"project\":\"project-hoomans\",\"signal\":\"best_effort\",\"indexed_at\":\"2026-10-30T21:21:20Z\",\"metadata\":{\"generation\":\"2026-10-30T21:21:20Z\",\"index_mode\":\"full\",\"recorded_at\":\"2026-10-30T21:21:28Z\",\"recording_status\":\"complete\",\"ignored_files_stored\":111,\"ignored_files_total\":111,\"hash_records_complete\":true,\"coverage_version\":3,\"generation_matches\":true},\"paths\":[{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow_Actions.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow_Actions.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow_Core.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow_Core.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug_AnimationTab.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug_AnimationTab.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]}],\"scopes\":[],\"caveat\":\"Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable.\"}"
+        }
+      ],
+      "structuredContent": {
+        "project": "project-hoomans",
+        "signal": "best_effort",
+        "indexed_at": "2026-10-30T21:21:20Z",
+        "metadata": {
+          "generation": "2026-10-30T21:21:20Z",
+          "index_mode": "full",
+          "recorded_at": "2026-10-30T21:21:28Z",
+          "recording_status": "complete",
+          "ignored_files_stored": 111,
+          "ignored_files_total": 111,
+          "hash_records_complete": true,
+          "coverage_version": 3,
+          "generation_matches": true
+        },
+        "paths": [
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow_Actions.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow_Actions.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow_Core.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_AnimationSceneDebugWindow_Core.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          },
+          {
+            "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug_AnimationTab.lua",
+            "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug_AnimationTab.lua",
+            "status": "no_recorded_issue",
+            "freshness": "metadata_match",
+            "recommended_action": "use_graph_with_best_effort_caveat",
+            "coverage": []
+          }
+        ],
+        "scopes": [],
+        "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+      },
+      "isError": false
+    },
+    "traces": [
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.NPCPresentationDebug.PNC_NPCPresentationDebug.ISPNCNPCPresentationDebugWindow:openScenes\ndirection: both\ncallees_total: 1\ncallees: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.NPCPresentationDebug.PNC_NPCPresentationDebug.WindowAPI:\n  Open 1 heuristic 0.01\ncallers_total: 0\ncallers: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\n"
+          }
+        ],
+        "isError": false
+      },
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.PNC_AnimationSceneDebugWindow_Actions.ISPNCAnimationSceneDebugWindow:onOpenXML\ndirection: both\ncallees_total: 1\ncallees: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.PNC_AnimationSceneDebugWindow_Actions.WindowAPI:\n  Open 1 heuristic 0.02\ncallers_total: 0\ncallers: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\n"
+          }
+        ],
+        "isError": false
+      }
+    ]
+  },
+  "limitations": [
+    "Statement-form require IMPORTS are supplemented by literal source review.",
+    "UI navigation traces have unresolved callback callers and false low-confidence Open aliases; button bindings and method source establish execution phase.",
+    "The retained UI SCC is an intra-domain on-demand navigation relation; it is not removed from all-phase import diagnostics."
+  ]
+}

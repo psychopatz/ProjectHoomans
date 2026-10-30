@@ -16,7 +16,7 @@ TalkStart.VERSION = 1
 TalkStart.SCHEMA = "semantic.talk.start.projection.v1"
 
 if not PNC.NPCTypePalette then
-    require "PNC/UI/PNC_NPCTypePalette"
+    require "PNC/Presentation/PNC_NPCTypePalette"
 end
 if not Conversation.Audience then
     require "PNC/Conversation/PNC_ConversationAudience"
