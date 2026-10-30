@@ -1,0 +1,142 @@
+{
+  "tier": "Verify (Tier 2)",
+  "source_revision": "0f7f326e",
+  "scope": "Client Conversation lifecycle close/cleanup, start and heartbeat support",
+  "coverage": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"project\":\"project-hoomans\",\"signal\":\"best_effort\",\"indexed_at\":\"2026-10-30T15:02:47Z\",\"metadata\":{\"generation\":\"2026-10-30T15:02:47Z\",\"index_mode\":\"full\",\"recorded_at\":\"2026-10-30T15:02:50Z\",\"recording_status\":\"complete\",\"ignored_files_stored\":93,\"ignored_files_total\":93,\"hash_records_complete\":true,\"coverage_version\":3,\"generation_matches\":true},\"paths\":[{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create_Finish.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create_Finish.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create_Begin.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create_Begin.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create_Update.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create_Update.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationFarewell.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationFarewell.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationSafety.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationSafety.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/PNC_ConversationScene.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/PNC_ConversationScene.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/PNC_ConversationScene/PNC_ConversationScene_Lease_End.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/PNC_ConversationScene/PNC_ConversationScene_Lease_End.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_conversation_lifecycle_refresh_smoke.lua\",\"path\":\"tests/pnc_conversation_lifecycle_refresh_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]}],\"scopes\":[],\"caveat\":\"Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable.\"}"
+      }
+    ],
+    "structuredContent": {
+      "project": "project-hoomans",
+      "signal": "best_effort",
+      "indexed_at": "2026-10-30T15:02:47Z",
+      "metadata": {
+        "generation": "2026-10-30T15:02:47Z",
+        "index_mode": "full",
+        "recorded_at": "2026-10-30T15:02:50Z",
+        "recording_status": "complete",
+        "ignored_files_stored": 93,
+        "ignored_files_total": 93,
+        "hash_records_complete": true,
+        "coverage_version": 3,
+        "generation_matches": true
+      },
+      "paths": [
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create_Finish.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create_Finish.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create_Begin.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create_Begin.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create_Update.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create_Update.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationFarewell.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationFarewell.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationSafety.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationSafety.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/PNC_ConversationScene.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/PNC_ConversationScene.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/PNC_ConversationScene/PNC_ConversationScene_Lease_End.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/PNC_ConversationScene/PNC_ConversationScene_Lease_End.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "tests/pnc_conversation_lifecycle_refresh_smoke.lua",
+          "path": "tests/pnc_conversation_lifecycle_refresh_smoke.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        }
+      ],
+      "scopes": [],
+      "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+    },
+    "isError": false
+  },
+  "finish": {
+    "content": [
+      {
+        "type": "text",
+        "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Create_Finish.finish\ndirection: both\ncallees_total: 10\ncallees: 10  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationFarewell.Farewell:\n  Schedule 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Create_Finish:\n  clearWorkingContext 1 heuristic 0.90\n  conversationTopicMask 1 heuristic 0.90\n  isNetworkClient 1 heuristic 0.90\n  presentSafetyFeedback 1 heuristic 0.90\n  send 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationSafety.Safety:\n  ResolveActors 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Conversation.PNC_ConversationScene.PNC_ConversationScene_Lease_End.Scene:\n  End 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Base.PNC_Core.Core:\n  LogInfo 1 heuristic 0.41\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.17\ncallers_total: 0\ncallers: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\n"
+      }
+    ],
+    "isError": false
+  },
+  "imports": {
+    "content": [
+      {
+        "type": "text",
+        "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle\ndirection: both\ncallees_total: 0\ncallees: 0  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\ncallers_total: 1\ncallers: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_Conversation.lua:\n  __file__ 1 - -\n"
+      }
+    ],
+    "isError": false
+  },
+  "limitations": [
+    "Statement-form require imports are incompletely indexed; literal source review supplements graph.",
+    "Returned callback alias inbound edge missing; factory source verifies finish binding.",
+    "Heuristic builtin type target is false; source controls."
+  ],
+  "source_hashes": {
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle.lua": "45175c2802a7dec0ca0f17945f8ed5bd1326e6ad3b48c6b907ed3cc601971528",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create.lua": "7010d008491834ad9f9aae1835ec85b1b9e230cc981b9bc6271952840f5c6d87",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Create_Finish.lua": "38378b4bd76ffe17e22eb503240d6277452162a99ec7c5c8fe131b577f2f89cf"
+  }
+}

@@ -276,7 +276,8 @@
         "Scene.Begin/End",
         "Lifecycle.Create",
         "Memory.Repository.PrepareRecord",
-        "Memory.Repository.RestoreRecord"
+        "Memory.Repository.RestoreRecord",
+        "Lifecycle.Finish (close outcome/authority handoff and working-session cleanup)"
       ],
       "queries": [
         "Memory public surface",
@@ -287,7 +288,13 @@
         "shared",
         "server",
         "client"
-      ]
+      ],
+      "subdomains": {
+        "Lifecycle": "client Lifecycle.Create/Finish; start and heartbeat support is private",
+        "Authority": "shared ConversationScene and server ConversationServer validate/commit scene changes",
+        "Memory": "public ConversationMemoryRepository; bounded schema independent of realization",
+        "Presentation": "client Farewell and SemanticSpeechPresentation deliver outcomes; no save/load authority"
+      }
     },
     "Semantics": {
       "owns": "semantic IR interpretation, dialogue policy/flow, realization and observatory subdomains",

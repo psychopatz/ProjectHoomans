@@ -1,0 +1,46 @@
+{
+  "stage": "P5 first bounded slice; P5B\u2013D remain mandatory",
+  "source_revision_before": "0f7f326e",
+  "full_lua": {
+    "passed": 981,
+    "total": 981,
+    "seconds": 8.99
+  },
+  "focused_lua": {
+    "passed": 24,
+    "total": 24
+  },
+  "kahlua": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 3,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  },
+  "static": [
+    {
+      "file": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle.lua",
+      "errors": 0
+    },
+    {
+      "file": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua",
+      "errors": 0
+    },
+    {
+      "file": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Support.lua",
+      "errors": 0
+    }
+  ],
+  "guard": {
+    "existing_issues": 82,
+    "new_debt": 0
+  },
+  "source_equivalence": "Close delivery, topic classification, session cleanup and safety bodies identical apart public function binding and callback boundary comment",
+  "compatibility": "Removed private Create/Finish providers after graph+literal caller review; Lifecycle.Create callback signature and public root unchanged",
+  "authority": "Added SP/MP close payload/order/teardown/safety retention assertions to existing focused regression"
+}

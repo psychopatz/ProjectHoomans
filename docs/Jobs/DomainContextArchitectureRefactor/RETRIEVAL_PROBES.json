@@ -55,8 +55,7 @@
       "entry": "client/PNC/Conversation/PNC_ConversationLifecycle.lua",
       "files": [
         "client/PNC/Conversation/PNC_ConversationLifecycle.lua",
-        "client/PNC/Conversation/PNC_ConversationLifecycle_Create.lua",
-        "client/PNC/Conversation/PNC_ConversationLifecycle_Create_Finish.lua",
+        "client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua",
         "client/PNC/Conversation/PNC_ConversationFarewell.lua",
         "client/PNC/Conversation/PNC_ConversationSafety.lua",
         "shared/PNC/Conversation/PNC_ConversationScene.lua",
@@ -68,10 +67,11 @@
         "Registry",
         "CoreConversation"
       ],
-      "hops": 3,
+      "hops": 2,
       "tests": [
         "tests/pnc_conversation_lifecycle_refresh_smoke.lua"
-      ]
+      ],
+      "review_note": "P5A: Lifecycle.Create directly binds the public Finish operation. Close owns outcome delivery, bounded topic handoff and working-session cleanup; start/heartbeat/availability support is a separate implementation slice. Safety, Farewell and authoritative Scene.End remain reviewed dependencies."
     },
     {
       "id": "persisted_inventory",

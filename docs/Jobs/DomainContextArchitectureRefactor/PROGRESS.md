@@ -1,6 +1,6 @@
 # Progress — Domain & Context Architecture Refactor
 
-**Status:** IN PROGRESS — P0–P4 developer gates accepted; P5 Conversation/Semantics is next.
+**Status:** IN PROGRESS — P0–P4 developer gates accepted; P5 Conversation/Semantics is active.
 
 ## Parent objective
 
@@ -12,7 +12,7 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
 - Existing `main` only; planning baseline `15cadee70be11b790ce4c48bfb7bd51badd8233b`.
   Initially clean, origin fetched, ahead 7 / behind 0. No concurrent edits found.
 - Accepted: P0 `4205a1d7`, P1 `24d61abc`, Inventory pilot `b4535421`,
-  tooling-baseline evidence `19749cef`, ordered composition `55049e99`, first persistence slice `034766f9`, Health/Identity `fa5b2a2d`; remaining P4 schema/restoration slice validated against that revision.
+  tooling-baseline evidence `19749cef`, ordered composition `55049e99`, first persistence slice `034766f9`, Health/Identity `fa5b2a2d`; remaining P4 schema/restoration `0f7f326e`.
 - MCP project `project-hoomans`; explicitly refreshed against actual source.
   Statement-form IMPORTS and heuristic alias/builtin resolution need the
   documented literal-import/source fallback. Matching HEAD alone is insufficient.
@@ -43,7 +43,7 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
   Public ModData mechanism; identical Reset compatibility object/body semantics;
   Memory repository loads bounded schemas/catalogs; Inventory owns lazy snapshot
   interop. Body hints, journal/travel and save coordinator behavior preserved.
-- Current seven probes: **33 files / 4,638 lines / 172,836 bytes**, -36,686 bytes
+- Current seven probes: **32 files / 4,478 lines / 166,641 bytes**, -42,881 bytes
   versus P0. Persisted inventory: 7 → 4 files, same depth, -25,710 bytes; removed
   envelope/bootstrap context is explained in `RETRIEVAL.md` and caller-tested.
   Memory's supplementary owned import closure: 83,367 → 55,416 bytes.
@@ -73,9 +73,15 @@ A phase/chunk completion does not complete this parent goal. Continue automatica
   Carrier-proof context: 4 files / 32,132 bytes → 2 / 6,658; native admission
   policy is a separate boundary, preserved by the binding/restart matrix.
 
+- First P5 slice: `P5A_VALIDATION.json`. Public Lifecycle.Finish owns close
+  delivery/cleanup; lifecycle entry directly binds callbacks. Start/heartbeat
+  support remains separate; obsolete private factory/finish chain removed.
+  Conversation close: 7 → 6 files, 3 → 2 handoffs; 981/981 Lua, 24/24 owning
+  regressions, 3/3 installed Kahlua, zero new debt. P5 is not yet accepted.
+
 ## Next mandatory chunk
 
-**Continue P5 — Conversation and Semantics domain capsules.**
+**Continue P5B–D — Public semantic subdomains and dependency inversion.**
 
 1. Establish current graph/source ownership, public entry/callers, inbound and
    outbound dependencies, affected tests and fixed conversation probe evidence.

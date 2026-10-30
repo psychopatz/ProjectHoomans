@@ -1,0 +1,97 @@
+{
+  "tier": "Verify (Tier 2)",
+  "coverage": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"project\":\"project-hoomans\",\"signal\":\"best_effort\",\"indexed_at\":\"2026-10-30T15:21:07Z\",\"metadata\":{\"generation\":\"2026-10-30T15:21:07Z\",\"index_mode\":\"full\",\"recorded_at\":\"2026-10-30T15:21:11Z\",\"recording_status\":\"complete\",\"ignored_files_stored\":98,\"ignored_files_total\":98,\"hash_records_complete\":true,\"coverage_version\":3,\"generation_matches\":true},\"paths\":[{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Support.lua\",\"path\":\"Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Support.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]},{\"requested_path\":\"tests/pnc_conversation_lifecycle_refresh_smoke.lua\",\"path\":\"tests/pnc_conversation_lifecycle_refresh_smoke.lua\",\"status\":\"no_recorded_issue\",\"freshness\":\"metadata_match\",\"recommended_action\":\"use_graph_with_best_effort_caveat\",\"coverage\":[]}],\"scopes\":[],\"caveat\":\"Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable.\"}"
+      }
+    ],
+    "structuredContent": {
+      "project": "project-hoomans",
+      "signal": "best_effort",
+      "indexed_at": "2026-10-30T15:21:07Z",
+      "metadata": {
+        "generation": "2026-10-30T15:21:07Z",
+        "index_mode": "full",
+        "recorded_at": "2026-10-30T15:21:11Z",
+        "recording_status": "complete",
+        "ignored_files_stored": 98,
+        "ignored_files_total": 98,
+        "hash_records_complete": true,
+        "coverage_version": 3,
+        "generation_matches": true
+      },
+      "paths": [
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Support.lua",
+          "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Support.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        },
+        {
+          "requested_path": "tests/pnc_conversation_lifecycle_refresh_smoke.lua",
+          "path": "tests/pnc_conversation_lifecycle_refresh_smoke.lua",
+          "status": "no_recorded_issue",
+          "freshness": "metadata_match",
+          "recommended_action": "use_graph_with_best_effort_caveat",
+          "coverage": []
+        }
+      ],
+      "scopes": [],
+      "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+    },
+    "isError": false
+  },
+  "trace": {
+    "content": [
+      {
+        "type": "text",
+        "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Close.Lifecycle.Finish\ndirection: both\ncallees_total: 10\ncallees: 10  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationFarewell.Farewell:\n  Schedule 1 heuristic 0.08\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Close:\n  clearWorkingContext 1 heuristic 0.17\n  conversationTopicMask 1 heuristic 0.17\n  isNetworkClient 1 heuristic 0.90\n  presentSafetyFeedback 1 heuristic 0.17\n  send 1 heuristic 0.90\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationSafety.Safety:\n  ResolveActors 1 heuristic 0.75\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Conversation.PNC_ConversationScene.PNC_ConversationScene_Lease_End.Scene:\n  End 1 heuristic 0.17\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Base.PNC_Core.Core:\n  LogInfo 1 heuristic 0.41\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1 heuristic 0.17\ncallers_total: 1\ncallers: 1  (rows: name hop strategy confidence; qn = group prefix + \".\" + name)\nproject-hoomans.tests:\n  pnc_conversation_lifecycle_refresh_smoke 1 heuristic 0.90\n"
+      }
+    ],
+    "isError": false
+  },
+  "snippet": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"name\":\"Lifecycle.Finish\",\"qualified_name\":\"project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Close.Lifecycle.Finish\",\"label\":\"Function\",\"file_path\":\"/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua\",\"start_line\":137,\"end_line\":183,\"source\":\"function Lifecycle.Finish(view, spec, state, reason)\\n    presentSafetyFeedback(spec, state, reason)\\n    if Farewell and type(Farewell.Schedule) == \\\"function\\\" then\\n        Farewell.Schedule(spec, state, reason)\\n    end\\n    if PNC.Core and PNC.Core.LogInfo then\\n        PNC.Core.LogInfo(table.concat({\\n            \\\"Conversation closed\\\",\\n            \\\"npc=\\\" .. tostring(state and state.npcID\\n                or spec and spec.npcID or \\\"unknown\\\"),\\n            \\\"token=\\\" .. tostring(state and state.token or \\\"none\\\"),\\n            \\\"guardThreats=\\\" .. tostring(not state\\n                or state.guardThreats ~= false),\\n            \\\"reason=\\\" .. tostring(reason or \\\"closed\\\"),\\n        }, \\\" \\\"))\\n    end\\n    local topicMask = conversationTopicMask(view)\\n    if state then\\n        if isNetworkClient() then\\n            send(Scene.CMD_END, state, reason, {\\n                llmRequestID = state and state.llmRequestID or nil,\\n                memoryTopicMask = topicMask,\\n            })\\n        else\\n            local _, zombie, record = H.Safety.ResolveActors(spec)\\n            if Scene and Scene.End then\\n                Scene.End(\\n                    record,\\n                    zombie,\\n                    state.token,\\n                    \\\"conversation_\\\" .. tostring(reason or \\\"closed\\\"),\\n                    {\\n                        llmRequestID = state and state.llmRequestID or nil,\\n                        memoryTopicMask = topicMask,\\n                        player = spec and spec.context\\n                            and spec.context.player,\\n                    }\\n                )\\n            end\\n        end\\n    end\\n    clearWorkingContext(\\n        view,\\n        spec,\\n        tostring(reason or \\\"\\\") == \\\"danger\\\"\\n    )\\nend\\n\",\"callers\":1,\"callees\":10}"
+      }
+    ],
+    "structuredContent": {
+      "name": "Lifecycle.Finish",
+      "qualified_name": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_ConversationLifecycle_Close.Lifecycle.Finish",
+      "label": "Function",
+      "file_path": "/home/psychopatz/Zomboid/Workshop/ProjectHoomans/Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/PNC_ConversationLifecycle_Close.lua",
+      "start_line": 137,
+      "end_line": 183,
+      "source": "function Lifecycle.Finish(view, spec, state, reason)\n    presentSafetyFeedback(spec, state, reason)\n    if Farewell and type(Farewell.Schedule) == \"function\" then\n        Farewell.Schedule(spec, state, reason)\n    end\n    if PNC.Core and PNC.Core.LogInfo then\n        PNC.Core.LogInfo(table.concat({\n            \"Conversation closed\",\n            \"npc=\" .. tostring(state and state.npcID\n                or spec and spec.npcID or \"unknown\"),\n            \"token=\" .. tostring(state and state.token or \"none\"),\n            \"guardThreats=\" .. tostring(not state\n                or state.guardThreats ~= false),\n            \"reason=\" .. tostring(reason or \"closed\"),\n        }, \" \"))\n    end\n    local topicMask = conversationTopicMask(view)\n    if state then\n        if isNetworkClient() then\n            send(Scene.CMD_END, state, reason, {\n                llmRequestID = state and state.llmRequestID or nil,\n                memoryTopicMask = topicMask,\n            })\n        else\n            local _, zombie, record = H.Safety.ResolveActors(spec)\n            if Scene and Scene.End then\n                Scene.End(\n                    record,\n                    zombie,\n                    state.token,\n                    \"conversation_\" .. tostring(reason or \"closed\"),\n                    {\n                        llmRequestID = state and state.llmRequestID or nil,\n                        memoryTopicMask = topicMask,\n                        player = spec and spec.context\n                            and spec.context.player,\n                    }\n                )\n            end\n        end\n    end\n    clearWorkingContext(\n        view,\n        spec,\n        tostring(reason or \"\") == \"danger\"\n    )\nend\n",
+      "callers": 1,
+      "callees": 10
+    },
+    "isError": false
+  },
+  "limitations": [
+    "Callback table return is not resolved as a Create→Finish CALLS edge; source-reviewed factory explicitly binds it.",
+    "Heuristic builtin and aliases have false/low-confidence matches; exact source and focused tests control."
+  ]
+}

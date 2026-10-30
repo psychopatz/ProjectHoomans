@@ -10,49 +10,8 @@ PNC.Conversation.Lifecycle = Lifecycle
 local Safety = PNC.Conversation.Safety
 local Farewell = PNC.Conversation.Farewell
 local Scene = PNC.ConversationScene
-local NAMEPLATE_UNAVAILABLE_GRACE_MS = 3000
-
-local function currentTime()
-    return PNC.Core and PNC.Core.Now and PNC.Core.Now()
-        or getTimeInMillis and getTimeInMillis()
-        or 0
-end
-
 local function isNetworkClient()
     return isClient and isClient() == true
-end
-
-local function isNameplateConversation(spec)
-    return spec and spec.context
-        and spec.context.nameplateConversation == true
-end
-
-local function isHostileConversation(spec)
-    local context = spec and spec.context or {}
-    local entry = context.entry or {}
-    local snapshot = entry.snapshot or {}
-    local entryRecord = entry.record or {}
-    local hostility = snapshot.hostility or entryRecord.hostility or {}
-    if hostility.attackPlayers == true then return true end
-    local _, _, record = Safety.ResolveActors(spec)
-    return record and record.hostility
-        and record.hostility.attackPlayers == true or false
-end
-
-local function requestNameplateFallback(view, spec, reason)
-    if isNameplateConversation(spec) or not isHostileConversation(spec) then
-        return false
-    end
-    local integration = PNC.PBrainZ
-    if not integration or not integration.RequestInlineFallback then
-        return false
-    end
-    local context = spec and spec.context or {}
-    local entry = context.entry or {
-        id = spec and spec.npcID,
-        zombie = spec and spec.character,
-    }
-    return integration.RequestInlineFallback(entry, reason, view) == true
 end
 
 local function send(command, state, reason, extra)
@@ -83,235 +42,26 @@ local function send(command, state, reason, extra)
     return true
 end
 
-local function conversationTopicMask(view)
-    local session = view and view.session
-    local events = PNC.Conversation and PNC.Conversation.Memory
-        and PNC.Conversation.Memory.Events or nil
-    if not events or type(events.GetConversationTopicMask) ~= "function" then
-        require "PNC/Conversation/Memory/PNC_ConversationMemory"
-    end
-    -- Close can happen before any semantic or provider request loads the
-    -- definitions. Require this lightweight catalog here so visible session
-    -- messages are still classified and transferred to today's memory.
-    require "PNC/Conversation/Definitions/Memory/ConversationTopics/00_PNC_ConversationMemoryTopics"
-    events = PNC.Conversation and PNC.Conversation.Memory
-        and PNC.Conversation.Memory.Events or nil
-    if events and type(events.GetConversationTopicMask) == "function" then
-        local mask = events.GetConversationTopicMask(session, 64)
-        return tonumber(mask)
-    end
-    local mask = session and tonumber(session.conversationTopicMask) or nil
-    if not mask or mask ~= mask or mask == math.huge or mask == -math.huge then
-        return nil
-    end
-    mask = math.floor(mask)
-    return mask > 0 and mask or nil
-end
-
-local function clearWorkingContext(view, spec, preserveSafetyFeedback)
-    local session = view and view.session or nil
-    local historyPart = view and view.historyPart or nil
-    local preservedMessages = {}
-    local namespace = session and session.namespace
-        or spec and spec.namespace or "ProjectHoomans"
-    local npcID = session and session.npcID
-        or spec and spec.npcID or "unknown"
-    local characterUUID = session and session.characterUUID
-        or spec and spec.characterUUID or "unbound"
-    local coreConversation = PsychopatzCore
-        and PsychopatzCore.Conversation or nil
-    local history = coreConversation and coreConversation.History or nil
-    local dialogueInput = PNC.Semantics
-        and PNC.Semantics.DialogueInput or nil
-
-    if history and type(history.Clear) == "function" then
-        history.Clear(namespace, npcID, characterUUID)
-    end
-    if session then
-        session.closed = true
-        session.conversationMemoryClosed = true
-        session.semanticDialoguePending = nil
-        session.semanticDialogueRouter = nil
-        session.semanticActorConversationService = nil
-        if session.semanticDialogueContext
-            and type(session.semanticDialogueContext.Reset) == "function"
-        then
-            session.semanticDialogueContext:Reset()
-        end
-        session.semanticDialogueContext = nil
-        session.semanticDialogueState = nil
-        session.conversationTopicMask = nil
-        session.queue = {}
-        session.busy = false
-        session.llmPending = false
-    end
-    if historyPart then
-        local messagesCleared = false
-        local typingCleared = false
-        if preserveSafetyFeedback == true
-            and type(historyPart.messages) == "table"
-        then
-            for _, message in ipairs(historyPart.messages) do
-                local source = message and message.source
-                if type(source) == "table"
-                    and source.eventType == "conversation_safety"
-                then
-                    preservedMessages[#preservedMessages + 1] = message
-                end
-            end
-        end
-        if type(historyPart.setMessages) == "function" then
-            messagesCleared = pcall(
-                historyPart.setMessages,
-                historyPart,
-                preservedMessages
-            )
-        end
-        if not messagesCleared then
-            historyPart.messages = preservedMessages
-        end
-        if type(historyPart.setTyping) == "function" then
-            typingCleared = pcall(
-                historyPart.setTyping,
-                historyPart,
-                nil
-            )
-        end
-        if not typingCleared then
-            historyPart.typingSpeaker = nil
-        end
-    end
-    if dialogueInput and dialogueInput.ActiveView == view then
-        dialogueInput.ActiveView = nil
-    end
-    if view then
-        view.lastSemanticDialogueResult = nil
-        view.lastSemanticActionResult = nil
-    end
-end
-
-local function refresh(state, spec)
-    local player, zombie, record = Safety.ResolveActors(spec)
-    if isNetworkClient() then
-        return send(Scene.CMD_BEGIN, state)
-    end
-    if not Scene or type(Scene.Begin) ~= "function" then
-        return false, "conversation_scene_unavailable"
-    end
-    -- Keep the authoritative rejection reason. A boolean `and/or` return
-    -- expression would discard Scene.Begin's second return value in Lua,
-    -- turning an expired lease into an opaque generic failure.
-    return Scene.Begin(
-        record,
-        zombie,
-        player,
-        state.token,
-        {
-            maximumDistance = Safety.GetMaximumDistance(),
-            dangerRadius = Safety.GetDangerRadius(),
-            enforceDistance = state.enforceDistance == true
-                and state.started ~= true,
-            guardThreats = state.guardThreats ~= false,
-            allowHostileParley = state.allowHostileParley == true,
-        }
-    )
-end
-
-local function refreshNow(view, spec, state)
-    if not state then return false, "conversation_not_ready" end
-    local renewed, reason = refresh(state, spec)
-    if renewed ~= true then
-        return false, reason or "conversation_lease_unavailable"
-    end
-    state.lastHeartbeatAt = currentTime()
-    return true
-end
-
-local function presentSafetyFeedback(spec, state, reason)
-    if tostring(reason or "") ~= "danger" then return false end
-    if state and state.guardThreats == false then return false end
-    if not Safety.GuardsThreats(spec) then return false end
-    local presentation = PNC.SemanticSpeechPresentation
-    if not presentation then
-        local ok, loaded = pcall(
-            require,
-            "PNC/Conversation/PNC_SemanticSpeechPresentation"
-        )
-        presentation = ok and loaded or PNC.SemanticSpeechPresentation
-    end
-    return presentation
-        and type(presentation.EnqueueConversationSafety) == "function"
-        and presentation.EnqueueConversationSafety(spec, state, reason)
-        or false
-end
-
-local function logAvailability(state, spec, reason)
-    if not Safety or not Safety.DescribeAvailability then return end
-    local details = Safety.DescribeAvailability(spec)
-    local signature = table.concat({
-        tostring(reason or "available"),
-        tostring(details.liveBodyPresent),
-        tostring(details.liveBodyAlive),
-        tostring(details.registryBodyPresent),
-        tostring(details.presenceBodyPresent),
-        tostring(details.presenceBodyAlive),
-        tostring(details.cachedBodyPresent),
-        tostring(details.snapshotPresent),
-        tostring(details.snapshotAlive),
-        tostring(details.snapshotPosition),
-        tostring(details.snapshotConversation),
-        tostring(details.networkClient),
-        tostring(details.presenceState),
-        tostring(details.recordAlive),
-        tostring(details.bodyLease),
-        tostring(details.presenceRevision),
-    }, "|")
-    if state and state.lastAvailabilitySignature == signature then
-        return
-    end
-    if state then state.lastAvailabilitySignature = signature end
-    if not PNC.Core or not PNC.Core.LogInfo then return end
-    PNC.Core.LogInfo(table.concat({
-        "Inline availability",
-        "npc=" .. tostring(details.npcID),
-        "reason=" .. tostring(reason or "available"),
-        "liveBody=" .. tostring(details.liveBodyPresent),
-        "liveAlive=" .. tostring(details.liveBodyAlive),
-        "registryBody=" .. tostring(details.registryBodyPresent),
-        "presenceBody=" .. tostring(details.presenceBodyPresent),
-        "presenceAlive=" .. tostring(details.presenceBodyAlive),
-        "cachedBody=" .. tostring(details.cachedBodyPresent),
-        "snapshot=" .. tostring(details.snapshotPresent),
-        "snapshotAlive=" .. tostring(details.snapshotAlive),
-        "snapshotPosition=" .. tostring(details.snapshotPosition),
-        "snapshotAllowed=" .. tostring(details.snapshotConversation),
-        "networkClient=" .. tostring(details.networkClient),
-        "presence=" .. tostring(details.presenceState),
-        "recordAlive=" .. tostring(details.recordAlive),
-        "bodyLease=" .. tostring(details.bodyLease),
-        "presenceRevision=" .. tostring(details.presenceRevision),
-    }, " "))
-end
-
-
 Lifecycle.Internal = Lifecycle.Internal or {}
-Lifecycle.Internal.CurrentTime = currentTime
-Lifecycle.Internal.IsNetworkClient = isNetworkClient
-Lifecycle.Internal.IsNameplateConversation = isNameplateConversation
-Lifecycle.Internal.RequestNameplateFallback = requestNameplateFallback
-Lifecycle.Internal.Send = send
-Lifecycle.Internal.Refresh = refresh
-Lifecycle.Internal.RefreshNow = refreshNow
-Lifecycle.Internal.PresentSafetyFeedback = presentSafetyFeedback
-Lifecycle.Internal.LogAvailability = logAvailability
-Lifecycle.Internal.ConversationTopicMask = conversationTopicMask
-Lifecycle.Internal.ClearWorkingContext = clearWorkingContext
-Lifecycle.Internal.Safety = Safety
-Lifecycle.Internal.Farewell = Farewell
-Lifecycle.Internal.Scene = Scene
-Lifecycle.Internal.NameplateUnavailableGraceMs = NAMEPLATE_UNAVAILABLE_GRACE_MS
+local H = Lifecycle.Internal
+H.IsNetworkClient = isNetworkClient
+H.Send = send
+H.Safety = Safety
+H.Farewell = Farewell
+H.Scene = Scene
 
-require "PNC/Conversation/PNC_ConversationLifecycle_Create"
+require "PNC/Conversation/PNC_ConversationLifecycle_Support"
+require "PNC/Conversation/PNC_ConversationLifecycle_Create_Begin"
+require "PNC/Conversation/PNC_ConversationLifecycle_Create_Update"
+require "PNC/Conversation/PNC_ConversationLifecycle_Close"
+
+function Lifecycle.Create()
+    return {
+        begin = H.CreateBegin,
+        update = H.CreateUpdate,
+        finish = Lifecycle.Finish,
+    }
+end
 
 function Lifecycle.RequestCeasefire(context)
     local state = context and context.conversationLifecycleState or nil
