@@ -1,6 +1,6 @@
 # Multiplayer Body Binding Migration
 
-**Current status:** M10 works in native SP but dedicated MP still failed because restored shells stream only after players load their chunks. M11 late-stream restart reconciliation plus MP debug/replica binding repairs are developer-validated in `fc932e1d` and `5c10a95b`; renewed native MP acceptance is the remaining completion gate.
+**Current status:** Post-M11 hosted MP acceptance failed: bound NPC replicas could still render with zombie HumanVisual state, and clean host shutdown could lose the saved-live restart flag for newly materialized NPCs. M12 presentation-authority and restart-proof durability repairs are developer-validated in `e5cd9645` and `bd84bfe4`; renewed native MP acceptance is the remaining completion gate.
 
 This job replaces Project Hoomans' fragile multiplayer assumption that a server-side managed IsoZombie remains the same identity-bearing object on clients, and hardens the physical carrier lifecycle so a managed live-human shell is proactively retired before Project Zomboid can virtualize it into native zombie-population state.
 
@@ -29,7 +29,7 @@ Single-player must remain on its proven local-object path and must not inherit M
 
 - AUDIT.md — verified starting evidence and why the current methodology fails in MP.
 - ARCHITECTURE.md — target authority, identity, protocol and lifecycle contracts.
-- ROADMAP.md — mandatory M0-M11 migration phases and gates.
+- ROADMAP.md — mandatory M0-M12 migration phases and gates.
 - HARNESS_ACCEPTANCE.md — deterministic developer-side regression matrix.
 - AGENT_RUNBOOK.md — execution procedure and standing constraints.
 - PROGRESS.md — current phase, evidence and immediate Next Chunk.

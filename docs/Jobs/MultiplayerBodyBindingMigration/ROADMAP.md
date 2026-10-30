@@ -1,10 +1,10 @@
 # Roadmap — Multiplayer Body Binding Migration
 
-**Status:** M10 native SP succeeds but dedicated MP exposed a late-stream restart race plus replica/debug-authority gaps. M11 is developer-accepted in `fc932e1d` and `5c10a95b`; renewed user-owned native MP acceptance pending.
+**Status:** M11 fixed command/binding and late-stream admission, but post-M11 hosted MP still exposed zombie-looking bound replicas and loss of restart admission across clean shutdown. M12 is developer-accepted in `e5cd9645` and `bd84bfe4`; renewed user-owned native MP acceptance pending.
 
 **Parent objective:** successfully migrate Project Hoomans from implicit cross-network IsoZombie identity to an explicit, incarnation-safe multiplayer body-binding protocol **and** prevent managed live-human carriers from reaching native zombie virtualization, while preserving SP behavior, durable Registry authority, MP streaming/reconnect, death/reanimation semantics, and exact cleanup.
 
-The full M0-M11 objective is the completion boundary. Phase completion is not goal completion.
+The full M0-M12 objective is the completion boundary. Phase completion is not goal completion.
 
 ## M0 — Restore/freeze single-player baseline and engine truth
 
@@ -352,9 +352,79 @@ Implementation commits:
 - `fc932e1d fix: restore multiplayer npc replica binding`
 - `5c10a95b fix: defer mp npc spawn for late restart shells`
 
+## M12 — MP human presentation authority and restart-proof durability
+
+Post-M11 hosted multiplayer acceptance on 2026-10-30 failed in two new, independently evidenced ways.
+
+The screenshot/session is post-M11 and contains successful `mp_body_binding_bound` events, proving the physical client replicas exist. However several bound NPCs render with zombie complexion/presentation. The matching server log shows every body initially created as a vanilla `Male/Female Zed, Dressed in PNCShellCarrier`.
+
+The same session also disproved M11 restart durability. A clean hosted shutdown persisted six newly created starting companions, but the next host start loaded 11 Registry records while arming late-stream rehydration for only 5.
+
+### M12A — authoritative human visual ownership
+
+Root cause:
+- `PNC_Visuals.ApplyHumanVisuals()` classified both server and client runtimes as network replicas;
+- authoritative MP servers therefore called `ApplyReplicaAppearance()` instead of `ApplyResolvedAppearance()`;
+- remote client replicas correctly refused to own clothing, leaving the underlying zombie carrier able to render zombie HumanVisual state;
+- after bind, native zombie replication could overwrite skin/hair/beard again while the client visual key prevented a second full appearance pass.
+
+Required:
+- `Core.IsAuthority()` decides resolved-vs-replica appearance ownership;
+- SP/server/host authority uses full resolved human appearance;
+- pure clients never clear/rebuild server-owned worn or attached items;
+- pure clients perform a bounded 250 ms identity-visual integrity check only;
+- the check compares gender/skin/hair/beard and does nothing when current;
+- on drift, it reapplies only human identity fields and refreshes the model;
+- clothing/equipment/inventory remain server-owned.
+
+Engine verification:
+- `IsoZombie.dressInNamedOutfit()` rebuilds HumanVisual/ItemVisuals but does not change `persistentOutfitId`;
+- therefore authoritative human dressing does not destroy the `PNCShellCarrier` fingerprint.
+
+Implementation: `e5cd9645 fix: preserve human visuals on mp replicas`.
+
+### M12B — durable live-detach restart proof
+
+Root cause:
+- clean host shutdown can detach/abstract a live NPC before `SaveAll`;
+- `CaptureDetachedBodyHint` retained instance/population/lease/position but omitted `wasLive=true`;
+- after the record became abstract, serialization emitted `bodyHint.wasLive=false`;
+- on the next boot, deserialization correctly did not set `startupRehydrateExpected`;
+- observed evidence: prior session created six live Weller/Foss starting companions; next session loaded 11 records but only 5 late-stream claims were armed.
+
+Required:
+- live, non-corpse detach records `wasLive=true` before clearing the body lease;
+- a corpse/death detach explicitly cannot inherit an older live-restart flag;
+- a late-stream claim may be held from `wasLive + lease + saved position` even if engine IDs are absent;
+- existing M11-affected saves receive a bounded backward migration only when an old `wasLive=false` hint still has lease + coordinates + exact saved engine carrier identity;
+- that legacy migration does not enable anonymous position-only adoption;
+- anonymous adoption continues to require the stricter current-save uniqueness/radius/sex proof.
+
+Implementation: `bd84bfe4 fix: persist mp restart body ownership`.
+
+### M12C — evidence clarification
+
+The reported “new save” hosted session is not a new world according to Project Zomboid:
+- PZ logs `isNewGame = false`;
+- it loads `Saves/Multiplayer/NPCEngine/global_mod_data.bin`;
+- PNC loads 5 pre-existing records before the joining character's 6 starting companions are created.
+
+This does not invalidate the zombie-presentation defect. It matters only for restart provenance: future audits must distinguish reused-world records from newly created starting companions.
+
+### M12D — developer validation
+
+Accepted developer evidence:
+- complete repository suite: **978/978**;
+- focused restart/husk/body/presence/visual/replica/network/persistence/appearance/human/corpse/reanimation matrix: **189/189**;
+- focused new M12 regressions cover authoritative visual ownership, post-bind zombie-skin repair, live-detach restart proof, corpse exclusion, M11 legacy strong-carrier migration, late-stream reconciliation, and existing replica visual ownership;
+- installed Project Zomboid Kahlua compiler: **7/7 changed/new runtime files pass**;
+- static Kahlua ERROR scan: all changed runtime files clean;
+- new `PNC_Visuals_ReplicaIntegrity.lua`, `PNC_BodyLifecycle_DetachedHint.lua`, and late-stream candidate policy remain below the 2k token-bloat threshold;
+- `git diff --check` clean.
+
 ### Native user acceptance handoff
 
-After all developer-side M0-M11 gates pass, user-owned native acceptance should verify:
+After all developer-side M0-M12 gates pass, user-owned native acceptance should verify:
 1. SP restart/materialization behavior is restored and no former SP husk regression returns.
 2. Fresh MP materialization does not leave an ordinary zombie precursor or stale zombie after reconciliation.
 3. Two players in the same area see the same one NPC.

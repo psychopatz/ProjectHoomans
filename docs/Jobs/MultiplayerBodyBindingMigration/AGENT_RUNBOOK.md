@@ -14,7 +14,7 @@ Use current code/tests/runtime evidence as source of truth over historical agent
 
 ## Parent objective
 
-Implement the complete M0-M11 Multiplayer Body Binding Migration.
+Implement the complete M0-M12 Multiplayer Body Binding Migration.
 
 The parent objective is the completion boundary. A phase/chunk passing does not finish the job.
 
@@ -135,9 +135,9 @@ After each coherent chunk:
 - update PROGRESS.md;
 - continue automatically.
 
-Before final M11:
+Before final M12:
 - full isolated Lua suite;
-- focused M0-M11 matrix;
+- focused M0-M12 matrix;
 - static performance/persistence audit;
 - changed-file Kahlua verification;
 - clean diff/status except intended committed work.
@@ -164,7 +164,7 @@ Do not publish/republish Workshop content without explicit authorization.
 ## Stop conditions
 
 Stop only for:
-- complete M0-M11 developer acceptance and user-owned native MP restart/replica handoff;
+- complete M0-M12 developer acceptance and user-owned native MP restart/presentation handoff;
 - genuine unsafe concurrent-work conflict;
 - required engine/tool capability unavailable with no accepted fallback;
 - architecture/scope conflict requiring user choice;

@@ -109,7 +109,7 @@ Installed 42.22 Java/native evidence also disproved the first M9 prototype assum
 
 ### Remaining acceptance
 
-This M9 acceptance statement was superseded by M10 and then M11 below. Renewed native multiplayer testing remains mandatory; any persistent old zombie/husk now reopens M11.
+This M9 acceptance statement was superseded by M10, M11, and M12 below. Renewed native multiplayer testing remains mandatory; any persistent old zombie/husk or zombie-looking managed replica now reopens M12.
 
 
 ## M10 developer addendum — restart-shell recovery
@@ -149,3 +149,22 @@ M11 closes those developer-side gaps with per-record late-stream restart claims,
 Validation: **975/975 full**, **228/228 broad**, **134/134 focused MP**, **16/16 installed-PZ compile**, static Kahlua clean, new modules under the token-bloat threshold.
 
 Native dedicated MP remains the final gate. Do not mark the parent goal complete until restart/reconnect shows no stale former-NPC husk and a multiplayer debug spawn produces one visible, bound NPC.
+
+
+## M12 developer addendum — human presentation and restart-proof durability
+
+Post-M11 native hosted MP testing failed the parent goal even though body binding succeeded.
+
+Implementation commits:
+- `e5cd9645 fix: preserve human visuals on mp replicas`
+- `bd84bfe4 fix: persist mp restart body ownership`
+
+M12 separates two ownership contracts that M11 did not cover:
+1. **render ownership** — server/SP authority builds the full survivor appearance; remote replicas may repair human identity drift but never own clothing/equipment;
+2. **restart-proof ownership** — the live→abstract detach boundary must persist that the carrier was live before clearing its lease, so clean shutdown cannot erase restart admission.
+
+Backward compatibility is intentionally narrow. Records produced by the M11 bug with `wasLive=false` are migrated only when exact engine carrier identity, lease, and saved coordinates all survived. Position alone remains non-authoritative.
+
+Developer gates: **978/978 full**, **189/189 focused**, **7/7 installed-PZ compile**, static Kahlua clean.
+
+Native hosted/dedicated MP remains mandatory before completion.

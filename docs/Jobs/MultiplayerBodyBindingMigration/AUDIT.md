@@ -265,3 +265,14 @@ The debug-spawn symptom exposed a separate authority bug: client debug dispatch 
 The invisible-dialogue symptom also exposed an MP binding consistency gap. Previous snapshots could combine a current body `onlineId` inside `bodyBinding` with a stale cached `liveBodyOnlineID`. Pure clients correctly rejected that inconsistent tuple. M11 builds all binding fields from one projection and adds a narrowly scoped exact-ID recovery when bind arrives before `OnZombieUpdate` observation. A WorldCensus miss no longer suppresses the exact engine-list fallback.
 
 No generic recurring zombie scan was reintroduced.
+
+
+## 16. M12 post-M11 hosted-MP audit
+
+The post-M11 screenshot is not a body-binding failure: the client console shows successful `mp_body_binding_bound` transitions for the visible NPCs. The defect is downstream presentation ownership.
+
+`PNC_Visuals.ApplyHumanVisuals` previously used a generic networked-runtime predicate. On a multiplayer server that predicate is true, so the authoritative carrier took the client replica path and skipped full resolved survivor appearance. Because the client correctly does not own server clothing, a bound vanilla IsoZombie carrier could retain/reacquire zombie HumanVisual state. M12 changes the branch to `Core.IsAuthority()` and adds a throttled identity-only replica integrity repair.
+
+The restart failure is a different persistence boundary. During clean hosted shutdown, a live NPC may detach before global save. The old detach helper stored carrier ids/lease/position but omitted the semantic fact that the body had been live. Serialization then saw an abstract record and persisted `wasLive=false`. The next startup therefore skipped M11 for exactly those records. M12 moves this fact into a dedicated detached-hint policy and provides a strong-identity-only migration for saves already written by the bug.
+
+The user's referenced hosted session was a reused world (`isNewGame=false`), not a newly initialized PZ world. This distinction is recorded so population persistence and starting-companion creation are not conflated.

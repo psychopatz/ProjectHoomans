@@ -1,10 +1,10 @@
 # Progress — Multiplayer Body Binding Migration
 
-**Status:** M11 dedicated late-stream restart reconciliation and MP replica/debug authority repairs implemented and developer-validated; renewed native MP acceptance pending.
+**Status:** M12 MP human-presentation authority and restart-proof durability repairs implemented and developer-validated; renewed native MP acceptance pending.
 **Branch:** existing main only.
 **Planning anchor:** 2a24bc59d36c845af51097642c55180434680cb7.
-**Current phase:** Native M11 multiplayer acceptance handoff.
-**Parent objective:** M0-M11 complete migration to explicit MP body binding, pre-virtualization carrier retirement, restart-shell recovery, dedicated late-stream reconciliation, and reliable MP replica/debug authority, with SP preserved; native MP convergence remains to be verified by the user.
+**Current phase:** Native M12 hosted/dedicated multiplayer acceptance handoff.
+**Parent objective:** M0-M12 complete migration to explicit MP body binding, carrier retirement/restart recovery, late-stream reconciliation, authoritative human presentation, and durable restart proof, with SP preserved; native MP convergence remains to be verified by the user.
 
 ## Verified starting evidence
 
@@ -32,8 +32,8 @@
 ## Remaining mandatory work
 
 - M0-M8 are implemented historical prerequisites and remain regression constraints.
-- M0-M11 developer work is implemented and validated. M9 added pre-virtualization retirement; M10 restored restart-shell identity recovery; M11 adds dedicated late-stream reconciliation plus MP replica/debug authority repair.
-- **Only renewed native multiplayer acceptance remains mandatory.** A stale shell, invisible authoritative NPC, or debug spawn that does not become one visible bound body is a hard failure and reopens M11.
+- M0-M12 developer work is implemented and validated. M9 added pre-virtualization retirement; M10 restored restart-shell identity recovery; M11 added late-stream/binding authority; M12 fixes human presentation ownership and live-detach restart-proof durability.
+- **Only renewed native multiplayer acceptance remains mandatory.** A stale shell, zombie-looking managed NPC, invisible authoritative NPC, or debug spawn that does not become one visible bound human is a hard failure and reopens M12.
 
 ## Current non-goals
 
@@ -48,7 +48,7 @@
 
 Do not mark complete after M0, a working binding prototype, or a passing focused suite.
 
-Developer completion requires all M0-M11 gates plus final full-suite/static/compiler evidence. That developer gate is now met by `fc932e1d` and `5c10a95b`; parent acceptance still requires renewed native dedicated-MP restart/replica proof.
+Developer completion requires all M0-M12 gates plus final full-suite/static/compiler evidence. That developer gate is now met through `e5cd9645` and `bd84bfe4`; parent acceptance still requires renewed native hosted/dedicated-MP restart and human-presentation proof.
 
 ## M0A local factory restoration — 2026-10-30
 
@@ -313,3 +313,37 @@ Implementation commits: `fc932e1d` and `5c10a95b`.
 Developer validation: **975/975 full**, **228/228 broad**, **134/134 focused MP**, **16/16 installed-PZ compile**, changed runtime files static-Kahlua clean, token-bloat guard clean for new modules, `git diff --check` clean.
 
 **Remaining mandatory action:** native dedicated MP acceptance. For debug spawn, the server log must show `PNC debug spawn variant=...`, then `mp_body_binding_ready`, and the client must show `mp_body_binding_bound`. For restart recovery, startup should arm late-stream claims rather than log the old fallback count, and each loaded saved area must rebound or explicitly release before any replacement body is spawned.
+
+
+## M12 post-M11 hosted-MP failure and repair — 2026-10-30
+
+User acceptance after M11 still showed bound NPCs with zombie-like appearance and reported persistent restart husks. The exact screenshot session was located in the archived 13:12 client / 13:13 hosted-server logs and occurred after the M11 commits.
+
+Visual evidence:
+- client repeatedly logs `mp_body_binding_bound` for the visible NPCs, so binding is no longer the missing layer;
+- server creates the bodies as vanilla `Zed, Dressed in PNCShellCarrier`;
+- current source made authoritative MP servers use the replica appearance lane because it treated any networked runtime as non-owning;
+- later native zombie updates continue to repair/reset zombie state after bind.
+
+Restart evidence:
+- first hosted session starts with 5 persisted records, then creates 6 starting companions and binds them;
+- clean host shutdown begins at 13:18:17 and runs `SaveAll`;
+- next hosted server loads 11 records but logs `startup late-stream rehydration armed count=5`;
+- live-detach capture preserved engine IDs/lease/position but not `wasLive=true`, so the newly detached six records lost restart admission.
+
+The hosted world itself was reused: PZ logs `isNewGame=false` and loads `Saves/Multiplayer/NPCEngine/global_mod_data.bin`. The six Weller/Foss starting companions were new to the joining character, but the world was not.
+
+M12 repairs:
+- authority now owns full human appearance in MP just as in SP;
+- remote clients keep clothing non-owning and repair only drifted human identity fields on a 250 ms bounded integrity cadence;
+- live detach persists `wasLive=true` before abstraction;
+- corpse detach cannot inherit live restart admission;
+- M11-affected saves with exact legacy carrier proof are migrated into late-stream claims, while weak anonymous historical hints remain rejected.
+
+Commits:
+- `e5cd9645 fix: preserve human visuals on mp replicas`
+- `bd84bfe4 fix: persist mp restart body ownership`
+
+Validation: **978/978 full**, **189/189 focused**, **7/7 installed-PZ compile**, static Kahlua clean, new policy modules under token budget, diff check clean.
+
+**Remaining mandatory action:** native hosted/dedicated MP acceptance. Bound NPCs must render with human skin/hair/outfit after initial spawn and remain human-looking after several seconds of native zombie replication. After a clean host/server restart, all previously-live NPC records with saved carrier proof must arm/rebind or explicitly release before replacement spawning; no former NPC may remain as a hostile husk.
