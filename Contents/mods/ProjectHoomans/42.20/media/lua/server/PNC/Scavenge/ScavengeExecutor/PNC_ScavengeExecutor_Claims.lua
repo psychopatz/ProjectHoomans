@@ -24,9 +24,9 @@ local function setWorkerPhase(session, worker, phase, leasePhase)
 end
 
 local function itemWeight(entry)
-    local internal = PNC.Inventory and PNC.Inventory.Internal or nil
-    local weight = internal and internal.getItemWeight
-        and internal.getItemWeight(entry.fullType) or 0.1
+    local queries = PNC.Inventory and PNC.Inventory.Queries or nil
+    local weight = queries and queries.GetItemWeight
+        and queries.GetItemWeight(entry.fullType) or 0.1
     return math.max(0, tonumber(weight) or 0.1)
         * math.max(1, tonumber(entry.quantity) or 1)
 end

@@ -1,6 +1,7 @@
 PNC = PNC or {}
 PNC.Equipment = PNC.Equipment or {}
 PNC.Equipment.Internal = PNC.Equipment.Internal or {}
+local Equipment = PNC.Equipment
 PNC.Equipment.DescriptorCache = PNC.Equipment.DescriptorCache or {}
 PNC.Equipment.PRESENTATION_REVISION = 3
 
@@ -15,3 +16,12 @@ require "PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_Replica"
 require "PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_Leases"
 require "PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_CombatState"
 require "PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_Describe"
+
+-- Public read boundaries for foreign domains. Native item creation remains
+-- owned by equipment application; descriptor queries never request creation.
+Equipment.IsNetworkedGame = Equipment.Internal.isNetworkedGame
+Equipment.ApplyPrimaryInventoryState = Equipment.Internal.applyPrimaryInventoryState
+Equipment.ApplyItemVisualState = Equipment.Internal.applyItemVisualState
+function Equipment.DescribeWeapon(fullType)
+    return Equipment.Internal.buildWeaponDescriptor(fullType, false)
+end

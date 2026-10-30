@@ -15,8 +15,7 @@ local CoreInventory =
     require "PsychopatzCore/Inventory/PsychopatzInventory"
 local ItemRecord =
     require "PsychopatzCore/Inventory/PsychopatzItemRecord"
-local StateCodec = require
-    "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec"
+local ItemState = require "PNC/Core/Inventory/PNC_InventoryItemState"
 local C = require
     "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 local Util = require
@@ -26,7 +25,7 @@ local EventTypes =
     require "PNC/Core/Events/PNC_EventDefinitions"
 
 function H.ExactRecord(item)
-    return CoreInventory.encodeItem(StateCodec.pseudoItem(item), 1)
+    return ItemState.Encode(item, 1)
 end
 
 function H.SameState(expected, candidate)

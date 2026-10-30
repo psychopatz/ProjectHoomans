@@ -126,14 +126,6 @@
     {
       "rule": "COMPOSITION_TO_PROVIDER",
       "source": "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
-      "target": "shared/PNC/Core/Equipment/PNC_Equipment_Items.lua",
-      "line": 37,
-      "detail": "",
-      "required_phase": "P3"
-    },
-    {
-      "rule": "COMPOSITION_TO_PROVIDER",
-      "source": "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
       "target": "shared/PNC/Core/Equipment/PNC_Equipment_Slots.lua",
       "line": 38,
       "detail": "",
@@ -1554,118 +1546,6 @@
       "line": 43,
       "detail": "",
       "required_phase": "P5/P6"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "client/PNC/Debug/NPCPresentationDebug/PNC_NPCPresentationDebug_HeldItem.lua",
-      "target": "shared/PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_Hands.lua",
-      "line": 17,
-      "detail": "",
-      "required_phase": "P2"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "client/PNC/Debug/NPCPresentationDebug/PNC_NPCPresentationDebug_HeldItem.lua",
-      "target": "shared/PNC/Core/Equipment/PNC_Equipment_Items.lua",
-      "line": 16,
-      "detail": "",
-      "required_phase": "P2"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_AbstractNPC.lua",
-      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
-      "line": 16,
-      "detail": "",
-      "required_phase": "P2"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_LiveNPC.lua",
-      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
-      "line": 16,
-      "detail": "",
-      "required_phase": "P2"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_NPCBulk.lua",
-      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
-      "line": 16,
-      "detail": "",
-      "required_phase": "P2"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_Physical.lua",
-      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
-      "line": 16,
-      "detail": "",
-      "required_phase": "P2"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_Player.lua",
-      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
-      "line": 16,
-      "detail": "",
-      "required_phase": "P2"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_Storage.lua",
-      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
-      "line": 16,
-      "detail": "",
-      "required_phase": "P2"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "server/PNC/Supply/PNC_ItemUtility.lua",
-      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
-      "line": 26,
-      "detail": "",
-      "required_phase": "P2"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_Consumption_Core.lua",
-      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
-      "line": 17,
-      "detail": "",
-      "required_phase": "P2"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_CoreRecords.lua",
-      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
-      "line": 18,
-      "detail": "",
-      "required_phase": "P2"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_NativeMatching.lua",
-      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
-      "line": 18,
-      "detail": "",
-      "required_phase": "P2"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_PersonalQueries.lua",
-      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
-      "line": 18,
-      "detail": "",
-      "required_phase": "P2"
-    },
-    {
-      "rule": "FOREIGN_IMPLEMENTATION",
-      "source": "server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_Removal.lua",
-      "target": "shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua",
-      "line": 18,
-      "detail": "",
-      "required_phase": "P2"
     }
   ]
 }

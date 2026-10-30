@@ -141,8 +141,8 @@ listing:close()
 -- LLM social reaction authority root.
 -- PNC_RelationshipService_EventMutation_Apply is loaded by the relationship
 -- mutation composition root.
--- PNC_ServerInventory_Transfer_Handle is loaded by the inventory transfer
--- authority composition root.
+-- The inventory server barrel loads medical supply before generic transfer;
+-- both providers retain the same authoritative server guard.
 -- PNC_ServerInventory_Currency is loaded by the inventory server barrel and
 -- keeps currency mutation on the same authoritative MP path.
 -- The four CampResourceService discovery spokes are loaded by its guarded

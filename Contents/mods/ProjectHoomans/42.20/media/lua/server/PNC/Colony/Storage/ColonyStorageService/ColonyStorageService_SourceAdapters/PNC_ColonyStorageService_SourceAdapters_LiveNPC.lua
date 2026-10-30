@@ -13,8 +13,6 @@ local H = Internal.SourceAdaptersInternal
 local CoreInventory = Internal.CoreInventory
 local ItemRecord =
     require "PsychopatzCore/Inventory/PsychopatzItemRecord"
-local StateCodec = require
-    "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec"
 
 function Internal.LiveNPCSource(record, item, quantity, body)
     local container = body and body.getInventory and body:getInventory() or nil
@@ -85,8 +83,7 @@ function Internal.LiveNPCSource(record, item, quantity, body)
     function source:restoreRemoved(removed)
         local physicalOK = physical:restoreRemoved(removed)
         if self.undo then
-            record.inventory = self.undo
-            PNC.Inventory.RebuildCaches(record)
+            PNC.Inventory.RestoreSnapshot(record, self.undo)
         end
         return physicalOK
     end

@@ -90,15 +90,13 @@ local function looksLikeRangedWeapon(weaponItem, fullType)
         return true
     end
     if PNC.Equipment
-        and PNC.Equipment.Internal
-        and PNC.Equipment.Internal.buildWeaponDescriptor
+        and PNC.Equipment.DescribeWeapon
         and normalized ~= ""
     then
         local ok
         ok, descriptor = pcall(
-            PNC.Equipment.Internal.buildWeaponDescriptor,
-            fullType or weaponFullType(weaponItem),
-            false
+            PNC.Equipment.DescribeWeapon,
+            fullType or weaponFullType(weaponItem)
         )
         if ok and descriptor and descriptor.hasUsableFirearm == true then
             return true

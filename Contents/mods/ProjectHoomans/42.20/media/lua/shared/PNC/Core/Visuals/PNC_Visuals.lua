@@ -270,10 +270,9 @@ local function applyBaseOutfitItems(zombie, appearance)
         then
             item, reason = equipment.CreateItem(fullType)
             if item then
-                if visualState and equipment.Internal
-                    and equipment.Internal.applyItemVisualState
+                if visualState and equipment.ApplyItemVisualState
                 then
-                    equipment.Internal.applyItemVisualState(item, visualState)
+                    equipment.ApplyItemVisualState(item, visualState)
                 end
                 safeSetWornItem(zombie, item)
             elseif reason and reason ~= "invalid_full_type" then

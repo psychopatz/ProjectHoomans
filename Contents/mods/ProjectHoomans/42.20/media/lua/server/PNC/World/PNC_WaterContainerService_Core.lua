@@ -15,7 +15,7 @@ local Events = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 local Inventory = PNC.Inventory
 local NearbyWater = PNC.NearbyWaterService
-local SupplyInternal = PNC.SupplyInventoryInternal
+local SupplyQueries = PNC.SupplyInventory and PNC.SupplyInventory.Queries
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local EPSILON = 0.0001
@@ -353,7 +353,7 @@ Service.Internal.Events = Events
 Service.Internal.EventTypes = EventTypes
 Service.Internal.Inventory = Inventory
 Service.Internal.NearbyWater = NearbyWater
-Service.Internal.SupplyInternal = SupplyInternal
+Service.Internal.SupplyQueries = SupplyQueries
 Service.Internal.Diagnostics = Diagnostics
 Service.Internal.EPSILON = EPSILON
 Service.Internal.call = call

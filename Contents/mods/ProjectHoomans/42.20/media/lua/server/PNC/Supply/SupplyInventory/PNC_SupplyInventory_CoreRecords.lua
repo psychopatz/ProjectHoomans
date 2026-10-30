@@ -15,8 +15,7 @@ local CoreInventory =
     require "PsychopatzCore/Inventory/PsychopatzInventory"
 local ItemRecord =
     require "PsychopatzCore/Inventory/PsychopatzItemRecord"
-local StateCodec = require
-    "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec"
+local ItemState = require "PNC/Core/Inventory/PNC_InventoryItemState"
 local C = require
     "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 local Util = require
@@ -26,7 +25,7 @@ local EventTypes =
     require "PNC/Core/Events/PNC_EventDefinitions"
 
 function H.CloneSpec(record)
-    local spec = StateCodec.readState(record)
+    local spec = ItemState.Decode(record)
     spec.type = CoreInventory.getItemFullType(record[C.TYPE_ID])
     spec.stack = record[C.QUANTITY]
     spec.container = "root"
@@ -124,8 +123,7 @@ function SupplyInventory.CreateDestination(record, reason)
             body:getInventory()
         ) or nil
         if physical then H.RemoveNativeList(physical, self.physicalItems) end
-        record.inventory = self.inventoryUndo
-        InventoryCommands.RebuildCaches(record)
+        InventoryCommands.RestoreSnapshot(record, self.inventoryUndo)
         self.rolledBack = true
         return true, {}
     end

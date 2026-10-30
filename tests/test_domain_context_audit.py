@@ -2,7 +2,7 @@
 import unittest
 
 from tools.domain_context_audit import components
-from tools.domain_contracts import inspect, compare_debt
+from tools.domain_contracts import inspect, compare_debt, private_accesses
 
 
 class CycleEvidenceTests(unittest.TestCase):
@@ -88,6 +88,23 @@ class ContractBoundaryTests(unittest.TestCase):
         self.policy['domains']['Supply'] = {'entries': [], 'namespace': 'PNC.Inventory'}
         result = inspect({'Inventory/Public.lua': 'Inventory'}, [], self.policy)
         self.assertIn('COMPETING_AUTHORITY', {v['rule'] for v in result['issues']})
+
+    def test_private_namespace_aliases_are_checked(self):
+        policy = {'private_roots': {'PNC.Inventory.Internal': 'Inventory'}}
+        source = 'local Inventory = PNC.Inventory\nreturn Inventory.Internal.getItemWeight()\n'
+        accesses = private_accesses(source, 'Supply', policy)
+        self.assertEqual([(a['target'], a['line']) for a in accesses],
+                         [('PNC.Inventory.Internal', 2)])
+        self.assertEqual(private_accesses(source, 'Inventory', policy), [])
+
+    def test_private_names_in_strings_and_comments_are_not_edges(self):
+        policy = {'private_roots': {'PNC.Inventory.Internal': 'Inventory'}}
+        source = '''-- PNC.Inventory.Internal
+local example = "PNC.Inventory.Internal"
+--[=[ PNC.Inventory.Internal ]=]
+return PNC.Inventory.Queries
+'''
+        self.assertEqual(private_accesses(source, 'UI', policy), [])
 
 
 if __name__ == '__main__':

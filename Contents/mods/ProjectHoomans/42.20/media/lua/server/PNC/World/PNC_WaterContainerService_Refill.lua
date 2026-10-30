@@ -9,7 +9,7 @@ local Events = Internal.Events
 local EventTypes = Internal.EventTypes
 local Inventory = Internal.Inventory
 local NearbyWater = Internal.NearbyWater
-local SupplyInternal = Internal.SupplyInternal
+local SupplyQueries = Internal.SupplyQueries
 local EPSILON = Internal.EPSILON
 local call = Internal.call
 local objectType = Internal.objectType
@@ -116,13 +116,13 @@ function Service.Refill(record, itemID, source)
     then
         return fail("WATER_FILL_SOURCE_UNAVAILABLE")
     end
-    selected = SupplyInternal and SupplyInternal.NativeCandidates
-        and SupplyInternal.NativeCandidates(body, item) or {}
+    selected = SupplyQueries and SupplyQueries.NativeCandidates
+        and SupplyQueries.NativeCandidates(body, item) or {}
     native = selected[1] and selected[1].item or nil
     if not native and Inventory.MaterializeItem then
         ok, _, materializeUndo = Inventory.MaterializeItem(record, body, item.id)
         if ok then
-            selected = SupplyInternal.NativeCandidates(body, item)
+            selected = SupplyQueries.NativeCandidates(body, item)
             native = selected[1] and selected[1].item or nil
         end
     end

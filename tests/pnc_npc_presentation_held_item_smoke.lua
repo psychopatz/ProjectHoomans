@@ -25,6 +25,7 @@ PNC = {
         CreateItem = function(fullType)
             if fullType ~= "Base.Apple"
                 and fullType ~= "Base.DoubleBarrelShotgun"
+                and fullType ~= "Base.CustomLauncher"
             then
                 return nil, "invalid_full_type"
             end
@@ -34,7 +35,7 @@ PNC = {
             }
             function item:getFullType() return self.fullType end
             function item:IsWeapon()
-                return self.fullType == "Base.DoubleBarrelShotgun"
+                return self.fullType ~= "Base.Apple"
             end
             function item:getEatType()
                 return self.fullType == "Base.Apple" and "Food" or nil
@@ -128,6 +129,9 @@ local body = {
 T.load(ACTION_PROPS)
 T.load(CLIENT_ACTION_PROPS)
 T.load(FILE)
+WeaponType = { FIREARM = 1, getWeaponType = function() return 1 end }
+T.load("ProjectHoomans", "shared",
+    "PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_Hands.lua")
 
 local Holder = PNC.NPCPresentationHeldItem
 T.equal(Holder.DefaultItem(), "Base.DoubleBarrelShotgun",
@@ -211,6 +215,18 @@ T.equal(primary.fullType, "Base.DoubleBarrelShotgun",
 T.equal(secondary.fullType, "Base.DoubleBarrelShotgun",
     "default shotgun occupies both hands")
 Holder.Disable("shotgun_test_done")
+
+-- Characterize the established debug selector independently of combat's
+-- classifier: an opaque type uses the one-handed presentation fallback.
+Holder.SetMode("equipment")
+Holder.SetRequestedType("Base.CustomLauncher")
+ok, reason = Holder.Enable(body, "held-npc", 0)
+T.truthy(ok, "opaque debug item can be equipped")
+T.equal(PNC.Equipment.Internal.resolvePrimaryType(primary), "rifle",
+    "combat classifier recognizes native firearm category")
+T.equal(Holder.GetState(body, "held-npc").primaryType, "onehanded",
+    "debug selector retains its established opaque-item fallback")
+Holder.Disable("opaque_item_test_done")
 
 Holder.SetRequestedType("Base.NotAnItem")
 ok, reason = Holder.Enable(body, "held-npc", 0)

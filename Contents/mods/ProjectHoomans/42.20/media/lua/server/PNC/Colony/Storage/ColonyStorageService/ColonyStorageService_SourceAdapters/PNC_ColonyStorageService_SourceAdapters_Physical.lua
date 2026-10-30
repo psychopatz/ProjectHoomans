@@ -13,8 +13,6 @@ local H = Internal.SourceAdaptersInternal
 local CoreInventory = Internal.CoreInventory
 local ItemRecord =
     require "PsychopatzCore/Inventory/PsychopatzItemRecord"
-local StateCodec = require
-    "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec"
 
 function Internal.PhysicalSelectionSource(items)
     local source = { revision = 0, items = items }

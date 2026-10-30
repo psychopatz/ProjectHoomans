@@ -135,9 +135,7 @@ PNC = {
             }
         end,
         ApplyHands = function() equippedHands = equippedHands + 1 end,
-        Internal = {
-            isNetworkedGame = function() return false end,
-        },
+        IsNetworkedGame = function() return false end,
     },
     SupplyInventory = {
         CreateDestination = function(record)

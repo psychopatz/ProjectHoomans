@@ -130,8 +130,7 @@ function SupplyInventory.Consume(record, itemID, request)
     effect.remainingUses = remainingUses
     effect.physicalProjectionMissing = false
     effect.undo = function()
-        record.inventory = inventoryUndo
-        InventoryCommands.RebuildCaches(record)
+        InventoryCommands.RestoreSnapshot(record, inventoryUndo)
         if physicalUndo then physicalUndo() end
         return true
     end

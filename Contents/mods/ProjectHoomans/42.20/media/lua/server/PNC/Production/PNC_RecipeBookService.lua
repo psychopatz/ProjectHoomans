@@ -89,10 +89,10 @@ local function returnBook(order, consumeOnRead)
 end
 
 local function nativeBook(input, body)
-    if not body or not PNC.SupplyInventoryInternal
-        or not PNC.SupplyInventoryInternal.NativeCandidates
+    local queries = PNC.SupplyInventory and PNC.SupplyInventory.Queries
+    if not body or not queries or not queries.NativeCandidates
     then return nil end
-    local candidates = PNC.SupplyInventoryInternal.NativeCandidates(
+    local candidates = queries.NativeCandidates(
         body, (input.records or {})[1])
     return candidates[1] and candidates[1].item or nil
 end

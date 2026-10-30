@@ -1,6 +1,6 @@
 # Progress — Domain & Context Architecture Refactor
 
-**Status:** IN PROGRESS — P0 and P1 ownership/enforcement established; P2 Inventory pilot audit is active.
+**Status:** IN PROGRESS — P2 Inventory capsule pilot developer-validated; P3 composition seams are next.
 
 ## Parent objective
 
@@ -34,44 +34,50 @@ P0 completion does not complete this goal. No production architecture changed ye
 - Architecture ownership/cycle/debt regression tests: **11/11**.
 - Probe rerun against P0: zero source/hop deltas.
 - `git diff --check`: clean. Runtime Lua unchanged, so no new runtime compile gate.
-- Full semantic-tooling unittest discovery is still running as an additional
-  tooling baseline; record its final result before the next production chunk.
+- Full in-process semantic-tooling baseline aborted with a pre-existing Tk
+  cleanup/thread failure (exit 134), before any production changes. An isolated
+  per-module retry runs against an immutable P1 archive; current baseline failures
+  are being collected and remain unaccepted final gates.
 - No native PZ launched; no Workshop publication.
 
 ## Current phase / next mandatory chunk
 
-**P2A — Inventory + Supply + Provision ownership and behavior freeze.**
+**P3 — Composition roots depend on domain registration seams.**
 
-P1 tooling is implemented and validated:
+P2 accepted evidence (`INVENTORY_PILOT.md`, `P2_VALIDATION.json`):
 
-- `DOMAIN_CONTRACTS.json`: 3,258 paths / 42 logical owners, runtime layers kept
-  separate; public pilot entries, canonical states and intended high-pressure seams.
-- `OWNERSHIP.md`: current navigation, boundaries and diagnostic limitations.
-- Guard result: no new debt; 208 pre-existing exact-endpoint violations remain:
-  173 cycle edges, 17 composition providers, 14 foreign pilot implementations,
-  4 domain-to-UI imports. These are migration work, not permanent waivers.
-- No literal foreign `Internal` or UI-to-gameplay-persistence imports found by
-  the current rule; lazy namespace writes still require domain-specific review.
-- Probe deltas remain zero. No production Lua changed.
-- MCP refreshed for tooling: 100,094 nodes / 410,733 edges; generation
-  `2026-10-30T08:14:09Z`. New tooling paths now match coverage metadata.
-- Source review rejects cross-language heuristic false callers for the Python
-  diagnostic (e.g. unrelated Lua `inspect`/`collect`); real callers are CLI/tests.
+- Inventory owns snapshot restoration and public item-state interop; foreign
+  codec imports removed (four real users migrated; eight unused bindings removed).
+- Equipment/Inventory/Supply queries and commands replace foreign private table
+  accesses in combat, authoring, scavenge, production, refill and compatibility.
+- Generic transfer owns gift replay; medical sharing stays independent. Deleted
+  the obsolete handler/handoff; both public command bodies match P0 exactly.
+- Full Lua **978/978**; focused **109/109**; diagnostics **13/13**;
+  installed PZ Kahlua **36/36**, static Kahlua **zero errors**, diff check clean.
+- Guard: zero new debt, fifteen resolved import/composition issues. Declared
+  foreign pilot private-root accesses: zero. Namespace alias coverage remains
+  bounded; source/MCP review is still required for arbitrary dynamic data flow.
+- Fixed probes now 36 unique files / 5,269 lines / 198,850 bytes: **-10,672 bytes**
+  versus P0. Transfer probe: 5 -> 4 files, 3 -> 2 handoffs, -10,976 bytes.
+- Small hub increases are explained in the pilot document; file count was not
+  used as a standalone acceptance target.
+- Existing semantic-tooling baseline is immutable at P1; isolated retry has
+  exposed pre-existing fact-transport/legacy-fixture failures. Complete/classify
+  its report and close those gates during Semantics/final acceptance.
 
 Next required work:
 
-1. Complete Inventory/Supply/Provision public seam/caller/state/rollback review.
-2. Finish recording the still-running additional semantic-tooling baseline
-   before production edits.
-3. Replace actual foreign codec/provider imports with owned public query seams;
-   remove unused provider imports only after exact source evidence.
-4. Preserve Inventory atomicity, native rollback, seed/delta/full persistence,
-   equipment and request payloads. Refine split/merge only with semantic evidence.
-5. Run focused + full Lua + installed-PZ/Kahlua checks for changed runtime,
-   dependency guard and relevant fixed probes; update progress and continue P3.
+1. Establish small registration entries for coherent ordered domain segments.
+2. Preserve exact expanded bootstrap order and partial SP/MP loader behavior;
+   do not collect interleaved providers early or add service-locator indirection.
+3. Migrate composition away from leaf knowledge using the proven pilot rules.
+4. Run composition/bootstrap, relevant focused tests, dependency/context guards
+   and changed-runtime installed-PZ/Kahlua checks, then continue P4 automatically.
+5. Before Presence/binding-related composition edits, preserve the inspected M12
+   identity/incarnation, loaded-envelope, restart and visual-authority contracts.
 
 ## Remaining gates
 
-P2–P8 remain mandatory; P1 enforcement must evolve with each accepted domain seam. Body-binding M12 native acceptance is user-owned and
+P3–P8 remain mandatory; enforcement evolves with each accepted domain seam. Body-binding M12 native acceptance is user-owned and
 must remain intact; inspect that job before changing its runtime paths.
 Historical refactor logs and root AGENTS remain unchanged.

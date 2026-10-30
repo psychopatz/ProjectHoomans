@@ -132,20 +132,32 @@
         "server/PNC/Server/PNC_ServerInventory.lua",
         "shared/PNC/Core/Equipment/PNC_Equipment.lua",
         "shared/PNC/Core/Inventory/InventoryActions/PNC_InventoryActions.lua",
-        "client/PNC/ActionProps/PNC_ClientActionProps.lua"
+        "client/PNC/ActionProps/PNC_ClientActionProps.lua",
+        "shared/PNC/Core/Inventory/PNC_InventoryItemState.lua",
+        "shared/PNC/Core/Equipment/PNC_Equipment_Items.lua"
       ],
       "commands": [
         "ApplyDelta",
         "AddItems",
         "RemoveItems",
         "ServerInventory.Transfer",
-        "ServerInventory.Action"
+        "ServerInventory.Action",
+        "RestoreSnapshot",
+        "Equipment.CreateItem",
+        "Equipment.ApplyPrimaryInventoryState",
+        "Equipment.ApplyItemVisualState"
       ],
       "queries": [
         "CanAccept",
         "BuildFullPayload",
         "BuildDeltaPayload",
-        "BuildSummaryPayload"
+        "BuildSummaryPayload",
+        "Queries.ItemState.Decode",
+        "Queries.ItemState.Encode",
+        "Queries.GetItemWeight",
+        "Queries.ToDefinitionSpec",
+        "Equipment.DescribeWeapon",
+        "Equipment.IsNetworkedGame"
       ],
       "repository": "Inventory.Serialize/Deserialize (seed/delta/full schema)",
       "layers": [
@@ -158,14 +170,16 @@
       "owns": "supply request/index/selection and atomic consumption; Inventory retains items",
       "namespace": "PNC.Supply",
       "entries": [
-        "server/PNC/Supply/PNC_Supply.lua"
+        "server/PNC/Supply/PNC_Supply.lua",
+        "server/PNC/Supply/PNC_SupplyInventory.lua"
       ],
       "commands": [
         "Commands",
         "Process"
       ],
       "queries": [
-        "Queries"
+        "Queries.FindPersonal",
+        "Queries.NativeCandidates"
       ],
       "repository": "domain supply request state; no shadow inventory",
       "layers": [
@@ -370,5 +384,11 @@
     "Diagnostics",
     "Presentation"
   ],
-  "debt_file": "DEPENDENCY_DEBT.json"
+  "debt_file": "DEPENDENCY_DEBT.json",
+  "private_roots": {
+    "PNC.Inventory.Internal": "Inventory",
+    "PNC.Equipment.Internal": "Inventory",
+    "PNC.ServerInventory.Internal": "Inventory",
+    "PNC.SupplyInventoryInternal": "Supply"
+  }
 }

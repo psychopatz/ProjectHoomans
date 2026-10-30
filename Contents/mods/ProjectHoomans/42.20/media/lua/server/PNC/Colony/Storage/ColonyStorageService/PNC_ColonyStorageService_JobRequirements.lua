@@ -184,9 +184,9 @@ local function applyEquipment(record, itemID, body, physicalItem)
         record, itemID, "debug_job_requirements")
     if not equipped then return false, reason or "equip_failed" end
     if body and physicalItem
-        and PNC.Equipment and PNC.Equipment.Internal
-        and type(PNC.Equipment.Internal.isNetworkedGame) == "function"
-        and PNC.Equipment.Internal.isNetworkedGame() ~= true
+        and PNC.Equipment
+        and type(PNC.Equipment.IsNetworkedGame) == "function"
+        and PNC.Equipment.IsNetworkedGame() ~= true
         and type(body.setPrimaryHandItem) == "function"
     then
         body:setPrimaryHandItem(physicalItem)
@@ -327,10 +327,7 @@ function Service.DebugSupplyJobRequirements(player, args)
             destinations[destinationIndex]:remove()
         end
         PNC.Inventory.EnsureRecordInventory(record)
-        record.inventory = inventoryBackup
-        if PNC.Inventory.RebuildCaches then
-            PNC.Inventory.RebuildCaches(record)
-        end
+        PNC.Inventory.RestoreSnapshot(record, inventoryBackup)
         restoreInventory(storage, backup)
     end
 

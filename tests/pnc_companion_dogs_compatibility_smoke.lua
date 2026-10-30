@@ -174,6 +174,7 @@ PNC = {
     },
     SupplyInventory = {
         Queries = {
+            NativeCandidates = function() return { { item = nativeFood } } end,
             FindPersonal = function()
                 return { {
                     itemID = "food-one",
@@ -187,9 +188,6 @@ PNC = {
                 return true, "consumed", { undo = function() return true end }
             end,
         },
-    },
-    SupplyInventoryInternal = {
-        NativeCandidates = function() return { { item = nativeFood } } end,
     },
     Network = {
         SendSocialGreeting = function(_, payload)

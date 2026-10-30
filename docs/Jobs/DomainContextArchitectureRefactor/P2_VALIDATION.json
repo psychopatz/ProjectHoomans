@@ -1,0 +1,262 @@
+{
+  "source_anchor": "24d61abcda34f15069cabb8de3112675e86cc89f",
+  "phase": "P2 Inventory + Supply + Provision pilot",
+  "full_lua": {
+    "passed": 978,
+    "total": 978,
+    "seconds": 15.15
+  },
+  "focused_matrix": {
+    "passed": 109,
+    "total": 109,
+    "seconds": 0.8
+  },
+  "diagnostic_tests": {
+    "passed": 13,
+    "total": 13
+  },
+  "installed_kahlua": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 36,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  },
+  "static_kahlua": {
+    "files": 36,
+    "errors": 0
+  },
+  "source_parity": {
+    "Service.Transfer": "exact function-body text equality with P0",
+    "Service.TransferMedicalBandageForTask": "exact function-body text equality with P0"
+  },
+  "dependency_guard": {
+    "new": [],
+    "resolved_count": 15,
+    "remaining_count": 193,
+    "declared_foreign_private_namespace_accesses": 0
+  },
+  "retrieval": {
+    "aggregate_unique": {
+      "files": 36,
+      "bytes": 198850,
+      "lines": 5269
+    },
+    "aggregate_delta": {
+      "files": -1,
+      "bytes": -10672,
+      "lines": -261
+    },
+    "delta": {
+      "inventory_transfer": {
+        "file_count": -1,
+        "source_bytes": -10976,
+        "source_lines": -267,
+        "hops": -1
+      },
+      "task_lease": {
+        "file_count": 0,
+        "source_bytes": 0,
+        "source_lines": 0,
+        "hops": 0
+      },
+      "conversation_close": {
+        "file_count": 0,
+        "source_bytes": 0,
+        "source_lines": 0,
+        "hops": 0
+      },
+      "persisted_inventory": {
+        "file_count": 0,
+        "source_bytes": 304,
+        "source_lines": 6,
+        "hops": 0
+      },
+      "ui_inventory_rows": {
+        "file_count": 0,
+        "source_bytes": 0,
+        "source_lines": 0,
+        "hops": 0
+      },
+      "presence_materialization": {
+        "file_count": 0,
+        "source_bytes": 0,
+        "source_lines": 0,
+        "hops": 0
+      },
+      "network_inventory": {
+        "file_count": 0,
+        "source_bytes": 71,
+        "source_lines": 1,
+        "hops": 0
+      }
+    }
+  },
+  "compatibility": {
+    "removed": [
+      "PNC_ServerInventory_Transfer_Handle.lua",
+      "ServerInventory.Internal.Transfer handoff",
+      "eight unused foreign codec bindings"
+    ],
+    "retained": [
+      "PNC.Inventory legacy public methods and Commands aliases",
+      "PNC.ServerInventory.Transfer / TransferMedicalBandageForTask",
+      "PNC.Equipment native item-factory entry",
+      "SupplyInventory Commands/Queries public subdomain",
+      "seed/delta/full serialization and all current command/payload names"
+    ]
+  },
+  "performance_persistence": "No saved fields, queues, scans, budgets, cadence or item-copy operations added. Existing transaction snapshot identity/revision and native rollback order preserved. One bounded value-adapter call added to item encoding; decoder is the same function reference. Public queries reuse owned implementations.",
+  "remaining_baseline_gate": "Immutable isolated semantic-tooling baseline is running; pre-existing failures are not accepted final gates. See P0 baseline.",
+  "runtime_files": [
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Debug/NPCPresentationDebug/PNC_NPCPresentationDebug_HeldItem.lua",
+      "sha256": "f9d30616a4f304a1e6ddd095ddf04ccd69b4d739097096cbac91829c8467f8a2"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Debug/PNC_AnimationDebugPlayer_Equipment.lua",
+      "sha256": "d6e846f9ba455e50a66f0fec52b60016c8b0ab036a541ae61665ebdb37290e2c"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel_Core.lua",
+      "sha256": "de70080a4a9cdb242602d5a5ce942ee5645f5b68c5bfe52ae89cf42fe520904c"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_AbstractNPC.lua",
+      "sha256": "24c9d800d56a81b35668d2dad7aaf19b1d3970f337839cd1710d7aaccc5e438a"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_LiveNPC.lua",
+      "sha256": "9690b7897ebbe613ecf68083507e9a50bcf1533a09cd25f2655e90c0bbed04ec"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_NPCBulk.lua",
+      "sha256": "a721627167d0dfe4e1a48f076ebc726153b46cf1b9315ce1aea7fe11de9a3e82"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_Physical.lua",
+      "sha256": "f9ce17334cd2e7a2bb724dabff359c45a02b10fc51a0ada5f53bab638e750fd8"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_Player.lua",
+      "sha256": "7e496fa671335f2b77e3b0666c18cc578e13b5c08922d2b3b180a07cef077247"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/ColonyStorageService/ColonyStorageService_SourceAdapters/PNC_ColonyStorageService_SourceAdapters_Storage.lua",
+      "sha256": "81ac850ff2f867d9958d7e0eb519ebf0e8273cfacdeb24bcaf5b390c0472185d"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_JobRequirements.lua",
+      "sha256": "f0104a562b935022333808131fa571b09631d1cde8d1b1252926f46cfe0e0643"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Lumber/LumberService/PNC_LumberService_Tools_Live.lua",
+      "sha256": "c097e5c7dee6d2e8cc0f443b534970165971e0d06683c5013f45fdb42b8edd56"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_RecipeBookService.lua",
+      "sha256": "0d35dfcac4a965fe23d805794fbec88196cbdefc1d91543387b3a64e146634df"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/ScavengeExecutor/PNC_ScavengeExecutor_Claims.lua",
+      "sha256": "fe9a882fbc936bae1664f523f748387ca335e65c2de666e76e0c0d32fa95351a"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Server/PNC_ServerInventory.lua",
+      "sha256": "f91bff96c94e41e57ba0650b88dfa09ebeb65f8593e7f220a689d12c93d34d08"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Server/ServerInventory/PNC_ServerInventory_MedicalSupply.lua",
+      "sha256": "8b901711ac219e78af3e6e9a9293fb70e898de63aea7f953fd787c54e8023bfb"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Server/ServerInventory/PNC_ServerInventory_Transfer.lua",
+      "sha256": "57ac47938952a75e6be664b448af1d4e5ba34768ec8d6aa74d13541a848a0087"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/ItemUtility/PNC_ItemUtility_Descriptors.lua",
+      "sha256": "32ff018ecdde4b67aa308364324a795a27c9d9a401f88d7f72f8f794300c9deb"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/PNC_ItemUtility.lua",
+      "sha256": "efb9b4eead80a6e6a23c1e282a4312daaedf51e7f90c22b76a708d52d3c2b62a"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/PNC_SupplyInventory.lua",
+      "sha256": "cbb34430634925a517e6cc178827f13cf83d4d7ee6df3320349e2483123fbee1"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_Consumption_Core.lua",
+      "sha256": "82f4eb9853b36e467bbcf222db49bd6cd5310b809625ba6985f207f551ec7564"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_Consumption_Transaction.lua",
+      "sha256": "a0431c8dd331f7178d8f14651d95a2ea3482e36a6cab13af267fa96915f4ee94"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_CoreRecords.lua",
+      "sha256": "27866b84c2698ca3e0e67ea2855d10ce2d5d0c9c4ce0fda84a38694a03f08cd0"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_NativeMatching.lua",
+      "sha256": "e845f5dd966e39d3b16ee52afc6e06ecbd999923e8d9b87c5f6c33724e195735"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_PersonalQueries.lua",
+      "sha256": "b62019fa2e8c8c36ddef67a52ea820b36faeea102e2ebc7932c53c32597fadfc"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Supply/SupplyInventory/PNC_SupplyInventory_Removal.lua",
+      "sha256": "ab3ee596ad3c8e5680cad7d908146436a8d14c01df3da22640912c72d38b666a"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_WaterContainerService_Admission.lua",
+      "sha256": "4c6acaaf3a1c118ecee6c9db4881bade7303d41604bdb24092e56a0ac8b2393c"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_WaterContainerService_Core.lua",
+      "sha256": "45ca2a1f8971421a9b83422f26b94bcf5b0af3e945dce0b17bbc273f5fc9e5c8"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_WaterContainerService_Refill.lua",
+      "sha256": "3245ab402484764e41c6d91b5f1a126dcae26fa9cfc8b392412dc833f91ac203"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/CombatResolution/PNC_CombatResolution_HitEvent.lua",
+      "sha256": "0087015ed408b2df0d96e6a7ef67ef89035daaebf5454de7f7bd60617b04f88c"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat.lua",
+      "sha256": "2130bd674bcbf97cdc5def9ecdfc705f59b59b27207e3e3bd2ac74868c28de20"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/Mods/CompanionDogs/PNC_CompanionDogs_Feed.lua",
+      "sha256": "9c43bfa804550c3f9a8b9f0b9fb5168a1c56b5cb63bc00e519466ce770ecda8e"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Equipment/PNC_Equipment.lua",
+      "sha256": "22f32800296c99c6027d5afc314f6890107be06e99ab52e08e8071f378469ed2"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Inventory/PNC_Inventory.lua",
+      "sha256": "1e943e29e9d52876ad14d69eec47265338033f106c9ea8118f42c0d04ffa862d"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Mutations.lua",
+      "sha256": "135cdf8a63b0d080cd596af569403a78fe9ec435c37bb9dbf5e0bc0f6e50079b"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Inventory/PNC_InventoryItemState.lua",
+      "sha256": "4ae014f41493e1b5d8341edd66a421cd367c9a79c64f7949cbad323d6c49bbff"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_Visuals.lua",
+      "sha256": "1aa854d906d0ffbd3977ea5211c5af5a9ace65cc4097d01894c443c1828b275f"
+    }
+  ]
+}

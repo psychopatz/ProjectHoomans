@@ -6,6 +6,7 @@ Domain migrations must also review source and MCP call/data relationships.
 from collections import Counter, defaultdict
 from fnmatch import fnmatchcase
 from pathlib import PurePosixPath
+import re
 
 def components(graph):
     """Iterative Kosaraju, including target-only vertices."""
@@ -55,6 +56,35 @@ def is_private(path):
     return any(part == 'Internal' or part.endswith('_Internal')
                or '_Internal_' in part
                for part in PurePosixPath(path).with_suffix('').parts)
+
+
+def private_accesses(source, source_owner, policy):
+    """Bounded lexical supplement for declared private roots and direct aliases.
+
+    This deliberately does not pretend to resolve arbitrary Lua data flow.
+    """
+    def blank(match):
+        return '\n' * match.group().count('\n')
+
+    code = re.sub(r'--\[(=*)\[.*?\]\1\]', blank, source, flags=re.S)
+    code = re.sub(r'"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'', blank, code, flags=re.S)
+    code = re.sub(r'\[(=*)\[.*?\]\1\]', blank, code, flags=re.S)
+    code = re.sub(r'--[^\n]*', '', code)
+    result = []
+    for private, target_owner in policy.get('private_roots', {}).items():
+        if target_owner == source_owner:
+            continue
+        parent, member = private.rsplit('.', 1)
+        names = {private}
+        aliases = re.findall(r'\blocal\s+(\w+)\s*=\s*' + re.escape(parent)
+                             + r'(?![\w.])', code)
+        names.update(alias + '.' + member for alias in aliases)
+        pattern = r'(?<![\w.])(?:' + '|'.join(re.escape(n) for n in names) + r')\b'
+        for line, text in enumerate(code.splitlines(), 1):
+            if re.search(pattern, text):
+                result.append({'rule': 'FOREIGN_PRIVATE_NAMESPACE', 'target': private,
+                               'line': line, 'detail': f'{source_owner} -> {target_owner}'})
+    return result
 
 
 def inspect(paths, edges, policy):

@@ -14,7 +14,6 @@ local Controller = PNC.NPCPresentationHeldItem
 if require then
     require "PNC/ActionProps/PNC_ClientActionProps"
     require "PNC/Core/Equipment/PNC_Equipment_Items"
-    require "PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_Hands"
 end
 
 local DEFAULT_ITEM = "Base.DoubleBarrelShotgun"
@@ -67,14 +66,7 @@ local function saveVariable(body, variables, name)
 end
 
 local function primaryTypeFor(item)
-    local equipment = PNC.Equipment
-    local internal = equipment and equipment.Internal or nil
-    local resolved
     local lowerType = string.lower(itemFullType(item) or "")
-    if internal and type(internal.resolvePrimaryType) == "function" then
-        resolved = readMethod(internal, "resolvePrimaryType", item)
-        if resolved and resolved ~= "barehand" then return tostring(resolved) end
-    end
     if string.find(lowerType, "pistol", 1, true)
         or string.find(lowerType, "revolver", 1, true)
     then

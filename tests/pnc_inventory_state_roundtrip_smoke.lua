@@ -26,6 +26,8 @@ T.load("ProjectHoomans", "shared",
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 local StateCodec = T.load("ProjectHoomans", "shared",
     "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec.lua")
+local ItemState = T.load("ProjectHoomans", "shared",
+    "PNC/Core/Inventory/PNC_InventoryItemState.lua")
 
 local raw = {
     condition = 0,
@@ -83,17 +85,21 @@ T.truthy(networkPayload.itemState.fluids,
 T.equal(networkPayload.itemState.modData, nil,
     "network state omits arbitrary modData")
 
-local spec = StateCodec.readState({
+local encodedFluid = {
     [C.FLAGS] = C.FLAG_FLUID,
     [C.STATE] = { {
         fluidAmount = 1.0,
         fluidType = "Water",
         fluids = { { type = "Water", amount = 1.0 } },
     } },
-})
+}
+local spec = ItemState.Decode(encodedFluid)
 T.equal(spec.itemState.fluidType, "Water", "fluid delta state decoded")
 T.equal(spec.itemState.fluids[1].amount, 1.0,
     "fluid component delta state decoded")
+spec.itemState.fluids[1].amount = 0.25
+T.equal(encodedFluid[C.STATE][1].fluids[1].amount, 1.0,
+    "public item-state query does not mutate the source record")
 
 PNC.Const.INVENTORY_OPLOG_MAX = 8
 PNC.Inventory.EnsureRecordInventory = function(record)

@@ -16,19 +16,11 @@ PNC = {
     Registry = {},
     Perception = {},
     Equipment = {
-        Internal = {
-            buildWeaponDescriptor = function(fullType)
-                local firearm = string.find(
-                    tostring(fullType or ""),
-                    "Pistol",
-                    1,
-                    true
-                ) ~= nil
-                return {
-                    hasUsableFirearm = firearm,
-                }
-            end,
-        },
+        DescribeWeapon = function(fullType)
+            local firearm = string.find(
+                tostring(fullType or ""), "Pistol", 1, true) ~= nil
+            return { hasUsableFirearm = firearm }
+        end,
         CreateItem = function(fullType)
             return item(fullType, "melee_swing")
         end,

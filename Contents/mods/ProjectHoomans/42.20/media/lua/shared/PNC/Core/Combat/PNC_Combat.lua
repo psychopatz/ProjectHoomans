@@ -295,10 +295,9 @@ function Internal.isFirearmWeapon(record, weaponItem, equipmentInfo)
         or (record and record.equipment and record.equipment.primaryFullType)
     if fullType
         and Equipment
-        and Equipment.Internal
-        and Equipment.Internal.buildWeaponDescriptor
+        and Equipment.DescribeWeapon
     then
-        descriptor = Equipment.Internal.buildWeaponDescriptor(fullType, false)
+        descriptor = Equipment.DescribeWeapon(fullType)
         return descriptor and descriptor.hasUsableFirearm == true
     end
     return false

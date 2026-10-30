@@ -30,15 +30,6 @@ local function findRangedInventoryItem(body)
 end
 
 local function primaryTypeForItem(item)
-    local equipment = PNC.Equipment
-    local internal = equipment and equipment.Internal or nil
-    local primaryType
-    if internal and internal.resolvePrimaryType then
-        primaryType = readValue(internal, "resolvePrimaryType", item)
-        if primaryType == "handgun" or primaryType == "rifle" then
-            return primaryType
-        end
-    end
     if string.find(string.lower(itemFullType(item) or ""), "pistol", 1, true)
         or string.find(string.lower(itemFullType(item) or ""), "revolver", 1, true)
     then

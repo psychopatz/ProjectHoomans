@@ -12,4 +12,9 @@ require "PNC/Supply/SupplyInventory/PNC_SupplyInventory_Consumption"
 require "PNC/Supply/SupplyInventory/PNC_SupplyInventory_Removal"
 require "PNC/Supply/SupplyInventory/PNC_SupplyInventory_PersonalQueries"
 
+local SupplyInventory = PNC.SupplyInventory
+SupplyInventory.Queries = SupplyInventory.Queries or {}
+SupplyInventory.Queries.NativeCandidates = PNC.SupplyInventoryInternal
+    and PNC.SupplyInventoryInternal.NativeCandidates
+
 return PNC.SupplyInventory

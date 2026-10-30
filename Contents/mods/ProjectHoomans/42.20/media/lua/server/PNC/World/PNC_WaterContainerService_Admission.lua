@@ -5,7 +5,7 @@ local Service = PNC and PNC.WaterContainerService
 if not Service then return end
 local Internal = Service.Internal or {}
 local Inventory = Internal.Inventory
-local SupplyInternal = Internal.SupplyInternal
+local SupplyQueries = Internal.SupplyQueries
 local EPSILON = Internal.EPSILON
 local logRefillAdmission = Internal.logRefillAdmission
 local liveBody = Internal.liveBody
@@ -59,8 +59,8 @@ function Service.CanRefill(record, itemID)
     if not item then return result(false, compactDescription) end
     body = liveBody(record)
     if not body then return result(false, "NPC_BODY_UNAVAILABLE") end
-    selected = SupplyInternal and SupplyInternal.NativeCandidates
-        and SupplyInternal.NativeCandidates(body, item) or {}
+    selected = SupplyQueries and SupplyQueries.NativeCandidates
+        and SupplyQueries.NativeCandidates(body, item) or {}
     native = selected[1] and selected[1].item or nil
     if not native then
         return result(false, "WATER_CONTAINER_PHYSICAL_MISSING")

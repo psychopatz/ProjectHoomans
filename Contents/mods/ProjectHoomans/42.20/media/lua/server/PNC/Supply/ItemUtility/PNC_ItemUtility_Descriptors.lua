@@ -5,7 +5,7 @@ local Utility = PNC.ItemUtility
 local H = Utility.Internal
 local CoreInventory = H.CoreInventory
 local C = H.Constants
-local StateCodec = H.StateCodec
+local ItemState = H.ItemState
 local Portable = require "PsychopatzCore/Inventory/PsychopatzPortableItemState"
 
 local function clampFraction(value)
@@ -172,7 +172,7 @@ end
 function Utility.DescribeCoreRecord(record)
     if type(record) ~= "table" then return nil end
     local typeID = tonumber(record[C.TYPE_ID])
-    local spec = StateCodec.readState(record)
+    local spec = ItemState.Decode(record)
     local state = type(spec.itemState) == "table" and spec.itemState or {}
     if spec.uses ~= nil then state.usedDelta = spec.uses end
     return H.Describe(Utility.GetStatic(typeID), state, record[C.QUANTITY])

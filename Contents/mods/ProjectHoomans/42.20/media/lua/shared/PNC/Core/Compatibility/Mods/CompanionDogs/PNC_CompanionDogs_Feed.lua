@@ -10,7 +10,6 @@ PNC.Compatibility.CompanionDogs = Bridge
 local function findDogFood(record, body, dog)
     local supply = PNC.SupplyInventory
     local queries = supply and supply.Queries
-    local supplyInternal = PNC.SupplyInventoryInternal
     local cd = Internal.CompanionDogs()
     local request
     local candidates
@@ -27,8 +26,7 @@ local function findDogFood(record, body, dog)
     local breedOK
     local dogHunger
     if not queries or type(queries.FindPersonal) ~= "function"
-        or not supplyInternal
-        or type(supplyInternal.NativeCandidates) ~= "function"
+        or type(queries.NativeCandidates) ~= "function"
         or not cd or type(cd.computeBite) ~= "function"
     then
         return nil
@@ -46,7 +44,7 @@ local function findDogFood(record, body, dog)
     if not ok or type(candidates) ~= "table" then return nil end
     for index = 1, #candidates do
         candidate = candidates[index]
-        nativeCandidates = supplyInternal.NativeCandidates(
+        nativeCandidates = queries.NativeCandidates(
             body, candidate and candidate.item)
         native = nativeCandidates and nativeCandidates[1]
             and nativeCandidates[1].item or nil

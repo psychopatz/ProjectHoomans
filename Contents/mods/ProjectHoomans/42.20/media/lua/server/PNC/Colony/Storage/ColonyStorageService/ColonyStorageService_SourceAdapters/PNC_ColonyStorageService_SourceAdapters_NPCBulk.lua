@@ -13,8 +13,6 @@ local H = Internal.SourceAdaptersInternal
 local CoreInventory = Internal.CoreInventory
 local ItemRecord =
     require "PsychopatzCore/Inventory/PsychopatzItemRecord"
-local StateCodec = require
-    "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec"
 
 function Internal.NPCBulkSource(record)
     local inventory = PNC.Inventory.EnsureRecordInventory(record)

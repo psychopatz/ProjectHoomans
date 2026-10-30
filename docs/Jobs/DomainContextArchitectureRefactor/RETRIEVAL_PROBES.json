@@ -10,7 +10,6 @@
         "server/PNC/Server/PNC_ServerInventory.lua",
         "server/PNC/Server/ServerInventory/PNC_ServerInventory_Context.lua",
         "server/PNC/Server/ServerInventory/PNC_ServerInventory_Transfer.lua",
-        "server/PNC/Server/ServerInventory/PNC_ServerInventory_Transfer_Handle.lua",
         "server/PNC/Server/ServerInventory/PNC_ServerInventory_PlayerToNPC.lua"
       ],
       "foreign": [
@@ -20,7 +19,7 @@
         "Medical",
         "Tasking"
       ],
-      "hops": 3,
+      "hops": 2,
       "tests": [
         "tests/pnc_inventory_transactions_smoke.lua",
         "tests/pnc_inventory_transfer_rollback_smoke.lua",

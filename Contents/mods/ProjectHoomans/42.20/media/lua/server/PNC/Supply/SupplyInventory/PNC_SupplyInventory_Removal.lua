@@ -15,8 +15,6 @@ local CoreInventory =
     require "PsychopatzCore/Inventory/PsychopatzInventory"
 local ItemRecord =
     require "PsychopatzCore/Inventory/PsychopatzItemRecord"
-local StateCodec = require
-    "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec"
 local C = require
     "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 local Util = require

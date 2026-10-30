@@ -114,7 +114,14 @@ source hashes; rerun the architecture scan first to discover added/deleted files
 - `python3 tests/run_tests.py`: **978/978**, isolated Lua processes, 4 workers,
   8.92 seconds. Runtime versions discovered by the repository runner.
 - `python3 -m unittest discover -s tools/unique_npc_manager/tests -q`: **6/6**.
-- Full semantic tooling discovery is tracked separately until its run completes.
+- Full in-process semantic tooling discovery aborted before a summary with
+  `Tcl_AsyncDelete: async handler deleted by the wrong thread` after repeated
+  Tk Variable cleanup errors, with production source unchanged. Exit 134.
+- Retry uses one Python process per module against an immutable P1 archive
+  (production identical to P0), not the migrating worktree. It already exposes
+  pre-existing assertions counting `SemanticInteractionLifecycle` fact traffic
+  as gameplay dispatch, plus stale category/choice fixtures. Record its complete
+  result and classify every failure before final acceptance; none are waived.
 - No runtime Lua changed in P0; installed-PZ compile is required when runtime
   changes begin. No native game launched or Workshop publication performed.
 

@@ -167,9 +167,8 @@ local function materializeLiveTool(record, body)
     if not item then
         return nil, "lumber_tool_materialize_failed:" .. tostring(reason)
     end
-    local internal = equipment.Internal
-    if internal and type(internal.applyPrimaryInventoryState) == "function" then
-        internal.applyPrimaryInventoryState(item, record)
+    if type(equipment.ApplyPrimaryInventoryState) == "function" then
+        equipment.ApplyPrimaryInventoryState(item, record)
     end
     local added, addReason = addLiveItemToInventory(body, item)
     if not added then return nil, addReason end

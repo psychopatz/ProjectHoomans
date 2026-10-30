@@ -113,10 +113,12 @@ PNC.Registry = {
         getInventory = function() return {} end,
     } end,
 }
-PNC.SupplyInventoryInternal = {
-    NativeCandidates = function() return {
-        { item = destination, container = {} },
-    } end,
+PNC.SupplyInventory = {
+    Queries = {
+        NativeCandidates = function() return {
+            { item = destination, container = {} },
+        } end,
+    },
 }
 
 local sourceAmount = 2

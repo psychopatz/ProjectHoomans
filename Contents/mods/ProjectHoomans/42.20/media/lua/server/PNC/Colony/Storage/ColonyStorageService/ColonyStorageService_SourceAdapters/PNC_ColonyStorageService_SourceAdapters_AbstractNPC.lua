@@ -13,11 +13,10 @@ local H = Internal.SourceAdaptersInternal
 local CoreInventory = Internal.CoreInventory
 local ItemRecord =
     require "PsychopatzCore/Inventory/PsychopatzItemRecord"
-local StateCodec = require
-    "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec"
+local ItemState = require "PNC/Core/Inventory/PNC_InventoryItemState"
 
 function H.CompactPreview(item, quantity)
-    return CoreInventory.encodeItem(StateCodec.pseudoItem(item), quantity)
+    return ItemState.Encode(item, quantity)
 end
 
 function H.MutateCompactRemoval(record, item, quantity, reason)
@@ -49,8 +48,7 @@ function Internal.AbstractNPCSource(record, item, quantity)
     end
     function source:restoreRemoved()
         if not self.undo then return false end
-        record.inventory = self.undo
-        PNC.Inventory.RebuildCaches(record)
+        PNC.Inventory.RestoreSnapshot(record, self.undo)
         return true
     end
     return source

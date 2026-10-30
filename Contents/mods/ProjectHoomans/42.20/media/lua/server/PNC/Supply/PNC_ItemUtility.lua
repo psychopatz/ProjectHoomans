@@ -23,7 +23,7 @@ H.CoreInventory =
     require "PsychopatzCore/Inventory/PsychopatzInventory"
 H.Constants =
     require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
-H.StateCodec = require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec"
+H.ItemState = require "PNC/Core/Inventory/PNC_InventoryItemState"
 
 require "PNC/Supply/ItemUtility/PNC_ItemUtility_Core"
 require "PNC/Supply/ItemUtility/PNC_ItemUtility_StaticProfiles"

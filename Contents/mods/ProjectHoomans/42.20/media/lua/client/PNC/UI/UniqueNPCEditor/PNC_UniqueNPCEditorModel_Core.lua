@@ -143,8 +143,8 @@ local function exportItems(draft)
             local preferred = item.container ~= "root" and "bag" or nil
             local key = "editor:" .. tostring(Model.BuildID(draft))
                 .. ":" .. tostring(index)
-            local spec = Inventory.Internal.itemToDefinitionSpec
-                and Inventory.Internal.itemToDefinitionSpec(
+            local spec = Inventory.Queries and Inventory.Queries.ToDefinitionSpec
+                and Inventory.Queries.ToDefinitionSpec(
                     item, key, preferred)
                 or nil
             if spec then output[#output + 1] = spec end

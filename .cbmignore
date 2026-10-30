@@ -1,0 +1,7 @@
+# Generated architecture evidence is data, not executable symbol/call ownership.
+docs/Jobs/DomainContextArchitectureRefactor/P*_ARCHITECTURE.json
+docs/Jobs/DomainContextArchitectureRefactor/P*_MCP_TRACES.json
+docs/Jobs/DomainContextArchitectureRefactor/P*_RETRIEVAL.json
+docs/Jobs/DomainContextArchitectureRefactor/P*_VALIDATION.json
+docs/Jobs/DomainContextArchitectureRefactor/P0_TOOLING_BASELINE.json
+docs/Jobs/DomainContextArchitectureRefactor/DEPENDENCY_DEBT.json

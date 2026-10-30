@@ -17,7 +17,7 @@ import sys
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from tools.domain_contracts import components, inspect, compare_debt
+from tools.domain_contracts import components, inspect, compare_debt, private_accesses
 
 
 def collect(root, policy=None):
@@ -102,6 +102,11 @@ def collect(root, policy=None):
             [{'source': relative[p], 'target': relative[e['target']], 'line': e['line']}
              for p, f in runtime.items() for e in f['resolved_imports']
              if e['target'] in runtime], policy)
+        for path in runtime:
+            relative_path = relative[path]
+            source_owner = result['contracts']['path_owners'][relative_path]
+            for access in private_accesses((root / path).read_text(), source_owner, policy):
+                result['contracts']['issues'].append({'source': relative_path, **access})
     return result
 
 

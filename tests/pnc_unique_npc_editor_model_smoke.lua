@@ -10,7 +10,7 @@ end
 PNC = {
     Core = { DeepCopy = deepCopy },
     Identity = {},
-    Inventory = { Internal = {} },
+    Inventory = { Queries = {} },
     SkillCatalog = {
         Find = function(id)
             return tostring(id) == "Cooking" and { id = "Cooking" } or nil
@@ -32,7 +32,7 @@ PNC = {
     UniqueNPCs = {},
 }
 
-PNC.Inventory.Internal.itemToDefinitionSpec = function(item, key, preferred)
+PNC.Inventory.Queries.ToDefinitionSpec = function(item, key, preferred)
     local output = deepCopy(item)
     output.id = nil
     output.container = nil
