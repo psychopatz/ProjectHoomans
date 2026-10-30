@@ -4,6 +4,7 @@ PNC = PNC or {}
 local Binding = PNC.MultiplayerBodyBinding or {}
 PNC.MultiplayerBodyBinding = Binding
 local receipts = setmetatable({}, { __mode = "k" })
+local projectionKeys = setmetatable({}, { __mode = "k" })
 local session
 local revision = 0
 local diagnostics = { binds=0, unbinds=0, removes=0, lastReason="idle" }
@@ -76,6 +77,40 @@ end
 
 -- Exact removal proof is constructed from identity captured BEFORE engine
 -- detach/corpse conversion. Anonymous legacy hints deliberately fail closed.
+-- Build one coherent transport projection. Snapshot builders must not mix a
+-- freshly observed body online id with a stale record.liveBodyOnlineID cache:
+-- pure clients reject that tuple as internally inconsistent.
+function Binding.Projection(record)
+    local message = Binding.Build(record)
+    local onlineID = nil
+    local lease = record and record.runtime
+        and record.runtime.bodyLease or nil
+
+    if message and message.operation == "bind" then
+        onlineID = message.onlineId
+        lease = message.incarnation
+        if record then
+            record.liveBodyOnlineID = onlineID
+            local key = tostring(lease) .. ":" .. tostring(onlineID)
+            if projectionKeys[record] ~= key then
+                projectionKeys[record] = key
+                if PNC.Core and PNC.Core.LogInfo then
+                    PNC.Core.LogInfo(
+                        "PNC mp_body_binding_ready npc="
+                            .. tostring(record.id)
+                            .. " lease=" .. tostring(lease)
+                            .. " onlineID=" .. tostring(onlineID)
+                    )
+                end
+            end
+        end
+    elseif record and record.presenceState ~= PNC.Const.PRESENCE_LIVE then
+        lease = nil
+    end
+
+    return message, onlineID, lease
+end
+
 function Binding.Removal(npcId, incarnation, onlineId)
     if not isServer or isServer() ~= true or npcId == nil
         or type(incarnation) ~= "string" or incarnation == ""

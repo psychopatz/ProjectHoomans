@@ -61,8 +61,16 @@ function Network.FindZombieByOnlineID(onlineID)
         return nil
     end
     if PNC.WorldCensus and PNC.WorldCensus.FindByOnlineID then
-        return PNC.WorldCensus.FindByOnlineID(onlineID, Core.Now())
+        local cached = PNC.WorldCensus.FindByOnlineID(
+            onlineID,
+            Core.Now()
+        )
+        if cached then return cached end
     end
+    -- The census is intentionally bounded/observational and may not yet know
+    -- a freshly replicated remote zombie. For an exact requested online id,
+    -- fall through to the local engine list instead of treating a census miss
+    -- as proof that no replica exists.
     cell = getCell()
     if not cell or not cell.getZombieList then
         return nil

@@ -70,6 +70,8 @@ function Network.BuildSnapshot(record, inventorySummaryOverride)
     local medicalCareState = state.medicalCareState
     local needsSummary = state.needsSummary
     local attackMode = state.attackMode
+    local bodyBinding, liveBodyOnlineID, liveBodyLease =
+        BodyBinding.Projection(record)
     local snapshot = buildIdentityProjection(record, state)
     snapshot.residence = buildResidenceProjection(record)
     snapshot.commandFeedback = buildCommandFeedback(record)
@@ -140,10 +142,9 @@ function Network.BuildSnapshot(record, inventorySummaryOverride)
     snapshot.replicaSequence = record.runtime
         and record.runtime.replicaSequence or nil
     snapshot.liveBodyInstanceID = record.liveBodyInstanceID
-    snapshot.bodyBinding = BodyBinding.Build(record)
-    snapshot.liveBodyOnlineID = record.liveBodyOnlineID
-    snapshot.liveBodyLease = record.runtime
-        and record.runtime.bodyLease or nil
+    snapshot.bodyBinding = bodyBinding
+    snapshot.liveBodyOnlineID = liveBodyOnlineID
+    snapshot.liveBodyLease = liveBodyLease
     snapshot.aiState = aiState
     snapshot.inCombat = inCombat
     snapshot.attackMode = attackMode

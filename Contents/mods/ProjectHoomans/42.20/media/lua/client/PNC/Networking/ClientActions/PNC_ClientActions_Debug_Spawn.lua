@@ -41,6 +41,13 @@ return {
     end,
 
     spawn = function(player, args)
+        if isClient and isClient() == true then
+            if not player or not sendClientCommand then
+                return false, "network_unavailable"
+            end
+            sendClientCommand(player, Const.MODULE, Const.CMD_DEBUG, args)
+            return true, "request_sent"
+        end
         if not PNC.API or not PNC.API.Spawn then
             return nil, CONTINUE
         end

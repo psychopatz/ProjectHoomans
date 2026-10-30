@@ -52,7 +52,14 @@ function Client.SendDebug(action, payload)
     if not Client.CanUseDebug() then
         return false
     end
-    if Core.IsClientOnly and Core.IsClientOnly() and player then
+    -- Multiplayer debug mutations must always cross the authoritative
+    -- client-command boundary. Hosted/listen configurations may expose both
+    -- client and server capabilities to Lua; relying on IsClientOnly there can
+    -- execute a local-only spawn and leave the dedicated/server world unaware.
+    if isClient and isClient() == true and player then
+        if not sendClientCommand then
+            return false
+        end
         sendClientCommand(player, Const.MODULE, Const.CMD_DEBUG, args)
         return true
     end

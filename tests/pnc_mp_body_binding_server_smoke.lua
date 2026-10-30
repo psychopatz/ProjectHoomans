@@ -15,6 +15,18 @@ local md = { PNC_NPC = true, PNC_UUID = "a", PNC_BodyKind = "live",
     PNC_BodyLease = "lease_a" }
 live = { getModData = function() return md end,
     getOnlineID = function() return onlineID end }
+r.liveBodyOnlineID = 12
+local projected, projectedOnline, projectedLease = B.Projection(r)
+T.equal(projected.operation, "bind")
+T.equal(projected.onlineId, 50,
+    "binding projection did not use the current shell online id")
+T.equal(projectedOnline, 50,
+    "projection exposed stale cached online id")
+T.equal(projectedLease, "lease_a",
+    "projection exposed the wrong incarnation")
+T.equal(r.liveBodyOnlineID, 50,
+    "projection did not repair the authoritative online-id cache")
+
 local a = B.Build(r)
 T.equal(a.operation, "bind")
 T.equal(a.incarnation, "lease_a")

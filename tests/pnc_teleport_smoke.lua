@@ -65,6 +65,7 @@ T.equal(nativeTeleports[1].y, 13501.5, "single-player destination y")
 T.equal(coreTeleportCalls[1].x, 12001.5, "client delegated destination to Core")
 
 clientOnly = true
+isClient = function() return true end
 T.equal(PNC.Client.SendDebug("teleport_to_npc", { id = "far_npc" }), true,
     "multiplayer request accepted")
 T.equal(clientCommands[1].command, "DebugCommand", "multiplayer request reached PNC server")

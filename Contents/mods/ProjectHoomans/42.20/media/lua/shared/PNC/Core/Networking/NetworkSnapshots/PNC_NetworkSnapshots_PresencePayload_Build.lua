@@ -28,6 +28,9 @@ local buildCombatDebugDelta = H.BuildCombatDebugDelta
 function Network.BuildPresenceDelta(record)
     local aiState
     local inCombat
+    local bodyBinding
+    local liveBodyOnlineID
+    local liveBodyLease
     local now = Core.Now()
     local ownership = buildIdentityOwnershipSummary(record)
     local radioGear = Equipment and Equipment.RadioGear
@@ -42,6 +45,8 @@ function Network.BuildPresenceDelta(record)
         and PNC.Treatment.BuildMedicalCareSnapshot
         and PNC.Treatment.BuildMedicalCareSnapshot(record) or nil
     aiState, inCombat = resolveAIState(record)
+    bodyBinding, liveBodyOnlineID, liveBodyLease =
+        BodyBinding.Projection(record)
     local pathDebugState
     local lastPathDebugAt = record.runtime
         and tonumber(record.runtime.pathDebugReplicatedAt) or 0
@@ -105,9 +110,9 @@ function Network.BuildPresenceDelta(record)
         replicaSequence = record.runtime
             and record.runtime.replicaSequence or nil,
         liveBodyInstanceID = record.liveBodyInstanceID,
-        bodyBinding = BodyBinding.Build(record),
-        liveBodyOnlineID = record.liveBodyOnlineID,
-        liveBodyLease = record.runtime and record.runtime.bodyLease or nil,
+        bodyBinding = bodyBinding,
+        liveBodyOnlineID = liveBodyOnlineID,
+        liveBodyLease = liveBodyLease,
         aiState = aiState,
         activeBehavior = record.activeBehavior,
         inCombat = inCombat,
@@ -150,6 +155,8 @@ end
 function Network.BuildCombatDamageDelta(record)
     local health = record and record.health or {}
     local runtime = record and record.runtime or {}
+    local bodyBinding, liveBodyOnlineID, liveBodyLease =
+        BodyBinding.Projection(record)
     local wounds = PNC.NPCWounds
     local bodyHealth = wounds and wounds.BuildSnapshot
         and wounds.BuildSnapshot(record) or nil
@@ -181,9 +188,9 @@ function Network.BuildCombatDamageDelta(record)
         presenceRevision = record and record.presenceRevision or nil,
         replicaSequence = runtime.replicaSequence,
         liveBodyInstanceID = record and record.liveBodyInstanceID or nil,
-        bodyBinding = BodyBinding.Build(record),
-        liveBodyOnlineID = record and record.liveBodyOnlineID or nil,
-        liveBodyLease = runtime.bodyLease,
+        bodyBinding = bodyBinding,
+        liveBodyOnlineID = liveBodyOnlineID,
+        liveBodyLease = liveBodyLease,
     }
 end
 

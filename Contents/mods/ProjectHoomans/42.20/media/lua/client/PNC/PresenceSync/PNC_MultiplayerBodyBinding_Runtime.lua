@@ -1,6 +1,7 @@
 -- ClientPresenceSync adapter for the canonical binding protocol. All lookup
 -- admission passes through the reconciler; ModData below is post-bind cache.
 local Binding = require "PNC/PresenceSync/PNC_MultiplayerBodyBinding_Client"
+local Recovery = require "PNC/PresenceSync/PNC_MultiplayerBodyBinding_TargetedRecovery"
 local Runtime = {}
 local client
 local lastSweep = -250
@@ -45,6 +46,14 @@ local function getClient()
                 s.BodyByLease[entry.npcId .. ":" .. entry.incarnation] = body
                 s.BodyByOnlineID[tostring(entry.onlineId)] = body
             end
+            if PNC.Core and PNC.Core.LogInfo then
+                PNC.Core.LogInfo(
+                    "PNC mp_body_binding_bound npc="
+                        .. tostring(entry.npcId)
+                        .. " lease=" .. tostring(entry.incarnation)
+                        .. " onlineID=" .. tostring(entry.onlineId)
+                )
+            end
         end,
         onUnbind = function(body, entry)
             local md = data(body)
@@ -76,6 +85,7 @@ local function getClient()
     })
     return client
 end
+
 function Runtime.AcceptSnapshot(snapshot)
     if not remote() or type(snapshot) ~= "table" then return false end
     local message = snapshot.bodyBinding
@@ -90,7 +100,18 @@ function Runtime.AcceptSnapshot(snapshot)
         or snapshot.interestDetailed == false
         or message.incarnation ~= tostring(snapshot.liveBodyLease)
         or message.onlineId ~= snapshot.liveBodyOnlineID) then return false end
-    return getClient().Receive(message, now())
+    local at = now()
+    local accepted = getClient().Receive(message, at)
+    if accepted and message.operation == "bind"
+        and not getClient().Resolve(
+            snapshot.id,
+            snapshot.liveBodyLease,
+            at
+        )
+    then
+        Recovery.Observe(message, at, getClient(), Binding)
+    end
+    return accepted
 end
 function Runtime.Forget(npcId)
     if remote() and client then client.DropInterest(npcId) end
@@ -116,18 +137,33 @@ function Runtime.Resolve(snapshot)
     if type(m) ~= "table" or m.operation ~= "bind" or m.npcId ~= tostring(snapshot.id)
         or m.incarnation ~= tostring(snapshot.liveBodyLease)
         or m.onlineId ~= snapshot.liveBodyOnlineID then return nil end
-    local body = getClient().Resolve(snapshot.id, snapshot.liveBodyLease, now())
+    local at = now()
+    local body = getClient().Resolve(
+        snapshot.id,
+        snapshot.liveBodyLease,
+        at
+    )
+    if not body then
+        Recovery.Observe(m, at, getClient(), Binding)
+        body = getClient().Resolve(
+            snapshot.id,
+            snapshot.liveBodyLease,
+            at
+        )
+    end
     return body and body:getOnlineID() == m.onlineId and body or nil
 end
 function Runtime.Sweep(at)
     if remote() and client and at >= lastSweep + 250 then
         client.Sweep(at)
+        Recovery.Sweep(at)
         lastSweep = at
     end
 end
 function Runtime.Reset()
     if client then client.Reset() end
     client, lastSweep = nil, -250
+    Recovery.Reset()
 end
 function Binding.IsClientBody(body)
     local md = data(body)

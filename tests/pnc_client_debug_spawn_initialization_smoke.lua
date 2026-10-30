@@ -154,4 +154,41 @@ PNC.Client.SendDebug("spawn", {
 })
 T.equal(baselineCount, 1,
     "neutral debug spawn does not receive companion relationship state")
+
+-- Any multiplayer client context, including hosted/listen configurations,
+-- must use the authoritative debug command instead of local PNC.API.Spawn.
+local sent
+isClient = function() return true end
+isServer = function() return true end
+sendClientCommand = function(receivedPlayer, module, command, args)
+    sent = {
+        player = receivedPlayer,
+        module = module,
+        command = command,
+        args = args,
+    }
+end
+local beforeNetworkSpawn = spawnCount
+T.equal(PNC.Client.SendDebug("spawn", {
+    variant = "hostile",
+    tacticalClass = "hostile",
+    x = 44, y = 55, z = 0,
+}), true, "multiplayer debug spawn request was not sent")
+T.equal(spawnCount, beforeNetworkSpawn,
+    "multiplayer debug spawn executed local PNC.API.Spawn")
+T.equal(sent.player, player, "debug spawn used the wrong player")
+T.equal(sent.module, PNC.Const.MODULE, "debug spawn module")
+T.equal(sent.command, PNC.Const.CMD_DEBUG, "debug spawn command")
+T.equal(sent.args.action, "spawn", "debug spawn action was not transported")
+T.equal(sent.args.tacticalClass, "hostile",
+    "debug spawn tactical class was not transported")
+
+local directSpawnSource = T.read(
+    "ProjectHoomans",
+    "client",
+    "PNC/Networking/ClientActions/PNC_ClientActions_Debug_Spawn.lua"
+)
+T.contains(directSpawnSource, "if isClient and isClient() == true then",
+    "direct spawn handler lacks multiplayer transport defense")
+
 T.finish("pnc_client_debug_spawn_initialization_smoke")
