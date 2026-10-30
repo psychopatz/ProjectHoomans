@@ -1,10 +1,10 @@
 # Roadmap — Multiplayer Body Binding Migration
 
-**Status:** M9 native restart acceptance failed; M10 restart-shell recovery is developer-accepted in ada48d24; renewed user-owned native SP/MP restart acceptance pending.
+**Status:** M10 native SP succeeds but dedicated MP exposed a late-stream restart race plus replica/debug-authority gaps. M11 is developer-accepted in `fc932e1d` and `5c10a95b`; renewed user-owned native MP acceptance pending.
 
 **Parent objective:** successfully migrate Project Hoomans from implicit cross-network IsoZombie identity to an explicit, incarnation-safe multiplayer body-binding protocol **and** prevent managed live-human carriers from reaching native zombie virtualization, while preserving SP behavior, durable Registry authority, MP streaming/reconnect, death/reanimation semantics, and exact cleanup.
 
-The full M0-M10 objective is the completion boundary. Phase completion is not goal completion.
+The full M0-M11 objective is the completion boundary. Phase completion is not goal completion.
 
 ## M0 — Restore/freeze single-player baseline and engine truth
 
@@ -275,9 +275,86 @@ Accepted developer evidence for ada48d24:
 - Startup_Batch is smaller than the pre-M10 baseline after extracting the anonymous-rehydrate helper;
 - git diff --check clean before commit.
 
+## M11 — Dedicated late-stream reconciliation and MP replica authority
+
+Native testing after M10 produced a split result: single-player restart behavior succeeded, while dedicated multiplayer still reproduced stale husks and the Spawn Hoomans debug action could produce dialogue/logical state without a visible NPC.
+
+The 2026-10-30 dedicated-server log establishes the owning race:
+- startup loaded eight Registry records with zero players/chunks;
+- at 11:58:09 startup logged `PNC startup rehydration fallback count=8`;
+- cleanup immediately completed with `removed=0 ordinaryUnknown=0 blockedRecords=0`;
+- only after a player joined did those NPC areas stream and fresh bodies materialize.
+
+Thus dedicated startup cannot assume absence of a shell when its saved chunk has never been loaded.
+
+### M11A — Authoritative multiplayer debug actions
+
+Required:
+- when Build 42 reports client mode, debug mutations use `sendClientCommand` even in hosted/listen configurations where client and server capabilities may coexist;
+- direct debug-spawn handler calls have the same network defense;
+- SP remains local;
+- server `PNC debug spawn variant=...` is the authoritative proof that a multiplayer spawn request arrived.
+
+Gate: MP debug spawn cannot create only local dialogue/logical state.
+
+### M11B — Atomic server body-binding projection and targeted client recovery
+
+Required:
+- `bodyBinding.onlineId`, `liveBodyOnlineID`, and `liveBodyLease` come from one verified server projection;
+- a freshly assigned engine online ID repairs the record cache before serialization;
+- a pure client may perform an exact online-ID lookup only while an authoritative bind is unresolved;
+- that lookup is cadence-bounded and stops after binding;
+- a WorldCensus miss falls through to the exact engine zombie-list lookup instead of returning nil early;
+- duplicate online IDs fail closed;
+- normal resolved lookups remain O(1).
+
+Transition diagnostics:
+- server: `PNC mp_body_binding_ready npc=<id> lease=<lease> onlineID=<id>`;
+- client: `PNC mp_body_binding_bound npc=<id> lease=<lease> onlineID=<id>`.
+
+Gate: a server-visible NPC cannot remain dialogue-only merely because bind and engine-replica observation arrived in the opposite order.
+
+### M11C — Dedicated late-stream restart claims
+
+Required:
+- unresolved saved-live claims are not discarded when dedicated startup has no player-interest chunks;
+- global startup may still complete; each unresolved record transfers into its own late-stream claim;
+- no world-wide scan is added;
+- when the saved square first loads, only that NPC gets a bounded 1500 ms settle window;
+- exact UUID/token/saved engine identity is preferred;
+- the existing current-save anonymous proof remains adoption-only;
+- streamed anonymous candidates are humanized/quarantined before vanilla hostile behavior can matter;
+- one proven/unique shell is rebound;
+- multiple candidates remain ambiguous and block replacement spawning;
+- after the loaded-square settle expires with no shell, the claim releases and normal materialization may continue;
+- true Knox-reanimated zombies remain protected/excluded.
+
+Expected log progression:
+- startup: `PNC startup late-stream rehydration armed count=N`;
+- first loaded saved square: `PNC late_stream_rehydrate_window npc=<id> settleMs=1500`;
+- successful recovery: `PNC late_stream_rehydrate_rebound npc=<id> ...`;
+- true miss after loaded settle: `PNC late_stream_rehydrate_released npc=<id> reason=no_shell_after_loaded_settle`.
+
+Gate: replacement `spawnPrimary` cannot happen before the saved area receives its late-stream reconciliation opportunity.
+
+### M11D — Developer validation
+
+Accepted developer evidence:
+- full isolated Lua suite: **975/975**;
+- broad restart/husk/body/presence/body-binding/debug-spawn/replica/network/persistence/follow/combat/infection/corpse/reanimation matrix: **228/228**;
+- focused MP network/body-binding/presence matrix during implementation: **134/134**;
+- installed Project Zomboid Kahlua compiler: **16/16 changed/new runtime Lua files pass**;
+- static Kahlua ERROR scan: all changed runtime Lua files clean;
+- new late-stream and targeted-recovery modules pass the 2k token-bloat guard after modular split;
+- `git diff --check` clean before commits.
+
+Implementation commits:
+- `fc932e1d fix: restore multiplayer npc replica binding`
+- `5c10a95b fix: defer mp npc spawn for late restart shells`
+
 ### Native user acceptance handoff
 
-After all developer-side M0-M10 gates pass, user-owned native acceptance should verify:
+After all developer-side M0-M11 gates pass, user-owned native acceptance should verify:
 1. SP restart/materialization behavior is restored and no former SP husk regression returns.
 2. Fresh MP materialization does not leave an ordinary zombie precursor or stale zombie after reconciliation.
 3. Two players in the same area see the same one NPC.

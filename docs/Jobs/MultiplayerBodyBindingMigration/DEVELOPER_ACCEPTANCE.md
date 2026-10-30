@@ -1,6 +1,6 @@
 # Developer acceptance — Multiplayer Body Binding Migration
 
-> **M9 NATIVE HANDOFF FAILED; M10 DEVELOPER REPAIR ACCEPTED 2026-10-30:** The 09:44/09:46 native restart logs still reproduced anonymous old NPC husks after M9. M10 restart-shell recovery is implemented in ada48d24; the parent goal still requires renewed native SP/MP restart acceptance.
+> **M10 NATIVE MP HANDOFF FAILED; M11 DEVELOPER REPAIR ACCEPTED 2026-10-30:** Single-player restart behavior now works, but the 11:56 dedicated-server session proved that M10 startup reconciliation finishes before player-interest chunks load and also exposed MP debug-spawn/replica-binding gaps. M11 is implemented in `fc932e1d` and `5c10a95b`; renewed native MP acceptance remains mandatory.
 
 M0-M8 developer implementation was accepted on existing `main`, 2026-10-30, before native testing. Planning baseline: `e3614241`.
 
@@ -109,7 +109,7 @@ Installed 42.22 Java/native evidence also disproved the first M9 prototype assum
 
 ### Remaining acceptance
 
-This M9 acceptance statement is superseded by M10 below. Renewed native testing remains mandatory; any persistent old zombie/husk now reopens M10.
+This M9 acceptance statement was superseded by M10 and then M11 below. Renewed native multiplayer testing remains mandatory; any persistent old zombie/husk now reopens M11.
 
 
 ## M10 developer addendum — restart-shell recovery
@@ -132,3 +132,20 @@ M10 restores restart recovery with stricter safety than the old implementation:
 Validation: 972/972 full, 231/231 broad, 163/163 focused, 14/14 installed-PZ compile, 14/14 static Kahlua ERROR clean.
 
 Native SP/MP restart acceptance remains mandatory. Do not mark the parent goal complete unless the next restart shows rebound before replacement materialization and no hostile former-NPC husk remains.
+
+
+## M11 developer addendum — dedicated late-stream and MP replica authority
+
+Implementation commits:
+- `fc932e1d fix: restore multiplayer npc replica binding`
+- `5c10a95b fix: defer mp npc spawn for late restart shells`
+
+The native MP symptom was not the same as SP. Dedicated startup runs before player-interest chunks are loaded, so M10 cleared eight saved-live claims while no old shells were observable. Later player streaming allowed replacement bodies to spawn before the former PopMan carrier could be reconciled.
+
+The same session exposed a second MP issue: debug spawning did not reliably cross the authoritative command boundary, and an authoritative NPC could have semantic/dialogue state while its engine replica remained unresolved on the client.
+
+M11 closes those developer-side gaps with per-record late-stream restart claims, authoritative MP debug routing, atomic binding payloads, and exact cadence-bounded client replica recovery.
+
+Validation: **975/975 full**, **228/228 broad**, **134/134 focused MP**, **16/16 installed-PZ compile**, static Kahlua clean, new modules under the token-bloat threshold.
+
+Native dedicated MP remains the final gate. Do not mark the parent goal complete until restart/reconnect shows no stale former-NPC husk and a multiplayer debug spawn produces one visible, bound NPC.

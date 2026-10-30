@@ -1,10 +1,10 @@
 # Progress — Multiplayer Body Binding Migration
 
-**Status:** M10 restart-shell recovery implemented and developer-validated; renewed native SP/MP restart acceptance pending.
+**Status:** M11 dedicated late-stream restart reconciliation and MP replica/debug authority repairs implemented and developer-validated; renewed native MP acceptance pending.
 **Branch:** existing main only.
 **Planning anchor:** 2a24bc59d36c845af51097642c55180434680cb7.
-**Current phase:** Native restart-shell acceptance handoff.
-**Parent objective:** M0-M10 complete migration to explicit MP body binding, pre-virtualization live-human carrier retirement, and restart-shell recovery, with SP preserved; native husk convergence remains to be verified by the user.
+**Current phase:** Native M11 multiplayer acceptance handoff.
+**Parent objective:** M0-M11 complete migration to explicit MP body binding, pre-virtualization carrier retirement, restart-shell recovery, dedicated late-stream reconciliation, and reliable MP replica/debug authority, with SP preserved; native MP convergence remains to be verified by the user.
 
 ## Verified starting evidence
 
@@ -32,8 +32,8 @@
 ## Remaining mandatory work
 
 - M0-M8 are implemented historical prerequisites and remain regression constraints.
-- M0-M10 developer work is implemented and validated. M9 selected the engine-proven pre-virtualization retirement path; M10 adds restart-shell recovery after native restart disproved M9 as sufficient.
-- **Only renewed native SP/MP acceptance remains mandatory.** Persistent old shells after abstraction/rematerialization, chunk streaming, restart or reconnect are still a hard failure and reopen the owning lifecycle gate.
+- M0-M11 developer work is implemented and validated. M9 added pre-virtualization retirement; M10 restored restart-shell identity recovery; M11 adds dedicated late-stream reconciliation plus MP replica/debug authority repair.
+- **Only renewed native multiplayer acceptance remains mandatory.** A stale shell, invisible authoritative NPC, or debug spawn that does not become one visible bound body is a hard failure and reopens M11.
 
 ## Current non-goals
 
@@ -48,7 +48,7 @@
 
 Do not mark complete after M0, a working binding prototype, or a passing focused suite.
 
-Developer completion requires all M0-M10 gates plus final full-suite/static/compiler evidence. That developer gate is now met by `ada48d24` plus docs reconciliation; parent acceptance still requires renewed native SP/MP restart proof.
+Developer completion requires all M0-M11 gates plus final full-suite/static/compiler evidence. That developer gate is now met by `fc932e1d` and `5c10a95b`; parent acceptance still requires renewed native dedicated-MP restart/replica proof.
 
 ## M0A local factory restoration — 2026-10-30
 
@@ -260,7 +260,7 @@ This specifically closes the native log sequence where a companion remained embo
 - Final validation: **970/970 full Lua**, **221/221 broad lifecycle/network/combat/death**, **152/152 focused presence/husk/follow/travel/body-loss**, **7/7 installed-PZ Kahlua compile**, **7/7 pz_verify Kahlua ERROR clean**, `git diff --check` clean.
 - No native Project Zomboid game was launched and no Workshop content was published.
 
-**Remaining mandatory action:** renewed user-owned native SP and MP acceptance. Repeated abstraction/rematerialization, old-location return, chunk unload/reload, reconnect/relog and restart must show no persistent former NPC shell. Any native husk reproduction reopens M10 despite the green developer suite.
+**Historical M10 handoff (superseded by M11 below):** the next native run disproved this handoff on dedicated MP because the saved chunks were not loaded during startup.
 
 
 ## M10 native restart failure and developer repair — 2026-10-30
@@ -287,4 +287,29 @@ Implementation commit: ada48d24 fix: reclaim anonymous npc shells on restart.
 
 Final developer evidence: 972/972 full, 231/231 broad, 163/163 focused restart/persistence, 14/14 installed-PZ compile, 14/14 static Kahlua ERROR clean, git diff --check clean.
 
-Remaining mandatory action: native SP and MP restart/relog testing. The decisive next-log success signal is PNC startup_rehydrate_rebound before any spawnPrimary for the same NPC. Any ordinaryUnknown/blockedRecords followed by replacement materialization without a rebound reopens M10.
+Historical M10 acceptance target (superseded by M11): SP subsequently passed, while dedicated MP showed that the shell could stream after global startup reconciliation had already completed.
+
+
+## M11 dedicated MP failure and developer repair — 2026-10-30
+
+User-owned native testing reported that single-player now works while multiplayer still retains the husk bug; additionally, Spawn Hoomans debug could trigger dialogue with no visible NPC.
+
+Newest dedicated-server evidence: `/home/psychopatz/Zomboid/Logs/2026-10-30_11-56_DebugLog-server.txt`.
+- 11:58:00 Registry loaded 8 NPC records.
+- 11:58:09 `PNC startup rehydration fallback count=8`.
+- same frame: startup cleanup completed with `removed=0 ambiguous=0 ordinaryUnknown=0 blockedRecords=0`.
+- there were no players/chunks holding the saved NPC shells at that point.
+- from 11:59 onward, those logical records freshly materialized as players entered the area.
+
+This proves M10's dedicated startup reconciliation was temporally early rather than semantically wrong: the old PopMan shells can arrive only after startup has already declared them missed.
+
+M11 repairs three connected MP authority gaps:
+1. debug mutations route through the authoritative server command whenever `isClient()==true`, including hosted/listen mode;
+2. server binding snapshots use one atomic online-id/lease projection, while unresolved pure-client binds may perform one cadence-bounded exact online-ID recovery;
+3. unresolved dedicated restart claims transfer to per-record late-stream claims and block replacement spawn until that saved square has had a bounded 1500 ms restore window.
+
+Implementation commits: `fc932e1d` and `5c10a95b`.
+
+Developer validation: **975/975 full**, **228/228 broad**, **134/134 focused MP**, **16/16 installed-PZ compile**, changed runtime files static-Kahlua clean, token-bloat guard clean for new modules, `git diff --check` clean.
+
+**Remaining mandatory action:** native dedicated MP acceptance. For debug spawn, the server log must show `PNC debug spawn variant=...`, then `mp_body_binding_ready`, and the client must show `mp_body_binding_bound`. For restart recovery, startup should arm late-stream claims rather than log the old fallback count, and each loaded saved area must rebound or explicitly release before any replacement body is spawned.

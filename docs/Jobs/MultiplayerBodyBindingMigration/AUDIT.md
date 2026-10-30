@@ -246,3 +246,22 @@ Installed Build 42.22 server evidence also shows dedicated saves call `ZombiePop
 Developer validation for the M10 implementation in `ada48d24`: 972/972 full tests, 231/231 broad lifecycle tests, 163/163 focused restart/persistence tests, 14/14 installed-PZ compiler passes, 14/14 static Kahlua-error clean.
 
 Native acceptance remains mandatory. Success requires a `PNC startup_rehydrate_rebound` line before any replacement `spawnPrimary` for the same NPC, with no hostile old live shell remaining.
+
+
+## 15. M11 dedicated late-stream and replica audit
+
+The 11:56 dedicated-server session explains the SP/MP split. At 11:58:09, with no player-interest chunks loaded, startup converted all eight unresolved saved-live claims into misses and immediately completed reconciliation. This is invalid on a dedicated server: absence from the currently loaded cell is not evidence that the PopMan shell does not exist.
+
+The correct ownership boundary is per record:
+- global server startup may complete;
+- each unresolved saved-live record keeps a late-stream claim;
+- the claim begins its timer only when the saved square becomes loaded;
+- replacement materialization is blocked during that bounded loaded-square settle;
+- a streamed candidate is quarantined and rebound when uniquely proven;
+- ambiguity never authorizes deletion or replacement spawning.
+
+The debug-spawn symptom exposed a separate authority bug: client debug dispatch used `Core.IsClientOnly()`, allowing hosted/listen configurations to fall into local execution instead of `sendClientCommand`. Multiplayer debug mutations now key from Build 42's actual `isClient()` transport role.
+
+The invisible-dialogue symptom also exposed an MP binding consistency gap. Previous snapshots could combine a current body `onlineId` inside `bodyBinding` with a stale cached `liveBodyOnlineID`. Pure clients correctly rejected that inconsistent tuple. M11 builds all binding fields from one projection and adds a narrowly scoped exact-ID recovery when bind arrives before `OnZombieUpdate` observation. A WorldCensus miss no longer suppresses the exact engine-list fallback.
+
+No generic recurring zombie scan was reintroduced.
