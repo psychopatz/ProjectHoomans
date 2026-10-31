@@ -58,9 +58,9 @@ local function retryInstall()
     end
 end
 
-local internal = PNC.Client and PNC.Client.Internal
-if internal and type(internal.RegisterServerCommand) == "function" then
-    internal.RegisterServerCommand(Client.COMMAND, function(payload)
+local transport = PNC.Client
+if transport and type(transport.RegisterServerCommand) == "function" then
+    transport.RegisterServerCommand(Client.COMMAND, function(payload)
         return emit("projectalife_client_flavor", payload)
     end)
 end

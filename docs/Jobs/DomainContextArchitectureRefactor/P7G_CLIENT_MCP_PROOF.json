@@ -1,0 +1,367 @@
+{
+  "project": "project-hoomans",
+  "tier": 2,
+  "pre_generation": "2026-10-31T03:03:46Z",
+  "post_generation": "2026-10-31T03:08:21Z",
+  "coverage_before": {
+    "project": "project-hoomans",
+    "signal": "best_effort",
+    "indexed_at": "2026-10-31T03:03:46Z",
+    "metadata": {
+      "generation": "2026-10-31T03:03:46Z",
+      "index_mode": "full",
+      "recorded_at": "2026-10-31T03:03:54Z",
+      "recording_status": "complete",
+      "ignored_files_stored": 129,
+      "ignored_files_total": 129,
+      "hash_records_complete": true,
+      "coverage_version": 3,
+      "generation_matches": true
+    },
+    "paths": [
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_Client.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_Client.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/PNC_ClientPresenceTick.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/PNC_ClientPresenceTick.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PuppetOpera/PNC_PuppetOpera_Client_Transport.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PuppetOpera/PNC_PuppetOpera_Client_Transport.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_EventClient.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_EventClient.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Gifts_Receive_Context.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Gifts_Receive_Context.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/ScavengeService/PNC_ScavengeService_Diagnostics.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/ScavengeService/PNC_ScavengeService_Diagnostics.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Registry.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Registry.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_KnowledgeState.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_KnowledgeState.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Exploration.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Exploration.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_InitialStateTick.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_InitialStateTick.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_Bootstrap.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_Bootstrap.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_World.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_World.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientCombatCommands.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientCombatCommands.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientStealthDiscovery.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientStealthDiscovery.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientZombieAggroCommands.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientZombieAggroCommands.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_puppet_opera_transport_smoke.lua",
+        "path": "tests/pnc_puppet_opera_transport_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_client_bootstrap_tick_smoke.lua",
+        "path": "tests/pnc_client_bootstrap_tick_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_client_initial_state_retry_smoke.lua",
+        "path": "tests/pnc_client_initial_state_retry_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_client_colony_base_scope_smoke.lua",
+        "path": "tests/pnc_client_colony_base_scope_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_client_commands_smoke.lua",
+        "path": "tests/pnc_client_commands_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_client_zombie_reaction_replica_smoke.lua",
+        "path": "tests/pnc_client_zombie_reaction_replica_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      }
+    ],
+    "scopes": [],
+    "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+  },
+  "pre_traces": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_Registry.Internal.RegisterServerCommand\ndirection: both\ncallees_total: 1\ncallees: 1  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1\ncallers_total: 21\ncallers: 21  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Compatibility.Mods.ProjectALife:\n  PNC_ProjectALife_EventClient 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter:\n  PNC_ClientCommandRouter_Colony 1\n  PNC_ClientCommandRouter_Diagnostics 1\n  PNC_ClientCommandRouter_Exploration 1\n  PNC_ClientCommandRouter_InteractionResults 1\n  PNC_ClientCommandRouter_Knowledge 1\n  PNC_ClientCommandRouter_KnowledgeDebug 1\n  PNC_ClientCommandRouter_KnowledgeDisclosure 1\n  PNC_ClientCommandRouter_LLMSocialReactionResult 1\n  PNC_ClientCommandRouter_RelationshipResult 1\n  PNC_ClientCommandRouter_SemanticIdentity 1\n  PNC_ClientCommandRouter_Semantics 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking:\n  PNC_ClientCombatCommands 1\n  PNC_ClientInventoryCommands 1\n  PNC_ClientRosterCommands_Deltas 1\n  PNC_ClientRosterCommands_Sync 1\n  PNC_ClientStealthDiscovery 1\n  PNC_ClientZombieAggroCommands 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.PuppetOpera:\n  PNC_PuppetOpera_Client_Transport 1\nproject-hoomans.tests:\n  pnc_client_commands_smoke 1\n  pnc_network_payload_budget_smoke 1\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_KnowledgeState.Internal.ApplyNPCKnowledgeSnapshot\ndirection: both\ncallees_total: 10\ncallees: 10  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Knowledge.PNC_KnowledgeInterest.Interest:\n  Acknowledge 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_KnowledgeMemory.Memory:\n  QueueSnapshotMemoryPrimitives 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_KnowledgeState:\n  auditIdentityKnowledgeMirror 1\n  identityNameFact 1\n  isStaleKnowledge 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.CharacterWindow.PNC_CharacterWindow.CharacterWindow:\n  ReceiveKnowledgeSnapshot 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Discovery.PNC_WorldDiscoveryRadioWindow.DiscoveryUI:\n  ReceiveSnapshot 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Knowledge.PNC_KnowledgePresentation.Presentation:\n  ShowLearnedFacts 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Compatibility.Mods.CompanionDogs.PNC_CompanionDogs_Access.Internal:\n  Now 1\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1\ncallers_total: 6\ncallers: 6  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.Blocks.ConversationComposer.PNC_ConversationComposer_Gifts_Receive_Context.ReceiveContext:\n  Build 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter:\n  PNC_ClientCommandRouter_Knowledge 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_KnowledgeBootstrap:\n  completeBootstrap 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter:\n  PNC_ClientCommandRouter_KnowledgeDisclosure 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_KnowledgePresentationState.Internal:\n  ApplyNPCPresentation 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientRequests.PNC_ClientRequests_Bootstrap:\n  applyKnowledgeSnapshot 1\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_Exploration.Internal.ApplyScavengeSnapshot\ndirection: both\ncallees_total: 3\ncallees: 3  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Discovery.PNC_WorldDiscoveryRadioWindow.DiscoveryUI:\n  ReceiveSnapshot 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Scavenge.PNC_ScavengeNotifications.Presentation:\n  Receive 1\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1\ncallers_total: 2\ncallers: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientActions.PNC_ClientActions_Scavenge.Client:\n  SendScavengeRequest 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Scavenge.ScavengeService.PNC_ScavengeService_Diagnostics.Service:\n  SendSnapshot 1\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientRequests.PNC_ClientRequests_InitialStateTick.Internal.PumpInitialStateRequests\ndirection: both\ncallees_total: 6\ncallees: 6  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Knowledge.PNC_KnowledgeInterest.Interest:\n  ConsumeFlush 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientRequests.PNC_ClientRequests_Bootstrap.Client:\n  EnsurePlayerBootstrap 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientRequests.PNC_ClientRequests_InitialStateTick:\n  isWorldReady 1\n  updateDiagnostics 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientRequests.PNC_ClientRequests_World.Client:\n  EnsureWorldDiscovery 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Compatibility.Mods.CompanionDogs.PNC_CompanionDogs_Access.Internal:\n  Now 1\ncallers_total: 1\ncallers: 1  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.PresenceSync.PNC_ClientPresenceTick.Sync:\n  OnTick 1\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.PNC_ClientCombatCommands.pumpCombatReplicas\ndirection: both\ncallees_total: 7\ncallees: 7  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.PNC_ClientCombatCommands:\n  applyZombieBite 1\n  finishBiteReplica 1\n  signalBiteRelease 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.PuppetOpera.PNC_PuppetOpera_Client_Runtime.Client:\n  Pump 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Combat.PNC_PlayerReaction.Reaction:\n  Pump 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Compatibility.Mods.CompanionDogs.PNC_CompanionDogs_Access.Internal:\n  Now 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Networking.PNC_Network_CombatEvents.Network:\n  FindZombieByOnlineID 1\ncallers_total: 0\ncallers: 0  (rows: name hop; qn = group prefix + \".\" + name)\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.PNC_ClientStealthDiscovery.Internal.ResetStealthDiscovery\ndirection: both\ncallees_total: 0\ncallees: 0  (rows: name hop; qn = group prefix + \".\" + name)\ncallers_total: 2\ncallers: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.PNC_Client:\n  onResetLua 1\nproject-hoomans.tests:\n  pnc_stealth_discovery_transport_smoke 1\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.PNC_ClientZombieAggroCommands.Internal.ResetZombiePursuitDirectives\ndirection: both\ncallees_total: 0\ncallees: 0  (rows: name hop; qn = group prefix + \".\" + name)\ncallers_total: 2\ncallers: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.PNC_Client:\n  onResetLua 1\nproject-hoomans.tests:\n  pnc_client_commands_smoke 1\n"
+          }
+        ],
+        "isError": false
+      }
+    }
+  ],
+  "post_traces": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_Registry.Internal.RegisterServerCommand\ndirection: both\ncallees_total: 1\ncallees: 1  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1\ncallers_total: 21\ncallers: 21  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Compatibility.Mods.ProjectALife:\n  PNC_ProjectALife_EventClient 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter:\n  PNC_ClientCommandRouter_Colony 1\n  PNC_ClientCommandRouter_Diagnostics 1\n  PNC_ClientCommandRouter_Exploration 1\n  PNC_ClientCommandRouter_InteractionResults 1\n  PNC_ClientCommandRouter_Knowledge 1\n  PNC_ClientCommandRouter_KnowledgeDebug 1\n  PNC_ClientCommandRouter_KnowledgeDisclosure 1\n  PNC_ClientCommandRouter_LLMSocialReactionResult 1\n  PNC_ClientCommandRouter_RelationshipResult 1\n  PNC_ClientCommandRouter_SemanticIdentity 1\n  PNC_ClientCommandRouter_Semantics 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking:\n  PNC_ClientCombatCommands 1\n  PNC_ClientInventoryCommands 1\n  PNC_ClientRosterCommands_Deltas 1\n  PNC_ClientRosterCommands_Sync 1\n  PNC_ClientStealthDiscovery 1\n  PNC_ClientZombieAggroCommands 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.PuppetOpera:\n  PNC_PuppetOpera_Client_Transport 1\nproject-hoomans.tests:\n  pnc_client_commands_smoke 1\n  pnc_network_payload_budget_smoke 1\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_KnowledgeState.Internal.ApplyNPCKnowledgeSnapshot\ndirection: both\ncallees_total: 10\ncallees: 10  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Knowledge.PNC_KnowledgeInterest.Interest:\n  Acknowledge 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_KnowledgeMemory.Memory:\n  QueueSnapshotMemoryPrimitives 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_KnowledgeState:\n  auditIdentityKnowledgeMirror 1\n  identityNameFact 1\n  isStaleKnowledge 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.CharacterWindow.PNC_CharacterWindow.CharacterWindow:\n  ReceiveKnowledgeSnapshot 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Discovery.PNC_WorldDiscoveryRadioWindow.DiscoveryUI:\n  ReceiveSnapshot 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Knowledge.PNC_KnowledgePresentation.Presentation:\n  ShowLearnedFacts 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Compatibility.Mods.CompanionDogs.PNC_CompanionDogs_Access.Internal:\n  Now 1\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1\ncallers_total: 6\ncallers: 6  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.Blocks.ConversationComposer.PNC_ConversationComposer_Gifts_Receive_Context.ReceiveContext:\n  Build 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter:\n  PNC_ClientCommandRouter_Knowledge 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_KnowledgeBootstrap:\n  completeBootstrap 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter:\n  PNC_ClientCommandRouter_KnowledgeDisclosure 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_KnowledgePresentationState.Internal:\n  ApplyNPCPresentation 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientRequests.PNC_ClientRequests_Bootstrap:\n  applyKnowledgeSnapshot 1\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientCommandRouter.PNC_ClientCommandRouter_Exploration.Internal.ApplyScavengeSnapshot\ndirection: both\ncallees_total: 3\ncallees: 3  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Discovery.PNC_WorldDiscoveryRadioWindow.DiscoveryUI:\n  ReceiveSnapshot 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Scavenge.PNC_ScavengeNotifications.Presentation:\n  Receive 1\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1\ncallers_total: 2\ncallers: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientActions.PNC_ClientActions_Scavenge.Client:\n  SendScavengeRequest 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Scavenge.ScavengeService.PNC_ScavengeService_Diagnostics.Service:\n  SendSnapshot 1\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientRequests.PNC_ClientRequests_InitialStateTick.Internal.PumpInitialStateRequests\ndirection: both\ncallees_total: 6\ncallees: 6  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Knowledge.PNC_KnowledgeInterest.Interest:\n  ConsumeFlush 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientRequests.PNC_ClientRequests_Bootstrap.Client:\n  EnsurePlayerBootstrap 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientRequests.PNC_ClientRequests_InitialStateTick:\n  isWorldReady 1\n  updateDiagnostics 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientRequests.PNC_ClientRequests_World.Client:\n  EnsureWorldDiscovery 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Compatibility.Mods.CompanionDogs.PNC_CompanionDogs_Access.Internal:\n  Now 1\ncallers_total: 1\ncallers: 1  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.PresenceSync.PNC_ClientPresenceTick.Sync:\n  OnTick 1\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.PNC_ClientCombatCommands.pumpCombatReplicas\ndirection: both\ncallees_total: 7\ncallees: 7  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.PNC_ClientCombatCommands:\n  applyZombieBite 1\n  finishBiteReplica 1\n  signalBiteRelease 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.PuppetOpera.PNC_PuppetOpera_Client_Runtime.Client:\n  Pump 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Combat.PNC_PlayerReaction.Reaction:\n  Pump 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Compatibility.Mods.CompanionDogs.PNC_CompanionDogs_Access.Internal:\n  Now 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Networking.PNC_Network_CombatEvents.Network:\n  FindZombieByOnlineID 1\ncallers_total: 0\ncallers: 0  (rows: name hop; qn = group prefix + \".\" + name)\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.PNC_ClientStealthDiscovery.Internal.ResetStealthDiscovery\ndirection: both\ncallees_total: 0\ncallees: 0  (rows: name hop; qn = group prefix + \".\" + name)\ncallers_total: 2\ncallers: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.PNC_Client:\n  onResetLua 1\nproject-hoomans.tests:\n  pnc_stealth_discovery_transport_smoke 1\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.PNC_ClientZombieAggroCommands.Internal.ResetZombiePursuitDirectives\ndirection: both\ncallees_total: 0\ncallees: 0  (rows: name hop; qn = group prefix + \".\" + name)\ncallers_total: 2\ncallers: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.PNC_Client:\n  onResetLua 1\nproject-hoomans.tests:\n  pnc_client_commands_smoke 1\n"
+          }
+        ],
+        "isError": false
+      }
+    }
+  ],
+  "limitations": "Graph alias resolution retains the same selected calls; function-reference tick registration is not represented as inbound CALLS. Builtin type and Core.Now are heuristically misresolved. Exact source and bootstrap/tick regression tests supplement graph evidence. No exhaustive alias/dataflow claim."
+}

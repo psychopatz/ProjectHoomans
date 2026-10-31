@@ -105,7 +105,7 @@ T.load(FILE)
 
 local Client = PNC.Client
 local State = PNC.Network.ClientState
-Client.Internal.ResetZombiePursuitDirectives()
+Client.ResetZombiePursuitDirectives()
 
 T.equal(State.zombiePursuitDirectives["17"], nil,
     "pursuit reset retained a directive from the previous client session")
@@ -124,7 +124,7 @@ T.equal(State.zombiePursuitDirectives["18"].npcId, "npc_legacy",
 State.zombiePursuitDirectives["19"] = {
     npcId = "npc_stale",
 }
-Client.Internal.ResetZombiePursuitDirectives()
+Client.ResetZombiePursuitDirectives()
 T.equal(State.zombiePursuitDirectives["19"], nil,
     "Lua reset retained a legacy pursuit directive")
 

@@ -32,9 +32,8 @@ PNC = {
         ClientState = { snapshots = {} },
     },
     Client = {
-        Internal = {
-            IsWorldReady = function() return true end,
-        },
+        Internal = {},
+        IsWorldReady = function() return true end,
     },
 }
 
@@ -56,7 +55,7 @@ T.load("ProjectHoomans", "client",
 local Client = PNC.Client
 local ClientState = PNC.Network.ClientState
 local Interest = PNC.KnowledgeInterest
-local pump = Client.Internal.PumpInitialStateRequests
+local pump = Client.PumpInitialStateRequests
 
 T.truthy(Interest.Require("npc_retry", "retry_smoke"),
     "test knowledge interest was not queued")

@@ -310,6 +310,7 @@ local function pumpCombatReplicas()
 end
 
 Internal.PumpCombatReplicas = pumpCombatReplicas
+Client.PumpCombatReplicas = pumpCombatReplicas
 -- Compatibility alias for older client bootstrap code and external tooling.
 Internal.PumpBiteReplicas = pumpCombatReplicas
 

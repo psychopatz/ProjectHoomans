@@ -78,11 +78,11 @@ function ReceiveContext.Build(args)
         session.semanticGiftRequests[requestID] = nil
     end
 
-    local clientInternal = PNC.Client and PNC.Client.Internal
-    if args.knowledgeSnapshot and clientInternal
-        and clientInternal.ApplyNPCKnowledgeSnapshot
+    local transport = PNC.Client
+    if args.knowledgeSnapshot and transport
+        and transport.ApplyNPCKnowledgeSnapshot
     then
-        clientInternal.ApplyNPCKnowledgeSnapshot(
+        transport.ApplyNPCKnowledgeSnapshot(
             args.knowledgeSnapshot, "gift_reaction"
         )
     end

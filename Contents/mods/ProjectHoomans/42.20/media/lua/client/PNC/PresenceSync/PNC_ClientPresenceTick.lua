@@ -31,10 +31,9 @@ function Sync.OnTick()
     local localSnapshotChangedByID
     local localVisualMaintainDue
     local applyLocalVisuals
-    if Client and Client.Internal
-        and Client.Internal.PumpInitialStateRequests
+    if Client and Client.PumpInitialStateRequests
     then
-        if Client.Internal.PumpInitialStateRequests(now) == false then
+        if Client.PumpInitialStateRequests(now) == false then
             return
         end
     elseif not isWorldReady() then

@@ -26,3 +26,22 @@ MCP can discover each public entry and retrieve the named owner implementation.
 Function-reference aliases are incompletely represented as call edges, so use
 the small entry source and literal caller checks alongside traces. Proof and
 validation: `P7C_COORDINATION_PROOF.json`; fixed probes: `P7C_RETRIEVAL.json`.
+
+## Client transport delivery and lifecycle
+
+Networking's public `PNC.Client` methods now include RegisterServerCommand,
+ApplyNPCKnowledgeSnapshot and ApplyScavengeSnapshot. Adapters/PuppetOpera register
+through the public handler seam; gift replies and SP scavenge results use public
+snapshot delivery. These are the exact existing functions, including existing
+validation, stale-revision rejection, payload shape and presentation notification.
+
+PresenceSync invokes public PumpInitialStateRequests at the same point before
+snapshot work. The composition root wires public PumpCombatReplicas and calls
+public ResetStealthDiscovery/ResetZombiePursuitDirectives. It supplies the same
+public IsWorldReady predicate used by bootstrap/world requests. No function
+wrapper, scheduler, state copy or identity authority is added. Owner-internal
+references remain; foreign Client.Internal access is guarded.
+
+P7G proofs record the unchanged provider bodies, current graph limitations,
+bootstrap ordering and developer validation. M12 identity, server visual
+authority, client 250 ms maintenance and restart contracts remain unchanged.

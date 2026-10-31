@@ -122,6 +122,12 @@ job-local reports and Git. Historical giant logs are not required reading.
 
 ## Latest validated boundary
 
+P7G exposes the existing client registration, snapshot delivery and lifecycle
+methods; foreign callers and composition use public contracts. Provider bodies,
+readiness and M12 timing/authority are unchanged. Full Lua 984/984 (9.73 s),
+diagnostics 22/22, installed Kahlua 15/15, static errors 0; guard 69/0 new.
+
+
 P7F migrates Communities to Factions.Repository and public FactionTypes shapes;
 colonist departure uses the non-creating public player-key lookup. Canonical
 aggregate, normalizers and revision behavior are preserved. Validation: 28/28

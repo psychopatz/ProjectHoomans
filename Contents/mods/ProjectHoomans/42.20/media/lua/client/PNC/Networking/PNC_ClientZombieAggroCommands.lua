@@ -207,4 +207,7 @@ end
 
 Internal.RegisterServerCommand(Const.CMD_ZOMBIE_PURSUIT, receiveDirective)
 
+-- Public lifecycle/delivery contract; the owner retains its internal reference.
+Client.ResetZombiePursuitDirectives = Internal.ResetZombiePursuitDirectives
+
 return Internal

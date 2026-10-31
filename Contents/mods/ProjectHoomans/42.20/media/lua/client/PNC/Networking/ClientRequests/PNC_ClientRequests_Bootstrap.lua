@@ -15,7 +15,7 @@ local BOOTSTRAP_RETRY_MS = 4000
 local BOOTSTRAP_RETRY_MAX_MS = 30000
 
 local function isWorldReady()
-    if Internal.IsWorldReady then return Internal.IsWorldReady() end
+    if Client.IsWorldReady then return Client.IsWorldReady() end
     return (not isIngameState) or isIngameState()
 end
 

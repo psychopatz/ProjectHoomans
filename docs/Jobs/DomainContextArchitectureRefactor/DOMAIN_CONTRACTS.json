@@ -482,11 +482,19 @@
       "commands": [
         "router Handle/Register",
         "Network delivery APIs",
-        "SendSemanticIdentityResult (public typed transport adapter; stable semantic path)"
+        "SendSemanticIdentityResult (public typed transport adapter; stable semantic path)",
+        "Client.RegisterServerCommand",
+        "Client.ApplyNPCKnowledgeSnapshot",
+        "Client.ApplyScavengeSnapshot",
+        "Client.PumpInitialStateRequests",
+        "Client.PumpCombatReplicas",
+        "Client.ResetStealthDiscovery",
+        "Client.ResetZombiePursuitDirectives"
       ],
       "queries": [
         "payload projections",
-        "ColonyJournalProtocol shared typed payload contract; Network public composition entry"
+        "ColonyJournalProtocol shared typed payload contract; Network public composition entry",
+        "Client.IsWorldReady"
       ],
       "repository": "none; transport does not own gameplay state",
       "layers": [
@@ -988,7 +996,8 @@
     "PNC.Tasking.Internal": "Tasking",
     "PNC.Presence.Internal": "Presence",
     "PNC.Factions.Internal": "Factions",
-    "PNC.FactionTypes.Internal": "Factions"
+    "PNC.FactionTypes.Internal": "Factions",
+    "PNC.Client.Internal": "Networking"
   },
   "registration_manifest": "REGISTRATIONS.json",
   "private_implementation_scopes": [

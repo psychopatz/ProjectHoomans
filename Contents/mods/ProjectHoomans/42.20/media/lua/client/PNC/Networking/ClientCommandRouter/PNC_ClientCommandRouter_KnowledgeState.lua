@@ -127,4 +127,7 @@ function Internal.ApplyNPCKnowledgeSnapshot(snapshot, reason)
     return type(snapshot) == "table" and snapshot.npcID ~= nil
 end
 
+-- Public lifecycle/delivery contract; the owner retains its internal reference.
+PNC.Client.ApplyNPCKnowledgeSnapshot = Internal.ApplyNPCKnowledgeSnapshot
+
 return State

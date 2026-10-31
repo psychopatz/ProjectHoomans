@@ -75,4 +75,7 @@ Internal.RegisterServerCommand(Const.CMD_WORLD_DISCOVERY_STATE,
 Internal.RegisterServerCommand(Const.CMD_SCAVENGE_STATE,
     Internal.ApplyScavengeSnapshot)
 
+-- Public lifecycle/delivery contract; the owner retains its internal reference.
+PNC.Client.ApplyScavengeSnapshot = Internal.ApplyScavengeSnapshot
+
 return PNC.Client

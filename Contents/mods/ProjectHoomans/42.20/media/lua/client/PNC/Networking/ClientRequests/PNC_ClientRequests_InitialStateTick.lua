@@ -121,8 +121,8 @@ local function updateDiagnostics(
 end
 
 local function isWorldReady()
-    if Internal.IsWorldReady then
-        return Internal.IsWorldReady()
+    if Client.IsWorldReady then
+        return Client.IsWorldReady()
     end
     return (not isIngameState) or isIngameState()
 end
@@ -159,5 +159,8 @@ function Internal.PumpInitialStateRequests(now)
     )
     return true
 end
+
+-- Public lifecycle/delivery contract; the owner retains its internal reference.
+Client.PumpInitialStateRequests = Internal.PumpInitialStateRequests
 
 return Client

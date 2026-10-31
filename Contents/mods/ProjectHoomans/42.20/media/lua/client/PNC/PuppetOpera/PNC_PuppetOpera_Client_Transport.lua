@@ -196,14 +196,13 @@ local function receiveTrace(snapshot)
     end
 end
 
-if PNC.Client and PNC.Client.Internal
-    and PNC.Client.Internal.RegisterServerCommand
+if PNC.Client and PNC.Client.RegisterServerCommand
 then
-    PNC.Client.Internal.RegisterServerCommand(
+    PNC.Client.RegisterServerCommand(
         Const.CMD_PUPPET_OPERA_STATE,
         Client.ReceiveState
     )
-    PNC.Client.Internal.RegisterServerCommand(
+    PNC.Client.RegisterServerCommand(
         Const.CMD_PUPPET_OPERA_TRACE,
         receiveTrace
     )

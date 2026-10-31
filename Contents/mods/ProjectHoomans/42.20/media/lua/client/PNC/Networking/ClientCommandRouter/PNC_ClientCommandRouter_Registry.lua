@@ -262,4 +262,7 @@ function Client.HandleServerCommand(command, args)
     return dispatchCommand(command, args)
 end
 
+-- Public lifecycle/delivery contract; the owner retains its internal reference.
+Client.RegisterServerCommand = Internal.RegisterServerCommand
+
 return Client

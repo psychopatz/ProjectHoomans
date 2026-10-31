@@ -86,12 +86,10 @@ PNC = {
         PRESENCE_LIVE = "live",
     },
     Client = {
-        Internal = {
-            RegisterServerCommand = function(command, handler)
-                handlers[command] = handler
-                return true
-            end,
-        },
+        RegisterServerCommand = function(command, handler)
+            handlers[command] = handler
+            return true
+        end,
     },
     AnimationDebugPlayer = previewDebugger,
 }

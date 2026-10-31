@@ -9,11 +9,9 @@ PNC = {
         Now = function() return 1000 end,
     },
     Client = {
-        Internal = {
-            IsWorldReady = function()
-                return ready
-            end,
-        },
+        IsWorldReady = function()
+            return ready
+        end,
         EnsurePlayerBootstrap = function(now, forceKnowledge)
             calls[#calls + 1] = {
                 name = "player",
@@ -46,7 +44,7 @@ T.load(
     "PNC/Networking/ClientRequests/PNC_ClientRequests_InitialStateTick.lua"
 )
 
-local pump = PNC.Client.Internal.PumpInitialStateRequests
+local pump = PNC.Client.PumpInitialStateRequests
 local pumped, reason = pump(1100)
 T.falsy(pumped, "initial-state requests ran before the world was ready")
 T.equal(reason, "world_not_ready", "not-ready result was not explicit")

@@ -43,4 +43,7 @@ end
 
 Internal.RegisterServerCommand(Const.CMD_STEALTH_DISCOVERY, accept)
 
+-- Public lifecycle/delivery contract; the owner retains its internal reference.
+PNC.Client.ResetStealthDiscovery = Internal.ResetStealthDiscovery
+
 return accept

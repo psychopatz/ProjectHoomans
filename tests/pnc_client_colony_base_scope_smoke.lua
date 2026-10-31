@@ -33,7 +33,7 @@ PNC = {
 }
 
 PNC.KnowledgeInterest = {}
-PNC.Client.Internal.IsWorldReady = function() return true end
+PNC.Client.IsWorldReady = function() return true end
 local sent
 getSpecificPlayer = function() return {} end
 sendClientCommand = function(_, module, command, args)

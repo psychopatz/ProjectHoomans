@@ -64,14 +64,14 @@ T.truthy(applied == 1,
 T.truthy(PNC.Client.ZombieReactionReplicas["11"] ~= nil,
     "client did not retain the reaction release lease")
 
-PNC.Client.Internal.PumpCombatReplicas()
+PNC.Client.PumpCombatReplicas()
 T.truthy(pumped == 1,
     "client combat tick did not pump zombie reaction release")
 T.truthy(PNC.Client.ZombieReactionReplicas["11"] == nil,
     "completed client reaction lease was not removed")
 T.truthy(
     PNC.Client.Internal.PumpBiteReplicas
-        == PNC.Client.Internal.PumpCombatReplicas,
+        == PNC.Client.PumpCombatReplicas,
     "legacy combat-pump alias no longer points at the unified pump"
 )
 T.finish("pnc_client_zombie_reaction_replica_smoke")

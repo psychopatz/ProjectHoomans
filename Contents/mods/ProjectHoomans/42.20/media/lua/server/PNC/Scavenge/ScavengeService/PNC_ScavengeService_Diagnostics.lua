@@ -105,10 +105,9 @@ function Service.SendSnapshot(session, player)
     if isServer and isServer() == true and sendServerCommand then
         sendServerCommand(player, Const.MODULE, Const.CMD_SCAVENGE_STATE,
             payload)
-    elseif PNC.Client and PNC.Client.Internal
-        and PNC.Client.Internal.ApplyScavengeSnapshot
+    elseif PNC.Client and PNC.Client.ApplyScavengeSnapshot
     then
-        PNC.Client.Internal.ApplyScavengeSnapshot(payload)
+        PNC.Client.ApplyScavengeSnapshot(payload)
     end
     session.lastSnapshotAt = PNC.Core.Now()
     session.snapshotPending = nil

@@ -10,7 +10,7 @@ local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 
 local function isWorldReady()
-    if Internal.IsWorldReady then return Internal.IsWorldReady() end
+    if Client.IsWorldReady then return Client.IsWorldReady() end
     return (not isIngameState) or isIngameState()
 end
 

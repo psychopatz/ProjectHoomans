@@ -1,0 +1,152 @@
+{
+  "stage": "P7G client delivery and lifecycle contracts",
+  "source_revision_before": "810bb7011e0d46769cd2cf99de2c5f5fd0df3497",
+  "public_methods": [
+    "RegisterServerCommand",
+    "ApplyNPCKnowledgeSnapshot",
+    "ApplyScavengeSnapshot",
+    "PumpInitialStateRequests",
+    "PumpCombatReplicas",
+    "ResetStealthDiscovery",
+    "ResetZombiePursuitDirectives",
+    "IsWorldReady"
+  ],
+  "pre_files": [
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_Client.lua",
+      "sha256": "c4dd276d322d2b9853e9e461f45bcc5f03d37c0d6c0726ec3a0fa03aa560d32e",
+      "bytes": 8469,
+      "lines": 231
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/PNC_ClientPresenceTick.lua",
+      "sha256": "2fcb05eb3e108e97967b1d1aed02dd93fbe5d1b50fb306d9553f2d905ffb61ad",
+      "bytes": 2391,
+      "lines": 74
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PuppetOpera/PNC_PuppetOpera_Client_Transport.lua",
+      "sha256": "b2c51e6fb2161814c2ea825857755f1ee909c82bb70ac718cebafcca20aa6eea",
+      "bytes": 7757,
+      "lines": 212
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_EventClient.lua",
+      "sha256": "1e393ebef451c1dc50c256191ac30e8fe136e3ac6155a130ca0c9cbc079e6d67",
+      "bytes": 2260,
+      "lines": 74
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Gifts_Receive_Context.lua",
+      "sha256": "96365f5e73bea1b28b27e341e72491a1393fdf2c67822cf515124a8fd63cc08f",
+      "bytes": 6245,
+      "lines": 172
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Scavenge/ScavengeService/PNC_ScavengeService_Diagnostics.lua",
+      "sha256": "d286b1f0a318c7a956b5feb5960002746294bba3f663f928c5f90a91d933a445",
+      "bytes": 6790,
+      "lines": 173
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Registry.lua",
+      "sha256": "366d808d36ec855d35de01cc4f88a570da4ea2a5663f1dc2a8046a4325db437b",
+      "bytes": 8405,
+      "lines": 265
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_KnowledgeState.lua",
+      "sha256": "0c09e5565faee4c2680d78c144e4f37d90d0e79259e5a81b8add53f9b886f2c0",
+      "bytes": 4899,
+      "lines": 130
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Exploration.lua",
+      "sha256": "3c20946a211f144f86ba24406c4c8aa3b06bbcf26af6edf404f74e85819bdb00",
+      "bytes": 3142,
+      "lines": 78
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_InitialStateTick.lua",
+      "sha256": "361786fea3b48feb5e20a85f4e67dae7848f38689a2f3f52bd7797e1eeae8a4f",
+      "bytes": 5387,
+      "lines": 163
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_Bootstrap.lua",
+      "sha256": "b1e4c9c057464884361eeb6defceaa330a9e7eac0cf9f6e525d6350287a693e5",
+      "bytes": 4118,
+      "lines": 119
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_World.lua",
+      "sha256": "18e1c49a79baaf3be465307b0c4a3e82d47ccdae20c3e13dfdc717f75fba41fe",
+      "bytes": 2422,
+      "lines": 67
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientCombatCommands.lua",
+      "sha256": "3308cc2e4a75054f2875a1255ce92ebd294f68ff560b76b255126a3518255104",
+      "bytes": 11946,
+      "lines": 344
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientStealthDiscovery.lua",
+      "sha256": "b3f0c18309cda59ea9404a24f2b84e99a1b67a3d0c509de45ece73678ee93906",
+      "bytes": 1380,
+      "lines": 46
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientZombieAggroCommands.lua",
+      "sha256": "40a0078b3824beff5cd2213d97766164b33910edb2ab94a302570e1e5d19d2c0",
+      "bytes": 6482,
+      "lines": 210
+    }
+  ],
+  "ownership": "Networking retains request serials, handler registry, snapshots and replica bookkeeping. Client composition supplies the same readiness predicate and wires public lifecycle methods. Foreign domains use public delivery/registration methods; no new state or transport.",
+  "validation": {
+    "focused_lua": "61/61 before final test caller migration; full suite includes migrated callers",
+    "full_lua": "984/984; 9.73 seconds",
+    "diagnostic_python": "22/22",
+    "installed_kahlua": {
+      "schemaVersion": 1,
+      "type": "kahlua_compile_verification",
+      "compiler": "installed_project_zomboid_kahlua_luacompiler",
+      "gameLaunched": false,
+      "luaExecuted": false,
+      "filesChecked": 15,
+      "passed": true,
+      "failure": null,
+      "sourceKind": "CHECKED_OUT_LUA",
+      "writesToSource": 0
+    },
+    "guard": "69 issues/0 new; same two owner SCCs",
+    "static_kahlua": "15 runtime files; no errors",
+    "m12": "Durable NPC/bodyLease/onlineId identities, server visual authority, client maintenance cadence and restart proofs unchanged. No native game launch."
+  },
+  "provider_executable_tokens_unchanged_except_declared_exports": [
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientZombieAggroCommands.lua",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientCombatCommands.lua",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/PNC_ClientStealthDiscovery.lua",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Exploration.lua",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_KnowledgeState.lua",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Registry.lua",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_InitialStateTick.lua",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_Bootstrap.lua",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_World.lua"
+  ],
+  "retrieval": {
+    "report": "P7G_RETRIEVAL.json",
+    "aggregate": {
+      "files": 33,
+      "bytes": 167545,
+      "lines": 4505
+    },
+    "delta_from_p0": {
+      "files": -4,
+      "bytes": -41977,
+      "lines": -1025
+    },
+    "same_as_p7f": true
+  }
+}

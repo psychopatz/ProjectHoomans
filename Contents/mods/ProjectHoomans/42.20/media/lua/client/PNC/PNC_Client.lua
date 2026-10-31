@@ -5,10 +5,8 @@
 
 PNC = PNC or {}
 PNC.Client = PNC.Client or {}
-PNC.Client.Internal = PNC.Client.Internal or {}
 
 local Client = PNC.Client
-local Internal = Client.Internal
 local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
 
@@ -16,7 +14,7 @@ local function isWorldReady()
     return (not isIngameState) or isIngameState()
 end
 
-Internal.IsWorldReady = isWorldReady
+Client.IsWorldReady = isWorldReady
 
 require "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter"
 require "PNC/Networking/PNC_ClientCombatCommands"
@@ -90,13 +88,13 @@ local function onResetLua()
     ClientState.activeBootstrapRequestID = nil
     ClientState.completedBootstrapRequestID = nil
     ClientState.pendingBootstrap = nil
-    if Internal.ResetZombiePursuitDirectives then
-        Internal.ResetZombiePursuitDirectives()
+    if Client.ResetZombiePursuitDirectives then
+        Client.ResetZombiePursuitDirectives()
     else
         ClientState.zombiePursuitDirectives = {}
     end
-    if Internal.ResetStealthDiscovery then
-        Internal.ResetStealthDiscovery()
+    if Client.ResetStealthDiscovery then
+        Client.ResetStealthDiscovery()
     else
         ClientState.stealthDiscovery = nil
     end
@@ -227,5 +225,5 @@ if Events and Events.OnResetLua then
     Events.OnResetLua.Add(onResetLua)
 end
 if Events and Events.OnTick then
-    Events.OnTick.Add(Internal.PumpCombatReplicas)
+    Events.OnTick.Add(Client.PumpCombatReplicas)
 end
