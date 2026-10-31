@@ -9,6 +9,8 @@ local Constants = PNC.FactionConstants
 local Types = PNC.FactionTypes
 local Archetypes = PNC.FactionArchetypes
 local EntityRef = PNC.EntityRef
+local EventBus = require "PsychopatzCore/Events/PC_EventBus"
+local FactionEvents = require "PNC/Core/Factions/PNC_FactionEvents"
 function Internal.mutateTreaty(
     firstFactionID,
     secondFactionID,
@@ -110,7 +112,13 @@ function Internal.mutateTreaty(
         "diplomacy_" .. incidentType,
         at
     )
-    return true, incidentType, Internal.copy(forward)
+    local relation = Internal.copy(forward)
+    -- Announce only after both relations, revisions and reconciliation commit.
+    -- Core isolates observer errors, as the former Knowledge observer did.
+    EventBus.emit(FactionEvents.TREATY_CHANGED,
+        firstFactionID, secondFactionID, incidentType,
+        relation, options.worldAgeHours)
+    return true, incidentType, relation
 end
 
 return Factions

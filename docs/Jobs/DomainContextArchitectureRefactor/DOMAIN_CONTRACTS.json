@@ -904,6 +904,44 @@
         "shared",
         "server"
       ]
+    },
+    "Factions": {
+      "owns": "Canonical faction registry, membership and treaty state; incident/toll/tactical subdomains remain separate public applications within this owner",
+      "namespace": "PNC.Factions",
+      "entries": [
+        "server/PNC/Factions/PNC_FactionService.lua",
+        "server/PNC/Factions/PNC_FactionCore.lua",
+        "server/PNC/Factions/PNC_FactionBehavior.lua",
+        "server/PNC/Factions/PNC_FactionIncidentService.lua",
+        "server/PNC/Factions/PNC_FactionTollService.lua",
+        "server/PNC/Factions/PNC_FactionDebug.lua",
+        "server/PNC/Factions/PNC_FactionValidation.lua",
+        "shared/PNC/Core/Factions/PNC_FactionModel.lua",
+        "shared/PNC/Core/Factions/PNC_FactionTypes.lua",
+        "shared/PNC/Core/Factions/PNC_FactionEvents.lua"
+      ],
+      "commands": [
+        "DeclareWar",
+        "StartTruce",
+        "MakePeace",
+        "EndWar",
+        "FormAlliance",
+        "BreakAlliance"
+      ],
+      "queries": [
+        "Get",
+        "GetPresentation",
+        "List",
+        "AreAtWar"
+      ],
+      "events": [
+        "FactionEvents.TREATY_CHANGED(firstID,secondID,incidentType,relationSnapshot,worldAgeHours), committed facts only"
+      ],
+      "repository": "Factions.Registry remains canonical; persistence schema/normalization remain faction-owned. Communities/player-key foreign helper access remains under review.",
+      "layers": [
+        "shared",
+        "server"
+      ]
     }
   },
   "canonical_states": {

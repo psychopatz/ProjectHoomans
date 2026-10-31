@@ -1,0 +1,88 @@
+{
+  "stage": "P7E committed Factions treaty fact instead of Knowledge private wrapper",
+  "source_revision_before": "0580df4e743e285e50f4c67096c1800eeb796270",
+  "public_contract": "shared/PNC/Core/Factions/PNC_FactionEvents.lua",
+  "private_wrapper_removed": "WorldKnowledge_Server no longer reads/writes Factions.Internal.mutateTreaty; it subscribes once to the public committed fact",
+  "preserved": "All faction admission, timestamp/instigator validation, mutation callback, audit, symmetric relation revisions, registry touches and reconciliation precede the event unchanged. Existing meaningful result values and detached relation snapshot remain. Failed/unchanged operations emit nothing. Observer errors remain isolated.",
+  "core_mechanism": {
+    "path": "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/Events/PC_EventBus.lua",
+    "sha256": "2c2a51c0cbabaa258764bb471f4a65a637e6fefece176d80fafb47f36fd47506",
+    "graph": "psychopatz-core generation2026-09-17T09:04:19Z excludes common/media. Entire current mechanism source read as required fallback; real module is exercised by the test. Core source unchanged.",
+    "dependency": "mod.info requires PsychopatzCore; explicit require uses the existing subscribe/emit mechanism, no new event bus."
+  },
+  "pre_mcp": {
+    "project": "project-hoomans",
+    "generation": "2026-10-31T02:22:16Z",
+    "tier": 2,
+    "coverage": "6 primary source/test paths metadata-match; no recorded gaps",
+    "trace": "mutateTreaty both directions depth1 complete, six public treaty-command callers. Alias false positives in math/types resolved against exact source."
+  },
+  "scope": "Only treaty observation migrates here. Existing public Health/Social/Incident/Destroy wrappers are unchanged; remaining Factions helpers remain next work.",
+  "source_proof": {
+    "mutation_admission_and_commit_body_unchanged": true,
+    "only_imports_and_success_notification_tail_change": true,
+    "before_sha256": "886b1c4edc5d3c3b94aa1bb027b2350b0f1ec52250a2300b53b5de2be5b34b8a",
+    "after_sha256": "41a6983972966b3a0b21baad36ee30ec97895dd0ad6878fc2f1cd0bfa10a4550"
+  },
+  "focused_lua": {
+    "passed": 28,
+    "total": 28
+  },
+  "full_lua": {
+    "passed": 984,
+    "total": 984,
+    "seconds": 12.83
+  },
+  "kahlua": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 3,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  },
+  "static_kahlua": {
+    "files": 3,
+    "errors": 0
+  },
+  "diagnostic_python": {
+    "passed": 22,
+    "total": 22
+  },
+  "guard": {
+    "issues": 69,
+    "new": 0,
+    "resolved": 124
+  },
+  "post_mcp": {
+    "generation": "2026-10-31T02:38:54Z",
+    "coverage": "4 changed source/test paths metadata-match; no recorded gaps",
+    "discovery": "FactionEvents graph query returns declaration, publisher and subscriber variable paths plus focused test",
+    "limitations": "No dedicated event-channel graph completeness claimed. Core common mechanism is excluded/stale in its graph and was source-verified."
+  },
+  "context": {
+    "fixed_report": "P7E_RETRIEVAL.json",
+    "fixed_aggregate": {
+      "files": 33,
+      "bytes": 167545,
+      "lines": 4505
+    },
+    "fixed_vs_P0_bytes": -41977,
+    "supplement": "P7E_KNOWLEDGE_RETRIEVAL.json",
+    "supplement_before": {
+      "files": 2,
+      "bytes": 5343,
+      "lines": 166
+    },
+    "supplement_after": {
+      "files": 2,
+      "bytes": 2346,
+      "lines": 58
+    }
+  },
+  "bootstrap": "Existing 7 expanded roots and barriers unchanged; new public vocabulary loads within the owning facade/provider and subscriber, no registrar order change."
+}

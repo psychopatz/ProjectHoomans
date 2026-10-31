@@ -1,0 +1,58 @@
+{
+  "behavior": "Change Knowledge treaty observation while preserving faction mutation admission and commit semantics",
+  "metric": "Reviewed whole maintained-source files; Core event-bus implementation is a reused public mechanism contract, not faction policy. Supplementary probe, not part of the fixed seven-probe aggregate.",
+  "before_revision": "0580df4e743e285e50f4c67096c1800eeb796270",
+  "before": {
+    "source": [
+      {
+        "path": "server/PNC/WorldKnowledge/PNC_WorldKnowledge_Server.lua",
+        "bytes": 1872,
+        "lines": 50,
+        "sha256": "4e09ea5655c2b07ddb65c9875992091768d905a1625db6b7bcd72d0be6ecfa95"
+      },
+      {
+        "path": "server/PNC/Factions/FactionService/PNC_FactionService_TreatyMutation.lua",
+        "bytes": 3471,
+        "lines": 116,
+        "sha256": "886b1c4edc5d3c3b94aa1bb027b2350b0f1ec52250a2300b53b5de2be5b34b8a"
+      }
+    ],
+    "files": 2,
+    "bytes": 5343,
+    "lines": 166,
+    "foreign_implementation": "Private faction mutator must be read to understand when the wrapper announces facts"
+  },
+  "after": {
+    "source": [
+      {
+        "path": "server/PNC/WorldKnowledge/PNC_WorldKnowledge_Server.lua",
+        "bytes": 1938,
+        "lines": 51,
+        "sha256": "8374829b7d5e0096d51acd86ce08935a7c9da72f4ebeaf7df67e3dfd249e44c8"
+      },
+      {
+        "path": "shared/PNC/Core/Factions/PNC_FactionEvents.lua",
+        "bytes": 408,
+        "lines": 7,
+        "sha256": "c5f86eb28ca88bcd518b9910e54e1b6a9f3c21a39f0743e3cc5fe18d95603050"
+      }
+    ],
+    "files": 2,
+    "bytes": 2346,
+    "lines": 58,
+    "foreign_implementation": "Public committed-fact declaration suffices; no private faction implementation retrieval for subscriber changes"
+  },
+  "delta": {
+    "files": 0,
+    "bytes": -2997,
+    "lines": -108
+  },
+  "dispatch": "Existing Core synchronous subscribe/emit mechanism; no dispatch-hop reduction claimed",
+  "tests": [
+    "tests/pnc_faction_treaty_fact_event_smoke.lua",
+    "tests/pnc_faction_diplomacy_smoke.lua",
+    "tests/pnc_faction_warfare_smoke.lua",
+    "tests/pnc_world_knowledge_smoke.lua"
+  ],
+  "mcp_discovery": "FactionEvents name query returns the public module plus publisher and subscriber variable paths; no dedicated event-channel edge completeness is claimed."
+}

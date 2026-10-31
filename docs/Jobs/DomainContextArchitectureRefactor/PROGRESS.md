@@ -58,9 +58,14 @@ literal/source fallback; clean coverage is a best-effort signal.
   existing provider, with no wrapper or new file. Private logger export is
   removed; Pathing uses the public seam. Disabled fast path is unchanged.
   Pathing/Presence matrix: **130/130**.
+- Knowledge no longer wraps the private faction treaty mutator. Factions
+  publishes a committed treaty fact through Core; Knowledge subscribes once.
+  Failed/unchanged requests publish nothing, observer failures remain isolated.
+  Treaty/Knowledge matrix **28/28**; subscriber retrieval keeps 2 files while
+  shrinking 5,343 → 2,346 bytes. Remaining faction helpers stay open.
 - The one three-file UI SCC is retained same-owner deferred window navigation,
   evidenced in `CYCLE_REVIEW.md`. Its all-phase diagnostic remains visible.
-- Maintained runtime: 3,324 files versus P0's 3,258; file count is not a target.
+- Maintained runtime: 3,325 files versus P0's 3,258; file count is not a target.
   Boundary/cycle manifestations: 69, zero new debt. The 193-entry ratchet has
   124 resolved entries; these are manifestations, not independent cycle counts.
 
@@ -80,14 +85,14 @@ Seven fixed probes: **33 files / 4,505 lines / 167,545 bytes**, versus P0's
 
 ## Current validation and limitations
 
-- Full isolated Lua: **983/983**, 4 workers, 14.48 seconds.
+- Full isolated Lua: **984/984**, 4 workers, 12.83 seconds.
 - Palette/Conversation/composition matrix: **28/28**; debug routes **2/2**;
   current semantic parity/translation Python **6/6**; dependency/bootstrap Python
   **22/22**. Prior session/authority/translation slice: **16/16** Python.
 - Puppet Opera definition storage moved byte-for-byte from UI to its owning
   client domain. Two maintained callers use its public entry; no UI-path shim
   retained. Cold storage/schema/error matrix and Opera suite pass **19/19**.
-- Changed runtime installed-PZ Kahlua: **8/8** current Presence diagnostic slice (coordination 14/14); static zero errors. Bootstrap
+- Changed runtime installed-PZ Kahlua: **3/3** current treaty-event slice (Presence diagnostics 8/8); static zero errors. Bootstrap
   ordering and diff checks pass. No game execution is implied by compiler checks.
 - Full semantic-tooling evidence remains explicit: P5B's 195 isolated modules
   yielded 155 pass / 40 fail, no timeouts, 786 tests. Focused inspector and
@@ -112,7 +117,7 @@ Seven fixed probes: **33 files / 4,505 lines / 167,545 bytes**, versus P0's
 Current contracts: `DOMAIN_CONTRACTS.json`, `SEMANTIC_SURFACES.md`,
 `PERSISTENCE_OWNERSHIP.md`, `COMPOSITION_SEAMS.md`, `INVENTORY_PILOT.md`,
 `OWNERSHIP.md`, `UI_OWNERSHIP.md`, `BODY_CONTRACTS.md`, `WORK_ITEMS.md`,
-`COORDINATION_CONTRACTS.md`, `CYCLE_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
+`COORDINATION_CONTRACTS.md`, `FACTION_CONTRACTS.md`, `CYCLE_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
 job-local reports and Git. Historical giant logs are not required reading.
 
 ## Next mandatory chunk

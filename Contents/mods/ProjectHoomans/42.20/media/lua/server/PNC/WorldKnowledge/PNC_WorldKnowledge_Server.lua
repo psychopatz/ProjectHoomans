@@ -35,12 +35,13 @@ wrap(PNC.Factions, "Destroy", function(results, factionID, reason, at)
     if results[1] == true then Adapter.PublishFactionStatus(factionID, "destroyed", reason, at) end
 end)
 
-local Internal = PNC.Factions and PNC.Factions.Internal
-wrap(Internal, "mutateTreaty", function(results, firstID, secondID, incidentType, options)
-    if results[1] == true then
-        Adapter.PublishIncident(firstID, secondID, incidentType, { relation = results[3] }, options and options.worldAgeHours)
-    end
-end)
+local EventBus = require "PsychopatzCore/Events/PC_EventBus"
+local FactionEvents = require "PNC/Core/Factions/PNC_FactionEvents"
+EventBus.subscribe(FactionEvents.TREATY_CHANGED,
+    function(firstID, secondID, incidentType, relation, worldAgeHours)
+        Adapter.PublishIncident(firstID, secondID, incidentType,
+            { relation = relation }, worldAgeHours)
+    end, Adapter)
 
 if type(Events) == "table" and Events.OnSave and type(Events.OnSave.Add) == "function" then
     Events.OnSave.Add(Adapter.Save)
