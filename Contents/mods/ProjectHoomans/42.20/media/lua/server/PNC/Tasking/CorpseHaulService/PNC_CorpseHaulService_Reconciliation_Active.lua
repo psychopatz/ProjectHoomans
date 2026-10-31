@@ -125,8 +125,8 @@ local function releaseBlockedAssignment(order, reason)
     elseif Work and Work.Commands and Work.Commands.ReleaseWorker then
         released, releaseReason = Work.Commands.ReleaseWorker(order.workerId,
             reason)
-    elseif Work and Work.Internal and Work.Internal.releaseClaim then
-        released, releaseReason = Work.Internal.releaseClaim(order, reason,
+    elseif Work and Work.Commands and Work.Commands.ReleaseClaim then
+        released, releaseReason = Work.Commands.ReleaseClaim(order, reason,
             false, true)
     end
     return released == true, releaseReason
@@ -195,8 +195,8 @@ local function recoverLegacyCompletion(order, candidates, now)
     end
     reconcileDiagnostic(order, "RECOVER", "CORPSE_HAUL_REQUEUED",
         sourceCandidate)
-    if Work and Work.Internal and Work.Internal.markAssignmentDirty then
-        Work.Internal.markAssignmentDirty(order,
+    if Work and Work.Commands and Work.Commands.MarkAssignmentDirty then
+        Work.Commands.MarkAssignmentDirty(order,
             "CORPSE_HAUL_LEGACY_COMPLETION_RECOVERED")
     end
     return "RETRYING"

@@ -25,4 +25,9 @@ require "PNC/Production/WorkService/PNC_WorkService_Queries"
 require "PNC/Production/WorkService/PNC_WorkService_Snapshots"
 require "PNC/Production/WorkService/PNC_WorkService_Scheduler"
 
+-- Public work-claim coordination; preserve existing owner functions and flags.
+PNC.WorkService.Commands.ReleaseClaim = PNC.WorkService.Internal.releaseClaim
+PNC.WorkService.Commands.MarkAssignmentDirty = PNC.WorkService.Internal.markAssignmentDirty
+PNC.WorkService.Commands.SetLiveOrder = PNC.WorkService.Internal.setLiveOrder
+
 return PNC.WorkService

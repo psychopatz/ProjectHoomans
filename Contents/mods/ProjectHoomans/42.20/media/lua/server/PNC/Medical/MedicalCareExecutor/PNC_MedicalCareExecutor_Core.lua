@@ -12,7 +12,7 @@ local Treatment = PNC.Treatment
 local Wounds = PNC.NPCWounds
 local Registry = PNC.Registry
 local Common = PNC.BehaviorCommon
-local Recovery = PNC.Tasking and PNC.Tasking.Internal
+local Recovery = PNC.Tasking and PNC.Tasking.Commands
 local WorkPolicy = PNC.WorkPolicy
     or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 

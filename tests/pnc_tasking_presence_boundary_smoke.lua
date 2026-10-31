@@ -45,6 +45,10 @@ package.preload["PNC/Needs/NeedFacilityTriggers/PNC_NeedFacilityTriggers"] =
     function() return {} end
 PNC = { Core = {} }
 local Tasking = T.load("ProjectHoomans", "server", path)
+T.equal(Tasking.Commands.ApplyMovementRecovery, Tasking.Internal.ApplyMovementRecovery,
+    "public recovery command must retain the owner function")
+T.equal(Tasking.Commands.MarkPuppetOperaResumed, Tasking.Internal.MarkPuppetOperaResumed,
+    "optional resume hook availability must stay unchanged")
 
 local commandCount = 0
 for name in pairs(commandFunctions) do

@@ -221,16 +221,16 @@ end
 
 function Internal.MarkTaskLeaseResumed(record, at)
     local service = PNC.TaskLeaseService
-    local taskInternal = PNC.Tasking and PNC.Tasking.Internal or nil
+    local taskCommands = PNC.Tasking and PNC.Tasking.Commands or nil
     local lease
     if not record or not service or type(service.ForNPC) ~= "function"
-        or not taskInternal
-        or type(taskInternal.MarkPuppetOperaResumed) ~= "function"
+        or not taskCommands
+        or type(taskCommands.MarkPuppetOperaResumed) ~= "function"
     then
         return
     end
     lease = service.ForNPC(record.id)
-    if lease then taskInternal.MarkPuppetOperaResumed(lease, at) end
+    if lease then taskCommands.MarkPuppetOperaResumed(lease, at) end
 end
 
 return PNC.PuppetOpera.Override

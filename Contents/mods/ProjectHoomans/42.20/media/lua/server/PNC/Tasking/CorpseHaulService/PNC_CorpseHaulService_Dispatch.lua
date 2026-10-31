@@ -37,8 +37,8 @@ local function pruneTerminalCorpseOrders()
             -- projection so the NPC cannot retain a production_work spec or
             -- native movement ownership.
             Internal.clearWorkRuntime(order, "terminal_corpse_order_pruned")
-            if Work and Work.Internal and Work.Internal.releaseClaim then
-                Work.Internal.releaseClaim(
+            if Work and Work.Commands and Work.Commands.ReleaseClaim then
+                Work.Commands.ReleaseClaim(
                     order,
                     "terminal_corpse_order_pruned",
                     false,

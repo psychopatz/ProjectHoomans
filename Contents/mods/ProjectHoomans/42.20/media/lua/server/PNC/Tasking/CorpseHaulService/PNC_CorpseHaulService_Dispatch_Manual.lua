@@ -62,8 +62,8 @@ local function markManualOrder(order, record)
     if WorkRepository and WorkRepository.MarkDirty then
         WorkRepository.MarkDirty()
     end
-    if Work and Work.Internal and Work.Internal.markAssignmentDirty then
-        Work.Internal.markAssignmentDirty(order,
+    if Work and Work.Commands and Work.Commands.MarkAssignmentDirty then
+        Work.Commands.MarkAssignmentDirty(order,
             "MANUAL_CORPSE_HAUL_REQUESTED")
     end
     return true, order
@@ -189,8 +189,8 @@ local function requeueManualOrder(order, record)
         })
         return true
     end
-    if Work and Work.Internal and Work.Internal.markAssignmentDirty then
-        Work.Internal.markAssignmentDirty(order,
+    if Work and Work.Commands and Work.Commands.MarkAssignmentDirty then
+        Work.Commands.MarkAssignmentDirty(order,
             "MANUAL_CORPSE_HAUL_RETRY")
         return true
     end

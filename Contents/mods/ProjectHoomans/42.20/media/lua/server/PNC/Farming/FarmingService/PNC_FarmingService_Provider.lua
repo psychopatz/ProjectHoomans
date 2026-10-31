@@ -10,7 +10,7 @@ local Internal = Service.Internal
 local Farming = PNC.Farming
 local Repository = PNC.SettlementRepository
 local baseFor = Internal.BaseFor
-local Recovery = PNC.Tasking and PNC.Tasking.Internal
+local Recovery = PNC.Tasking and PNC.Tasking.Commands
 local WorkPolicy = PNC.WorkPolicy
     or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 local FatigueGate = PNC.WorkFatigueGate

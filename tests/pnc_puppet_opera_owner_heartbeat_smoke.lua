@@ -35,7 +35,7 @@ PNC = {
         ForNPC = function() return taskLease end,
     },
     Tasking = {
-        Internal = {
+        Commands = {
             MarkPuppetOperaResumed = function(lease, at)
                 lease.puppetOperaResumeAt = at
             end,

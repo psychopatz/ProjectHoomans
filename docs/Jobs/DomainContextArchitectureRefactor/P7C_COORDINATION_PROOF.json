@@ -1,0 +1,103 @@
+{
+  "stage": "P7C public Tasking/Production coordination",
+  "source_revision_before": "fb50298474b1e868f3b24c7a986fed1a1375a22c",
+  "foreign_callers": [
+    "server/PNC/Farming/FarmingService/PNC_FarmingService_Provider.lua",
+    "server/PNC/Fishing/PNC_FishingExecutor.lua",
+    "server/PNC/Lumber/PNC_LumberExecutor.lua",
+    "server/PNC/Medical/MedicalCareExecutor/PNC_MedicalCareExecutor_Core.lua",
+    "server/PNC/Needs/NeedFacilityTriggers/PNC_NeedFacilityTriggers_Provider_Recovery.lua",
+    "server/PNC/Scavenge/ScavengeExecutor/PNC_ScavengeExecutor_Provider.lua",
+    "server/PNC/PuppetOpera/PNC_PuppetOpera_Override_Context.lua",
+    "server/PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_WorkAdapter.lua",
+    "server/PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_Reconciliation_Active.lua",
+    "server/PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_Dispatch_Manual.lua",
+    "server/PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_WorkAdapter_Transfer.lua",
+    "server/PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_Dispatch.lua"
+  ],
+  "pre_mcp": {
+    "generation": "2026-10-31T02:06:57Z",
+    "project": "project-hoomans",
+    "tier": 2,
+    "coverage": "18 owner/provider/caller paths metadata-match, no recorded gaps",
+    "trace": "ApplyMovementRecovery and releaseClaim both directions depth1 complete. Work release alias callers are incomplete; literal private-namespace scan supplements graph."
+  },
+  "optional_hook": "MarkPuppetOperaResumed has no graph definition or literal implementation found in current Tasking source. Existing guarded absence is preserved. The heartbeat fixture now supplies the optional command through its public surface. No gameplay feature is inferred or added.",
+  "load_order": "Tasking public aliases bind immediately after recovery providers and before executors/NeedFacility capture the command table. Work aliases bind after its existing providers. No provider order or barrier changes.",
+  "unchanged_implementations": [
+    {
+      "path": "server/PNC/Tasking/Tasking/PNC_Tasking_Recovery_Context.lua",
+      "sha256": "79da00937b84cb77e4e0926aa464c7ef3fc09de1fcda3500bb36d0863b7b22fd"
+    },
+    {
+      "path": "server/PNC/Production/WorkService/PNC_WorkService_Claims.lua",
+      "sha256": "7a050c29813efadfd996817838c726b0b41b3229abc1b1e1f903deecbca2d0ef"
+    },
+    {
+      "path": "server/PNC/Production/WorkService/PNC_WorkService_Core.lua",
+      "sha256": "8e76332610a05d9a8742fd5c6daf2ccfdb0a3c67abbcf9d8fa1e6241c8121b4e"
+    },
+    {
+      "path": "server/PNC/Production/WorkService/PNC_WorkService_Targets_Providers.lua",
+      "sha256": "ad56d5f783c389ce83218e9c39c4bdb524741ed096e59f1c5fe5ec1779ff1203"
+    }
+  ],
+  "focused_lua": {
+    "passed": 32,
+    "total": 32
+  },
+  "full_lua": {
+    "passed": 983,
+    "total": 983,
+    "seconds": 12.58
+  },
+  "kahlua": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 14,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  },
+  "static_kahlua": {
+    "files": 14,
+    "errors": 0
+  },
+  "diagnostic_python": {
+    "passed": 22,
+    "total": 22
+  },
+  "guard": {
+    "issues": 69,
+    "new": 0,
+    "resolved": 124,
+    "new_private_guards": [
+      "PNC.Tasking.Internal",
+      "PNC.WorkService.Internal"
+    ]
+  },
+  "post_mcp": {
+    "generation": "2026-10-31T02:16:00Z",
+    "coverage": "17 changed source/test paths metadata-match, no recorded gaps",
+    "limitations": "Public alias fields are not independent function nodes; read entry mappings with named owner snippets and literal callers."
+  },
+  "retrieval": {
+    "report": "P7C_RETRIEVAL.json",
+    "aggregate": {
+      "files": 33,
+      "lines": 4505,
+      "bytes": 167545
+    },
+    "versus_P0": {
+      "files": -4,
+      "lines": -1025,
+      "bytes": -41977
+    },
+    "explained_task_lease_delta": "+317 bytes / 4 lines for public command binding before executor captures; files and handoff depth unchanged"
+  },
+  "bootstrap": "All 7 expanded roots/barriers unchanged; no new registration or facade layer"
+}

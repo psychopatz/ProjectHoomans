@@ -1,6 +1,6 @@
 # Progress — Domain & Context Architecture Refactor
 
-**Status:** IN PROGRESS. P0–P4 developer gates accepted; P5 is active. P6 has authoring/storage slices and P7 has begun; P5/P6 review, remaining P7–P8
+**Status:** IN PROGRESS. P0–P4 developer gates accepted; P5/P6 review remains open. P7 is active with domain-boundary slices; remaining P7–P8
 and final acceptance remain mandatory. Continue automatically after each chunk.
 
 ## Objective and repository
@@ -50,6 +50,10 @@ literal/source fallback; clean coverage is a best-effort signal.
   contracts. Activities/Production SCC removed; exact composition expansion
   preserved. Two legacy public require paths forward to canonical tables; the
   temporary mixed-owner JobsRuntime registrar is removed. See `WORK_ITEMS.md`.
+- Tasking recovery and Production claim coordination now expose existing
+  functions through public Commands; foreign Internal access is guarded.
+  Bind-before-capture order and exact owner function identity are preserved.
+  Focused coordination matrix: **32/32**. See `COORDINATION_CONTRACTS.md`.
 - The one three-file UI SCC is retained same-owner deferred window navigation,
   evidenced in `CYCLE_REVIEW.md`. Its all-phase diagnostic remains visible.
 - Maintained runtime: 3,324 files versus P0's 3,258; file count is not a target.
@@ -58,9 +62,11 @@ literal/source fallback; clean coverage is a best-effort signal.
 
 ## Current retrieval evidence
 
-Seven fixed probes: **33 files / 4,501 lines / 167,228 bytes**, versus P0's
-37 / 5,530 / 209,522: **-42,294 bytes**. No unexplained individual regression.
+Seven fixed probes: **33 files / 4,505 lines / 167,545 bytes**, versus P0's
+37 / 5,530 / 209,522: **-41,977 bytes**. No unexplained individual regression.
 
+- Task lease: same files/hops; +317 bytes / 4 lines for public commands bound
+  before executors capture them. This small contract addition is explained.
 - Transfer: 5 → 4 files, 3 → 2 handoffs, -10,976 bytes.
 - Persisted inventory: 7 → 4 files, same depth, -25,710 bytes.
 - Close: same seven-file count as P0, 3 → 2 handoffs, -5,608 bytes. Its owning
@@ -70,14 +76,14 @@ Seven fixed probes: **33 files / 4,501 lines / 167,228 bytes**, versus P0's
 
 ## Current validation and limitations
 
-- Full isolated Lua: **983/983**, 4 workers, 19.39 seconds.
+- Full isolated Lua: **983/983**, 4 workers, 12.58 seconds.
 - Palette/Conversation/composition matrix: **28/28**; debug routes **2/2**;
   current semantic parity/translation Python **6/6**; dependency/bootstrap Python
   **22/22**. Prior session/authority/translation slice: **16/16** Python.
 - Puppet Opera definition storage moved byte-for-byte from UI to its owning
   client domain. Two maintained callers use its public entry; no UI-path shim
   retained. Cold storage/schema/error matrix and Opera suite pass **19/19**.
-- Changed runtime installed-PZ Kahlua: **10/10** current work-item slice (body 10/10, Identity 11/11); static zero errors. Bootstrap
+- Changed runtime installed-PZ Kahlua: **14/14** current coordination slice (work items/body 10/10 each); static zero errors. Bootstrap
   ordering and diff checks pass. No game execution is implied by compiler checks.
 - Full semantic-tooling evidence remains explicit: P5B's 195 isolated modules
   yielded 155 pass / 40 fail, no timeouts, 786 tests. Focused inspector and
@@ -102,12 +108,12 @@ Seven fixed probes: **33 files / 4,501 lines / 167,228 bytes**, versus P0's
 Current contracts: `DOMAIN_CONTRACTS.json`, `SEMANTIC_SURFACES.md`,
 `PERSISTENCE_OWNERSHIP.md`, `COMPOSITION_SEAMS.md`, `INVENTORY_PILOT.md`,
 `OWNERSHIP.md`, `UI_OWNERSHIP.md`, `BODY_CONTRACTS.md`, `WORK_ITEMS.md`,
-`CYCLE_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
+`COORDINATION_CONTRACTS.md`, `CYCLE_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
 job-local reports and Git. Historical giant logs are not required reading.
 
 ## Next mandatory chunk
 
-**Continue P5D, then P6–P8.**
+**Continue P7 private-boundary review; close P5/P6 gates, then all P8 gates.**
 
 1. Inspect the refreshed remaining-tooling results. Repair assertions against
    current public meaning/presentation/authoring contracts; preserve gameplay,

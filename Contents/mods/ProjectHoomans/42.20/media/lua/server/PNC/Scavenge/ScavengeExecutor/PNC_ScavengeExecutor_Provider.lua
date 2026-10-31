@@ -13,7 +13,7 @@ local completeLease = Internal.CompleteLease
 local workerFor = Internal.WorkerFor
 local clearWorkerAction = Internal.ClearWorkerAction
 local tickWorker = Internal.TickWorker
-local Recovery = PNC.Tasking and PNC.Tasking.Internal
+local Recovery = PNC.Tasking and PNC.Tasking.Commands
 
 local function recordFor(npcId)
     return PNC.Registry and PNC.Registry.Get

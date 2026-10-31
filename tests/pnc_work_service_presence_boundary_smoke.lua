@@ -70,6 +70,13 @@ PNC = {
     EventTypes = {},
 }
 T.load("ProjectHoomans", "server", "PNC/Production/PNC_WorkService.lua")
+T.equal(PNC.WorkService.Commands.ReleaseClaim, PNC.WorkService.Internal.releaseClaim,
+    "public work ReleaseClaim must retain the exact owner function")
+T.equal(PNC.WorkService.Commands.MarkAssignmentDirty, PNC.WorkService.Internal.markAssignmentDirty,
+    "public work MarkAssignmentDirty must retain the exact owner function")
+T.equal(PNC.WorkService.Commands.SetLiveOrder, PNC.WorkService.Internal.setLiveOrder,
+    "public work SetLiveOrder must retain the exact owner function")
+
 
 local serviceCount, commandCount, queryCount = 0, 0, 0
 for name, _ in pairs(public.service) do

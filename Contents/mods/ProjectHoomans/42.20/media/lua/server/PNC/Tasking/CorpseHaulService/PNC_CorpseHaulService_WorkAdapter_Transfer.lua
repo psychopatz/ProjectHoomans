@@ -147,8 +147,8 @@ local function recoverCompletionFailure(order, reason)
     elseif Work.Commands.ReleaseWorker and order.workerId then
         released, releaseReason = Work.Commands.ReleaseWorker(order.workerId,
             "corpse_haul_completion_retry")
-    elseif Work.Internal and Work.Internal.releaseClaim then
-        released, releaseReason = Work.Internal.releaseClaim(order,
+    elseif Work.Commands and Work.Commands.ReleaseClaim then
+        released, releaseReason = Work.Commands.ReleaseClaim(order,
             "corpse_haul_completion_retry", false, true)
     end
     if released ~= true and Work.Commands.ReleaseWorker and order.workerId then
@@ -169,8 +169,8 @@ local function recoverCompletionFailure(order, reason)
     order.updatedAt = Core.Now()
     order.revision = (tonumber(order.revision) or 0) + 1
     if WorkRepository then WorkRepository.MarkDirty() end
-    if Work.Internal and Work.Internal.markAssignmentDirty then
-        Work.Internal.markAssignmentDirty(order,
+    if Work.Commands and Work.Commands.MarkAssignmentDirty then
+        Work.Commands.MarkAssignmentDirty(order,
             "CORPSE_HAUL_COMPLETION_RETRY")
     end
     return true, "CORPSE_HAUL_COMPLETION_RETRY"

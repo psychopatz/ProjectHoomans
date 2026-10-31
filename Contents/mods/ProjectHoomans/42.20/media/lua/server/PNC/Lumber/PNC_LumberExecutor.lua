@@ -8,7 +8,7 @@ PNC.LumberExecutor = PNC.LumberExecutor or {}
 
 local Executor = PNC.LumberExecutor
 local Service = PNC.LumberService
-local Recovery = PNC.Tasking and PNC.Tasking.Internal
+local Recovery = PNC.Tasking and PNC.Tasking.Commands
 local WorkPolicy = PNC.WorkPolicy
     or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 

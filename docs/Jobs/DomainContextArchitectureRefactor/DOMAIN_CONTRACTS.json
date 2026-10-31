@@ -273,7 +273,9 @@
       ],
       "commands": [
         "Commands",
-        "TaskLeaseService.Create/Release"
+        "TaskLeaseService.Create/Release",
+        "Commands.ApplyMovementRecovery (existing snapshot coordination)",
+        "Commands.MarkPuppetOperaResumed (optional hook; absent unless owner supplies it)"
       ],
       "queries": [
         "Queries"
@@ -881,13 +883,15 @@
         "shared/PNC/Core/Production/PNC_WorkSequence.lua",
         "shared/PNC/Core/Production/PNC_WorkAnimationScenes.lua",
         "shared/PNC/Core/Production/PNC_WorkBehavior.lua",
-        "shared/PNC/Core/Production/PNC_ProductionCatalogs.lua"
+        "shared/PNC/Core/Production/PNC_ProductionCatalogs.lua",
+        "server/PNC/Production/PNC_WorkService.lua"
       ],
       "commands": [
         "JobRequirements.Register",
         "WorkItemService.RegisterValidator/Ensure/SetSource/Release",
         "existing WorkItemService pickup/return logistics",
-        "WorkItemService.Check (legacy inspection also fills a missing item.id; do not classify as a pure query)"
+        "WorkItemService.Check (legacy inspection also fills a missing item.id; do not classify as a pure query)",
+        "WorkService.Commands.ReleaseClaim/MarkAssignmentDirty/SetLiveOrder"
       ],
       "queries": [
         "JobRequirements.Get/GetRequirements/Describe/All",
@@ -935,7 +939,9 @@
     "PNC.ConversationScene.Internal": "Conversation",
     "PNC.Semantics.DialogueInput.ActiveView": "Semantics",
     "PNC.UniqueNPCEditorModel.Internal": "Identity",
-    "PNC.BodyLifecycle.Internal": "Presence"
+    "PNC.BodyLifecycle.Internal": "Presence",
+    "PNC.WorkService.Internal": "Production",
+    "PNC.Tasking.Internal": "Tasking"
   },
   "registration_manifest": "REGISTRATIONS.json",
   "private_implementation_scopes": [

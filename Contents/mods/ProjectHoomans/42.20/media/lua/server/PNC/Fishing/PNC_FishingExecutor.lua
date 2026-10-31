@@ -12,7 +12,7 @@ local Service = PNC.FishingService
 local Const = PNC.Const or {}
 local WorkPolicy = PNC.WorkPolicy
     or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
-local Recovery = PNC.Tasking and PNC.Tasking.Internal
+local Recovery = PNC.Tasking and PNC.Tasking.Commands
 
 local function liveBody(npcId)
     return PNC.Registry and PNC.Registry.GetLiveZombie

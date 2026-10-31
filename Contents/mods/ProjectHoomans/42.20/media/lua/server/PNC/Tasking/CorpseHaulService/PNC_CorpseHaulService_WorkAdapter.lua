@@ -152,10 +152,10 @@ local function setWorkPhase(order, lease, phase, status, target)
         end
     end
     if record and assignment and target and PNC.WorkService
-        and PNC.WorkService.Internal
-        and PNC.WorkService.Internal.setLiveOrder
+        and PNC.WorkService.Commands
+        and PNC.WorkService.Commands.SetLiveOrder
     then
-        PNC.WorkService.Internal.setLiveOrder(record, order, target, phase)
+        PNC.WorkService.Commands.SetLiveOrder(record, order, target, phase)
     end
     if WorkRepository then WorkRepository.MarkDirty() end
 end

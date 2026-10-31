@@ -11,7 +11,7 @@ local recordFor = Internal.RecordFor
 local definitionFor = Internal.DefinitionFor
 local taskPhaseFor = Internal.TaskPhaseFor
 local campPlacementLocked = Internal.CampPlacementLocked
-local Recovery = PNC.Tasking and PNC.Tasking.Internal
+local Recovery = PNC.Tasking and PNC.Tasking.Commands
 
 function Triggers.GetRecoveryState(lease)
     local record = recordFor(lease and lease.npcId)

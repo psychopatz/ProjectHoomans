@@ -77,6 +77,10 @@ require "PNC/Tasking/Tasking/PNC_Tasking_Assignment"
 require "PNC/Tasking/Tasking/PNC_Tasking_Evaluation"
 require "PNC/Tasking/Tasking/PNC_Tasking_Lifecycle"
 require "PNC/Tasking/Tasking/PNC_Tasking_Recovery"
+-- Public coordination commands are bound before foreign executors capture them.
+Tasking.Commands.ApplyMovementRecovery = Tasking.Internal.ApplyMovementRecovery
+-- Optional integration hook: preserve absence when no owner supplies it.
+Tasking.Commands.MarkPuppetOperaResumed = Tasking.Internal.MarkPuppetOperaResumed
 require "PNC/Tasking/Tasking/PNC_Tasking_Pump"
 require "PNC/Tasking/Tasking/PNC_Tasking_Queries"
 
