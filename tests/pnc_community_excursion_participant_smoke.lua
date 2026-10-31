@@ -61,7 +61,7 @@ PNC = {
     FactionTypes = {},
 }
 PNC.FactionTypes.Internal = {}
-T.load(SHARED .. "PNC_FactionTypes/Base.lua")
+T.load(SHARED .. "PNC_FactionTypes.lua")
 
 local homeCommunity = {
     id = "community_m10d_generic_home",
@@ -115,12 +115,11 @@ PNC.Factions = {
         return factions[factionID]
             and factions[factionID].memberIDs[npcID] == true
     end,
-    Internal = {
-        registryRecord = function(factionID) return factions[factionID] end,
-        touchFaction = function(record)
+    Repository = {
+        GetRecord = function(factionID) return factions[factionID] end,
+        MarkChanged = function(record)
             record.revision = (tonumber(record.revision) or 0) + 1
         end,
-        touchRegistry = function() end,
     },
 }
 PNC.Communities = {

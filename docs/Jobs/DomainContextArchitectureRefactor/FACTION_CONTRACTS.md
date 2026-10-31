@@ -3,7 +3,7 @@
 Authoritative entry: `server/PNC/Factions/PNC_FactionService.lua`.
 Factions owns its registry, affiliation/treaty schema, admission and symmetric
 relation commit. Incident, tactical behavior and toll applications retain their
-existing public entries. Communities/player-key helper access remains open work.
+existing public entries.
 
 ## Committed treaty facts
 
@@ -30,3 +30,22 @@ Knowledge handoff set keeps two files while replacing the private treaty
 implementation with the public fact declaration; exact bytes/lines and scope
 are in `P7E_KNOWLEDGE_RETRIEVAL.json`. The fixed seven-probe aggregate remains
 separate. `P7E_FACTION_FACTS_PROOF.json` records behavioral and source evidence.
+
+## Aggregate and shape cooperation
+
+`Factions.Repository.GetRecord` loads and returns the canonical faction aggregate
+for trusted authoritative child-domain writers. Communities owns excursion work;
+`Repository.MarkChanged` retains the exact parent faction/registry revision and
+dirty marking sequence. `Repository.IsAuthority` shares the existing predicate.
+UI/read-only consumers retain the existing detached Get/List query contracts.
+
+`Factions.FindPlayerKey` performs the existing non-creating identity lookup.
+Colonist departure retains its primary identity lookup and external callback
+error fence. FactionTypes publicly exposes its pure NormalizeTargetPoint and
+NormalizeExcursion functions; schema implementation bodies are unchanged.
+Foreign Factions.Internal and FactionTypes.Internal access is now guarded.
+
+P7F retains one registry and existing unavailable-capability fallbacks. There is
+no new persistence, authority, event or scheduling mechanism. See
+`P7F_FACTION_REPOSITORY_PROOF.json` and `P7F_MCP_PROOF.json`, including the graph's
+Travel alias false positives and indirect colonist-call limitation.

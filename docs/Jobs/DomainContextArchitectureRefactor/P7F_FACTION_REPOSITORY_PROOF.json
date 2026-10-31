@@ -1,0 +1,61 @@
+{
+  "stage": "P7F public faction aggregate/schema cooperation",
+  "source_revision_before": "591f6fe7ded877337a31a3cd68a357e8436bf71e",
+  "pre_mcp": {
+    "generation": "2026-10-31T02:38:54Z",
+    "project": "project-hoomans",
+    "tier": 2,
+    "coverage": "10 owner/caller/schema/test paths metadata-match; no recorded gaps",
+    "symbols": [
+      "Internal.authority",
+      "Internal.registryRecord",
+      "Internal.touchFaction",
+      "Internal.touchRegistry",
+      "Internal.playerKeyFor",
+      "Base.normalizeTargetPoint",
+      "Base.normalizeExcursion"
+    ]
+  },
+  "ownership": "One canonical Factions.Registry. Communities borrows an owner-loaded faction aggregate for its excursion workflow and calls the owner to mark parent revisions/dirty state. Pure stored-shape normalization remains FactionTypes-owned. No state copies or new store.",
+  "behavior": "GetRecord performs the same single EnsureLoaded before the same registry lookup. MarkChanged calls the same faction revision then registry revision/dirty helpers. FindPlayerKey delegates with ensure=false, preserving the colonist fallback callback and error fence. Existing unavailable-capability fallbacks remain.",
+  "unchanged_implementations": [
+    {
+      "path": "server/PNC/Factions/FactionService/PNC_FactionService_State.lua",
+      "sha256": "abd3f20bced87b95896dc5eb8fb0115b0349774a34c69557398101bd4ced88d1"
+    },
+    {
+      "path": "server/PNC/Factions/FactionService/PNC_FactionService_PlayerLookup.lua",
+      "sha256": "3c7bb9a87a1639d5d47b171e0058d7185e087fbe58a4406c89ab33ed23e03725"
+    },
+    {
+      "path": "shared/PNC/Core/Factions/PNC_FactionTypes/Base.lua",
+      "sha256": "5a5f57579ead4adf6d934baab60a3d13fae52f7296d41c875771e816230c75b9"
+    }
+  ],
+  "validation": {
+    "focused_lua": "28/28",
+    "full_lua": "984/984; 22.70 seconds",
+    "diagnostic_python": "22/22",
+    "installed_kahlua": {
+      "schemaVersion": 1,
+      "type": "kahlua_compile_verification",
+      "compiler": "installed_project_zomboid_kahlua_luacompiler",
+      "gameLaunched": false,
+      "luaExecuted": false,
+      "filesChecked": 4,
+      "passed": true,
+      "failure": null,
+      "sourceKind": "CHECKED_OUT_LUA",
+      "writesToSource": 0
+    },
+    "static_kahlua": "4 changed runtime files; 0 errors",
+    "dependency_guard": {
+      "issues": 69,
+      "new": 0,
+      "domain_sccs": 2
+    },
+    "graph_generation": "2026-10-31T03:03:46Z",
+    "retrieval": "P7F_RETRIEVAL.json; fixed seven probes unchanged from P7E",
+    "fixtures": "Community tests now load public FactionTypes entry instead of private Base provider; failure shape assertions retained."
+  }
+}

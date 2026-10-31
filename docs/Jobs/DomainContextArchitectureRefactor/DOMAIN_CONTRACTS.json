@@ -926,18 +926,23 @@
         "MakePeace",
         "EndWar",
         "FormAlliance",
-        "BreakAlliance"
+        "BreakAlliance",
+        "Repository.MarkChanged (authoritative child-domain writers only)"
       ],
       "queries": [
         "Get",
         "GetPresentation",
         "List",
-        "AreAtWar"
+        "AreAtWar",
+        "Repository.IsAuthority",
+        "Repository.GetRecord (loaded canonical aggregate borrowed by authoritative child-domain workflows)",
+        "FindPlayerKey (no identity creation)",
+        "FactionTypes.NormalizeTargetPoint/NormalizeExcursion"
       ],
       "events": [
         "FactionEvents.TREATY_CHANGED(firstID,secondID,incidentType,relationSnapshot,worldAgeHours), committed facts only"
       ],
-      "repository": "Factions.Registry remains canonical; persistence schema/normalization remain faction-owned. Communities/player-key foreign helper access remains under review.",
+      "repository": "Factions.Registry remains canonical. Repository loads/borrows aggregates and owns revision/dirty marking; FactionTypes owns stored child-record shape. Communities owns excursion workflow, not another faction store.",
       "layers": [
         "shared",
         "server"
@@ -981,7 +986,9 @@
     "PNC.BodyLifecycle.Internal": "Presence",
     "PNC.WorkService.Internal": "Production",
     "PNC.Tasking.Internal": "Tasking",
-    "PNC.Presence.Internal": "Presence"
+    "PNC.Presence.Internal": "Presence",
+    "PNC.Factions.Internal": "Factions",
+    "PNC.FactionTypes.Internal": "Factions"
   },
   "registration_manifest": "REGISTRATIONS.json",
   "private_implementation_scopes": [

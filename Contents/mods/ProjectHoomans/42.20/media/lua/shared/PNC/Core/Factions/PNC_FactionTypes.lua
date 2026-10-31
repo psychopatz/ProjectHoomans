@@ -14,4 +14,8 @@ require "PNC/Core/Factions/PNC_FactionTypes/Factions"
 require "PNC/Core/Factions/PNC_FactionTypes/Registry"
 require "PNC/Core/Factions/PNC_FactionTypes/Equality"
 
+-- Public, serialization-safe shapes used by community excursion workflows.
+PNC.FactionTypes.NormalizeTargetPoint = PNC.FactionTypes.Internal.NormalizeTargetPoint
+PNC.FactionTypes.NormalizeExcursion = PNC.FactionTypes.Internal.NormalizeExcursion
+
 return PNC.FactionTypes

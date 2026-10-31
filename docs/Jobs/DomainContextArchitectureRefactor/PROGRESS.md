@@ -120,6 +120,15 @@ Current contracts: `DOMAIN_CONTRACTS.json`, `SEMANTIC_SURFACES.md`,
 `COORDINATION_CONTRACTS.md`, `FACTION_CONTRACTS.md`, `CYCLE_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
 job-local reports and Git. Historical giant logs are not required reading.
 
+## Latest validated boundary
+
+P7F migrates Communities to Factions.Repository and public FactionTypes shapes;
+colonist departure uses the non-creating public player-key lookup. Canonical
+aggregate, normalizers and revision behavior are preserved. Validation: 28/28
+focused, 984/984 full Lua, 22/22 diagnostics, installed Kahlua 4/4, static errors 0;
+guard 69 issues/0 new and the same two owner SCCs. Fixed seven retrieval probes
+remain unchanged from P7E. Source/graph limitations are in P7F proofs.
+
 ## Next mandatory chunk
 
 **Continue P7 private-boundary review; close P5/P6 gates, then all P8 gates.**
@@ -132,7 +141,7 @@ job-local reports and Git. Historical giant logs are not required reading.
    with exact paths, phases and canonical owners rather than analyzer counts.
 3. Complete P6 UI authority/persistence classification and owning public seams.
 4. Complete P7's mandatory domain/transport/performance review, including remaining
-   Factions/Knowledge, client transport and remaining domain-private coupling. Tasking/BodyLifecycle access
+   Knowledge observation, client transport and remaining domain-private coupling. Tasking/BodyLifecycle access
    has migrated; the broader mandatory domain review remains. Re-read M12 before
    touching body/presence/network authority and preserve its current contracts.
 5. Complete every P8 cleanup and final validation gate, including a current full

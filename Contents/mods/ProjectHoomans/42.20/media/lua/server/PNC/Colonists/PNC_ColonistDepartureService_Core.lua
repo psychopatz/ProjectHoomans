@@ -77,13 +77,12 @@ local function playerKeyFor(player, at)
             return tostring(key)
         end
     end
-    local internal = Factions and Factions.Internal
-    if internal and internal.playerKeyFor then
+    local findKey = Factions and Factions.FindPlayerKey
+    if findKey then
         ok, key = pcall(
-            internal.playerKeyFor,
+            findKey,
             player,
-            "colonist_departure",
-            false
+            "colonist_departure"
         )
         if ok and key and tostring(key) ~= "" then
             return tostring(key)

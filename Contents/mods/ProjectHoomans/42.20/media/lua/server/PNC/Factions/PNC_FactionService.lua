@@ -8,6 +8,9 @@ end
 PNC = PNC or {}
 PNC.Factions = PNC.Factions or {}
 PNC.Factions.Internal = PNC.Factions.Internal or {}
+PNC.Factions.Repository = PNC.Factions.Repository or {}
+local Factions = PNC.Factions
+local Repository = Factions.Repository
 
 require "PNC/Factions/FactionService/PNC_FactionService_State"
 require "PNC/Factions/FactionService/PNC_FactionService_RegistryIndexes"
@@ -30,5 +33,20 @@ require "PNC/Factions/FactionService/PNC_FactionService_TreatyCommands"
 require "PNC/Factions/FactionService/PNC_FactionService_PlayerAggression"
 require "PNC/Factions/FactionService/PNC_FactionService_NPCAggression"
 require "PNC/Factions/FactionService/PNC_FactionService_Lifecycle"
+
+-- Borrowed canonical aggregates support authoritative child-domain writers.
+Repository.IsAuthority = Factions.Internal.authority
+function Repository.GetRecord(factionID)
+    Factions.EnsureLoaded()
+    return Factions.Internal.registryRecord(factionID)
+end
+function Repository.MarkChanged(faction)
+    Factions.Internal.touchFaction(faction)
+    Factions.Internal.touchRegistry()
+end
+-- This lookup never creates/registers a player identity.
+function Factions.FindPlayerKey(player, callback)
+    return Factions.Internal.playerKeyFor(player, callback, false)
+end
 
 return PNC.Factions

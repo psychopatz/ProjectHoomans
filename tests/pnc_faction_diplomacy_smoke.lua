@@ -653,6 +653,18 @@ end
 T.truthy(auditPreserved, "treaty audit preserved")
 saveSafe(Factions.Registry)
 saveSafe(migratedOnce)
+-- Child-domain writers borrow the canonical aggregate and mark its owner.
+local aggregate = Factions.Repository.GetRecord(alpha.id)
+T.truthy(aggregate)
+T.equal(aggregate, Factions.Registry.byID[alpha.id], "repository duplicated faction state")
+local priorFactionRevision = aggregate.revision
+local priorRegistryRevision = Factions.Registry.revision
+Factions.Repository.MarkChanged(aggregate)
+T.equal(aggregate.revision, priorFactionRevision + 1)
+T.equal(Factions.Registry.revision, priorRegistryRevision + 1)
+T.equal(Factions.Repository.IsAuthority, Factions.Internal.authority)
+T.equal(Types.NormalizeTargetPoint, Types.Internal.NormalizeTargetPoint)
+T.equal(Types.NormalizeExcursion, Types.Internal.NormalizeExcursion)
 T.finish("pnc_faction_diplomacy_smoke")
 
 T.finish("pnc_faction_diplomacy_smoke")

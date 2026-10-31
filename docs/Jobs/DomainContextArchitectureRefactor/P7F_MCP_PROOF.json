@@ -1,0 +1,108 @@
+{
+  "coverage": {
+    "project": "project-hoomans",
+    "signal": "best_effort",
+    "indexed_at": "2026-10-31T03:03:46Z",
+    "metadata": {
+      "generation": "2026-10-31T03:03:46Z",
+      "index_mode": "full",
+      "recorded_at": "2026-10-31T03:03:54Z",
+      "recording_status": "complete",
+      "ignored_files_stored": 129,
+      "ignored_files_total": 129,
+      "hash_records_complete": true,
+      "coverage_version": 3,
+      "generation_matches": true
+    },
+    "paths": [
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionService.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/PNC_FactionService.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityExcursionService.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Communities/PNC_CommunityExcursionService.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colonists/PNC_ColonistDepartureService_Core.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Colonists/PNC_ColonistDepartureService_Core.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionTypes.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionTypes.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/FactionService/PNC_FactionService_State.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/FactionService/PNC_FactionService_State.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/FactionService/PNC_FactionService_PlayerLookup.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Factions/FactionService/PNC_FactionService_PlayerLookup.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionTypes/Base.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Factions/PNC_FactionTypes/Base.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_community_excursion_smoke.lua",
+        "path": "tests/pnc_community_excursion_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_community_excursion_participant_smoke.lua",
+        "path": "tests/pnc_community_excursion_participant_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_faction_diplomacy_smoke.lua",
+        "path": "tests/pnc_faction_diplomacy_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      }
+    ],
+    "scopes": [],
+    "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+  },
+  "traces": [
+    "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Factions.PNC_FactionService.Repository.GetRecord\ndirection: both\ncallees_total: 2\ncallees: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Factions.FactionService.PNC_FactionService_RegistryPersistence.Factions:\n  EnsureLoaded 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Factions.FactionService.PNC_FactionService_State.Internal:\n  registryRecord 1\ncallers_total: 2\ncallers: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Communities.PNC_CommunityExcursionService:\n  factionRecord 1\nproject-hoomans.tests:\n  pnc_faction_diplomacy_smoke 1\n",
+    "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Factions.PNC_FactionService.Repository.MarkChanged\ndirection: both\ncallees_total: 2\ncallees: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Factions.FactionService.PNC_FactionService_State.Internal:\n  touchFaction 1\n  touchRegistry 1\ncallers_total: 9\ncallers: 9  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Communities.PNC_CommunityExcursionService:\n  touch 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Travel.PNC_Travel_Service.PNC_Travel_Service_Control.Service:\n  Retarget 1\n  SetState 1\n  Start 1\n  Supersede 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Travel.PNC_Travel_Service.PNC_Travel_Service_Live.Service:\n  TickLive 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Travel.PNC_Travel_Service.PNC_Travel_Service_Progression.Service:\n  Advance 1\n  ReachCurrentWaypoint 1\nproject-hoomans.tests:\n  pnc_faction_diplomacy_smoke 1\n",
+    "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Factions.PNC_FactionService.Factions.FindPlayerKey\ndirection: both\ncallees_total: 1\ncallees: 1  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Factions.FactionService.PNC_FactionService_PlayerLookup.Internal:\n  playerKeyFor 1\ncallers_total: 0\ncallers: 0  (rows: name hop; qn = group prefix + \".\" + name)\n"
+  ],
+  "limitations": "Repository.MarkChanged graph includes seven false Travel.Repository aliases; source confines real foreign use to Communities.touch. FindPlayerKey indirect local function reference in colonist departure is absent from CALLS; exact source reviewed. No exhaustive call-graph claim."
+}

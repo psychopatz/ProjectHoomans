@@ -15,7 +15,7 @@ local Communities = PNC.Communities
 local Types = PNC.FactionTypes
 local Constants = PNC.FactionConstants
 local Store = PNC.AbstractWorldStore
-local Internal = Factions and Factions.Internal or {}
+local Repository = Factions and Factions.Repository or {}
 local Core = PNC.Core
 
 Service.VERSION = 1
@@ -63,8 +63,8 @@ local function copy(value)
 end
 
 local function authority()
-    if Internal and type(Internal.authority) == "function" then
-        return Internal.authority() == true
+    if Repository and type(Repository.IsAuthority) == "function" then
+        return Repository.IsAuthority() == true
     end
     return Core and type(Core.IsAuthority) == "function"
         and Core.IsAuthority() == true
@@ -133,11 +133,11 @@ local function requestDiagnostic(kind, name, reason)
 end
 
 local function factionRecord(factionID)
+    if Repository and type(Repository.GetRecord) == "function" then
+        return Repository.GetRecord(factionID)
+    end
     if Factions and type(Factions.EnsureLoaded) == "function" then
         Factions.EnsureLoaded()
-    end
-    if Internal and type(Internal.registryRecord) == "function" then
-        return Internal.registryRecord(factionID)
     end
     return Factions and Factions.Registry
         and Factions.Registry.byID and Factions.Registry.byID[factionID]
@@ -145,23 +145,18 @@ local function factionRecord(factionID)
 end
 
 local function touch(faction, reason)
-    if Internal and type(Internal.touchFaction) == "function" then
-        Internal.touchFaction(faction)
-    else
-        faction.revision = math.max(0, math.floor(
-            tonumber(faction.revision) or 0
-        )) + 1
+    if Repository and type(Repository.MarkChanged) == "function" then
+        Repository.MarkChanged(faction)
+        return
     end
-    if Internal and type(Internal.touchRegistry) == "function" then
-        Internal.touchRegistry()
-    elseif Factions then
-        Factions.Dirty = true
-    end
+    faction.revision = math.max(0, math.floor(
+        tonumber(faction.revision) or 0
+    )) + 1
+    if Factions then Factions.Dirty = true end
 end
 
 local function normalizeTarget(target)
-    local normalizer = Types and Types.Internal
-        and Types.Internal.NormalizeTargetPoint or nil
+    local normalizer = Types and Types.NormalizeTargetPoint or nil
     if type(normalizer) == "function" then
         return normalizer(target, "location")
     end
@@ -212,8 +207,7 @@ local function normalizeItinerary(values)
 end
 
 local function normalizeExcursion(value)
-    local normalizer = Types and Types.Internal
-        and Types.Internal.NormalizeExcursion or nil
+    local normalizer = Types and Types.NormalizeExcursion or nil
     if type(normalizer) == "function" then return normalizer(value) end
     if type(value) ~= "table" then return nil end
     local homeFactionID = safeText(value.homeFactionID, Constants.ID_MAX_LENGTH)
