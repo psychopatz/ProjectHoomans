@@ -122,6 +122,11 @@ job-local reports and Git. Historical giant logs are not required reading.
 
 ## Latest validated boundary
 
+P7H classifies all 24 literal cross-owner imports in the presentation/knowledge
+owner group as retained public runtime composition relations. The diagnostics
+remain visible; no runtime edits. Focused knowledge/journal/result/debug tests
+pass 30/30. The Identity/Semantics/Social/World group still needs closure.
+
 P5E replaces stale 14-behavior/23-evidence counts with exact existing 30/26
 member sets. Four focused Python tests pass; catalog bodies and generated data
 are byte-identical to the pre-architecture revision. No wording/gameplay change.

@@ -1,0 +1,592 @@
+{
+  "stage": "P7H bounded Companions/Knowledge/Networking/UI cycle review",
+  "graph_generation": "2026-10-31T03:08:21Z",
+  "tier": 2,
+  "coverage": {
+    "project": "project-hoomans",
+    "signal": "best_effort",
+    "indexed_at": "2026-10-31T03:08:21Z",
+    "metadata": {
+      "generation": "2026-10-31T03:08:21Z",
+      "index_mode": "full",
+      "recorded_at": "2026-10-31T03:08:24Z",
+      "recording_status": "complete",
+      "ignored_files_stored": 131,
+      "ignored_files_total": 131,
+      "hash_records_complete": true,
+      "coverage_version": 3,
+      "generation_matches": true
+    },
+    "paths": [
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Commands/PNC_CompanionCommandInteractionQueue.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Commands/PNC_CompanionCommandInteractionQueue.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Commands/PNC_CompanionCommandPresentation.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Commands/PNC_CompanionCommandPresentation.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Commands/PNC_CompanionTargetResolver.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Commands/PNC_CompanionTargetResolver.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_KnowledgeInterest.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_KnowledgeInterest.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientActions/PNC_ClientActions_Debug_Spawn.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientActions/PNC_ClientActions_Debug_Spawn.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Colony.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Colony.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_CompanionCommandResult.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_CompanionCommandResult.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_InteractionResults.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_InteractionResults.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_Bootstrap.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_Bootstrap.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_InitialStateTick.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_InitialStateTick.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Info.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Info.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_ContextHub.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_ContextHub.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_NPCSelection.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_NPCSelection.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionMemberWindow.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionMemberWindow.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionTollWindow.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionTollWindow.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Inventory/PNC_InventoryWindow.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Inventory/PNC_InventoryWindow.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapCommandRegistry_Core.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapCommandRegistry_Core.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapHoverPortrait.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapHoverPortrait.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapHoverPortraitCard.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapHoverPortraitCard.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Nameplates/PNC_NameplateEntries.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Nameplates/PNC_NameplateEntries.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Nameplates/PNC_NameplateScopes.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Nameplates/PNC_NameplateScopes.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Nameplates/PNC_NameplateToolFeedback.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Nameplates/PNC_NameplateToolFeedback.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Shared/PNC_ColonyUIShared.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Shared/PNC_ColonyUIShared.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Journals/PNC_ColonyJournalFeed.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Journals/PNC_ColonyJournalFeed.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/ServerDebugCommandHandler/PNC_ServerDebugCommandHandler_Core.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/ServerDebugCommandHandler/PNC_ServerDebugCommandHandler_Core.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Companions/PNC_DebugCompanionInitialization.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Companions/PNC_DebugCompanionInitialization.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Networking/PNC_ColonyJournalProtocol.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Networking/PNC_ColonyJournalProtocol.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      }
+    ],
+    "scopes": [],
+    "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+  },
+  "traces": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Knowledge.PNC_NPCIdentityPresentation.Identity.GetName\ndirection: both\ncallees_total: 4\ncallees: 4  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Knowledge.PNC_NPCIdentityPresentation.Identity:\n  GetDebugName 1\n  GetFact 1\n  IsNameKnown 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Knowledge.PNC_NPCIdentityPresentation:\n  clientState 1\ncallers_total: 19\ncallers: 19  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Commands.PNC_CompanionCommandInteractionQueue:\n  targetName 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Commands.PNC_CompanionCommandPresentation:\n  targetName 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Commands.PNC_CompanionTargetResolver:\n  targetName 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Conversation.PNC_SemanticSpeechPresentation_Core:\n  npcName 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Knowledge.PNC_NPCIdentityPresentation.Identity:\n  GetContextLabel 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Travel.PNC_TravelDirectory.Directory:\n  GetProjected 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.CharacterWindow.PNC_CharacterWindow:\n  ISPNCCharacterWindow:refreshTitle 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.CharacterWindow.PNC_CharacterWindow_Info.Tabs:\n  RenderInfo 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Context.PNC_NPCSelection:\n  buildEntry 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Context.PNC_SinkCompanionContext:\n  companionName 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Factions.PNC_FactionMemberWindow_Core:\n  ISPNCFactionMemberWindow:refreshSnapshot 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Factions.PNC_FactionPresentation.FactionPresentation:\n  Resolve 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Inventory.InventoryWindow._Refresh:\n  updateInventoryIdentity 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Map.Layers.PNC_MapLayer_Travel:\n  displayLabel 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Map.PNC_MapCommandRegistry_Core:\n  normalizedSelection 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Map.PNC_MapHoverPortraitCard:\n  PNCMapHoverPortraitCard:setContext 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Nameplates.PNC_NameplateEntries_Metrics:\n  cacheMetrics 1\nproject-hoomans.tests:\n  pnc_identity_presentation_smoke 1\n  pnc_semantic_identity_knowledge_mirror_smoke 1\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Knowledge.PNC_KnowledgeInterest.Interest.Require\ndirection: both\ncallees_total: 2\ncallees: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Knowledge.PNC_KnowledgeInterest:\n  isHydrated 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Compatibility.Mods.CompanionDogs.PNC_CompanionDogs_Access.Internal:\n  Now 1\ncallers_total: 3\ncallers: 3  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.UI.Map.PNC_MapHoverPortrait.HoverPortrait:\n  Update 1\nproject-hoomans.tests:\n  pnc_client_commands_smoke 1\n  pnc_client_initial_state_retry_smoke 1\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Networking.PNC_ColonyJournalProtocol.Protocol.ToWire\ndirection: both\ncallees_total: 1\ncallees: 1  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Networking.PNC_ColonyJournalProtocol:\n  primitive 1\ncallers_total: 2\ncallers: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Journals.PNC_ColonyJournalFeed.Feed:\n  GetDelta 1\nproject-hoomans.tests:\n  pnc_colony_journal_feed_smoke 1\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Companions.PNC_DebugCompanionInitialization.Initialization.ApplyKnownCompanion\ndirection: both\ncallees_total: 6\ncallees: 6  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Knowledge.NPCKnowledgeService.PNC_NPCKnowledgeService_Discovery.Knowledge:\n  DiscoverAllForPlayer 1\n  DiscoverTopicForPlayer 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Knowledge.NPCKnowledgeService.PNC_NPCKnowledgeService_PlayerSnapshots.Knowledge:\n  BuildPlayerSnapshotForPlayer 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Player.PlayerCharacterService.PNC_PlayerCharacterService_Resolution.PlayerCharacters:\n  GetEntityKey 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Social.RelationshipService.PNC_RelationshipService_Queries.Relationships:\n  SetInitialBaseline 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Networking.PNC_Network_Server.PNC_Network_Server_DebugPayloads.Network:\n  SendNPCKnowledge 1\ncallers_total: 2\ncallers: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientActions:\n  PNC_ClientActions_Debug_Spawn 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Networking.Handlers.ServerDebugCommandHandler.PNC_ServerDebugCommandHandler_Core.H:\n  HandleDebugSpawn 1\n"
+          }
+        ],
+        "isError": false
+      }
+    }
+  ],
+  "scope": "24 cross-owner literal-import edges among four owners, complete for the current architecture cache; same-owner import SCC retained separately. Does not claim complete dynamic/alias call graph.",
+  "classification": "Required public runtime composition relations plus all-phase/domain aggregation: client presentation queries and typed result notification; Knowledge server journal uses a pure Networking wire codec; debug SP/MP paths call one Companions application seam. Public calls retain canonical authority and existing bounded work.",
+  "validation": {
+    "focused_lua": "30/30",
+    "current_full_lua": "984/984; unchanged runtime from P7G",
+    "current_guard": "69 issues/0 new; diagnostics retained",
+    "fixed_retrieval": "P7G_RETRIEVAL.json unchanged; no source moves/edits",
+    "runtime_changes": 0
+  },
+  "literal_edges": [
+    {
+      "source": "client/PNC/Commands/PNC_CompanionCommandInteractionQueue.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "Companions",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/Commands/PNC_CompanionCommandPresentation.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "Companions",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/Commands/PNC_CompanionTargetResolver.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "Companions",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/Networking/ClientActions/PNC_ClientActions_Debug_Spawn.lua",
+      "target": "shared/PNC/Core/Companions/PNC_DebugCompanionInitialization.lua",
+      "from": "Networking",
+      "to": "Companions"
+    },
+    {
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Colony.lua",
+      "target": "client/PNC/UI/Shared/PNC_ColonyUIShared.lua",
+      "from": "Networking",
+      "to": "UI"
+    },
+    {
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_CompanionCommandResult.lua",
+      "target": "client/PNC/UI/Nameplates/PNC_NameplateToolFeedback.lua",
+      "from": "Networking",
+      "to": "UI"
+    },
+    {
+      "source": "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_InteractionResults.lua",
+      "target": "client/PNC/UI/Factions/PNC_FactionTollWindow.lua",
+      "from": "Networking",
+      "to": "UI"
+    },
+    {
+      "source": "client/PNC/Networking/ClientRequests/PNC_ClientRequests_Bootstrap.lua",
+      "target": "client/PNC/Knowledge/PNC_KnowledgeInterest.lua",
+      "from": "Networking",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/Networking/ClientRequests/PNC_ClientRequests_InitialStateTick.lua",
+      "target": "client/PNC/Knowledge/PNC_KnowledgeInterest.lua",
+      "from": "Networking",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/UI/CharacterWindow/PNC_CharacterWindow.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Info.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/UI/Context/PNC_ContextHub.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/UI/Context/PNC_NPCSelection.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/UI/Factions/PNC_FactionMemberWindow.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/UI/Inventory/PNC_InventoryWindow.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/UI/Map/PNC_MapCommandRegistry_Core.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/UI/Map/PNC_MapHoverPortrait.lua",
+      "target": "client/PNC/Knowledge/PNC_KnowledgeInterest.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/UI/Map/PNC_MapHoverPortrait.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/UI/Map/PNC_MapHoverPortraitCard.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/UI/Nameplates/PNC_NameplateEntries.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "source": "client/PNC/UI/Nameplates/PNC_NameplateScopes.lua",
+      "target": "client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "from": "UI",
+      "to": "Knowledge"
+    },
+    {
+      "source": "server/PNC/Journals/PNC_ColonyJournalFeed.lua",
+      "target": "shared/PNC/Core/Networking/PNC_ColonyJournalProtocol.lua",
+      "from": "Knowledge",
+      "to": "Networking"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/ServerDebugCommandHandler/PNC_ServerDebugCommandHandler_Core.lua",
+      "target": "shared/PNC/Core/Companions/PNC_DebugCompanionInitialization.lua",
+      "from": "Networking",
+      "to": "Companions"
+    }
+  ],
+  "source_hashes": [
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Commands/PNC_CompanionCommandInteractionQueue.lua",
+      "sha256": "c7724616bb38e14255cb1db41776375ebd1ca218e8408db6b8e7c5ba59716ec4"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Commands/PNC_CompanionCommandPresentation.lua",
+      "sha256": "3176197c39d508d7f404c31175132c7620a8b651148e792498eeea76535b94f6"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Commands/PNC_CompanionTargetResolver.lua",
+      "sha256": "ac1cc9f81a29b5e1bc1ada7ddcc19ac47f0a0d094b683c5087ac7a2f8fd9f4d8"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_KnowledgeInterest.lua",
+      "sha256": "d292d7e9fa8bde45a689020d003e10ee023a29ac06f3e8558fb33358b24173ad"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua",
+      "sha256": "97733d220db6e794006f82cdd6fc1a66c982438290be33271e9b19ae52bba5e6"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientActions/PNC_ClientActions_Debug_Spawn.lua",
+      "sha256": "5f43dbb22c83490d091b710e6c2ccd833a4750a45de7df09122590e3c1e13334"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Colony.lua",
+      "sha256": "5413c6d1b5e0ea9dde04e38a950af011d3b764e3939914d5906ab13b727e8da8"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_CompanionCommandResult.lua",
+      "sha256": "b70b8824966be79f08884ad6d095764619ae18c170dbea1ffc97aba6709d2cb4"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_InteractionResults.lua",
+      "sha256": "edc8c1b0979f4fcc71cec2edda927fd0d32ddd82739331bcaa3a0344462194eb"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_Bootstrap.lua",
+      "sha256": "d3ed9e12c7ca24b829c538d5d7f5b9126b167ca77e045b06dc943baf23315364"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientRequests/PNC_ClientRequests_InitialStateTick.lua",
+      "sha256": "50572ba484cf2ae7347f0cb5a90f3cb4de4355088f78450057f79ce84467cdc7"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow.lua",
+      "sha256": "f77ad0743001dfd72b0500a792bb704944be1d11996d0380ec4efcb968582152"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Info.lua",
+      "sha256": "226ec712cfe1db036be0733974eccdcb7835cdefb097840c32b75edb191f2936"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_ContextHub.lua",
+      "sha256": "e594b9c5d6e61eb2c357362ab66a34f40045f94a2e5ca3d288ec1fbfa835bfae"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_NPCSelection.lua",
+      "sha256": "26e6267494a6fe3a66ebac67bbb3b6be4167697d95f3f768c128f1f1cdd081ff"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionMemberWindow.lua",
+      "sha256": "f3ae0fc009692cdb53b2f69456bc3603b7b63e7368c1ad6703e81452e43343ed"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionTollWindow.lua",
+      "sha256": "c338557108e89fbdd5284f3b7279b3746fdefb5cc095b383e6e6f26e8cdc9655"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Inventory/PNC_InventoryWindow.lua",
+      "sha256": "fdc5e4a539fad13221ebf72f2e2b586983b76324caec793c6ebe03e1f46e375f"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua",
+      "sha256": "c40f855665cd38d6e1adafe60dfebff3f4c4ecdbfa4f09f15dc0c543a13101ed"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapCommandRegistry_Core.lua",
+      "sha256": "74b33ff5c28c915f921d4cb11f726bc750f22a0e32fbae44bf44c1055b75d3b7"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapHoverPortrait.lua",
+      "sha256": "679e6e7905fbc61d0e62edbf8b638eeec9d6d5fd29019093815653946f403e3e"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/PNC_MapHoverPortraitCard.lua",
+      "sha256": "81898d2b2d572bb9f5b55aa948e12757cd68db613525cf2f86ad3be645fc033e"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Nameplates/PNC_NameplateEntries.lua",
+      "sha256": "fa1cbb72c1ddbae9d73c4ab0cd5a45ecdf7816e7888331c013121ab41b5d192e"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Nameplates/PNC_NameplateScopes.lua",
+      "sha256": "cc6bb72933d3fb215bb7ed12f8d65872e7c91b80cbc2d61e732b31330116f3c7"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Nameplates/PNC_NameplateToolFeedback.lua",
+      "sha256": "5631eb702702b6be0a70a5c5ba50dbc4840f72421bcbcecbb9638d65223536b4"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Shared/PNC_ColonyUIShared.lua",
+      "sha256": "d1e9ec4635c91aa0bd2d1c7ef4849bd307ed2cdb289fd5319c22ec20ce075a65"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Journals/PNC_ColonyJournalFeed.lua",
+      "sha256": "cc0a3575381b05327f43928ee4104f9a57359291d70479a8d5debd05cbb60d1b"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/ServerDebugCommandHandler/PNC_ServerDebugCommandHandler_Core.lua",
+      "sha256": "f9343ec6b96362df7453d8f63d18d7276270a212c5c40d26c467e87335b10a37"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Companions/PNC_DebugCompanionInitialization.lua",
+      "sha256": "690def854a0291d14656595d4d11718f91c81995336f1a16b37d0316b8fd9183"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Networking/PNC_ColonyJournalProtocol.lua",
+      "sha256": "7f0d9889d6bb7caa6951870308ac23e8eec528449f63391a0ccde85ec2e794c0"
+    }
+  ]
+}

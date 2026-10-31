@@ -47,12 +47,33 @@ improving authority or change-local context. The diagnostic SCC remains visible.
 `P5D2_ARCHITECTURE_PROOF.json` pins source hashes and exact unchanged palette
 bytes. The existing animation-scene debug route/smoke tests remain green.
 
+## Retained Companions / Knowledge / Networking / UI relations
+
+All 24 cross-owner literal imports in this four-owner group were enumerated
+against current source (`P7H_PRESENTATION_CYCLE_PROOF.json`). They are public
+contracts at distinct phases, with no cross-owner file-import SCC:
+
+| Direction | Concrete contract and execution phase | Ownership reason |
+| --- | --- | --- |
+| Companions/UI → Knowledge | Client `NPCIdentityPresentation` queries; GetName/GetKnownName/GetFaction read player-scoped knowledge/snapshot mirrors. | Knowledge owns disclosure meaning; windows and command labels use its presentation query. The cached placeholder set is presentation-only. |
+| UI/Networking → Knowledge | Client `KnowledgeInterest.Require/CollectNPCIDs/ConsumeFlush`; request consumers declare demand and bootstrap consumes the existing 100 ms debounce. | One deduplicated interest set and existing hydrated/missing checks; no synchronous request callback into a window. |
+| Knowledge → Networking | Server `ColonyJournalFeed.GetDelta` uses shared `ColonyJournalProtocol.ToWire`. | Stateless typed row encoding, primitive string bounds, batch 32 and retained feed 512; it loads no client/router/UI implementation. |
+| Networking → UI | Colony result → `ColonyUIShared.NotifyBuildFailure/NotifyBuildQueued`; companion result → `NameplateToolFeedback.Push`; toll result → `FactionTollUI.HandleServerMessage`. | Typed delivery to presentation. Halos, window state and 128-entry/3600 ms feedback are UI-owned. Toll choices submit a server command; money, treaty and admission rules remain authoritative elsewhere. Colony UI is loaded inside the result function; toll UI is loaded on receipt when absent. |
+| Networking → Companions | SP debug spawn and server debug handler → `DebugCompanionInitialization.ApplyKnownCompanion`. | One public companion application operation calls player identity, relationship baseline and knowledge owner APIs, then sends the resulting snapshot. The MP client sends its existing request before the SP implementation branch. |
+
+The reverse edges join different runtime layers and functions: a server wire
+codec and client result presentation do not form a reentrant initialization
+chain. Explicit typed delivery preserves the single inbound transport choke
+point. A new generic callback registry would add discovery and wiring cost to
+these existing public operations. Retain these relations and their diagnostics.
+This justification applies to the enumerated paths, not arbitrary future UI or
+transport authority. Four selected public-call traces, source hashes, coverage
+limitations and 30 passing focused tests are recorded in the P7H proof.
+
 ## Remaining owner groups
 
 Still require individual P5/P6/P7 review:
 
-- Companions / Knowledge / Networking / UI: command admission, presentation
-  mirrors, knowledge-interest queries and result presentation.
 - Identity / Semantics / Social / World: immutable vocabulary/value contracts,
   accepted-interaction evidence, trait context and world-fact projections.
 

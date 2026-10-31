@@ -46,6 +46,8 @@ WRITES edges were recorded. Neither absence is an exhaustive authority proof.
 
 The bounded literal candidate scan also found native read-only item/body identity
 inspection, debug settings, command/network submission and UI-local `Internal`
-providers. Continue reviewing these by actual state owner. Result presentation,
-facility/build admission, remaining domain cycles and Tasking/BodyLifecycle
-foreign-private access are still open; this document does not accept all of P6.
+providers. Continue reviewing these by actual state owner. Result presentation has been classified in CYCLE_REVIEW.md with P7H source and
+test evidence. Tasking/BodyLifecycle foreign-private calls migrated through P7A
+and P7C. Facility/build admission, provision submission and the remaining UI
+authority candidate set still require review; this document does not accept all
+of P6.
