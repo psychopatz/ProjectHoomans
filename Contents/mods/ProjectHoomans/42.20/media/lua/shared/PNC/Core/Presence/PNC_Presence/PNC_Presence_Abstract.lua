@@ -203,8 +203,8 @@ function Presence.Abstract(record, reason)
         record.runtime.forcePresenceCheck = true
         return false
     end
-    if Internal.LogTraversal then
-        Internal.LogTraversal(record, "presence_transition", zombie, {
+    if Presence.LogTraversal then
+        Presence.LogTraversal(record, "presence_transition", zombie, {
             "from=live",
             "to=abstract",
             "reason=" .. tostring(reason or "abstract"),

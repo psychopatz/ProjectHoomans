@@ -14,7 +14,7 @@ end
 
 -- One bounded audit helper is shared by presence, body, and pathing modules.
 -- It performs no body reads or string assembly while the channel is disabled.
-function Internal.LogTraversal(record, eventName, body, extra)
+function Presence.LogTraversal(record, eventName, body, extra)
     local navigation
     local fields
     if not Diagnostics
@@ -88,7 +88,7 @@ function Presence.RequestTraversalHandoff(record, reason)
     if PNC.SimulationClock and PNC.SimulationClock.Wake then
         PNC.SimulationClock.Wake(record, "presence", now)
     end
-    Internal.LogTraversal(record, "handoff_requested", nil, {
+    Presence.LogTraversal(record, "handoff_requested", nil, {
         "reason=" .. tostring(reason or "movement_stall"),
     })
     return true

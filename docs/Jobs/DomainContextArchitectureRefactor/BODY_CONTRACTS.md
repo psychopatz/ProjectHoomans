@@ -30,3 +30,8 @@ does not emit these function-reference fields as searchable functions or fully
 resolve callers through them. Read the small public entry, then the named owner
 function snippet. A reduced private-function caller count is not dead-code proof.
 `P7A_BODY_BOUNDARY_PROOF.json` records source and validation evidence.
+
+Presence also exposes `Presence.LogTraversal` through its existing public entry
+`shared/PNC/Core/Presence/PNC_Presence.lua`. Its existing named implementation
+retains the disabled fast path; Pathing no longer accesses Presence.Internal.
+No private logger alias remains. See `P7D_PRESENCE_DIAGNOSTIC_PROOF.json`.

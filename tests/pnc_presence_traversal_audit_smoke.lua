@@ -71,11 +71,11 @@ local record = {
 }
 
 -- Disabled diagnostics do not inspect the body or allocate an event payload.
-Presence.Internal.LogTraversal(record, "disabled", body)
+Presence.LogTraversal(record, "disabled", body)
 T.equal(#logs, 0, "disabled traversal audit emitted a log")
 
 PNC.PerformanceScalingDiagnostics.PresenceTraversalAuditEnabled = true
-Presence.Internal.LogTraversal(record, "enabled", nil, { "reason=test" })
+Presence.LogTraversal(record, "enabled", nil, { "reason=test" })
 T.equal(#logs, 1, "enabled traversal audit did not emit a log")
 T.equal(logs[1].event, "enabled", "wrong traversal audit event")
 
@@ -211,7 +211,7 @@ PNC.Presence.RequestTraversalHandoff = function(stalledRecord, reason)
     stalledRecord.runtime.handoffReason = reason
     return true
 end
-PNC.Presence.Internal.LogTraversal = function()
+PNC.Presence.LogTraversal = function()
     nativeAuditCalls = nativeAuditCalls + 1
 end
 PNC.NavigationRouter = {}

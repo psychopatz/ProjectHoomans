@@ -47,9 +47,8 @@ end
 
 local function auditTraversal(record, eventName, zombie, lane, extra)
     local presence = PNC.Presence
-    local presenceInternal = presence and presence.Internal or nil
     local fields
-    if not presenceInternal or not presenceInternal.LogTraversal then
+    if not presence or not presence.LogTraversal then
         return
     end
     fields = {
@@ -65,7 +64,7 @@ local function auditTraversal(record, eventName, zombie, lane, extra)
     for _, field in ipairs(extra or {}) do
         fields[#fields + 1] = tostring(field)
     end
-    presenceInternal.LogTraversal(record, eventName, zombie, fields)
+    presence.LogTraversal(record, eventName, zombie, fields)
 end
 
 local function requestTraversalHandoff(record, zombie, lane, reason)

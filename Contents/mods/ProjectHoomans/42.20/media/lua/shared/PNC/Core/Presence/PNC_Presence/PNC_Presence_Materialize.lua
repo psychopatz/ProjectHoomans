@@ -156,8 +156,8 @@ local function resolveSpawnPosition(record, reason, now)
     x, y, z, recoveryReason, deferredReason, resourceTarget =
         Internal.FindMaterializeSquare(record, now, reason)
     if deferredReason and deferredReason ~= "no_safe_square" then
-        if Internal.LogTraversal then
-            Internal.LogTraversal(record, "materialize_deferred", nil, {
+        if Presence.LogTraversal then
+            Presence.LogTraversal(record, "materialize_deferred", nil, {
                 "reason=" .. tostring(deferredReason),
                 "chunkReady=false",
             })
@@ -395,8 +395,8 @@ local function finishMaterialization(
         record.runtime.abstractFollowMaterializeRequested = nil
     end
     Registry.RegisterLiveZombie(record, zombie)
-    if Internal.LogTraversal then
-        Internal.LogTraversal(record, "presence_transition", zombie, {
+    if Presence.LogTraversal then
+        Presence.LogTraversal(record, "presence_transition", zombie, {
             "from=" .. tostring(fromState or Const.PRESENCE_ABSTRACT),
             "to=live",
             "reason=" .. tostring(reason or "materialize"),

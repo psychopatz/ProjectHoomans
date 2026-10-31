@@ -452,7 +452,8 @@
         "Abstract",
         "BodyRepository.RestoreCorpse",
         "BodyRepository.RestoreHint",
-        "BodyLifecycle.Corpses.Move/Follow/Remove/Stamp/Transmit (authority-owned execution only)"
+        "BodyLifecycle.Corpses.Move/Follow/Remove/Stamp/Transmit (authority-owned execution only)",
+        "Presence.LogTraversal (diagnostics; disabled fast path preserved)"
       ],
       "queries": [
         "ShouldMaterialize",
@@ -941,7 +942,8 @@
     "PNC.UniqueNPCEditorModel.Internal": "Identity",
     "PNC.BodyLifecycle.Internal": "Presence",
     "PNC.WorkService.Internal": "Production",
-    "PNC.Tasking.Internal": "Tasking"
+    "PNC.Tasking.Internal": "Tasking",
+    "PNC.Presence.Internal": "Presence"
   },
   "registration_manifest": "REGISTRATIONS.json",
   "private_implementation_scopes": [

@@ -44,10 +44,10 @@ local function discardStaleNavigation(record, body, navigation, reason)
     elseif record and record.runtime then
         record.runtime.localNavigation = nil
     end
-    if PNC.Presence and PNC.Presence.Internal
-        and PNC.Presence.Internal.LogTraversal
+    if PNC.Presence
+        and PNC.Presence.LogTraversal
     then
-        PNC.Presence.Internal.LogTraversal(record, "native_pump_rejected", nil, {
+        PNC.Presence.LogTraversal(record, "native_pump_rejected", nil, {
             "reason=" .. tostring(reason or "stale_navigation"),
         })
     end

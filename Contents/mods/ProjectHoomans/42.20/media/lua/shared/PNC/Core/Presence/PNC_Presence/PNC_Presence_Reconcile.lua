@@ -23,8 +23,8 @@ function Presence.Reconcile(record)
         and PNC.BodyLifecycle.IsRecordBodyLost
         and PNC.BodyLifecycle.IsRecordBodyLost(record) == true
     if bodyLost then
-        if Internal.LogTraversal then
-            Internal.LogTraversal(record, "body_lease_lost", nil, {
+        if Presence.LogTraversal then
+            Presence.LogTraversal(record, "body_lease_lost", nil, {
                 "reason=body_lost",
             })
         end
@@ -58,16 +58,16 @@ function Presence.Reconcile(record)
             })
     end
     if shouldMaterialize and record.presenceState ~= Const.PRESENCE_LIVE then
-        if Internal.LogTraversal then
-            Internal.LogTraversal(record, "presence_decision", nil, {
+        if Presence.LogTraversal then
+            Presence.LogTraversal(record, "presence_decision", nil, {
                 "decision=materialize",
                 "reason=range_enter",
             })
         end
         Presence.Materialize(record, "range_enter", nearest)
     elseif shouldAbstract then
-        if Internal.LogTraversal then
-            Internal.LogTraversal(record, "presence_decision", nil, {
+        if Presence.LogTraversal then
+            Presence.LogTraversal(record, "presence_decision", nil, {
                 "decision=abstract",
                 "reason=range_exit",
             })

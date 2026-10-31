@@ -1,0 +1,82 @@
+{
+  "stage": "P7D Presence traversal diagnostic boundary",
+  "source_revision_before": "4d687a704881ab8bc0cc04ec190992705b4f4225",
+  "changed_runtime": [
+    "shared/PNC/Core/Presence/PNC_Presence/PNC_Presence_Abstract.lua",
+    "shared/PNC/Core/Presence/PNC_Presence/PNC_Presence_Reconcile.lua",
+    "shared/PNC/Core/Presence/PNC_Presence/PNC_Presence_TraversalHandoff.lua",
+    "shared/PNC/Core/Presence/PNC_Presence/PNC_Presence_Materialize.lua",
+    "shared/PNC/Core/Pathing/PNC_EnginePathPlanner/PNC_EnginePathPlanner_Pump.lua",
+    "shared/PNC/Core/Pathing/PNC_EnginePathPlanner/PNC_EnginePathPlanner_Request.lua",
+    "shared/PNC/Core/Pathing/PNC_PathService/Motion/PNC_PathService_MotionNativeProgress.lua",
+    "shared/PNC/Core/Pathing/PNC_PathService/Motion/PNC_PathService_MotionScripted.lua"
+  ],
+  "pre_mcp": {
+    "generation": "2026-10-31T02:16:00Z",
+    "tier": 2,
+    "project": "project-hoomans",
+    "coverage": "9 source/test paths metadata-match, no recorded gaps",
+    "trace": "Both directions depth1, seven selected callers; source verifies engine/builtin/alias uncertainty."
+  },
+  "source_preservation": "TraversalHandoff differs only by Internal.LogTraversal -> Presence.LogTraversal declaration/call references. Function body and gameplay handoff/clear logic unchanged.",
+  "before_sha256": "934e48f81794863c20bd9abc15bb32516fd154e86ae0ea15797400578aecfc4d",
+  "after_sha256": "62da37860121c391975368ff032f766a2b3057517cb3d4b03f7f1b0a257f2a61",
+  "architecture": "Public named function, same provider and direct calls. No wrapper, new provider, event dispatcher, mutable state or runtime scan. Internal export retired after all maintained callers migrate.",
+  "focused_lua": {
+    "path_presence_passed": 130,
+    "total": 130
+  },
+  "full_lua": {
+    "passed": 983,
+    "total": 983,
+    "seconds": 14.48
+  },
+  "kahlua": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 8,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  },
+  "static_kahlua": {
+    "files": 8,
+    "errors": 0
+  },
+  "guard": {
+    "issues": 69,
+    "new": 0,
+    "resolved": 124,
+    "new_private_guard": "PNC.Presence.Internal"
+  },
+  "post_mcp": {
+    "generation": "2026-10-31T02:22:16Z",
+    "coverage": "9 changed source/test paths metadata-match, no recorded gaps",
+    "public_symbol": "PNC_Presence_TraversalHandoff.Presence.LogTraversal, function lines17-66",
+    "selected_inbound_callers": 8,
+    "limits": "Selected resolution includes the updated test; other qualified global/builtin edges still require source checks. Do not infer exact caller completeness from degree."
+  },
+  "retrieval": {
+    "report": "P7D_RETRIEVAL.json",
+    "aggregate": {
+      "files": 33,
+      "bytes": 167545,
+      "lines": 4505
+    },
+    "versus_P0": {
+      "files": -4,
+      "bytes": -41977,
+      "lines": -1025
+    },
+    "footprint_unchanged_vs_P7C": true
+  },
+  "diagnostic_python": {
+    "passed": 22,
+    "total": 22
+  },
+  "bootstrap": "No provider/composition order changes"
+}

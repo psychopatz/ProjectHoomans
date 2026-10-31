@@ -100,10 +100,10 @@ function Internal.BeginRequest(body, finalTarget, navigation, now, reason)
             navigation.targetReadinessWaitStartedAt or now
         navigation.planFailures =
             (tonumber(navigation.planFailures) or 0) + 1
-        if PNC.Presence and PNC.Presence.Internal
-            and PNC.Presence.Internal.LogTraversal
+        if PNC.Presence
+            and PNC.Presence.LogTraversal
         then
-            PNC.Presence.Internal.LogTraversal(record, "target_deferred", body, {
+            PNC.Presence.LogTraversal(record, "target_deferred", body, {
                 "reason=" .. tostring(targetReason),
                 "target=" .. tostring(finalTarget.x) .. ","
                     .. tostring(finalTarget.y) .. ","
@@ -186,10 +186,10 @@ function Internal.BeginRequest(body, finalTarget, navigation, now, reason)
     navigation.steeringKind = multiplayerAuthority
         and "engine_native_client"
         or "engine_native_behavior2"
-    if PNC.Presence and PNC.Presence.Internal
-        and PNC.Presence.Internal.LogTraversal
+    if PNC.Presence
+        and PNC.Presence.LogTraversal
     then
-        PNC.Presence.Internal.LogTraversal(record, "native_route_started", body, {
+        PNC.Presence.LogTraversal(record, "native_route_started", body, {
             "reason=" .. tostring(reason or "native_request"),
             "target=" .. tostring(x) .. "," .. tostring(y) .. ","
                 .. tostring(z),
