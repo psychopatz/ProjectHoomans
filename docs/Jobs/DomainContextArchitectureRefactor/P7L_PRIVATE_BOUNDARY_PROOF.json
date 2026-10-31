@@ -1,0 +1,45 @@
+{
+  "source_revision_before": "663d104c829231a655a77ad44c573dcafcf23cc8",
+  "scope": "Contents/mods/ProjectHoomans/42.20/media/lua/",
+  "resolved_private_namespaces": [
+    "PNC.ClientPresenceSync.Internal",
+    "PNC.PathService.Internal",
+    "PNC.HomeDutyService.Internal",
+    "PNC.Network.Internal",
+    "PNC.BaseValidationService.Internal",
+    "PNC.ColonyStorageService.Internal",
+    "PNC.FacilityService.Internal",
+    "PNC.Treatment.Internal",
+    "PNC.MedicalCareExecutor.Internal",
+    "PNC.AnimationScenes.Internal",
+    "PNC.Combat.Internal",
+    "PNC.CombatTactics.Internal",
+    "PNC.LiveBodyControl.Internal",
+    "PNC.BehaviorCompanion.Internal",
+    "PNC.Server.Internal",
+    "PNC.EnginePathPlanner.Internal"
+  ],
+  "guarded_private_roots_total": 93,
+  "remaining_foreign_private_violations": 0,
+  "validation": {
+    "lua_suite": "984/984 PASS",
+    "python_suite": "22/22 PASS",
+    "kahlua_compiler_checked": 58,
+    "pz_verify_kahlua_errors": 0,
+    "debt_ratchet": {
+      "issues": 69,
+      "new": 0,
+      "resolved": 124
+    },
+    "retrieval_probes": {
+      "files": 33,
+      "lines": 4505,
+      "bytes": 167545,
+      "delta_vs_p0": {
+        "files": -4,
+        "lines": -1025,
+        "bytes": -41977
+      }
+    }
+  }
+}

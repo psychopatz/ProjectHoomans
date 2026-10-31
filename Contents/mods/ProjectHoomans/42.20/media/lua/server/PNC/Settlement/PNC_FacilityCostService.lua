@@ -82,11 +82,11 @@ local function stockpileSource(player)
             end
         end
         if #specs <= 0 then return end
-        if service.Internal and service.Internal.CommitStorage then
-            service.Internal.CommitStorage(storage)
+        if service.CommitStorage then
+            service.CommitStorage(storage)
         end
-        if service.Internal and service.Internal.RecordActivity then
-            service.Internal.RecordActivity(storage, "TAKE",
+        if service.RecordActivity then
+            service.RecordActivity(storage, "TAKE",
                 player and player.getUsername and player:getUsername()
                     or "construction", specs, "facility_construction")
         end

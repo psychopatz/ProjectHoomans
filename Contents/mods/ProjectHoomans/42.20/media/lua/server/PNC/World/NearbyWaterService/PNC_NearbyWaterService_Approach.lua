@@ -24,9 +24,9 @@ function H.FacingToward(fromX, fromY, toX, toY)
 end
 
 function H.CanOccupy(x, y, z)
-    local internal = PNC.PathService and PNC.PathService.Internal
-    if internal and internal.isSquareWalkable then
-        return internal.isSquareWalkable(x, y, z) == true
+    local pathService = PNC.PathService
+    if pathService and pathService.IsSquareWalkable then
+        return pathService.IsSquareWalkable(x, y, z) == true
     end
     local cell = getCell and getCell() or nil
     local square = cell and cell.getGridSquare

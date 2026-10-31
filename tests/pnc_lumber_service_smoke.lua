@@ -515,18 +515,16 @@ PNC.ColonyStorageRepository = {
     Get = function(id) return id == stockpile.id and stockpile or nil end,
 }
 PNC.ColonyStorageService = {
-    Internal = {
-        LiveNPCSource = function(record, item, quantity, actor)
-            return { record = record, item = item, quantity = quantity,
-                actor = actor }
-        end,
-        TransferIntoStorage = function(_, source, quantity)
-            transferCalls = transferCalls + quantity
-            source.item.stack = source.item.stack - quantity
-            return true
-        end,
-        RecordActivity = function() activityCalls = activityCalls + 1 end,
-    },
+    LiveNPCSource = function(record, item, quantity, actor)
+        return { record = record, item = item, quantity = quantity,
+            actor = actor }
+    end,
+    TransferIntoStorage = function(_, source, quantity)
+        transferCalls = transferCalls + quantity
+        source.item.stack = source.item.stack - quantity
+        return true
+    end,
+    RecordActivity = function() activityCalls = activityCalls + 1 end,
 }
 body.x, body.y, records.live.x, records.live.y = 4.5, 4.5, 4.5, 4.5
 now = 26000

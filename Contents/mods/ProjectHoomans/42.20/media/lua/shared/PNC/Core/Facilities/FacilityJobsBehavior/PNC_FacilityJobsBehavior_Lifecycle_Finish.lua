@@ -5,7 +5,6 @@ local ActorControl = PNC.ActorControl
 
 function Internal.StopAnimationScene(record, zombie, reason)
     local runtime = record.runtime
-    local internal
     if record.runtime.animationScene and PNC.AnimationScenes then
         -- Scene callbacks are extension points. Keep the activity cleanup
         -- alive if one of them fails, but do not add protected calls around
@@ -17,9 +16,8 @@ function Internal.StopAnimationScene(record, zombie, reason)
             -- even though the command has already moved on. Use the scene
             -- lifecycle's normal clear path when available, then guarantee
             -- that the stale pointer cannot consume the next behavior tick.
-            internal = PNC.AnimationScenes.Internal
-            if internal and internal.ClearScene then
-                internal.ClearScene(record, zombie,
+            if PNC.AnimationScenes.ClearScene then
+                PNC.AnimationScenes.ClearScene(record, zombie,
                     reason or "player_stop", true)
             end
             runtime.animationScene = nil

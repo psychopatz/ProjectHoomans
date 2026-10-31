@@ -80,15 +80,13 @@ PNC = {
         end,
     },
     Network = {
-        Internal = {
-            SendToPlayer = function(_, command, payload)
-                sent[#sent + 1] = {
-                    command = command,
-                    payload = payload,
-                }
-                return true
-            end,
-        },
+        SendToPlayer = function(_, command, payload)
+            sent[#sent + 1] = {
+                command = command,
+                payload = payload,
+            }
+            return true
+        end,
     },
     CommunityMath = {
         IsInsideHomeArea = function()

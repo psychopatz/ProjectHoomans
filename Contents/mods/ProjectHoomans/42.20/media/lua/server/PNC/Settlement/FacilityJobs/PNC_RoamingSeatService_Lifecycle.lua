@@ -84,7 +84,6 @@ local function stop(record, zombie, reason)
     local runtime = record and record.runtime or nil
     local state = runtime and runtime.roamingSeat or nil
     local scene = runtime and runtime.animationScene or nil
-    local internal
     if not state then return false end
     state.stopRequested = true
     if scene and scene.id == state.sceneId
@@ -92,11 +91,11 @@ local function stop(record, zombie, reason)
     then
         PNC.AnimationScenes.Interrupt(record, zombie, "movement")
         if runtime.animationScene
-            and PNC.AnimationScenes.Internal
-            and PNC.AnimationScenes.Internal.ClearScene
+            and PNC.AnimationScenes.ClearScene
         then
-            internal = PNC.AnimationScenes.Internal
-            internal.ClearScene(record, zombie, "roaming_seat_stop", true)
+            PNC.AnimationScenes.ClearScene(
+                record, zombie, "roaming_seat_stop", true
+            )
         end
     end
     return finish(record, zombie, reason or "roaming_seat_stopped")

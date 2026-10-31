@@ -237,5 +237,6 @@ Internal.LogWaterSceneEvent = logWaterSceneEvent
 Internal.IsSeatingScene = isSeatingScene
 Internal.AuditScene = auditScene
 Internal.NotifyStop = notifyStop
+Scenes.ClearScene = Internal.ClearScene
 
 return Scenes

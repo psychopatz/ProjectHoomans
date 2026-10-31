@@ -104,4 +104,10 @@ function Internal.ClearEngineRequest(body, navigation)
     end
 end
 
+function PNC.EnginePathPlanner.InstallProfilerWrappers(wrap)
+    if type(wrap) ~= "function" then return end
+    wrap(Internal, "ClearEngineRequest",
+        "ProjectHoomans.Server.Update.NPC.Pathing.NativeClear")
+end
+
 return Internal

@@ -47,6 +47,37 @@ PNC = {
             ShouldIssueFollowMove = callback("move_gate"),
             EnforceOwnerPersonalSpace = callback("personal_space"),
         },
+        InstallProfilerWrappers = function(wrap)
+            local internal = PNC.BehaviorCompanion.Internal
+            wrap(internal, "TickFollowOwner",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.Tick")
+            wrap(internal, "TickAbstractFollowOwner",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.AbstractTick")
+            wrap(internal, "UpdateOwnerMotionState",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.OwnerMotion")
+            wrap(internal, "UpdateOwnerCombatState",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.OwnerCombat")
+            wrap(internal, "AssessFollowHazards",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.Hazards")
+            wrap(internal, "ResolveHordeAwareFollowTarget",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.HordeSteer")
+            wrap(internal, "ResolveSampledFollowSlot",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.Formation.SampledSlot")
+            wrap(internal, "ResolveFollowSlot",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.Formation.ResolveSlot")
+            wrap(internal, "TryRespondToThreat",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.ThreatResponse")
+            wrap(internal, "TryRespondToImmediateThreat",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.ImmediateThreat")
+            wrap(internal, "ShouldScanFollowThreat",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.ThreatGate")
+            wrap(internal, "HoldAndFaceOwner",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.Hold")
+            wrap(internal, "ShouldIssueFollowMove",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.MoveGate")
+            wrap(internal, "EnforceOwnerPersonalSpace",
+                "ProjectHoomans.Server.Update.NPC.FollowOwner.PersonalSpace")
+        end,
     },
     MoveIntent = {
         RequestMove = callback("move_request"),
@@ -61,6 +92,10 @@ PNC = {
         Internal = {
             ClearEngineRequest = callback("native_clear"),
         },
+        InstallProfilerWrappers = function(wrap)
+            wrap(PNC.EnginePathPlanner.Internal, "ClearEngineRequest",
+                "ProjectHoomans.Server.Update.NPC.Pathing.NativeClear")
+        end,
     },
     BehaviorRoaming = { Tick = callback("roaming_tick") },
     RoamAmbient = {

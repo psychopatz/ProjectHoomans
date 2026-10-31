@@ -43,9 +43,8 @@ end
 
 local function refreshPresenceBodies()
     local sync = PNC.ClientPresenceSync
-    local internal = sync and sync.Internal
-    if internal and internal.RefreshBodyMap then
-        internal.RefreshBodyMap(Runtime.Now())
+    if sync and sync.RefreshBodyMap then
+        sync.RefreshBodyMap(Runtime.Now())
     end
 end
 

@@ -26,7 +26,12 @@ PNC = {
     Scheduler = { PopDue = function() end, PumpJobs = function() end, Buckets = { one = {} } },
     Registry = { Data = { a = {}, b = {} }, LiveByID = { a = {} } },
     ZombieAggro = { ActiveSet = { order = { 1, 2 }, holes = 1 } },
-    Network = { Internal = { BuildRecordPayload = originalBuildPayload } },
+    Network = {
+        Internal = { BuildRecordPayload = originalBuildPayload },
+        InstallServerProfilerWrappers = function(wrap)
+            wrap(PNC.Network.Internal, "BuildRecordPayload", "Network.BroadcastRecord.BuildPayload")
+        end,
+    },
 }
 
 local Integration = require "PNC/Integrations/PNC_PsychopatzProfiler"

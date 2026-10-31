@@ -64,6 +64,7 @@ function Internal.passageWindowDestination(object, actorSquare)
     if sameSquare(actorSquare, oppositeSquare) then return objectSquare end
     return nil
 end
+PNC.PathService.PassageWindowDestination = Internal.passageWindowDestination
 
 function Internal.windowDestinationForContext(context, object)
     if context and context.blockedFromSquare and context.blockedSquare

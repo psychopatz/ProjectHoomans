@@ -37,10 +37,8 @@ local function applyAttackType(record, definition)
     end
     if attackType == (Const.ATTACK_TYPE_NONE or "none") then
         zombie = record.id and Registry.GetLiveZombie(record.id) or nil
-        if PNC.Combat and PNC.Combat.Internal
-            and PNC.Combat.Internal.finishAttackAction
-        then
-            PNC.Combat.Internal.finishAttackAction(record, zombie)
+        if PNC.Combat and PNC.Combat.FinishAttackAction then
+            PNC.Combat.FinishAttackAction(record, zombie)
         elseif record.runtime then
             record.runtime.attackAction = nil
         end

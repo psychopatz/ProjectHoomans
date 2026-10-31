@@ -73,11 +73,9 @@ PNC = {
         AddMemory = function() return true end,
     },
     CombatTactics = {
-        Internal = {
-            BuildZombieThreatCentroid = function()
-                return centroidX, centroidY, 8
-            end,
-        },
+        BuildZombieThreatCentroid = function()
+            return centroidX, centroidY, 8
+        end,
     },
     Semantics = {
         CombatEncounterIntent = {

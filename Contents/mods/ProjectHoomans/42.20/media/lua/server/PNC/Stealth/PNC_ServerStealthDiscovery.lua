@@ -20,11 +20,8 @@ Service.State = Service.State or {}
 Service.nextPumpAt = tonumber(Service.nextPumpAt) or 0
 
 local function playerKey(player)
-    if Network
-        and Network.Internal
-        and Network.Internal.PlayerKey
-    then
-        return Network.Internal.PlayerKey(player)
+    if Network and Network.PlayerKey then
+        return Network.PlayerKey(player)
     end
     if player and player.getUsername then
         return tostring(player:getUsername())
@@ -123,9 +120,8 @@ local function publish(
         ),
     }
     if not Network
-        or not Network.Internal
-        or not Network.Internal.SendToPlayer
-        or not Network.Internal.SendToPlayer(
+        or not Network.SendToPlayer
+        or not Network.SendToPlayer(
             player,
             Const.CMD_STEALTH_DISCOVERY,
             payload

@@ -301,6 +301,7 @@ Internal.calculatedState = calculatedState
 Internal.emit = emit
 Internal.addIndex = addIndex
 Internal.touch = touch
+Service.Touch = touch
 Internal.updateState = updateState
 Internal.GridRegion = GridRegion
 Internal.buildDefaultWorkZone = buildDefaultWorkZone

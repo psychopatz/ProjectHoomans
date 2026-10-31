@@ -294,3 +294,6 @@ function Internal.smashWindowForNPC(zombie, object)
     if square and square.RecalcProperties then square:RecalcProperties() end
     return true
 end
+PNC.PathService.OpenDoorForNPC = Internal.openDoorForNPC
+PNC.PathService.OpenWindowForNPC = Internal.openWindowForNPC
+PNC.PathService.SmashWindowForNPC = Internal.smashWindowForNPC

@@ -7,12 +7,10 @@ PNC = {
         CMD_SEMANTIC_SCENE_SPEECH = "SemanticSceneSpeech",
     },
     Network = {
-        Internal = {
-            SendToPlayer = function()
-                delivered = delivered + 1
-                return true
-            end,
-        },
+        SendToPlayer = function()
+            delivered = delivered + 1
+            return true
+        end,
     },
 }
 

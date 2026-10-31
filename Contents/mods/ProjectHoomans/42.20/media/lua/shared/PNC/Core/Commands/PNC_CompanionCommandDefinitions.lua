@@ -7,11 +7,10 @@ local Commands = PNC.CompanionCommands
 local Const = PNC.Const
 
 local function cancelActiveTask(record, reason)
-    if PNC.HomeDutyService and PNC.HomeDutyService.Internal
-        and type(PNC.HomeDutyService.Internal.CancelActiveTask)
-            == "function"
+    if PNC.HomeDutyService
+        and type(PNC.HomeDutyService.CancelActiveTask) == "function"
     then
-        return PNC.HomeDutyService.Internal.CancelActiveTask(
+        return PNC.HomeDutyService.CancelActiveTask(
             record, reason)
     end
     local lease

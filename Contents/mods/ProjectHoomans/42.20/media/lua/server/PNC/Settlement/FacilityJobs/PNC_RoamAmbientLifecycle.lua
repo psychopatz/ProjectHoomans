@@ -122,10 +122,8 @@ function Service.Stop(record, zombie, reason, interruptReason)
         and Scenes and Scenes.Interrupt
     then
         Scenes.Interrupt(record, zombie, interruptReason or "movement")
-        if runtime.animationScene and Scenes.Internal
-            and Scenes.Internal.ClearScene
-        then
-            Scenes.Internal.ClearScene(record, zombie,
+        if runtime.animationScene and Scenes.ClearScene then
+            Scenes.ClearScene(record, zombie,
                 "roam_ambient_stop", true)
         end
     end

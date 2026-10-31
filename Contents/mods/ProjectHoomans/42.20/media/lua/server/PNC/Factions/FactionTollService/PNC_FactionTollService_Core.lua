@@ -54,9 +54,9 @@ function H.PlayerKey(player, at)
 end
 
 function H.Send(player, payload)
-    return PNC.Network and PNC.Network.Internal
-        and PNC.Network.Internal.SendToPlayer
-        and PNC.Network.Internal.SendToPlayer(
+    return PNC.Network
+        and PNC.Network.SendToPlayer
+        and PNC.Network.SendToPlayer(
             player,
             Const.CMD_FACTION_TOLL,
             payload

@@ -44,6 +44,7 @@ function Internal.isSquareWalkable(x, y, z)
     end
     return false
 end
+PNC.PathService.IsSquareWalkable = Internal.isSquareWalkable
 
 function Internal.syncRecordPosition(record, zombie)
     if not record or not zombie then

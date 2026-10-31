@@ -207,6 +207,9 @@ function Internal.BuildZombieThreatCentroid(record, radius)
     if count <= 0 then return nil, nil, 0 end
     return sumX / count, sumY / count, count
 end
+Tactics.BuildZombieThreatCentroid = function(record, radius)
+    return Internal.BuildZombieThreatCentroid(record, radius)
+end
 
 function Internal.StableDirection(id)
     local value = tostring(id or "")
@@ -246,6 +249,14 @@ function Internal.IsProtectedNPC(record, other, target)
         return not Relationships.AreNPCsEnemies(record, other)
     end
     return tostring(other.tacticalClass or "") == tostring(record.tacticalClass or "")
+end
+
+function Tactics.InstallProfilerWrappers(wrap)
+    if type(wrap) ~= "function" then return end
+    wrap(Internal, "AssessThreat",
+        "ProjectHoomans.Server.Update.NPC.Combat.ThreatAssessment")
+    wrap(Internal, "BuildZombieThreatCentroid",
+        "ProjectHoomans.Server.Update.NPC.Combat.ThreatCentroid")
 end
 
 return Tactics

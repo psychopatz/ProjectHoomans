@@ -58,9 +58,9 @@ local function worldAgeHours()
 end
 
 local function send(player, command, payload)
-    local internal = PNC.Network and PNC.Network.Internal
-    if not internal or not internal.SendToPlayer then return false end
-    return internal.SendToPlayer(player, command, payload)
+    local network = PNC.Network
+    if not network or not network.SendToPlayer then return false end
+    return network.SendToPlayer(player, command, payload)
 end
 
 local RECRUIT_REPLY_VARIANTS = {

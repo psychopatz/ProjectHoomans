@@ -14,8 +14,7 @@ local Passage = Controller.PassageInternal
 local Shared = Passage.Shared
 
 local TraversalQuery = PNC.TraversalQuery
-local PathInternal = PNC.PathService
-    and PNC.PathService.Internal or nil
+local PathService = PNC.PathService
 local LiveBodyControl = PNC.LiveBodyControl
 
 local clearOwnedPath = Controller.ClearOwnedPath
@@ -59,7 +58,7 @@ end
 local function tryNativePassage(snapshot, body, state, goal, now)
     if not TraversalQuery
         or not TraversalQuery.FindPassageToward
-        or not PathInternal
+        or not PathService
     then
         return false, nil
     end
@@ -96,7 +95,7 @@ local function tryNativePassage(snapshot, body, state, goal, now)
         and not objectBool(object, "IsOpen")
         and not objectBool(object, "isOpen")
     then
-        if PathInternal.openDoorForNPC(body, object) then
+        if PathService.OpenDoorForNPC and PathService.OpenDoorForNPC(body, object) then
             clearOwnedPath(body, state)
             state.failed = true
             state.retryAt = now + 180

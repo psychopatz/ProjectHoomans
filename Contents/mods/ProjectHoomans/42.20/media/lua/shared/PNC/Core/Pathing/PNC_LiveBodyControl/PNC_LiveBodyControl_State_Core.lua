@@ -16,6 +16,7 @@ function Internal.clearVanillaIntent(zombie)
     if zombie.setAttackedBy then zombie:setAttackedBy(nil) end
     return true
 end
+LiveBodyControl.ClearVanillaIntent = Internal.clearVanillaIntent
 
 function Internal.isDamageReactionState(actionState)
     actionState = string.lower(tostring(actionState or ""))

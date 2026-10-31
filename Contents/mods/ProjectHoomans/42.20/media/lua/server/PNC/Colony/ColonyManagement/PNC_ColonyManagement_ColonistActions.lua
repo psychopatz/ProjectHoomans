@@ -91,10 +91,8 @@ local function colonistHomeAction(player, args, recover)
     if recover == true then
         return PNC.HomeDutyService.Recover(record, args.baseId)
     end
-    if PNC.HomeDutyService.Internal
-        and PNC.HomeDutyService.Internal.CancelActiveTask
-    then
-        local stopped, stopReason = PNC.HomeDutyService.Internal.CancelActiveTask(
+    if PNC.HomeDutyService.CancelActiveTask then
+        local stopped, stopReason = PNC.HomeDutyService.CancelActiveTask(
             record, "return_home_requested")
         if stopped == false then return false, stopReason end
     end

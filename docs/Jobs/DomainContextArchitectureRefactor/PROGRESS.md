@@ -76,8 +76,11 @@ literal/source fallback; clean coverage is a best-effort signal.
   (`PNC_LLMSocialReactionService`, `PNC_LLMSocialReactionPolicy`); Networking
   command routing requires the Conversation entries and keeps two guarded pure
   forwarders for legacy public paths. `PNC.Conversation.Authority.Internal` is
-  guarded. Broad private-boundary completion remains open across the remaining
-  14 candidate namespaces.
+  guarded. All 14 remaining candidate private namespaces in `P7J_PRIVATE_SCAN_PROOF.json`
+  (plus `PNC.MedicalCareExecutor.Internal` and `PNC.CombatTactics.Internal`) are
+  now resolved via owner-controlled public seams and profiler registration hooks,
+  and all 93 private roots are guarded in `DOMAIN_CONTRACTS.json` with `0`
+  foreign-private violations (`PRIVATE_BOUNDARY_REVIEW.md`, `P7L_PRIVATE_BOUNDARY_PROOF.json`).
 - Camp geometry exposes an explicit RuntimeAccess engine-query facet. World and
   hint adapters no longer consume its obsolete _Internal export; underlying
   engine/room implementations and scan bounds are unchanged.
@@ -110,7 +113,7 @@ Seven fixed probes: **33 files / 4,505 lines / 167,545 bytes**, versus P0's
 - Puppet Opera definition storage moved byte-for-byte from UI to its owning
   client domain. Two maintained callers use its public entry; no UI-path shim
   retained. Cold storage/schema/error matrix and Opera suite pass **19/19**.
-- Changed runtime installed-PZ Kahlua: **15/15** LLM social-reaction capsule slice; memory-query 2/2; geometry 3/3; client delivery 15/15; static zero errors. Bootstrap
+- Changed runtime installed-PZ Kahlua: **58/58** private-boundary completion slice (P7L); **15/15** LLM social-reaction capsule slice (P7K); memory-query 2/2; geometry 3/3; client delivery 15/15; static zero errors. Bootstrap
   ordering and diff checks pass. No game execution is implied by compiler checks.
 - Semantic tooling: last full isolated run was 195 modules, 155 pass/40 fail,
   786 tests, zero timeouts. Subsequent verified module repairs yield derived
@@ -136,23 +139,20 @@ job-local reports and Git. Historical giant logs are not required reading.
 
 ## Next mandatory chunk
 
-**Continue P7 private-boundary review; close P5/P6 gates, then all P8 gates.**
+**Close P5/P6 gates and remaining P7 cycle/domain review, then all P8 gates.**
 
-1. Review the remaining 14 candidate private namespaces in `P7J_PRIVATE_SCAN_PROOF.json`
-   (P7K moved the LLM social-reaction authority/policy capsule to Conversation and
-   guarded `PNC.Conversation.Authority.Internal`).
-2. Inspect the refreshed remaining-tooling results. Repair assertions against
+1. Inspect the refreshed remaining-tooling results. Repair assertions against
    current public meaning/presentation/authoring contracts; preserve gameplay,
    semantic IR, suggestions, queued tasks, optional LLM and SP/MP authority.
-3. Finish source/caller review of the remaining semantic/domain cycles. Migrate
+2. Finish source/caller review of the remaining semantic/domain cycles. Migrate
    real foreign-private coupling; justify retained protocol/composition relations
    with exact paths, phases and canonical owners rather than analyzer counts.
-4. Complete P6 UI authority/persistence classification and owning public seams.
-5. Complete P7's mandatory domain/transport/performance review, including remaining
+3. Complete P6 UI authority/persistence classification and owning public seams.
+4. Complete P7's mandatory domain/transport/performance review, including remaining
    Knowledge observation, client transport and remaining domain-private coupling. Tasking/BodyLifecycle access
    has migrated; the broader mandatory domain review remains. Re-read M12 before
    touching body/presence/network authority and preserve its current contracts.
-6. Complete every P8 cleanup and final validation gate, including a current full
+5. Complete every P8 cleanup and final validation gate, including a current full
    isolated suite, focused matrices, retrieval comparison, installed Kahlua,
    performance/persistence audit, compatibility classification and Git review.
 

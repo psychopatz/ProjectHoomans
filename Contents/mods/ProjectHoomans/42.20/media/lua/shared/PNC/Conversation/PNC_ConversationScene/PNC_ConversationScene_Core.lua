@@ -95,12 +95,10 @@ function Internal.SendCeasefireResult(player, ok, reason, value)
     local network = PNC.Network
     local command = PNC.Const
         and PNC.Const.CMD_CONVERSATION_CEASEFIRE_RESULT or nil
-    if not command or not network or not network.Internal
-        or not network.Internal.SendToPlayer
-    then
+    if not command or not network or not network.SendToPlayer then
         return false
     end
-    return network.Internal.SendToPlayer(player, command, {
+    return network.SendToPlayer(player, command, {
         ok = ok == true,
         reason = tostring(reason or "unknown"),
         factionID = value and value.factionID or nil,

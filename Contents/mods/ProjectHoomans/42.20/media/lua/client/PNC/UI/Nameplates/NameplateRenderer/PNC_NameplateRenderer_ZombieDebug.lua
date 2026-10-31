@@ -24,11 +24,10 @@ end
 
 local function findClientObservation(zombie, now)
     local sync = PNC.ClientPresenceSync
-    local internal = sync and sync.Internal or nil
-    if not internal or not internal.GetClientZombieSoundObservation then
+    if not sync or not sync.GetClientZombieSoundObservation then
         return nil
     end
-    return internal.GetClientZombieSoundObservation(zombie, now)
+    return sync.GetClientZombieSoundObservation(zombie, now)
 end
 
 local function nativeTargetLabel(zombie)

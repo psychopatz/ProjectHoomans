@@ -29,10 +29,10 @@ end
 
 local function squareState(x, y, z)
     local square = squareAt(x, y, z)
-    local pathInternal = PNC.PathService and PNC.PathService.Internal
+    local pathService = PNC.PathService
     if not square then return "unloaded" end
-    if pathInternal and pathInternal.isSquareWalkable then
-        local walkable = pathInternal.isSquareWalkable(x, y, z)
+    if pathService and pathService.IsSquareWalkable then
+        local walkable = pathService.IsSquareWalkable(x, y, z)
         return walkable == true and "walkable" or "blocked"
     end
     if square.isSolid and square:isSolid() == true then return "blocked" end

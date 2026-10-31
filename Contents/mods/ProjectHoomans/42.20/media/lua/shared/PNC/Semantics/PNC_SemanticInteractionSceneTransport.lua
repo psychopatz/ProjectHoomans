@@ -301,8 +301,7 @@ end
 function Transport.DeliverAffordance(scene, selected, spec, audience)
     audience = type(audience) == "table" and audience or {}
     local network = PNC.Network
-    local send = network and network.Internal
-        and network.Internal.SendToPlayer or nil
+    local send = network and network.SendToPlayer or nil
     local command = PNC.Const and PNC.Const.CMD_SEMANTIC_SCENE_SPEECH or nil
     if type(send) ~= "function" or not command then
         return 0, "scene_transport_unavailable"
@@ -334,8 +333,7 @@ end
 function Transport.Deliver(scene, result, audience)
     audience = type(audience) == "table" and audience or {}
     local network = PNC.Network
-    local send = network and network.Internal
-        and network.Internal.SendToPlayer or nil
+    local send = network and network.SendToPlayer or nil
     local command = PNC.Const and PNC.Const.CMD_SEMANTIC_SCENE_SPEECH or nil
     if type(send) ~= "function" or not command then
         return 0, "scene_transport_unavailable"

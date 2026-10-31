@@ -49,8 +49,9 @@ function Integration.InstallServer()
     wrap(PNC.Presence, "RefreshMaterializationCandidates",
         "Server.Update.MaterializationCandidates")
     wrap(PNC.Presence, "Materialize", "Server.Update.NPC.Materialize")
-    wrap(PNC.Server and PNC.Server.Internal, "ProcessRecord",
-        "Server.Update.NPC.ProcessRecord")
+    if PNC.Server and PNC.Server.InstallProfilerWrappers then
+        PNC.Server.InstallProfilerWrappers(wrap)
+    end
     wrap(PNC.Network, "RefreshInterestSets",
         "Server.Update.Network.RefreshInterestSets")
     wrap(PNC.ZombieAggro, "Pump", "Server.Update.ZombieAggro")
@@ -92,15 +93,9 @@ function Integration.InstallServer()
         "Server.Update.NPC.FacilityActivity.Tick")
     wrap(PNC.FacilityJobsBehaviorInternal, "OnSceneTick",
         "Server.Update.NPC.FacilityActivity.SceneTick")
-    local networkInternal = PNC.Network and PNC.Network.Internal or nil
-    wrap(networkInternal, "QueueBroadcastRoster",
-        "Network.BroadcastRecord.QueueRoster")
-    wrap(networkInternal, "CollectRecordRecipients",
-        "Network.BroadcastRecord.FindRecipients")
-    wrap(networkInternal, "BuildRecordPayload",
-        "Network.BroadcastRecord.BuildPayload")
-    wrap(networkInternal, "SendRecordPayload",
-        "Network.BroadcastRecord.SendPayload")
+    if PNC.Network and PNC.Network.InstallServerProfilerWrappers then
+        PNC.Network.InstallServerProfilerWrappers(wrap)
+    end
     Internal.Profiler.RegisterSampler("ProjectHoomans.server", function(api)
         local groups = PNC.AbstractGroups and PNC.AbstractGroups.List
             and PNC.AbstractGroups.List() or {}

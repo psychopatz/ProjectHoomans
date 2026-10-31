@@ -355,3 +355,15 @@ function Internal.SendRecordPayload(recipients, payload)
     triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_SYNC_RECORD, payload)
     return 1
 end
+
+function Network.InstallServerProfilerWrappers(wrap)
+    if type(wrap) ~= "function" then return end
+    wrap(Internal, "QueueBroadcastRoster",
+        "Network.BroadcastRecord.QueueRoster")
+    wrap(Internal, "CollectRecordRecipients",
+        "Network.BroadcastRecord.FindRecipients")
+    wrap(Internal, "BuildRecordPayload",
+        "Network.BroadcastRecord.BuildPayload")
+    wrap(Internal, "SendRecordPayload",
+        "Network.BroadcastRecord.SendPayload")
+end

@@ -59,8 +59,8 @@ local function approachLocation(session, source, location, record, excluded)
     local baseX, baseY = tonumber(location.x), tonumber(location.y)
     local baseZ = tonumber(location.z) or 0
     if not baseX or not baseY then return nil, "source_location_invalid" end
-    local checker = PNC.PathService and PNC.PathService.Internal
-        and PNC.PathService.Internal.isSquareWalkable or nil
+    local checker = PNC.PathService
+        and PNC.PathService.IsSquareWalkable or nil
     local exactSquare = source.sourceType == "floor"
         or source.sourceType == "corpse"
     -- Containers occupy their source square. Target an adjacent interaction

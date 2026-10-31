@@ -18,7 +18,12 @@ Profiler.Start("BASIC", {
 
 PNC = {
     Core = { Now = function() return now end },
-    Server = { Internal = { ProcessRecord = callback("process_record") } },
+    Server = {
+        Internal = { ProcessRecord = callback("process_record") },
+        InstallProfilerWrappers = function(wrap)
+            wrap(PNC.Server.Internal, "ProcessRecord", "Server.Update.NPC.ProcessRecord")
+        end,
+    },
     Registry = { Data = {}, LiveByID = {}, DirtyByID = {} },
     WorldCensus = { OrdinaryZombies = {}, ManagedBodies = {} },
     Scheduler = { PopDue = callback("pop_due"), PumpJobs = callback("pump_jobs"),
@@ -45,6 +50,10 @@ PNC = {
     Combat = {
         PumpAttackAction = callback("attack_pump"),
         Internal = { applyAttackActionHit = callback("attack_hit") },
+        InstallProfilerWrappers = function(wrap)
+            wrap(PNC.Combat.Internal, "applyAttackActionHit",
+                "ProjectHoomans.Server.Update.NPC.Combat.AttackHitResolution")
+        end,
     },
     CombatEngagement = { Tick = callback("engagement") },
     CombatTactics = {
@@ -53,6 +62,12 @@ PNC = {
             AssessThreat = callback("assess_threat"),
             BuildZombieThreatCentroid = callback("threat_centroid"),
         },
+        InstallProfilerWrappers = function(wrap)
+            wrap(PNC.CombatTactics.Internal, "AssessThreat",
+                "ProjectHoomans.Server.Update.NPC.Combat.ThreatAssessment")
+            wrap(PNC.CombatTactics.Internal, "BuildZombieThreatCentroid",
+                "ProjectHoomans.Server.Update.NPC.Combat.ThreatCentroid")
+        end,
     },
     CombatDefense = { Refresh = callback("defense") },
     Stamina = {
@@ -88,6 +103,12 @@ PNC = {
             BuildRecordPayload = callback("build_payload"),
             SendRecordPayload = callback("send_payload"),
         },
+        InstallServerProfilerWrappers = function(wrap)
+            wrap(PNC.Network.Internal, "QueueBroadcastRoster", "Network.BroadcastRecord.QueueRoster")
+            wrap(PNC.Network.Internal, "CollectRecordRecipients", "Network.BroadcastRecord.FindRecipients")
+            wrap(PNC.Network.Internal, "BuildRecordPayload", "Network.BroadcastRecord.BuildPayload")
+            wrap(PNC.Network.Internal, "SendRecordPayload", "Network.BroadcastRecord.SendPayload")
+        end,
     },
 }
 

@@ -63,6 +63,7 @@ Internal.BandageTypes = bandageTypes
 Internal.IsBandageType = isBandageType
 Internal.BandageDisplayName = bandageDisplayName
 Internal.PlayerFirstAidLevel = playerFirstAidLevel
+Treatment.IsBandageType = isBandageType
 
 function Treatment.GetPlayerFirstAidLevel(player)
     return playerFirstAidLevel(player)

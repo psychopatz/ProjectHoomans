@@ -216,21 +216,19 @@ PNC.TraversalQuery = {
     end,
 }
 PNC.PathService = {
-    Internal = {
-        openDoorForNPC = function(_, object)
-            object.open = true
-            return true
-        end,
-        openWindowForNPC = function(_, object)
-            if object.locked then return false end
-            object.open = true
-            return true
-        end,
-        smashWindowForNPC = function(_, object)
-            object.smashed = true
-            return true
-        end,
-    },
+    OpenDoorForNPC = function(_, object)
+        object.open = true
+        return true
+    end,
+    OpenWindowForNPC = function(_, object)
+        if object.locked then return false end
+        object.open = true
+        return true
+    end,
+    SmashWindowForNPC = function(_, object)
+        object.smashed = true
+        return true
+    end,
 }
 PNC.Animation = {
     PlayBump = function(_, _, bumpType)

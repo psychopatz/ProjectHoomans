@@ -27,15 +27,13 @@ PNC = {
         end,
     },
     Network = {
-        Internal = {
-            PlayerKey = function(value) return value:getUsername() end,
-            SendToPlayer = function(target, command, payload)
-                sent[#sent + 1] = {
-                    target = target, command = command, payload = payload,
-                }
-                return true
-            end,
-        },
+        PlayerKey = function(value) return value:getUsername() end,
+        SendToPlayer = function(target, command, payload)
+            sent[#sent + 1] = {
+                target = target, command = command, payload = payload,
+            }
+            return true
+        end,
     },
     Registry = {
         Data = {

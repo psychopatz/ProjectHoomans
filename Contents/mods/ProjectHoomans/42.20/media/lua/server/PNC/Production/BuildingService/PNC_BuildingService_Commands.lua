@@ -152,9 +152,8 @@ function Service.Queue(player, args)
     if preparedFacility then
         preparedFacility.constructionWorkOrderId = order.id
         preparedFacility.constructionState = "UNDER_CONSTRUCTION"
-        local serviceInternal = PNC.FacilityService.Internal
-        if serviceInternal and serviceInternal.touch then
-            serviceInternal.touch(context.base, preparedFacility)
+        if PNC.FacilityService and PNC.FacilityService.Touch then
+            PNC.FacilityService.Touch(context.base, preparedFacility)
         elseif PNC.SettlementRepository then
             PNC.SettlementRepository.MarkDirty()
         end

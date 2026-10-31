@@ -107,8 +107,8 @@ function Server.NormalizeStance(value)
 end
 
 local function dispatchToPlayer(player, payload)
-    local internal = PNC.Network and PNC.Network.Internal
-    local send = internal and internal.SendToPlayer
+    local network = PNC.Network
+    local send = network and network.SendToPlayer
     if type(send) == "function" then
         return send(player, Server.COMMAND, payload) ~= false
     end

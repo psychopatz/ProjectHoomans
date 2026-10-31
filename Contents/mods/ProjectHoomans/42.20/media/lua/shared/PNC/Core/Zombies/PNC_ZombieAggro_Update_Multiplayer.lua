@@ -23,8 +23,7 @@ local function getMPNetwork()
     local network = PNC.Network
     if not network
         or not network.GetZombieOnlineID
-        or not network.Internal
-        or not network.Internal.SendToNearbyPlayers
+        or not network.SendToNearbyPlayers
     then
         return nil
     end
@@ -69,7 +68,7 @@ local function clearMPTargetDirective(zombie, now)
     }
     sent = 0
     if zombieOnlineID ~= nil then
-        sent = network.Internal.SendToNearbyPlayers(
+        sent = network.SendToNearbyPlayers(
             zombie,
             nil,
             Const.CMD_ZOMBIE_PURSUIT,
@@ -176,7 +175,7 @@ local function publishMPTargetDirective(
         expiresAt = now + (tonumber(Const.ZOMBIE_NPC_DIRECTIVE_TTL_MS) or 1100),
         revision = tonumber(modData.PNC_MPAggroDirectiveRevision) or 1,
     }
-    sent = network.Internal.SendToNearbyPlayers(
+    sent = network.SendToNearbyPlayers(
         zombie,
         npcBody,
         Const.CMD_ZOMBIE_PURSUIT,

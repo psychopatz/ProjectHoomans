@@ -24,18 +24,17 @@ end
 
 local function prepareMaterializedFollower(record)
     local companion = PNC.BehaviorCompanion
-    local internal = companion and companion.Internal or nil
     record.runtime = record.runtime or {}
     record.runtime.followReconcilePending = true
     -- A bodyless follower cannot complete a native attack action. Drop any
     -- stale action lease before the recreated body reaches live behavior.
     record.runtime.attackAction = nil
     record.runtime.inCombatUntil = 0
-    if internal and internal.ResetFollowMoveIssue then
+    if companion and companion.ResetFollowMoveIssue then
         -- Abstraction clears the native path state, while the follow issue
         -- cache survives. Reset it so the first live tick always republishes
         -- a movement target after the body is recreated.
-        internal.ResetFollowMoveIssue(record)
+        companion.ResetFollowMoveIssue(record)
     end
 end
 

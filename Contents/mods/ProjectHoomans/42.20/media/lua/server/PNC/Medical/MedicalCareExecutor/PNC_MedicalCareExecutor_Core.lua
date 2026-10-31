@@ -114,6 +114,10 @@ function Internal.CurrentPart(patient)
     return entries[1] and tostring(entries[1].partId) or nil
 end
 
+Executor.IsDoctor = Internal.IsDoctor
+Executor.SameCareGroup = Internal.SameCareGroup
+Executor.CurrentPart = Internal.CurrentPart
+
 function Internal.CanTreat(actor, task)
     local patient
     local plan

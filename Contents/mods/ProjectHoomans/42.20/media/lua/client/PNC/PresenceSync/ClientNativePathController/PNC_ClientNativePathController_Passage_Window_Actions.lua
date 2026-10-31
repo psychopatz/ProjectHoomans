@@ -14,8 +14,7 @@ local Shared = Passage.Shared
 
 local TraversalQuery = PNC.TraversalQuery
 local TraversalProfiles = PNC.TraversalProfiles
-local PathInternal = PNC.PathService
-    and PNC.PathService.Internal or nil
+local PathService = PNC.PathService
 local Animation = PNC.Animation
 local LiveBodyControl = PNC.LiveBodyControl
 
@@ -93,8 +92,8 @@ local function resolveWindowDestination(body, object, passage)
     local objectSquare
     local oppositeSquare
     if destination then return destination end
-    if PathInternal and PathInternal.passageWindowDestination then
-        return PathInternal.passageWindowDestination(object, actorSquare)
+    if PathService and PathService.PassageWindowDestination then
+        return PathService.PassageWindowDestination(object, actorSquare)
     end
     objectSquare = object and object.getSquare and object:getSquare() or nil
     oppositeSquare = object and object.getOppositeSquare

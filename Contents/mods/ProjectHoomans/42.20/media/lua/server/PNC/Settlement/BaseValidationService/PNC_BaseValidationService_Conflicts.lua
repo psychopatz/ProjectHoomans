@@ -28,6 +28,8 @@ function H.RectangleRegion(minX, minY, maxX, maxY, minZ, maxZ)
     return GridRegion.normalize(region)
 end
 
+Validation.RectangleRegion = H.RectangleRegion
+
 function H.ConflictsWithRegisteredBase(footprint, options)
     local exported = Zones.export and Zones.export() or { byID = {} }
     for zoneID, zone in pairs(exported.byID or {}) do

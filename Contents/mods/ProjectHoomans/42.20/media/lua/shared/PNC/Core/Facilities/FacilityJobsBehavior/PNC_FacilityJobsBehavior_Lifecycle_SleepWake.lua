@@ -160,10 +160,8 @@ function Internal.TickSleepWake(record, zombie)
         if zombie and not runtime.sleepWakeBodyPrepared
             and PNC.LiveBodyControl
         then
-            if PNC.LiveBodyControl.Internal
-                and PNC.LiveBodyControl.Internal.clearVanillaIntent
-            then
-                PNC.LiveBodyControl.Internal.clearVanillaIntent(zombie)
+            if PNC.LiveBodyControl.ClearVanillaIntent then
+                PNC.LiveBodyControl.ClearVanillaIntent(zombie)
             end
             if PNC.LiveBodyControl.ResetPresentationNativeMovementState then
                 PNC.LiveBodyControl.ResetPresentationNativeMovementState(zombie)
@@ -234,10 +232,8 @@ function Internal.TickSleepWake(record, zombie)
         end
     end
     if zombie and PNC.LiveBodyControl then
-        if PNC.LiveBodyControl.Internal
-            and PNC.LiveBodyControl.Internal.clearVanillaIntent
-        then
-            PNC.LiveBodyControl.Internal.clearVanillaIntent(zombie)
+        if PNC.LiveBodyControl.ClearVanillaIntent then
+            PNC.LiveBodyControl.ClearVanillaIntent(zombie)
         end
         if PNC.LiveBodyControl.ResetPresentationNativeMovementState then
             PNC.LiveBodyControl.ResetPresentationNativeMovementState(zombie)

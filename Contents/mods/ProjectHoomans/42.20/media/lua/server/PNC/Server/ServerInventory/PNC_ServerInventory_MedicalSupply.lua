@@ -32,9 +32,8 @@ end
 
 local function medicalBandageItemType(fullType)
     local treatment = PNC.Treatment
-    local internal = treatment and treatment.Internal or nil
-    return internal and type(internal.IsBandageType) == "function"
-        and internal.IsBandageType(fullType) == true or false
+    return treatment and type(treatment.IsBandageType) == "function"
+        and treatment.IsBandageType(fullType) == true or false
 end
 
 local function inventoryItemSpec(item)
@@ -58,7 +57,6 @@ end
 local function medicalSupplyGiftTask(player, record, args)
     local taskService = PNC.MedicalCareService
     local medical = PNC.MedicalCareExecutor
-    local medicalInternal = medical and medical.Internal or nil
     local taskID = args and args.medicalSupplyTaskID
     local requestID = args and args.medicalSupplyRequestID
     local task
@@ -86,12 +84,12 @@ local function medicalSupplyGiftTask(player, record, args)
         or tostring(task.supplyRequestId or "") ~= tostring(requestID)
         or record.alive == false
         or not patient or patient.alive == false
-        or not medicalInternal or type(medicalInternal.IsDoctor) ~= "function"
-        or medicalInternal.IsDoctor(record) ~= true
-        or type(medicalInternal.SameCareGroup) ~= "function"
-        or not medicalInternal.SameCareGroup(record, patient)
-        or type(medicalInternal.CurrentPart) ~= "function"
-        or not medicalInternal.CurrentPart(patient)
+        or not medical or type(medical.IsDoctor) ~= "function"
+        or medical.IsDoctor(record) ~= true
+        or type(medical.SameCareGroup) ~= "function"
+        or not medical.SameCareGroup(record, patient)
+        or type(medical.CurrentPart) ~= "function"
+        or not medical.CurrentPart(patient)
     then
         return false, "medical_supply_request_stale"
     end
@@ -127,7 +125,6 @@ function Service.TransferMedicalBandageForTask(taskID, donorID, itemID)
         and Registry.Get(task.supplyRequesterId) or nil
     local patient = task and task.patientKind == "npc" and Registry
         and Registry.Get and Registry.Get(task.patientId) or nil
-    local medicalInternal = medical and medical.Internal or nil
     local donorPlan
     local donorInventory
     local item
@@ -156,13 +153,13 @@ function Service.TransferMedicalBandageForTask(taskID, donorID, itemID)
         or combatActive(requester)
         or combatActive(donor)
         or not treatment or not treatment.GetNPCBandagePlan
-        or not medicalInternal or not medicalInternal.SameCareGroup
-        or not medicalInternal.IsDoctor
-        or not medicalInternal.IsDoctor(requester)
-        or not medicalInternal.SameCareGroup(donor, patient)
-        or not medicalInternal.SameCareGroup(requester, patient)
-        or type(medicalInternal.CurrentPart) ~= "function"
-        or not medicalInternal.CurrentPart(patient)
+        or not medical or not medical.SameCareGroup
+        or not medical.IsDoctor
+        or not medical.IsDoctor(requester)
+        or not medical.SameCareGroup(donor, patient)
+        or not medical.SameCareGroup(requester, patient)
+        or type(medical.CurrentPart) ~= "function"
+        or not medical.CurrentPart(patient)
     then
         return false, "medical_bandage_share_unavailable"
     end

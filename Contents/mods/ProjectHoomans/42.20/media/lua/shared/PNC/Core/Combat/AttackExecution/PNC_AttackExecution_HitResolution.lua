@@ -379,3 +379,9 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
 
     return false, "unknown_target"
 end
+
+function PNC.Combat.InstallProfilerWrappers(wrap)
+    if type(wrap) ~= "function" then return end
+    wrap(Internal, "applyAttackActionHit",
+        "ProjectHoomans.Server.Update.NPC.Combat.AttackHitResolution")
+end

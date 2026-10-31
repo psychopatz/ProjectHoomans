@@ -80,7 +80,7 @@ end
 -- square, however, must never become a durable home target.
 local function homePointUsability(point, cell)
     local square
-    local pathInternal
+    local pathService
     if not cell then return nil end
     square = cell:getGridSquare(
         math.floor(tonumber(point and point.x) or 0),
@@ -88,9 +88,9 @@ local function homePointUsability(point, cell)
         math.floor(tonumber(point and point.z) or 0)
     )
     if not square then return nil end
-    pathInternal = PNC.PathService and PNC.PathService.Internal or nil
-    if pathInternal and pathInternal.isSquareWalkable then
-        return pathInternal.isSquareWalkable(
+    pathService = PNC.PathService
+    if pathService and pathService.IsSquareWalkable then
+        return pathService.IsSquareWalkable(
             point.x, point.y, point.z) == true
     end
     if square.isSolid and square:isSolid() == true then return false end

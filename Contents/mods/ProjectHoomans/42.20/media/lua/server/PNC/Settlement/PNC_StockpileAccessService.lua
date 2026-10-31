@@ -47,9 +47,9 @@ local function squareState(x, y, z)
     local square = cell:getGridSquare(math.floor(x), math.floor(y), math.floor(z))
     if not square then return "unloaded" end
 
-    local pathInternal = PNC.PathService and PNC.PathService.Internal
-    if pathInternal and pathInternal.isSquareWalkable then
-        local checked, walkable = pcall(pathInternal.isSquareWalkable,
+    local pathService = PNC.PathService
+    if pathService and pathService.IsSquareWalkable then
+        local checked, walkable = pcall(pathService.IsSquareWalkable,
             x, y, z)
         if checked then return walkable == true and "walkable" or "blocked" end
     end

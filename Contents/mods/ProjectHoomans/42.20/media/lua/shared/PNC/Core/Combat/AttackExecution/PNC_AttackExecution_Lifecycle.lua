@@ -21,6 +21,7 @@ function Internal.finishAttackAction(record, zombie)
         record.runtime.forceSyncEvent = "attack_finish"
     end
 end
+Combat.FinishAttackAction = Internal.finishAttackAction
 
 function Internal.buildAttackAction(record, target, attackKind, attackType, anim, damage, skillID, extra)
     local now = Core.Now()

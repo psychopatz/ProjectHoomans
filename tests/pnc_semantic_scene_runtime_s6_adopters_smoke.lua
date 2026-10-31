@@ -128,16 +128,14 @@ PNC = {
         CMD_SEMANTIC_SCENE_SPEECH = "SemanticSceneSpeech",
     },
     Network = {
-        Internal = {
-            SendToPlayer = function(playerValue, command, payload)
-                deliveredPackets[#deliveredPackets + 1] = {
-                    player = playerValue,
-                    command = command,
-                    payload = payload,
-                }
-                return true
-            end,
-        },
+        SendToPlayer = function(playerValue, command, payload)
+            deliveredPackets[#deliveredPackets + 1] = {
+                player = playerValue,
+                command = command,
+                payload = payload,
+            }
+            return true
+        end,
     },
     Factions = {
         GetFactionID = function(recordValue)

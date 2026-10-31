@@ -57,5 +57,6 @@ then
 end
 
 Internal.InstallSendGuard()
+Network.InstallSendGuard = Internal.InstallSendGuard
 
 return Budget

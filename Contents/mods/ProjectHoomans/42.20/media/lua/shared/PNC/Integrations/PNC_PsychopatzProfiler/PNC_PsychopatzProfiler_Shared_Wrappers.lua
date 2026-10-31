@@ -63,37 +63,11 @@ function Internal.InstallSharedPerformanceWrappers()
     -- installed only while the performance section is active, so the normal
     -- gameplay path keeps its existing call graph and state transitions.
     local companion = PNC.BehaviorCompanion
-    local companionInternal = companion and companion.Internal or nil
     Internal.Wrap(companion, "Tick",
         "ProjectHoomans.Server.Update.NPC.Companion.Dispatch")
-    Internal.Wrap(companionInternal, "TickFollowOwner",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.Tick")
-    Internal.Wrap(companionInternal, "TickAbstractFollowOwner",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.AbstractTick")
-    Internal.Wrap(companionInternal, "UpdateOwnerMotionState",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.OwnerMotion")
-    Internal.Wrap(companionInternal, "UpdateOwnerCombatState",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.OwnerCombat")
-    Internal.Wrap(companionInternal, "AssessFollowHazards",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.Hazards")
-    Internal.Wrap(companionInternal, "ResolveHordeAwareFollowTarget",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.HordeSteer")
-    Internal.Wrap(companionInternal, "ResolveSampledFollowSlot",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.Formation.SampledSlot")
-    Internal.Wrap(companionInternal, "ResolveFollowSlot",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.Formation.ResolveSlot")
-    Internal.Wrap(companionInternal, "TryRespondToThreat",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.ThreatResponse")
-    Internal.Wrap(companionInternal, "TryRespondToImmediateThreat",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.ImmediateThreat")
-    Internal.Wrap(companionInternal, "ShouldScanFollowThreat",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.ThreatGate")
-    Internal.Wrap(companionInternal, "HoldAndFaceOwner",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.Hold")
-    Internal.Wrap(companionInternal, "ShouldIssueFollowMove",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.MoveGate")
-    Internal.Wrap(companionInternal, "EnforceOwnerPersonalSpace",
-        "ProjectHoomans.Server.Update.NPC.FollowOwner.PersonalSpace")
+    if companion and companion.InstallProfilerWrappers then
+        companion.InstallProfilerWrappers(Internal.Wrap)
+    end
 
     -- These are global movement authorities. Keeping them separate from the
     -- existing PathService.Pump marker shows whether a follow spike is caused
@@ -107,9 +81,9 @@ function Internal.InstallSharedPerformanceWrappers()
     local enginePlanner = PNC.EnginePathPlanner
     Internal.Wrap(enginePlanner, "Invalidate",
         "ProjectHoomans.Server.Update.NPC.Pathing.NativeInvalidate")
-    Internal.Wrap(enginePlanner and enginePlanner.Internal,
-        "ClearEngineRequest",
-        "ProjectHoomans.Server.Update.NPC.Pathing.NativeClear")
+    if enginePlanner and enginePlanner.InstallProfilerWrappers then
+        enginePlanner.InstallProfilerWrappers(Internal.Wrap)
+    end
 
     -- Follow is evaluated beside transient roaming presentation leases. These
     -- markers make an order/lease conflict visible without changing which
@@ -137,17 +111,14 @@ function Internal.InstallSharedPerformanceWrappers()
         "ProjectHoomans.Server.Update.NPC.Combat.Engagement")
     Internal.Wrap(PNC.CombatTactics, "PreAttackDecision",
         "ProjectHoomans.Server.Update.NPC.Combat.PreAttackDecision")
-    Internal.Wrap(PNC.CombatTactics and PNC.CombatTactics.Internal,
-        "AssessThreat",
-        "ProjectHoomans.Server.Update.NPC.Combat.ThreatAssessment")
-    Internal.Wrap(PNC.CombatTactics and PNC.CombatTactics.Internal,
-        "BuildZombieThreatCentroid",
-        "ProjectHoomans.Server.Update.NPC.Combat.ThreatCentroid")
+    if PNC.CombatTactics and PNC.CombatTactics.InstallProfilerWrappers then
+        PNC.CombatTactics.InstallProfilerWrappers(Internal.Wrap)
+    end
     Internal.Wrap(PNC.Combat, "PumpAttackAction",
         "ProjectHoomans.Server.Update.NPC.Combat.AttackPump")
-    Internal.Wrap(PNC.Combat and PNC.Combat.Internal,
-        "applyAttackActionHit",
-        "ProjectHoomans.Server.Update.NPC.Combat.AttackHitResolution")
+    if PNC.Combat and PNC.Combat.InstallProfilerWrappers then
+        PNC.Combat.InstallProfilerWrappers(Internal.Wrap)
+    end
     Internal.Wrap(PNC.CombatDefense, "Refresh",
         "ProjectHoomans.Server.Update.NPC.Combat.Defense")
 

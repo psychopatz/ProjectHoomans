@@ -24,7 +24,7 @@ local distanceTo = Internal.distanceTo
 local AMBIENT_FACILITY_ID = Internal.AMBIENT_FACILITY_ID
 local FLOOR_SCENE_ID = Internal.FLOOR_SCENE_ID
 local function floorSquareUsable(square, allowOccupied, x, y, z)
-    local pathInternal
+    local pathService
     local checked
     local walkable
     if not square then return false end
@@ -36,9 +36,9 @@ local function floorSquareUsable(square, allowOccupied, x, y, z)
     -- room-floor object. Solid/occupancy/path checks below are the actual
     -- movement safety boundary.
     if allowOccupied == true then return true end
-    pathInternal = PNC.PathService and PNC.PathService.Internal or nil
-    if pathInternal and pathInternal.isSquareWalkable then
-        checked, walkable = pcall(pathInternal.isSquareWalkable, x, y, z)
+    pathService = PNC.PathService
+    if pathService and pathService.IsSquareWalkable then
+        checked, walkable = pcall(pathService.IsSquareWalkable, x, y, z)
         if checked then return walkable == true end
     end
     if square.isFree and square:isFree(false) ~= true then return false end

@@ -360,9 +360,8 @@ end
 
 local function buildHordeSpatial(record, now, episodeID)
     local tactics = PNC.CombatTactics
-    local internal = tactics and tactics.Internal or nil
-    if not internal
-        or type(internal.BuildZombieThreatCentroid) ~= "function"
+    if not tactics
+        or type(tactics.BuildZombieThreatCentroid) ~= "function"
         or not TacticalSpatial
         or type(TacticalSpatial.Project) ~= "function"
     then
@@ -370,7 +369,7 @@ local function buildHordeSpatial(record, now, episodeID)
     end
 
     local radius = tonumber(Const and Const.ZOMBIE_TARGET_RADIUS) or 12
-    local x, y, count = internal.BuildZombieThreatCentroid(record, radius)
+    local x, y, count = tactics.BuildZombieThreatCentroid(record, radius)
     if not x or not y or (tonumber(count) or 0) <= 0 then
         return nil, "horde_centroid_unavailable"
     end

@@ -14,8 +14,7 @@ local Shared = Passage.Shared
 local Window = Passage.WindowInternal
 
 local TraversalQuery = PNC.TraversalQuery
-local PathInternal = PNC.PathService
-    and PNC.PathService.Internal or nil
+local PathService = PNC.PathService
 
 local clearOwnedPath = Controller.ClearOwnedPath
 local logState = Controller.LogState
@@ -36,7 +35,9 @@ local function tryWindow(snapshot, body, state, passage, object, now)
     local smashed = objectBool(object, "isSmashed")
         or objectBool(object, "IsSmashed")
     if not open and not smashed then
-        if PathInternal.openWindowForNPC(body, object) then
+        if PathService and PathService.OpenWindowForNPC
+            and PathService.OpenWindowForNPC(body, object)
+        then
             clearOwnedPath(body, state)
             state.failed = true
             state.retryAt = now + 250

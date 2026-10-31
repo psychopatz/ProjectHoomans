@@ -15,8 +15,7 @@ local Window = Passage.WindowInternal
 
 local TraversalAction = PNC.TraversalAction
 local TraversalQuery = PNC.TraversalQuery
-local PathInternal = PNC.PathService
-    and PNC.PathService.Internal or nil
+local PathService = PNC.PathService
 local LiveBodyControl = PNC.LiveBodyControl
 local Core = PNC.Core
 
@@ -120,8 +119,8 @@ local function updateWindowAction(body, state, now)
         and now >= (tonumber(action.impactAt) or now)
     then
         action.applied = true
-        if PathInternal and PathInternal.smashWindowForNPC then
-            PathInternal.smashWindowForNPC(body, action.object)
+        if PathService and PathService.SmashWindowForNPC then
+            PathService.SmashWindowForNPC(body, action.object)
         elseif action.object and action.object.smashWindow then
             action.object:smashWindow()
         end

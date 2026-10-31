@@ -54,6 +54,39 @@ function Internal.ResetFollowMoveIssue(record)
     state.issuedAvoidance = nil
     state.issuedAt = 0
 end
+Companion.ResetFollowMoveIssue = Internal.ResetFollowMoveIssue
+
+function Companion.InstallProfilerWrappers(wrap)
+    if type(wrap) ~= "function" then return end
+    wrap(Internal, "TickFollowOwner",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.Tick")
+    wrap(Internal, "TickAbstractFollowOwner",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.AbstractTick")
+    wrap(Internal, "UpdateOwnerMotionState",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.OwnerMotion")
+    wrap(Internal, "UpdateOwnerCombatState",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.OwnerCombat")
+    wrap(Internal, "AssessFollowHazards",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.Hazards")
+    wrap(Internal, "ResolveHordeAwareFollowTarget",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.HordeSteer")
+    wrap(Internal, "ResolveSampledFollowSlot",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.Formation.SampledSlot")
+    wrap(Internal, "ResolveFollowSlot",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.Formation.ResolveSlot")
+    wrap(Internal, "TryRespondToThreat",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.ThreatResponse")
+    wrap(Internal, "TryRespondToImmediateThreat",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.ImmediateThreat")
+    wrap(Internal, "ShouldScanFollowThreat",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.ThreatGate")
+    wrap(Internal, "HoldAndFaceOwner",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.Hold")
+    wrap(Internal, "ShouldIssueFollowMove",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.MoveGate")
+    wrap(Internal, "EnforceOwnerPersonalSpace",
+        "ProjectHoomans.Server.Update.NPC.FollowOwner.PersonalSpace")
+end
 
 function Internal.ShouldIssueFollowMove(record, target, mode, now)
     local state = Internal.GetFollowState(record)

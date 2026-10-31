@@ -241,3 +241,8 @@ function H.ProcessRecord(record, now)
         ScalingDiagnostics.EndTiming(timerName, timerStart, record.id)
     end
 end
+
+function PNC.Server.InstallProfilerWrappers(wrap)
+    if type(wrap) ~= "function" then return end
+    wrap(H, "ProcessRecord", "Server.Update.NPC.ProcessRecord")
+end

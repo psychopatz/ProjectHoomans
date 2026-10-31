@@ -37,6 +37,8 @@ function H.CancelActiveTask(record, reason)
     return true
 end
 
+Service.CancelActiveTask = H.CancelActiveTask
+
 function Service.SendHome(record, baseId, reason, options)
     if not record or record.alive == false then return false, "NPC_MISSING" end
     local allowFollowOverride = type(options) == "table"

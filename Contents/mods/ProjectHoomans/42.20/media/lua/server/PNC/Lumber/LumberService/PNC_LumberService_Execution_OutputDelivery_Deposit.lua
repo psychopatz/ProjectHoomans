@@ -105,12 +105,12 @@ local function outputReservationId(job, effect)
             or job and job.pendingOutput and job.pendingOutput.treeKey or "")
 end
 
-local function releaseOutputCapacity(job, storageInternal)
+local function releaseOutputCapacity(job, storageService)
     local owner = job and job.outputCapacityReservationId or nil
-    if owner and storageInternal
-        and type(storageInternal.ReleaseOutputCapacity) == "function"
+    if owner and storageService
+        and type(storageService.ReleaseOutputCapacity) == "function"
     then
-        storageInternal.ReleaseOutputCapacity(owner)
+        storageService.ReleaseOutputCapacity(owner)
     end
     if job then
         job.outputCapacityReservationId = nil
@@ -138,12 +138,11 @@ end
 local function outputWaitStorageChanged(job)
     local storageID = job and job.outputWaitStorageId or nil
     local storageService = PNC.ColonyStorageService
-    local storageInternal = storageService and storageService.Internal or nil
     if not storageID then
         return false
     end
-    if storageInternal and type(storageInternal.HasStorageChanged) == "function" then
-        local changed = storageInternal.HasStorageChanged(
+    if storageService and type(storageService.HasStorageChanged) == "function" then
+        local changed = storageService.HasStorageChanged(
             storageID,
             job.outputWaitStorageRevision
         )
@@ -159,10 +158,9 @@ local function outputWaitStorageChanged(job)
 end
 
 local function storageRevision(storage)
-    local storageInternal = PNC.ColonyStorageService
-        and PNC.ColonyStorageService.Internal or nil
-    if storageInternal and type(storageInternal.GetStorageRevision) == "function" then
-        return storageInternal.GetStorageRevision(storage)
+    local storageService = PNC.ColonyStorageService
+    if storageService and type(storageService.GetStorageRevision) == "function" then
+        return storageService.GetStorageRevision(storage)
     end
     return tonumber(storage and storage.revision) or 0
 end
@@ -172,7 +170,7 @@ end
 -- deposit animation / travel loop. Test doubles may not expose preview(); in
 -- that compatibility case the authoritative transfer still performs its own
 -- preflight.
-local function previewOutputItems(record, body, effect, storageInternal)
+local function previewOutputItems(record, body, effect, storageService)
     local pendingByType = {}
     for _, descriptor in ipairs(effect.items or {}) do
         if descriptor.collected and not descriptor.delivered then
@@ -189,7 +187,7 @@ local function previewOutputItems(record, body, effect, storageInternal)
             local available = math.max(0, math.floor(tonumber(item.stack) or 0))
             local quantity = math.min(available, remaining)
             if quantity > 0 then
-                local source, sourceReason = storageInternal.LiveNPCSource(
+                local source, sourceReason = storageService.LiveNPCSource(
                     record, item, quantity, body)
                 if not source then return nil, sourceReason end
                 if type(source.preview) ~= "function" then
@@ -211,26 +209,25 @@ local function previewOutputItems(record, body, effect, storageInternal)
 end
 
 local function reserveOutputCapacity(job, record, body, storage, effect)
-    local storageInternal = PNC.ColonyStorageService
-        and PNC.ColonyStorageService.Internal or nil
-    if not storageInternal
-        or type(storageInternal.LiveNPCSource) ~= "function"
+    local storageService = PNC.ColonyStorageService
+    if not storageService
+        or type(storageService.LiveNPCSource) ~= "function"
     then
         return true, nil, nil
     end
     local preview, previewReason = previewOutputItems(record, body, effect,
-        storageInternal)
+        storageService)
     if not preview then
         if previewReason then return false, previewReason end
         return true, nil, nil
     end
     local owner = outputReservationId(job, effect)
     local ok, reason, details
-    if type(storageInternal.ReserveOutputCapacity) == "function" then
-        ok, reason, details = storageInternal.ReserveOutputCapacity(
+    if type(storageService.ReserveOutputCapacity) == "function" then
+        ok, reason, details = storageService.ReserveOutputCapacity(
             storage, preview, owner)
-    elseif type(storageInternal.Preflight) == "function" then
-        ok, reason, details = storageInternal.Preflight(storage, preview)
+    elseif type(storageService.Preflight) == "function" then
+        ok, reason, details = storageService.Preflight(storage, preview)
     else
         return true, nil, nil
     end
@@ -245,11 +242,10 @@ local function reserveOutputCapacity(job, record, body, storage, effect)
 end
 
 local function depositOutputItems(record, body, storage, effect, reservationOwner)
-    local storageInternal = PNC.ColonyStorageService
-        and PNC.ColonyStorageService.Internal or nil
-    if not storageInternal
-        or type(storageInternal.LiveNPCSource) ~= "function"
-        or type(storageInternal.TransferIntoStorage) ~= "function"
+    local storageService = PNC.ColonyStorageService
+    if not storageService
+        or type(storageService.LiveNPCSource) ~= "function"
+        or type(storageService.TransferIntoStorage) ~= "function"
     then
         return false, "LUMBER_STORAGE_TRANSFER_UNAVAILABLE"
     end
@@ -268,10 +264,10 @@ local function depositOutputItems(record, body, storage, effect, reservationOwne
             local available = math.max(0, math.floor(tonumber(item.stack) or 0))
             local quantity = math.min(available, remaining)
             if quantity > 0 then
-                local source, sourceReason = storageInternal.LiveNPCSource(
+                local source, sourceReason = storageService.LiveNPCSource(
                     record, item, quantity, body)
                 if not source then return false, sourceReason end
-                local ok, reason = storageInternal.TransferIntoStorage(
+                local ok, reason = storageService.TransferIntoStorage(
                     storage, source, quantity, reservationOwner)
                 if not ok then return false, reason end
                 local delivered = quantity
@@ -293,8 +289,8 @@ local function depositOutputItems(record, body, storage, effect, reservationOwne
             fullType = descriptor.fullType, quantity = descriptor.quantity or 1,
         }
     end
-    if storageInternal.RecordActivity then
-        storageInternal.RecordActivity(storage, "STORE",
+    if storageService.RecordActivity then
+        storageService.RecordActivity(storage, "STORE",
             tostring(record.name or record.id), activity, "lumber")
     end
     setOutputEffectState(effect, "APPLIED", "LUMBER_OUTPUT_STORED")
@@ -307,14 +303,12 @@ local function tickLiveOutput(job, record, body, at)
     local tree = output and Service.GetTree(output.treeKey) or nil
     local effect = tree and tree.outputEffect or nil
     if not effect then
-        releaseOutputCapacity(job, PNC.ColonyStorageService
-            and PNC.ColonyStorageService.Internal or nil)
+        releaseOutputCapacity(job, PNC.ColonyStorageService)
         job.state, job.phase = "FAILED", "FAILED"
         return false, false, "LUMBER_OUTPUT_EFFECT_MISSING"
     end
     if tostring(effect.state or "") == "APPLIED" then
-        releaseOutputCapacity(job, PNC.ColonyStorageService
-            and PNC.ColonyStorageService.Internal or nil)
+        releaseOutputCapacity(job, PNC.ColonyStorageService)
         job.pendingOutput, job.outputTreeKey = nil, nil
         job.state, job.phase = "READY", "RECONCILING"
         updateRuntime(record, job, nil)
@@ -399,8 +393,7 @@ local function tickLiveOutput(job, record, body, at)
             job, effect)
         if not destination then
             haltOutputMovement(record, body, "lumber_stockpile_missing")
-            releaseOutputCapacity(job, PNC.ColonyStorageService
-                and PNC.ColonyStorageService.Internal or nil)
+            releaseOutputCapacity(job, PNC.ColonyStorageService)
             job.state, job.phase = "WAITING", "WAITING_FOR_STOCKPILE"
             job.outputRetryAt = at + OUTPUT_RETRY_MS
             job.outputWaitReason = destinationReason
@@ -416,8 +409,7 @@ local function tickLiveOutput(job, record, body, at)
             and PNC.ColonyStorageRepository.Get(destination.storageId) or nil
         if not storage then
             haltOutputMovement(record, body, "lumber_storage_missing")
-            releaseOutputCapacity(job, PNC.ColonyStorageService
-                and PNC.ColonyStorageService.Internal or nil)
+            releaseOutputCapacity(job, PNC.ColonyStorageService)
             job.outputDestination = nil
             job.state, job.phase = "WAITING", "WAITING_FOR_STOCKPILE"
             job.outputRetryAt = at + OUTPUT_RETRY_MS
@@ -432,8 +424,7 @@ local function tickLiveOutput(job, record, body, at)
             reserveOutputCapacity(job, record, body, storage, effect)
         if not capacityOK then
             haltOutputMovement(record, body, "lumber_stockpile_full")
-            releaseOutputCapacity(job, PNC.ColonyStorageService
-                and PNC.ColonyStorageService.Internal or nil)
+            releaseOutputCapacity(job, PNC.ColonyStorageService)
             job.outputDestination = nil
             job.state, job.phase = "WAITING", "WAITING_FOR_STOCKPILE"
             job.outputRetryAt = at + OUTPUT_RETRY_MS
@@ -473,8 +464,7 @@ local function tickLiveOutput(job, record, body, at)
             job, effect)
         if not destination then
             haltOutputMovement(record, body, "lumber_stockpile_missing")
-            releaseOutputCapacity(job, PNC.ColonyStorageService
-                and PNC.ColonyStorageService.Internal or nil)
+            releaseOutputCapacity(job, PNC.ColonyStorageService)
             job.state, job.phase = "WAITING", "WAITING_FOR_STOCKPILE"
             job.outputRetryAt = at + OUTPUT_RETRY_MS
             job.outputWaitReason = destinationReason
@@ -490,8 +480,7 @@ local function tickLiveOutput(job, record, body, at)
             and PNC.ColonyStorageRepository.Get(destination.storageId) or nil
         if not storage then
             haltOutputMovement(record, body, "lumber_storage_missing")
-            releaseOutputCapacity(job, PNC.ColonyStorageService
-                and PNC.ColonyStorageService.Internal or nil)
+            releaseOutputCapacity(job, PNC.ColonyStorageService)
             job.outputDestination = nil
             job.state, job.phase = "WAITING", "WAITING_FOR_STOCKPILE"
             job.outputRetryAt = at + OUTPUT_RETRY_MS
@@ -504,8 +493,7 @@ local function tickLiveOutput(job, record, body, at)
             reserveOutputCapacity(job, record, body, storage, effect)
         if not capacityOK then
             haltOutputMovement(record, body, "lumber_stockpile_full")
-            releaseOutputCapacity(job, PNC.ColonyStorageService
-                and PNC.ColonyStorageService.Internal or nil)
+            releaseOutputCapacity(job, PNC.ColonyStorageService)
             job.outputDestination = nil
             job.state, job.phase = "WAITING", "WAITING_FOR_STOCKPILE"
             job.outputRetryAt = at + OUTPUT_RETRY_MS
@@ -542,8 +530,7 @@ local function tickLiveOutput(job, record, body, at)
             effect.updatedAt = at
             if depositReason == "storage_full" then
                 haltOutputMovement(record, body, "lumber_stockpile_full")
-                releaseOutputCapacity(job, PNC.ColonyStorageService
-                    and PNC.ColonyStorageService.Internal or nil)
+                releaseOutputCapacity(job, PNC.ColonyStorageService)
                 job.outputDestination = nil
                 job.state, job.phase = "WAITING", "WAITING_FOR_STOCKPILE"
                 job.outputRetryAt = at + OUTPUT_RETRY_MS
@@ -555,8 +542,7 @@ local function tickLiveOutput(job, record, body, at)
             markDirty()
             return true, false, depositReason
         end
-        releaseOutputCapacity(job, PNC.ColonyStorageService
-            and PNC.ColonyStorageService.Internal or nil)
+        releaseOutputCapacity(job, PNC.ColonyStorageService)
         job.pendingOutput, job.outputTreeKey = nil, nil
         job.outputDestination = nil
         job.state, job.phase = "READY", "RECONCILING"
@@ -568,6 +554,5 @@ local function tickLiveOutput(job, record, body, at)
 end
 Internal.TickLiveOutput = tickLiveOutput
 Internal.ReleaseOutputCapacity = function(job)
-    releaseOutputCapacity(job, PNC.ColonyStorageService
-        and PNC.ColonyStorageService.Internal or nil)
+    releaseOutputCapacity(job, PNC.ColonyStorageService)
 end

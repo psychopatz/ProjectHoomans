@@ -128,3 +128,7 @@ Internal.PlayerKey = playerKey
 Internal.SendToPlayer = sendToPlayer
 Internal.SendToInterestedNPC = sendToInterestedNPC
 Internal.SendToNearbyPlayers = sendToNearbyPlayers
+Network.PlayerKey = playerKey
+Network.SendToPlayer = sendToPlayer
+Network.SendToInterestedNPC = sendToInterestedNPC
+Network.SendToNearbyPlayers = sendToNearbyPlayers

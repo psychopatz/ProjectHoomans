@@ -79,8 +79,7 @@ end
 
 local function rectangleRegion(bounds)
     local helper = PNC.BaseValidationService
-        and PNC.BaseValidationService.Internal
-        and PNC.BaseValidationService.Internal.RectangleRegion
+        and PNC.BaseValidationService.RectangleRegion
     if helper then
         return helper(
             bounds.minX,

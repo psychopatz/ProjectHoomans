@@ -149,6 +149,7 @@ function Internal.GetClientZombieSoundObservation(zombie, now)
             and safeSound.sourceIsPlayer == true or false,
     })
 end
+Sync.GetClientZombieSoundObservation = Internal.GetClientZombieSoundObservation
 
 local function hasZombieSound(zombie, now)
     local observation = Internal.GetClientZombieSoundObservation(zombie, now)
