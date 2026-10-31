@@ -6,8 +6,8 @@ then return end
 
 PNC = PNC or {}
 if not PNC.WorkItemService then
-    require "PNC/Core/Jobs/PNC_JobRequirements"
-    require "PNC/Core/Jobs/PNC_WorkItemService"
+    require "PNC/Core/Production/WorkItems/PNC_JobRequirements"
+    require "PNC/Core/Production/WorkItems/PNC_WorkItemService"
 end
 PNC.WorkItemService = PNC.WorkItemService or {}
 

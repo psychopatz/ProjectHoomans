@@ -67,8 +67,8 @@ PNC = {
 
 T.load("ProjectHoomans", "shared",
     "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions_Constants.lua")
-T.load("ProjectHoomans", "shared", "PNC/Core/Jobs/PNC_JobRequirements.lua")
-T.load("ProjectHoomans", "shared", "PNC/Core/Jobs/PNC_WorkItemService.lua")
+T.load("ProjectHoomans", "shared", "PNC/Core/Production/WorkItems/PNC_JobRequirements.lua")
+T.load("ProjectHoomans", "shared", "PNC/Core/Production/WorkItems/PNC_WorkItemService.lua")
 
 PNC.WorkItemService.RegisterValidator("lumber_tool", function(_, item)
     return string.find(string.lower(tostring(item.type or "")), "axe", 1, true)

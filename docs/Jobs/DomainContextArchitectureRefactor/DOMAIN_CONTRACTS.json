@@ -100,6 +100,14 @@
   },
   "path_owners": [
     {
+      "pattern": "shared/PNC/Core/Jobs/PNC_JobRequirements.lua",
+      "owner": "Production"
+    },
+    {
+      "pattern": "shared/PNC/Core/Jobs/PNC_WorkItemService.lua",
+      "owner": "Production"
+    },
+    {
       "pattern": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel.lua",
       "owner": "Identity"
     },
@@ -830,6 +838,66 @@
       "repository": "Storage owns opera definition envelope; DefinitionDatabase owns generic file/index mechanism",
       "layers": [
         "client"
+      ]
+    },
+    "Activities": {
+      "owns": "Activity-specific execution/validators and JobSystem behavior arbitration; generic reusable work-item selection/logistics belong to Production",
+      "namespace": "PNC.JobSystem",
+      "entries": [
+        "shared/PNC/Core/Jobs/PNC_JobSystem.lua",
+        "shared/PNC/Core/Activities/PNC_ActivityStatus.lua",
+        "shared/PNC/Core/Fishing/PNC_Fishing.lua",
+        "shared/PNC/Core/Fishing/PNC_FishingAnimationScenes.lua",
+        "shared/PNC/Core/Lumber/PNC_LumberAnimationScenes.lua"
+      ],
+      "commands": [
+        "JobSystem.RegisterOrder"
+      ],
+      "queries": [
+        "JobSystem.IsFacilityActivityActive",
+        "JobSystem.Select",
+        "ActivityStatus public projection",
+        "Fishing shared catch/work-point rules"
+      ],
+      "repository": "existing activity-owned runtime fields; no new store",
+      "layers": [
+        "shared",
+        "server"
+      ]
+    },
+    "Production": {
+      "owns": "Work/research/building execution and repositories; shared work-item requirement/validator contract and equipment intent plus server pickup/return logistics extend one WorkItemService owner",
+      "namespace": null,
+      "entries": [
+        "shared/PNC/Core/Production/WorkItems/PNC_JobRequirements.lua",
+        "shared/PNC/Core/Production/WorkItems/PNC_WorkItemService.lua",
+        "shared/PNC/Core/Jobs/PNC_JobRequirements.lua",
+        "shared/PNC/Core/Jobs/PNC_WorkItemService.lua",
+        "shared/PNC/Core/Production/PNC_WorkItemsRuntime.lua",
+        "server/PNC/Production/PNC_Production.lua",
+        "server/PNC/Production/PNC_WorkItemService_Logistics.lua",
+        "shared/PNC/Core/Production/WorkDefinition/PNC_WorkPolicy.lua",
+        "shared/PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions.lua",
+        "shared/PNC/Core/Production/PNC_WorkSequence.lua",
+        "shared/PNC/Core/Production/PNC_WorkAnimationScenes.lua",
+        "shared/PNC/Core/Production/PNC_WorkBehavior.lua",
+        "shared/PNC/Core/Production/PNC_ProductionCatalogs.lua"
+      ],
+      "commands": [
+        "JobRequirements.Register",
+        "WorkItemService.RegisterValidator/Ensure/SetSource/Release",
+        "existing WorkItemService pickup/return logistics",
+        "WorkItemService.Check (legacy inspection also fills a missing item.id; do not classify as a pure query)"
+      ],
+      "queries": [
+        "JobRequirements.Get/GetRequirements/Describe/All",
+        "WorkItemService.GetLease (borrowed read-only lease)/Status",
+        "WorkPolicy.GetPriority/IsEnabled"
+      ],
+      "repository": "Existing Work/Research/Knowledge repositories own saved schemas; runtime.workItems remains canonical per record, Inventory owns actual items",
+      "layers": [
+        "shared",
+        "server"
       ]
     }
   },

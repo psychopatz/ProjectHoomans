@@ -1,0 +1,92 @@
+{
+  "stage": "P7B Activities/Production owner inversion",
+  "source_revision_before": "713184609230647af72ed9f99cab5b4e73fa779b",
+  "ownership_evidence": "Shared selection/equipment lease methods and server pickup/return functions extend the same PNC.WorkItemService table and per-record runtime.workItems lease. Production now owns both; activity-specific validators remain explicit registered callbacks. Inventory remains actual item authority.",
+  "preservation": [
+    {
+      "legacy": "shared/PNC/Core/Jobs/PNC_JobRequirements.lua",
+      "canonical": "shared/PNC/Core/Production/WorkItems/PNC_JobRequirements.lua",
+      "implementation_bytes_equal": true,
+      "sha256": "90b086b55b6c7eea77b529094ac13e0b9d13fdaa310b9e6132af8c26f9af4416"
+    },
+    {
+      "legacy": "shared/PNC/Core/Jobs/PNC_WorkItemService.lua",
+      "canonical": "shared/PNC/Core/Production/WorkItems/PNC_WorkItemService.lua",
+      "implementation_bytes_equal": true,
+      "sha256": "39a4659b41955f3cd29f35f48ef71826cad81f852af2995cca480d7998e56ec3"
+    }
+  ],
+  "composition": "JobSystem still loads before JobRequirements then WorkItemService; WorkItemsRuntime registers the last two under Production. Temporary P3 JobsRuntime removed, permanent legacy service/requirement entries are pure aliases.",
+  "pre_mcp": {
+    "project": "project-hoomans",
+    "generation": "2026-10-30T22:56:25Z",
+    "tier": 2,
+    "coverage": "12 source/caller/test paths metadata-match, no recorded gaps",
+    "pagination": "All 19 WorkItemService and 10 JobRequirements nodes; Check/Ensure traces both directions depth1 complete",
+    "caller_examples": [
+      "server Production pickup/PrepareOrder",
+      "WorkService snapshots",
+      "Activities status diagnostics"
+    ],
+    "limits": "Builtin type/other alias edges are heuristic; literal-import/source fallback used."
+  },
+  "focused_lua": {
+    "passed": 21,
+    "total": 21
+  },
+  "full_lua": {
+    "passed": 983,
+    "total": 983,
+    "seconds": 19.39
+  },
+  "kahlua": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 10,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  },
+  "static_kahlua": {
+    "files": 10,
+    "errors": 0
+  },
+  "bootstrap": {
+    "roots_equal": 7,
+    "registrations": 47,
+    "compatibility_imports": 5,
+    "change": "One extra direct public require at shared CombatRuntime distinguishes Activities JobSystem from Production registration. Expanded leaf order/barriers unchanged."
+  },
+  "post_mcp": {
+    "generation": "2026-10-31T02:06:57Z",
+    "coverage": "10 changed source/test paths and 4 existing Activities public entries metadata-match; no recorded gaps",
+    "Check_dependencies": "same requirement lookup and item-selection helpers; builtin type remains heuristic",
+    "caller_change": "5 -> 6 selected Check callers reflects fresh alias resolution (Fishing executor); that file is unchanged. Do not infer added behavior from graph resolution.",
+    "data_scope": "P*_PROOF.json snapshots excluded with .cbmignore; contracts/runtime/declarative source stay indexed."
+  },
+  "cqs_note": "Check retains a legacy missing-item-ID normalization side effect and is classified as a compatibility mutation; pure query behavior is not falsely claimed.",
+  "fixed_probe_changed_sources": [],
+  "guard": {
+    "issues": 69,
+    "new": 0,
+    "resolved": 124,
+    "owner_sccs": [
+      [
+        "Companions",
+        "Knowledge",
+        "Networking",
+        "UI"
+      ],
+      [
+        "Identity",
+        "Semantics",
+        "Social",
+        "World"
+      ]
+    ]
+  }
+}

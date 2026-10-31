@@ -16,8 +16,13 @@ PNC = {
     },
 }
 
-T.load("ProjectHoomans", "shared", "PNC/Core/Jobs/PNC_JobRequirements.lua")
-T.load("ProjectHoomans", "shared", "PNC/Core/Jobs/PNC_WorkItemService.lua")
+T.load("ProjectHoomans", "shared", "PNC/Core/Production/WorkItems/PNC_JobRequirements.lua")
+T.load("ProjectHoomans", "shared", "PNC/Core/Production/WorkItems/PNC_WorkItemService.lua")
+T.equal(require "PNC/Core/Jobs/PNC_JobRequirements", PNC.JobRequirements,
+    "legacy requirement path must return the canonical registry")
+T.equal(require "PNC/Core/Jobs/PNC_WorkItemService", PNC.WorkItemService,
+    "legacy work-item path must return the canonical service")
+T.equal(#PNC.JobRequirements.All(), 2, "alias must not duplicate registered operations")
 
 PNC.WorkItemService.RegisterValidator("lumber_tool", function(_, item)
     local fullType = tostring(item.type or "")

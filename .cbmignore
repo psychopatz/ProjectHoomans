@@ -7,3 +7,6 @@ docs/Jobs/DomainContextArchitectureRefactor/P0_TOOLING_BASELINE.json
 docs/Jobs/DomainContextArchitectureRefactor/DEPENDENCY_DEBT.json
 
 docs/Jobs/DomainContextArchitectureRefactor/P*_BOOTSTRAP*.json
+
+# Source/hash proof snapshots are generated evidence, not code definitions.
+docs/Jobs/DomainContextArchitectureRefactor/P*_PROOF.json

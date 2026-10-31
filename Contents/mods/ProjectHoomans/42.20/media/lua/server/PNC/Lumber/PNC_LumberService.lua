@@ -19,8 +19,8 @@ local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 -- The shared composition normally loads this before server jobs. Keep the
 -- direct lumber test/compatibility entry point loadable as well.
 if not PNC.WorkItemService then
-    require "PNC/Core/Jobs/PNC_JobRequirements"
-    require "PNC/Core/Jobs/PNC_WorkItemService"
+    require "PNC/Core/Production/WorkItems/PNC_JobRequirements"
+    require "PNC/Core/Production/WorkItems/PNC_WorkItemService"
 end
 
 Service.MODDATA_KEY = "PNC_LumberWorld_V1"

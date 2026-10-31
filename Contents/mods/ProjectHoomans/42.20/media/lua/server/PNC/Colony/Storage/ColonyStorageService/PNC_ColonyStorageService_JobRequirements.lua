@@ -12,7 +12,7 @@ end
 
 local function requirementsRegistry()
     if PNC.JobRequirements then return PNC.JobRequirements end
-    return require "PNC/Core/Jobs/PNC_JobRequirements"
+    return require "PNC/Core/Production/WorkItems/PNC_JobRequirements"
 end
 
 local function normalizeCreatedItem(item)

@@ -2,7 +2,7 @@ PNC = PNC or {}
 
 local Model = {}
 local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
-local Registry = require "PNC/Core/Jobs/PNC_JobRequirements"
+local Registry = require "PNC/Core/Production/WorkItems/PNC_JobRequirements"
 local WorkRegistry = require "PNC/UI/CommandHub/PNC_CommandHub_WorkRegistry"
 
 local function tr(key, fallback)

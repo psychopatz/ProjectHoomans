@@ -18,6 +18,14 @@ of analyzer manifestations are not counts of independent architecture problems.
   duplicate state. Bootstrap canonicalization verifies the pure forwarder and
   preserves the expanded provider order.
 
+- Activities now consumes Production work policy/items in one direction. The
+  shared work-item capability and server logistics extend one Production-owned
+  namespace; two implementations moved intact to canonical Production paths.
+  The mixed-owner temporary JobsRuntime registrar is removed, while exact
+  expanded startup order is retained. `WORK_ITEMS.md` and
+  `P7B_WORK_ITEMS_PROOF.json` record the real ownership split and repair.
+  Five cycle-edge diagnostics resolved; this was one owner-level group.
+
 ## Retained UI navigation SCC
 
 The all-phase import report contains one three-file SCC, wholly owned by UI.
@@ -43,7 +51,6 @@ bytes. The existing animation-scene debug route/smoke tests remain green.
 
 Still require individual P5/P6/P7 review:
 
-- Activities ↔ Production: work-policy/requirement/item-service ownership.
 - Companions / Knowledge / Networking / UI: command admission, presentation
   mirrors, knowledge-interest queries and result presentation.
 - Identity / Semantics / Social / World: immutable vocabulary/value contracts,

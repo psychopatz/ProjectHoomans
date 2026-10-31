@@ -346,16 +346,15 @@
       "responsibility": "AttackRuntime"
     },
     {
-      "owner": "Activities",
-      "path": "shared/PNC/Core/Jobs/PNC_JobsRuntime.lua",
-      "module": "PNC/Core/Jobs/PNC_JobsRuntime",
+      "owner": "Production",
+      "path": "shared/PNC/Core/Production/PNC_WorkItemsRuntime.lua",
+      "module": "PNC/Core/Production/PNC_WorkItemsRuntime",
       "root": "shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
       "providers": [
-        "PNC/Core/Jobs/PNC_JobSystem",
-        "PNC/Core/Jobs/PNC_JobRequirements",
-        "PNC/Core/Jobs/PNC_WorkItemService"
+        "PNC/Core/Production/WorkItems/PNC_JobRequirements",
+        "PNC/Core/Production/WorkItems/PNC_WorkItemService"
       ],
-      "responsibility": "JobsRuntime"
+      "responsibility": "WorkItemsRuntime"
     },
     {
       "owner": "Foundation",
@@ -705,6 +704,16 @@
       "legacy_path": "client/PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel.lua",
       "module": "PNC/Identity/PNC_UniqueNPCDraft",
       "reason": "Permanent stable editor-model require path, same public table and methods; internal providers and storage callers use canonical Identity paths."
+    },
+    {
+      "legacy_path": "shared/PNC/Core/Jobs/PNC_JobRequirements.lua",
+      "module": "PNC/Core/Production/WorkItems/PNC_JobRequirements",
+      "reason": "Permanent public work-item/requirement require path; identical canonical Production table, no duplicate state."
+    },
+    {
+      "legacy_path": "shared/PNC/Core/Jobs/PNC_WorkItemService.lua",
+      "module": "PNC/Core/Production/WorkItems/PNC_WorkItemService",
+      "reason": "Permanent public work-item/requirement require path; identical canonical Production table, no duplicate state."
     }
   ]
 }

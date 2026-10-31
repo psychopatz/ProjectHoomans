@@ -177,8 +177,8 @@ PNC.Equipment.CreateItem = function(fullType)
     return presentationItem(fullType), "test_item"
 end
 
-T.load("ProjectHoomans", "shared", "PNC/Core/Jobs/PNC_JobRequirements.lua")
-T.load("ProjectHoomans", "shared", "PNC/Core/Jobs/PNC_WorkItemService.lua")
+T.load("ProjectHoomans", "shared", "PNC/Core/Production/WorkItems/PNC_JobRequirements.lua")
+T.load("ProjectHoomans", "shared", "PNC/Core/Production/WorkItems/PNC_WorkItemService.lua")
 
 local squares = {}
 local function squareKey(x, y, z)

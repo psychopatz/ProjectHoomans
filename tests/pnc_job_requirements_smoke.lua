@@ -1,7 +1,7 @@
 local T = require "tests/support/test"
 
 local Registry = T.load("ProjectHoomans", "shared",
-    "PNC/Core/Jobs/PNC_JobRequirements.lua")
+    "PNC/Core/Production/WorkItems/PNC_JobRequirements.lua")
 
 T.truthy(Registry.All, "job requirement registry has no ordered listing")
 T.equal(Registry.All()[1], "LUMBER",
