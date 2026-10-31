@@ -15,16 +15,16 @@ if not H then return Authority end
 local worldAgeHours = H.worldAgeHours
 local rejected = H.rejected
 if not H.NormalizeReactionRequest then
-    require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_AdmissionRequest"
+    require "PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_AdmissionRequest"
 end
 if not H.ReplayCachedReaction then
-    require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_LeaseLifecycle"
+    require "PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_LeaseLifecycle"
 end
 if not H.AuthorizeReactionLease then
-    require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_AdmissionLease"
+    require "PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_AdmissionLease"
 end
 if not H.EvaluateReactionAdmission then
-    require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_AdmissionPolicy"
+    require "PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_AdmissionPolicy"
 end
 local normalizeReactionRequest = H.NormalizeReactionRequest
 local authorizeReactionLease = H.AuthorizeReactionLease

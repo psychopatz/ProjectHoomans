@@ -12,22 +12,22 @@ if not H then return Authority end
 local log = H.log
 local rejected = H.rejected
 if not H.ReplayCachedReaction then
-    require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_LeaseLifecycle"
+    require "PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_LeaseLifecycle"
 end
 if not H.AdmitReaction then
-    require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_Admission"
+    require "PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_Admission"
 end
 local admitReaction = H.AdmitReaction
 if not H.ApplyRelationshipEffect then
-    require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_ApplyEffect"
+    require "PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_ApplyEffect"
 end
 local applyRelationshipEffect = H.ApplyRelationshipEffect
 if not H.BuildReactionResult then
-    require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_BuildResult"
+    require "PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_BuildResult"
 end
 local buildReactionResult = H.BuildReactionResult
 if not H.DeliverReactionResult then
-    require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_DeliverResult"
+    require "PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_DeliverResult"
 end
 local deliverReactionResult = H.DeliverReactionResult
 local recordAppliedReaction = H.RecordAppliedReaction

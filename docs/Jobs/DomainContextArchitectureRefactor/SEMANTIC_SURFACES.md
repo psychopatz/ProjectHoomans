@@ -9,6 +9,7 @@ in `DOMAIN_CONTRACTS.json`; provider filenames are implementation details.
 | --- | --- | --- |
 | Open/update/close a client session | `client/PNC/Conversation/PNC_ConversationLifecycle` | `Lifecycle.Create` callbacks; `Lifecycle.Finish` delivers close outcome and clears working state. Start/heartbeat helpers remain a separate slice. |
 | Authorize scene mutations | `shared/PNC/Conversation/PNC_ConversationScene`, `server/PNC/Conversation/PNC_ConversationServer` | Server/SP scene lease owner. MP client submits requests with the same token; transport cannot grant authority. |
+| Authorize LLM social reactions | `server/PNC/Conversation/PNC_LLMSocialReactionService`, `server/PNC/Conversation/PNC_LLMSocialReactionPolicy` | Conversation owns LLM request reserve/release, scene-lease validation, fixed reaction policy and receipt caching; Networking routes commands and retains guarded compatibility forwarders. |
 | Persist conversation memory | `shared/PNC/Conversation/Memory/PNC_ConversationMemoryRepository` | Bounded portable schema. Persistence coordinates timing; it does not load UI or response realization. |
 | Interpret typed/structured input | `client/PNC/Semantics/PNC_SemanticDialogueInput` | `DialogueInput.Submit` / `SubmitSemanticFrame` coordinate parsing, policy and existing adapters. Core supplies reusable parser/IR mechanisms. |
 | Register Hoomans language definitions | `shared/PNC/Semantics/PNC_SemanticCatalog` | `Catalog.Register`; useful phrase/concept catalogs stay fine-grained. No gameplay mutation. |

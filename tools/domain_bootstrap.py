@@ -42,7 +42,10 @@ def verify(base, manifest, baseline):
     for compatibility in manifest.get('compatibility_imports', []):
         legacy = compatibility['legacy_path']
         target = compatibility['module']
-        if code_lines(base / legacy) != [f'return require "{target}"']:
+        expected_forwarder = [f'return require "{target}"']
+        if legacy.startswith('server/'):
+            expected_forwarder.insert(0, SERVER_GUARD)
+        if code_lines(base / legacy) != expected_forwarder:
             raise ValueError('Compatibility import is not a pure forwarder: ' + legacy)
         aliases[legacy.split('/', 1)[1].removesuffix('.lua')] = target
 

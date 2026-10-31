@@ -714,6 +714,16 @@
       "legacy_path": "shared/PNC/Core/Jobs/PNC_WorkItemService.lua",
       "module": "PNC/Core/Production/WorkItems/PNC_WorkItemService",
       "reason": "Permanent public work-item/requirement require path; identical canonical Production table, no duplicate state."
+    },
+    {
+      "legacy_path": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler.lua",
+      "module": "PNC/Conversation/PNC_LLMSocialReactionService",
+      "reason": "Permanent public handler/policy require compatibility; identical Conversation authority/policy object. Old private transport providers removed."
+    },
+    {
+      "legacy_path": "server/PNC/Networking/PNC_LLMSocialReactionPolicy.lua",
+      "module": "PNC/Conversation/PNC_LLMSocialReactionPolicy",
+      "reason": "Permanent public handler/policy require compatibility; identical Conversation authority/policy object. Old private transport providers removed."
     }
   ]
 }

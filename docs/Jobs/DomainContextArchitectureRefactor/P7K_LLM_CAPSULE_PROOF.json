@@ -1,0 +1,164 @@
+{
+  "source_revision_before": "4ce399fbd5bf0e3777acaa20dbd6dd9fbc933fa6",
+  "moves": [
+    {
+      "old_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler.lua",
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/PNC_LLMSocialReactionService.lua",
+      "sha256_before": "e6faf6461bb5a56a3e081a96d66bfe1dedc9a0863f4e43ad81a76aa5254a3d54",
+      "sha256_after": "f68b5e9a4f9faf407f2cd6b52b9f0a9ccf35dbc150cdf649373fc94fe69faee2",
+      "lines": 270,
+      "bytes_before": 9205,
+      "bytes_after": 9126,
+      "transformation": "quoted require paths only"
+    },
+    {
+      "old_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/PNC_LLMSocialReactionPolicy.lua",
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/PNC_LLMSocialReactionPolicy.lua",
+      "sha256_before": "566b8c55a559ac036157ce55ae4f15da24c09e7525033099fffe38c03fc1e1e3",
+      "sha256_after": "88ef940eea9b470d86e6a37dd0bc4d74d8d44ab0e83872d4ccc4a660732ecb4d",
+      "lines": 231,
+      "bytes_before": 7250,
+      "bytes_after": 7264,
+      "transformation": "quoted require paths only"
+    },
+    {
+      "old_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/PNC_LLMSocialReactionPolicy_Capabilities.lua",
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_Capabilities.lua",
+      "sha256_before": "1545b1f46fb8a75452a38111cb4b99b5c8555834e07c0e11ae2d259ba8ed8600",
+      "sha256_after": "1545b1f46fb8a75452a38111cb4b99b5c8555834e07c0e11ae2d259ba8ed8600",
+      "lines": 95,
+      "bytes_before": 2987,
+      "bytes_after": 2987,
+      "transformation": "quoted require paths only"
+    },
+    {
+      "old_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_ApplyEffect.lua",
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_ApplyEffect.lua",
+      "sha256_before": "f555b83ba3e45d19c79a5c505eb36a36aa3a6cdd0b75085652a01593fd208cd6",
+      "sha256_after": "f555b83ba3e45d19c79a5c505eb36a36aa3a6cdd0b75085652a01593fd208cd6",
+      "lines": 62,
+      "bytes_before": 2289,
+      "bytes_after": 2289,
+      "transformation": "quoted require paths only"
+    },
+    {
+      "old_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_AdmissionRequest.lua",
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_AdmissionRequest.lua",
+      "sha256_before": "77a759bd6dc853b79077f305502f2b2ad9e094dae455048cc83bfab2f6bfe261",
+      "sha256_after": "77a759bd6dc853b79077f305502f2b2ad9e094dae455048cc83bfab2f6bfe261",
+      "lines": 65,
+      "bytes_before": 2179,
+      "bytes_after": 2179,
+      "transformation": "quoted require paths only"
+    },
+    {
+      "old_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_Admission.lua",
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_Admission.lua",
+      "sha256_before": "833b856bdd41a79fa0202cf60340e44b7e58289936c7adaf2e3daad79d30c942",
+      "sha256_after": "941e135db46ad758991de216c9a76cc3513849ac1b522535026a1e8cc17e9836",
+      "lines": 128,
+      "bytes_before": 4266,
+      "bytes_after": 4230,
+      "transformation": "quoted require paths only"
+    },
+    {
+      "old_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_Handle.lua",
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_Handle.lua",
+      "sha256_before": "5a156ca410bd11573de1cc0763184766def20b9a24f07c3f586355d487a5cc1a",
+      "sha256_after": "77b6e45510a92ca411aa7458b0f36fa8452e8c5808fef4c39b9e49ebd9eb9186",
+      "lines": 132,
+      "bytes_before": 4893,
+      "bytes_after": 4848,
+      "transformation": "quoted require paths only"
+    },
+    {
+      "old_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_AdmissionLease.lua",
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_AdmissionLease.lua",
+      "sha256_before": "e8b7c6638fccbc124ff52f55cad98a2b110f2964aafb0cd799d402a19f83ff39",
+      "sha256_after": "e8b7c6638fccbc124ff52f55cad98a2b110f2964aafb0cd799d402a19f83ff39",
+      "lines": 88,
+      "bytes_before": 2623,
+      "bytes_after": 2623,
+      "transformation": "quoted require paths only"
+    },
+    {
+      "old_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_DeliverResult.lua",
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_DeliverResult.lua",
+      "sha256_before": "4723c77e5f88958958b4303684071626ee3b0ccb11c34aa39542e079f5649abd",
+      "sha256_after": "4723c77e5f88958958b4303684071626ee3b0ccb11c34aa39542e079f5649abd",
+      "lines": 35,
+      "bytes_before": 1111,
+      "bytes_after": 1111,
+      "transformation": "quoted require paths only"
+    },
+    {
+      "old_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_BuildResult.lua",
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_BuildResult.lua",
+      "sha256_before": "0dce722b9db4d6537491703bb701faba4651729c3691d10b54aee0acffdf6734",
+      "sha256_after": "0dce722b9db4d6537491703bb701faba4651729c3691d10b54aee0acffdf6734",
+      "lines": 89,
+      "bytes_before": 3367,
+      "bytes_after": 3367,
+      "transformation": "quoted require paths only"
+    },
+    {
+      "old_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_AdmissionPolicy.lua",
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_AdmissionPolicy.lua",
+      "sha256_before": "ba34a312f529dba110b5afa0ea9cd411f3b465d5ff66a87e8765638ac44f24fd",
+      "sha256_after": "ba34a312f529dba110b5afa0ea9cd411f3b465d5ff66a87e8765638ac44f24fd",
+      "lines": 87,
+      "bytes_before": 2924,
+      "bytes_after": 2924,
+      "transformation": "quoted require paths only"
+    },
+    {
+      "old_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_LeaseLifecycle.lua",
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Conversation/LLMSocialReaction/PNC_LLMSocialReaction_LeaseLifecycle.lua",
+      "sha256_before": "98a8ac7243fc32496767650fd27b1a975f9f0101c7eb0deffcd5589196ab0953",
+      "sha256_after": "98a8ac7243fc32496767650fd27b1a975f9f0101c7eb0deffcd5589196ab0953",
+      "lines": 45,
+      "bytes_before": 1457,
+      "bytes_after": 1457,
+      "transformation": "quoted require paths only"
+    }
+  ],
+  "ownership": "Conversation owns existing social reaction authority and policy; Networking registers/dispatches the public application entry. Functions, fixed effects, payloads, role guards and helper load order unchanged. No new mutable state.",
+  "mcp_verification": {
+    "indexed_at": "2026-10-31T04:29:21Z",
+    "nodes": 100147,
+    "edges": 358171,
+    "coverage": "7/7 paths metadata_match, no_recorded_issue",
+    "handle_trace": {
+      "function": "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.Conversation.LLMSocialReaction.PNC_LLMSocialReaction_Handle.Authority.HandleLLMSocialReaction",
+      "callees": 7,
+      "callers": [
+        "project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.client.PNC.Networking.ClientActions.PNC_ClientActions_Social.Client.ExecuteLLMSocialReaction",
+        "project-hoomans.tests.pnc_pbrainz_social_reaction_smoke"
+      ]
+    },
+    "limitations": "Policy.Evaluate in AdmissionPolicy heuristically resolves to ColonistDeparturePolicy.Policy.Evaluate in MCP CALLS; direct source confirms PNC.Conversation.LLMSocialReactionPolicy.Evaluate."
+  },
+  "validation": {
+    "focused_lua": "3/3",
+    "full_lua": "984/984; 8.46 seconds",
+    "diagnostic_python": "22/22",
+    "semantic_static_boundary_python": "9/9",
+    "bootstrap_equivalence": "7/7 expanded_order_equal",
+    "installed_kahlua": "15/15",
+    "static_kahlua": "68 files; 0 errors",
+    "guard": "69 issues/0 new; 124 resolved; PNC.Conversation.Authority.Internal guarded",
+    "fixed_probes": "33 files/4505 lines/167545 bytes; unchanged from P7J"
+  },
+  "installed_compiler": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 15,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  }
+}

@@ -47,7 +47,7 @@ class BootstrapTests(unittest.TestCase):
                 ('server', 'Domain'): {'path': 'server/Domain.lua'}})
 
     def test_legacy_import_may_only_forward_to_the_same_public_entry(self):
-        (self.base / 'server/Legacy.lua').write_text('return require "Domain"\n')
+        (self.base / 'server/Legacy.lua').write_text(SERVER_GUARD + '\nreturn require "Domain"\n')
         self.manifest['compatibility_imports'] = [
             {'legacy_path': 'server/Legacy.lua', 'module': 'Domain'}]
         self.baseline['roots']['server/Root.lua']['trace'][1:3] = ['require "Legacy"']
@@ -55,7 +55,11 @@ class BootstrapTests(unittest.TestCase):
         empty = {'registrations': [],
                  'compatibility_imports': self.manifest['compatibility_imports']}
         self.assertTrue(verify(self.base, empty, self.baseline)[0]['expanded_order_equal'])
-        (self.base / 'server/Legacy.lua').write_text('Policy()\nreturn require "Domain"\n')
+        (self.base / 'server/Legacy.lua').write_text('return require "Domain"\n')
+        with self.assertRaisesRegex(ValueError, 'not a pure forwarder'):
+            verify(self.base, empty, self.baseline)
+        (self.base / 'server/Legacy.lua').write_text(
+            SERVER_GUARD + '\nPolicy()\nreturn require "Domain"\n')
         with self.assertRaisesRegex(ValueError, 'not a pure forwarder'):
             verify(self.base, empty, self.baseline)
 

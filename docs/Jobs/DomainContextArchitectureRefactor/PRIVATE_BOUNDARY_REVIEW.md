@@ -22,7 +22,7 @@ hook; it does not justify exposing every internal function. No new debt baseline
 | `PNC.Network.Internal` | Networking | 9 | Pending graph/source review |
 | `PNC.BaseValidationService.Internal` | Settlement | 1 | Pending graph/source review |
 | `PNC.ColonyStorageService.Internal` | Colony | 2 | Pending graph/source review |
-| `PNC.Conversation.Authority.Internal` | Conversation | 10 | Pending graph/source review |
+| `PNC.Conversation.Authority.Internal` | Conversation | 10 | Resolved in P7K: 12 LLM social-reaction service/policy modules moved to Conversation; Networking retains guarded require forwarders and command routing. |
 | `PNC.FacilityService.Internal` | Settlement | 1 | Pending graph/source review |
 | `PNC.Treatment.Internal` | Health | 1 | Pending graph/source review |
 | `PNC.AnimationScenes.Internal` | Presentation | 3 | Pending graph/source review |
@@ -32,11 +32,11 @@ hook; it does not justify exposing every internal function. No new debt baseline
 | `PNC.Server.Internal` | Composition | 1 | Pending graph/source review |
 | `PNC.EnginePathPlanner.Internal` | Pathing | 1 | Pending graph/source review |
 
-Next: review the ten authoritative LLM social-reaction handler files that extend
-Conversation.Authority.Internal from Networking. Establish a Conversation-owned
-application seam and keep networking as validation/delivery if the source confirms
-this split. Preserve provider validation, scene leases, fixed effect policy,
-receipts and SP/MP command admission. Paused wording authoring stays paused.
+Next: review the remaining 14 candidate private namespaces in `P7J_PRIVATE_SCAN_PROOF.json`
+with MCP caller/dependency/source evidence, migrate genuine cross-domain private coupling
+to owner-controlled public contracts, and classify intra-domain/composition/false-positive
+cases. Preserve leases, fixed effect policy, receipts and SP/MP command admission.
+Paused wording authoring stays paused.
 
 The Identity/Semantics/Social/World group remains open until its remaining public
 read/adapter relations are justified and real private coupling is eliminated.

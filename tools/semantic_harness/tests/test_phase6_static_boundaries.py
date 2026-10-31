@@ -75,8 +75,8 @@ class Phase6StaticBoundaryTests(unittest.TestCase):
         self,
     ) -> None:
         admission_lease = (
-            SERVER_HANDLER_ROOT
-            / "PNC_ServerLLMSocialReactionCommandHandler_AdmissionLease.lua"
+            SERVER_HANDLER_ROOT.parent.parent
+            / "Conversation/LLMSocialReaction/PNC_LLMSocialReaction_AdmissionLease.lua"
         ).read_text(encoding="utf-8")
         for marker in (
             "internal.ValidateLLMRequest",

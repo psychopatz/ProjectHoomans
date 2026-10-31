@@ -293,19 +293,23 @@
         "shared/PNC/Conversation/PNC_ConversationScene.lua",
         "client/PNC/Conversation/PNC_ConversationLifecycle.lua",
         "server/PNC/Conversation/PNC_ConversationServer.lua",
-        "shared/PNC/Conversation/Memory/PNC_ConversationMemoryRepository.lua"
+        "shared/PNC/Conversation/Memory/PNC_ConversationMemoryRepository.lua",
+        "server/PNC/Conversation/PNC_LLMSocialReactionService.lua",
+        "server/PNC/Conversation/PNC_LLMSocialReactionPolicy.lua"
       ],
       "commands": [
         "Scene.Begin/End",
         "Lifecycle.Create",
         "Memory.Repository.PrepareRecord",
         "Memory.Repository.RestoreRecord",
-        "Lifecycle.Finish (close outcome/authority handoff and working-session cleanup)"
+        "Lifecycle.Finish (close outcome/authority handoff and working-session cleanup)",
+        "Authority.HandleLLMSocialReaction and existing registered reserve/release requests"
       ],
       "queries": [
         "Memory public surface",
         "Memory.Repository.SerializeRecord",
-        "Memory.Events.CurrentWorldDay (calendar identity for bounded remote evidence)"
+        "Memory.Events.CurrentWorldDay (calendar identity for bounded remote evidence)",
+        "LLMSocialReactionPolicy.Evaluate/BuildCapabilities/CooldownMutation"
       ],
       "repository": "Memory.Repository compact event arrays/selection metadata; History and InteractionLifecyclePersistence retain their own state",
       "layers": [
@@ -1002,7 +1006,8 @@
     "PNC.Client.Internal": "Networking",
     "PNC.Semantics.CampSiteGeometry.Internal": "Semantics",
     "PNC.Semantics.CampSiteGeometry._Internal": "Semantics",
-    "PNC.Conversation.Memory.Events.Internal": "Conversation"
+    "PNC.Conversation.Memory.Events.Internal": "Conversation",
+    "PNC.Conversation.Authority.Internal": "Conversation"
   },
   "registration_manifest": "REGISTRATIONS.json",
   "private_implementation_scopes": [

@@ -71,8 +71,13 @@ literal/source fallback; clean coverage is a best-effort signal.
   composition and foreign callers avoid Client.Internal. Provider bodies,
   readiness and M12 timing/authority are unchanged.
 - Event-memory calendar identity is public; remote semantic evidence no longer
-  reads its private date helper. Broad private-boundary completion remains open:
-  101 provisional references in 15 further namespaces need individual review.
+  reads its private date helper. Authoritative LLM social-reaction service,
+  policy and ten implementation providers now live under Conversation
+  (`PNC_LLMSocialReactionService`, `PNC_LLMSocialReactionPolicy`); Networking
+  command routing requires the Conversation entries and keeps two guarded pure
+  forwarders for legacy public paths. `PNC.Conversation.Authority.Internal` is
+  guarded. Broad private-boundary completion remains open across the remaining
+  14 candidate namespaces.
 - Camp geometry exposes an explicit RuntimeAccess engine-query facet. World and
   hint adapters no longer consume its obsolete _Internal export; underlying
   engine/room implementations and scan bounds are unchanged.
@@ -98,14 +103,14 @@ Seven fixed probes: **33 files / 4,505 lines / 167,545 bytes**, versus P0's
 
 ## Current validation and limitations
 
-- Full isolated Lua: **984/984**, 4 workers, 15.87 seconds.
+- Full isolated Lua: **984/984**, 4 workers, 8.46 seconds.
 - Palette/Conversation/composition matrix: **28/28**; debug routes **2/2**;
   current semantic parity/translation Python **6/6**; dependency/bootstrap Python
-  **22/22**. Prior session/authority/translation slice: **16/16** Python.
+  **22/22**; static boundary Python **9/9**. Prior session/authority/translation slice: **16/16** Python.
 - Puppet Opera definition storage moved byte-for-byte from UI to its owning
   client domain. Two maintained callers use its public entry; no UI-path shim
   retained. Cold storage/schema/error matrix and Opera suite pass **19/19**.
-- Changed runtime installed-PZ Kahlua: **2/2** current memory-query slice; geometry 3/3; client delivery 15/15; static zero errors. Bootstrap
+- Changed runtime installed-PZ Kahlua: **15/15** LLM social-reaction capsule slice; memory-query 2/2; geometry 3/3; client delivery 15/15; static zero errors. Bootstrap
   ordering and diff checks pass. No game execution is implied by compiler checks.
 - Semantic tooling: last full isolated run was 195 modules, 155 pass/40 fail,
   786 tests, zero timeouts. Subsequent verified module repairs yield derived
@@ -133,9 +138,9 @@ job-local reports and Git. Historical giant logs are not required reading.
 
 **Continue P7 private-boundary review; close P5/P6 gates, then all P8 gates.**
 
-1. Review the newly recorded private-boundary work queue. Start with the ten
-   LLM social-reaction transport providers that extend Conversation authority;
-   preserve leases/policy/receipts and establish the owner application seam.
+1. Review the remaining 14 candidate private namespaces in `P7J_PRIVATE_SCAN_PROOF.json`
+   (P7K moved the LLM social-reaction authority/policy capsule to Conversation and
+   guarded `PNC.Conversation.Authority.Internal`).
 2. Inspect the refreshed remaining-tooling results. Repair assertions against
    current public meaning/presentation/authoring contracts; preserve gameplay,
    semantic IR, suggestions, queued tasks, optional LLM and SP/MP authority.
