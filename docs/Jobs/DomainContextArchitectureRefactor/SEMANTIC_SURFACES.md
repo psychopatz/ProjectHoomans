@@ -38,6 +38,16 @@ separate responsibilities. No facade reconstructs duplicate authoritative state.
 Keep direct calls within an owner. Public specialist queries are preferable to
 loading a full dialogue application merely to read one bounded contract.
 
+## Camp geometry engine-query contract
+
+`CampSiteGeometry.RuntimeAccess` exposes the existing Call, Position and RoomFor
+functions for camp-zone and hint adapters. The public entry remains
+`shared/PNC/Semantics/PNC_SemanticCampSiteGeometry.lua`. Engine implementation,
+room/scan caps, primitive projections and cached geometry stay with Semantics.
+World owns allocation/resource state. The obsolete `_Internal` adapter export
+is removed; implementation Internal providers remain private. P7I proves exact
+function identity, unchanged engine providers and focused/full behavior.
+
 ## Tooling evidence contract
 
 The Semantic Lab worker retains **all** wire events in `transport` and keeps

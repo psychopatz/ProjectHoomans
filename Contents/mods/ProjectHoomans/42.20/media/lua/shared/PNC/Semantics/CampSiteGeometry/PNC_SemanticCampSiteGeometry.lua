@@ -24,12 +24,10 @@ require "PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RoomEnumera
 require "PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RoomSelection"
 require "PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_SiteMembership"
 
--- Retain the established internal hooks consumed by camp-zone adapters.
-Geometry._Internal = Geometry._Internal or {}
-Geometry._Internal.Call = Internal.Call
-Geometry._Internal.Position = Internal.Position
-Geometry._Internal.RoomFor = Internal.RoomFor
-Geometry._Internal.RoomDefFor = Internal.RoomDefFor
-Geometry._Internal.BoundsFor = Internal.BoundsFor
+-- Explicit engine-query facet for camp-zone and client hint adapters.
+Geometry.RuntimeAccess = Geometry.RuntimeAccess or {}
+Geometry.RuntimeAccess.Call = Internal.Call
+Geometry.RuntimeAccess.Position = Internal.Position
+Geometry.RuntimeAccess.RoomFor = Internal.RoomFor
 
 return Geometry

@@ -1,0 +1,283 @@
+{
+  "stage": "P7I camp geometry engine-query seam",
+  "pre_generation": "2026-10-31T03:08:21Z",
+  "post_generation": "2026-10-31T03:17:40Z",
+  "tier": 2,
+  "pre_coverage": {
+    "project": "project-hoomans",
+    "signal": "best_effort",
+    "indexed_at": "2026-10-31T03:08:21Z",
+    "metadata": {
+      "generation": "2026-10-31T03:08:21Z",
+      "index_mode": "full",
+      "recorded_at": "2026-10-31T03:08:24Z",
+      "recording_status": "complete",
+      "ignored_files_stored": 131,
+      "ignored_files_total": 131,
+      "hash_records_complete": true,
+      "coverage_version": 3,
+      "generation_matches": true
+    },
+    "paths": [
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RuntimeAccess.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RuntimeAccess.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RoomRecords.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RoomRecords.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_CampZoneService_Core.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_CampZoneService_Core.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCampSiteHints.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCampSiteHints.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_semantic_camp_site_smoke.lua",
+        "path": "tests/pnc_semantic_camp_site_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_camp_zone_service_smoke.lua",
+        "path": "tests/pnc_camp_zone_service_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_semantic_camp_site_hint_client_smoke.lua",
+        "path": "tests/pnc_semantic_camp_site_hint_client_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      }
+    ],
+    "scopes": [],
+    "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+  },
+  "post_coverage": {
+    "project": "project-hoomans",
+    "signal": "best_effort",
+    "indexed_at": "2026-10-31T03:17:40Z",
+    "metadata": {
+      "generation": "2026-10-31T03:17:40Z",
+      "index_mode": "full",
+      "recorded_at": "2026-10-31T03:17:43Z",
+      "recording_status": "complete",
+      "ignored_files_stored": 136,
+      "ignored_files_total": 136,
+      "hash_records_complete": true,
+      "coverage_version": 3,
+      "generation_matches": true
+    },
+    "paths": [
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RuntimeAccess.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RuntimeAccess.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RoomRecords.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RoomRecords.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_CampZoneService_Core.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/World/PNC_CampZoneService_Core.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCampSiteHints.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCampSiteHints.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_semantic_camp_site_smoke.lua",
+        "path": "tests/pnc_semantic_camp_site_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_camp_zone_service_smoke.lua",
+        "path": "tests/pnc_camp_zone_service_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_semantic_camp_site_hint_client_smoke.lua",
+        "path": "tests/pnc_semantic_camp_site_hint_client_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      }
+    ],
+    "scopes": [],
+    "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+  },
+  "pre_traces": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.World.PNC_CampZoneService_Core.roomFor\ndirection: both\ncallees_total: 2\ncallees: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.World.PNC_CampZoneService_Core:\n  call 1\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1\ncallers_total: 0\ncallers: 0  (rows: name hop; qn = group prefix + \".\" + name)\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.World.PNC_CampZoneService_Core.roomSquares\ndirection: both\ncallees_total: 4\ncallees: 4  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.World.NearbyResourceLocator.PNC_NearbyResourceLocator_Core.H:\n  Call 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.World.PNC_CampZoneService_Core:\n  call 1\n  field 1\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1\ncallers_total: 0\ncallers: 0  (rows: name hop; qn = group prefix + \".\" + name)\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Semantics.CampSiteGeometry.PNC_SemanticCampSiteGeometry_RoomRecords.roomFor\ndirection: both\ncallees_total: 2\ncallees: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Semantics.CampSiteGeometry.PNC_SemanticCampSiteGeometry_RoomRecords:\n  call 1\n  field 1\ncallers_total: 2\ncallers: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Semantics.CampSiteGeometry.PNC_SemanticCampSiteGeometry_RoomRecords.Geometry:\n  RoomIdentity 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Semantics.CampSiteGeometry.PNC_SemanticCampSiteGeometry_RoomRecords:\n  roomDefFor 1\n"
+          }
+        ],
+        "isError": false
+      }
+    }
+  ],
+  "post_traces": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.World.PNC_CampZoneService_Core.roomFor\ndirection: both\ncallees_total: 2\ncallees: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.World.PNC_CampZoneService_Core:\n  call 1\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1\ncallers_total: 0\ncallers: 0  (rows: name hop; qn = group prefix + \".\" + name)\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.World.PNC_CampZoneService_Core.roomSquares\ndirection: both\ncallees_total: 4\ncallees: 4  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.World.NearbyResourceLocator.PNC_NearbyResourceLocator_Core.H:\n  Call 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.server.PNC.World.PNC_CampZoneService_Core:\n  call 1\n  field 1\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1\ncallers_total: 0\ncallers: 0  (rows: name hop; qn = group prefix + \".\" + name)\n"
+          }
+        ],
+        "isError": false
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "content": [
+          {
+            "type": "text",
+            "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Semantics.CampSiteGeometry.PNC_SemanticCampSiteGeometry_RoomRecords.roomFor\ndirection: both\ncallees_total: 2\ncallees: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Semantics.CampSiteGeometry.PNC_SemanticCampSiteGeometry_RoomRecords:\n  call 1\n  field 1\ncallers_total: 2\ncallers: 2  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Semantics.CampSiteGeometry.PNC_SemanticCampSiteGeometry_RoomRecords.Geometry:\n  RoomIdentity 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Semantics.CampSiteGeometry.PNC_SemanticCampSiteGeometry_RoomRecords:\n  roomDefFor 1\n"
+          }
+        ],
+        "isError": false
+      }
+    }
+  ],
+  "ownership": "Semantics camp geometry retains engine interpretation. World camp-zone allocation and client hints consume public RuntimeAccess.Call/Position/RoomFor direct references. No new provider, wrapper or state store. Obsolete _Internal adapter export (including two unused helper aliases) removed; owner Internal providers stay private.",
+  "limitations": "Function-reference export/capture resolution is incomplete. CampZone roomSquares Internal.Call was heuristically resolved to NearbyResourceLocator.H.Call; exact source fallback confirms Geometry call. No exhaustive alias graph claim.",
+  "validation": {
+    "focused_lua": "17/17",
+    "full_lua": "984/984;14.66 seconds",
+    "diagnostic_python": "22/22",
+    "installed_kahlua": "3/3",
+    "static_kahlua": "3 files;0 errors",
+    "guard": "69 issues/0 new; same two owner SCCs",
+    "fixed_probe": "33 files/4505 lines/167545 bytes; unchanged from P7H;41977 fewer bytes than P0"
+  },
+  "unchanged_engine_implementations": [
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RuntimeAccess.lua",
+      "sha256": "71edfa759e1e5f4f5ca9d13cceb0c2fc978fafaa52c6fe4ccc5c34d9ab6363c6"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RoomRecords.lua",
+      "sha256": "30e1be99d03b63dd8f459c791158815a6aa8433e47a59e7a27efd04fff21e189"
+    }
+  ],
+  "installed_compiler": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 3,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  }
+}

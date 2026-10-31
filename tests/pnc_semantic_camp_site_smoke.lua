@@ -312,4 +312,10 @@ T.truthy(arrivedSafe, "arrived campfire activity remains inside its zone")
 T.equal(arrivedReason, nil,
     "arrived campfire activity has no safety failure")
 
+-- Public engine reads retain the exact geometry implementation functions.
+T.equal(Geometry.RuntimeAccess.Call, Geometry.Internal.Call)
+T.equal(Geometry.RuntimeAccess.Position, Geometry.Internal.Position)
+T.equal(Geometry.RuntimeAccess.RoomFor, Geometry.Internal.RoomFor)
+T.equal(Geometry._Internal, nil, "obsolete private adapter export removed")
+
 T.finish("pnc_semantic_camp_site_smoke")

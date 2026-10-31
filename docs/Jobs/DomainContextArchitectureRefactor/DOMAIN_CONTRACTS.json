@@ -384,7 +384,8 @@
         "RealizationAuthority.Resolve/AttachProvenance",
         "TaskRequest/InventoryQuery normalization contracts",
         "InteractionEvidence/Relations bounded fact projections",
-        "DialogueSession.GetActiveView"
+        "DialogueSession.GetActiveView",
+        "CampSiteGeometry.RuntimeAccess: existing Call/Position/RoomFor engine reads"
       ],
       "repository": "semantic lifecycle domain repository; persistence timing remains coordinator-owned",
       "layers": [
@@ -997,7 +998,9 @@
     "PNC.Presence.Internal": "Presence",
     "PNC.Factions.Internal": "Factions",
     "PNC.FactionTypes.Internal": "Factions",
-    "PNC.Client.Internal": "Networking"
+    "PNC.Client.Internal": "Networking",
+    "PNC.Semantics.CampSiteGeometry.Internal": "Semantics",
+    "PNC.Semantics.CampSiteGeometry._Internal": "Semantics"
   },
   "registration_manifest": "REGISTRATIONS.json",
   "private_implementation_scopes": [

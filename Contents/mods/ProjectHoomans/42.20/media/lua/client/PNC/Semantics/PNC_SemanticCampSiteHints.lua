@@ -81,8 +81,8 @@ local function scopeFor(target)
 end
 
 local function position(value)
-    if Geometry._Internal and Geometry._Internal.Position then
-        return Geometry._Internal.Position(value)
+    if Geometry.RuntimeAccess and Geometry.RuntimeAccess.Position then
+        return Geometry.RuntimeAccess.Position(value)
     end
     return nil
 end

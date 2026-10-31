@@ -43,8 +43,9 @@ literal/source fallback; clean coverage is a best-effort signal.
   engine policy; foreign BodyLifecycle.Internal access is guarded. Focused
   corpse/body/path matrix passes **22/22**. See `BODY_CONTRACTS.md`.
 - Persistence, Storage and Conversation are outside the current owner SCCs.
-  Remaining groups: Companions/Knowledge/Networking/UI;
-  Identity/Semantics/Social/World. Review their real paths individually.
+  The Companions/Knowledge/Networking/UI group is justified by enumerated public
+  runtime composition relations. Identity/Semantics/Social/World remains under
+  review; diagnostics stay visible.
 - Shared work-item requirements/selection and server logistics now have one
   Production owner. Activities retains specific validators and uses public
   contracts. Activities/Production SCC removed; exact composition expansion
@@ -62,7 +63,16 @@ literal/source fallback; clean coverage is a best-effort signal.
   publishes a committed treaty fact through Core; Knowledge subscribes once.
   Failed/unchanged requests publish nothing, observer failures remain isolated.
   Treaty/Knowledge matrix **28/28**; subscriber retrieval keeps 2 files while
-  shrinking 5,343 → 2,346 bytes. Remaining faction helpers stay open.
+  shrinking 5,343 → 2,346 bytes. Communities uses the loaded canonical Factions.Repository aggregate/revision
+  contract and public FactionTypes shapes; colonist departure uses the non-creating
+  FindPlayerKey lookup. No foreign Factions.Internal helper access remains in
+  the reviewed paths.
+- Client registration, snapshot delivery and lifecycle methods are public;
+  composition and foreign callers avoid Client.Internal. Provider bodies,
+  readiness and M12 timing/authority are unchanged.
+- Camp geometry exposes an explicit RuntimeAccess engine-query facet. World and
+  hint adapters no longer consume its obsolete _Internal export; underlying
+  engine/room implementations and scan bounds are unchanged.
 - The one three-file UI SCC is retained same-owner deferred window navigation,
   evidenced in `CYCLE_REVIEW.md`. Its all-phase diagnostic remains visible.
 - Maintained runtime: 3,325 files versus P0's 3,258; file count is not a target.
@@ -85,27 +95,22 @@ Seven fixed probes: **33 files / 4,505 lines / 167,545 bytes**, versus P0's
 
 ## Current validation and limitations
 
-- Full isolated Lua: **984/984**, 4 workers, 12.83 seconds.
+- Full isolated Lua: **984/984**, 4 workers, 14.66 seconds.
 - Palette/Conversation/composition matrix: **28/28**; debug routes **2/2**;
   current semantic parity/translation Python **6/6**; dependency/bootstrap Python
   **22/22**. Prior session/authority/translation slice: **16/16** Python.
 - Puppet Opera definition storage moved byte-for-byte from UI to its owning
   client domain. Two maintained callers use its public entry; no UI-path shim
   retained. Cold storage/schema/error matrix and Opera suite pass **19/19**.
-- Changed runtime installed-PZ Kahlua: **3/3** current treaty-event slice (Presence diagnostics 8/8); static zero errors. Bootstrap
+- Changed runtime installed-PZ Kahlua: **3/3** current geometry slice; client delivery 15/15; static zero errors. Bootstrap
   ordering and diff checks pass. No game execution is implied by compiler checks.
-- Full semantic-tooling evidence remains explicit: P5B's 195 isolated modules
-  yielded 155 pass / 40 fail, no timeouts, 786 tests. Focused inspector and
-  contract-fixture repairs yield a derived **167 pass / 26 remaining failures**;
-  this is not a second full run. A fresh run of those 35 completed: one additional module passed, 34 still fail,
-  and none timed out. Three further wording-ownership modules now pass 9/9 tests
-  after typed source-location and pre-existing locale snapshot alignment. The
-  remaining 28 are open individual gates. The apology module now passes 4/4,
-  including eight EN/TL family cases and a cold no-antecedent clarification check;
-  catalog selection and final authored utterance are checked separately. Two
-  further modules pass 9/9 after published locale-key and registered-flow-count
-  alignment. C7G still fails alone at 0.403s mean against 0.30s; keep this
-  pre-existing performance finding open rather than blaming only contention.
+- Semantic tooling: last full isolated run was 195 modules, 155 pass/40 fail,
+  786 tests, zero timeouts. Subsequent verified module repairs yield derived
+  **169 pass / 26 remaining failures**; a fresh full run remains required.
+  Catalog/locale/compiler-source oracles now match byte-unchanged published
+  contracts; exact membership and behavior checks remain. Bounded evidence is
+  in P5B/P5D/P5E reports. C7G still fails alone at 0.403s mean against 0.30s;
+  the pre-existing performance finding needs review.
 - Tooling retains complete wire traffic and lifecycle facts separately from
   executable dispatch evidence. Unknown commands remain dispatches. GUI tests
   use the proven per-process XIM fallback; no desktop setting was changed.
@@ -119,32 +124,6 @@ Current contracts: `DOMAIN_CONTRACTS.json`, `SEMANTIC_SURFACES.md`,
 `OWNERSHIP.md`, `UI_OWNERSHIP.md`, `BODY_CONTRACTS.md`, `WORK_ITEMS.md`,
 `COORDINATION_CONTRACTS.md`, `FACTION_CONTRACTS.md`, `CYCLE_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
 job-local reports and Git. Historical giant logs are not required reading.
-
-## Latest validated boundary
-
-P7H classifies all 24 literal cross-owner imports in the presentation/knowledge
-owner group as retained public runtime composition relations. The diagnostics
-remain visible; no runtime edits. Focused knowledge/journal/result/debug tests
-pass 30/30. The Identity/Semantics/Social/World group still needs closure.
-
-P5E replaces stale 14-behavior/23-evidence counts with exact existing 30/26
-member sets. Four focused Python tests pass; catalog bodies and generated data
-are byte-identical to the pre-architecture revision. No wording/gameplay change.
-The derived tooling result is 169/195 modules passing, with 26 remaining; a fresh
-full isolated tooling run and individual remaining-failure review are still due.
-
-P7G exposes the existing client registration, snapshot delivery and lifecycle
-methods; foreign callers and composition use public contracts. Provider bodies,
-readiness and M12 timing/authority are unchanged. Full Lua 984/984 (9.73 s),
-diagnostics 22/22, installed Kahlua 15/15, static errors 0; guard 69/0 new.
-
-
-P7F migrates Communities to Factions.Repository and public FactionTypes shapes;
-colonist departure uses the non-creating public player-key lookup. Canonical
-aggregate, normalizers and revision behavior are preserved. Validation: 28/28
-focused, 984/984 full Lua, 22/22 diagnostics, installed Kahlua 4/4, static errors 0;
-guard 69 issues/0 new and the same two owner SCCs. Fixed seven retrieval probes
-remain unchanged from P7E. Source/graph limitations are in P7F proofs.
 
 ## Next mandatory chunk
 

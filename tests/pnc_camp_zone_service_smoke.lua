@@ -191,7 +191,7 @@ PNC.Semantics.CampSiteGeometry = {
             resourceRadius = 12,
         }
     end,
-    _Internal = {
+    RuntimeAccess = {
         RoomFor = function() return rooms.living end,
     },
 }

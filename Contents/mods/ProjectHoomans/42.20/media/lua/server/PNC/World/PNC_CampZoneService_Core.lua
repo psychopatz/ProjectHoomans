@@ -160,9 +160,9 @@ local function cellFor(options)
 end
 
 local function roomFor(square)
-    local internal = Geometry and Geometry._Internal
-    if internal and type(internal.RoomFor) == "function" then
-        return internal.RoomFor(square)
+    local access = Geometry and Geometry.RuntimeAccess
+    if access and type(access.RoomFor) == "function" then
+        return access.RoomFor(square)
     end
     return call(square, "getRoom") or call(square, "getIsoRoom")
 end
@@ -172,9 +172,9 @@ local function roomBuilding(room)
 end
 
 local function roomSquares(room)
-    local internal = Geometry and Geometry._Internal
-    if internal and type(internal.Call) == "function" then
-        return internal.Call(room, "getSquares")
+    local access = Geometry and Geometry.RuntimeAccess
+    if access and type(access.Call) == "function" then
+        return access.Call(room, "getSquares")
             or field(room, "squares") or field(room, "tileList")
     end
     return call(room, "getSquares")

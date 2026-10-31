@@ -53,7 +53,7 @@ PNC = {
             NormalizeScope = function(scope) return scope end,
         },
         CampSiteGeometry = {
-            _Internal = {
+            RuntimeAccess = {
                 Position = function(value)
                     if type(value) ~= "table" then return nil end
                     return value.x, value.y, value.z
