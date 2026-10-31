@@ -1,0 +1,104 @@
+{
+  "stage": "P5E exact current first-party catalog membership",
+  "mcp_generation": "2026-10-31T03:08:21Z",
+  "coverage": {
+    "project": "project-hoomans",
+    "signal": "best_effort",
+    "indexed_at": "2026-10-31T03:08:21Z",
+    "metadata": {
+      "generation": "2026-10-31T03:08:21Z",
+      "index_mode": "full",
+      "recorded_at": "2026-10-31T03:08:24Z",
+      "recording_status": "complete",
+      "ignored_files_stored": 131,
+      "ignored_files_total": 131,
+      "hash_records_complete": true,
+      "coverage_version": 3,
+      "generation_matches": true
+    },
+    "paths": [
+      {
+        "requested_path": "tools/semantic_harness/tests/test_unified_evidence_e2.py",
+        "path": "tools/semantic_harness/tests/test_unified_evidence_e2.py",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tools/semantic_harness/tests/test_pragmatic_interaction_p4.py",
+        "path": "tools/semantic_harness/tests/test_pragmatic_interaction_p4.py",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tools/semantic_harness/lua/worker/EvidenceAcceptance.lua",
+        "path": "tools/semantic_harness/lua/worker/EvidenceAcceptance.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tools/semantic_harness/runtime/worker.py",
+        "path": "tools/semantic_harness/runtime/worker.py",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialEventDefinitions.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialEventDefinitions.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters.lua",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Index/Behavior/Social.lua",
+        "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Index/Behavior/Social.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      }
+    ],
+    "scopes": [],
+    "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+  },
+  "scope": "Two tests only; no runtime, compiler, catalog, generated data or wording edits. Function/authority assertions retained. Exact catalog membership replaces obsolete counts.",
+  "validation": {
+    "focused_python": "4/4; 5.431 seconds",
+    "full_lua": "P7G current unchanged runtime: 984/984",
+    "tooling_status": "169 passed / 26 remaining failed modules out of195, derived selected-module result; final fresh isolated run remains required",
+    "retrieval": "All fixed seven probe maintained source sets unchanged; no affected source added/removed. P7G comparison remains current for runtime."
+  },
+  "source_identity_proof": [
+    {
+      "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Relationships/PNC_SocialEventDefinitions.lua",
+      "same_as_pre_architecture": true,
+      "sha256": "f5aff6896a58cd5b4964b6846798633cc4fa07c6ed7048964e25fa94d45261b2"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters.lua",
+      "same_as_pre_architecture": true,
+      "sha256": "8ac30997a7dc85c4399f168c18d4494f2189818e55c51c4a97b5ffa25562a9c7"
+    },
+    {
+      "path": "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/Generated/Conversation/Index/Behavior/Social.lua",
+      "same_as_pre_architecture": true,
+      "sha256": "8f4319d51f4dad1162d59e3059c0ad04548ecebbe363415272f0f039efd31d88"
+    }
+  ]
+}

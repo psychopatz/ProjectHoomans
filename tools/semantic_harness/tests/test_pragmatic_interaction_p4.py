@@ -14,7 +14,42 @@ class PragmaticInteractionP4WorkerTests(unittest.TestCase):
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             catalog = worker.beat_catalog()
             self.assertEqual(catalog["beatCount"], 3)
-            self.assertEqual(catalog["behaviorCount"], 14)
+            self.assertSetEqual(
+                {row["id"] for row in catalog["behaviors"]},
+                {
+                    'behavior.acknowledge_memory',
+                    'behavior.acknowledge_news',
+                    'behavior.acknowledge_repair',
+                    'behavior.acknowledge_reply',
+                    'behavior.acknowledge_thanks',
+                    'behavior.ask_memory_followup',
+                    'behavior.challenge',
+                    'behavior.clarify_context',
+                    'behavior.deescalate',
+                    'behavior.end_conversation',
+                    'behavior.reconcile',
+                    'behavior.retaliate_verbally',
+                    'behavior.scene_excursion_acknowledge',
+                    'behavior.scene_excursion_departing',
+                    'behavior.scene_excursion_failed',
+                    'behavior.scene_excursion_home',
+                    'behavior.scene_excursion_preparing',
+                    'behavior.scene_excursion_returning',
+                    'behavior.scene_grounded_news_share',
+                    'behavior.scene_horde_prompt',
+                    'behavior.scene_horde_reply_brave',
+                    'behavior.scene_horde_reply_cautious',
+                    'behavior.scene_horde_reply_steady',
+                    'behavior.scene_news_followup',
+                    'behavior.scene_news_followup_answer',
+                    'behavior.scene_post_combat_clear',
+                    'behavior.scene_task_work_assigned',
+                    'behavior.scene_task_work_completed',
+                    'behavior.warn',
+                    'behavior.world_event_warn',
+                },
+            )
+            self.assertEqual(catalog["behaviorCount"], 30)
             argument = next(
                 item for item in catalog["beats"]
                 if item["id"] == "beat.argument_escalation"

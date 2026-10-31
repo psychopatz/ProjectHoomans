@@ -96,7 +96,7 @@ Seven fixed probes: **33 files / 4,505 lines / 167,545 bytes**, versus P0's
   ordering and diff checks pass. No game execution is implied by compiler checks.
 - Full semantic-tooling evidence remains explicit: P5B's 195 isolated modules
   yielded 155 pass / 40 fail, no timeouts, 786 tests. Focused inspector and
-  contract-fixture repairs yield a derived **167 pass / 28 remaining failures**;
+  contract-fixture repairs yield a derived **167 pass / 26 remaining failures**;
   this is not a second full run. A fresh run of those 35 completed: one additional module passed, 34 still fail,
   and none timed out. Three further wording-ownership modules now pass 9/9 tests
   after typed source-location and pre-existing locale snapshot alignment. The
@@ -121,6 +121,12 @@ Current contracts: `DOMAIN_CONTRACTS.json`, `SEMANTIC_SURFACES.md`,
 job-local reports and Git. Historical giant logs are not required reading.
 
 ## Latest validated boundary
+
+P5E replaces stale 14-behavior/23-evidence counts with exact existing 30/26
+member sets. Four focused Python tests pass; catalog bodies and generated data
+are byte-identical to the pre-architecture revision. No wording/gameplay change.
+The derived tooling result is 169/195 modules passing, with 26 remaining; a fresh
+full isolated tooling run and individual remaining-failure review are still due.
 
 P7G exposes the existing client registration, snapshot delivery and lifecycle
 methods; foreign callers and composition use public contracts. Provider bodies,
