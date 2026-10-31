@@ -56,20 +56,20 @@ local function transferCorpse(order, assignment, task)
         return operationFailure(order, task, nil, "TRANSFER",
             "CORPSE_NOT_FOUND")
     end
-    if not Lifecycle or not Lifecycle.Internal
-        or (task and task.carrying and not Lifecycle.Internal.followCorpse)
+    if not Lifecycle or not Lifecycle.Corpses
+        or (task and task.carrying and not Lifecycle.Corpses.Follow)
         or (not task or (not task.carrying
-            and not Lifecycle.Internal.moveCorpse))
+            and not Lifecycle.Corpses.Move))
     then
         return operationFailure(order, task, nil, "TRANSFER",
             "CORPSE_TRANSFER_UNAVAILABLE")
     end
-    if task and task.carrying and Lifecycle.Internal.followCorpse then
-        ok, reason = Lifecycle.Internal.followCorpse(corpse,
+    if task and task.carrying and Lifecycle.Corpses.Follow then
+        ok, reason = Lifecycle.Corpses.Follow(corpse,
             assignment.dropX + 0.5, assignment.dropY + 0.5,
             assignment.dropZ)
     else
-        ok, reason = Lifecycle.Internal.moveCorpse(corpse, destinationSquare,
+        ok, reason = Lifecycle.Corpses.Move(corpse, destinationSquare,
             assignment.dropX, assignment.dropY, assignment.dropZ)
     end
     if not ok then
@@ -112,13 +112,13 @@ local function completeWorkOrder(order)
         and Registry.GetDeathMarker and Registry.GetDeathMarker(
             data.PNC_DeathMarkerID) or nil
     if marker and marker.alive == false and PNC.BodyLifecycle
-        and PNC.BodyLifecycle.Internal
-        and PNC.BodyLifecycle.Internal.stampCorpse
+        and PNC.BodyLifecycle.Corpses
+        and PNC.BodyLifecycle.Corpses.Stamp
     then
-        PNC.BodyLifecycle.Internal.stampCorpse(marker, corpse,
+        PNC.BodyLifecycle.Corpses.Stamp(marker, corpse,
             assignment.haulToken)
-        if PNC.BodyLifecycle.Internal.transmitCorpseState then
-            PNC.BodyLifecycle.Internal.transmitCorpseState(corpse)
+        if PNC.BodyLifecycle.Corpses.Transmit then
+            PNC.BodyLifecycle.Corpses.Transmit(corpse)
         end
     end
     clearWorkRuntime(order, "corpse_haul_complete")
@@ -228,10 +228,10 @@ end
 
 local function anyCorpseInSquare(square)
     local found = false
-    if not square or not Lifecycle or not Lifecycle.Internal
-        or not Lifecycle.Internal.forEachCorpse
+    if not square or not Lifecycle or not Lifecycle.Corpses
+        or not Lifecycle.Corpses.ForEach
     then return false end
-    Lifecycle.Internal.forEachCorpse(square, function()
+    Lifecycle.Corpses.ForEach(square, function()
         found = true
     end)
     return found
@@ -314,12 +314,12 @@ local function applyDeferredTransfer(order)
     if not corpse then
         return deferredWait(order, effect, "SOURCE_CORPSE_MISSING")
     end
-    if not Lifecycle or not Lifecycle.Internal
-        or not Lifecycle.Internal.moveCorpse
+    if not Lifecycle or not Lifecycle.Corpses
+        or not Lifecycle.Corpses.Move
     then
         return deferredWait(order, effect, "CORPSE_TRANSFER_UNAVAILABLE")
     end
-    local moved, moveReason = Lifecycle.Internal.moveCorpse(corpse,
+    local moved, moveReason = Lifecycle.Corpses.Move(corpse,
         destinationSquare, effect.destinationX, effect.destinationY,
         effect.destinationZ)
     if not moved then

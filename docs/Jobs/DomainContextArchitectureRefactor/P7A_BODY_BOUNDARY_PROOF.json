@@ -1,0 +1,83 @@
+{
+  "stage": "P7A BodyLifecycle public corpse/identity contracts",
+  "source_revision_before": "c909d36afbd0f761e3ef2adbd466571b067fd8b5",
+  "tasking_callers": [
+    "server/PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_Carry.lua",
+    "server/PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_World_Corpses.lua",
+    "server/PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_World_Destinations.lua",
+    "server/PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_World_Helpers.lua",
+    "server/PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_Reconciliation_Candidates.lua",
+    "server/PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_WorkAdapter_Transfer.lua"
+  ],
+  "methods": {
+    "forEachCorpse": "ForEach",
+    "moveCorpse": "Move",
+    "followCorpse": "Follow",
+    "removeCorpse": "Remove",
+    "stampCorpse": "Stamp",
+    "transmitCorpseState": "Transmit"
+  },
+  "pre_mcp": {
+    "project": "project-hoomans",
+    "generation": "2026-10-30T22:47:09Z",
+    "tier": 2,
+    "material_source_paths": 12,
+    "coverage": "metadata-match; no recorded gaps",
+    "trace": "Both directions depth 1, tests included, all pages for ForEach/Move/Follow/Remove. Heuristic engine/test/builtin alias edges supplemented with exact snippets and literal namespace scan."
+  },
+  "ownership": "BodyLifecycle owns engine object/square membership/identity/corpse stamp and packet policy. Tasking owns haul work orders/tokens/reservations and retains authority guards. Pathing reads existing lease predicate. Public fields alias identical existing owner functions; no wrappers, state copy, scheduler, traversal, scan or engine policy changes.",
+  "m12": "README, ARCHITECTURE authority/identity sections and latest M12 progress reread. No live-shell/incarnation/visual/restart or SP/MP policy changed.",
+  "unchanged_implementations": [
+    {
+      "path": "shared/PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_World.lua",
+      "sha256": "592e093cad5a364cdb8c3425eabb0bd5097d134034a98a0ba1037911d8d5965e"
+    },
+    {
+      "path": "shared/PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Corpses.lua",
+      "sha256": "a16de8b441b5d1d1946c91b977ddfd41ee673569e9d664748130503cbd3c64df"
+    },
+    {
+      "path": "shared/PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_CorpseWornItems.lua",
+      "sha256": "739f789f58c7bf230a6b3b747cdd21b5d35c9f55923db196d03087f467c988a6"
+    }
+  ],
+  "focused_lua": {
+    "passed": 22,
+    "total": 22
+  },
+  "full_lua": {
+    "passed": 983,
+    "total": 983,
+    "seconds": 8.7
+  },
+  "kahlua": {
+    "filesChecked": 10,
+    "passed": true,
+    "gameLaunched": false,
+    "luaExecuted": false
+  },
+  "static_kahlua": {
+    "files": 10,
+    "errors": 0
+  },
+  "guard": {
+    "issues": 74,
+    "new": 0,
+    "resolved": 119,
+    "new_private_guard": "PNC.BodyLifecycle.Internal; no maintained foreign access reported after migration"
+  },
+  "bootstrap": "7 expanded roots and barriers unchanged",
+  "fixed_probe_source_hashes_unchanged": 33,
+  "post_mcp": {
+    "generation": "2026-10-30T22:56:25Z",
+    "coverage": "13 primary changed/test paths plus Frames metadata-match, no recorded gaps",
+    "limitations": "Function-reference fields are not standalone function nodes; private Move caller count falls from 3 to 1 because aliases are unresolved. Read public entry and source namespace mappings; do not infer removed behavior."
+  },
+  "pathing_consumers": [
+    "PNC_EnginePathPlanner_Pump.lua",
+    "PNC_EnginePathPlanner_Frames.lua",
+    "PNC_LiveBodyControl_Events.lua"
+  ],
+  "function_identity_assertions": 7,
+  "context": "Public entry grows by 15 lines, without adding a provider or dispatch hop. Fixed probes unchanged. No minimum byte reduction claimed for this ownership repair."
+}

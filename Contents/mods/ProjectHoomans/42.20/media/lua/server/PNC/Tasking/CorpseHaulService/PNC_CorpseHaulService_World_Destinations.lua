@@ -58,10 +58,10 @@ local function scanBaseCorpses(base)
     if not sourceRegion then return found end
     forEachRegionTile(sourceRegion, function(x, y, z)
         local square = squareAt(x, y, z)
-        if square and Lifecycle and Lifecycle.Internal
-            and Lifecycle.Internal.forEachCorpse
+        if square and Lifecycle and Lifecycle.Corpses
+            and Lifecycle.Corpses.ForEach
         then
-            Lifecycle.Internal.forEachCorpse(square, function(corpse)
+            Lifecycle.Corpses.ForEach(square, function(corpse)
                 local token
                 local data
                 if Service.IsEligibleCorpse(corpse) then

@@ -10,8 +10,7 @@ local ActorControl = PNC.ActorControl
 local plantProtectionState = setmetatable({}, { __mode = "k" })
 
 local function canAdvanceNative(record, zombie)
-    local bodyInternal = PNC.BodyLifecycle
-        and PNC.BodyLifecycle.Internal or nil
+    local bodyLifecycle = PNC.BodyLifecycle
     if not record then return false end
     if record.presenceState
         and record.presenceState ~= (PNC.Const
@@ -19,8 +18,8 @@ local function canAdvanceNative(record, zombie)
     then
         return false
     end
-    if bodyInternal and bodyInternal.matchesRecordBody then
-        return bodyInternal.matchesRecordBody(record, zombie) == true
+    if bodyLifecycle and bodyLifecycle.MatchesRecordBody then
+        return bodyLifecycle.MatchesRecordBody(record, zombie) == true
     end
     return true
 end

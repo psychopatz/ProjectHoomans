@@ -149,10 +149,10 @@ end
 
 local function hasCorpse(square)
     local result = false
-    if not square or not Lifecycle or not Lifecycle.Internal
-        or not Lifecycle.Internal.forEachCorpse
+    if not square or not Lifecycle or not Lifecycle.Corpses
+        or not Lifecycle.Corpses.ForEach
     then return false end
-    Lifecycle.Internal.forEachCorpse(square, function() result = true end)
+    Lifecycle.Corpses.ForEach(square, function() result = true end)
     return result
 end
 

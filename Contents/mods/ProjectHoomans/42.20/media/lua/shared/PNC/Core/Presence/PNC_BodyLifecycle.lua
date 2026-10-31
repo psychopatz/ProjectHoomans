@@ -28,3 +28,18 @@ require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Reanimation"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_CorpseAudit"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Audit"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Diagnostics"
+
+-- Public engine boundary for authoritative corpse work. Keep the exact owner
+-- functions: square membership, rollback, inert stamping and MP packet choice
+-- remain BodyLifecycle policy. Tasking owns haul orders, never body internals.
+-- Mutations are called only by authority-owned lifecycle/task execution.
+Lifecycle.Corpses = Lifecycle.Corpses or {}
+Lifecycle.Corpses.ForEach = Lifecycle.Internal.forEachCorpse
+Lifecycle.Corpses.Move = Lifecycle.Internal.moveCorpse
+Lifecycle.Corpses.Follow = Lifecycle.Internal.followCorpse
+Lifecycle.Corpses.Remove = Lifecycle.Internal.removeCorpse
+Lifecycle.Corpses.Stamp = Lifecycle.Internal.stampCorpse
+Lifecycle.Corpses.Transmit = Lifecycle.Internal.transmitCorpseState
+
+-- Read-only lease/identity proof shared with native pathing.
+Lifecycle.MatchesRecordBody = Lifecycle.Internal.matchesRecordBody

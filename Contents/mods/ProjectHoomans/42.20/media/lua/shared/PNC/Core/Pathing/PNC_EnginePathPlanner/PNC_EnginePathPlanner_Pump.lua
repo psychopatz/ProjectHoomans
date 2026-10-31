@@ -8,8 +8,7 @@ local ActorControl = PNC.ActorControl
 
 local function currentLiveBody(record, body, navigation)
     local liveState = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
-    local bodyInternal = PNC.BodyLifecycle
-        and PNC.BodyLifecycle.Internal or nil
+    local bodyLifecycle = PNC.BodyLifecycle
     if not record or record.presenceState
         and record.presenceState ~= liveState
     then
@@ -26,8 +25,8 @@ local function currentLiveBody(record, body, navigation)
     then
         return false, "stale_body_lease"
     end
-    if bodyInternal and bodyInternal.matchesRecordBody
-        and bodyInternal.matchesRecordBody(record, body) ~= true
+    if bodyLifecycle and bodyLifecycle.MatchesRecordBody
+        and bodyLifecycle.MatchesRecordBody(record, body) ~= true
     then
         return false, "body_lease_mismatch"
     end
@@ -35,11 +34,10 @@ local function currentLiveBody(record, body, navigation)
 end
 
 local function discardStaleNavigation(record, body, navigation, reason)
-    local bodyInternal = PNC.BodyLifecycle
-        and PNC.BodyLifecycle.Internal or nil
+    local bodyLifecycle = PNC.BodyLifecycle
     local owned = true
-    if bodyInternal and bodyInternal.matchesRecordBody then
-        owned = bodyInternal.matchesRecordBody(record, body) == true
+    if bodyLifecycle and bodyLifecycle.MatchesRecordBody then
+        owned = bodyLifecycle.MatchesRecordBody(record, body) == true
     end
     if owned then
         Internal.ClearEngineRequest(body, navigation)

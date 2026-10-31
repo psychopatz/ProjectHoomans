@@ -134,8 +134,8 @@ function Internal.tickCorpseCarry(order, task, record, body, assignment, now)
     if not corpse then return false, "CORPSE_NOT_FOUND_WHILE_CARRYING" end
     x, y, z = carryPosition(body, assignment)
     if not x then return false, "LIVE_BODY_REQUIRED" end
-    if not Lifecycle or not Lifecycle.Internal
-        or not Lifecycle.Internal.followCorpse
+    if not Lifecycle or not Lifecycle.Corpses
+        or not Lifecycle.Corpses.Follow
     then
         return false, "CORPSE_FOLLOW_UNAVAILABLE"
     end
@@ -171,7 +171,7 @@ function Internal.tickCorpseCarry(order, task, record, body, assignment, now)
         end
         return true
     end
-    moved, reason = Lifecycle.Internal.followCorpse(corpse, x, y, z)
+    moved, reason = Lifecycle.Corpses.Follow(corpse, x, y, z)
     if not moved then return false, reason end
 
     task.corpse = corpse

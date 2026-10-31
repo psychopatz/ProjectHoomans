@@ -8,8 +8,7 @@ local ActorControl = PNC.ActorControl
 local function canPumpFrame(record, body)
     local navigation = record and record.runtime
         and record.runtime.localNavigation or nil
-    local bodyInternal = PNC.BodyLifecycle
-        and PNC.BodyLifecycle.Internal or nil
+    local bodyLifecycle = PNC.BodyLifecycle
     local liveState = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
     if record and record.presenceState
         and record.presenceState ~= liveState
@@ -27,8 +26,8 @@ local function canPumpFrame(record, body)
     then
         return false, "stale_body_lease"
     end
-    if bodyInternal and bodyInternal.matchesRecordBody
-        and bodyInternal.matchesRecordBody(record, body) ~= true
+    if bodyLifecycle and bodyLifecycle.MatchesRecordBody
+        and bodyLifecycle.MatchesRecordBody(record, body) ~= true
     then
         return false, "body_lease_mismatch"
     end
@@ -80,11 +79,10 @@ end
 function Planner.PumpFrame(record, body)
     local canPump, pumpReason = canPumpFrame(record, body)
     if not canPump then
-        local bodyInternal = PNC.BodyLifecycle
-            and PNC.BodyLifecycle.Internal or nil
+        local bodyLifecycle = PNC.BodyLifecycle
         local owned = true
-        if bodyInternal and bodyInternal.matchesRecordBody then
-            owned = bodyInternal.matchesRecordBody(record, body) == true
+        if bodyLifecycle and bodyLifecycle.MatchesRecordBody then
+            owned = bodyLifecycle.MatchesRecordBody(record, body) == true
         end
         if owned and Internal.ClearEngineRequest then
             Internal.ClearEngineRequest(

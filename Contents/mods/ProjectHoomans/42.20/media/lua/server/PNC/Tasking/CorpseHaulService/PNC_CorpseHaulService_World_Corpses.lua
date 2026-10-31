@@ -71,10 +71,10 @@ end
 function Service.GetCorpseAt(x, y, z, token, deathMarkerId)
     local square = squareAt(x, y, z)
     local found
-    if not square or not Lifecycle or not Lifecycle.Internal
-        or not Lifecycle.Internal.forEachCorpse
+    if not square or not Lifecycle or not Lifecycle.Corpses
+        or not Lifecycle.Corpses.ForEach
     then return nil end
-    Lifecycle.Internal.forEachCorpse(square, function(corpse)
+    Lifecycle.Corpses.ForEach(square, function(corpse)
         local candidateToken = Service.GetCorpseToken(corpse, false)
         local data = corpse and corpse.getModData
             and corpse:getModData() or nil
@@ -101,15 +101,15 @@ function Service.CountCorpsesInRegion(region)
     local eligible = 0
     local cell = getCell and getCell() or nil
     if not cell or not cell.getGridSquare
-        or not Lifecycle or not Lifecycle.Internal
-        or not Lifecycle.Internal.forEachCorpse
+        or not Lifecycle or not Lifecycle.Corpses
+        or not Lifecycle.Corpses.ForEach
     then
         return nil, nil
     end
     forEachRegionTile(region, function(x, y, z)
         local square = squareAt(x, y, z)
         if square then
-            Lifecycle.Internal.forEachCorpse(square, function(corpse)
+            Lifecycle.Corpses.ForEach(square, function(corpse)
                 total = total + 1
                 if Service.IsEligibleCorpse(corpse) then
                     eligible = eligible + 1

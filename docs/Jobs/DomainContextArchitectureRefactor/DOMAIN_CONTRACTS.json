@@ -441,13 +441,16 @@
         "Materialize",
         "Abstract",
         "BodyRepository.RestoreCorpse",
-        "BodyRepository.RestoreHint"
+        "BodyRepository.RestoreHint",
+        "BodyLifecycle.Corpses.Move/Follow/Remove/Stamp/Transmit (authority-owned execution only)"
       ],
       "queries": [
         "ShouldMaterialize",
         "ShouldAbstract",
         "BodyRepository.NormalizeCorpse",
-        "BodyRepository.BuildHint"
+        "BodyRepository.BuildHint",
+        "BodyLifecycle.Corpses.ForEach (one square, duplicate engine lists deduplicated)",
+        "BodyLifecycle.MatchesRecordBody (existing lease/identity predicate)"
       ],
       "repository": "body hints/leases via existing lifecycle persistence",
       "layers": [
@@ -863,7 +866,8 @@
     "PNC.Conversation.Lifecycle.Internal": "Conversation",
     "PNC.ConversationScene.Internal": "Conversation",
     "PNC.Semantics.DialogueInput.ActiveView": "Semantics",
-    "PNC.UniqueNPCEditorModel.Internal": "Identity"
+    "PNC.UniqueNPCEditorModel.Internal": "Identity",
+    "PNC.BodyLifecycle.Internal": "Presence"
   },
   "registration_manifest": "REGISTRATIONS.json",
   "private_implementation_scopes": [

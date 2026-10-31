@@ -66,10 +66,10 @@ end
 
 local function addSquareCandidates(candidates, seen, x, y, z)
     local square = Internal.squareAt(x, y, z)
-    if not square or not Lifecycle or not Lifecycle.Internal
-        or not Lifecycle.Internal.forEachCorpse
+    if not square or not Lifecycle or not Lifecycle.Corpses
+        or not Lifecycle.Corpses.ForEach
     then return end
-    Lifecycle.Internal.forEachCorpse(square, function(corpse)
+    Lifecycle.Corpses.ForEach(square, function(corpse)
         addCandidate(candidates, seen, corpse, x, y, z)
     end)
 end
@@ -297,8 +297,8 @@ local function removeDuplicateCorpses(candidates, canonical, order)
     local marker = canonical and canonical.deathMarkerId
     local token = canonical and canonical.token
     local originalToken = canonical and (canonical.originalToken or token)
-    if not canonical or not Lifecycle or not Lifecycle.Internal
-        or not Lifecycle.Internal.removeCorpse
+    if not canonical or not Lifecycle or not Lifecycle.Corpses
+        or not Lifecycle.Corpses.Remove
     then return removed end
     for _, candidate in ipairs(candidates or {}) do
         local duplicate = candidate ~= canonical
@@ -310,7 +310,7 @@ local function removeDuplicateCorpses(candidates, canonical, order)
             or same(candidate.token, token)
             or same(candidate.token, originalToken))
         then
-            if Lifecycle.Internal.removeCorpse(candidate.corpse) then
+            if Lifecycle.Corpses.Remove(candidate.corpse) then
                 removed = removed + 1
             end
         end

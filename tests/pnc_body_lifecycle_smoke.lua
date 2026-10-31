@@ -89,6 +89,21 @@ getCell = function()
 end
 
 T.load(ROOT .. "Presence/PNC_BodyLifecycle.lua")
+T.equal(PNC.BodyLifecycle.MatchesRecordBody, PNC.BodyLifecycle.Internal.matchesRecordBody,
+    "public body identity proof must preserve the exact lease predicate")
+T.equal(PNC.BodyLifecycle.Corpses.ForEach, PNC.BodyLifecycle.Internal.forEachCorpse,
+    "public corpse ForEach must preserve owner function identity")
+T.equal(PNC.BodyLifecycle.Corpses.Move, PNC.BodyLifecycle.Internal.moveCorpse,
+    "public corpse Move must preserve owner function identity")
+T.equal(PNC.BodyLifecycle.Corpses.Follow, PNC.BodyLifecycle.Internal.followCorpse,
+    "public corpse Follow must preserve owner function identity")
+T.equal(PNC.BodyLifecycle.Corpses.Remove, PNC.BodyLifecycle.Internal.removeCorpse,
+    "public corpse Remove must preserve owner function identity")
+T.equal(PNC.BodyLifecycle.Corpses.Stamp, PNC.BodyLifecycle.Internal.stampCorpse,
+    "public corpse Stamp must preserve owner function identity")
+T.equal(PNC.BodyLifecycle.Corpses.Transmit, PNC.BodyLifecycle.Internal.transmitCorpseState,
+    "public corpse Transmit must preserve owner function identity")
+
 
 local first = makeBody(101, 11)
 T.equal(PNC.BodyLifecycle.StampLiveBody(record, first), "body_1", "generated body lease")

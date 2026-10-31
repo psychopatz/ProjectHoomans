@@ -1,6 +1,6 @@
 # Progress — Domain & Context Architecture Refactor
 
-**Status:** IN PROGRESS. P0–P4 developer gates accepted; P5 is active. P6 has begun with authoring/storage slices; P5/P6 review, P7–P8
+**Status:** IN PROGRESS. P0–P4 developer gates accepted; P5 is active. P6 has authoring/storage slices and P7 has begun; P5/P6 review, remaining P7–P8
 and final acceptance remain mandatory. Continue automatically after each chunk.
 
 ## Objective and repository
@@ -38,6 +38,10 @@ literal/source fallback; clean coverage is a best-effort signal.
   five cohesive internal providers remain. Preview records stay unregistered.
   Stable editor-model require is a pure same-table forwarder; old private
   provider/storage paths are removed. See `UI_OWNERSHIP.md`.
+- Tasking corpse hauling and Pathing body-ownership checks now use public
+  BodyLifecycle contracts. Seven direct function references preserve existing
+  engine policy; foreign BodyLifecycle.Internal access is guarded. Focused
+  corpse/body/path matrix passes **22/22**. See `BODY_CONTRACTS.md`.
 - Persistence, Storage and Conversation are outside the current owner SCCs.
   Remaining groups: Activities/Production; Companions/Knowledge/Networking/UI;
   Identity/Semantics/Social/World. Review their real paths individually.
@@ -61,14 +65,14 @@ Seven fixed probes: **33 files / 4,501 lines / 167,228 bytes**, versus P0's
 
 ## Current validation and limitations
 
-- Full isolated Lua: **983/983**, 4 workers, 12.54 seconds.
+- Full isolated Lua: **983/983**, 4 workers, 8.70 seconds.
 - Palette/Conversation/composition matrix: **28/28**; debug routes **2/2**;
   current semantic parity/translation Python **6/6**; dependency/bootstrap Python
   **22/22**. Prior session/authority/translation slice: **16/16** Python.
 - Puppet Opera definition storage moved byte-for-byte from UI to its owning
   client domain. Two maintained callers use its public entry; no UI-path shim
   retained. Cold storage/schema/error matrix and Opera suite pass **19/19**.
-- Changed runtime installed-PZ Kahlua: **11/11** for current Identity slice (Opera 3/3, palette 8/8); static zero errors. Bootstrap
+- Changed runtime installed-PZ Kahlua: **10/10** current body-boundary slice (Identity 11/11, Opera 3/3); static zero errors. Bootstrap
   ordering and diff checks pass. No game execution is implied by compiler checks.
 - Full semantic-tooling evidence remains explicit: P5B's 195 isolated modules
   yielded 155 pass / 40 fail, no timeouts, 786 tests. Focused inspector and
@@ -92,7 +96,7 @@ Seven fixed probes: **33 files / 4,501 lines / 167,228 bytes**, versus P0's
 
 Current contracts: `DOMAIN_CONTRACTS.json`, `SEMANTIC_SURFACES.md`,
 `PERSISTENCE_OWNERSHIP.md`, `COMPOSITION_SEAMS.md`, `INVENTORY_PILOT.md`,
-`OWNERSHIP.md`, `UI_OWNERSHIP.md`, `CYCLE_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
+`OWNERSHIP.md`, `UI_OWNERSHIP.md`, `BODY_CONTRACTS.md`, `CYCLE_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
 job-local reports and Git. Historical giant logs are not required reading.
 
 ## Next mandatory chunk
@@ -106,8 +110,9 @@ job-local reports and Git. Historical giant logs are not required reading.
    real foreign-private coupling; justify retained protocol/composition relations
    with exact paths, phases and canonical owners rather than analyzer counts.
 3. Complete P6 UI authority/persistence classification and owning public seams.
-4. Complete P7's mandatory domain/transport/performance review, including Tasking
-   foreign BodyLifecycle implementation access. Re-read the M12 migration before
+4. Complete P7's mandatory domain/transport/performance review, including remaining
+   Presence/Pathing and domain-private coupling. Tasking/BodyLifecycle access
+   has migrated; the broader mandatory domain review remains. Re-read M12 before
    touching body/presence/network authority and preserve its current contracts.
 5. Complete every P8 cleanup and final validation gate, including a current full
    isolated suite, focused matrices, retrieval comparison, installed Kahlua,

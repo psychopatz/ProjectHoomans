@@ -10,8 +10,8 @@ PsychopatzCore = {
 
 PNC = {
     Core = { Now = function() return 1234 end },
-    BodyLifecycle = { Internal = {
-        forEachCorpse = function() end,
+    BodyLifecycle = { Corpses = {
+        ForEach = function() end,
     } },
     BaseService = {
         Get = function()

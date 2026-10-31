@@ -168,21 +168,21 @@ PNC = {
         GetBase = function() return nil end,
     },
     BodyLifecycle = {
-        Internal = {
-            forEachCorpse = function(square, callback)
+        Corpses = {
+            ForEach = function(square, callback)
                 for _, item in ipairs(square and square.corpses or {}) do
                     callback(item)
                 end
             end,
-            stampCorpse = function() return true end,
-            moveCorpse = function(item, destination, x, y, z)
+            Stamp = function() return true end,
+            Move = function(item, destination, x, y, z)
                 local source = item.square
                 source:removeCorpse(item, false)
                 item.x, item.y, item.z = x + 0.5, y + 0.5, z
                 destination:addCorpse(item, false)
                 return true
             end,
-            followCorpse = function(item, x, y, z)
+            Follow = function(item, x, y, z)
                 local source = item.square
                 local destination = squares[tostring(math.floor(x)) .. ":"
                     .. tostring(math.floor(y)) .. ":"

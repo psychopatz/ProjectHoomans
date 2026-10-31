@@ -120,8 +120,8 @@ PNC = {
         Save = function() end,
     },
     BodyLifecycle = {
-        Internal = {
-            forEachCorpse = function(target, callback)
+        Corpses = {
+            ForEach = function(target, callback)
                 for _, item in ipairs(target and target.corpses or {}) do
                     callback(item)
                 end
