@@ -37,7 +37,7 @@ function Adapters.Install(Providers)
                 local Events = PNC.Conversation and PNC.Conversation.Memory
                     and PNC.Conversation.Memory.Events
                 if tier == "TODAY" and (not Events
-                    or snapshot.observedWorldDay ~= Events.Internal.CurrentWorldDay()) then return {} end
+                    or snapshot.observedWorldDay ~= Events.CurrentWorldDay()) then return {} end
                 local rows = {}
                 for index = 1, math.min(#(snapshot.rows or {}), 16) do
                     local value = snapshot.rows[index]

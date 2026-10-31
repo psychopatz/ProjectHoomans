@@ -70,6 +70,9 @@ literal/source fallback; clean coverage is a best-effort signal.
 - Client registration, snapshot delivery and lifecycle methods are public;
   composition and foreign callers avoid Client.Internal. Provider bodies,
   readiness and M12 timing/authority are unchanged.
+- Event-memory calendar identity is public; remote semantic evidence no longer
+  reads its private date helper. Broad private-boundary completion remains open:
+  101 provisional references in 15 further namespaces need individual review.
 - Camp geometry exposes an explicit RuntimeAccess engine-query facet. World and
   hint adapters no longer consume its obsolete _Internal export; underlying
   engine/room implementations and scan bounds are unchanged.
@@ -95,14 +98,14 @@ Seven fixed probes: **33 files / 4,505 lines / 167,545 bytes**, versus P0's
 
 ## Current validation and limitations
 
-- Full isolated Lua: **984/984**, 4 workers, 14.66 seconds.
+- Full isolated Lua: **984/984**, 4 workers, 15.87 seconds.
 - Palette/Conversation/composition matrix: **28/28**; debug routes **2/2**;
   current semantic parity/translation Python **6/6**; dependency/bootstrap Python
   **22/22**. Prior session/authority/translation slice: **16/16** Python.
 - Puppet Opera definition storage moved byte-for-byte from UI to its owning
   client domain. Two maintained callers use its public entry; no UI-path shim
   retained. Cold storage/schema/error matrix and Opera suite pass **19/19**.
-- Changed runtime installed-PZ Kahlua: **3/3** current geometry slice; client delivery 15/15; static zero errors. Bootstrap
+- Changed runtime installed-PZ Kahlua: **2/2** current memory-query slice; geometry 3/3; client delivery 15/15; static zero errors. Bootstrap
   ordering and diff checks pass. No game execution is implied by compiler checks.
 - Semantic tooling: last full isolated run was 195 modules, 155 pass/40 fail,
   786 tests, zero timeouts. Subsequent verified module repairs yield derived
@@ -122,25 +125,29 @@ Seven fixed probes: **33 files / 4,505 lines / 167,545 bytes**, versus P0's
 Current contracts: `DOMAIN_CONTRACTS.json`, `SEMANTIC_SURFACES.md`,
 `PERSISTENCE_OWNERSHIP.md`, `COMPOSITION_SEAMS.md`, `INVENTORY_PILOT.md`,
 `OWNERSHIP.md`, `UI_OWNERSHIP.md`, `BODY_CONTRACTS.md`, `WORK_ITEMS.md`,
-`COORDINATION_CONTRACTS.md`, `FACTION_CONTRACTS.md`, `CYCLE_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
+`COORDINATION_CONTRACTS.md`, `FACTION_CONTRACTS.md`, `CYCLE_REVIEW.md`,
+`PRIVATE_BOUNDARY_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
 job-local reports and Git. Historical giant logs are not required reading.
 
 ## Next mandatory chunk
 
 **Continue P7 private-boundary review; close P5/P6 gates, then all P8 gates.**
 
-1. Inspect the refreshed remaining-tooling results. Repair assertions against
+1. Review the newly recorded private-boundary work queue. Start with the ten
+   LLM social-reaction transport providers that extend Conversation authority;
+   preserve leases/policy/receipts and establish the owner application seam.
+2. Inspect the refreshed remaining-tooling results. Repair assertions against
    current public meaning/presentation/authoring contracts; preserve gameplay,
    semantic IR, suggestions, queued tasks, optional LLM and SP/MP authority.
-2. Finish source/caller review of the remaining semantic/domain cycles. Migrate
+3. Finish source/caller review of the remaining semantic/domain cycles. Migrate
    real foreign-private coupling; justify retained protocol/composition relations
    with exact paths, phases and canonical owners rather than analyzer counts.
-3. Complete P6 UI authority/persistence classification and owning public seams.
-4. Complete P7's mandatory domain/transport/performance review, including remaining
+4. Complete P6 UI authority/persistence classification and owning public seams.
+5. Complete P7's mandatory domain/transport/performance review, including remaining
    Knowledge observation, client transport and remaining domain-private coupling. Tasking/BodyLifecycle access
    has migrated; the broader mandatory domain review remains. Re-read M12 before
    touching body/presence/network authority and preserve its current contracts.
-5. Complete every P8 cleanup and final validation gate, including a current full
+6. Complete every P8 cleanup and final validation gate, including a current full
    isolated suite, focused matrices, retrieval comparison, installed Kahlua,
    performance/persistence audit, compatibility classification and Git review.
 

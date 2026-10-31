@@ -38,6 +38,11 @@ separate responsibilities. No facade reconstructs duplicate authoritative state.
 Keep direct calls within an owner. Public specialist queries are preferable to
 loading a full dialogue application merely to read one bounded contract.
 
+Event-memory calendar identity is queried through
+`Conversation.Memory.Events.CurrentWorldDay`, exported by the existing Memory
+Events facade. Remote semantic evidence retains its TODAY/date and elapsed-time
+checks without accessing the owner's private registry helpers.
+
 ## Camp geometry engine-query contract
 
 `CampSiteGeometry.RuntimeAccess` exposes the existing Call, Position and RoomFor

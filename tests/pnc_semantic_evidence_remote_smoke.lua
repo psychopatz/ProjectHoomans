@@ -1,8 +1,8 @@
 local T = require "tests/support/test"
 T.addPackagePaths()
-PNC = { Conversation = { Memory = { Events = { Internal = {
+PNC = { Conversation = { Memory = { Events = {
     CurrentWorldDay = function() return 10 end,
-} } } } }
+} } } }
 local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
 local snapshot = { observedWorldDay = 10, observedWorldAgeHours = 48, rows = {} }
 for _, tier in ipairs({ "TODAY", "DURABLE" }) do

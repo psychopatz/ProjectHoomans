@@ -1,0 +1,144 @@
+{
+  "stage": "P7J public event-memory calendar query",
+  "coverage_before": {
+    "project": "project-hoomans",
+    "signal": "best_effort",
+    "indexed_at": "2026-10-31T03:17:40Z",
+    "metadata": {
+      "generation": "2026-10-31T03:17:40Z",
+      "index_mode": "full",
+      "recorded_at": "2026-10-31T03:17:43Z",
+      "recording_status": "complete",
+      "ignored_files_stored": 136,
+      "ignored_files_total": 136,
+      "hash_records_complete": true,
+      "coverage_version": 3,
+      "generation_matches": true
+    },
+    "paths": [
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Registry.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Registry.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionEvidenceAdapters.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionEvidenceAdapters.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_semantic_evidence_remote_smoke.lua",
+        "path": "tests/pnc_semantic_evidence_remote_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      }
+    ],
+    "scopes": [],
+    "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+  },
+  "coverage_after": {
+    "project": "project-hoomans",
+    "signal": "best_effort",
+    "indexed_at": "2026-10-31T03:22:14Z",
+    "metadata": {
+      "generation": "2026-10-31T03:22:14Z",
+      "index_mode": "full",
+      "recorded_at": "2026-10-31T03:22:18Z",
+      "recording_status": "complete",
+      "ignored_files_stored": 138,
+      "ignored_files_total": 138,
+      "hash_records_complete": true,
+      "coverage_version": 3,
+      "generation_matches": true
+    },
+    "paths": [
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/PNC_ConversationMemory_Events.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Registry.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Registry.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionEvidenceAdapters.lua",
+        "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionEvidenceAdapters.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      },
+      {
+        "requested_path": "tests/pnc_semantic_evidence_remote_smoke.lua",
+        "path": "tests/pnc_semantic_evidence_remote_smoke.lua",
+        "status": "no_recorded_issue",
+        "freshness": "metadata_match",
+        "recommended_action": "use_graph_with_best_effort_caveat",
+        "coverage": []
+      }
+    ],
+    "scopes": [],
+    "caveat": "Best-effort signal only. No recorded issue does not prove graph or source completeness; read flagged source and qualify claims when metadata is changed or unavailable."
+  },
+  "post_trace": {
+    "content": [
+      {
+        "type": "text",
+        "text": "function: project-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Conversation.Memory.Events.PNC_ConversationMemory_Events_Registry.currentWorldDay\ndirection: both\ncallees_total: 5\ncallees: 5  (rows: name hop; qn = group prefix + \".\" + name)\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Conversation.Memory.Events.PNC_ConversationMemory_Events_Registry:\n  identityAPI 1\n  positiveInteger 1\nproject-hoomans.Contents.mods.ProjectHoomans.42.20.media.lua.shared.PNC.Core.Identity.PNC_Identity.Identity:\n  CurrentWorldDate 1\n  EncodeBirthDate 1\nproject-hoomans.tools.semantic_harness.codebuilder.sources.conversation.realization.social.contextual_replies_en:\n  type 1\ncallers_total: 0\ncallers: 0  (rows: name hop; qn = group prefix + \".\" + name)\n"
+      }
+    ],
+    "isError": false
+  },
+  "scope": "Semantics remote evidence now queries Memory.Events.CurrentWorldDay through its owning public facade. The exact existing date function remains in Conversation's registry provider. Existing TODAY/DURABLE age/day and actor checks retained.",
+  "limitations": "The clock is captured/exported by function reference; graph inbound CALLS is empty. Direct source and focused remote evidence test prove the public invocation; no negative caller claim.",
+  "validation": {
+    "focused_lua": "21/21",
+    "full_lua": "984/984;15.87 seconds",
+    "diagnostic_python": "22/22",
+    "installed_kahlua": "2/2",
+    "static_kahlua": "2 files;0 errors",
+    "guard": "69 issues/0 new",
+    "fixed_probes": "33 files/4505 lines/167545 bytes; unchanged from P7I"
+  },
+  "open_private_review": "Broader lexical scan infers 86 private roots from unambiguous definition sites and finds 101 cross-owner candidate lines in15 namespaces. Provisional; each requires graph/source review, including alias-flow limitations. Do not accept private-boundary completion yet.",
+  "unchanged_calendar_provider": {
+    "path": "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Registry.lua",
+    "sha256": "277da6e13091a62eed4e41236487e55e6eab0830691bae77398741f38833e9ea"
+  },
+  "installed_compiler": {
+    "schemaVersion": 1,
+    "type": "kahlua_compile_verification",
+    "compiler": "installed_project_zomboid_kahlua_luacompiler",
+    "gameLaunched": false,
+    "luaExecuted": false,
+    "filesChecked": 2,
+    "passed": true,
+    "failure": null,
+    "sourceKind": "CHECKED_OUT_LUA",
+    "writesToSource": 0
+  }
+}

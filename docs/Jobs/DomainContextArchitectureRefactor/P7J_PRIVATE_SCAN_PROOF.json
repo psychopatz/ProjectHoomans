@@ -1,0 +1,808 @@
+{
+  "inferred_roots": {
+    "PNC.PBrainZ.Internal": "Adapters",
+    "PNC.Client.Internal": "Networking",
+    "PNC.ClientPresenceSync.Internal": "Presence",
+    "PNC.ColonyManagement.Internal": "Colony",
+    "PNC.ColonyStorageService.Internal": "Colony",
+    "PNC.Communities.Internal": "Communities",
+    "PNC.CommunityDirector.Internal": "Communities",
+    "PNC.CommunityValidation.Internal": "Communities",
+    "PNC.Conversation.Authority.Internal": "Conversation",
+    "PNC.AbstractCombatResolver.Internal": "Director",
+    "PNC.AbstractDirectorDebug.Internal": "Director",
+    "PNC.AbstractTraversal.Internal": "Director",
+    "PNC.GroupGenerator.Internal": "Director",
+    "PNC.PopulationDirector.Internal": "Director",
+    "PNC.FactionBehavior.Internal": "Factions",
+    "PNC.FactionDebug.Internal": "Factions",
+    "PNC.FactionIncidentService.Internal": "Factions",
+    "PNC.FactionValidation.Internal": "Factions",
+    "PNC.Factions.Internal": "Factions",
+    "PNC.FarmingService.Internal": "Activities",
+    "PNC.PZFarmingAdapter.Internal": "Activities",
+    "PNC.NPCKnowledge.Internal": "Knowledge",
+    "PNC.PlayerKnowledgeCommands.Internal": "Knowledge",
+    "PNC.GroupNeeds.Internal": "Needs",
+    "PNC.IndividualNeeds.Internal": "Needs",
+    "PNC.NeedsDebug.Internal": "Needs",
+    "PNC.ServerDebugCommandHandler.Internal": "Networking",
+    "PNC.PlayerCharacterLifecycle.Internal": "Player",
+    "PNC.PlayerCharacters.Internal": "Player",
+    "PNC.ConstructionService.Internal": "Production",
+    "PNC.HomeDutyService.Internal": "Production",
+    "PNC.WorkService.Internal": "Production",
+    "PNC.ResearchService.Internal": "Production",
+    "PNC.ProvisionEvaluator.Internal": "Provision",
+    "PNC.ProvisionScheduler.Internal": "Provision",
+    "PNC.Server.Internal": "Composition",
+    "PNC.ServerInventory.Internal": "Inventory",
+    "PNC.FacilityService.Internal": "Settlement",
+    "PNC.BaseValidationService.Internal": "Settlement",
+    "PNC.FacilityReservations.Internal": "Settlement",
+    "PNC.FacilityValidationService.Internal": "Settlement",
+    "PNC.Conduct.Internal": "Social",
+    "PNC.RelationshipDebug.Internal": "Social",
+    "PNC.Relationships.Internal": "Social",
+    "PNC.SocialEncounterTracker.Internal": "Social",
+    "PNC.SocialGreeting.Internal": "Social",
+    "PNC.SocialProfiles.Internal": "Social",
+    "PNC.SocialEvents.Internal": "Social",
+    "PNC.NPCSupplyService.Internal": "Supply",
+    "PNC.ItemUtility.Internal": "Supply",
+    "PNC.CorpseHaulService.Internal": "Tasking",
+    "PNC.NearbyResourceLocator.Internal": "World",
+    "PNC.WorldDiscovery.Internal": "World",
+    "PNC.Conversation.Registry.Internal": "Conversation",
+    "PNC.Conversation.Rules.Internal": "Conversation",
+    "PNC.ConversationScene.Internal": "Conversation",
+    "PNC.API.Internal": "Foundation",
+    "PNC.BehaviorCompanion.Internal": "Behavior",
+    "PNC.BehaviorThreatGuard.Internal": "Behavior",
+    "PNC.Combat.Internal": "Combat",
+    "PNC.CombatDefense.Internal": "Combat",
+    "PNC.CombatEngagement.Internal": "Combat",
+    "PNC.AbstractWorldTypes.Internal": "Director",
+    "PNC.Equipment.Internal": "Inventory",
+    "PNC.FactionTypes.Internal": "Factions",
+    "PNC.Health.Internal": "Health",
+    "PNC.NPCWounds.Internal": "Health",
+    "PNC.PlayerDamage.Internal": "Health",
+    "PNC.Treatment.Internal": "Health",
+    "PNC.Inventory.Internal": "Inventory",
+    "PNC.Network.Internal": "Networking",
+    "PNC.EnginePathPlanner.Internal": "Pathing",
+    "PNC.FakeLocomotion.Internal": "Pathing",
+    "PNC.LiveBodyControl.Internal": "Pathing",
+    "PNC.PathService.Internal": "Pathing",
+    "PNC.TraversalQuery.Internal": "Pathing",
+    "PNC.Perception.Internal": "Perception",
+    "PNC.Persistence.Internal": "Persistence",
+    "PNC.BodyLifecycle.Internal": "Presence",
+    "PNC.Presence.Internal": "Presence",
+    "PNC.Registry.Internal": "Registry",
+    "PNC.Travel.Service.Internal": "Travel",
+    "PNC.CompanionVehicle.Internal": "Vehicles",
+    "PNC.Animation.Internal": "Presentation",
+    "PNC.AnimationScenes.Internal": "Presentation",
+    "PNC.PresentationAnimations.Internal": "Presentation"
+  },
+  "ambiguous": {},
+  "candidates": [
+    {
+      "source": "client/PNC/Integrations/PBrainZ/PNC_PBrainZ_InlineChatTargets.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ClientPresenceSync.Internal",
+      "line": 46,
+      "detail": "Adapters -> Presence"
+    },
+    {
+      "source": "client/PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController_Passage_Routing.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.PathService.Internal",
+      "line": 18,
+      "detail": "Presence -> Pathing"
+    },
+    {
+      "source": "client/PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController_Passage_Window.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.PathService.Internal",
+      "line": 18,
+      "detail": "Presence -> Pathing"
+    },
+    {
+      "source": "client/PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController_Passage_Window_Actions.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.PathService.Internal",
+      "line": 18,
+      "detail": "Presence -> Pathing"
+    },
+    {
+      "source": "client/PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController_Passage_Window_Update.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.PathService.Internal",
+      "line": 19,
+      "detail": "Presence -> Pathing"
+    },
+    {
+      "source": "client/PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer_ZombieDebug.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ClientPresenceSync.Internal",
+      "line": 27,
+      "detail": "UI -> Presence"
+    },
+    {
+      "source": "server/PNC/Colony/ColonyManagement/PNC_ColonyManagement_ColonistActions.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.HomeDutyService.Internal",
+      "line": 94,
+      "detail": "Colony -> Production"
+    },
+    {
+      "source": "server/PNC/Colony/ColonyManagement/PNC_ColonyManagement_ColonistActions.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.HomeDutyService.Internal",
+      "line": 95,
+      "detail": "Colony -> Production"
+    },
+    {
+      "source": "server/PNC/Colony/ColonyManagement/PNC_ColonyManagement_ColonistActions.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.HomeDutyService.Internal",
+      "line": 97,
+      "detail": "Colony -> Production"
+    },
+    {
+      "source": "server/PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_EventServer.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 110,
+      "detail": "Adapters -> Networking"
+    },
+    {
+      "source": "server/PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Context.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 61,
+      "detail": "Conversation -> Networking"
+    },
+    {
+      "source": "server/PNC/Director/MobileGroupDirector/PNC_MobileGroupDirector_Ambient_Core.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.BaseValidationService.Internal",
+      "line": 82,
+      "detail": "Director -> Settlement"
+    },
+    {
+      "source": "server/PNC/Director/MobileGroupDirector/PNC_MobileGroupDirector_Ambient_Core.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.BaseValidationService.Internal",
+      "line": 83,
+      "detail": "Director -> Settlement"
+    },
+    {
+      "source": "server/PNC/Factions/FactionTollService/PNC_FactionTollService_Core.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 57,
+      "detail": "Factions -> Networking"
+    },
+    {
+      "source": "server/PNC/Factions/FactionTollService/PNC_FactionTollService_Core.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 58,
+      "detail": "Factions -> Networking"
+    },
+    {
+      "source": "server/PNC/Factions/FactionTollService/PNC_FactionTollService_Core.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 59,
+      "detail": "Factions -> Networking"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 141,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 163,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 215,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 249,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 311,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 317,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 403,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 420,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 436,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 477,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 494,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 508,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 546,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 559,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Lumber/LumberService/PNC_LumberService_Execution_OutputDelivery_Deposit.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 572,
+      "detail": "Activities -> Colony"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 24,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 165,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 196,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 222,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_Admission.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 12,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_AdmissionLease.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 12,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_AdmissionLease.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 28,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_AdmissionPolicy.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 12,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_AdmissionRequest.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 12,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_ApplyEffect.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 11,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_BuildResult.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 11,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_DeliverResult.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 11,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_Handle.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 9,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_LeaseLifecycle.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Conversation.Authority.Internal",
+      "line": 11,
+      "detail": "Networking -> Conversation"
+    },
+    {
+      "source": "server/PNC/Production/BuildingService/PNC_BuildingService_Commands.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.FacilityService.Internal",
+      "line": 155,
+      "detail": "Production -> Settlement"
+    },
+    {
+      "source": "server/PNC/Production/HomeDutyService/PNC_HomeDutyService_Core.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.PathService.Internal",
+      "line": 91,
+      "detail": "Production -> Pathing"
+    },
+    {
+      "source": "server/PNC/Scavenge/ScavengeExecutor/PNC_ScavengeExecutor_Runtime.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.PathService.Internal",
+      "line": 62,
+      "detail": "Scavenge -> Pathing"
+    },
+    {
+      "source": "server/PNC/Scavenge/ScavengeExecutor/PNC_ScavengeExecutor_Runtime.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.PathService.Internal",
+      "line": 63,
+      "detail": "Scavenge -> Pathing"
+    },
+    {
+      "source": "server/PNC/Server/Server/PNC_Server_Lifecycle.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 28,
+      "detail": "Composition -> Networking"
+    },
+    {
+      "source": "server/PNC/Server/ServerInventory/PNC_ServerInventory_MedicalSupply.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Treatment.Internal",
+      "line": 35,
+      "detail": "Inventory -> Health"
+    },
+    {
+      "source": "server/PNC/Settlement/FacilityJobs/PNC_RoamAmbientLifecycle.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.AnimationScenes.Internal",
+      "line": 125,
+      "detail": "Settlement -> Presentation"
+    },
+    {
+      "source": "server/PNC/Settlement/FacilityJobs/PNC_RoamAmbientLifecycle.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.AnimationScenes.Internal",
+      "line": 126,
+      "detail": "Settlement -> Presentation"
+    },
+    {
+      "source": "server/PNC/Settlement/FacilityJobs/PNC_RoamAmbientLifecycle.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.AnimationScenes.Internal",
+      "line": 128,
+      "detail": "Settlement -> Presentation"
+    },
+    {
+      "source": "server/PNC/Settlement/FacilityJobs/PNC_RoamingSeatService_Discovery.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.PathService.Internal",
+      "line": 39,
+      "detail": "Settlement -> Pathing"
+    },
+    {
+      "source": "server/PNC/Settlement/FacilityJobs/PNC_RoamingSeatService_Lifecycle.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.AnimationScenes.Internal",
+      "line": 95,
+      "detail": "Settlement -> Presentation"
+    },
+    {
+      "source": "server/PNC/Settlement/FacilityJobs/PNC_RoamingSeatService_Lifecycle.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.AnimationScenes.Internal",
+      "line": 96,
+      "detail": "Settlement -> Presentation"
+    },
+    {
+      "source": "server/PNC/Settlement/FacilityJobs/PNC_RoamingSeatService_Lifecycle.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.AnimationScenes.Internal",
+      "line": 98,
+      "detail": "Settlement -> Presentation"
+    },
+    {
+      "source": "server/PNC/Settlement/PNC_FacilityCostService.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 85,
+      "detail": "Settlement -> Colony"
+    },
+    {
+      "source": "server/PNC/Settlement/PNC_FacilityCostService.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 86,
+      "detail": "Settlement -> Colony"
+    },
+    {
+      "source": "server/PNC/Settlement/PNC_FacilityCostService.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 88,
+      "detail": "Settlement -> Colony"
+    },
+    {
+      "source": "server/PNC/Settlement/PNC_FacilityCostService.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.ColonyStorageService.Internal",
+      "line": 89,
+      "detail": "Settlement -> Colony"
+    },
+    {
+      "source": "server/PNC/Settlement/PNC_StockpileAccessService.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.PathService.Internal",
+      "line": 50,
+      "detail": "Settlement -> Pathing"
+    },
+    {
+      "source": "server/PNC/Stealth/PNC_ServerStealthDiscovery.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 24,
+      "detail": "Combat -> Networking"
+    },
+    {
+      "source": "server/PNC/Stealth/PNC_ServerStealthDiscovery.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 25,
+      "detail": "Combat -> Networking"
+    },
+    {
+      "source": "server/PNC/Stealth/PNC_ServerStealthDiscovery.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 27,
+      "detail": "Combat -> Networking"
+    },
+    {
+      "source": "server/PNC/Stealth/PNC_ServerStealthDiscovery.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 126,
+      "detail": "Combat -> Networking"
+    },
+    {
+      "source": "server/PNC/Stealth/PNC_ServerStealthDiscovery.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 127,
+      "detail": "Combat -> Networking"
+    },
+    {
+      "source": "server/PNC/Stealth/PNC_ServerStealthDiscovery.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 128,
+      "detail": "Combat -> Networking"
+    },
+    {
+      "source": "server/PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_World_Helpers.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.PathService.Internal",
+      "line": 32,
+      "detail": "Tasking -> Pathing"
+    },
+    {
+      "source": "server/PNC/World/NearbyWaterService/PNC_NearbyWaterService_Approach.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.PathService.Internal",
+      "line": 27,
+      "detail": "World -> Pathing"
+    },
+    {
+      "source": "shared/PNC/Conversation/PNC_ConversationScene/PNC_ConversationScene_Core.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 98,
+      "detail": "Conversation -> Networking"
+    },
+    {
+      "source": "shared/PNC/Conversation/PNC_ConversationScene/PNC_ConversationScene_Core.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 99,
+      "detail": "Conversation -> Networking"
+    },
+    {
+      "source": "shared/PNC/Conversation/PNC_ConversationScene/PNC_ConversationScene_Core.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 103,
+      "detail": "Conversation -> Networking"
+    },
+    {
+      "source": "shared/PNC/Core/Commands/PNC_CompanionCommandDefinitions.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.HomeDutyService.Internal",
+      "line": 10,
+      "detail": "Companions -> Production"
+    },
+    {
+      "source": "shared/PNC/Core/Commands/PNC_CompanionCommandDefinitions.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.HomeDutyService.Internal",
+      "line": 11,
+      "detail": "Companions -> Production"
+    },
+    {
+      "source": "shared/PNC/Core/Commands/PNC_CompanionCommandDefinitions.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.HomeDutyService.Internal",
+      "line": 14,
+      "detail": "Companions -> Production"
+    },
+    {
+      "source": "shared/PNC/Core/Commands/PNC_CompanionCommandRegistry_Application.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Combat.Internal",
+      "line": 40,
+      "detail": "Companions -> Combat"
+    },
+    {
+      "source": "shared/PNC/Core/Commands/PNC_CompanionCommandRegistry_Application.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Combat.Internal",
+      "line": 41,
+      "detail": "Companions -> Combat"
+    },
+    {
+      "source": "shared/PNC/Core/Commands/PNC_CompanionCommandRegistry_Application.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Combat.Internal",
+      "line": 43,
+      "detail": "Companions -> Combat"
+    },
+    {
+      "source": "shared/PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Lifecycle_Finish.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.AnimationScenes.Internal",
+      "line": 20,
+      "detail": "Facilities -> Presentation"
+    },
+    {
+      "source": "shared/PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Lifecycle_SleepWake.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.LiveBodyControl.Internal",
+      "line": 163,
+      "detail": "Facilities -> Pathing"
+    },
+    {
+      "source": "shared/PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Lifecycle_SleepWake.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.LiveBodyControl.Internal",
+      "line": 164,
+      "detail": "Facilities -> Pathing"
+    },
+    {
+      "source": "shared/PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Lifecycle_SleepWake.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.LiveBodyControl.Internal",
+      "line": 166,
+      "detail": "Facilities -> Pathing"
+    },
+    {
+      "source": "shared/PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Lifecycle_SleepWake.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.LiveBodyControl.Internal",
+      "line": 237,
+      "detail": "Facilities -> Pathing"
+    },
+    {
+      "source": "shared/PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Lifecycle_SleepWake.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.LiveBodyControl.Internal",
+      "line": 238,
+      "detail": "Facilities -> Pathing"
+    },
+    {
+      "source": "shared/PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Lifecycle_SleepWake.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.LiveBodyControl.Internal",
+      "line": 240,
+      "detail": "Facilities -> Pathing"
+    },
+    {
+      "source": "shared/PNC/Core/Presence/PNC_Presence/PNC_Presence_Materialize.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.BehaviorCompanion.Internal",
+      "line": 27,
+      "detail": "Presence -> Behavior"
+    },
+    {
+      "source": "shared/PNC/Core/Zombies/PNC_ZombieAggro_Update_Multiplayer.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 26,
+      "detail": "Combat -> Networking"
+    },
+    {
+      "source": "shared/PNC/Core/Zombies/PNC_ZombieAggro_Update_Multiplayer.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 27,
+      "detail": "Combat -> Networking"
+    },
+    {
+      "source": "shared/PNC/Core/Zombies/PNC_ZombieAggro_Update_Multiplayer.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 72,
+      "detail": "Combat -> Networking"
+    },
+    {
+      "source": "shared/PNC/Core/Zombies/PNC_ZombieAggro_Update_Multiplayer.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 179,
+      "detail": "Combat -> Networking"
+    },
+    {
+      "source": "shared/PNC/Integrations/PNC_PsychopatzProfiler/PNC_PsychopatzProfiler_Server.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Server.Internal",
+      "line": 52,
+      "detail": "Adapters -> Composition"
+    },
+    {
+      "source": "shared/PNC/Integrations/PNC_PsychopatzProfiler/PNC_PsychopatzProfiler_Server.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 95,
+      "detail": "Adapters -> Networking"
+    },
+    {
+      "source": "shared/PNC/Integrations/PNC_PsychopatzProfiler/PNC_PsychopatzProfiler_Shared_Wrappers.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.BehaviorCompanion.Internal",
+      "line": 66,
+      "detail": "Adapters -> Behavior"
+    },
+    {
+      "source": "shared/PNC/Integrations/PNC_PsychopatzProfiler/PNC_PsychopatzProfiler_Shared_Wrappers.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Combat.Internal",
+      "line": 148,
+      "detail": "Adapters -> Combat"
+    },
+    {
+      "source": "shared/PNC/Integrations/PNC_PsychopatzProfiler/PNC_PsychopatzProfiler_Shared_Wrappers.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.EnginePathPlanner.Internal",
+      "line": 110,
+      "detail": "Adapters -> Pathing"
+    },
+    {
+      "source": "shared/PNC/Semantics/PNC_SemanticInteractionSceneTransport.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 304,
+      "detail": "Semantics -> Networking"
+    },
+    {
+      "source": "shared/PNC/Semantics/PNC_SemanticInteractionSceneTransport.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 305,
+      "detail": "Semantics -> Networking"
+    },
+    {
+      "source": "shared/PNC/Semantics/PNC_SemanticInteractionSceneTransport.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 337,
+      "detail": "Semantics -> Networking"
+    },
+    {
+      "source": "shared/PNC/Semantics/PNC_SemanticInteractionSceneTransport.lua",
+      "rule": "FOREIGN_PRIVATE_NAMESPACE",
+      "target": "PNC.Network.Internal",
+      "line": 338,
+      "detail": "Semantics -> Networking"
+    }
+  ],
+  "tier": "provisional lexical supplement; graph/data-flow and scope verification required before acceptance",
+  "source_revision": "dc16860c",
+  "scope": "maintained current runtime paths from P7I architecture cache",
+  "limitations": [
+    "Ownership inferred only where a fully-qualified private-root initialization is recorded in exactly one owner. Alias-only definitions and compound alias expressions are missed.",
+    "Candidate lines are references, not independent architecture defects; profiler instrumentation may require an explicit owner hook instead of exposing an entire Internal table.",
+    "This is a work queue. No new roots added to dependency debt or waived merely because they were discovered."
+  ]
+}

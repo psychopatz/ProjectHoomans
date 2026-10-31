@@ -304,7 +304,8 @@
       ],
       "queries": [
         "Memory public surface",
-        "Memory.Repository.SerializeRecord"
+        "Memory.Repository.SerializeRecord",
+        "Memory.Events.CurrentWorldDay (calendar identity for bounded remote evidence)"
       ],
       "repository": "Memory.Repository compact event arrays/selection metadata; History and InteractionLifecyclePersistence retain their own state",
       "layers": [
@@ -1000,7 +1001,8 @@
     "PNC.FactionTypes.Internal": "Factions",
     "PNC.Client.Internal": "Networking",
     "PNC.Semantics.CampSiteGeometry.Internal": "Semantics",
-    "PNC.Semantics.CampSiteGeometry._Internal": "Semantics"
+    "PNC.Semantics.CampSiteGeometry._Internal": "Semantics",
+    "PNC.Conversation.Memory.Events.Internal": "Conversation"
   },
   "registration_manifest": "REGISTRATIONS.json",
   "private_implementation_scopes": [
