@@ -13,7 +13,7 @@ from .loader import SemanticCase, discover_cases, load_cases_from_file
 
 
 REPOSITORY = Path(__file__).resolve().parents[3]
-DEFAULT_FIXTURES_DIR = REPOSITORY / "tools/semantic_harness/fixtures"
+DEFAULT_FIXTURES_DIR = REPOSITORY / "tools/semantic_harness/fixtures/v1"
 
 
 def build_parser() -> argparse.ArgumentParser:
