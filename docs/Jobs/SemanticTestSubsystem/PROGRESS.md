@@ -38,6 +38,8 @@
   - Duplicate-case and schema linter implemented at `tools/semantic_harness/testing/lint.py`.
   - 17 fixture files, 116 cases checked; 0 duplicate IDs, 0 schema errors.
   - Measured efficiency: 38.7% reduction in raw file size (47,232 bytes vs 77,109 bytes, saving ~7,469 tokens per full context read) while eliminating repetitive test boilerplate.
+  - Safely deprecated and removed 2 legacy duplicated behavioural smoke tests (586 LOC): `tests/pnc_semantic_nlu_smoke.lua` (331 LOC) and `tests/pnc_semantic_local_response_questions_smoke.lua` (255 LOC).
+  - Post-deletion Lua regression suite verified: 144/144 pnc_semantic tests pass in 3.68s; 151/151 total semantic tests pass in 3.27s. Zero regressions.
 - **End-to-End Developer Acceptance (P7) Verified:**
   - Gate 1 (Linter): `python3 -m tools.semantic_harness.testing.lint` checked 17 files, 116 cases cleanly with zero duplicate IDs or schema violations.
   - Gate 2 (Lua Smoke Regression): `python3 tests/run_tests.py pnc_semantic` (PASS 146/146 in 3.38s) and `python3 tests/run_tests.py semantic` (PASS 153/153 in 3.40s).
