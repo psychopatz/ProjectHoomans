@@ -1,0 +1,11 @@
+# Agent runbook — Semantic Test Subsystem
+
+1. Work in /home/psychopatz/Zomboid/Workshop/ProjectHoomans on existing **main**. Read root AGENTS.md; this job's README, ARCHITECTURE, AUDIT, HARNESS_ACCEPTANCE, ROADMAP; read **PROGRESS last**.
+2. Before edits verify branch, HEAD, status, origin/main and active concurrent worktrees. Preserve other jobs and user edits. Do not create branches, blind-pull, reset, rebase, stash automatically, force push or rewrite unrelated files. Commit coherent accepted chunks only after safe ownership checks.
+3. Inspect current tests and current worker APIs: tools/semantic_harness/runtime, tools/semantic_harness/fixtures, tools/semantic_harness/c0a_baseline.py, tools/semantic_harness/tests, tests/support/test.lua, tests/pnc_semantic*_smoke.lua, existing CLI, Simulation and Observatory. No second harness.
+4. Start with PROGRESS Next Chunk P0. Identify coverage before design and preserve old runner entrypoints until equivalent semantic and authority assertions pass. An imperfect conversion is not license to delete the old test.
+5. Keep test Python as runner/projection only. Production Lua owns parsing/policy/realization; no fixture-specific logic that makes a bad semantic implementation appear green. Protect negative tests.
+6. Scope changes to job docs and related testing code. Do not change AGENTS.md or other job roadmaps, do not check in GOAL_PROMPT.md. Avoid writing temporary directories under watched PZ media; no saves mutations, native launch or Workshop action.
+7. Validate each coherent chunk with relevant current commands, document commands/counts/HEAD and remaining gaps in concise PROGRESS. Continue mandatory phases automatically. Do not stop after P0, first JSON case, one passing test or a documentation-only chunk.
+8. If actual current system differs from examples, implement faithful minimal adapters and update architecture based on verified facts. Reject unsupported features explicitly rather than fake passing.
+9. Final report separates developer-verified evidence and user-native acceptance, lists retained imperative tests, migrated cases, removed duplication, actual performance/token metrics, remaining limitations and commit(s).
