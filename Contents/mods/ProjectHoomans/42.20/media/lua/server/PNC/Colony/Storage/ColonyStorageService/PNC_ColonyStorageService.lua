@@ -24,21 +24,36 @@ function PNC.ColonyStorageService.RecordActivity(storageOrID, event, actor,
     return Journal.Record(storage, event)
 end
 
-PNC.ColonyStorageService.GetStorageRevision =
-    PNC.ColonyStorageService.Internal.GetStorageRevision
-PNC.ColonyStorageService.HasStorageChanged =
-    PNC.ColonyStorageService.Internal.HasStorageChanged
-PNC.ColonyStorageService.Preflight =
-    PNC.ColonyStorageService.Internal.Preflight
-PNC.ColonyStorageService.ReserveOutputCapacity =
-    PNC.ColonyStorageService.Internal.ReserveOutputCapacity
-PNC.ColonyStorageService.ReleaseOutputCapacity =
-    PNC.ColonyStorageService.Internal.ReleaseOutputCapacity
-PNC.ColonyStorageService.CommitStorage =
-    PNC.ColonyStorageService.Internal.CommitStorage
-PNC.ColonyStorageService.TransferIntoStorage =
-    PNC.ColonyStorageService.Internal.TransferIntoStorage
-PNC.ColonyStorageService.LiveNPCSource =
-    PNC.ColonyStorageService.Internal.LiveNPCSource
+function PNC.ColonyStorageService.GetStorageRevision(...)
+    return PNC.ColonyStorageService.Internal.GetStorageRevision(...)
+end
+
+function PNC.ColonyStorageService.HasStorageChanged(...)
+    return PNC.ColonyStorageService.Internal.HasStorageChanged(...)
+end
+
+function PNC.ColonyStorageService.Preflight(...)
+    return PNC.ColonyStorageService.Internal.Preflight(...)
+end
+
+function PNC.ColonyStorageService.ReserveOutputCapacity(...)
+    return PNC.ColonyStorageService.Internal.ReserveOutputCapacity(...)
+end
+
+function PNC.ColonyStorageService.ReleaseOutputCapacity(...)
+    return PNC.ColonyStorageService.Internal.ReleaseOutputCapacity(...)
+end
+
+function PNC.ColonyStorageService.CommitStorage(...)
+    return PNC.ColonyStorageService.Internal.CommitStorage(...)
+end
+
+function PNC.ColonyStorageService.TransferIntoStorage(...)
+    return PNC.ColonyStorageService.Internal.TransferIntoStorage(...)
+end
+
+function PNC.ColonyStorageService.LiveNPCSource(...)
+    return PNC.ColonyStorageService.Internal.LiveNPCSource(...)
+end
 
 return PNC.ColonyStorageService

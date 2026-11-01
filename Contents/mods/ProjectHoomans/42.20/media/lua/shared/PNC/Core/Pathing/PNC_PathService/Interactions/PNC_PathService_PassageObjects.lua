@@ -163,7 +163,7 @@ local function reportDoorFailure(object, square, failure)
     )
 end
 
-function Internal.openDoorForNPC(zombie, object)
+function PNC.PathService.OpenDoorForNPC(zombie, object)
     local square
     local properties
     local doorSound
@@ -246,8 +246,9 @@ function Internal.openDoorForNPC(zombie, object)
     end
     return opened
 end
+Internal.openDoorForNPC = PNC.PathService.OpenDoorForNPC
 
-function Internal.openWindowForNPC(zombie, object)
+function PNC.PathService.OpenWindowForNPC(zombie, object)
     local square
     if not object or methodReturnsTrue(object, { "IsOpen", "isOpen" }) then
         return object ~= nil
@@ -276,8 +277,9 @@ function Internal.openWindowForNPC(zombie, object)
     if zombie and zombie.playSound then zombie:playSound("OpenWindow") end
     return true
 end
+Internal.openWindowForNPC = PNC.PathService.OpenWindowForNPC
 
-function Internal.smashWindowForNPC(zombie, object)
+function PNC.PathService.SmashWindowForNPC(zombie, object)
     if not object then return false end
     if methodReturnsTrue(object, { "isSmashed", "IsSmashed" }) then
         return true
@@ -294,6 +296,4 @@ function Internal.smashWindowForNPC(zombie, object)
     if square and square.RecalcProperties then square:RecalcProperties() end
     return true
 end
-PNC.PathService.OpenDoorForNPC = Internal.openDoorForNPC
-PNC.PathService.OpenWindowForNPC = Internal.openWindowForNPC
-PNC.PathService.SmashWindowForNPC = Internal.smashWindowForNPC
+Internal.smashWindowForNPC = PNC.PathService.SmashWindowForNPC

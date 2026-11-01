@@ -256,6 +256,7 @@ end
 
 Internal.compactMessages = compactMessages
 Internal.compactRelationshipRecord = compactRelationshipRecord
+TalkParity.CompactStart = compactStart
 Internal.compactStart = compactStart
 Internal.compactTurn = compactTurn
 Internal.compactObservation = compactObservation

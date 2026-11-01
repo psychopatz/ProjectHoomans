@@ -7,7 +7,7 @@ local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local Definitions = PNC.SettlementDefinitions
 
-function H.RectangleRegion(minX, minY, maxX, maxY, minZ, maxZ)
+function Validation.RectangleRegion(minX, minY, maxX, maxY, minZ, maxZ)
     local region = { levels = {} }
     local z
     for z = math.floor(tonumber(minZ) or 0),
@@ -27,8 +27,7 @@ function H.RectangleRegion(minX, minY, maxX, maxY, minZ, maxZ)
     end
     return GridRegion.normalize(region)
 end
-
-Validation.RectangleRegion = H.RectangleRegion
+H.RectangleRegion = Validation.RectangleRegion
 
 function H.ConflictsWithRegisteredBase(footprint, options)
     local exported = Zones.export and Zones.export() or { byID = {} }

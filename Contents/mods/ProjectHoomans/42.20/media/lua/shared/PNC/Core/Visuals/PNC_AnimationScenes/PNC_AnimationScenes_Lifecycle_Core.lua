@@ -172,7 +172,7 @@ local function notifyStop(definition, record, zombie, scene, reason)
     end
 end
 
-function Internal.ClearScene(record, zombie, reason, release, options)
+function Scenes.ClearScene(record, zombie, reason, release, options)
     local runtime
     local scene
     local definition
@@ -229,7 +229,7 @@ function Internal.ClearScene(record, zombie, reason, release, options)
     end
     return true
 end
-
+Internal.ClearScene = Scenes.ClearScene
 
 Internal.IsWaterScene = isWaterScene
 Internal.ActiveTraversalOwner = activeTraversalOwner
@@ -237,6 +237,5 @@ Internal.LogWaterSceneEvent = logWaterSceneEvent
 Internal.IsSeatingScene = isSeatingScene
 Internal.AuditScene = auditScene
 Internal.NotifyStop = notifyStop
-Scenes.ClearScene = Internal.ClearScene
 
 return Scenes

@@ -17,7 +17,7 @@ local Stealth = H.Stealth
 local Common = H.Common
 local CompanionVehicle = H.CompanionVehicle
 
-function Internal.TickFollowOwner(record, zombie)
+function Companion.TickFollowOwner(record, zombie)
     local owner = Common.GetOwner(record)
     local now = Core.Now and Core.Now() or 0
     local ownerVehicle
@@ -126,5 +126,7 @@ function Internal.TickFollowOwner(record, zombie)
     end
     return true
 end
+
+Internal.TickFollowOwner = Companion.TickFollowOwner
 
 return Companion

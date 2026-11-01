@@ -60,7 +60,7 @@ local function cacheObservation(zombie, now, value)
     return cached.value
 end
 
-function Internal.GetClientZombieSoundObservation(zombie, now)
+function Sync.GetClientZombieSoundObservation(zombie, now)
     local manager
     local query
     local ok
@@ -149,7 +149,7 @@ function Internal.GetClientZombieSoundObservation(zombie, now)
             and safeSound.sourceIsPlayer == true or false,
     })
 end
-Sync.GetClientZombieSoundObservation = Internal.GetClientZombieSoundObservation
+Internal.GetClientZombieSoundObservation = Sync.GetClientZombieSoundObservation
 
 local function hasZombieSound(zombie, now)
     local observation = Internal.GetClientZombieSoundObservation(zombie, now)

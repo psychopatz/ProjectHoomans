@@ -19,6 +19,8 @@ require "PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Recorder"
 require "PNC/Conversation/Memory/Events/PNC_ConversationMemory_Events_Gossip"
 
 -- Calendar identity is queried by remote semantic evidence readers.
-Events.CurrentWorldDay = Events.Internal.CurrentWorldDay
+function Events.CurrentWorldDay()
+    return Events.Internal.CurrentWorldDay()
+end
 
 return Events

@@ -60,10 +60,13 @@ local function isPlayerOwned(record)
 end
 
 Internal.BandageTypes = bandageTypes
-Internal.IsBandageType = isBandageType
 Internal.BandageDisplayName = bandageDisplayName
 Internal.PlayerFirstAidLevel = playerFirstAidLevel
-Treatment.IsBandageType = isBandageType
+
+function Treatment.IsBandageType(itemType)
+    return isBandageType(itemType)
+end
+Internal.IsBandageType = Treatment.IsBandageType
 
 function Treatment.GetPlayerFirstAidLevel(player)
     return playerFirstAidLevel(player)

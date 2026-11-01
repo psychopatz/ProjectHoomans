@@ -92,8 +92,10 @@ local function refreshBodyMap(now)
     )
 end
 
-Internal.RefreshBodyMap = refreshBodyMap
-Sync.RefreshBodyMap = refreshBodyMap
+function Sync.RefreshBodyMap(now)
+    return refreshBodyMap(now)
+end
+Internal.RefreshBodyMap = Sync.RefreshBodyMap
 Internal.ResolveSnapshotBody = function(snapshot)
     if PNC.Core.IsClientOnly() then return BodyBinding.Resolve(snapshot) end
     return Registry.ResolveSnapshotBody(Sync, snapshot)

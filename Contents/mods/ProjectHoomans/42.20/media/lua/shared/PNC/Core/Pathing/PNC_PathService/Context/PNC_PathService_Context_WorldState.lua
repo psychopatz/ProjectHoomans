@@ -35,7 +35,7 @@ function Internal.getSquare(x, y, z)
     return getCell():getGridSquare(math.floor(x), math.floor(y), z)
 end
 
-function Internal.isSquareWalkable(x, y, z)
+function PNC.PathService.IsSquareWalkable(x, y, z)
     if TraversalQuery and TraversalQuery.CanTraverseAt then
         return TraversalQuery.CanTraverseAt(x, y, z)
     end
@@ -44,7 +44,7 @@ function Internal.isSquareWalkable(x, y, z)
     end
     return false
 end
-PNC.PathService.IsSquareWalkable = Internal.isSquareWalkable
+Internal.isSquareWalkable = PNC.PathService.IsSquareWalkable
 
 function Internal.syncRecordPosition(record, zombie)
     if not record or not zombie then

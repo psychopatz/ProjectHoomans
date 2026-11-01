@@ -170,7 +170,7 @@ function Internal.AssessThreat(record, target)
     return report
 end
 
-function Internal.BuildZombieThreatCentroid(record, radius)
+function Tactics.BuildZombieThreatCentroid(record, radius)
     local zombies
     local zombie
     local count = 0
@@ -207,9 +207,7 @@ function Internal.BuildZombieThreatCentroid(record, radius)
     if count <= 0 then return nil, nil, 0 end
     return sumX / count, sumY / count, count
 end
-Tactics.BuildZombieThreatCentroid = function(record, radius)
-    return Internal.BuildZombieThreatCentroid(record, radius)
-end
+Internal.BuildZombieThreatCentroid = Tactics.BuildZombieThreatCentroid
 
 function Internal.StableDirection(id)
     local value = tostring(id or "")

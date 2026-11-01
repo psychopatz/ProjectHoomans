@@ -32,9 +32,10 @@ local function regionTouchesFacility(facility, region)
     return false
 end
 
-function H.WorkZoneTouchesFacility(facility, region)
+function Validation.WorkZoneTouchesFacility(facility, region)
     return regionTouchesFacility(facility, region)
 end
+H.WorkZoneTouchesFacility = Validation.WorkZoneTouchesFacility
 
 function Validation.NormalizeComponent(base, facility, input)
     if type(input) ~= "table" or (input.kind ~= "anchor"

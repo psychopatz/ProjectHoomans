@@ -144,8 +144,8 @@ local function ensureWorkZone(facility, base)
     end
     if existing and existing.kind == "region"
         and existing.region and facility.constructionRegion
-        and Validation.Internal.WorkZoneTouchesFacility
-        and Validation.Internal.WorkZoneTouchesFacility(facility, existing.region)
+        and (Validation.WorkZoneTouchesFacility or (Validation.Internal and Validation.Internal.WorkZoneTouchesFacility))
+        and (Validation.WorkZoneTouchesFacility or Validation.Internal.WorkZoneTouchesFacility)(facility, existing.region)
     then
         return false
     end
@@ -300,8 +300,10 @@ end
 Internal.calculatedState = calculatedState
 Internal.emit = emit
 Internal.addIndex = addIndex
-Internal.touch = touch
-Service.Touch = touch
+function Service.Touch(base, facility, now)
+    return touch(base, facility, now)
+end
+Internal.touch = Service.Touch
 Internal.updateState = updateState
 Internal.GridRegion = GridRegion
 Internal.buildDefaultWorkZone = buildDefaultWorkZone

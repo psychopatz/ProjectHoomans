@@ -2,7 +2,7 @@ local LiveBodyControl = PNC.LiveBodyControl
 local Internal = LiveBodyControl.Internal
 local ActorControl = PNC.ActorControl
 
-function Internal.clearVanillaIntent(zombie)
+function LiveBodyControl.ClearVanillaIntent(zombie)
     if not zombie then return false end
     if zombie.setTarget then zombie:setTarget(nil) end
     if zombie.setTargetSeenTime then zombie:setTargetSeenTime(0) end
@@ -16,7 +16,7 @@ function Internal.clearVanillaIntent(zombie)
     if zombie.setAttackedBy then zombie:setAttackedBy(nil) end
     return true
 end
-LiveBodyControl.ClearVanillaIntent = Internal.clearVanillaIntent
+Internal.clearVanillaIntent = LiveBodyControl.ClearVanillaIntent
 
 function Internal.isDamageReactionState(actionState)
     actionState = string.lower(tostring(actionState or ""))

@@ -5,12 +5,16 @@ if type(Internal) ~= "table" then
     error("camp-site geometry runtime access requires its entry module")
 end
 
-local function call(object, method, ...)
+local RuntimeAccess = Geometry.RuntimeAccess or {}
+Geometry.RuntimeAccess = RuntimeAccess
+
+function RuntimeAccess.Call(object, method, ...)
     local fn = object and object[method]
     if type(fn) ~= "function" then return nil end
     local ok, value = pcall(fn, object, ...)
     return ok and value or nil
 end
+local call = RuntimeAccess.Call
 
 local function field(object, name)
     if not object then return nil end
@@ -54,7 +58,7 @@ local function values(list, maximum)
     return output
 end
 
-local function position(value)
+function RuntimeAccess.Position(value)
     local x = number(call(value, "getX"))
     local y = number(call(value, "getY"))
     local z = number(call(value, "getZ")) or 0
@@ -67,6 +71,7 @@ local function position(value)
     end
     return nil
 end
+local position = RuntimeAccess.Position
 
 local function cellFor(options)
     options = type(options) == "table" and options or {}

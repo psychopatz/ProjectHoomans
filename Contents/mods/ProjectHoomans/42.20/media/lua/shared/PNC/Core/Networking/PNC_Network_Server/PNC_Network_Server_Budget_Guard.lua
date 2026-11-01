@@ -25,7 +25,7 @@ end
     The wrapper is tracked with a module flag instead of a field on the bound
     Java function, because arbitrary keys cannot be set on engine functions.
 ]]
-function Internal.InstallSendGuard()
+function Network.InstallSendGuard()
     if Internal.SendGuardInstalled == true then return true end
     if not serverRunning() then return false end
     local current = sendServerCommand
@@ -49,6 +49,7 @@ function Internal.InstallSendGuard()
     Internal.SendGuardInstalled = true
     return true
 end
+Internal.InstallSendGuard = Network.InstallSendGuard
 
 if type(Internal.RawSendServerCommand) ~= "function"
     and type(sendServerCommand) == "function"
@@ -56,7 +57,6 @@ then
     Internal.RawSendServerCommand = sendServerCommand
 end
 
-Internal.InstallSendGuard()
-Network.InstallSendGuard = Internal.InstallSendGuard
+Network.InstallSendGuard()
 
 return Budget

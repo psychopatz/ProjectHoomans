@@ -47,7 +47,7 @@ function TalkParity.Start(context, value, utterance)
         snapshot.conversationPresentation
     )
     local compactScenarioValue = compactScenario(scenario, Values)
-    local compactStartValue = Internal.compactStart(start, Values)
+    local compactStartValue = (TalkParity.CompactStart or Internal.compactStart)(start, Values)
     local compactConfigured = compactTalkSnapshot(configured, Values)
     if type(compactConfigured.sourceSnapshot) == "table" then
         compactConfigured.sourceSnapshot.data = nil

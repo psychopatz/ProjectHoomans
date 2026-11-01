@@ -62,7 +62,7 @@ local function ownerKey(record)
         or nonempty(record and record.ownerUsername)
 end
 
-function Internal.IsDoctor(record)
+function Executor.IsDoctor(record)
     local source = affiliation(record)
     local role = string.lower(tostring(
         source.role or source.communityRole or record and record.communityRole
@@ -74,8 +74,9 @@ function Internal.IsDoctor(record)
         or archetype == "doctor"
         or jobs and jobs.MedicalCare == true
 end
+Internal.IsDoctor = Executor.IsDoctor
 
-function Internal.SameCareGroup(actor, patient)
+function Executor.SameCareGroup(actor, patient)
     local actorFaction = factionId(actor)
     local patientFaction = factionId(patient)
     local actorCommunity = communityId(actor)
@@ -94,6 +95,7 @@ function Internal.SameCareGroup(actor, patient)
     return Types and Types.IsColonist
         and Types.IsColonist(actor) and Types.IsColonist(patient) or false
 end
+Internal.SameCareGroup = Executor.SameCareGroup
 
 function Internal.Patient(task)
     if not task or task.patientKind ~= "npc" then return nil end
@@ -109,14 +111,11 @@ function Internal.Treatable(patient)
     return Wounds.GetTreatableWounds(patient)
 end
 
-function Internal.CurrentPart(patient)
+function Executor.CurrentPart(patient)
     local entries = Internal.Treatable(patient)
     return entries[1] and tostring(entries[1].partId) or nil
 end
-
-Executor.IsDoctor = Internal.IsDoctor
-Executor.SameCareGroup = Internal.SameCareGroup
-Executor.CurrentPart = Internal.CurrentPart
+Internal.CurrentPart = Executor.CurrentPart
 
 function Internal.CanTreat(actor, task)
     local patient

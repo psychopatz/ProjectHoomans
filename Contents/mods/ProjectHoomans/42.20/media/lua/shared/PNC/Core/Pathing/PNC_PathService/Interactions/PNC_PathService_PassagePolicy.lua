@@ -55,7 +55,7 @@ function Internal.passageObstacleSquareKey(square)
     return square and ("sq:" .. Internal.describeSquare(square)) or nil
 end
 
-function Internal.passageWindowDestination(object, actorSquare)
+function PNC.PathService.PassageWindowDestination(object, actorSquare)
     local objectSquare = object and object.getSquare
         and object:getSquare() or nil
     local oppositeSquare = object and object.getOppositeSquare
@@ -64,7 +64,7 @@ function Internal.passageWindowDestination(object, actorSquare)
     if sameSquare(actorSquare, oppositeSquare) then return objectSquare end
     return nil
 end
-PNC.PathService.PassageWindowDestination = Internal.passageWindowDestination
+Internal.passageWindowDestination = PNC.PathService.PassageWindowDestination
 
 function Internal.windowDestinationForContext(context, object)
     if context and context.blockedFromSquare and context.blockedSquare

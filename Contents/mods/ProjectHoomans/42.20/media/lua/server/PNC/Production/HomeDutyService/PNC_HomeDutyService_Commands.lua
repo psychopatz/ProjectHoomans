@@ -4,7 +4,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 local Service = PNC.HomeDutyService
 local H = Service.Internal
 
-function H.CancelActiveTask(record, reason)
+function Service.CancelActiveTask(record, reason)
     local lease
     local stopped
     local stopReason
@@ -36,8 +36,7 @@ function H.CancelActiveTask(record, reason)
     end
     return true
 end
-
-Service.CancelActiveTask = H.CancelActiveTask
+H.CancelActiveTask = Service.CancelActiveTask
 
 function Service.SendHome(record, baseId, reason, options)
     if not record or record.alive == false then return false, "NPC_MISSING" end

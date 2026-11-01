@@ -41,7 +41,7 @@ for name in pairs(publicFunctions) do
     T.equal(type(Validation[name]), "function",
         "entry point preserves FacilityValidationService." .. name)
 end
-T.equal(publicCount, 6, "facility-validation public function count")
+T.equal(publicCount, 7, "facility-validation public function count")
 
 for i = 1, #providers do
     package.loaded[prefix .. providers[i]] = nil

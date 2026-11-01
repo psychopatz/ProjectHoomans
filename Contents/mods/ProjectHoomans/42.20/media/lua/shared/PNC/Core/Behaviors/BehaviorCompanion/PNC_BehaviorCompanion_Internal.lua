@@ -45,7 +45,7 @@ function Internal.GetFollowOwnerKey(record, owner)
     )
 end
 
-function Internal.ResetFollowMoveIssue(record)
+function Companion.ResetFollowMoveIssue(record)
     local state = Internal.GetFollowState(record)
     state.issuedTargetX = nil
     state.issuedTargetY = nil
@@ -54,7 +54,7 @@ function Internal.ResetFollowMoveIssue(record)
     state.issuedAvoidance = nil
     state.issuedAt = 0
 end
-Companion.ResetFollowMoveIssue = Internal.ResetFollowMoveIssue
+Internal.ResetFollowMoveIssue = Companion.ResetFollowMoveIssue
 
 function Companion.InstallProfilerWrappers(wrap)
     if type(wrap) ~= "function" then return end

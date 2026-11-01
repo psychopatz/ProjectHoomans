@@ -11,7 +11,7 @@ function Internal.clearAttackAction(record)
     end
 end
 
-function Internal.finishAttackAction(record, zombie)
+function Combat.FinishAttackAction(record, zombie)
     -- Clearing the authoritative action publishes an inactive snapshot. The
     -- rendering client owns FinishBump so SP and MP follow the same path.
     Internal.clearAttackAction(record)
@@ -21,7 +21,7 @@ function Internal.finishAttackAction(record, zombie)
         record.runtime.forceSyncEvent = "attack_finish"
     end
 end
-Combat.FinishAttackAction = Internal.finishAttackAction
+Internal.finishAttackAction = Combat.FinishAttackAction
 
 function Internal.buildAttackAction(record, target, attackKind, attackType, anim, damage, skillID, extra)
     local now = Core.Now()
