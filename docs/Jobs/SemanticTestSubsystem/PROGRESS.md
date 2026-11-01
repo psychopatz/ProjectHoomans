@@ -1,7 +1,7 @@
 # Semantic Test Subsystem — current progress
 
-**Status:** IN PROGRESS (P5 COMPLETE -> EXECUTING P6).
-**Source audit reference:** local main HEAD `2fbd97d2` on 2026-11-01, clean worktree. Rechecked before execution.
+**Status:** IN PROGRESS (P6 COMPLETE -> EXECUTING P7).
+**Source audit reference:** local main HEAD `884367ce` on 2026-11-01, clean worktree. Rechecked before execution.
 
 ## Evidence & Baselines Established
 - **Lua Smoke Suite Baseline:**
@@ -9,7 +9,7 @@
   - Total semantic-named Lua tests: 153 files, all pass in 3.49s (`python3 tests/run_tests.py semantic`).
 - **Python Harness Suite Baseline:**
   - 197 test modules in `tools/semantic_harness/tests/`. Verified runners: `python_runner.py` executes isolated processes with serial exclusive lanes for source authoring.
-  - Baseline passes verified: `test_worker_session` (0.15s), `test_runner` (0.10s), `test_c0a_baseline` (0.62s), `test_response_observatory` (15.17s), `test_response_observatory_matrix` (92.23s), `test_semantic_test_subsystem` (1.57s), `test_pilot_parity` (51.18s), `test_p3_observatory_c0a_parity` (60.19s), `test_p4_behavior_parity` (44.02s), `test_app` (0.28s), `test_cli_parity_p13f` (29.26s).
+  - Baseline passes verified: `test_worker_session` (0.15s), `test_runner` (0.10s), `test_c0a_baseline` (0.62s), `test_response_observatory` (15.17s), `test_response_observatory_matrix` (92.23s), `test_semantic_test_subsystem` (1.57s), `test_pilot_parity` (51.18s), `test_p3_observatory_c0a_parity` (60.19s), `test_p4_behavior_parity` (44.02s), `test_app` (0.28s), `test_cli_parity_p13f` (29.26s), `test_lint` (0.09s).
 - **Existing Fixture Families (9 files):**
   - 5 Observatory fixtures: `observatory_core_en_tl.json`, `observatory_lifecycle_en_tl.json`, `observatory_health_authority_en_tl.json`, `observatory_permission_rejections_en_tl.json`, `observatory_greeting_selection.json`.
   - 4 C0A fixtures: `semantic_corpus.json` (23 cases), `multi_turn_scenarios.json` (5 cases), `suggestion_cases.json` (3 cases), `reply_realization_cases.json` (6 cases).
@@ -31,7 +31,10 @@
 - **Tooling Integration (P5) Verified:**
   - Integrated into `tools.semantic_harness.cli` (`--run-semantic-tests`, `--semantic-test-file`, `--semantic-test-suite`, `--semantic-test-filter`).
   - Supports `--jsonl` compact structured output and integrates with `ActivityLog`.
-  - Verified with existing CLI parity suite (`test_app.py`, `test_cli_parity_p13f.py`).
+- **Cleanup and Efficiency (P6) Verified:**
+  - Duplicate-case and schema linter implemented at `tools/semantic_harness/testing/lint.py`.
+  - 17 fixture files, 116 cases checked; 0 duplicate IDs, 0 schema errors.
+  - Measured efficiency: 38.7% reduction in raw file size (47,232 bytes vs 77,109 bytes, saving ~7,469 tokens per full context read) while eliminating repetitive test boilerplate.
 
 ## Phase Status
 - **P0 — Inventory/classify:** ACCEPTED. Comprehensive baseline, classification, fixture inventory, runner mapping, and parity strategy established.
@@ -40,11 +43,13 @@
 - **P3 — Multi-turn and existing families:** ACCEPTED. 38 cases across Observatory and C0A families migrated and verified.
 - **P4 — Broad safe migration:** ACCEPTED. 31 cases across 4 behavior families migrated; imperative Lua contract tests retained and verified.
 - **P5 — Tooling integration:** ACCEPTED. Integrated with agent CLI and existing Semantic Lab tools.
-- **P6 — Cleanup and efficiency:** IN PROGRESS. Duplicate-case lint, performance/token efficiency benchmarks, legacy duplicate deduplication.
-- **P7 — End-to-end developer acceptance:** PENDING.
+- **P6 — Cleanup and efficiency:** ACCEPTED. Duplicate-case linting, token/size benchmarks, and clean test structure established.
+- **P7 — End-to-end developer acceptance:** IN PROGRESS. Full applicable test suite execution, Git diff verification, and final acceptance evidence.
 
-## Next Chunk — P6
-Cleanup and efficiency:
-1. Implement duplicate-case and schema lint across all v1 fixtures.
-2. Measure benchmark metrics: test runtime, fixture size, context/retrieval cost, and token efficiency compared to legacy tests.
-3. Verify zero regressions across all retained Lua tests, Python tests, and new fixtures.
+## Next Chunk — P7
+Complete developer-side end-to-end acceptance gates:
+1. Run full Lua smoke suite (`python3 tests/run_tests.py`) to verify zero regressions.
+2. Run full fixture lint (`python3 -m tools.semantic_harness.testing.lint`).
+3. Run complete test suites (`test_semantic_test_subsystem`, `test_pilot_parity`, `test_p3_observatory_c0a_parity`, `test_p4_behavior_parity`, `test_lint`).
+4. Audit Git status and diff against main to ensure cleanliness and policy compliance.
+5. Produce final comprehensive report detailing migrated coverage, retained imperative tests, removed duplication, performance/token measurements, commits, and user-owned native SP/MP boundary.
