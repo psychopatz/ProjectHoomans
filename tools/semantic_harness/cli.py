@@ -70,6 +70,8 @@ CLI_OPERATIONS = (
     "reset_conversation",
     "reset_actor",
     "reload_save",
+    "run_semantic_tests",
+    "semantic_test_files",
 )
 
 
@@ -475,6 +477,54 @@ def cli(arguments: argparse.Namespace) -> int:
             _print_result(report.as_dict(), arguments.jsonl)
             emit_activity()
             return 0 if report.conflicts == [] else 3
+        if arguments.run_semantic_tests or arguments.semantic_test_files:
+            from .testing.loader import discover_cases, load_cases_from_file
+            from .testing.executor import execute_case
+
+            cases = []
+            if arguments.semantic_test_files:
+                for f in arguments.semantic_test_files:
+                    cases.extend(load_cases_from_file(Path(f).resolve()))
+            else:
+                fixtures_dir = authoring_service.repository / "tools/semantic_harness/fixtures/v1"
+                cases.extend(discover_cases([fixtures_dir]))
+
+            filtered = [
+                c for c in cases
+                if c.matches_filter(
+                    suite=arguments.semantic_test_suite,
+                    pattern=arguments.semantic_test_filter,
+                )
+            ]
+            results = [
+                execute_case(
+                    c,
+                    worker_factory=lambda sc: LuaSemanticWorker(sc, **worker_kwargs),
+                )
+                for c in filtered
+            ]
+            passed = sum(1 for r in results if r.passed)
+            failed = len(results) - passed
+            report = {
+                "ok": failed == 0,
+                "passed": passed,
+                "failed": failed,
+                "total": len(results),
+                "cases": [
+                    {
+                        "id": r.case.case_id,
+                        "suite": r.case.suite,
+                        "passed": r.passed,
+                        "duration": round(r.duration, 3),
+                        "failures": [str(f) for f in r.failures],
+                        "error": r.error,
+                    }
+                    for r in results
+                ],
+            }
+            _print_result(report, arguments.jsonl)
+            emit_activity()
+            return 0 if failed == 0 else 3
         scenario = load_scenario(Path(arguments.scenario) if arguments.scenario else None)
         if arguments.language:
             scenario.setdefault("runtime", {})["language"] = arguments.language.upper()
@@ -829,6 +879,25 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--response-quality-matrix", metavar="PATH",
         help="run up to eight isolated production-Lua fixture cases from JSON",
+    )
+    parser.add_argument(
+        "--run-semantic-tests",
+        action="store_true",
+        help="run declarative semantic test fixtures through production Lua",
+    )
+    parser.add_argument(
+        "--semantic-test-file",
+        action="append",
+        dest="semantic_test_files",
+        help="specific declarative semantic test fixture file to run (repeatable)",
+    )
+    parser.add_argument(
+        "--semantic-test-suite",
+        help="filter declarative semantic tests by suite name",
+    )
+    parser.add_argument(
+        "--semantic-test-filter",
+        help="filter declarative semantic tests by substring pattern",
     )
     observatory.add_argument(
         "--response-translation-coverage", metavar="POOL_ID",
