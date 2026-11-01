@@ -93,8 +93,21 @@ def execute_case(
                 input_text = turn_spec.get("text") or turn_spec.get("input")
                 action_kind = turn_spec.get("action")
                 suggestion_frame = turn_spec.get("suggestionClick")
+                root_choice = turn_spec.get("rootChoice")
 
-                if suggestion_frame:
+                if root_choice:
+                    worker.open_conversation()
+                    view = worker.conversation_projection()
+                    choice_rows = ((view.get("presentation") or {}).get("responseChannel") or {}).get("rows") or []
+                    candidate_id = "conversation.root:menu:" + str(root_choice)
+                    matched = [
+                        row for row in choice_rows if isinstance(row, dict)
+                        and row.get("id") == candidate_id
+                    ]
+                    if len(matched) != 1:
+                        raise ValueError(f"conversation root choice '{root_choice}' unavailable")
+                    record = worker.suggestion_click(matched[0]["frame"])
+                elif suggestion_frame:
                     record = worker.suggestion_click(suggestion_frame)
                 elif action_kind == "preview" and input_text:
                     record = worker.preview(input_text)

@@ -154,5 +154,44 @@ def resolve_observation_path(turn: dict[str, Any], path: str) -> Any:
                         if tid is not None:
                             return tid
 
+    # Observatory lifecycle & translation aliases
+    if path == "conversationClosed":
+        lifecycle = (turn.get("conversationPresentation") or {}).get("lifecycle") or {}
+        return lifecycle.get("closed") is True
+
+    if path == "fallbackLookups":
+        lookups = (turn.get("translation") or {}).get("lookups") or []
+        return sum(
+            1 for item in lookups if isinstance(item, dict) and item.get("fallbackUsed") is True
+        )
+
+    if path in {"lastKey", "firstKey", "firstSemanticKey", "lastSemanticKey"}:
+        messages = [
+            msg.get("payload", {}) for msg in turn.get("messages", [])
+            if isinstance(msg, dict) and msg.get("speaker") == "npc" and isinstance(msg.get("payload"), dict)
+        ]
+        if not messages:
+            messages = [
+                msg.get("payload", {}) for msg in turn.get("messages", [])
+                if isinstance(msg, dict) and isinstance(msg.get("payload"), dict)
+            ]
+        if not messages:
+            return ABSENT
+        if path == "firstKey":
+            return messages[0].get("key") or messages[0].get("templateID", ABSENT)
+        elif path == "lastKey":
+            return messages[-1].get("key") or messages[-1].get("templateID", ABSENT)
+        elif path == "firstSemanticKey":
+            return messages[0].get("semanticTemplateID") or messages[0].get("key", ABSENT)
+        elif path == "lastSemanticKey":
+            return messages[-1].get("semanticTemplateID") or messages[-1].get("key", ABSENT)
+
+    if path == "companionCommandTransportCount":
+        transports = turn.get("transport") or []
+        return sum(
+            1 for evt in transports
+            if isinstance(evt, dict) and evt.get("command") == "CompanionCommand"
+        )
+
     # Fallback direct path navigation on turn
     return _resolve_raw_path(turn, parts)

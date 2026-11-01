@@ -117,6 +117,7 @@ def validate_turn(turn: Any, index: int, case_id: str) -> dict[str, Any]:
     input_text = turn.get("text") or turn.get("input")
     action_kind = turn.get("action")
     suggestion_frame = turn.get("suggestionClick") or turn.get("suggestion_frame")
+    root_choice = turn.get("rootChoice") or turn.get("root_choice")
     
     if input_text is not None:
         if not isinstance(input_text, str):
@@ -131,13 +132,17 @@ def validate_turn(turn: Any, index: int, case_id: str) -> dict[str, Any]:
         validated["action"] = action_kind
         if "payload" in turn:
             validated["payload"] = turn["payload"]
+    elif root_choice is not None:
+        if not isinstance(root_choice, str):
+            raise SchemaValidationError(f"{context} rootChoice must be a string")
+        validated["rootChoice"] = root_choice
     elif suggestion_frame is not None:
         if not isinstance(suggestion_frame, dict):
             raise SchemaValidationError(f"{context} suggestionClick must be an object")
         validated["suggestionClick"] = suggestion_frame
     elif input_text is None:
         raise SchemaValidationError(
-            f"{context} must specify an input ('text'/'input', 'action', or 'suggestionClick')"
+            f"{context} must specify an input ('text'/'input', 'action', 'rootChoice', or 'suggestionClick')"
         )
     
     # Optional speaker
