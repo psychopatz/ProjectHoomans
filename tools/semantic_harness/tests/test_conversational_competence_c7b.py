@@ -69,12 +69,12 @@ class ConversationalCompetenceC7BTests(unittest.TestCase):
             (
                 "do you know about the radio tower",
                 "NPC_KNOWLEDGE",
-                "I don't have reliable information about the radio tower",
+                "I don't have reliable information about that",
             ),
             (
                 "have you heard of the radio tower",
                 "NPC_KNOWLEDGE",
-                "I don't have reliable information about the radio tower",
+                "I don't have reliable information about that",
             ),
         )
         for text, subject, expected_text in cases:

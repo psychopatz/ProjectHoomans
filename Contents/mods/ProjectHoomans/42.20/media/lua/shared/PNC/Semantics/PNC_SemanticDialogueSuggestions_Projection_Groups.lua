@@ -260,20 +260,31 @@ local function buildGroups(
     -- semantic topic. Keep the first Talk surface on the landing page.
     local semanticTopicActive = currentTopic
         and tostring(currentTopic) ~= "greeting"
+    local topicGroup = semanticTopicActive and topicGroupID(currentTopic) or nil
     local requestedGroupID = context and context.activeSuggestionGroupID
     local requestedNonRootGroup = requestedGroupID
         and requestedGroupID ~= Suggestions.ROOT_GROUP_ID
+    local explicitRootRefresh = requestedGroupID == Suggestions.ROOT_GROUP_ID
+        and rootGroupID ~= nil
+        and not semanticTopicActive
+        and (context == nil
+            or context.dialogueResult == nil
+            or context.dialogueResult.accepted == false)
     local currentGroupID = requestedNonRootGroup and byID[requestedGroupID]
         and requestedGroupID
+        or explicitRootRefresh and rootGroupID
+        or currentTopic == "whats_up"
+        and byID["semantic_hub.whats_up"]
+        and "semantic_hub.whats_up"
+        or topicGroup and byID[topicGroup] and topicGroup
         -- A conversational turn owns the immediate response surface. The
         -- root landing group is navigation/fallback, so it must not hide a
         -- valid direct-response branch merely because the prior topic is the
-        -- authored greeting. Explicit non-root navigation still wins above.
+        -- authored greeting. Explicit non-root navigation and active topic
+        -- surfaces still win above.
         or byID.conversation_branch and "conversation_branch"
         or not semanticTopicActive and rootGroupID
-        or currentTopic == "whats_up"
-        and byID["semantic_hub.whats_up"]
-        and "semantic_hub.whats_up" or topicGroupID(currentTopic)
+        or topicGroupID(currentTopic)
     if not byID[currentGroupID] then
         currentGroupID = byID.conversation_branch and "conversation_branch"
             or byID.active_flow and "active_flow"

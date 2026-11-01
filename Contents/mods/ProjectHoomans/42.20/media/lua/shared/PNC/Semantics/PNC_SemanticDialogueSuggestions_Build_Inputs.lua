@@ -43,6 +43,9 @@ function Internal.PrepareSuggestionBuild(result, context, messages)
         actorConversationContext = ActorConversationContext.Build(context)
     end
 
+    if type(context) == "table" then
+        context.dialogueResult = result
+    end
     local state = {
         result = result,
         context = context,

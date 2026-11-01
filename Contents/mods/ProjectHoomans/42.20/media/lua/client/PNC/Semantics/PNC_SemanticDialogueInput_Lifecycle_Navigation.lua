@@ -261,6 +261,7 @@ function Internal.SelectSemanticRoot(view, frame, options)
     if not target then return false, "semantic_root_unknown" end
     local fromGroupID = tostring(frame.fromGroupID or "")
     if fromGroupID ~= ""
+        and options.skipPlayerReply ~= true
         and tostring(projection.currentGroupID or "") ~= fromGroupID
     then
         return false, "stale_suggestion"

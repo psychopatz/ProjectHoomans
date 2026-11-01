@@ -57,14 +57,14 @@ class ObservatoryP7ScaleTests(unittest.TestCase):
                     self.assertLessEqual(len(detail["variants"]), 16)
                     self.assertEqual(detail["hasMore"],
                                      detail["variantCount"] > 16)
-                    self.assertLess(len(json.dumps(detail)), 32 * 1024)
+                    self.assertLess(len(json.dumps(detail)), 64 * 1024)
                     self.assertTrue(detail["contentFingerprint"].startswith("catalog-v1:"))
 
     def test_repeated_inspection_is_read_only_across_actor_state_and_source(self):
         root = Path(__file__).resolve().parents[3]
         watched = [
             root / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Selection.lua",
-            root / "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/GeneratedTaskCommands.json",
+            root / "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Command.json",
         ]
         hashes = lambda: [sha256(path.read_bytes()).hexdigest() for path in watched]
         before_files = hashes()

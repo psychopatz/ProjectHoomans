@@ -110,6 +110,19 @@ local function compactObservation(context, start, turn, snapshot)
             }
         end
     end
+    local compactSuggestions = {
+        schemaVersion = suggestions.schemaVersion,
+        kind = suggestions.kind,
+        revision = suggestions.revision,
+        turnID = suggestions.turnID,
+        rootGroupID = suggestions.rootGroupID,
+        currentGroupID = suggestions.currentGroupID,
+        currentTopic = suggestions.currentTopic,
+        allowBack = suggestions.allowBack,
+        activeFlow = context.Values.copy(suggestions.activeFlow),
+        candidateCount = #(suggestions.candidates or {}),
+        groupCount = #(suggestions.groups or {}),
+    }
     local responseText = response.text
     if not responseText and turn and turn.messages then
         for index = #turn.messages, 1, -1 do
@@ -142,7 +155,7 @@ local function compactObservation(context, start, turn, snapshot)
             kind = graph and graph.graphKind or "none",
             graph = context.Values.copy(graph),
         },
-        suggestions = context.Values.copy(suggestions),
+        suggestions = compactSuggestions,
         choices = choicesFor(context.Runtime.view),
         messages = compactMessages(turn and turn.messages or {}),
         toolCalls = context.Values.copy(turn and turn.toolCalls or {}),

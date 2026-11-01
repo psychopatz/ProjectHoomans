@@ -516,7 +516,7 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         )
         self.assertEqual(
             diagnostics["rejections"][0]["patternID"],
-            "pnc.command.follow",
+            "pnc.request.fetch",
         )
         self.assertEqual(turn["dispatchTransport"], [])
         self.assertEqual(turn["toolCalls"], [])

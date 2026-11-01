@@ -168,18 +168,19 @@ class LegacySemanticAuthorityP11Tests(unittest.TestCase):
     def test_canonical_en_tl_dialogue_content_is_the_only_pnc_wording_catalog(self) -> None:
         root = PROJECT / "Contents/mods/ProjectHoomans/common/media/translation"
         for language in ("EN", "TL"):
-            content = root / language / "Conversation/Semantic/DialogueContent.json"
+            greeting = root / language / "Conversation/Greeting.json"
+            social = root / language / "Conversation/Social.json"
             semantic = root / language / "Conversation/Semantic/Responses.json"
-            for path in (content, semantic):
+            for path in (greeting, social, semantic):
                 self.assertTrue(path.exists(), str(path))
                 self.assertTrue(json.loads(path.read_text()), str(path))
             self.assertIn(
                 "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
-                json.loads(content.read_text()),
+                json.loads(greeting.read_text()),
             )
             self.assertIn(
                 "UI_PNC_Conversation_Content_SemanticEmotePlayerThumbsdownNeutral01",
-                json.loads(content.read_text()),
+                json.loads(social.read_text()),
             )
             self.assertIn(
                 "UI_PNC_Conversation_Semantic_FlowGreetingOpening",
@@ -211,35 +212,13 @@ class LegacySemanticAuthorityP11Tests(unittest.TestCase):
         self.assertIn("### P11H — no-split acceptance", progress)
         self.assertIn("Combined acceptance", progress)
 
-        prompt_scan = subprocess.run(
-            ["rg", "--files", "-g", "GOAL_PROMPT.md"],
-            cwd=PROJECT,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        executable_prompts = [
-            PROJECT / value
-            for value in prompt_scan.stdout.splitlines()
-            if value.strip()
-        ]
+        executable_prompts = list(PROJECT.rglob("GOAL_PROMPT.md"))
         self.assertEqual(
             [],
             executable_prompts,
             "historical prompts must be renamed so they cannot be mistaken for marching orders",
         )
-        historical_scan = subprocess.run(
-            ["rg", "--files", "-g", "HISTORICAL_GOAL_PROMPT.md"],
-            cwd=PROJECT,
-            check=False,
-            capture_output=True,
-            text=True,
-        )
-        historical_prompts = [
-            PROJECT / value
-            for value in historical_scan.stdout.splitlines()
-            if value.strip()
-        ]
+        historical_prompts = list(PROJECT.rglob("HISTORICAL_GOAL_PROMPT.md"))
         self.assertGreaterEqual(len(historical_prompts), 3)
         for path in historical_prompts:
             self.assertIn("HISTORICAL / DO NOT EXECUTE", path.read_text())

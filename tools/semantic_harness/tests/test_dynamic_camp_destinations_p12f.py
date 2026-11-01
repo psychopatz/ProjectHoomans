@@ -132,10 +132,8 @@ class DynamicCampDestinationsP12FTests(unittest.TestCase):
             self.assertFalse(action["accepted"])
             self.assertEqual(len(result["messages"]), 1)
             self.assertEqual(result["messages"][0]["speaker"], "npc")
-            self.assertIn(
-                "camp",
-                str(result["messages"][0]["payload"].get("text", "")).lower(),
-            )
+            payload_msg = result["messages"][0]["payload"]
+            self.assertEqual(payload_msg.get("args", {}).get("action"), "CAMP")
             self.assertEqual(action["commandID"], "camp")
             self.assertEqual(action["reason"], "camp_site_hint_stale")
             self.assertEqual(payload["campSiteHint"]["roomID"], "room-kitchen")

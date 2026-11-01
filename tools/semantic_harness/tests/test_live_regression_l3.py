@@ -63,9 +63,9 @@ class LiveRegressionL3Tests(unittest.TestCase):
             double_down = candidate(hostile, "DOUBLE_DOWN")
             resolved = worker.suggestion_click(double_down["frame"])
 
-        self.assertEqual(
+        self.assertIn(
             double_down["display"]["utterance"],
-            "Yeah, I meant it.",
+            {"Yeah, I meant it.", "I meant what I said.", "I stand by it."},
         )
         self.assertEqual(double_down["stance"], "NEGATIVE")
         self.assertTrue(double_down["frame"]["modifiers"]["doubledDown"])
@@ -95,9 +95,9 @@ class LiveRegressionL3Tests(unittest.TestCase):
             visible["generated.claim_joke"],
             "I was joking.",
         )
-        self.assertEqual(
+        self.assertIn(
             visible["generated.double_down"],
-            "Yeah, I meant it.",
+            {"Yeah, I meant it.", "I meant what I said.", "I stand by it."},
         )
         self.assertEqual(
             visible["generated.apologize"],

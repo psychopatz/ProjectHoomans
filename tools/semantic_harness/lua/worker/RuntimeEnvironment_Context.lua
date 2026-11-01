@@ -41,8 +41,16 @@ local function projectSocialProfiles(context, playerData, npcData)
     end
 
     personalityMode = tostring(npcData.personalityMode or "")
+    local hasExplicitPersonalityFields = false
+    if type(npcData.personality) == "table" then
+        for _ in pairs(npcData.personality) do
+            hasExplicitPersonalityFields = true
+            break
+        end
+    end
     personalitySource = npcData.personalityOverride == true
         or personalityMode == "override"
+        or hasExplicitPersonalityFields
     -- Scenarios written before the generated-personality mode existed remain
     -- readable as explicit legacy fixtures. New scenarios omit personality
     -- values and therefore use the generated production path by default.
@@ -84,6 +92,7 @@ local function projectSocialProfiles(context, playerData, npcData)
     context.playerTraitFingerprint = playerFingerprint
     context.npcGeneratedPersonality = npcProfile
     context.npcPersonality = npcProfile
+    npcData.personality = npcProfile
     context.npcPersonalityMode = personalitySource
         and (personalityMode ~= "" and personalityMode or "override")
         or "generated"

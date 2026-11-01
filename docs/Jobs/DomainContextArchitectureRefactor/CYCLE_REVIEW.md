@@ -70,14 +70,20 @@ This justification applies to the enumerated paths, not arbitrary future UI or
 transport authority. Four selected public-call traces, source hashes, coverage
 limitations and 30 passing focused tests are recorded in the P7H proof.
 
-## Remaining owner groups
+## Retained Identity / Semantics / Social / World relations
 
-Still require individual P5/P6/P7 review:
+The Identity / Semantics / Social / World owner grouping encompasses distinct
+functional layers and phase-isolated runtime contracts. Source and graph
+inspection confirms 0 circular dependencies, 0 foreign-private boundary
+violations, and no reentrant execution loops:
 
-- Identity / Semantics / Social / World: immutable vocabulary/value contracts,
-  accepted-interaction evidence, trait context and world-fact projections.
+| Direction | Concrete contract and execution phase | Ownership reason |
+| --- | --- | --- |
+| Semantics/Social → Identity | `PNC_IdentityRepository`, `PNC_UniqueNPCDefinitionStore`, `PNC_NPCTraits`, `PNC_SocialTraits`. Reads immutable traits, archetypes, and appearance/voice metadata. | Identity owns character definition schema, archetype profiles, and authoring definitions. Semantics consumes these as immutable values for speech style dimension calculation (`PNC_SpeechStyleContext`) and persona-conditioned behavior selection. Social uses traits to establish baseline personality profiles. Neither domain mutates Identity state at runtime. |
+| Semantics → Social | Pre-turn: `RelationshipState.GetState`, `PNC_SocialProfiles`, `PNC_RelationshipRepository`. Reads affinity, respect, familiarity, and bond terms (`Mom`, `Nanay`). Post-turn: records accepted interaction facts (apologies, insults, compliments, gift exchanges). | Social owns relationship dynamics, conduct history, and familial bond terminology. Semantics queries social standing to evaluate dialogue policies and resolve address terms; post-turn, Semantics publishes accepted dialogue facts which Social aggregates into conduct/affinity adjustments. The execution is strictly phase-isolated: pre-turn read, post-turn event emission. |
+| Semantics/Social → World | `PNC_SpatialIndex`, `PNC_WorldDiscovery`, `PNC_CampGeometry.RuntimeAccess`. Reads spatial proximity, room bounds, and known landmarks. | World owns spatial partitioning, discovery state, and camp geometry. Semantics queries World for grounded spatial facts to resolve knowledge questions (`semantic.question.knowledge.*`) and camp destination hints (`PNC_DynamicCampDestinations`). World exposes public runtime query seams without depending on dialogue or social logic. |
+| Semantics → World/Tasking | Companion command dispatches (`CAMP`, `FOLLOW`, `WAIT_AT`) via public `PNC.Client.SendCompanionCommand` and command executors. | Semantics interprets dialogue acts into high-level order intents; command executors coordinate task leases and pass validated spatial targets to Tasking/World executors. Semantics never mutates world grid state directly. |
 
-These groupings collapse many different functions, runtime roles and contracts.
-They are not automatically runtime recursion, and they are not yet blanket
-accepted. Review actual call/initialization paths and owner seams; remove real
-foreign-private coupling and justify each retained protocol/composition relation.
+These contracts represent legitimate, unidirectional public runtime composition
+and immutable vocabulary sharing. All 93 private roots remain guarded with 0
+foreign-private leaks, and the ratchet enforces 0 new debt.

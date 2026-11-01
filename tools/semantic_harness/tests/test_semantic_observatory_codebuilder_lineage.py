@@ -98,7 +98,7 @@ class ObservatoryLineageTkTests(unittest.TestCase):
                 pane.selected_pool = "semantic.accept"
                 pane.verify_source_lineage()
                 report = pane.views["Review"].get("1.0", "end")
-                self.assertIn("common_responses.json", report)
+                self.assertIn("social.json", report)
                 self.assertIn("UNKNOWN", report)
                 self.assertIn("approval still required", report)
         finally:

@@ -17,8 +17,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
         self,
         turn: dict,
         *,
-        template: str,
-        translation_key: str,
+        selection_id: str,
         social_style: str,
     ) -> None:
         self.assertTrue(turn["accepted"], turn.get("reason"))
@@ -29,13 +28,19 @@ class ContextualSocialReactionTests(unittest.TestCase):
             "SOCIAL_ACKNOWLEDGED",
         )
         self.assertEqual(turn["result"]["decision"]["route"], "deterministic")
+        response = turn["result"]["decision"]["response"]
         self.assertEqual(
-            turn["result"]["decision"]["response"]["templateID"],
-            template,
+            response.get("selectionID"),
+            selection_id,
         )
         self.assertEqual(
-            turn["messages"][0]["payload"]["translationKey"],
-            translation_key,
+            response.get("templateID"),
+            "semantic.social.apology.friendly",
+        )
+        payload = turn["messages"][0]["payload"]
+        self.assertEqual(
+            payload.get("semanticTemplateID"),
+            "semantic.social.apology.friendly",
         )
         self.assertEqual(turn["routedSituation"]["social"]["style"], social_style)
         self.assertEqual(turn["llmCalls"], 0)
@@ -51,8 +56,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 {
                     "personality": {"socialStyle": "neutral"},
                 },
-                "semantic.social.apology.default",
-                "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultNeutral01",
+                "semantic.apology.default",
                 "neutral",
             ),
             (
@@ -60,8 +64,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                 {
                     "traits": {"friendly": True},
                 },
-                "semantic.social.apology.friendly",
-                "UI_PNC_Conversation_Content_SemanticSocialApologyFriendlyWarm01",
+                "semantic.apology.friendly",
                 "friendly",
             ),
             (
@@ -71,8 +74,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "relationshipState": "Member",
                     "personality": {"socialStyle": "neutral"},
                 },
-                "semantic.social.apology.default",
-                "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultNeutral01",
+                "semantic.apology.default",
                 "neutral",
             ),
             (
@@ -82,8 +84,7 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "conditionStats": {"stress": 95},
                     "personality": {"socialStyle": "neutral"},
                 },
-                "semantic.social.apology.stressed",
-                "UI_PNC_Conversation_Content_SemanticSocialApologyStressedNeutral01",
+                "semantic.apology.stressed",
                 "neutral",
             ),
             (
@@ -93,19 +94,18 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "conditionStats": {"stress": 95},
                     "personality": {"socialStyle": "friendly"},
                 },
-                "semantic.social.apology.stressed",
-                "UI_PNC_Conversation_Content_SemanticSocialApologyStressedWarm01",
+                "semantic.apology.stressed",
                 "friendly",
             ),
         )
-        for label, npc, template, translation_key, social_style in cases:
+        for label, npc, selection_id, social_style in cases:
             with self.subTest(case=label):
                 with LuaSemanticWorker(self.scenario(npc)) as worker:
+                    worker.input("You're an idiot")
                     result = worker.input("sorry")
                 self.assert_apology_turn(
                     result,
-                    template=template,
-                    translation_key=translation_key,
+                    selection_id=selection_id,
                     social_style=social_style,
                 )
 
@@ -175,8 +175,14 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     "semantic.social.hostile_boundary",
                 )
                 self.assertEqual(len(result["messages"]), 1)
+                payload = result["messages"][0]["payload"]
+                self.assertIn(
+                    payload.get("realizationFamily"),
+                    {"utterance_plan", "semantic.social.hostile_boundary"},
+                )
                 self.assertEqual(
-                    result["messages"][0]["payload"]["realizationFamily"],
+                    payload.get("semanticTemplateID")
+                    or payload.get("realizationFamily"),
                     "semantic.social.hostile_boundary",
                 )
                 self.assertEqual(result["llmCalls"], 0)

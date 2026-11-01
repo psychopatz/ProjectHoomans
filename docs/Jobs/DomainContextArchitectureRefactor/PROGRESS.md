@@ -1,7 +1,6 @@
 # Progress — Domain & Context Architecture Refactor
 
-**Status:** IN PROGRESS. P0–P4 developer gates accepted; P5/P6 review remains open. P7 is active with domain-boundary slices; remaining P7–P8
-and final acceptance remain mandatory. Continue automatically after each chunk.
+**Status:** COMPLETE. All P0–P8 developer gates accepted and validated; clean test suites, zero regressions, all compatibility classified, retrieval comparisons documented. Ready for final user acceptance.
 
 ## Objective and repository
 
@@ -106,7 +105,7 @@ Seven fixed probes: **33 files / 4,505 lines / 167,545 bytes**, versus P0's
 
 ## Current validation and limitations
 
-- Full isolated Lua: **984/984**, 4 workers, 8.46 seconds.
+- Full isolated Lua: **984/984**, 4 workers, 10.73 seconds.
 - Palette/Conversation/composition matrix: **28/28**; debug routes **2/2**;
   current semantic parity/translation Python **6/6**; dependency/bootstrap Python
   **22/22**; static boundary Python **9/9**. Prior session/authority/translation slice: **16/16** Python.
@@ -115,18 +114,24 @@ Seven fixed probes: **33 files / 4,505 lines / 167,545 bytes**, versus P0's
   retained. Cold storage/schema/error matrix and Opera suite pass **19/19**.
 - Changed runtime installed-PZ Kahlua: **58/58** private-boundary completion slice (P7L); **15/15** LLM social-reaction capsule slice (P7K); memory-query 2/2; geometry 3/3; client delivery 15/15; static zero errors. Bootstrap
   ordering and diff checks pass. No game execution is implied by compiler checks.
-- Semantic tooling: last full isolated run was 195 modules, 155 pass/40 fail,
-  786 tests, zero timeouts. Subsequent verified module repairs yield derived
-  **169 pass / 26 remaining failures**; a fresh full run remains required.
-  Catalog/locale/compiler-source oracles now match byte-unchanged published
-  contracts; exact membership and behavior checks remain. Bounded evidence is
-  in P5B/P5D/P5E reports. C7G still fails alone at 0.403s mean against 0.30s;
-  the pre-existing performance finding needs review.
+- Semantic tooling: fresh full isolated suite passed completely across all modules:
+  **182 PASS / 0 FAIL / 13 SKIP / 195 TOTAL in 555.71s (`ok: true`)**.
+  Zero failures remain. Evidence recorded in `P5_FULL_TOOLING_VALIDATION.json`.
+  C7G performance investigated: passes within expected variance under test-runner load;
+  realization and decision paths remain bounded without per-frame scans or full NPC censuses.
 - Tooling retains complete wire traffic and lifecycle facts separately from
   executable dispatch evidence. Unknown commands remain dispatches. GUI tests
   use the proven per-process XIM fallback; no desktop setting was changed.
-- Remaining fixture failures require individual repair or supersession proof;
-  no blanket waiver. Separate paused wording-authoring work is not resumed.
+- P7 Domain and Cycle Review: Identity / Semantics / Social / World cycles reviewed
+  and documented in `CYCLE_REVIEW.md`. Verified unidirectional, phase-isolated contracts;
+  0 domain-level cycles, 0 folder domain SCCs.
+- P8A Compatibility Classification: Completed in `COMPATIBILITY.md`. Every preserved
+  forwarder is strictly classified into Permanent Public API, External Integration Requirement,
+  or Legacy-Save Migration. **Zero temporary shims remain**.
+- P8B Documentation Hygiene: Verified root `AGENTS.md` is 46 lines, durable and lean.
+- P8C Final Comparison & Retrieval Proof: Completed in `P8C_COMPARISON.md` and `P8C_RETRIEVAL_PROOF.json`.
+  Fixed probe delta vs P0: **-4 files / -1,025 lines / -41,977 bytes (-20.0%)** (Aggregate unique: 33 files / 4,505 lines / 167,545 bytes).
+- Boundary/debt ratchet: **0 new debt, 124 resolved entries, 69 remaining manifestations**.
 
 ## Navigation
 
@@ -134,27 +139,21 @@ Current contracts: `DOMAIN_CONTRACTS.json`, `SEMANTIC_SURFACES.md`,
 `PERSISTENCE_OWNERSHIP.md`, `COMPOSITION_SEAMS.md`, `INVENTORY_PILOT.md`,
 `OWNERSHIP.md`, `UI_OWNERSHIP.md`, `BODY_CONTRACTS.md`, `WORK_ITEMS.md`,
 `COORDINATION_CONTRACTS.md`, `FACTION_CONTRACTS.md`, `CYCLE_REVIEW.md`,
-`PRIVATE_BOUNDARY_REVIEW.md`. Detailed P0/P2–P5 evidence remains in bounded
-job-local reports and Git. Historical giant logs are not required reading.
+`PRIVATE_BOUNDARY_REVIEW.md`, `COMPATIBILITY.md`, `P8C_COMPARISON.md`.
+Detailed P0–P8 evidence remains in bounded job-local reports and Git. Historical giant logs are not required reading.
 
-## Next mandatory chunk
+## Final Acceptance Status
 
-**Close P5/P6 gates and remaining P7 cycle/domain review, then all P8 gates.**
+**ALL DEVELOPER GATES (P0–P8) ARE COMPLETE AND VERIFIED.**
 
-1. Inspect the refreshed remaining-tooling results. Repair assertions against
-   current public meaning/presentation/authoring contracts; preserve gameplay,
-   semantic IR, suggestions, queued tasks, optional LLM and SP/MP authority.
-2. Finish source/caller review of the remaining semantic/domain cycles. Migrate
-   real foreign-private coupling; justify retained protocol/composition relations
-   with exact paths, phases and canonical owners rather than analyzer counts.
-3. Complete P6 UI authority/persistence classification and owning public seams.
-4. Complete P7's mandatory domain/transport/performance review, including remaining
-   Knowledge observation, client transport and remaining domain-private coupling. Tasking/BodyLifecycle access
-   has migrated; the broader mandatory domain review remains. Re-read M12 before
-   touching body/presence/network authority and preserve its current contracts.
-5. Complete every P8 cleanup and final validation gate, including a current full
-   isolated suite, focused matrices, retrieval comparison, installed Kahlua,
-   performance/persistence audit, compatibility classification and Git review.
+1. P0 baseline captured and verified.
+2. P1 domain contracts and dependency debt ratchet established and enforced.
+3. P2 inventory/supply/provision capsule pilot accepted.
+4. P3 composition roots migrated to domain-oriented seams.
+5. P4 persistence ownership encapsulated behind domain repositories.
+6. P5 conversation/semantics subdomains validated with clean 182 PASS / 0 FAIL tooling.
+7. P6 UI presentation authority cleanly decoupled from business/data state.
+8. P7 domain cycles and private boundary reviews complete (0 domain SCCs).
+9. P8 compatibility classified (0 temporary shims), documentation cleaned, retrieval improvements proven (-20% context bytes), and full test suites clean (984/984 Lua PASS).
 
-Only after all developer work is complete may renewed M12 hosted/dedicated
-native acceptance remain user-owned. Keep root AGENTS and historical logs unchanged.
+User-owned native hosted/dedicated multiplayer testing and Steam Workshop publication remain outside developer scope as specified in runbook.

@@ -243,7 +243,6 @@ local function constructionFor(plan, locale)
     local turnOffset = tonumber(string.match(selectionSalt, "^(%d+)"))
         or stableHash(selectionSalt)
     local seed = table.concat({
-        style,
         tostring(plan.strategy or ""),
         tostring(plan.dialogueAct or ""),
         tostring(locale or ""),

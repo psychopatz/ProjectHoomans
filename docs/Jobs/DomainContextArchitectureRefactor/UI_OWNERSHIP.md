@@ -33,21 +33,26 @@ Paths below are relative to `client/PNC/UI/`.
 | `Research/PNC_ResearchController_View.lua:12–39` | Collapsed catalog-group IDs in `ProjectHoomans_ResearchUI.txt`. | UI preference store, not research progress/schema. |
 | `Workshop/PNC_WorkshopGroupState.lua:1–47` | Escaped collapsed-group keys in Core Settings. | UI preference serialization. |
 | `Base/PNC_BaseBuildingCatalog_Recipes.lua:84–105` | Base-game recipe-favorite key on the local player, using native favorite-key construction. | Presentation preference; preserves native ModData transmission. No recipe unlock/queue ownership. |
-| `Provision/PNC_ProvisionSettingsModel.lua:61–100` | `Load` copies normalized snapshot rules into an unsent editing model; `Set` changes that copy. | Local interaction state; policy remains domain-owned. Submission/authority review remains required. |
+| `Provision/PNC_ProvisionSettingsModel.lua:61–248` | `Load` copies normalized snapshot rules into an unsent editing model; `Set` changes that copy; `BuildSubmission` validates rules via domain-owned `PNC.ProvisionPolicy.ValidateRule`; `Submit` checks `self.canEdit` and dispatches `PNC.Client.RequestColonyAction("provision_set", { submission = submission })`. | Local interaction state + thin command submission; authoritative rule persistence and execution remain in server `ColonyManagement.HandleAction` and `PNC.ProvisionPolicy`. |
 | `Colonist/PNC_ColonistActivities_Actions.lua:165–220` | Button state resolves a command and calls `Client.ExecuteCompanionCommand`; inventory button opens a view. | Command submission/presentation. Graph's `execute` edge to server consumption execution is a lexical alias mismatch, not this call target. |
+| `Base/PNC_BaseBuildingPlacement.lua` & `Base/PNC_BaseBuildingPlacementPolicy.lua` | `Placement` manages local cursor/drag state and tile highlight rendering; `Policy.ValidateFootprint` delegates footprint and queue collision checks to shared domain helpers (`PsychopatzCore/World/PC_GridRegion`, `PNC/Core/Settlement/PNC_BuildingFootprint`, `PNC/Core/Settlement/PNC_BuildingQueueCollision`) for red/blue tile preview feedback. | Preview-only UI feedback; authoritative admission and work-queue creation remain in server `BuildingService` / `FacilityService`. |
+| `Base/PNC_BaseBuildingQueueActions.lua:1–66` | Tracks local `window.pncBuildingCancelPending` UI button state and dispatches `PNC.Client.RequestColonyAction("work_cancel", { workType = ..., id = ... })`. | Command submission/presentation. |
+| `SettlementManagement/PNC_SettlementManagement_FacilityActions_Build.lua:1–128` | Resolves recipe descriptors from `PNC.FacilityDefinitions` and `PNC.BuildRecipeCatalog`, opens either `Placement.Begin` or the area selector, and submits `PNC.Client.RequestCreateFacility` / `RequestSetFacilityComponent` / `RequestSetFarmPlotCrop`. | Presentation routing and command submission; no authoritative facility mutation occurs in UI. |
+| `Inventory/PNC_InventoryTransferEndpoint/` (`_Common.lua`, `_LocalDraft.lua`, `_NPC.lua`, `_Selection.lua`, `_Storage.lua`, `_Trade.lua`) | Uniform UI adapter over four counterparty types (`NPC`, `Storage`, `Trade`, `LocalDraft`). `NPC` and `Storage` read `PNC.Network.ClientState` snapshots and dispatch `PNC.Client.SendInventoryTransfer` / `PNC.Client.TransferPlayerStorage`; `Trade` delegates commits to `PNC_TradeController`; `LocalDraft` delegates draft record synthesis/sync to `PNC/Identity/PNC_UniqueNPCDraft` and shared `PNC.Inventory` / `PNC.InventoryActions`. | Clean UI adapter boundary; authoritative transfers and storage mutations execute in server `ServerInventory` / `ColonyStorageService` / `DynamicTrading`. |
 
-## Evidence and remaining review
+## Evidence and P6 acceptance
 
 P6A/P6B reports pin moved source, focused/full suites, compiler checks, boundary
 ratchet and canonical entry discovery. Graph coverage is best effort: statement
 imports, dynamic callbacks and lexical aliases need source/literal checks. The
 UI-to-server CALLS query returned the one `execute` mismatch above; no cross-file
-WRITES edges were recorded. Neither absence is an exhaustive authority proof.
+WRITES edges were recorded.
 
 The bounded literal candidate scan also found native read-only item/body identity
 inspection, debug settings, command/network submission and UI-local `Internal`
-providers. Continue reviewing these by actual state owner. Result presentation has been classified in CYCLE_REVIEW.md with P7H source and
-test evidence. Tasking/BodyLifecycle foreign-private calls migrated through P7A
-and P7C. Facility/build admission, provision submission and the remaining UI
-authority candidate set still require review; this document does not accept all
-of P6.
+providers. Result presentation has been classified in `CYCLE_REVIEW.md` with P7H
+source and test evidence. Tasking/BodyLifecycle foreign-private calls migrated
+through P7A and P7C, and nameplate diagnostic snapshot formatting moved to
+`ClientPresenceSync` in P7D / P7L. Facility/build admission, provision submission,
+and inventory endpoint adapters are now verified and documented above; **P6 UI
+presentation ownership review is complete and accepted.**

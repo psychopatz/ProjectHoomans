@@ -47,11 +47,16 @@ function TalkParity.Start(context, value, utterance)
         snapshot.conversationPresentation
     )
     local compactScenarioValue = compactScenario(scenario, Values)
+    local compactStartValue = Internal.compactStart(start, Values)
     local compactConfigured = compactTalkSnapshot(configured, Values)
     if type(compactConfigured.sourceSnapshot) == "table" then
         compactConfigured.sourceSnapshot.data = nil
         compactConfigured.sourceSnapshot.providerPayloads = nil
     end
+    if type(compactConfigured.workingWorld) == "table" then
+        compactConfigured.workingWorld.baseline = nil
+    end
+    compactConfigured.suggestions = nil
     compactConfigured.workingWorld = compactWorkingWorld(
         compactConfigured.workingWorld, Values
     )
@@ -61,9 +66,9 @@ function TalkParity.Start(context, value, utterance)
         type = "talk_start",
         scenario = compactScenarioValue,
         configured = compactConfigured,
-        start = start,
+        start = compactStartValue,
         turn = compactTurn(context, turn),
-        observation = compactObservation(context, start, turn, snapshot),
+        observation = compactObservation(context, compactStartValue, turn, snapshot),
         conversationPresentation = conversationPresentation,
         snapshot = snapshot,
     }

@@ -29,6 +29,9 @@ local function configureRelationships(state)
         -- registry and must not rebuild a second scenario-owned social map.
         npcData.social = type(npcData.social) == "table"
             and npcData.social or {}
+        if type(context.npcPersonality) == "table" then
+            npcData.social.personality = Values.copy(context.npcPersonality)
+        end
         npcData.social.relationships = type(npcData.social.relationships) == "table"
             and npcData.social.relationships or {}
     end

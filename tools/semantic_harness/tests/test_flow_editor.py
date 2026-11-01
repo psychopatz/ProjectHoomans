@@ -225,8 +225,8 @@ class FlowEditorTests(unittest.TestCase):
         coverage = catalog["generation"]["coverage"]
         summary = coverage_summary(coverage)
         lines = coverage_lines(coverage)
-        self.assertEqual(sum(summary.values()), 20)
-        self.assertEqual(summary["generated"], 17)
+        self.assertEqual(sum(summary.values()), 23)
+        self.assertEqual(summary["generated"], 20)
         self.assertEqual(summary["recognition_only"], 3)
         self.assertEqual(summary.get("unsupported_workflow", 0), 0)
         self.assertTrue(
@@ -336,6 +336,9 @@ class FlowEditorTests(unittest.TestCase):
                 "pnc.generated.parameterized_task.pnc.task.refill",
                 "pnc.generated.parameterized_task.pnc.task.wait.at",
                 "pnc.generated.simple_command.pnc.companion.camp",
+                "pnc.generated.simple_command.pnc.companion.combat.avoid",
+                "pnc.generated.simple_command.pnc.companion.combat.engage",
+                "pnc.generated.simple_command.pnc.companion.combat.hold",
                 "pnc.generated.simple_command.pnc.companion.follow",
                 "pnc.generated.simple_command.pnc.companion.go.home",
                 "pnc.generated.simple_command.pnc.companion.stay",

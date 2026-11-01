@@ -1,0 +1,5634 @@
+{
+  "type": "python_semantic_harness_acceptance",
+  "root": "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+  "python": "/home/psychopatz/Zomboid/Workshop/ProjectHoomans/tools/semantic_harness/.venv/bin/python",
+  "jobs": 4,
+  "timeout": 300.0,
+  "headless": true,
+  "exclusiveModules": [
+    "test_codebuilder_consolidation",
+    "test_conversational_competence_c7g",
+    "test_interaction_spec",
+    "test_semantic_authoring_compiler",
+    "test_v1_visual_authoring"
+  ],
+  "modules": [
+    {
+      "module": "tools.semantic_harness.tests.test_activity_log",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.06399762100045336,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 141567,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 0.003s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_actor_inspectors_p13c",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.1197755919993142,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 141569,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_app",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.2471629550000216,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 141571,
+      "output": "----------------------------------------------------------------------\nRan 9 tests in 0.117s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_automatic_flow_generation",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 45.69140170799983,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 141572,
+      "output": "----------------------------------------------------------------------\nRan 11 tests in 45.606s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_c0a_baseline",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.5655425230006585,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 141573,
+      "output": "----------------------------------------------------------------------\nRan 9 tests in 0.483s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_c7f_dataset_precision",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 29.68134785300026,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 141578,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 29.591s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_catalog_naming",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.05353509899941855,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 141579,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_cli_parity_p13f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 33.083634714000254,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 141580,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 33.022s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_codeblocks",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.9386707470002875,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 141585,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 6.843s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_codebuilder_consolidation",
+      "classification": "exclusive",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.8807587609999246,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 158059,
+      "output": "----------------------------------------------------------------------\nRan 9 tests in 0.765s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c10",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 19.71654491299978,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 141651,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 19.613s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c1_c2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 30.604857219999758,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 142128,
+      "output": "----------------------------------------------------------------------\nRan 8 tests in 30.507s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c3_c4",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.767381128000125,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 142189,
+      "output": "----------------------------------------------------------------------\nRan 7 tests in 12.675s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c6_c7",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 23.626368942000227,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 142560,
+      "output": "----------------------------------------------------------------------\nRan 8 tests in 23.522s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c8",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 20.741377227000157,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 142702,
+      "output": "----------------------------------------------------------------------\nRan 6 tests in 20.645s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_companion_orders_hub_p12e",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 9.032681349000086,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 142734,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 8.937s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_acceptance_c6b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.146871208999983,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 144655,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 12.030s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_actor_context_p2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.505134944999554,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 144815,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 7.394s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_baseline_matrix",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 14.37479747999987,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 145027,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 14.261s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_bonds_p8a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 35.18057404599949,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 145239,
+      "output": "----------------------------------------------------------------------\nRan 6 tests in 35.067s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_choice_provider_p8c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.610564405000332,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 145263,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 7.521s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_choice_registry_p1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.402889574000255,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 145355,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 7.311s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c0",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.482026403999953,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 145469,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 4.394s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.526156126999922,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 145473,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 7.436s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.7183662220004408,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 145853,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 2.622s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.985892644999694,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 145871,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 6.901s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.27935448900007,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 145879,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 8.190s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.300386873000207,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 145953,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 5.213s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.921769644000051,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 146002,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 6.831s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.611259851000796,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 146010,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 7.526s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.453892546999668,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 146017,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 6.364s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.5566038449997,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 146074,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 8.467s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.013340857000003,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 146081,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 5.925s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_dialogue_persona_choices_p0",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 14.086088169000504,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 146092,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 13.994s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_dynamic_trading_p5",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.507850473999497,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 146476,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 12.420s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_provider_parity_c6c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.838284905000364,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 146484,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 11.744s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_ranking_p4",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.97478771399983,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 146488,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 8.891s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_graph_p11f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.917275812999833,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 146572,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 5.757s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.0696405310000046,
+      "timedOut": false,
+      "skipCount": 2,
+      "pid": 146596,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 2.929s\n\nOK (skipped=2)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.407158843000616,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 146615,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 3.235s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 16.334085280999716,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 146616,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 16.197s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 18.38237932999982,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 146626,
+      "output": "----------------------------------------------------------------------\nRan 7 tests in 18.241s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11e",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.882057906000227,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 146637,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 5.748s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_speech_p11g",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 9.080038166999657,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 146662,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 8.977s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_scale_isolation",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.935258115000579,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 147034,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 7.849s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_semantic_hub_p10b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 23.028076771000087,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 147092,
+      "output": "----------------------------------------------------------------------\nRan 7 tests in 22.936s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p6",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.506104520000008,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 147146,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 7.407s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p8d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.245978800000557,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 147153,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 6.102s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_social_reactions",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 52.43573604700032,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 147168,
+      "output": "----------------------------------------------------------------------\nRan 12 tests in 52.351s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_speech_behavior_p8b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 49.76907469999969,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 147189,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 49.683s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_speech_style_p3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.357781967999472,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 147338,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 12.261s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_followup",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.517915052000717,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 147677,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 7.385s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_hub_presentation",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 9.591467739000109,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 147691,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 9.505s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 14.520727006000016,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 147764,
+      "output": "----------------------------------------------------------------------\nRan 6 tests in 14.431s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 22.351332016000015,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 148132,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 22.268s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 23.912736393999694,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 148277,
+      "output": "----------------------------------------------------------------------\nRan 8 tests in 23.809s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s4",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.1396198299999014,
+      "timedOut": false,
+      "skipCount": 7,
+      "pid": 148738,
+      "output": "----------------------------------------------------------------------\nRan 7 tests in 0.000s\n\nOK (skipped=7)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_whats_up",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 32.1430694820001,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 148742,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 32.054s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_talk_parity_p11j",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 53.34171509499993,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 148768,
+      "output": "----------------------------------------------------------------------\nRan 22 tests in 53.183s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_weather_gate",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 9.99391413900048,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 148795,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 9.888s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversation_compiler_p11b0",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.9288242679995165,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 148874,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 1.846s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversation_content_authority",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 21.65165566700034,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 148884,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 21.544s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversation_context_health_c5",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.6673943699997835,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 148888,
+      "output": "----------------------------------------------------------------------\nRan 8 tests in 1.576s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversation_inspector",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.87840742499975,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 149226,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 11.776s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversation_semantic_composition",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.9363433359994815,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 149371,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 1.843s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 26.180498644999716,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 149385,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 26.076s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 25.668250362000435,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 149394,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 25.571s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 34.76619360599943,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 149443,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 34.670s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 19.179244382000434,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 150350,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 19.079s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7g",
+      "classification": "exclusive",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 32.90087336600027,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 158060,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 32.828s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_dataset_adapters",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.13385160400048335,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 150351,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 0.016s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_dialogue_dataset",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.11057459500079858,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 150355,
+      "output": "----------------------------------------------------------------------\nRan 8 tests in 0.023s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_dynamic_camp_destinations_p12f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.128656872999272,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 150356,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 8.027s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_f4_semantic_lab_acceptance",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 20.765915750000204,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 150386,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 20.655s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_faction_community_workbench_p13d",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.15704625499984104,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 150478,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_fixture_provider_p12f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.6734727490002115,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 150479,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 2.577s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_flow_editor",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 16.068894625999746,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 150512,
+      "output": "----------------------------------------------------------------------\nRan 11 tests in 15.969s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_follow_action_binding",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 9.106917599000553,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 150577,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 8.994s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_gift_capability_binding",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.70768311699976,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 150725,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 8.618s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_b0",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 21.650623685999562,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151074,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 21.566s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_b2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.7709127699999954,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151086,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 2.678s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_b3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.5838287099995796,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151132,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 3.499s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_h3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.314251538999997,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151143,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 12.227s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_h4",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.25105273600002,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151147,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 11.163s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_grounded_world_knowledge_gossip",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.118782342000486,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151158,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 5.038s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_gui_saved_pair_entrypoint",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.15131426500011003,
+      "timedOut": false,
+      "skipCount": 4,
+      "pid": 151196,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nOK (skipped=4)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_harness",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 68.60066345900032,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151197,
+      "output": "----------------------------------------------------------------------\nRan 24 tests in 68.518s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_hub_diagnostics_graph_history_p10f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.9296340619994226,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 151259,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 1.789s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_interaction_spec",
+      "classification": "exclusive",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.169422126999962,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 158980,
+      "output": "----------------------------------------------------------------------\nRan 12 tests in 7.077s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_inventory_gift_workbench_p13e",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.16790058500009764,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 151263,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_kahlua_verifier",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.07886261800013017,
+      "timedOut": false,
+      "skipCount": 2,
+      "pid": 151433,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 0.003s\n\nOK (skipped=2)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_legacy_category_ownership",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.6875401670004067,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151582,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 3.592s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_legacy_semantic_authority_p11",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.37177116200018645,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151626,
+      "output": "----------------------------------------------------------------------\nRan 11 tests in 0.303s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_lexicon_compiler",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.09308857999985776,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151628,
+      "output": "----------------------------------------------------------------------\nRan 9 tests in 0.015s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_live_profiler_provider_p12g",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.9066834899995229,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151632,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 1.816s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_live_regression_l1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.306446687000062,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151646,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 11.217s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_live_regression_l2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.798910149000221,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151647,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 6.705s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_live_regression_l3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 15.656735653999931,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151654,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 15.558s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_live_regression_l4",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 22.451624833000096,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151708,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 22.363s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_live_regression_l5",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.856446524000603,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151774,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 11.758s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_missing_state_audit_p14e",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.660051636999924,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151820,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 1.564s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_modular_dataset_authoring",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.162160814999879,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152155,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 3.058s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_open_ended_semantic_combat_awareness",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.723226447000343,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152207,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 12.635s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_operational_acceptance_p13g",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 21.306252242000483,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 152225,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 21.159s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_operational_world_browser_p13a",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.1426141550000466,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 152262,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p11b_health_migration",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 10.872990331000437,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152263,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 10.762s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p11b_needs_migration",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.485261210999852,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152293,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 5.391s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p11b_social_apology_migration",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 19.558470757000578,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152651,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 19.461s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p11b_wellbeing_migration",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.284887124999841,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152700,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 7.177s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p12h_native_effect_acceptance",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.161344355000438,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152751,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 4.078s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p3b_startup_session_parity",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.13911624299998948,
+      "timedOut": false,
+      "skipCount": 4,
+      "pid": 152775,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 0.000s\n\nOK (skipped=4)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_p3c_test_isolation",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.16533884799991938,
+      "timedOut": false,
+      "skipCount": 2,
+      "pid": 152776,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK (skipped=2)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_package_boundaries",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.07924623899998551,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152777,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 0.022s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_package_entrypoint",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.19943919199977245,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152781,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 0.144s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_phase6_performance",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.09356272500008345,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152784,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_phase6_static_boundaries",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.07767208499990375,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152785,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 0.008s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_player_engine_state_p13b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.4702443859996492,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152786,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 2.392s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_portable_c6_matrix",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 10.06837130599979,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152799,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 9.954s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.9547507779998341,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152832,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 0.884s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.592112443999213,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 152837,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 11.500s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.653898247000143,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153234,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 5.571s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p4",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.334663761999764,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153238,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 5.237s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p5",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.996720899000138,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153264,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 3.902s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p6",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 13.495270918000642,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153292,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 13.403s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_r6",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.902282758000183,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153296,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 6.820s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_r9",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.139554373999999,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153300,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 4.036s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_recovery_r2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.2616020369996477,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153301,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 3.154s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_production_faction_rehydration_p14c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.395218999999997,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153351,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 8.300s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_production_inventory_rehydration_p14b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 13.707564330999958,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153355,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 13.615s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_production_leave_group_p4a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 17.908208493999155,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153400,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 17.810s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_production_mutations_p12h",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.309675122000044,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153429,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 2.220s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_production_rehydration_p14a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.619114858999637,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153787,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 7.538s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_production_social_context_p14d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.714558317999945,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153799,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 4.601s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_protocol",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.06498418600040168,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153843,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 0.003s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_python_acceptance_runner",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.1114910590004001,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153844,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 1.036s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_quest_flow_binding",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 17.41218432400001,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153871,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 17.334s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_real_save_production_runtime_p14f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 33.854960914,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153877,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 33.740s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_response_observatory",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 16.530876252999406,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153882,
+      "output": "----------------------------------------------------------------------\nRan 10 tests in 16.439s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_response_observatory_matrix",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 108.23828481300006,
+      "timedOut": false,
+      "skipCount": 2,
+      "pid": 153934,
+      "output": "----------------------------------------------------------------------\nRan 20 tests in 108.138s\n\nOK (skipped=2)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_runner",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.10627624900007504,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154396,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_runtime_config",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.06470948400055931,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154398,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 0.002s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_runtime_package",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.07859956599986617,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154399,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_save_backed_conversation_p12j",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.912582592000035,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154400,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 11.813s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_save_backed_snapshot_p12a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.1108252309995805,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154429,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 3.026s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_save_browser_p12d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.1486379770003623,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 154448,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 0.007s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_save_catalog_p12b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.07332452399987233,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154449,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 0.010s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_save_import_p12c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.234404505999919,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154450,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 3.149s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_saved_world_relationship_lens_p15b",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.13735778899990692,
+      "timedOut": false,
+      "skipCount": 3,
+      "pid": 154496,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nOK (skipped=3)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_blocks",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.6410099659997286,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154497,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 3.551s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_combat_observatory",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.178036384000734,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154547,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 4.096s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_definition_compiler",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.07479880499977298,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154555,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 0.001s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_dialogue_flows",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 23.175113350000174,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154556,
+      "output": "----------------------------------------------------------------------\nRan 8 tests in 23.083s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_identity_wellbeing_collision",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 34.11716114899991,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154611,
+      "output": "----------------------------------------------------------------------\nRan 13 tests in 33.980s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_interaction_continuation_contract",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.06722897399959038,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154621,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 0.001s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_interaction_lifecycle_acceptance",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.828502610999749,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154622,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 7.743s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_interaction_lifecycle_p1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.34785045299941,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 155047,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 12.264s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_lab_npc_profiles",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.806039170000076,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 155159,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 7.713s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_live_parity",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.06750852599998325,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 155203,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 0.001s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_observatory_codebuilder_lineage",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 10.256863178999993,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 155204,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 10.144s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_observatory_p7_scale",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.600689400999727,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 155651,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 6.510s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_observatory_translation_coverage",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.223736569999346,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 155708,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 4.136s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_paraphrases",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 19.33533796499978,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 155722,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 19.251s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_provider_parity",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.410828762000165,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 155726,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 7.320s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_scene_observatory",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.795146151000154,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 155789,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 8.693s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_scene_runtime_s8_acceptance",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.9751076009997632,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156141,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 2.868s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_simulation_ux_p10c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.013577921000433,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 156351,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 2.867s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_translation_integration",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.947043889999804,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156356,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 6.852s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_tree_projection_p10e",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.05720719500004634,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156377,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 0.001s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_shared_actor_conversation_service",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.034618218000105,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156381,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 3.946s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_simulation_workbench_p10e",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.363380541999504,
+      "timedOut": false,
+      "skipCount": 3,
+      "pid": 156434,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 3.210s\n\nOK (skipped=3)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_stateful_capability_refresh_p12g",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.362962117000279,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156435,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 4.271s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_stay_wait_at_binding",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.8513647460003995,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156448,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 7.762s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_structured_inventory_p10d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.3412363380002716,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 156488,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 3.189s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_suite",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.5419891299998199,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156502,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 0.469s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_surface_consolidation",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.13456353200035664,
+      "timedOut": false,
+      "skipCount": 5,
+      "pid": 156525,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 0.000s\n\nOK (skipped=5)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_tool_call_formatting",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.05606728199927602,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156527,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_transcript",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.05870885200056364,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156528,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 0.000s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_transport_evidence",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.2255347159998564,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156529,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 2.135s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_ui_organization",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.1359278390000327,
+      "timedOut": false,
+      "skipCount": 2,
+      "pid": 156537,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 0.000s\n\nOK (skipped=2)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_ui_state_persistence",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.13596721300018544,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 156539,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_authority_p2_event_followup",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 14.034142370000154,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156540,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 13.946s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e0",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 10.376513422000244,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156544,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 10.284s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.779853568999897,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156592,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 1.688s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.4408084329998019,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156933,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 1.344s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 10.277053415999944,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 156946,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 10.185s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e4",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 23.14680616500027,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 157011,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 23.056s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e5",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 22.42210454799988,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 157064,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 22.336s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e6",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.622919123999964,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 157075,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 6.539s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e7",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 17.52802357100063,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 157148,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 17.443s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_v1_visual_authoring",
+      "classification": "exclusive",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.94567412700053,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 159040,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 8.856s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_wellbeing_projection",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 30.162441625999236,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 157152,
+      "output": "----------------------------------------------------------------------\nRan 12 tests in 30.079s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_whats_up_semantic_response_p12h",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.8465437240001847,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 157628,
+      "output": "----------------------------------------------------------------------\nRan 2 tests in 3.756s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_worker_session",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.1599648290002733,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 157646,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 0.001s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_world_knowledge_gui",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.14966006899976492,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 157652,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 0.000s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_world_knowledge_inspector",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.815310615999806,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 157653,
+      "output": "----------------------------------------------------------------------\nRan 1 test in 1.730s\n\nOK\n",
+      "terminationReason": null
+    }
+  ],
+  "slowest": [
+    {
+      "module": "tools.semantic_harness.tests.test_response_observatory_matrix",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 108.23828481300006,
+      "timedOut": false,
+      "skipCount": 2,
+      "pid": 153934,
+      "output": "----------------------------------------------------------------------\nRan 20 tests in 108.138s\n\nOK (skipped=2)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_harness",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 68.60066345900032,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 151197,
+      "output": "----------------------------------------------------------------------\nRan 24 tests in 68.518s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_talk_parity_p11j",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 53.34171509499993,
+      "timedOut": false,
+      "skipCount": 1,
+      "pid": 148768,
+      "output": "----------------------------------------------------------------------\nRan 22 tests in 53.183s\n\nOK (skipped=1)\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_social_reactions",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 52.43573604700032,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 147168,
+      "output": "----------------------------------------------------------------------\nRan 12 tests in 52.351s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_speech_behavior_p8b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 49.76907469999969,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 147189,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 49.683s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_automatic_flow_generation",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 45.69140170799983,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 141572,
+      "output": "----------------------------------------------------------------------\nRan 11 tests in 45.606s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_contextual_bonds_p8a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 35.18057404599949,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 145239,
+      "output": "----------------------------------------------------------------------\nRan 6 tests in 35.067s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 34.76619360599943,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 149443,
+      "output": "----------------------------------------------------------------------\nRan 4 tests in 34.670s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_semantic_identity_wellbeing_collision",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 34.11716114899991,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 154611,
+      "output": "----------------------------------------------------------------------\nRan 13 tests in 33.980s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_real_save_production_runtime_p14f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 33.854960914,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 153877,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 33.740s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_cli_parity_p13f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 33.083634714000254,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 141580,
+      "output": "----------------------------------------------------------------------\nRan 3 tests in 33.022s\n\nOK\n",
+      "terminationReason": null
+    },
+    {
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7g",
+      "classification": "exclusive",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 32.90087336600027,
+      "timedOut": false,
+      "skipCount": 0,
+      "pid": 158060,
+      "output": "----------------------------------------------------------------------\nRan 5 tests in 32.828s\n\nOK\n",
+      "terminationReason": null
+    }
+  ],
+  "events": [
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_activity_log",
+      "classification": "parallel",
+      "pid": 141567,
+      "time": 1793523136.493398
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_actor_inspectors_p13c",
+      "classification": "parallel",
+      "pid": 141569,
+      "time": 1793523136.495056
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_app",
+      "classification": "parallel",
+      "pid": 141571,
+      "time": 1793523136.49715
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_automatic_flow_generation",
+      "classification": "parallel",
+      "pid": 141572,
+      "time": 1793523136.4972792
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_activity_log",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.06399762100045336,
+      "time": 1793523136.5562563
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_c0a_baseline",
+      "classification": "parallel",
+      "pid": 141573,
+      "time": 1793523136.5568361
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_actor_inspectors_p13c",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.1197755919993142,
+      "time": 1793523136.6124988
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_c7f_dataset_precision",
+      "classification": "parallel",
+      "pid": 141578,
+      "time": 1793523136.6132133
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_app",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.2471629550000216,
+      "time": 1793523136.7402182
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_catalog_naming",
+      "classification": "parallel",
+      "pid": 141579,
+      "time": 1793523136.7409384
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_catalog_naming",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.05353509899941855,
+      "time": 1793523136.7938168
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_cli_parity_p13f",
+      "classification": "parallel",
+      "pid": 141580,
+      "time": 1793523136.7945642
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_c0a_baseline",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.5655425230006585,
+      "time": 1793523137.1218612
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_codeblocks",
+      "classification": "parallel",
+      "pid": 141585,
+      "time": 1793523137.12258
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_codeblocks",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.9386707470002875,
+      "time": 1793523144.0605886
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c10",
+      "classification": "parallel",
+      "pid": 141651,
+      "time": 1793523144.0613015
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c10",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 19.71654491299978,
+      "time": 1793523163.7771957
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c1_c2",
+      "classification": "parallel",
+      "pid": 142128,
+      "time": 1793523163.778
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_c7f_dataset_precision",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 29.68134785300026,
+      "time": 1793523166.2939277
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c3_c4",
+      "classification": "parallel",
+      "pid": 142189,
+      "time": 1793523166.2948434
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_cli_parity_p13f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 33.083634714000254,
+      "time": 1793523169.8775208
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c6_c7",
+      "classification": "parallel",
+      "pid": 142560,
+      "time": 1793523169.8784518
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c3_c4",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.767381128000125,
+      "time": 1793523179.061388
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c8",
+      "classification": "parallel",
+      "pid": 142702,
+      "time": 1793523179.062125
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_automatic_flow_generation",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 45.69140170799983,
+      "time": 1793523182.1846662
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_companion_orders_hub_p12e",
+      "classification": "parallel",
+      "pid": 142734,
+      "time": 1793523182.1854537
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_companion_orders_hub_p12e",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 9.032681349000086,
+      "time": 1793523191.217425
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_acceptance_c6b",
+      "classification": "parallel",
+      "pid": 144655,
+      "time": 1793523191.218245
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c6_c7",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 23.626368942000227,
+      "time": 1793523193.5039685
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_actor_context_p2",
+      "classification": "parallel",
+      "pid": 144815,
+      "time": 1793523193.5046663
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c1_c2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 30.604857219999758,
+      "time": 1793523194.382134
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_baseline_matrix",
+      "classification": "parallel",
+      "pid": 145027,
+      "time": 1793523194.3831575
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_coherent_conversation_c8",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 20.741377227000157,
+      "time": 1793523199.8028517
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_bonds_p8a",
+      "classification": "parallel",
+      "pid": 145239,
+      "time": 1793523199.803889
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_actor_context_p2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.505134944999554,
+      "time": 1793523201.0091708
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_choice_provider_p8c",
+      "classification": "parallel",
+      "pid": 145263,
+      "time": 1793523201.0098503
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_acceptance_c6b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.146871208999983,
+      "time": 1793523203.3643794
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_choice_registry_p1",
+      "classification": "parallel",
+      "pid": 145355,
+      "time": 1793523203.3652668
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_choice_provider_p8c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.610564405000332,
+      "time": 1793523208.6197944
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c0",
+      "classification": "parallel",
+      "pid": 145469,
+      "time": 1793523208.620478
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_baseline_matrix",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 14.37479747999987,
+      "time": 1793523208.7570071
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c1",
+      "classification": "parallel",
+      "pid": 145473,
+      "time": 1793523208.75773
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_choice_registry_p1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.402889574000255,
+      "time": 1793523210.7673588
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c2",
+      "classification": "parallel",
+      "pid": 145853,
+      "time": 1793523210.7682526
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c0",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.482026403999953,
+      "time": 1793523213.1018844
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3",
+      "classification": "parallel",
+      "pid": 145871,
+      "time": 1793523213.1025777
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.7183662220004408,
+      "time": 1793523213.4858131
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3b",
+      "classification": "parallel",
+      "pid": 145879,
+      "time": 1793523213.4866009
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.526156126999922,
+      "time": 1793523216.28323
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3c",
+      "classification": "parallel",
+      "pid": 145953,
+      "time": 1793523216.2839453
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.985892644999694,
+      "time": 1793523220.0878422
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3d",
+      "classification": "parallel",
+      "pid": 146002,
+      "time": 1793523220.0886438
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.300386873000207,
+      "time": 1793523221.583689
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4a",
+      "classification": "parallel",
+      "pid": 146010,
+      "time": 1793523221.5845516
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.27935448900007,
+      "time": 1793523221.7652469
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4b",
+      "classification": "parallel",
+      "pid": 146017,
+      "time": 1793523221.7660863
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c3d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.921769644000051,
+      "time": 1793523227.0096765
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4c",
+      "classification": "parallel",
+      "pid": 146074,
+      "time": 1793523227.0103896
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.453892546999668,
+      "time": 1793523228.2192144
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4d",
+      "classification": "parallel",
+      "pid": 146081,
+      "time": 1793523228.2199707
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.611259851000796,
+      "time": 1793523229.1950154
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_dialogue_persona_choices_p0",
+      "classification": "parallel",
+      "pid": 146092,
+      "time": 1793523229.1957536
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.013340857000003,
+      "time": 1793523234.232621
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_dynamic_trading_p5",
+      "classification": "parallel",
+      "pid": 146476,
+      "time": 1793523234.2333252
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_bonds_p8a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 35.18057404599949,
+      "time": 1793523234.9835126
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_provider_parity_c6c",
+      "classification": "parallel",
+      "pid": 146484,
+      "time": 1793523234.9843597
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_conversation_c4c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.5566038449997,
+      "time": 1793523235.566349
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_ranking_p4",
+      "classification": "parallel",
+      "pid": 146488,
+      "time": 1793523235.5671463
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_dialogue_persona_choices_p0",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 14.086088169000504,
+      "time": 1793523243.2811794
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_graph_p11f",
+      "classification": "parallel",
+      "pid": 146572,
+      "time": 1793523243.2819645
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_ranking_p4",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.97478771399983,
+      "time": 1793523244.5412118
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11a",
+      "classification": "parallel",
+      "pid": 146596,
+      "time": 1793523244.5420241
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_dynamic_trading_p5",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.507850473999497,
+      "time": 1793523246.740543
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11b",
+      "classification": "parallel",
+      "pid": 146615,
+      "time": 1793523246.7413533
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_provider_parity_c6c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.838284905000364,
+      "time": 1793523246.8218744
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11c",
+      "classification": "parallel",
+      "pid": 146616,
+      "time": 1793523246.8226402
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.0696405310000046,
+      "time": 1793523247.6109297
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11d",
+      "classification": "parallel",
+      "pid": 146626,
+      "time": 1793523247.6117754
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_graph_p11f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.917275812999833,
+      "time": 1793523249.1985307
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11e",
+      "classification": "parallel",
+      "pid": 146637,
+      "time": 1793523249.1992528
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.407158843000616,
+      "time": 1793523250.1477869
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_speech_p11g",
+      "classification": "parallel",
+      "pid": 146662,
+      "time": 1793523250.1486354
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11e",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.882057906000227,
+      "time": 1793523255.0806537
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_scale_isolation",
+      "classification": "parallel",
+      "pid": 147034,
+      "time": 1793523255.081336
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_speech_p11g",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 9.080038166999657,
+      "time": 1793523259.2278984
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_semantic_hub_p10b",
+      "classification": "parallel",
+      "pid": 147092,
+      "time": 1793523259.2286246
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_scale_isolation",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.935258115000579,
+      "time": 1793523263.0159712
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p6",
+      "classification": "parallel",
+      "pid": 147146,
+      "time": 1793523263.0166423
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 16.334085280999716,
+      "time": 1793523263.156027
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p8d",
+      "classification": "parallel",
+      "pid": 147153,
+      "time": 1793523263.1567595
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_runtime_parity_p11d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 18.38237932999982,
+      "time": 1793523265.9933836
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_social_reactions",
+      "classification": "parallel",
+      "pid": 147168,
+      "time": 1793523265.9940877
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p8d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.245978800000557,
+      "time": 1793523269.4021108
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_speech_behavior_p8b",
+      "classification": "parallel",
+      "pid": 147189,
+      "time": 1793523269.4028275
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_semantic_lab_persona_p6",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.506104520000008,
+      "time": 1793523270.522138
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_speech_style_p3",
+      "classification": "parallel",
+      "pid": 147338,
+      "time": 1793523270.5229166
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_semantic_hub_p10b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 23.028076771000087,
+      "time": 1793523282.2560399
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_followup",
+      "classification": "parallel",
+      "pid": 147677,
+      "time": 1793523282.2567818
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_speech_style_p3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.357781967999472,
+      "time": 1793523282.8799877
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_hub_presentation",
+      "classification": "parallel",
+      "pid": 147691,
+      "time": 1793523282.8808272
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_followup",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.517915052000717,
+      "time": 1793523289.7740612
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s1",
+      "classification": "parallel",
+      "pid": 147764,
+      "time": 1793523289.7749
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_hub_presentation",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 9.591467739000109,
+      "time": 1793523292.471526
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s2",
+      "classification": "parallel",
+      "pid": 148132,
+      "time": 1793523292.472208
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 14.520727006000016,
+      "time": 1793523304.2948716
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s3",
+      "classification": "parallel",
+      "pid": 148277,
+      "time": 1793523304.2957535
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 22.351332016000015,
+      "time": 1793523314.8229187
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s4",
+      "classification": "parallel",
+      "pid": 148738,
+      "time": 1793523314.823629
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s4",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.1396198299999014,
+      "time": 1793523314.9626071
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_whats_up",
+      "classification": "parallel",
+      "pid": 148742,
+      "time": 1793523314.963463
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_social_reactions",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 52.43573604700032,
+      "time": 1793523318.4291873
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_talk_parity_p11j",
+      "classification": "parallel",
+      "pid": 148768,
+      "time": 1793523318.4299655
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_speech_behavior_p8b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 49.76907469999969,
+      "time": 1793523319.1712492
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_contextual_weather_gate",
+      "classification": "parallel",
+      "pid": 148795,
+      "time": 1793523319.1720862
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_s3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 23.912736393999694,
+      "time": 1793523328.2076757
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_conversation_compiler_p11b0",
+      "classification": "parallel",
+      "pid": 148874,
+      "time": 1793523328.2084033
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_weather_gate",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 9.99391413900048,
+      "time": 1793523329.1652303
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_conversation_content_authority",
+      "classification": "parallel",
+      "pid": 148884,
+      "time": 1793523329.166094
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_conversation_compiler_p11b0",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.9288242679995165,
+      "time": 1793523330.1365647
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_conversation_context_health_c5",
+      "classification": "parallel",
+      "pid": 148888,
+      "time": 1793523330.137327
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_conversation_context_health_c5",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.6673943699997835,
+      "time": 1793523331.80403
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_conversation_inspector",
+      "classification": "parallel",
+      "pid": 149226,
+      "time": 1793523331.8047903
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_conversation_inspector",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.87840742499975,
+      "time": 1793523343.6825562
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_conversation_semantic_composition",
+      "classification": "parallel",
+      "pid": 149371,
+      "time": 1793523343.6834192
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_conversation_semantic_composition",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.9363433359994815,
+      "time": 1793523345.618982
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7a",
+      "classification": "parallel",
+      "pid": 149385,
+      "time": 1793523345.6198971
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_suggestions_whats_up",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 32.1430694820001,
+      "time": 1793523347.1057484
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7b",
+      "classification": "parallel",
+      "pid": 149394,
+      "time": 1793523347.1064632
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_conversation_content_authority",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 21.65165566700034,
+      "time": 1793523350.8169541
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7c",
+      "classification": "parallel",
+      "pid": 149443,
+      "time": 1793523350.8177135
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_contextual_talk_parity_p11j",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 53.34171509499993,
+      "time": 1793523371.7709703
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7d",
+      "classification": "parallel",
+      "pid": 150350,
+      "time": 1793523371.771787
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 26.180498644999716,
+      "time": 1793523371.7995653
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_dataset_adapters",
+      "classification": "parallel",
+      "pid": 150351,
+      "time": 1793523371.8003213
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_dataset_adapters",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.13385160400048335,
+      "time": 1793523371.9334872
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_dialogue_dataset",
+      "classification": "parallel",
+      "pid": 150355,
+      "time": 1793523371.9343216
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_dialogue_dataset",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.11057459500079858,
+      "time": 1793523372.0441406
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_dynamic_camp_destinations_p12f",
+      "classification": "parallel",
+      "pid": 150356,
+      "time": 1793523372.0450985
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 25.668250362000435,
+      "time": 1793523372.774134
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_f4_semantic_lab_acceptance",
+      "classification": "parallel",
+      "pid": 150386,
+      "time": 1793523372.7748928
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_dynamic_camp_destinations_p12f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.128656872999272,
+      "time": 1793523380.1728828
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_faction_community_workbench_p13d",
+      "classification": "parallel",
+      "pid": 150478,
+      "time": 1793523380.173632
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_faction_community_workbench_p13d",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.15704625499984104,
+      "time": 1793523380.3300002
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_fixture_provider_p12f",
+      "classification": "parallel",
+      "pid": 150479,
+      "time": 1793523380.3307846
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_fixture_provider_p12f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.6734727490002115,
+      "time": 1793523383.003538
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_flow_editor",
+      "classification": "parallel",
+      "pid": 150512,
+      "time": 1793523383.004259
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 34.76619360599943,
+      "time": 1793523385.5832205
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_follow_action_binding",
+      "classification": "parallel",
+      "pid": 150577,
+      "time": 1793523385.5840864
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 19.179244382000434,
+      "time": 1793523390.9502845
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_gift_capability_binding",
+      "classification": "parallel",
+      "pid": 150725,
+      "time": 1793523390.9510643
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_f4_semantic_lab_acceptance",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 20.765915750000204,
+      "time": 1793523393.5401247
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_b0",
+      "classification": "parallel",
+      "pid": 151074,
+      "time": 1793523393.540782
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_follow_action_binding",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 9.106917599000553,
+      "time": 1793523394.6902194
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_b2",
+      "classification": "parallel",
+      "pid": 151086,
+      "time": 1793523394.6910696
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_b2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.7709127699999954,
+      "time": 1793523397.4612074
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_b3",
+      "classification": "parallel",
+      "pid": 151132,
+      "time": 1793523397.46202
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_flow_editor",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 16.068894625999746,
+      "time": 1793523399.072499
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_h3",
+      "classification": "parallel",
+      "pid": 151143,
+      "time": 1793523399.073275
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_gift_capability_binding",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.70768311699976,
+      "time": 1793523399.6580365
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_h4",
+      "classification": "parallel",
+      "pid": 151147,
+      "time": 1793523399.6587842
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_b3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.5838287099995796,
+      "time": 1793523401.0451136
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_grounded_world_knowledge_gossip",
+      "classification": "parallel",
+      "pid": 151158,
+      "time": 1793523401.0458834
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_grounded_world_knowledge_gossip",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.118782342000486,
+      "time": 1793523406.163965
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_gui_saved_pair_entrypoint",
+      "classification": "parallel",
+      "pid": 151196,
+      "time": 1793523406.1646395
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_gui_saved_pair_entrypoint",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.15131426500011003,
+      "time": 1793523406.3153408
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_harness",
+      "classification": "parallel",
+      "pid": 151197,
+      "time": 1793523406.3160825
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_h4",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.25105273600002,
+      "time": 1793523410.9091654
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_hub_diagnostics_graph_history_p10f",
+      "classification": "parallel",
+      "pid": 151259,
+      "time": 1793523410.9098752
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_h3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.314251538999997,
+      "time": 1793523411.3868313
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_inventory_gift_workbench_p13e",
+      "classification": "parallel",
+      "pid": 151263,
+      "time": 1793523411.387708
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_inventory_gift_workbench_p13e",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.16790058500009764,
+      "time": 1793523411.5548153
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_kahlua_verifier",
+      "classification": "parallel",
+      "pid": 151433,
+      "time": 1793523411.5555837
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_kahlua_verifier",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.07886261800013017,
+      "time": 1793523411.6337428
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_legacy_category_ownership",
+      "classification": "parallel",
+      "pid": 151582,
+      "time": 1793523411.634523
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_hub_diagnostics_graph_history_p10f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.9296340619994226,
+      "time": 1793523412.8388662
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_legacy_semantic_authority_p11",
+      "classification": "parallel",
+      "pid": 151626,
+      "time": 1793523412.8395867
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_legacy_semantic_authority_p11",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.37177116200018645,
+      "time": 1793523413.2107103
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_lexicon_compiler",
+      "classification": "parallel",
+      "pid": 151628,
+      "time": 1793523413.211533
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_lexicon_compiler",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.09308857999985776,
+      "time": 1793523413.30387
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_live_profiler_provider_p12g",
+      "classification": "parallel",
+      "pid": 151632,
+      "time": 1793523413.3046825
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_grounded_personal_dialogue_b0",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 21.650623685999562,
+      "time": 1793523415.19081
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_live_regression_l1",
+      "classification": "parallel",
+      "pid": 151646,
+      "time": 1793523415.1915104
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_live_profiler_provider_p12g",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.9066834899995229,
+      "time": 1793523415.2106283
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_live_regression_l2",
+      "classification": "parallel",
+      "pid": 151647,
+      "time": 1793523415.2114303
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_legacy_category_ownership",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.6875401670004067,
+      "time": 1793523415.32136
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_live_regression_l3",
+      "classification": "parallel",
+      "pid": 151654,
+      "time": 1793523415.322178
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_live_regression_l2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.798910149000221,
+      "time": 1793523422.009603
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_live_regression_l4",
+      "classification": "parallel",
+      "pid": 151708,
+      "time": 1793523422.0102808
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_live_regression_l1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.306446687000062,
+      "time": 1793523426.4973214
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_live_regression_l5",
+      "classification": "parallel",
+      "pid": 151774,
+      "time": 1793523426.498119
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_live_regression_l3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 15.656735653999931,
+      "time": 1793523430.9781756
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_missing_state_audit_p14e",
+      "classification": "parallel",
+      "pid": 151820,
+      "time": 1793523430.9789114
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_missing_state_audit_p14e",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.660051636999924,
+      "time": 1793523432.6382973
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_modular_dataset_authoring",
+      "classification": "parallel",
+      "pid": 152155,
+      "time": 1793523432.639089
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_modular_dataset_authoring",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.162160814999879,
+      "time": 1793523435.800546
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_open_ended_semantic_combat_awareness",
+      "classification": "parallel",
+      "pid": 152207,
+      "time": 1793523435.80133
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_live_regression_l5",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.856446524000603,
+      "time": 1793523438.353848
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_operational_acceptance_p13g",
+      "classification": "parallel",
+      "pid": 152225,
+      "time": 1793523438.3547995
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_live_regression_l4",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 22.451624833000096,
+      "time": 1793523444.4612935
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_operational_world_browser_p13a",
+      "classification": "parallel",
+      "pid": 152262,
+      "time": 1793523444.4620912
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_operational_world_browser_p13a",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.1426141550000466,
+      "time": 1793523444.603986
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_p11b_health_migration",
+      "classification": "parallel",
+      "pid": 152263,
+      "time": 1793523444.6047404
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_open_ended_semantic_combat_awareness",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.723226447000343,
+      "time": 1793523448.5238507
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_p11b_needs_migration",
+      "classification": "parallel",
+      "pid": 152293,
+      "time": 1793523448.5246334
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_p11b_needs_migration",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.485261210999852,
+      "time": 1793523454.0091765
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_p11b_social_apology_migration",
+      "classification": "parallel",
+      "pid": 152651,
+      "time": 1793523454.0098803
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_p11b_health_migration",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 10.872990331000437,
+      "time": 1793523455.4770606
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_p11b_wellbeing_migration",
+      "classification": "parallel",
+      "pid": 152700,
+      "time": 1793523455.4779394
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_operational_acceptance_p13g",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 21.306252242000483,
+      "time": 1793523459.6601913
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_p12h_native_effect_acceptance",
+      "classification": "parallel",
+      "pid": 152751,
+      "time": 1793523459.661065
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_p11b_wellbeing_migration",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.284887124999841,
+      "time": 1793523462.7620313
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_p3b_startup_session_parity",
+      "classification": "parallel",
+      "pid": 152775,
+      "time": 1793523462.7628636
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_p3b_startup_session_parity",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.13911624299998948,
+      "time": 1793523462.9012308
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_p3c_test_isolation",
+      "classification": "parallel",
+      "pid": 152776,
+      "time": 1793523462.9019349
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_p3c_test_isolation",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.16533884799991938,
+      "time": 1793523463.06664
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_package_boundaries",
+      "classification": "parallel",
+      "pid": 152777,
+      "time": 1793523463.067374
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_package_boundaries",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.07924623899998551,
+      "time": 1793523463.1459532
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_package_entrypoint",
+      "classification": "parallel",
+      "pid": 152781,
+      "time": 1793523463.146674
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_package_entrypoint",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.19943919199977245,
+      "time": 1793523463.345457
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_phase6_performance",
+      "classification": "parallel",
+      "pid": 152784,
+      "time": 1793523463.3461955
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_phase6_performance",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.09356272500008345,
+      "time": 1793523463.4391136
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_phase6_static_boundaries",
+      "classification": "parallel",
+      "pid": 152785,
+      "time": 1793523463.4398327
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_phase6_static_boundaries",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.07767208499990375,
+      "time": 1793523463.5168555
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_player_engine_state_p13b",
+      "classification": "parallel",
+      "pid": 152786,
+      "time": 1793523463.517612
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_p12h_native_effect_acceptance",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.161344355000438,
+      "time": 1793523463.821607
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_portable_c6_matrix",
+      "classification": "parallel",
+      "pid": 152799,
+      "time": 1793523463.8223343
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_player_engine_state_p13b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.4702443859996492,
+      "time": 1793523465.9871643
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p1",
+      "classification": "parallel",
+      "pid": 152832,
+      "time": 1793523465.9878569
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.9547507779998341,
+      "time": 1793523466.9419823
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p2",
+      "classification": "parallel",
+      "pid": 152837,
+      "time": 1793523466.942791
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_p11b_social_apology_migration",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 19.558470757000578,
+      "time": 1793523473.567711
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p3",
+      "classification": "parallel",
+      "pid": 153234,
+      "time": 1793523473.5686162
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_portable_c6_matrix",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 10.06837130599979,
+      "time": 1793523473.8900626
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p4",
+      "classification": "parallel",
+      "pid": 153238,
+      "time": 1793523473.890831
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_harness",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 68.60066345900032,
+      "time": 1793523474.916095
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p5",
+      "classification": "parallel",
+      "pid": 153264,
+      "time": 1793523474.9167616
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.592112443999213,
+      "time": 1793523478.5341663
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p6",
+      "classification": "parallel",
+      "pid": 153292,
+      "time": 1793523478.5350106
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p5",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.996720899000138,
+      "time": 1793523478.9128814
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_r6",
+      "classification": "parallel",
+      "pid": 153296,
+      "time": 1793523478.913587
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.653898247000143,
+      "time": 1793523479.2216747
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_r9",
+      "classification": "parallel",
+      "pid": 153300,
+      "time": 1793523479.22238
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p4",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 5.334663761999764,
+      "time": 1793523479.224802
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_recovery_r2",
+      "classification": "parallel",
+      "pid": 153301,
+      "time": 1793523479.2255163
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_recovery_r2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.2616020369996477,
+      "time": 1793523482.4864705
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_production_faction_rehydration_p14c",
+      "classification": "parallel",
+      "pid": 153351,
+      "time": 1793523482.4873126
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_r9",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.139554373999999,
+      "time": 1793523483.3612876
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_production_inventory_rehydration_p14b",
+      "classification": "parallel",
+      "pid": 153355,
+      "time": 1793523483.3619626
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_r6",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.902282758000183,
+      "time": 1793523485.81524
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_production_leave_group_p4a",
+      "classification": "parallel",
+      "pid": 153400,
+      "time": 1793523485.8160777
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_production_faction_rehydration_p14c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.395218999999997,
+      "time": 1793523490.8817616
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_production_mutations_p12h",
+      "classification": "parallel",
+      "pid": 153429,
+      "time": 1793523490.8825228
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_pragmatic_interaction_p6",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 13.495270918000642,
+      "time": 1793523492.0295064
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_production_rehydration_p14a",
+      "classification": "parallel",
+      "pid": 153787,
+      "time": 1793523492.0302763
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_production_mutations_p12h",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.309675122000044,
+      "time": 1793523493.1914976
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_production_social_context_p14d",
+      "classification": "parallel",
+      "pid": 153799,
+      "time": 1793523493.1921875
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_production_inventory_rehydration_p14b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 13.707564330999958,
+      "time": 1793523497.06892
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_protocol",
+      "classification": "parallel",
+      "pid": 153843,
+      "time": 1793523497.0697114
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_protocol",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.06498418600040168,
+      "time": 1793523497.1339827
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_python_acceptance_runner",
+      "classification": "parallel",
+      "pid": 153844,
+      "time": 1793523497.1348867
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_production_social_context_p14d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.714558317999945,
+      "time": 1793523497.9061184
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_quest_flow_binding",
+      "classification": "parallel",
+      "pid": 153871,
+      "time": 1793523497.9067757
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_python_acceptance_runner",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.1114910590004001,
+      "time": 1793523498.2455435
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_real_save_production_runtime_p14f",
+      "classification": "parallel",
+      "pid": 153877,
+      "time": 1793523498.2462592
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_production_rehydration_p14a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.619114858999637,
+      "time": 1793523499.6486838
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_response_observatory",
+      "classification": "parallel",
+      "pid": 153882,
+      "time": 1793523499.649395
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_production_leave_group_p4a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 17.908208493999155,
+      "time": 1793523503.7235184
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_response_observatory_matrix",
+      "classification": "parallel",
+      "pid": 153934,
+      "time": 1793523503.7242572
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_quest_flow_binding",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 17.41218432400001,
+      "time": 1793523515.3183715
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_runner",
+      "classification": "parallel",
+      "pid": 154396,
+      "time": 1793523515.3191087
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_runner",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.10627624900007504,
+      "time": 1793523515.4247181
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_runtime_config",
+      "classification": "parallel",
+      "pid": 154398,
+      "time": 1793523515.4255116
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_runtime_config",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.06470948400055931,
+      "time": 1793523515.4894998
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_runtime_package",
+      "classification": "parallel",
+      "pid": 154399,
+      "time": 1793523515.4902163
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_runtime_package",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.07859956599986617,
+      "time": 1793523515.5681596
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_save_backed_conversation_p12j",
+      "classification": "parallel",
+      "pid": 154400,
+      "time": 1793523515.568827
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_response_observatory",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 16.530876252999406,
+      "time": 1793523516.1796188
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_save_backed_snapshot_p12a",
+      "classification": "parallel",
+      "pid": 154429,
+      "time": 1793523516.1803043
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_save_backed_snapshot_p12a",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.1108252309995805,
+      "time": 1793523519.2905135
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_save_browser_p12d",
+      "classification": "parallel",
+      "pid": 154448,
+      "time": 1793523519.2913797
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_save_browser_p12d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.1486379770003623,
+      "time": 1793523519.439232
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_save_catalog_p12b",
+      "classification": "parallel",
+      "pid": 154449,
+      "time": 1793523519.440105
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_save_catalog_p12b",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.07332452399987233,
+      "time": 1793523519.5126286
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_save_import_p12c",
+      "classification": "parallel",
+      "pid": 154450,
+      "time": 1793523519.5133474
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_save_import_p12c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.234404505999919,
+      "time": 1793523522.747102
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_saved_world_relationship_lens_p15b",
+      "classification": "parallel",
+      "pid": 154496,
+      "time": 1793523522.7477472
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_saved_world_relationship_lens_p15b",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.13735778899990692,
+      "time": 1793523522.8845274
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_blocks",
+      "classification": "parallel",
+      "pid": 154497,
+      "time": 1793523522.8852928
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_blocks",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.6410099659997286,
+      "time": 1793523526.5256028
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_combat_observatory",
+      "classification": "parallel",
+      "pid": 154547,
+      "time": 1793523526.5263124
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_save_backed_conversation_p12j",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 11.912582592000035,
+      "time": 1793523527.4808047
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_definition_compiler",
+      "classification": "parallel",
+      "pid": 154555,
+      "time": 1793523527.4815803
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_definition_compiler",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.07479880499977298,
+      "time": 1793523527.555669
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_dialogue_flows",
+      "classification": "parallel",
+      "pid": 154556,
+      "time": 1793523527.556386
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_combat_observatory",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.178036384000734,
+      "time": 1793523530.7037008
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_identity_wellbeing_collision",
+      "classification": "parallel",
+      "pid": 154611,
+      "time": 1793523530.7045295
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_real_save_production_runtime_p14f",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 33.854960914,
+      "time": 1793523532.100571
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_interaction_continuation_contract",
+      "classification": "parallel",
+      "pid": 154621,
+      "time": 1793523532.101345
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_interaction_continuation_contract",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.06722897399959038,
+      "time": 1793523532.167874
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_interaction_lifecycle_acceptance",
+      "classification": "parallel",
+      "pid": 154622,
+      "time": 1793523532.1686747
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_interaction_lifecycle_acceptance",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.828502610999749,
+      "time": 1793523539.9964442
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_interaction_lifecycle_p1",
+      "classification": "parallel",
+      "pid": 155047,
+      "time": 1793523539.997205
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_dialogue_flows",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 23.175113350000174,
+      "time": 1793523550.730853
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_lab_npc_profiles",
+      "classification": "parallel",
+      "pid": 155159,
+      "time": 1793523550.7316594
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_interaction_lifecycle_p1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 12.34785045299941,
+      "time": 1793523552.3443527
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_live_parity",
+      "classification": "parallel",
+      "pid": 155203,
+      "time": 1793523552.34492
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_live_parity",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.06750852599998325,
+      "time": 1793523552.4119284
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_observatory_codebuilder_lineage",
+      "classification": "parallel",
+      "pid": 155204,
+      "time": 1793523552.4127893
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_lab_npc_profiles",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.806039170000076,
+      "time": 1793523558.5369682
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_observatory_p7_scale",
+      "classification": "parallel",
+      "pid": 155651,
+      "time": 1793523558.5377388
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_observatory_codebuilder_lineage",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 10.256863178999993,
+      "time": 1793523562.668871
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_observatory_translation_coverage",
+      "classification": "parallel",
+      "pid": 155708,
+      "time": 1793523562.6697369
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_identity_wellbeing_collision",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 34.11716114899991,
+      "time": 1793523564.8209286
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_paraphrases",
+      "classification": "parallel",
+      "pid": 155722,
+      "time": 1793523564.8217
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_observatory_p7_scale",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.600689400999727,
+      "time": 1793523565.1377263
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_provider_parity",
+      "classification": "parallel",
+      "pid": 155726,
+      "time": 1793523565.1383617
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_observatory_translation_coverage",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.223736569999346,
+      "time": 1793523566.8926883
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_scene_observatory",
+      "classification": "parallel",
+      "pid": 155789,
+      "time": 1793523566.893506
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_provider_parity",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.410828762000165,
+      "time": 1793523572.548625
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_scene_runtime_s8_acceptance",
+      "classification": "parallel",
+      "pid": 156141,
+      "time": 1793523572.5495782
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_scene_runtime_s8_acceptance",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.9751076009997632,
+      "time": 1793523575.5238082
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_simulation_ux_p10c",
+      "classification": "parallel",
+      "pid": 156351,
+      "time": 1793523575.5245674
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_scene_observatory",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.795146151000154,
+      "time": 1793523575.687917
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_translation_integration",
+      "classification": "parallel",
+      "pid": 156356,
+      "time": 1793523575.6887488
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_simulation_ux_p10c",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.013577921000433,
+      "time": 1793523578.5374532
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_semantic_tree_projection_p10e",
+      "classification": "parallel",
+      "pid": 156377,
+      "time": 1793523578.538194
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_tree_projection_p10e",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.05720719500004634,
+      "time": 1793523578.5947344
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_shared_actor_conversation_service",
+      "classification": "parallel",
+      "pid": 156381,
+      "time": 1793523578.5955265
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_shared_actor_conversation_service",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.034618218000105,
+      "time": 1793523582.6294246
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_simulation_workbench_p10e",
+      "classification": "parallel",
+      "pid": 156434,
+      "time": 1793523582.6301591
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_translation_integration",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.947043889999804,
+      "time": 1793523582.635041
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_stateful_capability_refresh_p12g",
+      "classification": "parallel",
+      "pid": 156435,
+      "time": 1793523582.6358273
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_semantic_paraphrases",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 19.33533796499978,
+      "time": 1793523584.1563342
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_stay_wait_at_binding",
+      "classification": "parallel",
+      "pid": 156448,
+      "time": 1793523584.1570897
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_simulation_workbench_p10e",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.363380541999504,
+      "time": 1793523585.9928665
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_structured_inventory_p10d",
+      "classification": "parallel",
+      "pid": 156488,
+      "time": 1793523585.9935508
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_stateful_capability_refresh_p12g",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 4.362962117000279,
+      "time": 1793523586.9980845
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_suite",
+      "classification": "parallel",
+      "pid": 156502,
+      "time": 1793523586.9988785
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_suite",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.5419891299998199,
+      "time": 1793523587.5401313
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_surface_consolidation",
+      "classification": "parallel",
+      "pid": 156525,
+      "time": 1793523587.540806
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_surface_consolidation",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.13456353200035664,
+      "time": 1793523587.674757
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_tool_call_formatting",
+      "classification": "parallel",
+      "pid": 156527,
+      "time": 1793523587.6754613
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_tool_call_formatting",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.05606728199927602,
+      "time": 1793523587.7308877
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_transcript",
+      "classification": "parallel",
+      "pid": 156528,
+      "time": 1793523587.7315874
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_transcript",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.05870885200056364,
+      "time": 1793523587.7896597
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_transport_evidence",
+      "classification": "parallel",
+      "pid": 156529,
+      "time": 1793523587.7903705
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_structured_inventory_p10d",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.3412363380002716,
+      "time": 1793523589.334171
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_ui_organization",
+      "classification": "parallel",
+      "pid": 156537,
+      "time": 1793523589.3348632
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_ui_organization",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.1359278390000327,
+      "time": 1793523589.470168
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_ui_state_persistence",
+      "classification": "parallel",
+      "pid": 156539,
+      "time": 1793523589.470894
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_ui_state_persistence",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.13596721300018544,
+      "time": 1793523589.6061993
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_unified_authority_p2_event_followup",
+      "classification": "parallel",
+      "pid": 156540,
+      "time": 1793523589.6069357
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_transport_evidence",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 2.2255347159998564,
+      "time": 1793523590.0152588
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e0",
+      "classification": "parallel",
+      "pid": 156544,
+      "time": 1793523590.015991
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_stay_wait_at_binding",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.8513647460003995,
+      "time": 1793523592.0077672
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e1",
+      "classification": "parallel",
+      "pid": 156592,
+      "time": 1793523592.0086398
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e1",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.779853568999897,
+      "time": 1793523593.787693
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e2",
+      "classification": "parallel",
+      "pid": 156933,
+      "time": 1793523593.7885642
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e2",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.4408084329998019,
+      "time": 1793523595.2285728
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e3",
+      "classification": "parallel",
+      "pid": 156946,
+      "time": 1793523595.2293196
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e0",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 10.376513422000244,
+      "time": 1793523600.391836
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e4",
+      "classification": "parallel",
+      "pid": 157011,
+      "time": 1793523600.3925507
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_unified_authority_p2_event_followup",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 14.034142370000154,
+      "time": 1793523603.6404052
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e5",
+      "classification": "parallel",
+      "pid": 157064,
+      "time": 1793523603.6411319
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e3",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 10.277053415999944,
+      "time": 1793523605.505691
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e6",
+      "classification": "parallel",
+      "pid": 157075,
+      "time": 1793523605.5064464
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_response_observatory_matrix",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 108.23828481300006,
+      "time": 1793523611.9618762
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e7",
+      "classification": "parallel",
+      "pid": 157148,
+      "time": 1793523611.9626956
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e6",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 6.622919123999964,
+      "time": 1793523612.1286776
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_wellbeing_projection",
+      "classification": "parallel",
+      "pid": 157152,
+      "time": 1793523612.1294787
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e4",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 23.14680616500027,
+      "time": 1793523623.5387104
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_whats_up_semantic_response_p12h",
+      "classification": "parallel",
+      "pid": 157628,
+      "time": 1793523623.5395675
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e5",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 22.42210454799988,
+      "time": 1793523626.0625787
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_worker_session",
+      "classification": "parallel",
+      "pid": 157646,
+      "time": 1793523626.0633292
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_worker_session",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.1599648290002733,
+      "time": 1793523626.2226121
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_world_knowledge_gui",
+      "classification": "parallel",
+      "pid": 157652,
+      "time": 1793523626.2233863
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_world_knowledge_gui",
+      "classification": "parallel",
+      "status": "SKIP",
+      "returncode": 0,
+      "elapsed": 0.14966006899976492,
+      "time": 1793523626.3723524
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_world_knowledge_inspector",
+      "classification": "parallel",
+      "pid": 157653,
+      "time": 1793523626.3732255
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_whats_up_semantic_response_p12h",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 3.8465437240001847,
+      "time": 1793523627.3853235
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_world_knowledge_inspector",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 1.815310615999806,
+      "time": 1793523628.187736
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_unified_evidence_e7",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 17.52802357100063,
+      "time": 1793523629.489966
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_wellbeing_projection",
+      "classification": "parallel",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 30.162441625999236,
+      "time": 1793523642.291184
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_codebuilder_consolidation",
+      "classification": "exclusive",
+      "pid": 158059,
+      "time": 1793523642.2921426
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_codebuilder_consolidation",
+      "classification": "exclusive",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 0.8807587609999246,
+      "time": 1793523643.1723645
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7g",
+      "classification": "exclusive",
+      "pid": 158060,
+      "time": 1793523643.1729808
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_conversational_competence_c7g",
+      "classification": "exclusive",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 32.90087336600027,
+      "time": 1793523676.0732758
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_interaction_spec",
+      "classification": "exclusive",
+      "pid": 158980,
+      "time": 1793523676.0738776
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_interaction_spec",
+      "classification": "exclusive",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 7.169422126999962,
+      "time": 1793523683.242736
+    },
+    {
+      "event": "module.started",
+      "module": "tools.semantic_harness.tests.test_v1_visual_authoring",
+      "classification": "exclusive",
+      "pid": 159040,
+      "time": 1793523683.2433548
+    },
+    {
+      "event": "module.finished",
+      "module": "tools.semantic_harness.tests.test_v1_visual_authoring",
+      "classification": "exclusive",
+      "status": "PASS",
+      "returncode": 0,
+      "elapsed": 8.94567412700053,
+      "time": 1793523692.188448
+    }
+  ],
+  "maxActiveProcesses": 4,
+  "elapsed": 555.7060059020005,
+  "summary": {
+    "PASS": 182,
+    "FAIL": 0,
+    "SKIP": 13,
+    "total": 195
+  },
+  "ok": true
+}

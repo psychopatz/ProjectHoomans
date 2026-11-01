@@ -149,6 +149,17 @@ function Realization.PhraseCoverage()
     })
 end
 
+function Realization.GetFamilyKeys()
+    local keys = {}
+    if phraseRegistry and type(phraseRegistry.PHRASE_FAMILIES) == "table" then
+        for k in pairs(phraseRegistry.PHRASE_FAMILIES) do
+            keys[#keys + 1] = tostring(k)
+        end
+    end
+    table.sort(keys)
+    return keys
+end
+
 function Realization.ResetPhraseHistory()
     for key in pairs(phraseHistory) do phraseHistory[key] = nil end
     for index = #phraseHistoryOrder, 1, -1 do phraseHistoryOrder[index] = nil end

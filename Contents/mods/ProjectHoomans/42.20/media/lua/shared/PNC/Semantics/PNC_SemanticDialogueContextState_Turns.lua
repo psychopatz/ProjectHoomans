@@ -175,6 +175,9 @@ end
 
 function Context:RecordNPCResponse(ir, options)
     options = type(options) == "table" and options or {}
+    if type(ir) == "table" and ir.confidence == nil then
+        ir.confidence = tonumber(options.confidence) or 1
+    end
     local recordOptions = {}
     local key
     local value

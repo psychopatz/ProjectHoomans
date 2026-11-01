@@ -166,8 +166,18 @@ local function applyLocalResponse(result, ir, state, context)
             and type(interactionPlan.dialogueAct) == "string"
         then
             dialogueAct = interactionPlan.dialogueAct
+            local sourcePool = result.response and result.response.sourcePoolID
+            local preserveSpecificResponse =
+                sourcePool == "semantic.question.relationship_status.acknowledged"
+                or sourcePool == "semantic.conversation.acknowledged"
+                or sourcePool == "semantic.threat"
+                or sourcePool == "semantic.refuse"
+                or sourcePool == "semantic.accept"
+                or (ir and (ir.intent == "ACKNOWLEDGE" or ir.intent == "ACCEPT")
+                    and result.response.templateID == "semantic.social.acknowledged")
             if type(interactionPlan.contentTemplateID) == "string"
                 and interactionPlan.contentTemplateID ~= ""
+                and not preserveSpecificResponse
             then
                 result.response.templateID =
                     interactionPlan.contentTemplateID

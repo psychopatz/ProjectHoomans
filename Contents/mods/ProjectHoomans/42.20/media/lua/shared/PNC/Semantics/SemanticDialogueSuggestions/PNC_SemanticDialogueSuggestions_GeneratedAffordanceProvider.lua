@@ -448,9 +448,20 @@ function Provider.collect(context)
     context = projected
     local ir = type(context.dialogueIR) == "table"
         and context.dialogueIR or {}
-    local frame = currentFrame(context)
+    local result = type(context.dialogueResult) == "table"
+        and context.dialogueResult or nil
     local scenePlan = type(context.sceneResponsePlan) == "table"
         and context.sceneResponsePlan or nil
+    if result and result.accepted == false
+        and ir.intent == nil and ir.speechAct == nil
+        and scenePlan == nil
+    then
+        return {}
+    end
+    if context.activeHubID ~= nil then
+        return {}
+    end
+    local frame = currentFrame(context)
     if ir.intent == nil and ir.speechAct == nil
         and #context.semanticEvidenceQuery.rows == 0
         and scenePlan == nil

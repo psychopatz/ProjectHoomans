@@ -37,7 +37,8 @@ local function normalizedTopic(value)
 end
 
 local function npcSocialStyle(npcID)
-    local record = Registry and Registry.Get and Registry.Get(npcID) or nil
+    local registry = PNC.Registry
+    local record = registry and registry.Get and registry.Get(npcID) or nil
     local social = record and record.social or nil
     local personality = social and social.personality
         or record and record.personality or nil
@@ -152,7 +153,8 @@ function Knowledge.Disclose(characterUUID, npcID, descriptorID, context)
         characterUUID, npcID, descriptorID, context
     )
     local descriptor = Definitions.Get(descriptorID)
-    local record = Registry and Registry.Get and Registry.Get(tostring(npcID or "")) or nil
+    local registry = PNC.Registry
+    local record = registry and registry.Get and registry.Get(tostring(npcID or "")) or nil
     if not allowed then return nil, reason end
     local truth; truth, reason = Providers.GetTruth(record, descriptor)
     if truth == nil then return nil, reason end

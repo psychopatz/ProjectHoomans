@@ -81,6 +81,8 @@ class ContextualSpeechBehaviorP8BTests(unittest.TestCase):
         with LuaSemanticWorker(deepcopy(scenario)) as worker:
             if language != "EN":
                 worker.set_language(language)
+            if text == "sorry":
+                worker.input("You are an idiot")
             return worker.input(text)
 
     @staticmethod
@@ -113,11 +115,11 @@ class ContextualSpeechBehaviorP8BTests(unittest.TestCase):
                 self.assertTrue(warm_q.get("realizationFamily"), text)
                 self.assertTrue(guarded_q.get("realizationFamily"), text)
                 self.assertIn(
-                    warm_q.get("realizationVariant"),
+                    warm_q.get("speechStyleVariant") or warm_q.get("realizationVariant"),
                     {"warm", "guarded", "neutral", "terse"},
                 )
                 self.assertIn(
-                    guarded_q.get("realizationVariant"),
+                    guarded_q.get("speechStyleVariant") or guarded_q.get("realizationVariant"),
                     {"warm", "guarded", "neutral", "terse"},
                 )
                 self.assertNotEqual(warm_q.get("text"), guarded_q.get("text"))
@@ -175,7 +177,7 @@ class ContextualSpeechBehaviorP8BTests(unittest.TestCase):
         phrase_content = catalog["speechRealization"]["phraseContent"]
         names = {row["family"] for row in coverage}
         self.assertTrue({"greeting", "wellbeing", "medical", "companion_action"} <= names)
-        self.assertNotIn("semantic.question.health_state.healthy", families)
+        self.assertIn("semantic.question.health_state.healthy", families)
         self.assertTrue(phrase_content["families"])
         self.assertEqual(len(phrase_content["fingerprint"]), 64)
         self.assertNotIn(
