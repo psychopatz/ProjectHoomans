@@ -124,7 +124,8 @@ def validate_turn(turn: Any, index: int, case_id: str) -> dict[str, Any]:
         if len(input_text) > MAX_TEXT_LENGTH:
             raise SchemaValidationError(f"{context} input text exceeds max length {MAX_TEXT_LENGTH}")
         validated["text"] = input_text
-    elif action_kind is not None:
+        
+    if action_kind is not None:
         if not isinstance(action_kind, str):
             raise SchemaValidationError(f"{context} action must be a string")
         validated["action"] = action_kind
@@ -134,7 +135,7 @@ def validate_turn(turn: Any, index: int, case_id: str) -> dict[str, Any]:
         if not isinstance(suggestion_frame, dict):
             raise SchemaValidationError(f"{context} suggestionClick must be an object")
         validated["suggestionClick"] = suggestion_frame
-    else:
+    elif input_text is None:
         raise SchemaValidationError(
             f"{context} must specify an input ('text'/'input', 'action', or 'suggestionClick')"
         )

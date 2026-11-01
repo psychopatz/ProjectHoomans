@@ -74,8 +74,9 @@ class ConflictLedger:
             return
 
         result = turn.get("result")
+        is_preview = turn.get("type") == "preview"
         sequence = result.get("sequence") if isinstance(result, dict) else None
-        if isinstance(sequence, int):
+        if isinstance(sequence, int) and not is_preview:
             if sequence <= self._previous_sequence:
                 self._record(
                     {
