@@ -2,85 +2,128 @@
 
 ## Operating goal
 
-Implement the **entire** Semantic Exhaustive Dialogue Quality Sweep described by this job: production-backed dimension discovery, semantic buckets, deterministic coverage planning, bounded resumable execution, compact per-sentence provenance, reachability, quality flags/clustering, agent/CLI review bundles, existing-Simulation UI integration, affected replay and full developer-side regression/performance acceptance.
+Complete the reopened Semantic Exhaustive Dialogue Quality Sweep after the independent audit disproved the prior P7 acceptance claim.
 
-The full parent objective is the completion boundary. Start from PROGRESS.md Next Chunk, but after accepting each chunk update progress and continue automatically through all remaining mandatory roadmap work. Do not stop after a planner, one batch, one quality rule, one GUI page or one successful defect discovery.
+The target is not merely a runnable batch system. The finished harness must truthfully discover current production surfaces/response pools, execute bounded combinations through real Lua, verify the intended surface was actually reached, preserve full persona/relationship/state provenance, expose run-level quality failures, support reliable cancel/resume, and provide a dedicated Quality Sweep workbench for human inspection.
+
+Read PROGRESS.md last and start from its Immediate Next Chunk. After each accepted chunk, update progress and continue automatically through all remaining mandatory P1–P7 remediation.
 
 ## Checkout and document order
 
-1. Work only in /home/psychopatz/Zomboid/Workshop/ProjectHoomans on existing main.
-2. Read root AGENTS.md, then this job's README.md, AGENT_RUNBOOK.md, ARCHITECTURE.md, QUALITY_RUBRIC.md, HARNESS_ACCEPTANCE.md, ROADMAP.md, AUDIT.md, and **PROGRESS.md last**.
-3. Read relevant current authority docs from:
-   - docs/Jobs/SemanticTestSubsystem/
-   - docs/Jobs/SemanticObservatoryDialogueQuality/
-   - active semantic architecture jobs only as needed for real runtime ownership.
-4. Before writes inspect actual branch/HEAD/status/worktrees and origin/main. At job creation local main was 17 commits ahead of origin; preserve unpublished/user/agent history. Never reset, rebase, auto-stash, blind-pull, force-push or create a new branch.
-5. Do not push remote Git history unless explicitly authorized by the user/standing repository workflow. Never Workshop-publish.
+1. Work only in `/home/psychopatz/Zomboid/Workshop/ProjectHoomans` on existing `main`.
+2. Read root `AGENTS.md`, then this job's:
+   - README.md
+   - AGENT_RUNBOOK.md
+   - ARCHITECTURE.md
+   - GUI_WORKBENCH.md
+   - QUALITY_RUBRIC.md
+   - HARNESS_ACCEPTANCE.md
+   - ROADMAP.md
+   - AUDIT.md
+   - **PROGRESS.md last**
+3. Read current Semantic Test Subsystem and Semantic Observatory docs as authority dependencies.
+4. Inspect branch/HEAD/status/worktrees/upstream before writes. Preserve unrelated or uncertain changes.
+5. Never reset/rebase/auto-stash/blind-pull/force-push/create a branch.
+6. Do not Workshop-publish.
+
+## Critical audit corrections
+
+Do not trust the previous `COMPLETE` wording.
+
+Specifically:
+
+- a completed worker request does not prove the planned surface was reached;
+- current root-choice names must be discovered/verified from production;
+- evidence must use current Inspector actor-context paths;
+- trait option objects must normalize to canonical values;
+- response-pool reachability must paginate the full registry;
+- cancellation must be resumable;
+- quality analysis must include cross-row duplicates/repetition;
+- a `lazy=true` trace marker is not a functional inspector resolver;
+- synthetic rows do not satisfy end-to-end acceptance.
 
 ## Reuse rules
 
-- Extend tools/semantic_harness/testing/; do not create a competing runner.
-- Reuse LuaSemanticWorker, existing fixture scenario/session, Response Observatory, Conversation Inspector, source lineage and Simulation.
-- Production Lua decides semantic selection/flow/realization. Python may plan contexts, project evidence and flag text; it may not become the semantic oracle.
-- Use worker control/persona catalogs as the default dimension source. Add explicit adapters only when a production-backed scenario dimension cannot be represented generically.
-- Keep the existing <=64 expansion/batch safety boundary unless measured evidence and an explicit design revision justify a different cap.
-- Preserve existing quality-matrix/fuzz utilities when they retain distinct bounded acceptance roles.
+- Extend existing `tools/semantic_harness/testing/`.
+- Reuse `LuaSemanticWorker`, fixture scenario/session, Response Observatory, Conversation Inspector and source lineage.
+- Production Lua owns semantic behavior.
+- Python may discover/plan contexts, compare planned vs reached routes, project evidence and evaluate text quality. It may not become a semantic oracle.
+- Maintain bounded batch execution and explicit caps.
 
-## Implementation discipline
+## GUI ownership
 
-- Build machine-readable services first; GUI consumes the same services.
-- Keep deterministic case identity and catalog/source fingerprints from the start.
-- Treat full sweep as complete declared semantic bucket/coverage strategy execution, not an unbounded float/world Cartesian product.
-- Store compact evidence rows; full traces are lazy/replayed.
-- Generated run artifacts go to a gitignored path outside watched media and source saves.
-- Every quality heuristic has positive and negative controls and a confidence class. Do not turn subjective style preferences into gameplay rules.
-- Relationship/family/perspective flags must use semantic/context evidence where available.
-- LLM review is optional developer tooling. Project Zomboid runtime must remain fully offline/deterministic.
-- LLM content proposals cannot alter plans/actions/authority/eligibility unless explicitly approved as a behavior change.
-- Quality Sweep GUI belongs under Simulation only. Do not resurrect duplicate Studio testing/coverage surfaces.
+Implement a dedicated top-level **Quality Sweep** workspace in the existing Semantic Harness.
 
-## Validation loop
+- Simulation remains live/single-scenario interaction.
+- Quality Sweep owns broad batch coverage/review.
+- Studio remains authoring.
 
-For every coherent chunk:
+The GUI must consume `DialogueQualitySweepService` or its evolved shared service API. Do not create a separate GUI runner.
 
-1. define production-backed observable behavior and negative controls;
-2. implement narrowly;
-3. run focused unit tests;
-4. run real-worker integration/parity relevant to the chunk;
-5. inspect output bounds and reproducibility;
-6. update PROGRESS.md current truth;
-7. continue to the next mandatory chunk.
+The current Simulation Quality Sweep sub-tab may be migrated or reduced to a launcher/summary. Do not maintain two full interfaces.
 
-Use current repository toolchain conventions. Prefer tools/semantic_harness/.venv/bin/python where Tk/Python 3.12 is required. Do not hide slow/failing tests behind larger blanket timeouts.
+Long-running execution must not block Tk. Use a safe background worker/event queue and marshal UI updates onto the Tk thread.
+
+## Validation discipline
+
+For each chunk:
+
+1. define the production-backed observable;
+2. add negative controls;
+3. implement narrowly;
+4. run focused unit tests;
+5. run real-worker integration;
+6. inspect actual output—not only exit status;
+7. verify planned surface vs reached surface;
+8. update PROGRESS.md;
+9. continue to next mandatory chunk.
+
+A test named “real worker” is insufficient if its crucial defect evidence is still synthetic.
+
+## Acceptance evidence discipline
+
+Use precise categories:
+
+- real production Lua;
+- production-backed replay fixture;
+- synthetic/unit-only;
+- GUI hermetic;
+- static-only.
+
+Never describe synthetic dictionaries as real production-Lua demonstrations.
+
+For contrast claims, assert the contrast itself. Merely asserting that both outputs exist is not acceptance.
 
 ## Git/document discipline
 
-- Modify only this job docs and code/tests genuinely required by this goal.
-- Do not modify root AGENTS.md unless a repository-wide durable rule truly changes.
+- Keep root AGENTS.md lean and unchanged unless a repository-wide durable rule changes.
 - Do not create checked-in GOAL_PROMPT.md.
-- Keep PROGRESS.md current-state-only; replace stale narrative rather than append chronology.
-- Commit coherent accepted chunks locally after verifying status/ownership.
-- Preserve unrelated local work and unpublished commits.
+- PROGRESS.md is current truth, not chronology.
+- Commit coherent accepted work locally after checking status.
+- Push only when explicitly authorized by current workflow/user.
+- Preserve the README workbench direction already present at audit time.
 
 ## Stop conditions
 
 Stop only when:
 
-1. the complete developer-side ROADMAP and HARNESS_ACCEPTANCE gates are satisfied; or
-2. a genuine authorization/scope/technical blocker prevents further safe work after independently implementable work is completed; or
-3. only explicitly user-owned native SP/MP acceptance remains.
+1. all reopened ROADMAP and HARNESS_ACCEPTANCE gates pass; or
+2. a genuine blocker prevents safe further work after all independent work is exhausted; or
+3. only explicitly user-owned native acceptance remains.
 
-A phase completion, passing focused test, generated report, or found bad sentence is not a stop condition.
+Do not stop because a phase test file passes, the GUI renders, a large sweep completes, or a cluster is found.
 
 ## Final report
 
 Report:
 
-- parent-goal status;
-- implemented services/surfaces;
-- exact evidence and test counts;
-- coverage strategy and measured case/batch performance;
-- known limitations and honest untested categories;
-- commit(s);
-- whether anything was pushed;
-- explicit statement that native PZ/source saves/Workshop were not touched unless separately authorized.
+- parent status;
+- planned vs reached surface coverage;
+- full pool/variant enumeration totals;
+- real demonstration evidence;
+- cancel/resume evidence;
+- GUI responsiveness/feature evidence;
+- regression counts;
+- performance/storage measurements;
+- commits and publication state;
+- any honest untested categories.

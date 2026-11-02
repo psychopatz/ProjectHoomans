@@ -20,7 +20,8 @@ A developer or agent can:
 6. filter and cluster likely defects such as one-word fragments, unsupported family/intimacy terms, wrong perspective, placeholder leaks, repetitive/generic wording, and tone/voice mismatches;
 7. export bounded JSONL/cluster bundles suitable for LLM review without dumping full inspector traces;
 8. rerun only affected clusters/cases after a content fix, then run broader regression;
-9. use the same services from headless CLI and the existing Semantic Lab **Simulation** surface.
+9. use the same services from headless CLI, Simulation, and a dedicated **Quality Sweep** workbench in the Semantic Harness;
+10. browse the production surface/pool/variant inventory, coverage gaps, evidence rows, quality clusters, and rerun status without reading raw JSON files.
 
 ## Existing systems to reuse
 
@@ -30,7 +31,8 @@ A developer or agent can:
 - Simulation control/persona catalogs exposed by the worker for production-backed context dimensions.
 - Conversation Inspector for semantic, persona, authority, response and effect joins.
 - Existing CodeBuilder/Dialogue Content/source-lineage contracts for canonical ownership.
-- Existing Simulation GUI as the only execution/testing workbench.
+- Existing Simulation GUI for single-scenario/live interaction work.
+- Dedicated Semantic Harness **Quality Sweep** workbench for broad batch coverage and dialogue-quality review. It must consume the same sweep services and must not become a second runner.
 
 ## Documents
 
@@ -38,11 +40,12 @@ Read in this order after root AGENTS.md:
 
 1. AGENT_RUNBOOK.md
 2. ARCHITECTURE.md
-3. QUALITY_RUBRIC.md
-4. HARNESS_ACCEPTANCE.md
-5. ROADMAP.md
-6. AUDIT.md
-7. PROGRESS.md **last**
+3. GUI_WORKBENCH.md
+4. QUALITY_RUBRIC.md
+5. HARNESS_ACCEPTANCE.md
+6. ROADMAP.md
+7. AUDIT.md
+8. PROGRESS.md **last**
 
 PROGRESS.md is current execution truth. ROADMAP.md defines the full mandatory developer-side objective.
 

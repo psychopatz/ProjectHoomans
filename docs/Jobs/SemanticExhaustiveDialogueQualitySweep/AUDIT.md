@@ -1,117 +1,132 @@
 # Audit — Semantic Exhaustive Dialogue Quality Sweep
 
-## Audited repository state
+## Post-implementation acceptance audit
 
-Audit basis: local ProjectHoomans main at 3b597b97273f91d819127c76f3cd8f29de110719.
+Audit baseline: ProjectHoomans `5af171b079b9652fd1b8c2ef64c18b5bfd07ccab`.
 
-At planning time the worktree was clean. After an explicit fetch, local main was **17 commits ahead of origin/main and 0 behind**. This job must preserve that unpublished local history and must not reset/rebase/overwrite it.
+The implementation is substantial and preserves the old semantic system, but the prior developer-complete claim is not supported by real acceptance evidence.
 
-No production code, save, native Project Zomboid runtime or Workshop publication was modified during this audit.
+## Verified healthy foundation
 
-## Verified existing foundation
+The audit reran:
 
-### 1. Canonical Semantic Test Subsystem already exists
+- new sweep suite: **32/32 PASS**;
+- Lua semantic regression: **144/144 PASS**;
+- focused Semantic Test Subsystem/parity set: **27/27 PASS**;
+- Response Observatory set: **30/30 PASS**;
+- Quality Sweep Tk/Xvfb test file: **4/4 PASS**.
 
-tools/semantic_harness/testing/ owns the reusable JSON fixture schema, projection, comparator, loader, executor, CLI and linting. Its completed job records production-worker execution and broad fixture migration. This new goal must extend it rather than create another harness.
+This establishes that the agent added real code without obviously regressing existing semantics.
 
-The generic matrix schema already supports deterministic expansion and rejects expansion above MAX_MATRIX_EXPANSIONS = 64 for one declared fixture case.
+## Verified acceptance defects
 
-loader.py already supports direct injection of language, weather, arbitrary scenario.* paths, and preserves other matrix values under scenario.matrix.
+### A. Stale hard-coded interaction surfaces
 
-### 2. Response Observatory already executes real production Lua
+Current planner default root-choice names do not match the current live root projection.
 
-tools/semantic_harness/inspection/response_observatory.py runs isolated cases through LuaSemanticWorker and joins the Conversation Inspector. Its current quality-matrix contract is intentionally small:
+A real conversation projection showed choices such as `ask_name`, `recruit`, `goodbye`, `whats_up`, and `companion.orders:open`.
 
-- MAX_CASES = 8
-- MAX_UTTERANCES = 4
+A real smoke sweep nevertheless counted stale `wellbeing`, `orders`, `companion_status`, and `trade` cases as completed after they fell into clarification.
 
-It reports final response keys/text, semantic response keys, effects, command/transport outcome, translation fallback evidence and PASS/FAIL/OBSERVED state.
+**Impact:** the harness can report green coverage without exercising the target semantic feature.
 
-This is a bounded acceptance utility, not yet a broad dialogue-quality exploration engine.
+### B. Full plan is badly distributed
 
-### 3. Input fuzzing exists but solves a different problem
+A 256-case full plan contained:
 
-tools/semantic_harness/testing/conversation_fuzz.py is a bounded real-worker input mutation matrix (MAX_CASES = 32) focused on NLU robustness such as compact profanity, typos, punctuation and unsafe item fuzziness.
+- 240 parameterized root-choice cases;
+- 0 parameterized utterance cases;
+- 221 cases on `scenario.rootChoice:wellbeing`.
 
-It does not enumerate response/persona/relationship state space or perform prose-quality review.
+Because that surface is stale in the observed root menu, this makes the main broad-combination strategy misleading.
 
-### 4. Production-backed context dimensions are already discoverable
+### C. Evidence projection reads outdated paths
 
-The worker Simulation control catalog exposes real controls rather than requiring a new hard-coded test vocabulary. Verified examples include:
+Real Conversation Inspector data exposes relationship/personality/traits/situation under `personaChoices.actorConversationContext` and related social-context structures.
 
-- player and NPC hunger, thirst, fatigue, stress, boredom and panic;
-- NPC traits and generated-personality override mode;
-- production social-style enum and numeric personality dimensions;
-- relationship approval, respect, familiarity, identity trust and derived relationship state;
-- durable bond kind;
-- actor authority flags;
-- health/current behavior and other scenario fields already present in the runtime scenario.
+The compact evidence row for a real `how are you?` turn returned empty persona/state and missing relationship values.
 
-The default scenario already carries distinct player/NPC needs, NPC health/body state, active behavior, identity/archetype/traits, relationship state and actor authority.
+**Impact:** exactly the parameters needed to explain bad dialogue are absent from the output the LLM/user is supposed to review.
 
-### 5. Existing inspectors already expose much of the required “why”
+### D. Trait options are malformed
 
-conversation_inspector_persona.py already exposes:
+Production trait options are structured objects with canonical IDs. Current extraction stringifies the object.
 
-- semanticTemplateID
-- renderTemplateID
-- realizationFamily
-- realizationVariant
-- fallbackReason
-- translationKey
-- familyAddress
-- durable bond context
-- bounded semantic frame
-- speech-style and actor conversation context
+**Impact:** trait sweep inputs are not trustworthy.
 
-response_turn_trace.py already exposes:
+### E. Reachability covers only first 64 pools
 
-- final rendered text
-- semantic variant ID
-- phrase ID
-- translation key
-- exact selected registered variant when verifiable
-- registered variant matches and selection provenance
-- bounded translation and effect/authority evidence
+Production reported:
 
-The missing work is orchestration and aggregation, not raw observability from scratch.
+- `total = 234`;
+- `returned = 64`;
+- `hasMore = true`.
 
-## Verified gaps
+Current reachability code does not paginate.
 
-The current system does **not** yet provide:
+**Impact:** the reachability report covers only a minority of production pools while appearing comprehensive.
 
-1. automatic discovery and normalization of all sweep-worthy context dimensions;
-2. semantic bucket policies for numeric controls/thresholds;
-3. pairwise/boundary/persona/full-bounded coverage planning;
-4. automated variant-selection reachability exploration;
-5. large-run deterministic batching/resume over the existing <=64 case safety boundary;
-6. a compact per-rendered-sentence evidence schema designed for tens of thousands of rows;
-7. lazy rerun/full-inspector expansion from a compact row;
-8. systematic dialogue-quality flags for fragments, unsupported relationship/family terms, perspective suspicion, placeholder/key leaks, repetition and generic/robotic wording;
-9. clustering of many bad executions back to one canonical response/phrase/source defect;
-10. LLM-oriented bounded review bundles and affected-case rerun;
-11. a single existing-Simulation GUI surface for planning/running/filtering these sweeps.
+### F. Reachability does not perform the required frontier search
 
-## Main design risk: combinatorial explosion
+Non-selected variants are primarily checked against one baseline selection explanation.
 
-A literal Cartesian product of every trait, personality slider, relationship metric, need, health value, language, flow and response is neither useful nor bounded. Numeric sliders alone make an exhaustive product effectively unbounded.
+**Impact:** `ELIGIBLE_NOT_SELECTED` / `TESTED_INELIGIBLE` classifications are not a systematic search over approved context buckets.
 
-The required interpretation of “all possible combinations” is therefore:
+### G. Cancel/resume is broken
 
-> Systematically cover all **declared semantic buckets, boundaries, registered variants/surfaces and meaningful interactions between dimensions**, using deterministic coverage strategies and bounded restartable batches, while clearly reporting what was and was not covered.
+Direct reproduction:
 
-The system must never label a variant globally unreachable merely because it was not selected in a finite tested matrix.
+- cancel before execution → manifest `CANCELLED`, batch `CANCELLED`;
+- run again → still `CANCELLED`, 0 completed.
 
-## Quality risk: false mechanical judgments
+**Impact:** the restartable batch requirement is not met.
 
-Natural dialogue cannot be fully judged by string rules. Deterministic checks should identify high-confidence defects or review candidates; subjective properties such as post-apocalyptic enough, bland, robotic, voice mismatch or subtle perspective error remain LLM/human review categories unless production semantics prove them.
+### H. Run-level repetition analysis is absent
 
-The “family” example is especially useful as a target class: the harness should surface a one-word family/intimacy response, show familyAddress/bond/semantic context, and flag unsupported family/relationship use when context does not justify it. It should not hard-code that exact text as the only defect.
+Multiple real smoke cases rendered the same clarification fallback. Cluster report returned 0 flagged rows / 0 clusters.
 
-## Recommendation
+**Impact:** one of the user's primary complaints—robotic/repetitive dialogue—can pass cleanly.
 
-Build one **Dialogue Quality Sweep** orchestration layer on top of the completed Test Subsystem + Observatory:
+### I. Lazy inspector handle is non-functional
 
-discover → plan → deterministic batches → production Lua → compact evidence → quality flags → canonical-source clusters → bounded LLM review → affected rerun → regression.
+Evidence rows contain a marker but no service/UI resolver.
 
-Do not redesign the semantic architecture to accomplish this.
+**Impact:** the user/LLM cannot expand a compact row into the promised full explanation.
+
+### J. P7 demonstrations overclaim real evidence
+
+Key family, perspective and clustering checks use synthetic row dictionaries. Other assertions check only existence rather than the claimed contrast/change.
+
+**Impact:** the prior 10-scenario acceptance statement is not valid.
+
+### K. UI is only a partial workbench
+
+The current Simulation sub-tab exists and renders, but lacks the full promised scope/inventory browsing, rich filters, full-inspector/source navigation, and safe responsive long-run execution.
+
+The controller runs sweeps synchronously from the Tk callback.
+
+**Impact:** large runs can block the GUI and make cancel unreliable.
+
+## User-directed architecture expansion
+
+The user now explicitly wants a dedicated GUI for checking the broad sweep.
+
+Approved direction:
+
+- add a first-class **Quality Sweep** workspace inside the existing Semantic Harness;
+- use the same shared services as CLI;
+- browse surfaces, dimensions, pools/variants, coverage gaps, evidence and clusters;
+- support plan/run/cancel/resume/filter/inspect/source/replay/export;
+- keep Simulation for one-scenario/live testing;
+- keep Studio for authoring;
+- do not create a second semantic engine or runner.
+
+See `GUI_WORKBENCH.md`.
+
+## Correct next step
+
+Fix evidence/surface truth first, then build the dedicated GUI on those corrected services.
+
+The recovery sequence is:
+
+`evidence join + option normalization → live surface discovery + reached-surface verification → resume repair → full registry/reachability → run-level quality → dedicated GUI → real P7 acceptance`.

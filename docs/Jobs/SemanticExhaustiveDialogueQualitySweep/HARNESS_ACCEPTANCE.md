@@ -1,161 +1,203 @@
 # Acceptance — Semantic Exhaustive Dialogue Quality Sweep
 
-No phase passes on a planner-only JSON file or mocked Python selector. Newly implemented behavior must be exercised through the existing production Lua worker and current Semantic Test/Observatory contracts.
+The prior developer-complete claim is revoked. Passing unit scaffolding is not enough: required behavior must be proven through the current production Lua worker, current Inspector contracts and the dedicated Quality Sweep workflow.
 
 ## A. Baseline and reuse
 
-- Record exact ProjectHoomans/Core revisions and relevant worker/catalog fingerprints.
-- Existing Semantic Test Subsystem, Observatory, Conversation Inspector and Simulation remain authoritative; no second harness/selector/registry/GUI application is introduced.
-- Existing focused test families remain green before claiming new acceptance.
+- Record exact ProjectHoomans/Core revisions and relevant catalog/registry fingerprints.
+- Existing Semantic Test Subsystem, Observatory, Conversation Inspector and production Lua remain authoritative.
+- No second semantic selector/runner/registry is introduced.
+- Existing focused regressions remain green.
 
-## B. Dimension discovery
+## B. Dimension and surface discovery
 
-- Planner discovers sweepable controls from the worker's current control/persona catalogs and records their production source.
-- Enum/multi-select/numeric/boolean controls are normalized correctly.
-- Read-only derived fields are never mutated as inputs.
-- Conditional controls such as generated personality override respect their prerequisites.
-- Unknown/unsupported controls fail explicitly rather than silently disappearing.
-- At least player/NPC needs, NPC personality, traits, relationship metrics/bond/identity trust/authority and selected health/activity context are proven through real worker projections.
+- Editable dimensions come from current worker catalogs or narrowly justified source-backed adapters.
+- Object options preserve canonical values; trait multi-select options use real production trait IDs.
+- Read-only derived controls are never mutated.
+- Prerequisites are enforced.
+- Current root/landing/menu interaction surfaces are discovered from production projection rather than assumed from stale strings.
+- Planner reports missing/unsupported surfaces explicitly.
 
-## C. Semantic bucket correctness
+## C. Evidence projection correctness
 
-- Numeric bucket policies are bounded and reproducible.
-- Production thresholds are used where available and provenance/reason is recorded.
-- Threshold neighbors prove expected branch/eligibility changes for at least one relationship/need/personality-sensitive response.
-- The report describes coverage as semantic bucket coverage, never literal infinite/numeric exhaustiveness.
+For real-worker representative turns, compact rows expose, when production provides them:
 
-## D. Planning strategies
-
-- Smoke produces one bounded representative set.
-- Boundary covers every selected dimension bucket against controlled baseline.
-- Pairwise proves every permitted selected value-pair is represented or explains a constraint exclusion.
-- Persona/relationship preset covers the approved trait/style/bond/relationship matrix without unrelated-world explosion.
-- Full-bounded is the deterministic deduplicated union of declared strategies.
-- Same inputs/catalog revision produce identical planned case IDs/order.
-- Planner can estimate total cases/batches before execution and enforce configured caps.
-
-## E. Batch execution and resume
-
-- Each execution batch respects the existing safe bounded case limit, normally <=64.
-- Cases run through actual LuaSemanticWorker; no Python semantic oracle.
-- Each case is isolated unless an explicitly declared multi-turn history requires continuity.
-- Interrupted sweep can resume completed compatible batches without rerunning everything.
-- Changed/stale catalog/source fingerprint refuses unsafe result mixing.
-- Failed cases remain visible; failure is never silently treated as skipped/clean.
-- No source save bytes, loaded media assets or user UI persistence are mutated.
-
-## F. Compact evidence row
-
-For representative conversation/input and root-choice cases, every rendered NPC line exposes, when available:
-
-- case/batch/strategy/turn/language identity;
-- triggering parameter vector;
-- bounded persona/relationship/needs/health/activity summary;
-- semantic IR/flow/policy identity;
-- response pool/template/semantic variant;
-- render template/realization family/realization variant;
-- phrase/translation identity;
+- planned and reached surface;
+- relationship approval/respect/familiarity/identity trust/state;
+- durable bond kind/class;
+- personality dimensions and social style;
+- traits;
+- needs, health/activity/behavior;
+- actor authority/roles;
+- semantic/response/realization/phrase/translation identity;
 - final text/fallback;
-- selection provenance and source owner or explicit UNKNOWN;
-- action/transport/authority summary;
-- repository/Core/catalog fingerprints.
+- selection/source provenance;
+- effects/action/authority.
 
-A compact row must remain substantially smaller than a full Conversation Inspector dump. Full detail is accessible by lazy replay/inspection from case ID.
+A value present in current Conversation Inspector may not silently become empty/None in compact evidence without an explicit reason.
 
-## G. Variant reachability
+Trace handles must be functionally resolvable into the existing full Inspector.
 
-- Coverage starts from actual registered response pools/variants.
-- Report distinguishes untested, tested-ineligible, eligible-not-selected, selected and selected-under-suspicious-context.
-- Selector explanation comes from production observability, not a reconstructed Python evaluator.
-- Equal-score/tie/history behavior remains production-faithful.
-- Finite non-selection is never labeled globally impossible/unreachable.
+## D. Semantic bucket and planning correctness
 
-## H. Deterministic quality flags
+- Numeric buckets are bounded and reproducible.
+- Production thresholds and provenance are recorded where available.
+- Smoke covers every selected discovered surface.
+- Boundary/pairwise/persona strategies target valid surfaces.
+- Pairwise reports complete permitted-pair coverage or explicit gaps.
+- Full-bounded reports planned/reached/invalid surface counts and dimension/bucket coverage.
+- Same revision/input yields deterministic case IDs/order.
+- Caps/truncation are explicit.
 
-Prove positive and negative controls for at least:
+## E. Executed-surface verification
+
+For every case:
+
+- planned surface is recorded;
+- observed semantic/flow/choice route is recorded;
+- mismatch is classified.
+
+Unexpected clarification/fallback does **not** count as successful coverage of the planned surface.
+
+A real regression test must catch a stale/missing root-choice ID.
+
+## F. Batch, cancellation and resume
+
+- Each batch remains bounded, normally <=64 cases.
+- Real Lua worker executes cases.
+- Cancellation remains responsive.
+- A cancelled sweep can be resumed and completes remaining compatible cases.
+- Partial-batch resume does not duplicate accepted evidence.
+- Resume validates catalog fingerprint **and plan digest/schema/revision compatibility**.
+- Manifest distinguishes valid, invalid-surface, failed, cancelled/incomplete and skipped cases.
+
+## G. Complete reachability frontier
+
+- Enumerate response pools across all pages until `hasMore=false`.
+- Assert enumerated pool count matches production-reported total, unless explicit bounded error records explain a mismatch.
+- Enumerate variants for all discovered pools.
+- Report UNTESTED / TESTED_INELIGIBLE / ELIGIBLE_NOT_SELECTED / SELECTED / SELECTED_UNDER_SUSPICIOUS_CONTEXT.
+- Non-selected variants receive bounded production-explain/context exploration where applicable.
+- Finite search never claims global unreachability.
+
+## H. Dialogue quality flags
+
+Positive and negative controls must cover:
 
 - empty/one-word/very-short fragment;
-- placeholder or translation-key leak;
-- duplicate/repeated rendered text;
-- unsupported family/relationship term;
+- placeholder/translation-key leak;
+- unsupported family/intimacy;
 - identity/private-name misuse where evidence exists;
-- perspective-suspect case using semantic actor/referent evidence;
-- generic acknowledgement suspect.
+- perspective suspicion;
+- generic acknowledgement;
+- duplicate rendered text;
+- repeated recent text;
+- repeated clarification/fallback saturation.
 
-False-positive controls are mandatory: legitimate No./Yeah. or supported family wording must not be automatically classified as definite failure solely because they are short/contain a relationship word.
+Legitimate short responses and supported family/lover terms must not be definite failures solely because of their form.
 
-The user-observed family defect class must be representable: the evidence view shows final text plus family/bond/semantic path, and unsupported context receives a high-severity review flag.
+## I. Run-level clustering and replay
 
-## I. Clustering and affected replay
+- Cross-row duplicates/repetition are analyzed after execution.
+- Canonically identical causes cluster together.
+- Same visible text from distinct semantic causes remains distinguishable.
+- Clusters expose counts, context ranges, representative examples, case IDs and source identity/UNKNOWN.
+- Affected case replay works after cancellation and after content changes.
 
-- Many rows caused by the same canonical phrase/variant/source can be grouped into one cluster.
-- Cluster includes count, affected context ranges/flags, representative examples and verified source identity or UNKNOWN.
-- Same visible text from different semantic sources does not get incorrectly collapsed when causes differ.
-- Agent can rerun selected cluster/case IDs after a content change.
-- Targeted rerun preserves source revision/fingerprint evidence and broader regression can follow.
+## J. CLI and review output
 
-## J. LLM/agent output
+CLI supports:
 
-- CLI can emit compact JSONL rows and bounded cluster/review bundles.
-- Filtering by severity/flag/pool/source/variant/phrase/strategy/case is supported.
-- A review bundle is bounded; it does not dump tens of thousands of full traces.
-- LLM review remains advisory and separate from deterministic flags.
-- No LLM is required in the game runtime.
-- Suggested content changes cannot alter non-text semantic/authority metadata unless a separately explicit goal authorizes that behavior change.
+- plan/run/resume/status/report;
+- reachability;
+- bundles/export;
+- selected case/cluster replay;
+- filters by severity/flag/pool/template/variant/phrase/source/strategy/batch/case/language/surface/reachability state.
 
-## K. Simulation GUI parity
+Review bundles are bounded and advisory.
 
-- Quality Sweep lives in the existing Simulation testing/execution surface.
-- GUI uses the same planner/executor/report services as CLI.
-- User can choose scope/strategy, see estimated cases/batches, run/cancel/resume, filter results/clusters and inspect compact evidence.
-- Open full inspector reaches existing Conversation Inspector evidence rather than recreating it.
-- No duplicate Studio Test Lab/Coverage runner is added.
-- GUI tests use hermetic UI state and do not touch the user's remembered save selection.
+## K. Dedicated Quality Sweep GUI
 
-## L. Performance and storage
+A dedicated first-class **Quality Sweep** workspace exists in the Semantic Harness.
 
-Measure and report:
+It must:
 
+- browse discovered surfaces, dimensions, response pools and variants;
+- choose scope, strategy, languages, caps and batch size;
+- show case/batch estimates before execution;
+- run, cancel and resume without freezing the GUI;
+- display live progress and valid/invalid/failed counts;
+- filter evidence rows and clusters;
+- show triggering parameters plus persona/relationship/state context;
+- show semantic path, selected variant, phrase/translation and source;
+- open the full existing Conversation Inspector for a selected row;
+- navigate to verified canonical source metadata;
+- show response-pool/variant reachability and coverage gaps;
+- replay selected case/cluster;
+- export bounded evidence/review bundles.
+
+The old Simulation sweep sub-tab may become a launcher/summary or be migrated away. There must not be two independent sweep UIs/runners.
+
+Hermetic GUI tests must run under Xvfb/Tk and must not alter user save-selection state.
+
+## L. GUI responsiveness
+
+- Long sweeps execute outside the Tk event thread.
+- UI updates are marshaled safely to the Tk thread.
+- Cancel can be triggered while work is running.
+- Closing the GUI during a run does not corrupt the manifest.
+- Resume from a cancelled GUI run is proven.
+
+## M. Performance and storage
+
+Measure/report at minimum:
+
+- surface/dimension discovery time;
+- pool pagination time;
 - planning time;
-- worker startup/reuse policy;
-- cases/second for representative sweep;
+- cases/sec;
 - batch overhead;
-- compact bytes/row;
-- total artifact size for at least a multi-thousand-case synthetic/real-worker plan where practical;
-- lazy full-trace cost;
-- memory peak or bounded proxy used by the harness.
+- bytes per compact row;
+- run-level quality-analysis time;
+- artifact size/growth;
+- lazy inspector resolution time;
+- GUI progress overhead/bounded responsiveness proxy.
 
-Acceptance requires bounded output and explicit caps/truncation, not a specific hardcoded machine-independent speed target.
+No giant generated snapshot is committed.
 
-No giant generated snapshot is committed to Git. Result/cache artifacts are gitignored and outside watched media.
+## N. Required real production-Lua demonstrations
 
-## M. Regression and developer closeout
+Synthetic dictionaries may be used for unit controls but **cannot** satisfy these demonstrations.
+
+At minimum prove through real worker execution:
+
+1. ordinary wellbeing response across multiple actual persona/relationship contexts;
+2. known-vs-unknown identity wording with privacy evidence;
+3. hostile vs friendly case where the resulting selection/tone evidence actually differs;
+4. supported family/bond wording and unsupported-family defect class;
+5. real or production-backed adversarial perspective case plus known-good control;
+6. EN and TL output with translation/fallback evidence;
+7. anti-repeat where repeated eligible turns actually demonstrate history-sensitive selection;
+8. same response variant selected under at least two distinct parameter vectors;
+9. a truly `ELIGIBLE_NOT_SELECTED` variant shown by production explain evidence;
+10. one canonical source causing multiple real suspicious/bad rows and one targeted replay;
+11. stale/missing planned surface correctly marked invalid rather than successful;
+12. cancel → resume completes remaining work without duplicate evidence;
+13. full response-pool pagination count matches production total.
+
+## O. Regression and closeout
 
 Before developer-side completion:
 
-- relevant new Python unit/integration tests pass;
+- all new focused tests pass;
 - Semantic Test Subsystem parity tests pass;
 - Response Observatory tests pass;
-- relevant full headless Python suite passes according to current repository practice;
-- production Lua semantic smoke/regression passes;
+- relevant full Python harness regression passes;
+- production Lua semantic regression passes;
+- GUI tests pass under Xvfb;
 - Kahlua verification passes for touched Lua;
-- CodeBuilder/content idempotence passes if canonical dialogue assets are touched;
-- git diff --check passes;
+- CodeBuilder/content idempotence passes if canonical content is touched;
+- `git diff --check` passes;
 - unrelated user work is preserved.
 
-Native Project Zomboid SP/MP remains user-owned unless separately requested. This goal should be developer-complete without requiring a Workshop publication.
-
-## Required demonstration scenarios
-
-At minimum produce evidence for:
-
-1. ordinary wellbeing response across multiple persona/relationship buckets;
-2. known-vs-unknown identity/relationship wording;
-3. hostile vs friendly response-tone contrast;
-4. supported family/bond wording and unsupported-family negative control;
-5. one wrong-perspective adversarial case or known-good perspective negative control;
-6. EN and TL;
-7. anti-repeat history across repeated eligible turns;
-8. response variant selected under more than one context;
-9. eligible-but-dominated variant;
-10. at least one cluster where one canonical source explains multiple bad/suspicious rows.
+Native Project Zomboid SP/MP remains user-owned unless separately requested.
