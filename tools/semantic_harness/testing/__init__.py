@@ -81,6 +81,13 @@ from .sweep_reachability import (
     VariantReachabilityRecord,
     VariantReachabilityState,
 )
+from .sweep_review import (
+    ALLOWED_REVIEW_BUNDLE_SCHEMAS,
+    REVIEW_BUNDLE_SCHEMA_V1,
+    build_llm_review_bundle,
+    create_replay_plan,
+)
+from .sweep_service import DialogueQualitySweepService
 
 __all__ = [
     "ABSENT",
@@ -88,6 +95,7 @@ __all__ = [
     "ALLOWED_EVIDENCE_SCHEMAS",
     "ALLOWED_MANIFEST_SCHEMAS",
     "ALLOWED_REACHABILITY_SCHEMAS",
+    "ALLOWED_REVIEW_BUNDLE_SCHEMAS",
     "ALLOWED_SHORT_WORDS",
     "AssertionFailure",
     "BucketPolicy",
@@ -100,6 +108,7 @@ __all__ = [
     "DEFAULT_SURFACES",
     "DialogueClusterReport",
     "DialogueQualityCluster",
+    "DialogueQualitySweepService",
     "EVIDENCE_SCHEMA_V1",
     "EXPLICIT_SCENARIO_ADAPTERS",
     "HarnessCase",
@@ -115,6 +124,7 @@ __all__ = [
     "QualityFlag",
     "REACHABILITY_SCHEMA_V1",
     "RELATIONSHIP_BUCKETS",
+    "REVIEW_BUNDLE_SCHEMA_V1",
     "ReadOnlyDimensionError",
     "ReachabilityAnalyzer",
     "ReachabilityReport",
@@ -135,7 +145,9 @@ __all__ = [
     "VariantReachabilityRecord",
     "VariantReachabilityState",
     "build_bucket_inventory",
+    "build_llm_review_bundle",
     "compare_value",
+    "create_replay_plan",
     "detect_conflicts",
     "discover_cases",
     "evaluate_expectations",

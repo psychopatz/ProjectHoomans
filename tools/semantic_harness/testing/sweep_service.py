@@ -1,0 +1,185 @@
+"""Unified machine-readable service interface for sweeps.
+
+Consumed identically by headless CLI and Simulation UI.
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any, Callable, Mapping, Sequence
+
+from ..runtime.scenario import DEFAULT_SCENARIO
+from ..runtime.worker import LuaSemanticWorker
+from .sweep_batch import SweepBatch, SweepBatchExecutor, SweepManifest
+from .sweep_cluster import ClusterAggregator, DialogueClusterReport
+from .sweep_dimensions import SweepDimensionInventory, extract_dimension_inventory
+from .sweep_planner import CoveragePlan, CoveragePlanner, MAX_BATCH_SIZE
+from .sweep_quality import QualityAnalyzer
+from .sweep_reachability import ReachabilityAnalyzer, ReachabilityReport
+from .sweep_review import build_llm_review_bundle, create_replay_plan
+
+
+class DialogueQualitySweepService:
+    """Orchestrates dialogue quality sweep planning, execution, analysis, and replay."""
+
+    def __init__(
+        self,
+        *,
+        base_dir: Path | str = "tools/semantic_harness/reports/sweeps",
+        worker_factory: Callable[..., Any] = LuaSemanticWorker,
+    ) -> None:
+        self.base_dir = Path(base_dir)
+        self.worker_factory = worker_factory
+        self.quality_analyzer = QualityAnalyzer()
+        self.cluster_aggregator = ClusterAggregator(self.quality_analyzer)
+        self.reachability_analyzer = ReachabilityAnalyzer()
+
+    def get_dimension_inventory(
+        self, worker: Any | None = None
+    ) -> SweepDimensionInventory:
+        """Extract dimension inventory using provided or temporary worker."""
+        if worker is not None:
+            return extract_dimension_inventory(worker)
+        with self.worker_factory(DEFAULT_SCENARIO) as temp_worker:
+            return extract_dimension_inventory(temp_worker)
+
+    def plan_sweep(
+        self,
+        *,
+        strategy: str = "smoke",
+        sweep_id: str = "dialogue_sweep_v1",
+        surfaces: Sequence[str] | None = None,
+        dimensions: Sequence[str] | None = None,
+        languages: Sequence[str] = ("EN", "TL"),
+        max_cases: int = 512,
+        worker: Any | None = None,
+        inventory: SweepDimensionInventory | None = None,
+    ) -> CoveragePlan:
+        """Generate a deterministic coverage plan."""
+        inv = inventory or self.get_dimension_inventory(worker)
+        planner = CoveragePlanner(inv, sweep_id=sweep_id)
+
+        strat_lower = strategy.lower()
+        if strat_lower == "smoke":
+            kwargs = {}
+            if surfaces:
+                kwargs["surfaces"] = surfaces
+            if languages:
+                kwargs["languages"] = languages
+            return planner.plan_smoke(**kwargs)
+        if strat_lower == "boundary":
+            kwargs = {"max_cases": max_cases}
+            if surfaces:
+                kwargs["surfaces"] = surfaces
+            if dimensions:
+                kwargs["dimensions"] = dimensions
+            if languages:
+                kwargs["languages"] = languages
+            return planner.plan_boundary(**kwargs)
+        if strat_lower == "pairwise":
+            kwargs = {"max_cases": max_cases}
+            if surfaces:
+                kwargs["surfaces"] = surfaces
+            if dimensions:
+                kwargs["dimensions"] = dimensions
+            if languages:
+                kwargs["languages"] = languages
+            return planner.plan_pairwise(**kwargs)
+        if strat_lower == "persona":
+            kwargs = {"max_cases": max_cases}
+            if surfaces:
+                kwargs["surfaces"] = surfaces
+            if languages:
+                kwargs["languages"] = languages
+            return planner.plan_persona(**kwargs)
+        if strat_lower == "full":
+            kwargs = {"max_cases": max_cases}
+            if surfaces:
+                kwargs["surfaces"] = surfaces
+            if languages:
+                kwargs["languages"] = languages
+            return planner.plan_full(**kwargs)
+
+        raise ValueError(f"Unknown coverage strategy: '{strategy}'")
+
+    def run_sweep(
+        self,
+        plan: CoveragePlan,
+        *,
+        inventory: SweepDimensionInventory | None = None,
+        batch_size: int = MAX_BATCH_SIZE,
+        is_cancelled: Callable[[], bool] | None = None,
+        progress_callback: Callable[[SweepBatch, SweepManifest], None] | None = None,
+    ) -> SweepManifest:
+        """Run all batches in a sweep plan to completion or cancellation."""
+        inv = inventory or self.get_dimension_inventory()
+        artifact_dir = self.base_dir / plan.sweep_id
+        executor = SweepBatchExecutor(
+            plan,
+            inv,
+            artifact_dir=artifact_dir,
+            worker_factory=self.worker_factory,
+            batch_size=batch_size,
+        )
+        return executor.execute_all(
+            is_cancelled=is_cancelled,
+            progress_callback=progress_callback,
+        )
+
+    def load_manifest(self, sweep_id: str) -> SweepManifest:
+        """Load manifest for an existing sweep."""
+        manifest_path = self.base_dir / sweep_id / "manifest.json"
+        return SweepManifest.load(manifest_path)
+
+    def load_evidence_rows(self, sweep_id: str) -> list[dict[str, Any]]:
+        """Load all evidence rows from a sweep's evidence.jsonl."""
+        evidence_path = self.base_dir / sweep_id / "evidence.jsonl"
+        if not evidence_path.exists():
+            return []
+        rows = []
+        with open(evidence_path, "r", encoding="utf-8") as f:
+            for line in f:
+                stripped = line.strip()
+                if stripped:
+                    rows.append(json.loads(stripped))
+        return rows
+
+    def generate_cluster_report(self, sweep_id: str) -> DialogueClusterReport:
+        """Load evidence rows, evaluate quality flags, and produce a cluster report."""
+        rows = self.load_evidence_rows(sweep_id)
+        return self.cluster_aggregator.aggregate_rows(rows, sweep_id=sweep_id)
+
+    def generate_review_bundle(
+        self, sweep_id: str, *, max_clusters: int = 10
+    ) -> dict[str, Any]:
+        """Generate token-efficient LLM review bundle for a sweep."""
+        rows = self.load_evidence_rows(sweep_id)
+        report = self.cluster_aggregator.aggregate_rows(rows, sweep_id=sweep_id)
+        return build_llm_review_bundle(report, rows, max_clusters=max_clusters)
+
+    def generate_reachability_report(
+        self, sweep_id: str, *, worker: Any | None = None
+    ) -> ReachabilityReport:
+        """Analyze variant reachability across registered pools."""
+        rows = self.load_evidence_rows(sweep_id)
+        if worker is not None:
+            return self.reachability_analyzer.analyze_reachability(
+                rows, worker=worker, sweep_id=sweep_id
+            )
+        with self.worker_factory(DEFAULT_SCENARIO) as temp_worker:
+            return self.reachability_analyzer.analyze_reachability(
+                rows, worker=temp_worker, sweep_id=sweep_id
+            )
+
+    def plan_replay(
+        self,
+        original_plan: CoveragePlan,
+        affected_case_ids: Sequence[str],
+        *,
+        replay_sweep_id: str | None = None,
+    ) -> CoveragePlan:
+        """Construct a targeted replay plan for affected case IDs."""
+        return create_replay_plan(
+            original_plan, affected_case_ids, replay_sweep_id=replay_sweep_id
+        )

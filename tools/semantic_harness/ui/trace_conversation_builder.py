@@ -280,5 +280,8 @@ def build_conversation_trace(
 
     app.trace_tabs.add(compare_frame, text="Compare / Regression")
 
+    from .simulation_sweep_builder import build_simulation_sweep_panel
+    build_simulation_sweep_panel(app, ttk, scrolled_text)
+
 
 __all__ = ["build_conversation_trace"]

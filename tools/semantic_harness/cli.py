@@ -72,6 +72,11 @@ CLI_OPERATIONS = (
     "reload_save",
     "run_semantic_tests",
     "semantic_test_files",
+    "sweep_plan",
+    "sweep_run",
+    "sweep_status",
+    "sweep_report",
+    "sweep_replay",
 )
 
 
@@ -477,6 +482,108 @@ def cli(arguments: argparse.Namespace) -> int:
             _print_result(report.as_dict(), arguments.jsonl)
             emit_activity()
             return 0 if report.conflicts == [] else 3
+        if (
+            getattr(arguments, "sweep_plan", False)
+            or getattr(arguments, "sweep_run", False)
+            or getattr(arguments, "sweep_status", False)
+            or getattr(arguments, "sweep_report", False)
+            or getattr(arguments, "sweep_replay", False)
+        ):
+            from .testing.sweep_service import DialogueQualitySweepService
+
+            service = DialogueQualitySweepService(
+                worker_factory=lambda sc: LuaSemanticWorker(sc, **worker_kwargs)
+            )
+            sweep_id = getattr(arguments, "sweep_id", None) or "dialogue_sweep_v1"
+
+            if arguments.sweep_plan:
+                plan = service.plan_sweep(
+                    strategy=getattr(arguments, "sweep_strategy", None) or "smoke",
+                    sweep_id=sweep_id,
+                    max_cases=getattr(arguments, "sweep_max_cases", 512) or 512,
+                )
+                report = {
+                    "ok": True,
+                    "type": "sweep_plan",
+                    "sweepID": plan.sweep_id,
+                    "strategy": plan.strategy,
+                    "planDigest": plan.plan_digest,
+                    "totalCases": plan.total_cases,
+                    "estimatedBatches": plan.estimated_batches,
+                    "cases": [c.to_dict() for c in plan.cases[:32]],
+                    "truncated": len(plan.cases) > 32,
+                }
+                _print_result(report, arguments.jsonl)
+                emit_activity()
+                return 0
+
+            if arguments.sweep_run:
+                plan = service.plan_sweep(
+                    strategy=getattr(arguments, "sweep_strategy", None) or "smoke",
+                    sweep_id=sweep_id,
+                    max_cases=getattr(arguments, "sweep_max_cases", 512) or 512,
+                )
+                manifest = service.run_sweep(
+                    plan,
+                    batch_size=getattr(arguments, "sweep_batch_size", 64) or 64,
+                )
+                report = manifest.to_dict()
+                _print_result(report, arguments.jsonl)
+                emit_activity()
+                return 0 if manifest.status == "COMPLETED" else 3
+
+            if arguments.sweep_status:
+                manifest = service.load_manifest(sweep_id)
+                _print_result(manifest.to_dict(), arguments.jsonl)
+                emit_activity()
+                return 0
+
+            if arguments.sweep_report:
+                if getattr(arguments, "sweep_bundle", False):
+                    bundle = service.generate_review_bundle(sweep_id)
+                    _print_result(bundle, arguments.jsonl)
+                    emit_activity()
+                    return 0
+                if getattr(arguments, "sweep_reachability", False):
+                    reachability = service.generate_reachability_report(sweep_id)
+                    _print_result(reachability.to_dict(), arguments.jsonl)
+                    emit_activity()
+                    return 0
+                cluster_report = service.generate_cluster_report(sweep_id)
+                filtered = cluster_report.filter_by(
+                    severity=getattr(arguments, "sweep_severity", None),
+                    flag=getattr(arguments, "sweep_flag", None),
+                )
+                rep_dict = cluster_report.to_dict()
+                rep_dict["clusters"] = [c.to_dict() for c in filtered]
+                _print_result(rep_dict, arguments.jsonl)
+                emit_activity()
+                return 0 if cluster_report.flagged_rows == 0 else 1
+
+            if arguments.sweep_replay:
+                manifest = service.load_manifest(sweep_id)
+                cluster_report = service.generate_cluster_report(sweep_id)
+                case_id_arg = getattr(arguments, "sweep_case_id", None)
+                cluster_id_arg = getattr(arguments, "sweep_cluster_id", None)
+                if case_id_arg:
+                    case_ids = [case_id_arg]
+                elif cluster_id_arg:
+                    case_ids = cluster_report.get_affected_case_ids([cluster_id_arg])
+                else:
+                    case_ids = cluster_report.get_affected_case_ids()
+                plan = service.plan_sweep(
+                    strategy=manifest.strategy,
+                    sweep_id=sweep_id,
+                    max_cases=manifest.total_cases,
+                )
+                replay_plan = service.plan_replay(plan, case_ids)
+                replay_manifest = service.run_sweep(
+                    replay_plan,
+                    batch_size=getattr(arguments, "sweep_batch_size", 64) or 64,
+                )
+                _print_result(replay_manifest.to_dict(), arguments.jsonl)
+                emit_activity()
+                return 0 if replay_manifest.status == "COMPLETED" else 3
         if arguments.run_semantic_tests or arguments.semantic_test_files:
             from .testing.loader import discover_cases, load_cases_from_file
             from .testing.executor import execute_case
@@ -1104,11 +1211,23 @@ def _parser() -> argparse.ArgumentParser:
         action="store_true",
         help="compare native Talk startup across the production target catalog",
     )
-    parser.add_argument(
-        "--talk-utterance",
-        default="hello",
-        help="first utterance used by --talk-start/--talk-matrix (default: hello)",
-    )
+    parser.add_argument("--talk-utterance", default="hello", help="first utterance used by --talk-start/--talk-matrix (default: hello)")
+    sweep_ops = parser.add_mutually_exclusive_group()
+    sweep_ops.add_argument("--sweep-plan", action="store_true", help="plan a deterministic dialogue quality sweep")
+    sweep_ops.add_argument("--sweep-run", action="store_true", help="execute or resume planned sweep batches")
+    sweep_ops.add_argument("--sweep-status", action="store_true", help="show manifest status of a sweep")
+    sweep_ops.add_argument("--sweep-report", action="store_true", help="output defect cluster report")
+    sweep_ops.add_argument("--sweep-replay", action="store_true", help="replay affected cases from clusters")
+    parser.add_argument("--sweep-id", default="dialogue_sweep_v1", help="unique sweep ID")
+    parser.add_argument("--sweep-strategy", default="smoke", choices=["smoke", "boundary", "pairwise", "persona", "full"], help="sweep coverage strategy")
+    parser.add_argument("--sweep-batch-size", type=int, default=64, help="cases per batch (<= 64)")
+    parser.add_argument("--sweep-max-cases", type=int, default=512, help="maximum cases cap")
+    parser.add_argument("--sweep-cluster-id", help="filter or replay specific cluster ID")
+    parser.add_argument("--sweep-case-id", help="replay specific case ID")
+    parser.add_argument("--sweep-severity", help="filter cluster report by severity")
+    parser.add_argument("--sweep-flag", help="filter cluster report by flag name")
+    parser.add_argument("--sweep-bundle", action="store_true", help="emit LLM review bundle instead of cluster report")
+    parser.add_argument("--sweep-reachability", action="store_true", help="emit variant reachability report")
     parser.add_argument("--input", action="append", default=[], help="chat input; repeatable")
     parser.add_argument("--timeout", type=float, default=5.0, help="per-request timeout in seconds")
     parser.add_argument("--startup-timeout", type=float, default=8.0, help="worker startup timeout in seconds")
