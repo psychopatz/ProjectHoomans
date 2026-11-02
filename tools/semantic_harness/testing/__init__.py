@@ -18,6 +18,14 @@ from .schema import (
     validate_expectations,
     validate_fixture_document,
 )
+from .sweep_buckets import (
+    NEED_BUCKETS,
+    PERSONALITY_DIMENSIONS,
+    RELATIONSHIP_BUCKETS,
+    BucketPolicy,
+    build_bucket_inventory,
+    get_bucket_policy,
+)
 from .sweep_dimensions import (
     EXPLICIT_SCENARIO_ADAPTERS,
     InvalidDimensionValueError,
@@ -36,20 +44,36 @@ from .sweep_evidence import (
     extract_evidence_rows_from_turn,
     validate_evidence_row,
 )
+from .sweep_planner import (
+    DEFAULT_SURFACES,
+    MAX_BATCH_SIZE,
+    CoveragePlan,
+    CoveragePlanner,
+    PlannedCase,
+)
 
 __all__ = [
     "ABSENT",
     "ALLOWED_EVIDENCE_SCHEMAS",
     "AssertionFailure",
+    "BucketPolicy",
     "CaseResult",
     "ConflictLedger",
+    "CoveragePlan",
+    "CoveragePlanner",
+    "DEFAULT_SURFACES",
     "EVIDENCE_SCHEMA_V1",
     "EXPLICIT_SCENARIO_ADAPTERS",
     "HarnessCase",
     "HarnessRun",
     "InvalidDimensionValueError",
+    "MAX_BATCH_SIZE",
+    "NEED_BUCKETS",
+    "PERSONALITY_DIMENSIONS",
+    "PlannedCase",
     "PrerequisiteDimensionError",
     "QualityFlag",
+    "RELATIONSHIP_BUCKETS",
     "ReadOnlyDimensionError",
     "SCHEMA_V1",
     "SchemaValidationError",
@@ -59,6 +83,7 @@ __all__ = [
     "SweepDimensionInventory",
     "TurnResult",
     "UnsupportedDimensionError",
+    "build_bucket_inventory",
     "compare_value",
     "detect_conflicts",
     "discover_cases",
@@ -68,6 +93,7 @@ __all__ = [
     "expand_matrix_case",
     "extract_dimension_inventory",
     "extract_evidence_rows_from_turn",
+    "get_bucket_policy",
     "load_case",
     "load_cases_from_dict",
     "load_cases_from_file",
