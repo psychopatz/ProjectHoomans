@@ -69,6 +69,12 @@ Explicitly distinguish synthetic/headless acceptance from native Project Zomboid
 
 Synthetic payload preservation is not cross-adopter acceptance. Hot-plug gates must load and exercise the actual production adapters/services for each adopter and interleave their real writes.
 
+Identity hot-plug acceptance must invoke the real Hoomans player-character service (`PNC.PlayerCharacters.EnsureIdentity` / `GetEntityKey`) after a DT/Core-first identity already exists. Manually constructing the expected Hoomans key is not acceptance.
+
+Semantic capability acceptance must exercise `PsychopatzActorConversationService:Submit`, not only direct registry/parser calls. The test must prove effective context capabilities reach parsing.
+
+Dynamic Trading factual whereabouts/story acceptance must assert provenance/evidence from DT/Core world-knowledge state. A hardcoded plausible sentence is not proof of grounded whereabouts.
+
 No native PZ launch, Workshop upload, republish or destructive save manipulation unless explicitly authorized by the user.
 
 ## Performance discipline

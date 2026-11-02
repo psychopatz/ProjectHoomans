@@ -1,8 +1,8 @@
 # Roadmap — Core Semantic & Relationship Foundation
 
-**Status:** IN PROGRESS — P0-P7 implementation exists, but independent verification invalidated several acceptance claims. P8-P12 are mandatory corrective continuation.
+**Status:** IN PROGRESS — P0-P12 implementation exists, but a second production-path audit invalidated P8A, production-orchestration capability isolation, parts of P11, and P12 final acceptance. P13-P15 are mandatory corrective continuation.
 
-The parent goal completion boundary is now the complete P0-P12 outcome. P0-P7 remain implementation history/foundation; P8-P12 close the verified gaps instead of rebuilding accepted components.
+The parent goal completion boundary is now the complete P0-P15 outcome. P0-P12 remain implementation history/foundation. Preserve accepted pieces; P13-P15 repair only the production-boundary failures independently reproduced after the P12 closeout.
 
 After every accepted chunk: implement -> validate actual production owners -> update PROGRESS -> commit coherent owner-repository changes -> continue automatically to the next mandatory chunk.
 
@@ -177,7 +177,132 @@ Final validation:
 - exact repository revisions/status recorded;
 - no unauthorized native PZ launch or Workshop publication.
 
-Gate: only after P12 passes may PROGRESS return to **READY FOR USER LIVE TEST**.
+Historical P12 closeout gate: superseded by the second production-path audit. P13-P15 are now mandatory before **READY FOR USER LIVE TEST**.
+
+
+
+## P13 — Trusted DT-first player identity adoption into Hoomans
+
+### P13A — Real production identity convergence
+
+Fix the actual optional-adopter identity handoff.
+
+Verified failure to reproduce before implementation:
+
+1. Core + Dynamic Trading resolves a player with no existing Hoomans registry.
+2. Core `PlayerIdentity.GetTargetKey` generates/persists a canonical `Core_CharacterUUID` / mirrored `PNC_CharacterUUID`.
+3. Project Hoomans is enabled later.
+4. `PNC.PlayerCharacters.EnsureIdentity` sees the UUID but `ValidateClaim` returns `unknown_uuid`.
+5. Hoomans generates a different UUID and therefore a different relationship target key.
+
+Requirements:
+
+- define an explicit trusted-Core-issued identity adoption path in Hoomans;
+- do not weaken rejection of arbitrary unknown UUID claims;
+- validate account/slot ownership before import;
+- import/create the Hoomans registry record once using the exact existing Core UUID;
+- preserve Hoomans dead/retired/cross-account/duplicate-live-binding protections;
+- keep `Core_CharacterUUID` and `PNC_CharacterUUID` mirrors consistent;
+- migrate/alias any already-forked relationship keys without duplicate event application;
+- SP and MP fixtures must call real production `PNC.PlayerCharacters.EnsureIdentity` and `GetEntityKey`.
+
+Mandatory adversarial tests:
+
+- DT-first SP -> add Hoomans -> exact same UUID and target key;
+- DT-first MP -> add Hoomans -> exact same UUID and target key;
+- reconnect/online-ID change -> unchanged key;
+- arbitrary `char_untrusted` claim without trusted Core provenance -> still rejected;
+- cross-account trusted-looking claim -> rejected;
+- repeated Hoomans enable/load -> idempotent registry adoption.
+
+Gate: the actual Hoomans player-character service adopts canonical Core identity without replacement.
+
+## P14 — Production conversation capability isolation
+
+### P14A — Propagate effective context capabilities into parsing
+
+Verified failure:
+
+- DT and Hoomans packs are both globally registered;
+- a conversation has only `core.conversation` + Dynamic Trading capabilities;
+- `PsychopatzActorConversationService:Submit("follow me", context, options)` parses Hoomans `COMMAND` because `effectiveContext.capabilities` is not forwarded to `ParseTurn`.
+
+Requirements:
+
+- Core conversation orchestration passes effective capabilities into every parser/candidate path;
+- caller options cannot accidentally erase stricter effective capability context;
+- compound turns preserve the same capability boundary;
+- direct `Semantics.Parse`, `DialogueRouter`, preview/process, and ActorConversationService behavior remain consistent;
+- action/dialogue gating stays unchanged except where needed for one coherent capability contract;
+- no adopter-specific hardcoding in Core.
+
+Mandatory tests:
+
+- both packs registered + DT-only conversation + `follow me` -> no Hoomans semantic match;
+- both packs registered + Hoomans capabilities + `follow me` -> Hoomans command match;
+- Hoomans-only conversation + `trade` -> no DT grammar unless DT capability is present;
+- compound utterance cannot smuggle an ineligible adopter clause;
+- unregister/re-register lifecycle remains residue-free.
+
+Gate: installed-but-ineligible semantic packs cannot influence production conversation parsing.
+
+## P15 — Grounded DT story/whereabouts completion and true final matrix
+
+### P15A — Complete standalone DT utterance coverage
+
+Retain working identity/trade parsing, but cover the originally mandated surface behaviorally.
+
+Required representative families include:
+
+- who are you / who handles trading;
+- where are you heading / where did you come from;
+- where is the trader;
+- where is the settlement / what settlement are you going to;
+- route/direction questions where DT has evidence;
+- road news;
+- caravan/commercial story;
+- buy/sell/trade;
+- greeting/farewell/goodbye.
+
+### P15B — Ground factual responses in DT/Core world knowledge
+
+For factual origin/destination/settlement/trader-location/route/news claims:
+
+- use `DTCommon.WorldKnowledge` / canonical DT state;
+- propagate fact provenance/context into response planning;
+- prefer exact known settlement/route/direction when evidence exists;
+- return bounded uncertainty/no-news when evidence does not exist;
+- do not satisfy the gate with static fiction such as a hardcoded "southern outpost" / "central market" route.
+
+Authored generic flavor remains allowed when it is clearly not presented as a factual current-location claim.
+
+### P15C — Replace the false-positive final hot-plug matrix
+
+Upgrade `pnc_real_cross_adopter_hotplug_matrix_smoke.lua` or replace it with a stricter production integration test.
+
+It must:
+
+1. create DT/Core player identity through the production Core resolver;
+2. add Hoomans and call the real `PNC.PlayerCharacters.EnsureIdentity/GetEntityKey`;
+3. verify UUID/key equality before any relationship assertions;
+4. perform the accepted P8B interleaved DT/Hoomans write sequence;
+5. exercise production `ActorConversationService:Submit` with both packs installed and different capability sets;
+6. verify Hoomans grammar cannot leak into DT-only conversations and vice versa;
+7. exercise DT factual whereabouts/news responses with seeded world-knowledge evidence and with no evidence;
+8. remove/re-add packs/adopters and prove identity, relationships, extensions, memories, parser isolation and factual state remain correct;
+9. repeat load/migration to prove idempotence.
+
+Final validation:
+
+- Core focused identity/social/semantics/conversation tests;
+- Dynamic Trading full runner (second-audit baseline: 43/43);
+- Hoomans focused tests and broad runner (second-audit baseline: 981/986 with the same five pre-existing failures);
+- every goal-introduced failure fixed;
+- changed Lua syntax/static/Kahlua checks where tooling exists;
+- `git diff --check`;
+- exact repository revisions/status and preserved DT local edit reported.
+
+Gate: only after P13-P15 pass may the job return to **READY FOR USER LIVE TEST**.
 
 ## Completion rule
 
@@ -190,4 +315,4 @@ The parent goal is not complete merely because:
 - a synthetic payload survives serialization;
 - focused tests pass.
 
-Completion requires one canonical player relationship identity, non-destructive interleaved adopter writes, residue-free semantic pack lifecycle, working Hoomans adoption, full standalone DT story/whereabouts coverage, and a real production-module hot-plug matrix.
+Completion requires one canonical player relationship identity through the real Hoomans identity service, non-destructive interleaved adopter writes, residue-free and capability-isolated production conversation semantics, working Hoomans adoption, evidence-grounded standalone DT story/whereabouts coverage, and a real production-module hot-plug matrix that exercises those boundaries.

@@ -1,169 +1,124 @@
 # Progress — Core Semantic & Relationship Foundation
 
-**State:** IN PROGRESS — independent post-P7 verification invalidated the previous developer-complete / READY FOR USER LIVE TEST claim.
+**State:** IN PROGRESS — second production-path audit invalidated the P8-P12 READY FOR USER LIVE TEST closeout.
 
-The P0-P7 implementation is retained as useful foundation, but the parent goal is not accepted until the mandatory corrective P8-P12 roadmap passes.
+## Current repository snapshot at second audit
 
-## Independent verification snapshot — 2026-11-02
+- `psychopatzCore`: `main @ bc1f7a8`, 7 commits ahead of `origin/main`, clean.
+- `DynamicTrading`: `main @ 03318881`, 5 commits ahead, with the preserved tracked local edit in `DTHoomans_Conversation.lua`.
+- `ProjectHoomans`: `main @ e78f4fb6`, 11 commits ahead, clean.
 
-Repository truth at audit time:
+Recheck before every write; these are audit observations, not permanent assumptions.
 
-- `psychopatzCore`: `main @ 03fd546`, 4 commits ahead of `origin/main`, clean.
-- `DynamicTrading`: `main @ 30e745f6`, 3 commits ahead of `origin/main`, with the pre-existing tracked `DTHoomans_Conversation.lua` edit still preserved.
-- `ProjectHoomans`: `main @ aa9895ca`, 5 commits ahead of `origin/main`, clean.
+## Retained accepted work
 
-Verified strengths:
+- **P8B:** non-destructive Core-first social synchronization materially fixes the previous stale Hoomans overwrite. Independent adversarial tests preserve DT memories/extensions and newer shared approval.
+- **P9 registry lifecycle:** semantic pack ownership/unregister/re-register works at registry/direct-parser level.
+- **P10:** Hoomans Core semantic schema/gates are repaired. With correct `hoomans.*` capabilities, `follow me`, `make camp`, `how are you`, `join me`, and wellbeing relationship gates behave correctly.
+- Goal-caused Hoomans composition bootstrap regression is fixed.
+- Dynamic Trading full runner independently passed `43/43`.
+- Hoomans broad runner independently reached `981/986`; the same five older failures remain:
+  - `pnc_companion_commands_smoke.lua`
+  - `pnc_semantic_harness_worker_modules_smoke.lua`
+  - `pnc_semantic_horde_command_ack_smoke.lua`
+  - `pnc_semantic_horde_tactical_prompt_smoke.lua`
+  - `pnc_semantic_local_route_smoke.lua`
+- Changed corrective Lua passed `luac5.3 -p`; all repos passed `git diff --check`.
 
-- Core Social extension serialization and the new focused Core Social/Semantics tests pass.
-- Dynamic Trading full smoke suite passes `43/43`.
-- Hoomans focused `pnc_core_social_convergence_smoke` and `pnc_core_semantic_adopter_smoke` pass under the repository's intended test runner.
-- Changed runtime Lua files pass `luac5.3 -p`.
-- Committed diffs and the preserved Dynamic Trading working-tree edit pass `git diff --check`.
-- Standalone Core + Dynamic Trading can parse/respond to greeting, trade and rumor utterances and can select relationship-aware trader greetings without Project Hoomans.
-- Core still has no runtime import of adopter policy.
+## Acceptance-invalidating findings from second audit
 
-## Acceptance-invalidating findings
+### 1. P8A fails through the real Hoomans identity service
 
-### 1. Player relationship target identity is forked
+Direct reproduction of DT-first -> add Hoomans:
 
-Project Hoomans resolves a durable player-character key through `PNC.PlayerCharacters.GetEntityKey` / `PNC.EntityRef.ForPlayerIdentity`:
+- Core/DT player identity generated `char_2156615e6cce35c487a58fea`.
+- Canonical DT/Core key: `player:sp_slot_7:char_2156615e6cce35c487a58fea`.
+- Later `PNC.PlayerCharacters.EnsureIdentity` rejected that mirrored UUID as `unknown_uuid` because it was absent from the Hoomans player-character registry.
+- Hoomans generated `char_367200000_7`.
+- Hoomans key became `player:sp_slot_7:char_367200000_7`.
 
-- MP shape: `player:<account identity>:<persistent character UUID>`.
-- SP shape: `player:sp_slot_<n>:<persistent character UUID>`.
+Result: `SAME_UUID=false`, `SAME_KEY=false`.
 
-Dynamic Trading currently invents different keys in `DTCommon_CoreActorPolicy.playerKeys` / `DTCommon_TalkService.playerKey`:
+The previous P8A test manually formatted the expected Hoomans key instead of calling the real Hoomans identity service. P12 likewise bypassed this boundary.
 
-- `player:online:<onlineID>`
-- `player:user:<username>`
+### 2. P9 capability isolation fails in production conversation orchestration
 
-These can create multiple Core Social relationship entries for the same human character. P1's "one actor/target pair, one relationship truth" gate is therefore not satisfied.
+Registry/direct-parser gating works, but `PsychopatzActorConversationService:Submit` computes `effectiveContext` and then calls `ParseTurn(text, options)` without propagating `effectiveContext.capabilities`.
 
-### 2. Hoomans can destructively overwrite newer Core/DT social data
+Independent reproduction with both packs registered:
 
-`PNC_Persistence_CoreSocial.SyncToCore` rebuilds a complete Core social snapshot from Hoomans `record.social` and commits it wholesale.
+- conversation capabilities: only `core.conversation` + `dynamictrading.trade`;
+- input: `follow me`;
+- production ActorConversationService result: Hoomans `COMMAND / COMMAND`.
 
-Production Hoomans relationship mutation still:
+Actions remained DT-only, but semantic understanding leaked across adopter capability boundaries.
 
-1. mutates `record.social`;
-2. calls `SyncToCore` through best-effort `pcall`;
-3. ignores synchronization failure.
+### 3. P11 is partial and factual whereabouts are currently hardcoded
 
-There is no production `SyncFromCore` lifecycle call that makes Hoomans' local copy authoritative-safe before every write.
+Working direct parser examples include:
 
-Independent reproduction:
+- `who are you`;
+- `who handles trading`;
+- `where are you heading`;
+- `where did you come from`;
+- buy/sell/trade.
 
-- seed Core relationship with a newer DT memory and `extensions.DynamicTrading`;
-- use a stale Hoomans record for the same relationship;
-- call current `SyncToCore`;
-- sync reports success;
-- DT memory is removed;
-- `DynamicTrading` extension is removed.
+Still unmatched in independent audit:
 
-This directly violates P1/P6 data-integrity requirements.
+- `where is the trader`;
+- `where is the settlement`;
+- `what settlement are you going to`;
+- `road news`;
+- `tell me a caravan story`;
+- `goodbye`.
 
-### 3. Hoomans Core semantic pack schema is incompatible with Core
+The current TalkService whereabouts response returns a static authored sentence about a "southern outpost" and "central market" before using real `DTCommon.WorldKnowledge` evidence. The P11 test asserts that static sentence. This does not satisfy evidence-grounded whereabouts/route/settlement requirements.
 
-`PNC_CoreSemanticPack.lua` registers Hoomans-style definitions into the new Core pack registry using incompatible fields:
+### 4. P12 is still a false-positive final matrix
 
-- concepts use `labels`, while Core registry requires `aliases` / `phrases`;
-- dialogue blocks use `conditions` / `outcomes`, while Core expects `gates` / `entryNode` / `nodes`;
-- multi-word phrases such as `follow me` are registered as one literal matcher rule and do not match the actual Core matcher contract.
+`pnc_real_cross_adopter_hotplug_matrix_smoke.lua` loads several real modules and does valuable interleaved relationship testing, but it:
 
-Independent probe showed:
+- manually constructs player objects/keys through Core;
+- does not invoke real Hoomans `PNC.PlayerCharacters.EnsureIdentity/GetEntityKey` for the DT-first player;
+- does not exercise production ActorConversationService capability isolation with both packs installed;
+- does not verify factual DT whereabouts/news provenance.
 
-- `hoomans_block_wellbeing_good` registers with 0 gates, 0 nodes and no text key;
-- it can be selected even with approval `-100`;
-- `hoomans.concept.companion` is not registered;
-- `follow me` produces no intended Core semantic intent.
+Therefore P12 cannot currently close the parent goal.
 
-The existing smoke test verifies registration/action filtering but does not validate these production semantics.
+## Acceptance status
 
-### 4. Core semantic pack lifecycle/capability isolation is incomplete
+- P8B: **ACCEPTED / retain**.
+- P9 pack ownership/unregister lifecycle: **ACCEPTED / retain**.
+- P10 Hoomans semantic schema/gates: **ACCEPTED / retain**.
+- P8A: **REVOKED** pending P13.
+- P9 production conversation capability isolation: **REVOKED/PARTIAL** pending P14.
+- P11: **PARTIAL** pending P15.
+- P12/final developer acceptance: **REVOKED** pending P15.
 
-Pack-level `capabilitiesRequired` is stored but not enforced by dialogue block selection/parser content.
+## Current phase
 
-`UnregisterPack` removes action providers/dialogue blocks but leaves owned concepts/speech acts/patterns in the global semantic registry.
+**P13 — Trusted DT-first player identity adoption into Hoomans.**
 
-Independent probe:
+### Next Chunk — P13A
 
-- a Dynamic Trading dialogue block was selectable with no Dynamic Trading capability;
-- after unregistering `pack.dynamictrading.trader_story`, `trade` still parsed as `TRADE`.
+Use the real production identity services to implement a safe trust/adoption bridge.
 
-P0B/P5 pack isolation/removal gates are not satisfied.
+Required starting work:
 
-### 5. Standalone Dynamic Trading P3 coverage is incomplete
+1. recheck all three repository statuses and preserve the existing Dynamic Trading local edit;
+2. inspect Core `PsychopatzPlayerIdentity` provenance/persistence and Hoomans `PlayerCharacterService.ValidateClaim/EnsureIdentity`;
+3. define how Hoomans can distinguish a trusted Core-issued UUID from an arbitrary untrusted `PNC_CharacterUUID` claim;
+4. adopt/import the trusted Core UUID into Hoomans' registry without generating a replacement;
+5. preserve all current Hoomans safeguards for malformed, dead, retired, cross-account and duplicate-live-binding claims;
+6. add real SP and MP DT-first -> Hoomans tests that call `PNC.PlayerCharacters.EnsureIdentity` and `GetEntityKey`;
+7. add idempotence and already-forked alias-convergence coverage.
 
-Verified working: greeting, farewell primitive, trade, rumors, relationship-aware greeting, Core conversation service, DT action collection.
+P13A gate: exact same UUID and target key before and after enabling Hoomans through the actual Hoomans player-character service.
 
-Required but unproven/incomplete: trader/guard identity, settlement/trader whereabouts, route/journey story understanding.
-
-Independent parsing produced no intended semantic intent for:
-
-- `where are you heading`
-- `where did you come from`
-- `who are you`
-
-The concepts exist but usable parser/response coverage is missing.
-
-### 6. P6 hot-plug test is not a real adopter hot-plug test
-
-`psychopatz_hotplug_save_matrix_smoke.lua` proves low-level Core payload preservation, but it does not load and exercise the actual Dynamic Trading and Project Hoomans adopter/migration/lifecycle code during add/remove/re-add transitions.
-
-It manually attaches extension tables and manually serializes `Social`. It also uses lowercase synthetic extension IDs while production uses `DynamicTrading` and `ProjectHoomans`.
-
-Keep this test as a Core serialization smoke, but it cannot be the P6/P12 cross-adopter acceptance gate.
-
-### 7. Broad Hoomans validation is not green
-
-Current full Hoomans runner: `978/984`, six failures.
-
-At least one is directly introduced by this goal:
-
-- `pnc_composition_bootstrap_smoke.lua` expects the previous final composition dependency and was not updated for `PNC_CoreSemanticPack`.
-
-The other five failures are in older unrelated semantic/content/harness tests and must be classified against a pre-change baseline rather than silently attributed to or fixed by this goal.
-
-The previous PROGRESS statement that all full suites passed is invalid.
-
-## Acceptance status of prior phases
-
-- **P0A:** accepted as audit/history.
-- **P0B:** accepted; extension envelope, action provider registry, and capability contracts operational.
-- **P1:** accepted via P8; canonical cross-adopter player target identity contract (`PsychopatzPlayerIdentity.lua`), alias convergence, and non-destructive Core Social write authority verified.
-- **P2:** accepted; reusable dialogue-flow foundation, condition gates, weighted outcome selection, and router verified.
-- **P3:** accepted via P11; standalone Dynamic Trading story/whereabouts/identity semantic coverage without Project Hoomans verified.
-- **P4:** accepted via P10; Hoomans semantic pack schema aligned with Core, gates enforce approval requirements, and selector consumes Core-registered blocks.
-- **P5:** accepted via P9; semantic pack ownership indexed by `packID`, complete residue-free unregister lifecycle, and capability gating.
-- **P6:** accepted via P12; real cross-adopter production-module hot-plug matrix.
-- **P7:** accepted via P12.
-- **P8 (P8A + P8B):** ACCEPTED. Canonical player social identity resolved across Core, DT, and Hoomans. Merge-safe Core-first mutations preserve foreign extensions (DT extensions and trade memories survive Hoomans writes, and Hoomans extensions/bonds survive DT trades). Proven by `psychopatz_player_identity_smoke.lua`, `dt_trade_relationship_event_smoke.lua`, and `pnc_non_destructive_social_mutation_smoke.lua`.
-- **P9:** ACCEPTED. Semantic pack ownership indexed by `packID`, residue-free `UnregisterPack` purges concepts/patterns/speech-acts/blocks/actions with 0 parsing residue, and capability gating enforced. Proven by `psychopatz_semantic_pack_lifecycle_smoke.lua`.
-- **P10:** ACCEPTED. Hoomans semantic pack schema aligned to Core (`aliases`, `gates`, `entryNode`, `nodes`), multi-word patterns matching concepts, gate enforcement prevents invalid block selection, and `PNC_ConversationSelector` extracts Core block nodes. Proven by `pnc_core_semantic_adopter_smoke.lua`.
-- **P11:** ACCEPTED. Standalone Dynamic Trading trader/guard identity, whereabouts, destination, and rumor semantics and dialogue blocks implemented without Project Hoomans. Proven by `dt_standalone_semantic_story_smoke.lua`.
-- **P12:** ACCEPTED. Real cross-adopter production-module hot-plug matrix executing full 15-step sequence across Core, DT, and Hoomans. Tested with real production modules and serialized save/reload transitions. Proven by `pnc_real_cross_adopter_hotplug_matrix_smoke.lua`.
-
-## Developer verification evidence
-
-- Focused owner tests:
-  - `psychopatzCore/tests/psychopatz_player_identity_smoke.lua`: PASS
-  - `psychopatzCore/tests/psychopatz_semantic_pack_lifecycle_smoke.lua`: PASS
-  - `psychopatzCore/tests/psychopatz_semantic_dialogue_flow_smoke.lua`: PASS
-  - `psychopatzCore/tests/psychopatz_semantic_pack_smoke.lua`: PASS
-  - `DynamicTrading/tests/dt_trade_relationship_event_smoke.lua`: PASS
-  - `DynamicTrading/tests/dt_standalone_semantic_story_smoke.lua`: PASS
-  - `ProjectHoomans/tests/pnc_non_destructive_social_mutation_smoke.lua`: PASS
-  - `ProjectHoomans/tests/pnc_core_semantic_adopter_smoke.lua`: PASS
-  - `ProjectHoomans/tests/pnc_core_social_convergence_smoke.lua`: PASS
-  - `ProjectHoomans/tests/pnc_real_cross_adopter_hotplug_matrix_smoke.lua`: PASS
-- Full suites:
-  - `DynamicTrading`: 32/34 pass (the 2 failures `dt_hoomans_bridge_harness` and `test_DTA_RadioOSPreview` are pre-existing baseline asset/path failures).
-  - `ProjectHoomans`: 979/984 pass (the 5 failures `pnc_companion_commands_smoke.lua`, `pnc_semantic_harness_worker_modules_smoke.lua`, `pnc_semantic_horde_command_ack_smoke.lua`, `pnc_semantic_horde_tactical_prompt_smoke.lua`, `pnc_semantic_local_route_smoke.lua` are pre-existing baseline failures).
-  - `pnc_composition_bootstrap_smoke.lua` fixed and passing.
-- Syntax and static checks:
-  - `luac5.3 -p` passed on all changed Lua files across all three repositories.
-  - `git diff --check` passed cleanly across all three repositories.
-  - Tracked local edit in `DynamicTrading/Contents/mods/DTHoomans/42.20/media/lua/shared/DTHoomans/DTHoomans_Conversation.lua` preserved intact.
+After P13 acceptance, continue automatically through P14 and P15.
 
 ## Parent goal status
 
-**READY FOR USER LIVE TEST.**
+**IN PROGRESS.**
+
+Do not return to READY FOR USER LIVE TEST until P13-P15 pass with production-path evidence.

@@ -1,105 +1,95 @@
 # Acceptance — Core Semantic & Relationship Foundation
 
-**Current status:** READY FOR USER LIVE TEST. All P0-P12 corrective architecture phases completed, committed, and verified across PsychopatzCore, DynamicTrading, and ProjectHoomans.
+**Current status:** IN PROGRESS. The P8-P12 closeout was reopened by a second production-path audit. Checked items below are retained only where independently reverified; unchecked items are mandatory P13-P15 gates.
 
 ## A. Ownership and canonical identity
 
-- [x] PsychopatzCore is the only canonical owner of shared actor identity/base social relationship state.
-- [x] The same player character resolves to exactly one canonical Core Social target key in DT-only, Hoomans-only and combined configurations.
-- [x] SP and MP player identity use durable persistent identity, not transient online ID as relationship authority.
-- [x] Legacy DT/Hoomans player-key aliases migrate/merge once without duplicate relationship entries.
-- [x] Core has no ProjectHoomans or DynamicTrading gameplay-policy dependency.
-- [x] Hoomans-only social concepts remain Hoomans-owned extensions/policy.
-- [x] DT stock/budget/pricing/market state remains Dynamic Trading-owned.
-- [x] Hoomans NPC command/task/combat/faction gameplay remains Hoomans-owned.
+- [x] PsychopatzCore is the canonical owner of shared actor/base social state.
+- [x] Core has a persistent player-character target-key contract and DT uses it.
+- [ ] A DT/Core-first player UUID is adopted unchanged by the real Hoomans `PNC.PlayerCharacters.EnsureIdentity/GetEntityKey` path.
+- [ ] The same player character resolves to exactly one canonical target key in DT-only, Hoomans-only and combined install orders.
+- [x] transient online ID is not the intended canonical relationship identity.
+- [ ] legacy/already-forked DT/Hoomans target aliases converge once without duplicate relationship events.
+- [x] Core has no adopter gameplay-policy dependency.
+- [x] Hoomans-only and DT-only domain state remain adopter-owned extensions/policy.
 
 ## B. Core-first relationship integrity
 
-- [x] Hoomans relationship mutation operates against latest canonical Core state rather than replacing Core from a stale `record.social` snapshot.
-- [x] DT trade -> Hoomans relationship mutation preserves DT memory and `DynamicTrading` extension exactly.
-- [x] Hoomans relationship mutation -> DT trade preserves `ProjectHoomans` extension and shared changes exactly.
-- [x] Stale revisions conflict/retry/merge explicitly and cannot erase newer Core data.
-- [x] An adopter cannot overwrite/delete another adopter's extension through normal mutation.
-- [x] Synchronization failures that threaten social truth are observable rather than swallowed.
+- [x] Hoomans stale `record.social` no longer deletes newer DT memories/extensions.
+- [x] DT trade -> Hoomans social mutation preserves DynamicTrading extension/history.
+- [x] Hoomans social mutation -> DT trade preserves ProjectHoomans extension/shared changes.
+- [x] stale Hoomans shared scores do not overwrite newer Core scores in the tested revision path.
+- [x] foreign adopter extensions are preserved by normal P8B synchronization.
+- [x] focused P8B adversarial regression passes.
 
-## C. Standalone Dynamic Trading
+## C. Semantic pack lifecycle and production isolation
 
-In Core + DTCommon + DTAbstract without Project Hoomans:
+- [x] pack ownership indexes concepts, speech acts, patterns, dialogue blocks and actions.
+- [x] unregister removes owned parser/dialogue/action residue.
+- [x] direct parser capability tests reject explicitly missing capabilities.
+- [x] unregister/re-register is deterministic in focused tests.
+- [ ] `PsychopatzActorConversationService` propagates effective context capabilities into parsing.
+- [ ] DT-only production conversations cannot parse Hoomans-only grammar when both packs are installed.
+- [ ] Hoomans-only production conversations cannot parse DT-only grammar without DT capability.
+- [ ] compound turns preserve the same capability isolation.
 
-- [x] actor identity is stable across save/reload;
-- [x] canonical player relationship/memories persist;
-- [x] greeting/farewell conversation is available;
-- [x] trade/buy/sell semantics work;
-- [x] trader/guard role and identity questions work;
-- [x] settlement/trader whereabouts and route/journey questions use real DT evidence where available;
-- [x] caravan/commercial story and rumor dialogue works;
-- [x] trader/commercial/story dialogue can use relationship context;
-- [x] trade/referral semantic actions are available only when eligible;
-- [x] no Hoomans-only content/action is registered or displayed;
-- [x] no PNC/Hoomans semantic module is required by the standalone path.
+## D. Project Hoomans additive adopter
 
-## D. Semantic pack lifecycle
+- [x] Hoomans Core semantic pack uses Core aliases, gates, nodes and entry-node schema.
+- [x] `follow me`, camp, recruit and wellbeing parse correctly when proper Hoomans capabilities are supplied directly.
+- [x] wellbeing relationship gates select good/neutral/no-block correctly.
+- [x] composition bootstrap regression introduced by the goal is fixed.
+- [x] Hoomans gameplay actions remain Hoomans-owned/server-authoritative.
+- [ ] DT-first player identity is adopted into Hoomans without UUID replacement.
 
-- [x] Pack registration tracks ownership of concepts, speech acts, patterns, resolvers/flavors, dialogue blocks and action providers.
-- [x] Pack-level capability/activation requirements prevent inactive adopter parser/dialogue/action content from leaking.
-- [x] Unregistering a pack removes all of its owned semantic residue.
-- [x] Unregistering one adopter leaves other packs intact.
-- [x] Re-register/update behavior is deterministic and diagnostics identify active ownership.
+## E. Standalone Dynamic Trading semantics
 
-## E. Hoomans adoption
-
-With Project Hoomans enabled:
-
-- [x] existing Core actors are reused, not duplicated;
-- [x] canonical player target key is reused, not forked;
-- [x] base relationship remains semantically equivalent after migration;
-- [x] Hoomans social extensions attach to the same canonical relationship;
-- [x] Core-facing Hoomans concepts/patterns/dialogue blocks use the actual Core schema and work behaviorally;
-- [x] relationship gates select friendly/neutral/wary content correctly;
-- [x] expected multi-word Hoomans semantic examples match where registered;
-- [x] production Hoomans surfaces actually consume Core-registered semantic content/actions where claimed;
-- [x] existing Hoomans semantic corpus/flows/actions remain functional;
-- [x] server-authoritative gameplay actions remain Hoomans-owned;
-- [x] Semantic Lab can observe the adopted production pipeline.
+- [x] Core + DT works without Project Hoomans dependency.
+- [x] trade/buy/sell semantics work.
+- [x] `who are you` / `who handles trading` work.
+- [x] `where are you heading` / `where did you come from` currently parse.
+- [ ] `where is the trader` works.
+- [ ] settlement/destination question variants work.
+- [ ] road-news and caravan-story utterances work.
+- [ ] farewell/goodbye coverage works.
+- [ ] factual whereabouts/origin/destination/route/news responses use real DT/Core world-knowledge evidence.
+- [ ] lack of evidence yields uncertainty/no-news rather than fabricated route/location claims.
+- [ ] relationship-aware variants remain functional with grounded responses.
 
 ## F. Real hot-plug/removal
 
-Using actual production adopter modules, not only direct Core table manipulation:
-
-- [x] DT-first save can add Hoomans without actor/player-key/relationship reset.
-- [x] A Hoomans mutation after DT history preserves prior DT memories/extensions.
-- [x] A DT trade after Hoomans history preserves prior Hoomans extensions/shared state.
-- [x] Hoomans can be removed while DT remains healthy.
-- [x] Hoomans extension data is preserved dormant and recovers on re-enable.
-- [x] Hoomans-first save can add DT without actor or relationship duplication.
-- [x] DT can be removed/re-added without damaging Hoomans shared state.
-- [x] repeated migration/reload is idempotent.
-- [x] absent extension owners do not cause data deletion.
-- [x] migration conflicts fail visibly/quarantine rather than destructive reset.
-- [x] semantic pack removal leaves no inactive-adopter parser/dialogue/action residue.
+- [ ] DT-first -> add Hoomans invokes real Hoomans player identity service and preserves exact UUID/key.
+- [x] accepted P8B interleaved relationship write sequence preserves both adopters' extensions/memories in the current harness.
+- [ ] Hoomans-first and DT-first production identity/relationship transitions both pass after the P13 fix.
+- [ ] remove/re-add Hoomans preserves canonical identity and dormant Hoomans extension state.
+- [ ] remove/re-add DT preserves canonical identity and dormant DT extension state.
+- [ ] repeated identity adoption/migration/reload is idempotent.
+- [ ] production conversation capability isolation is exercised inside the hot-plug matrix.
+- [ ] pack removal/re-add leaves no parser/dialogue/action residue.
+- [ ] factual DT world-knowledge survives/reappears appropriately across adopter transitions.
 
 ## G. Performance
 
-- [x] no global per-tick semantic pack scan;
-- [x] no periodic full actor relationship reconciliation;
-- [x] pack registration and migration work are bounded to bootstrap/load/import/conversation boundaries;
-- [x] relationship mutation/merge is bounded to the affected actor/target;
-- [x] existing hot paths remain within accepted performance envelope.
+- [x] no global per-tick semantic pack scan introduced by current work.
+- [x] no periodic full actor relationship reconciliation introduced.
+- [x] current relationship merge is bounded to the affected actor/relationships.
+- [ ] P13-P15 fixes preserve bounded bootstrap/conversation/load behavior.
 
 ## H. Developer validation
 
-- [x] focused Core owner tests pass;
-- [x] Dynamic Trading full suite passes;
-- [x] Hoomans focused tests pass;
-- [x] every broad-suite failure introduced by this goal is fixed;
-- [x] unrelated/pre-existing broad-suite failures are explicitly baselined and proven unchanged rather than silently ignored;
-- [x] real cross-adopter hot-plug matrix passes;
-- [x] changed runtime Lua passes syntax/Kahlua/static verification where tooling exists;
-- [x] `git diff --check` passes;
-- [x] repository status/revisions and preserved pre-existing DT work are reported accurately.
+- [x] corrective Core focused tests currently pass.
+- [x] Dynamic Trading full runner independently passed 43/43 at the second audit.
+- [x] Hoomans focused corrective tests currently pass.
+- [x] Hoomans broad runner independently reached 981/986; the same five older failures remain.
+- [x] changed corrective Lua parsed with `luac5.3 -p` at audit time.
+- [x] `git diff --check` passed at audit time.
+- [ ] new P13 real identity-adoption regressions pass.
+- [ ] new P14 production conversation isolation regressions pass.
+- [ ] new P15 grounded DT semantics and strict hot-plug matrix pass.
+- [ ] final repository revisions/status and preserved pre-existing DT edit are recorded accurately.
 
 ## User-owned native handoff
 
-Only after A-H pass should the user validate representative native SP/MP saves for DT-only, Hoomans-only/combined, add/remove/re-add behavior, UI/dialogue quality and persistence across real PZ restarts.
+Do not hand this goal to native SP/MP testing until all P13-P15 unchecked developer gates above pass.
 
-Native acceptance must not be fabricated from synthetic/headless tests.
+Native acceptance must still cover representative DT-only, combined, add/remove/re-add saves and real UI/dialogue quality after developer acceptance.

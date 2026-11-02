@@ -46,6 +46,12 @@ Also inspect the accepted Core foundation docs under `psychopatzCore/Docs/npc_fo
 
 ## Completion state
 
-**Current state: IN PROGRESS.** An independent post-P7 audit invalidated the earlier READY FOR USER LIVE TEST claim. The existing P0-P7 implementation is retained, but mandatory corrective P8-P12 work must close canonical player identity, non-destructive relationship writes, semantic pack lifecycle, Hoomans adopter schema/integration, standalone DT coverage and real adopter hot-plug acceptance.
+**Current state: IN PROGRESS.** A second production-path audit after the P8-P12 closeout invalidated READY FOR USER LIVE TEST.
 
-Developer-side completion requires the full current roadmap and acceptance matrix. Native Project Zomboid SP/MP validation remains user-owned unless explicitly reassigned. Steam Workshop publication is never implied by Git completion.
+Accepted and retained foundation includes non-destructive Core-first social merging, semantic pack ownership/unregister lifecycle, and the repaired Hoomans Core semantic schema/gates. Mandatory P13-P15 work remains for:
+
+- trusted adoption of Core-issued DT-first player identity into the real Hoomans player-character registry;
+- propagation of effective conversation capabilities into Core parsing so installed-but-ineligible adopter grammar cannot leak;
+- complete, evidence-grounded Dynamic Trading whereabouts/story/farewell coverage and a stricter production-path hot-plug matrix.
+
+Developer-side completion now requires the full P0-P15 roadmap and current acceptance matrix. Native Project Zomboid SP/MP validation remains user-owned unless explicitly reassigned. Steam Workshop publication is never implied by Git completion.

@@ -275,3 +275,29 @@ A second source/test audit on 2026-11-02 checked the agent's completion claim ag
 6. **P6 test scope mismatch:** the existing hot-plug smoke manipulates Core payloads directly and does not exercise real DT/Hoomans production lifecycle/adapters.
 
 These findings supersede the earlier P7 developer-complete claim. See PROGRESS P8 and ROADMAP P8-P12.
+
+
+---
+
+## Second post-closeout production-path audit — P13-P15 required
+
+A second independent audit after commits through Core `bc1f7a8`, DynamicTrading `03318881`, and ProjectHoomans `e78f4fb6` re-ran focused/full suites and adversarial production paths.
+
+### Positive evidence
+
+- Core focused identity/semantic lifecycle/dialogue-flow/pack tests pass.
+- Dynamic Trading full runner passes `43/43`.
+- Hoomans focused P8B/P10/P12 tests pass.
+- Hoomans broad runner is `981/986`; the same five older failures remain and the goal-caused composition failure is fixed.
+- P8B preserves DT memories/extensions across stale and subsequent Hoomans writes.
+- P10 Hoomans patterns and wellbeing gates behave correctly when invoked with the intended Hoomans capabilities.
+- Changed corrective Lua parses; `git diff --check` is clean.
+
+### New acceptance-invalidating evidence
+
+1. **Real DT-first identity handoff still forks.** Core/DT can issue and mirror a canonical UUID, but later Hoomans `ValidateClaim` rejects it as `unknown_uuid` because its registry has no record, then `EnsureIdentity` creates a different UUID. The prior P8A/P12 tests bypassed the actual Hoomans identity service.
+2. **Production conversation capability leak.** `ActorConversationService:Submit` does not pass `effectiveContext.capabilities` into `ParseTurn`. With both packs registered, a DT-only-capability conversation parses `follow me` as Hoomans `COMMAND`.
+3. **P11 factual coverage incomplete.** Several required utterance families still do not parse, and current whereabouts output is a hardcoded "southern outpost / central market" sentence selected before real DT world-knowledge evidence.
+4. **P12 final matrix misses all three boundaries above.** It is useful for interleaved social-state preservation but is not sufficient final hot-plug acceptance.
+
+These findings supersede the P8-P12 READY FOR USER LIVE TEST closeout. See ROADMAP P13-P15 and current PROGRESS.

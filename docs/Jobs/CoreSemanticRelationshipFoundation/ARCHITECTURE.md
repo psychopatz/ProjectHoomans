@@ -54,6 +54,20 @@ Core must provide or own the durable target-key contract and alias/migration mec
 
 Legacy keys converge into the canonical key through an idempotent merge that preserves memories, scores and every adopter extension without double-applying events.
 
+## 1B. Trusted identity adoption across optional adopters
+
+Core-issued player-character identity must be adoptable by a later-installed Project Hoomans without being mistaken for an arbitrary untrusted modData claim.
+
+The trust boundary is explicit:
+
+- an arbitrary `PNC_CharacterUUID` string is not automatically trusted;
+- a UUID previously issued/persisted by the canonical Core player-identity authority is eligible for bounded import/adoption into Hoomans' registry;
+- adoption validates account/slot ownership and character status, creates the Hoomans registry record once, and preserves the exact canonical UUID;
+- malformed, cross-account, dead, duplicate-live-binding, or otherwise conflicting claims remain rejected;
+- the real `PNC.PlayerCharacters.EnsureIdentity/GetEntityKey` path must converge with Core/DT, not merely string formatting in tests.
+
+A DT-first save followed by enabling Hoomans must therefore keep the exact same player target key.
+
 ## 2. Base relationship versus adopter extensions
 
 Core owns shared values that must survive across mods:
@@ -158,6 +172,14 @@ Core tracks every semantic registration owned by a pack: concepts, speech acts, 
 
 Pack capability/activation requirements apply to all relevant semantic surfaces, not only executable actions. Inactive adopter content must not win parser arbitration or dialogue selection.
 
+## 4B. Conversation capability propagation
+
+Capability isolation must survive orchestration.
+
+`PsychopatzActorConversationService` derives an effective conversation context and must propagate that context's capabilities into the parser/turn options used for semantic candidate selection. It is not sufficient for registry-level direct `Semantics.Parse` tests to gate correctly.
+
+If a conversation has only Dynamic Trading capabilities, globally registered Hoomans grammar must not parse `follow me`, recruit, camp, or other Hoomans-only utterances. The same rule applies symmetrically to every adopter.
+
 ## 5. Hot-plug and removal model
 
 ### DT first, Hoomans added later
@@ -249,3 +271,11 @@ No cross-mod save routine directly edits another owner's internal schema.
 Registration happens at bootstrap/capability activation.
 
 Conversation work is request/event driven. Relationship reconciliation happens on explicit migration/import or actor load boundaries. There is no global per-tick semantic/relationship convergence pass.
+
+## 9A. Evidence-grounded adopter dialogue
+
+Adopter-owned story/whereabouts responses distinguish authored flavor from factual world claims.
+
+Dynamic Trading may use authored flavor for greetings and generic atmosphere, but location, destination, route, settlement, trader whereabouts, origin, and current road-news claims must be derived from actual Dynamic Trading/Core world-knowledge evidence when presented as facts.
+
+When evidence is unavailable, the response must be uncertain/unknown rather than inventing a named or implied route such as a fictional outpost or market. Parser coverage and response grounding are separate acceptance gates.
