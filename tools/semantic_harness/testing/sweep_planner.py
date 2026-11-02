@@ -57,6 +57,8 @@ class CoveragePlan:
     total_cases: int
     estimated_batches: int
     batch_size: int = MAX_BATCH_SIZE
+    planned_surfaces: list[str] = field(default_factory=list)
+    languages: list[str] = field(default_factory=list)
     dimension_summary: dict[str, list[Any]] = field(default_factory=dict)
     uncovered_pairs: list[tuple[str, Any, str, Any]] = field(default_factory=list)
 
@@ -69,6 +71,9 @@ class CoveragePlan:
             "totalCases": self.total_cases,
             "estimatedBatches": self.estimated_batches,
             "batchSize": self.batch_size,
+            "plannedSurfaces": self.planned_surfaces,
+            "languages": self.languages,
+            "dimensionSummary": self.dimension_summary,
             "cases": [c.to_dict() for c in self.cases],
         }
 
@@ -95,23 +100,36 @@ def _make_turn_spec_for_surface(surface: str, language: str) -> list[dict[str, A
     """Convert an interaction surface string into declarative turn specs."""
     if surface.startswith("scenario.rootChoice:"):
         choice = surface.split(":", 1)[1]
-        return [{"rootChoice": choice, "language": language}]
+        return [{"rootChoice": choice, "surface": surface, "language": language}]
+    if surface.startswith("conversation.root:menu:"):
+        choice = surface.split("menu:", 1)[1]
+        return [{"rootChoice": choice, "surface": surface, "language": language}]
+    if surface.startswith("conversation.landing:"):
+        choice = surface.split("landing:", 1)[1]
+        return [{"rootChoice": choice, "surface": surface, "language": language}]
+    if surface.startswith("companion.orders:"):
+        return [{"rootChoice": "orders", "surface": surface, "language": language}]
     if surface.startswith("scenario.utterance:"):
         utterance = surface.split(":", 1)[1]
-        return [{"text": utterance, "language": language}]
-    # Default fallback
-    return [{"text": "hello", "language": language}]
+        is_fb = "unrecognized" in utterance or "xyzzy" in utterance
+        return [{"text": utterance, "surface": surface, "language": language, "expect_fallback": is_fb}]
+    if surface.startswith("utterance:"):
+        utterance = surface.split(":", 1)[1]
+        is_fb = "unrecognized" in utterance or "xyzzy" in utterance
+        return [{"text": utterance, "surface": surface, "language": language, "expect_fallback": is_fb}]
+    return [{"text": surface, "surface": surface, "language": language}]
 
 
 DEFAULT_SURFACES = (
-    "scenario.rootChoice:wellbeing",
-    "scenario.rootChoice:orders",
-    "scenario.rootChoice:companion_status",
-    "scenario.rootChoice:trade",
-    "scenario.rootChoice:gift",
+    "scenario.rootChoice:ask_name",
+    "scenario.rootChoice:recruit",
     "scenario.rootChoice:goodbye",
-    "scenario.utterance:hello",
+    "scenario.rootChoice:whats_up",
+    "scenario.rootChoice:orders",
     "scenario.utterance:how are you?",
+    "scenario.utterance:hello",
+    "scenario.utterance:who are you?",
+    "scenario.utterance:what's up?",
 )
 
 
@@ -159,7 +177,7 @@ class CoveragePlanner:
     def plan_boundary(
         self,
         *,
-        surfaces: Sequence[str] = ("scenario.rootChoice:wellbeing", "scenario.utterance:how are you?"),
+        surfaces: Sequence[str] = ("scenario.rootChoice:ask_name", "scenario.utterance:how are you?"),
         dimensions: Sequence[str] | None = None,
         languages: Sequence[str] = ("EN", "TL"),
         max_cases: int = DEFAULT_MAX_SWEEP_CASES,
@@ -236,7 +254,7 @@ class CoveragePlanner:
         self,
         *,
         dimensions: Sequence[str] | None = None,
-        surfaces: Sequence[str] = ("scenario.rootChoice:wellbeing",),
+        surfaces: Sequence[str] = ("scenario.rootChoice:ask_name", "scenario.utterance:how are you?"),
         languages: Sequence[str] = ("EN",),
         max_cases: int = DEFAULT_MAX_SWEEP_CASES,
     ) -> CoveragePlan:
@@ -348,7 +366,7 @@ class CoveragePlanner:
     def plan_persona(
         self,
         *,
-        surfaces: Sequence[str] = ("scenario.rootChoice:wellbeing", "scenario.utterance:how are you?"),
+        surfaces: Sequence[str] = ("scenario.rootChoice:ask_name", "scenario.utterance:how are you?"),
         languages: Sequence[str] = ("EN", "TL"),
         max_cases: int = DEFAULT_MAX_SWEEP_CASES,
     ) -> CoveragePlan:
@@ -462,6 +480,13 @@ class CoveragePlanner:
             "\n".join(c.case_id for c in cases).encode("utf-8")
         ).hexdigest()
 
+        planned_surfs = sorted(set(c.surface for c in cases))
+        langs = sorted(set(c.language for c in cases))
+        dim_summary: dict[str, set[Any]] = {}
+        for c in cases:
+            for k, v in c.parameters.items():
+                dim_summary.setdefault(k, set()).add(str(v))
+
         return CoveragePlan(
             sweep_id=self.sweep_id,
             strategy=strategy,
@@ -471,4 +496,7 @@ class CoveragePlanner:
             total_cases=total,
             estimated_batches=batches,
             batch_size=MAX_BATCH_SIZE,
+            planned_surfaces=planned_surfs,
+            languages=langs,
+            dimension_summary={k: sorted(list(vals)) for k, vals in dim_summary.items()},
         )

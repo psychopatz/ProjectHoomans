@@ -48,6 +48,7 @@ class SweepDimension:
     value_type: str  # "enum", "boolean", "number", "integer", "text", "array", "object"
     control_kind: str  # "combobox", "slider", "boolean", "text", etc.
     options: tuple[str, ...] = ()
+    option_labels: dict[str, str] = field(default_factory=dict)
     options_source: str | None = None
     min_value: float | None = None
     max_value: float | None = None
@@ -106,6 +107,8 @@ class SweepDimension:
             return value
 
         if self.value_type == "enum":
+            if isinstance(value, dict) and "value" in value:
+                value = value["value"]
             str_val = str(value)
             if self.options and str_val not in self.options:
                 raise InvalidDimensionValueError(
@@ -117,11 +120,22 @@ class SweepDimension:
             return str(value)
 
         if self.value_type == "array":
-            if isinstance(value, (list, tuple)):
-                return list(value)
-            raise InvalidDimensionValueError(
-                f"Dimension '{self.id}' expects list/array, got {type(value).__name__}"
-            )
+            if not isinstance(value, (list, tuple)):
+                raise InvalidDimensionValueError(
+                    f"Dimension '{self.id}' expects list/array, got {type(value).__name__}"
+                )
+            normalized_items = []
+            for item in value:
+                if isinstance(item, dict) and "value" in item:
+                    item_str = str(item["value"])
+                else:
+                    item_str = str(item)
+                if self.options and item_str not in self.options:
+                    raise InvalidDimensionValueError(
+                        f"Dimension '{self.id}' array item '{item_str}' is not in valid options: {list(self.options)[:10]}..."
+                    )
+                normalized_items.append(item_str)
+            return normalized_items
 
         return value
 
@@ -308,15 +322,11 @@ EXPLICIT_SCENARIO_ADAPTERS: list[dict[str, Any]] = [
         "valueType": "enum",
         "control": "combobox",
         "options": [
-            "orders",
-            "wellbeing",
-            "companion_status",
-            "personal",
-            "trade",
-            "gift",
+            "ask_name",
+            "recruit",
             "goodbye",
-            "follow",
-            "wait",
+            "whats_up",
+            "orders",
         ],
         "page": "Scenario",
         "section": "Interaction",
@@ -338,6 +348,146 @@ EXPLICIT_SCENARIO_ADAPTERS: list[dict[str, Any]] = [
         "source": "scenario_adapter",
     },
 ]
+
+
+@dataclass(frozen=True)
+class DiscoveredSurface:
+    """Production-discovered interaction surface."""
+
+    surface_id: str
+    display_label: str
+    surface_type: str  # "root_choice", "landing_choice", "utterance", "order_menu"
+    provider: str  # "conversation_root", "conversation_landing", "semantic_utterance", "companion_orders"
+    candidate_id: str | None = None
+    action_id: str | None = None
+    frame: dict[str, Any] = field(default_factory=dict)
+    utterance_text: str | None = None
+    expected_intent: str | None = None
+    expected_subject: str | None = None
+    expect_fallback: bool = False
+    executable: bool = True
+    discovery_source: str = "production_projection"
+    prerequisites: tuple[str, ...] = ()
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "surfaceID": self.surface_id,
+            "displayLabel": self.display_label,
+            "surfaceType": self.surface_type,
+            "provider": self.provider,
+            "candidateID": self.candidate_id,
+            "actionID": self.action_id,
+            "frame": self.frame,
+            "utteranceText": self.utterance_text,
+            "expectedIntent": self.expected_intent,
+            "expectedSubject": self.expected_subject,
+            "expectFallback": self.expect_fallback,
+            "executable": self.executable,
+            "discoverySource": self.discovery_source,
+            "prerequisites": list(self.prerequisites),
+        }
+
+
+def discover_interaction_surfaces(
+    worker: Any | None = None,
+    *,
+    base_scenario: dict[str, Any] | None = None,
+) -> list[DiscoveredSurface]:
+    """Discover available interaction surfaces from live worker or verified production baseline."""
+    surfaces: list[DiscoveredSurface] = []
+    seen_ids: set[str] = set()
+
+    if worker is not None and hasattr(worker, "open_conversation"):
+        try:
+            open_res = worker.open_conversation()
+            presentation = open_res.get("presentation") or {}
+            rows = (presentation.get("responseChannel") or {}).get("rows") or []
+            for r in rows:
+                if not isinstance(r, dict):
+                    continue
+                cid = str(r.get("id") or "")
+                if not cid or cid in seen_ids:
+                    continue
+                frame = r.get("frame") or r.get("semanticFrame") or {}
+                ext = frame.get("extensions") or {}
+                action_id = ext.get("actionID") or ext.get("rootChoiceID")
+                label = r.get("text") or ext.get("textFallback") or cid
+                src_kind = (r.get("source") or {}).get("kind") or ext.get("origin") or "conversation_root"
+
+                stype = "root_choice"
+                if "landing" in cid:
+                    stype = "landing_choice"
+                elif "orders" in cid:
+                    stype = "order_menu"
+
+                surfaces.append(
+                    DiscoveredSurface(
+                        surface_id=cid,
+                        display_label=label,
+                        surface_type=stype,
+                        provider=src_kind,
+                        candidate_id=cid,
+                        action_id=action_id,
+                        frame=frame,
+                        executable=r.get("enabled", True),
+                        discovery_source="production_projection",
+                    )
+                )
+                seen_ids.add(cid)
+        except Exception:
+            pass
+
+    # If no surfaces discovered from worker, use verified production baseline
+    if not surfaces:
+        baseline_root_choices = [
+            ("conversation.root:menu:ask_name", "What's your name?", "ask_name", "conversation_root"),
+            ("conversation.root:menu:recruit", "Would you like to join us?", "recruit", "conversation_root"),
+            ("conversation.root:menu:goodbye", "That's all. Stay safe.", "goodbye", "conversation_root"),
+            ("conversation.landing:whats_up", "What's going on?", "whats_up", "conversation_landing"),
+            ("companion.orders:open", "All right. What do you need?", "orders", "companion_orders"),
+        ]
+        for cid, label, aid, prov in baseline_root_choices:
+            surfaces.append(
+                DiscoveredSurface(
+                    surface_id=cid,
+                    display_label=label,
+                    surface_type="root_choice" if "root" in cid else ("landing_choice" if "landing" in cid else "order_menu"),
+                    provider=prov,
+                    candidate_id=cid,
+                    action_id=aid,
+                    executable=True,
+                    discovery_source="verified_baseline",
+                )
+            )
+            seen_ids.add(cid)
+
+    # Add canonical production utterance surfaces
+    utterances = [
+        ("scenario.utterance:how are you?", "How are you? (Wellbeing)", "how are you?", "QUESTION", "WELLBEING", False),
+        ("scenario.utterance:hello", "Hello (Greeting)", "hello", "GREETING", "GREETING", False),
+        ("scenario.utterance:who are you?", "Who are you? (Identity)", "who are you?", "QUESTION", "IDENTITY", False),
+        ("scenario.utterance:what's up?", "What's up? (Status)", "what's up?", "QUESTION", "STATUS", False),
+        ("scenario.utterance:xyzzy_unrecognized", "Unrecognized utterance (fallback)", "xyzzy unrecognized query", "CLARIFICATION", "CLARIFICATION", True),
+    ]
+    for uid, label, text, intent, subj, is_fb in utterances:
+        if uid not in seen_ids:
+            surfaces.append(
+                DiscoveredSurface(
+                    surface_id=uid,
+                    display_label=label,
+                    surface_type="utterance",
+                    provider="semantic_utterance",
+                    utterance_text=text,
+                    expected_intent=intent,
+                    expected_subject=subj,
+                    expect_fallback=is_fb,
+                    executable=True,
+                    discovery_source="production_semantic_families",
+                )
+            )
+            seen_ids.add(uid)
+
+    return surfaces
 
 
 def extract_dimension_inventory(
@@ -373,7 +523,22 @@ def extract_dimension_inventory(
         label = str(row.get("label") or control_id)
         val_type = str(row.get("valueType") or "text").lower()
         control_kind = str(row.get("control") or "text").lower()
-        options = tuple(str(opt) for opt in (row.get("options") or ()))
+
+        options_data = row.get("options") or ()
+        canonical_options: list[str] = []
+        option_labels: dict[str, str] = {}
+        for opt in options_data:
+            if isinstance(opt, dict) and "value" in opt:
+                v_str = str(opt["value"])
+                l_str = str(opt.get("label") or v_str)
+                canonical_options.append(v_str)
+                option_labels[v_str] = l_str
+            else:
+                v_str = str(opt)
+                canonical_options.append(v_str)
+                option_labels[v_str] = v_str
+
+        options = tuple(canonical_options)
         options_source = row.get("optionsSource")
 
         min_val = float(row["min"]) if "min" in row and row["min"] is not None else None
@@ -398,6 +563,7 @@ def extract_dimension_inventory(
             value_type=val_type,
             control_kind=control_kind,
             options=options,
+            option_labels=option_labels,
             options_source=options_source,
             min_value=min_val,
             max_value=max_val,
@@ -432,6 +598,7 @@ def extract_dimension_inventory(
                 value_type=bond_dim.value_type,
                 control_kind=bond_dim.control_kind,
                 options=all_options,
+                option_labels=dict(bond_dim.option_labels),
                 options_source="persona_catalog.relationshipKinds",
                 min_value=bond_dim.min_value,
                 max_value=bond_dim.max_value,

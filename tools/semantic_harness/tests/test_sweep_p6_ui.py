@@ -23,6 +23,14 @@ from tools.semantic_harness.testing.sweep_review import (
 )
 from tools.semantic_harness.testing.sweep_service import DialogueQualitySweepService
 from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
+from tools.semantic_harness.ui.quality_sweep_controller import (
+    on_qs_apply_filter,
+    on_qs_cancel,
+    on_qs_cluster_select,
+    on_qs_evidence_select,
+    on_qs_plan,
+    on_qs_refresh,
+)
 from tools.semantic_harness.ui.simulation_sweep_controller import (
     on_sweep_cluster_select,
     on_sweep_plan,
@@ -188,6 +196,144 @@ class SweepP6UiAndReviewTests(SemanticLabGuiTestCase):
             details_content = app.sweep_details_text.get("1.0", "end")
             self.assertIn("ONE_WORD_RESPONSE", details_content)
             self.assertIn("Huh.", details_content)
+
+        finally:
+            root.destroy()
+
+    @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
+    def test_dedicated_quality_sweep_workbench(self) -> None:
+        root = tk.Tk()
+        app = self.make_gui_app(root)
+
+        try:
+            root.geometry("1200x800")
+            # 1. Verify Quality Sweep is present as a top-level tab in main_tabs
+            main_tab_names = [app.main_tabs.tab(t, "text") for t in app.main_tabs.tabs()]
+            self.assertIn("Quality Sweep", main_tab_names)
+
+            # Switch to Quality Sweep tab
+            app.main_tabs.select(app.quality_sweep_tab)
+            root.update_idletasks()
+
+            # Ensure hermetic catalogs
+            app.simulation_control_catalog = {
+                "controls": [
+                    {
+                        "id": "runtime.language",
+                        "path": "runtime.language",
+                        "valueType": "enum",
+                        "options": ["EN", "TL"],
+                    }
+                ]
+            }
+            app.persona_catalog = {"relationshipKinds": []}
+
+            # 2. Test Plan Generation & Coverage Explorer Population
+            app.quality_sweep_strategy_var.set("smoke")
+            on_qs_plan(app)
+            self.assertIsNotNone(app.quality_sweep_plan)
+            self.assertIn("Planned", app.quality_sweep_summary_var.get())
+
+            # Verify Coverage Explorer treeviews populated
+            surf_items = app.qs_surfaces_tree.get_children()
+            self.assertGreater(len(surf_items), 0)
+
+            dim_items = app.qs_dimensions_tree.get_children()
+            self.assertGreater(len(dim_items), 0)
+
+            batch_items = app.qs_batches_tree.get_children()
+            self.assertGreater(len(batch_items), 0)
+
+            # 3. Test Evidence Row Filtering & Treeview Population
+            mock_rows = [
+                {
+                    "rowID": "row_1",
+                    "identity": {
+                        "caseID": "case_smoke_1",
+                        "plannedSurface": "ask_name",
+                        "reachedSurface": "ask_name",
+                        "surfaceStatus": "MATCHED",
+                        "language": "EN",
+                    },
+                    "trigger": {
+                        "parameters": {"player.hunger": 0.5},
+                        "actorConversationContext": {
+                            "archetype": "survivor",
+                            "traits": ["pnc_brawler"],
+                            "personality": "stoic",
+                        },
+                        "relationshipSummary": {
+                            "bondKind": "none",
+                            "approval": 10,
+                            "respect": 20,
+                        },
+                    },
+                    "semanticPath": {
+                        "semanticTemplateID": "name.reply",
+                        "semanticVariantID": "var_default",
+                        "phraseID": "phrase_name_01",
+                    },
+                    "output": {"finalText": "I'm Mara."},
+                    "selectionProvenance": {"canonicalSourceOwner": "dialogue_dataset.name"},
+                    "authority": {},
+                    "quality": {"flags": []},
+                },
+                {
+                    "rowID": "row_2",
+                    "identity": {
+                        "caseID": "case_smoke_2",
+                        "plannedSurface": "wellbeing",
+                        "reachedSurface": "semantic.ask_clarification",
+                        "surfaceStatus": "INVALID_SURFACE",
+                        "language": "EN",
+                    },
+                    "trigger": {
+                        "parameters": {},
+                        "actorConversationContext": {},
+                        "relationshipSummary": {"bondKind": "none"},
+                    },
+                    "semanticPath": {
+                        "semanticTemplateID": "semantic.ask_clarification",
+                        "semanticVariantID": "var_fallback",
+                    },
+                    "output": {"finalText": "I'm not sure what you mean."},
+                    "selectionProvenance": {"canonicalSourceOwner": "core.fallback"},
+                    "authority": {},
+                    "quality": {
+                        "flags": [
+                            {"name": "INVALID_SURFACE", "severity": "HIGH", "confidence": "DEFINITE"}
+                        ]
+                    },
+                },
+            ]
+            app.quality_sweep_evidence_rows = mock_rows
+
+            # Apply filter for invalid surfaces only
+            app.qs_filter_invalid_only_var.set(True)
+            on_qs_apply_filter(app)
+            self.assertEqual(len(app.quality_sweep_filtered_rows), 1)
+            self.assertEqual(app.quality_sweep_filtered_rows[0]["rowID"], "row_2")
+
+            # Reset filter
+            app.qs_filter_invalid_only_var.set(False)
+            on_qs_apply_filter(app)
+            self.assertEqual(len(app.quality_sweep_filtered_rows), 2)
+
+            # 4. Test Selecting Evidence Row Populates Structured Inspector
+            app.qs_evidence_tree.selection_set("row_1")
+            on_qs_evidence_select(app)
+            self.assertIsNotNone(app.selected_quality_sweep_row)
+            inspector_text = app.qs_inspector_text.get("1.0", "end")
+            self.assertIn("Mara", inspector_text)
+            self.assertIn("survivor", inspector_text)
+            self.assertIn("pnc_brawler", inspector_text)
+            self.assertIn("name.reply", inspector_text)
+
+            # 5. Test Cancellation State Transition
+            app.quality_sweep_is_running = True
+            on_qs_cancel(app)
+            self.assertTrue(app.quality_sweep_cancel_requested)
+            self.assertIn("Cancellation requested", app.quality_sweep_status_var.get())
 
         finally:
             root.destroy()

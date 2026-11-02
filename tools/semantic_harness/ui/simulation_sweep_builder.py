@@ -74,6 +74,13 @@ def build_simulation_sweep_panel(app: Any, ttk: Any, scrolled_text: Any) -> None
     )
     app.sweep_cancel_button.grid(row=0, column=6, sticky="w", padx=(0, 4))
 
+    app.sweep_open_workbench_button = ttk.Button(
+        top_frame,
+        text="Open Quality Sweep Workbench…",
+        command=lambda: app.main_tabs.select(app.quality_sweep_tab) if hasattr(app, "quality_sweep_tab") else None,
+    )
+    app.sweep_open_workbench_button.grid(row=0, column=7, sticky="e", padx=(8, 0))
+
     # Status & Progress Frame
     status_frame = ttk.Frame(app.sweep_frame, padding=(2, 2))
     status_frame.grid(row=1, column=0, sticky="ew", pady=(0, 4))

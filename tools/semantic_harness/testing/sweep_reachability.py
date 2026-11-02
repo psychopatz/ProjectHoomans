@@ -70,6 +70,9 @@ class ReachabilityReport:
     status_counts: dict[str, int]
     pool_records: dict[str, list[VariantReachabilityRecord]]
     frontier_candidates: list[dict[str, Any]] = field(default_factory=list)
+    production_total_pools: int = 0
+    enumerated_total_pools: int = 0
+    pagination_complete: bool = True
     global_unreachable_warning: str = (
         "Finite non-selection in tested matrices does not prove global unreachability."
     )
@@ -83,6 +86,9 @@ class ReachabilityReport:
             "sweepID": self.sweep_id,
             "totalPools": self.total_pools,
             "totalVariants": self.total_variants,
+            "productionTotalPools": self.production_total_pools,
+            "enumeratedTotalPools": self.enumerated_total_pools,
+            "paginationComplete": self.pagination_complete,
             "statusCounts": self.status_counts,
             "globalUnreachableWarning": self.global_unreachable_warning,
             "pools": {
@@ -93,11 +99,67 @@ class ReachabilityReport:
         }
 
 
+FRONTIER_CONTEXT_PROFILES: list[tuple[str, dict[str, Any]]] = [
+    ("neutral", {}),
+    (
+        "friendly",
+        {
+            "relationship": {"approval": 60, "respect": 40, "familiarity": 50},
+            "bond": {"kind": "friend", "class": "friend"},
+        },
+    ),
+    (
+        "rival",
+        {
+            "relationship": {"approval": -60, "respect": -40, "familiarity": 40},
+        },
+    ),
+    (
+        "family",
+        {
+            "relationship": {"approval": 90, "respect": 70, "familiarity": 85},
+            "bond": {"kind": "sister", "class": "family"},
+        },
+    ),
+]
+
+
+def enumerate_all_response_pools(
+    active_worker: Any, limit: int = 64
+) -> list[dict[str, Any]]:
+    """Paginate all response pools until hasMore is False and return list of pools."""
+    analyzer = ReachabilityAnalyzer()
+    pools, _, _ = analyzer.enumerate_all_response_pools(active_worker, limit=limit)
+    return pools
+
+
 class ReachabilityAnalyzer:
     """Analyzes response variant reachability using production worker evidence."""
 
     def __init__(self, worker: Any | None = None) -> None:
         self.worker = worker
+
+    def enumerate_all_response_pools(
+        self, active_worker: Any, limit: int = 64
+    ) -> tuple[list[dict[str, Any]], int, bool]:
+        """Paginate all response pools until hasMore is False."""
+        all_pools: list[dict[str, Any]] = []
+        offset = 0
+        prod_total = 0
+
+        while True:
+            res = active_worker.response_pool_list(offset=offset, limit=limit)
+            pools = res.get("pools", [])
+            if not pools:
+                break
+            all_pools.extend(pools)
+            prod_total = int(res.get("total", len(all_pools)))
+            if not res.get("hasMore"):
+                break
+            offset += len(pools)
+
+        is_complete = len(all_pools) == prod_total or prod_total == 0
+        return all_pools, prod_total, is_complete
 
     def analyze_reachability(
         self,
@@ -113,14 +175,18 @@ class ReachabilityAnalyzer:
         if active_worker is None:
             raise ValueError("A LuaSemanticWorker is required to discover registered pools and explain selection")
 
-        # Discover registered pools
+        # Discover registered pools with pagination
         if target_pools:
             pool_ids = list(target_pools)
+            prod_total = len(pool_ids)
+            enumerated_total = len(pool_ids)
+            pag_complete = True
         else:
-            pools_listing = active_worker.response_pool_list(limit=64)
+            discovered_pools, prod_total, pag_complete = self.enumerate_all_response_pools(active_worker)
+            enumerated_total = len(discovered_pools)
             pool_ids = [
                 p["id"]
-                for p in pools_listing.get("pools", [])
+                for p in discovered_pools
                 if isinstance(p, dict) and p.get("id")
             ]
 
@@ -143,6 +209,7 @@ class ReachabilityAnalyzer:
                     "RELATIONSHIP_TERM_WITHOUT_BOND",
                     "PERSPECTIVE_SUSPECT",
                     "EXECUTION_ERROR",
+                    "INVALID_SURFACE",
                 )
                 for f in flags
             )
@@ -180,18 +247,21 @@ class ReachabilityAnalyzer:
             total_variants_count += len(variants)
             records: list[VariantReachabilityRecord] = []
 
-            # Sample 1 baseline context to test eligibility explanation if not already selected
-            explanation = None
+            # Check candidate explanations across frontier profiles if not all variants were selected
+            cand_explanations: list[dict[str, Any]] = []
             try:
-                explanation = active_worker.explain_response_selection(pool_id, {}, "")
+                for profile_name, ctx in FRONTIER_CONTEXT_PROFILES[:2]:  # Sample top profiles
+                    exp = active_worker.explain_response_selection(pool_id, ctx, "")
+                    if exp and exp.get("candidates"):
+                        cand_explanations.append(exp)
             except Exception:
-                explanation = {}
+                pass
 
-            cand_by_id = {
-                c["id"]: c
-                for c in explanation.get("candidates", [])
-                if isinstance(c, dict) and c.get("id")
-            }
+            cand_by_id: dict[str, list[dict[str, Any]]] = {}
+            for exp in cand_explanations:
+                for c in exp.get("candidates", []):
+                    if isinstance(c, dict) and c.get("id"):
+                        cand_by_id.setdefault(c["id"], []).append(c)
 
             for v in variants:
                 var_id = v.get("id")
@@ -222,28 +292,23 @@ class ReachabilityAnalyzer:
                         global_unreachable_claim=False,
                     )
                 else:
-                    # Check candidate explanation in tested baseline
-                    cand = cand_by_id.get(var_id)
-                    if cand is not None:
-                        eligible = cand.get("eligible", False)
-                        reason = cand.get("reason", "unknown")
-                        failed_checks = [
-                            chk["field"]
-                            for chk in cand.get("checks", [])
-                            if not chk.get("matched")
-                        ]
-                        if eligible:
+                    # Check candidate explanations across tested context profiles
+                    cand_list = cand_by_id.get(var_id, [])
+                    if cand_list:
+                        # Check if any candidate explanation shows eligibility
+                        eligible_cand = next((c for c in cand_list if c.get("eligible")), None)
+                        if eligible_cand:
                             status = VariantReachabilityState.ELIGIBLE_NOT_SELECTED
-                            reasons = [reason] if reason else ["lower_score"]
+                            reason = eligible_cand.get("reason", "lower_score")
                             status_counts[status] += 1
                             rec = VariantReachabilityRecord(
                                 pool_id=pool_id,
                                 variant_id=var_id,
                                 status=status,
-                                tested_contexts_count=1,
+                                tested_contexts_count=len(cand_list),
                                 eligible_contexts_count=1,
                                 selected_contexts_count=0,
-                                rejection_reasons=reasons,
+                                rejection_reasons=[reason],
                                 canonical_source_owner=source_owner,
                                 global_unreachable_claim=False,
                             )
@@ -256,15 +321,21 @@ class ReachabilityAnalyzer:
                         else:
                             status = VariantReachabilityState.TESTED_INELIGIBLE
                             status_counts[status] += 1
+                            reasons = [c.get("reason", "ineligible") for c in cand_list]
+                            failed_checks = []
+                            for c in cand_list:
+                                for chk in c.get("checks", []):
+                                    if not chk.get("matched"):
+                                        failed_checks.append(chk.get("field", "unknown"))
                             rec = VariantReachabilityRecord(
                                 pool_id=pool_id,
                                 variant_id=var_id,
                                 status=status,
-                                tested_contexts_count=1,
+                                tested_contexts_count=len(cand_list),
                                 eligible_contexts_count=0,
                                 selected_contexts_count=0,
-                                rejection_reasons=[reason],
-                                failed_checks=failed_checks,
+                                rejection_reasons=reasons[:3],
+                                failed_checks=list(set(failed_checks))[:5],
                                 canonical_source_owner=source_owner,
                                 global_unreachable_claim=False,
                             )
@@ -299,6 +370,9 @@ class ReachabilityAnalyzer:
             sweep_id=sweep_id,
             total_pools=len(pool_records),
             total_variants=total_variants_count,
+            production_total_pools=prod_total,
+            enumerated_total_pools=enumerated_total,
+            pagination_complete=pag_complete,
             status_counts=status_counts,
             pool_records=pool_records,
             frontier_candidates=frontier_candidates,

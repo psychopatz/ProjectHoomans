@@ -183,3 +183,18 @@ class DialogueQualitySweepService:
         return create_replay_plan(
             original_plan, affected_case_ids, replay_sweep_id=replay_sweep_id
         )
+
+    def resolve_trace(
+        self,
+        trace_handle: dict[str, Any],
+        *,
+        worker: Any | None = None,
+        turn_input_spec: dict[str, Any] | None = None,
+        language: str = "EN",
+    ) -> dict[str, Any]:
+        """Resolve a lazy trace handle into full Conversation Inspector data."""
+        from .sweep_evidence import resolve_trace_handle
+        if worker is not None:
+            return resolve_trace_handle(trace_handle, worker=worker, input_spec=turn_input_spec, language=language)
+        with self.worker_factory(DEFAULT_SCENARIO) as temp_worker:
+            return resolve_trace_handle(trace_handle, worker=temp_worker, input_spec=turn_input_spec, language=language)

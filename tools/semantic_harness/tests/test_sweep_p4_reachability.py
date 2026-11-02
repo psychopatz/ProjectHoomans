@@ -101,6 +101,24 @@ class SweepP4ReachabilityTests(unittest.TestCase):
             # Mandatory rule: global_unreachable_claim must be False
             self.assertFalse(rec_map["semantic.accept.request"].global_unreachable_claim)
 
+    def test_full_response_pool_pagination(self) -> None:
+        """Verify that ReachabilityAnalyzer paginates the entire production pool registry."""
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            analyzer = ReachabilityAnalyzer(worker)
+            pools, prod_total, is_complete = analyzer.enumerate_all_response_pools(worker)
+            self.assertGreaterEqual(prod_total, 200)
+            self.assertEqual(len(pools), prod_total)
+            self.assertTrue(is_complete)
+
+            # Analyze a sample slice and verify report metadata
+            report = analyzer.analyze_reachability(
+                [],
+                worker=worker,
+                target_pools=[p["id"] for p in pools[:5]],
+            )
+            self.assertEqual(report.total_pools, 5)
+            self.assertGreater(report.total_variants, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

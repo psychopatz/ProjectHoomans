@@ -284,12 +284,33 @@ class SweepP2PlannerTests(unittest.TestCase):
 
     def test_batch_estimation(self) -> None:
         plan = self.planner.plan_smoke(
-            surfaces=["scenario.rootChoice:wellbeing"] * 10,
+            surfaces=["scenario.rootChoice:ask_name"] * 10,
             languages=("EN", "TL"),
         )
         # 20 cases, batch size 64 -> 1 batch
         self.assertEqual(plan.total_cases, 20)
         self.assertEqual(plan.estimated_batches, 1)
+
+    def test_surface_distribution_and_metadata(self) -> None:
+        """Verify plans distribute cases across valid root choices and utterances."""
+        plan = self.planner.plan_full(
+            surfaces=(
+                "scenario.rootChoice:ask_name",
+                "scenario.rootChoice:recruit",
+                "scenario.utterance:how are you?",
+                "scenario.utterance:hello",
+            ),
+            languages=("EN", "TL"),
+            max_cases=64,
+        )
+        surfaces_in_plan = set(c.surface for c in plan.cases)
+        # Both root choices and utterance surfaces must be present
+        self.assertTrue(any("rootChoice" in s for s in surfaces_in_plan))
+        self.assertTrue(any("utterance" in s for s in surfaces_in_plan))
+        self.assertIn("scenario.rootChoice:ask_name", plan.planned_surfaces)
+        self.assertIn("scenario.utterance:how are you?", plan.planned_surfaces)
+        self.assertEqual(plan.languages, ["EN", "TL"])
+        self.assertIn("relationship.approval", plan.dimension_summary)
 
 
 if __name__ == "__main__":

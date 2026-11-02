@@ -141,9 +141,10 @@ class ClusterAggregator:
         # (primary_flag, canonical_source, pool_id, phrase_id, variant_id)
         grouped_rows: dict[tuple[str, str, str, str, str], list[dict[str, Any]]] = {}
 
+        # Run analyzer across all rows (Stage 1 per-row + Stage 2 cross-row checks)
+        self.analyzer.analyze_run(rows)
+
         for row in rows:
-            # Run analyzer to ensure flags are attached
-            self.analyzer.tag_row(row)
             flags = row.get("quality", {}).get("flags", [])
 
             if not flags:

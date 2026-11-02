@@ -125,7 +125,8 @@ class SweepP3BatchTests(unittest.TestCase):
             manifest.validate_catalog_fingerprint("new_incompatible_fingerprint")
         self.assertIn("production catalog fingerprint changed", str(ctx.exception))
 
-    def test_cancellation_callback(self) -> None:
+    def test_cancellation_and_resumption(self) -> None:
+        """Verify that cancelling a batch marks it CANCELLED, and subsequent resume finishes cases."""
         with tempfile.TemporaryDirectory() as tmpdir:
             plan = self.planner.plan_smoke(
                 surfaces=("scenario.utterance:hello",),
@@ -135,18 +136,67 @@ class SweepP3BatchTests(unittest.TestCase):
                 plan,
                 self.inventory,
                 artifact_dir=tmpdir,
-                worker_factory=lambda sc: None,  # Won't be reached if cancelled
+                worker_factory=LuaSemanticWorker,
+                batch_size=64,
             )
+            # Cancel immediately before execution
             with self.assertRaises(SweepExecutionCancelled):
                 executor.execute_next_batch(is_cancelled=lambda: True)
 
             self.assertEqual(executor.manifest.status, "CANCELLED")
+            self.assertEqual(executor.manifest.batches[0].status, "CANCELLED")
+
+            # Resuming should pick up the CANCELLED batch and complete it
+            resume_executor = SweepBatchExecutor(
+                plan,
+                self.inventory,
+                artifact_dir=tmpdir,
+                worker_factory=LuaSemanticWorker,
+                batch_size=64,
+            )
+            resumed_batch = resume_executor.execute_next_batch()
+            self.assertIsNotNone(resumed_batch)
+            self.assertEqual(resumed_batch.status, "COMPLETED")
+            self.assertEqual(resumed_batch.completed_cases, 2)
+            self.assertEqual(resume_executor.manifest.status, "COMPLETED")
+
+            # Ensure both cases executed without duplicate case executions
+            rows = list(resume_executor.iter_evidence_rows())
+            executed_case_ids = set(r["identity"]["caseID"] for r in rows)
+            self.assertEqual(len(executed_case_ids), 2)
+            self.assertGreaterEqual(len(rows), 2)
+
+    def test_stale_root_choice_detected_as_invalid_surface(self) -> None:
+        """Verify that attempting to execute a stale root choice marks batch as COMPLETED_WITH_INVALID_SURFACE."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            plan = self.planner.plan_smoke(
+                surfaces=("scenario.rootChoice:wellbeing",),
+                languages=("EN",),
+            )
+            executor = SweepBatchExecutor(
+                plan,
+                self.inventory,
+                artifact_dir=tmpdir,
+                worker_factory=LuaSemanticWorker,
+                batch_size=64,
+            )
+            batch = executor.execute_next_batch()
+            self.assertIsNotNone(batch)
+            self.assertEqual(batch.status, "COMPLETED_WITH_INVALID_SURFACE")
+            self.assertGreaterEqual(batch.invalid_surface_cases, 1)
+
+            rows = list(executor.iter_evidence_rows())
+            self.assertEqual(len(rows), 1)
+            row = rows[0]
+            self.assertEqual(row["identity"]["surfaceStatus"], "INVALID_SURFACE")
+            flags = [f["name"] for f in row["quality"]["flags"]]
+            self.assertIn("INVALID_SURFACE", flags)
 
     def test_real_lua_batch_execution_and_resume(self) -> None:
         """Integration with real LuaSemanticWorker running 2 cases and testing resume."""
         with tempfile.TemporaryDirectory() as tmpdir:
             plan = self.planner.plan_smoke(
-                surfaces=("scenario.rootChoice:wellbeing",),
+                surfaces=("scenario.rootChoice:ask_name",),
                 languages=("EN", "TL"),
             )
             self.assertEqual(plan.total_cases, 2)
@@ -171,6 +221,7 @@ class SweepP3BatchTests(unittest.TestCase):
             for row in evidence_rows:
                 self.assertEqual(row["schema"], "pnc.semantic-dialogue-quality-evidence.v1")
                 self.assertIsNotNone(row["output"]["finalText"])
+                self.assertEqual(row["identity"]["surfaceStatus"], "MATCHED")
 
             # Test resume: creating a new executor pointing to the same directory
             # should see batch already completed and return None

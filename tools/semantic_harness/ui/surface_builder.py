@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from .quality_sweep_builder import build_quality_sweep_workbench
 from .saved_world_browser_builder import build_saved_world_browser
 from .simulation_conversation_builder import build_conversation_panel
 from .simulation_pane_builder import build_simulation_panes
@@ -78,13 +79,19 @@ def build_ui(app: Any) -> None:
     app.activity_log_widget = scrolled_text(log_tab, wrap="none", state="disabled")
     app.activity_log_widget.grid(row=1, column=0, sticky="nsew")
 
+    quality_sweep_tab = ttk.Frame(app.main_tabs, padding=8)
+    quality_sweep_tab.rowconfigure(0, weight=1)
+    quality_sweep_tab.columnconfigure(0, weight=1)
     world_browser_tab = ttk.Frame(app.main_tabs, padding=10)
     world_browser_tab.rowconfigure(1, weight=1)
     world_browser_tab.columnconfigure(0, weight=1)
     app.main_tabs.add(simulation_tab, text="Simulation")
+    app.main_tabs.add(quality_sweep_tab, text="Quality Sweep")
     app.main_tabs.add(studio_tab, text="Studio")
     app.main_tabs.add(log_tab, text="Log")
     app.main_tabs.add(world_browser_tab, text="World Browser")
+    app.quality_sweep_tab = quality_sweep_tab
+    build_quality_sweep_workbench(app, quality_sweep_tab)
     app.studio_tab = studio_tab
     app.explore_tab = explore_tab
     app.review_tab = review_tab

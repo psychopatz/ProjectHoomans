@@ -241,3 +241,115 @@ class QualityAnalyzer:
             row["quality"]["reviewState"] = "UNREVIEWED"
 
         return row
+
+    def analyze_run(self, rows: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Run two-stage analysis across all rows in a sweep run:
+
+        Stage 1: Per-row local quality heuristics (tag_row).
+        Stage 2: Cross-row analysis for duplicate rendered text, fallback saturation,
+        variant collapse, and generic acknowledgement concentration.
+        """
+        # Stage 1: Tag each row locally
+        for row in rows:
+            self.tag_row(row)
+
+        # Stage 2: Cross-row analysis
+        text_groups: dict[str, list[dict[str, Any]]] = {}
+        for row in rows:
+            text = str(row.get("output", {}).get("finalText") or "").strip()
+            if text:
+                text_groups.setdefault(text.lower(), []).append(row)
+
+        for text_lower, group_rows in text_groups.items():
+            count = len(group_rows)
+            if count < 2:
+                continue
+
+            first_text = group_rows[0].get("output", {}).get("finalText") or ""
+            distinct_cases = list(dict.fromkeys(
+                r.get("identity", {}).get("caseID")
+                for r in group_rows
+                if r.get("identity", {}).get("caseID")
+            ))
+
+            # Only analyze if repeated across distinct cases
+            if len(distinct_cases) < 2:
+                continue
+
+            # 1. Fallback / clarification saturation across intended non-clarification surfaces
+            clarification_rows = [
+                r for r in group_rows
+                if (
+                    r.get("semanticPath", {}).get("semanticTemplateID") == "semantic.ask_clarification"
+                    or r.get("identity", {}).get("reachedSurface") == "semantic.ask_clarification"
+                    or text_lower == "i'm not sure what you mean."
+                )
+            ]
+            if len(clarification_rows) >= 2:
+                for r in clarification_rows:
+                    if r.get("identity", {}).get("surfaceStatus") != "EXPECTED_FALLBACK":
+                        # Check if flag already added
+                        existing_flag_names = {f["name"] for f in r.get("quality", {}).get("flags", [])}
+                        if "FALLBACK_SATURATION" not in existing_flag_names:
+                            flag = QualityFlag(
+                                name="FALLBACK_SATURATION",
+                                severity="HIGH",
+                                confidence="DEFINITE",
+                                detail=f"Clarification fallback '{first_text}' rendered across {len(distinct_cases)} distinct cases",
+                            )
+                            r.setdefault("quality", {}).setdefault("flags", []).append(flag.to_dict())
+                            r.setdefault("quality", {}).setdefault("clusterKeys", []).append("flag:FALLBACK_SATURATION")
+                            r["quality"]["reviewState"] = "FLAGGED"
+
+            # 2. Variant collapse: multiple distinct semantic variants render identical visible text
+            variants_in_group = list(dict.fromkeys(
+                r.get("semanticPath", {}).get("semanticVariantID")
+                for r in group_rows
+                if r.get("semanticPath", {}).get("semanticVariantID")
+            ))
+            if len(variants_in_group) >= 2:
+                for r in group_rows:
+                    existing_flag_names = {f["name"] for f in r.get("quality", {}).get("flags", [])}
+                    if "VARIANT_COLLAPSE" not in existing_flag_names:
+                        flag = QualityFlag(
+                            name="VARIANT_COLLAPSE",
+                            severity="MEDIUM",
+                            confidence="DEFINITE",
+                            detail=f"Multiple semantic variants ({', '.join(variants_in_group[:3])}) rendered identical text '{first_text}'",
+                        )
+                        r.setdefault("quality", {}).setdefault("flags", []).append(flag.to_dict())
+                        r.setdefault("quality", {}).setdefault("clusterKeys", []).append("flag:VARIANT_COLLAPSE")
+                        r["quality"]["reviewState"] = "FLAGGED"
+
+            # 3. Generic acknowledgement concentration
+            if text_lower in ("i understand.", "i see.", "acknowledged.", "that is good.", "okay.", "sure."):
+                if len(distinct_cases) >= 3:
+                    for r in group_rows:
+                        existing_flag_names = {f["name"] for f in r.get("quality", {}).get("flags", [])}
+                        if "GENERIC_ACKNOWLEDGEMENT_CONCENTRATION" not in existing_flag_names:
+                            flag = QualityFlag(
+                                name="GENERIC_ACKNOWLEDGEMENT_CONCENTRATION",
+                                severity="MEDIUM",
+                                confidence="SUSPECT",
+                                detail=f"Generic acknowledgement '{first_text}' concentrated across {len(distinct_cases)} cases",
+                            )
+                            r.setdefault("quality", {}).setdefault("flags", []).append(flag.to_dict())
+                            r.setdefault("quality", {}).setdefault("clusterKeys", []).append("flag:GENERIC_ACKNOWLEDGEMENT_CONCENTRATION")
+                            r["quality"]["reviewState"] = "FLAGGED"
+
+            # 4. Duplicate rendered text across distinct cases (general)
+            if len(distinct_cases) >= 3 and text_lower not in ALLOWED_SHORT_WORDS:
+                for r in group_rows:
+                    existing_flag_names = {f["name"] for f in r.get("quality", {}).get("flags", [])}
+                    if "DUPLICATE_RENDERED_TEXT" not in existing_flag_names:
+                        flag = QualityFlag(
+                            name="DUPLICATE_RENDERED_TEXT",
+                            severity="MEDIUM",
+                            confidence="DEFINITE",
+                            detail=f"Exact text '{first_text}' duplicated across {len(distinct_cases)} cases",
+                        )
+                        r.setdefault("quality", {}).setdefault("flags", []).append(flag.to_dict())
+                        r.setdefault("quality", {}).setdefault("clusterKeys", []).append("flag:DUPLICATE_RENDERED_TEXT")
+                        r["quality"]["reviewState"] = "FLAGGED"
+
+        return list(rows)

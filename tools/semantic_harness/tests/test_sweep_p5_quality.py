@@ -167,6 +167,60 @@ class SweepP5QualityTests(unittest.TestCase):
         self.assertEqual(len(replayed_cases), 5)
         self.assertEqual(replayed_cases, [f"case_{i}" for i in range(5)])
 
+    def test_run_level_quality_checks(self) -> None:
+        """Verify cross-row Stage 2 quality detection."""
+        # 1. Fallback saturation
+        fallback_rows = [
+            {
+                "identity": {"caseID": f"case_fb_{i}", "surfaceStatus": "INVALID_SURFACE"},
+                "output": {"finalText": "I'm not sure what you mean."},
+                "trigger": {},
+                "semanticPath": {"semanticTemplateID": "semantic.ask_clarification"},
+                "selectionProvenance": {"canonicalSourceOwner": "core.fallback"},
+            }
+            for i in range(3)
+        ]
+        self.analyzer.analyze_run(fallback_rows)
+        for r in fallback_rows:
+            flags = {f["name"] for f in r.get("quality", {}).get("flags", [])}
+            self.assertIn("FALLBACK_SATURATION", flags)
+
+        # 2. Variant collapse
+        collapse_rows = [
+            {
+                "identity": {"caseID": f"case_vc_{i}"},
+                "output": {"finalText": "I'm holding up alright."},
+                "trigger": {},
+                "semanticPath": {
+                    "semanticTemplateID": "companion.chat",
+                    "semanticVariantID": f"var_healthy_{i}",
+                },
+                "selectionProvenance": {"canonicalSourceOwner": "dialogue_dataset.chat"},
+            }
+            for i in range(3)
+        ]
+        self.analyzer.analyze_run(collapse_rows)
+        for r in collapse_rows:
+            flags = {f["name"] for f in r.get("quality", {}).get("flags", [])}
+            self.assertIn("VARIANT_COLLAPSE", flags)
+
+        # 3. Duplicate rendered text & generic acknowledgement concentration
+        ack_rows = [
+            {
+                "identity": {"caseID": f"case_ack_{i}"},
+                "output": {"finalText": "I understand."},
+                "trigger": {},
+                "semanticPath": {"semanticTemplateID": "companion.ack"},
+                "selectionProvenance": {"canonicalSourceOwner": "dialogue_dataset.ack"},
+            }
+            for i in range(4)
+        ]
+        self.analyzer.analyze_run(ack_rows)
+        for r in ack_rows:
+            flags = {f["name"] for f in r.get("quality", {}).get("flags", [])}
+            self.assertIn("GENERIC_ACKNOWLEDGEMENT_CONCENTRATION", flags)
+            self.assertIn("DUPLICATE_RENDERED_TEXT", flags)
+
 
 if __name__ == "__main__":
     unittest.main()

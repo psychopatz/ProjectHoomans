@@ -10,16 +10,19 @@ from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.testing.sweep_dimensions import (
     EXPLICIT_SCENARIO_ADAPTERS,
+    DiscoveredSurface,
     InvalidDimensionValueError,
     PrerequisiteDimensionError,
     ReadOnlyDimensionError,
     SweepDimensionInventory,
     UnsupportedDimensionError,
+    discover_interaction_surfaces,
     extract_dimension_inventory,
 )
 from tools.semantic_harness.testing.sweep_evidence import (
     EVIDENCE_SCHEMA_V1,
     extract_evidence_rows_from_turn,
+    resolve_trace_handle,
     validate_evidence_row,
 )
 
@@ -324,6 +327,65 @@ class SweepP1FoundationTests(unittest.TestCase):
             self.assertEqual(row["trigger"]["relationshipSummary"]["bondKind"], "sister")
             self.assertIsNotNone(row["output"]["finalText"])
             self.assertTrue(row["traceHandle"]["lazy"])
+
+            # Verify context fields are actually populated from Conversation Inspector
+            rel = row["trigger"]["relationshipSummary"]
+            self.assertIsNotNone(rel["approval"])
+            self.assertIsNotNone(rel["respect"])
+            self.assertIsNotNone(rel["familiarity"])
+            self.assertIsNotNone(rel["identityTrust"])
+
+            persona = row["trigger"]["personaSummary"]
+            self.assertTrue(bool(persona["personality"]))
+            self.assertIsNotNone(persona["socialStyle"])
+
+            actor = row["trigger"]["actorSummary"]
+            self.assertTrue(bool(actor["roles"]))
+
+            state = row["trigger"]["stateSummary"]
+            self.assertTrue(bool(state["npcHealth"]))
+
+            # Verify planned and reached surface
+            self.assertEqual(row["identity"]["surfaceStatus"], "MATCHED")
+            self.assertIn("wellbeing", row["identity"]["reachedSurface"])
+
+            # Verify lazy trace handle resolves to full Conversation Inspector view
+            view = resolve_trace_handle(
+                row["traceHandle"],
+                worker=worker,
+                input_spec={"text": "how are you?"},
+                language="EN",
+            )
+            self.assertIn("personaChoices", view)
+            self.assertIn("semantic", view)
+            self.assertIn("socialContext", view)
+
+    def test_trait_option_normalization(self) -> None:
+        """Verify structured trait options normalize to canonical IDs and carry labels."""
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            inventory = extract_dimension_inventory(worker)
+            trait_dim = inventory.get("persona.traits")
+            self.assertIsNotNone(trait_dim)
+            self.assertEqual(trait_dim.value_type, "array")
+            self.assertIn("pnc_berserker", trait_dim.options)
+            self.assertEqual(trait_dim.option_labels.get("pnc_berserker"), "Berserker")
+
+            # Validate parameter vector with raw strings and object dicts
+            validated = trait_dim.validate_value(["pnc_berserker", {"value": "pnc_brawler", "label": "Brawler"}])
+            self.assertEqual(validated, ["pnc_berserker", "pnc_brawler"])
+
+    def test_surface_discovery_from_worker(self) -> None:
+        """Verify interaction surfaces are discovered from production worker."""
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            surfaces = discover_interaction_surfaces(worker)
+            surface_ids = [s.surface_id for s in surfaces]
+            # Must contain production root choices
+            self.assertIn("conversation.root:menu:ask_name", surface_ids)
+            self.assertIn("conversation.root:menu:recruit", surface_ids)
+            self.assertIn("conversation.root:menu:goodbye", surface_ids)
+            # Must contain production utterances
+            self.assertIn("scenario.utterance:how are you?", surface_ids)
+            self.assertIn("scenario.utterance:hello", surface_ids)
 
 
 if __name__ == "__main__":

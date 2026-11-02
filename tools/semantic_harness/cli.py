@@ -501,6 +501,8 @@ def cli(arguments: argparse.Namespace) -> int:
                     strategy=getattr(arguments, "sweep_strategy", None) or "smoke",
                     sweep_id=sweep_id,
                     max_cases=getattr(arguments, "sweep_max_cases", 512) or 512,
+                    surfaces=getattr(arguments, "sweep_surfaces", None),
+                    languages=getattr(arguments, "sweep_languages", None) or ("EN", "TL"),
                 )
                 report = {
                     "ok": True,
@@ -522,6 +524,8 @@ def cli(arguments: argparse.Namespace) -> int:
                     strategy=getattr(arguments, "sweep_strategy", None) or "smoke",
                     sweep_id=sweep_id,
                     max_cases=getattr(arguments, "sweep_max_cases", 512) or 512,
+                    surfaces=getattr(arguments, "sweep_surfaces", None),
+                    languages=getattr(arguments, "sweep_languages", None) or ("EN", "TL"),
                 )
                 manifest = service.run_sweep(
                     plan,
@@ -553,6 +557,8 @@ def cli(arguments: argparse.Namespace) -> int:
                 filtered = cluster_report.filter_by(
                     severity=getattr(arguments, "sweep_severity", None),
                     flag=getattr(arguments, "sweep_flag", None),
+                    pool=getattr(arguments, "sweep_pool", None),
+                    source=getattr(arguments, "sweep_source", None),
                 )
                 rep_dict = cluster_report.to_dict()
                 rep_dict["clusters"] = [c.to_dict() for c in filtered]
@@ -1226,6 +1232,10 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--sweep-case-id", help="replay specific case ID")
     parser.add_argument("--sweep-severity", help="filter cluster report by severity")
     parser.add_argument("--sweep-flag", help="filter cluster report by flag name")
+    parser.add_argument("--sweep-source", help="filter cluster report by canonical source owner")
+    parser.add_argument("--sweep-pool", help="filter cluster report by pool ID")
+    parser.add_argument("--sweep-surfaces", nargs="*", help="interaction surfaces to target")
+    parser.add_argument("--sweep-languages", nargs="*", help="languages to target (e.g. EN TL)")
     parser.add_argument("--sweep-bundle", action="store_true", help="emit LLM review bundle instead of cluster report")
     parser.add_argument("--sweep-reachability", action="store_true", help="emit variant reachability report")
     parser.add_argument("--input", action="append", default=[], help="chat input; repeatable")

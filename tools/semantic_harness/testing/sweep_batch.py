@@ -45,10 +45,12 @@ class SweepBatch:
     batch_id: str
     sweep_id: str
     case_ids: list[str]
-    status: str = "PENDING"  # PENDING, RUNNING, COMPLETED, FAILED, CANCELLED
+    status: str = "PENDING"  # PENDING, RUNNING, COMPLETED, COMPLETED_WITH_INVALID_SURFACE, FAILED, CANCELLED
     cases_count: int = 0
     completed_cases: int = 0
     failed_cases: int = 0
+    invalid_surface_cases: int = 0
+    completed_case_ids: list[str] = field(default_factory=list)
     started_at: float | None = None
     completed_at: float | None = None
     duration: float = 0.0
@@ -63,6 +65,8 @@ class SweepBatch:
             "casesCount": self.cases_count,
             "completedCases": self.completed_cases,
             "failedCases": self.failed_cases,
+            "invalidSurfaceCases": self.invalid_surface_cases,
+            "completedCaseIDs": list(self.completed_case_ids),
             "startedAt": self.started_at,
             "completedAt": self.completed_at,
             "duration": self.duration,
@@ -79,6 +83,8 @@ class SweepBatch:
             cases_count=int(data.get("casesCount", 0)),
             completed_cases=int(data.get("completedCases", 0)),
             failed_cases=int(data.get("failedCases", 0)),
+            invalid_surface_cases=int(data.get("invalidSurfaceCases", 0)),
+            completed_case_ids=list(data.get("completedCaseIDs", [])),
             started_at=data.get("startedAt"),
             completed_at=data.get("completedAt"),
             duration=float(data.get("duration", 0.0)),
@@ -97,9 +103,10 @@ class SweepManifest:
     total_cases: int
     batch_size: int
     batches: list[SweepBatch]
-    status: str = "PLANNED"  # PLANNED, RUNNING, COMPLETED, FAILED, CANCELLED
+    status: str = "PLANNED"  # PLANNED, RUNNING, COMPLETED, COMPLETED_WITH_INVALID_SURFACE, FAILED, CANCELLED
     completed_cases: int = 0
     failed_cases: int = 0
+    invalid_surface_cases: int = 0
     artifact_directory: str = ""
     evidence_file: str = "evidence.jsonl"
     created_at: float = field(default_factory=time.time)
@@ -118,6 +125,7 @@ class SweepManifest:
             "totalCases": self.total_cases,
             "completedCases": self.completed_cases,
             "failedCases": self.failed_cases,
+            "invalidSurfaceCases": self.invalid_surface_cases,
             "batchSize": self.batch_size,
             "status": self.status,
             "artifactDirectory": self.artifact_directory,
@@ -144,6 +152,7 @@ class SweepManifest:
             status=str(data.get("status", "PLANNED")),
             completed_cases=int(data.get("completedCases", 0)),
             failed_cases=int(data.get("failedCases", 0)),
+            invalid_surface_cases=int(data.get("invalidSurfaceCases", 0)),
             artifact_directory=str(data.get("artifactDirectory", "")),
             evidence_file=str(data.get("evidenceFile", "evidence.jsonl")),
             created_at=float(data.get("createdAt", time.time())),
@@ -177,6 +186,16 @@ class SweepManifest:
                 f"Cannot resume sweep '{self.sweep_id}': production catalog fingerprint changed!\n"
                 f"Manifest fingerprint: {self.catalog_fingerprint}\n"
                 f"Current fingerprint:  {current_fingerprint}"
+            )
+
+    def validate_compatibility(self, inventory: Any, plan: Any) -> None:
+        """Validate that current inventory and plan match the recorded manifest."""
+        self.validate_catalog_fingerprint(inventory.production_fingerprint)
+        if self.plan_digest != plan.plan_digest:
+            raise SweepBatchError(
+                f"Cannot resume sweep '{self.sweep_id}': plan digest changed!\n"
+                f"Manifest digest: {self.plan_digest}\n"
+                f"Current digest:  {plan.plan_digest}"
             )
 
 
@@ -235,7 +254,7 @@ class SweepBatchExecutor:
     def _init_manifest(self) -> SweepManifest:
         if self.manifest_path.exists():
             manifest = SweepManifest.load(self.manifest_path)
-            manifest.validate_catalog_fingerprint(self.inventory.production_fingerprint)
+            manifest.validate_compatibility(self.inventory, self.plan)
             return manifest
 
         batches = split_plan_into_batches(self.plan, self.batch_size)
@@ -260,14 +279,17 @@ class SweepBatchExecutor:
         is_cancelled: Callable[[], bool] | None = None,
     ) -> SweepBatch | None:
         """Execute the next pending/incomplete batch. Returns None when all batches are complete."""
-        # Find first incomplete batch
+        # Find first incomplete batch (including CANCELLED batches that are being resumed)
         batch = next(
-            (b for b in self.manifest.batches if b.status in ("PENDING", "FAILED")),
+            (b for b in self.manifest.batches if b.status in ("PENDING", "FAILED", "CANCELLED", "RUNNING")),
             None,
         )
         if batch is None:
-            if all(b.status == "COMPLETED" for b in self.manifest.batches):
-                self.manifest.status = "COMPLETED"
+            if all(b.status in ("COMPLETED", "COMPLETED_WITH_INVALID_SURFACE") for b in self.manifest.batches):
+                if any(b.status == "COMPLETED_WITH_INVALID_SURFACE" for b in self.manifest.batches):
+                    self.manifest.status = "COMPLETED_WITH_INVALID_SURFACE"
+                else:
+                    self.manifest.status = "COMPLETED"
                 self.manifest.save(self.artifact_dir)
             return None
 
@@ -278,17 +300,23 @@ class SweepBatchExecutor:
             raise SweepExecutionCancelled(f"Execution cancelled before {batch.batch_id}")
 
         batch.status = "RUNNING"
-        batch.started_at = time.time()
+        if not batch.started_at:
+            batch.started_at = time.time()
         self.manifest.status = "RUNNING"
         self.manifest.save(self.artifact_dir)
 
-        completed_in_batch = 0
-        failed_in_batch = 0
+        completed_in_batch = len(batch.completed_case_ids)
+        failed_in_batch = batch.failed_cases
+        invalid_in_batch = batch.invalid_surface_cases
         batch_start = time.monotonic()
 
         # Open evidence file in append mode
         with open(self.evidence_path, "a", encoding="utf-8") as out_f:
             for case_id in batch.case_ids:
+                if case_id in batch.completed_case_ids:
+                    # Already completed in a prior interrupted/partial run: do not re-run or duplicate
+                    continue
+
                 if is_cancelled and is_cancelled():
                     batch.status = "CANCELLED"
                     self.manifest.status = "CANCELLED"
@@ -300,10 +328,14 @@ class SweepBatchExecutor:
                     continue
 
                 try:
-                    self._execute_single_case(planned_case, batch.batch_id, out_f)
+                    case_res = self._execute_single_case(planned_case, batch.batch_id, out_f)
                     completed_in_batch += 1
+                    batch.completed_case_ids.append(case_id)
+                    if case_res.get("invalid_surface"):
+                        invalid_in_batch += 1
                 except Exception as exc:
                     failed_in_batch += 1
+                    batch.completed_case_ids.append(case_id)
                     # Record failure as a synthetic error row rather than crashing the batch
                     error_row = {
                         "schema": "pnc.semantic-dialogue-quality-evidence.v1",
@@ -320,6 +352,9 @@ class SweepBatchExecutor:
                             "language": planned_case.language,
                             "salt": None,
                             "historyMode": "isolated",
+                            "plannedSurface": planned_case.surface,
+                            "reachedSurface": "execution_error",
+                            "surfaceStatus": "EXECUTION_ERROR",
                             "input": {"text": planned_case.surface},
                         },
                         "trigger": {
@@ -359,21 +394,28 @@ class SweepBatchExecutor:
                     out_f.write(json.dumps(error_row) + "\n")
                     out_f.flush()
 
-        batch.duration = time.monotonic() - batch_start
+        batch.duration += time.monotonic() - batch_start
         batch.completed_at = time.time()
         batch.completed_cases = completed_in_batch
         batch.failed_cases = failed_in_batch
+        batch.invalid_surface_cases = invalid_in_batch
 
         if failed_in_batch > 0 and completed_in_batch == 0:
             batch.status = "FAILED"
+        elif invalid_in_batch > 0:
+            batch.status = "COMPLETED_WITH_INVALID_SURFACE"
         else:
             batch.status = "COMPLETED"
 
         self.manifest.completed_cases = sum(b.completed_cases for b in self.manifest.batches)
         self.manifest.failed_cases = sum(b.failed_cases for b in self.manifest.batches)
+        self.manifest.invalid_surface_cases = sum(b.invalid_surface_cases for b in self.manifest.batches)
 
-        if all(b.status == "COMPLETED" for b in self.manifest.batches):
-            self.manifest.status = "COMPLETED"
+        if all(b.status in ("COMPLETED", "COMPLETED_WITH_INVALID_SURFACE") for b in self.manifest.batches):
+            if any(b.status == "COMPLETED_WITH_INVALID_SURFACE" for b in self.manifest.batches):
+                self.manifest.status = "COMPLETED_WITH_INVALID_SURFACE"
+            else:
+                self.manifest.status = "COMPLETED"
         elif any(b.status == "FAILED" for b in self.manifest.batches):
             self.manifest.status = "FAILED"
 
@@ -400,10 +442,12 @@ class SweepBatchExecutor:
         case: PlannedCase,
         batch_id: str,
         out_file: Any,
-    ) -> None:
+    ) -> dict[str, Any]:
         """Execute a planned case against LuaSemanticWorker and stream rows."""
         scenario = self.inventory.project_to_scenario(case.parameters, DEFAULT_SCENARIO)
         scenario.setdefault("runtime", {})["language"] = case.language
+
+        has_invalid_surface = False
 
         with self.worker_factory(scenario) as worker:
             if hasattr(worker, "set_language"):
@@ -416,6 +460,7 @@ class SweepBatchExecutor:
                 root_choice = turn_spec.get("rootChoice")
                 input_text = turn_spec.get("text") or turn_spec.get("input")
                 suggestion_frame = turn_spec.get("suggestionClick")
+                surface_missing = False
 
                 if root_choice:
                     worker.open_conversation()
@@ -424,15 +469,27 @@ class SweepBatchExecutor:
                         ((view.get("presentation") or {}).get("responseChannel") or {}).get("rows")
                         or []
                     )
-                    candidate_id = "conversation.root:menu:" + str(root_choice)
-                    matched = [
-                        row for row in choice_rows
-                        if isinstance(row, dict) and row.get("id") == candidate_id
-                    ]
-                    if len(matched) == 1:
-                        record = worker.suggestion_click(matched[0]["frame"])
+                    target = str(root_choice).strip()
+                    matched = None
+                    for r in choice_rows:
+                        if not isinstance(r, dict):
+                            continue
+                        rid = str(r.get("id") or "")
+                        ext = (r.get("frame") or {}).get("extensions") or {}
+                        aid = ext.get("actionID") or ext.get("rootChoiceID")
+                        if (
+                            rid == target
+                            or rid.endswith(":" + target)
+                            or aid == target
+                            or ("orders" in rid and target in ("orders", "companion_orders"))
+                        ):
+                            matched = r
+                            break
+
+                    if matched and "frame" in matched:
+                        record = worker.suggestion_click(matched["frame"])
                     else:
-                        # Fallback to direct input
+                        surface_missing = True
                         record = worker.input(f"root:{root_choice}")
                 elif suggestion_frame:
                     record = worker.suggestion_click(suggestion_frame)
@@ -451,12 +508,18 @@ class SweepBatchExecutor:
                     parameters=case.parameters,
                     language=case.language,
                     input_spec=turn_spec,
+                    planned_surface=case.surface,
+                    surface_missing=surface_missing,
                     worker=worker,
                 )
 
                 for row in rows:
+                    if row.get("identity", {}).get("surfaceStatus") == "INVALID_SURFACE":
+                        has_invalid_surface = True
                     out_file.write(json.dumps(row) + "\n")
                 out_file.flush()
+
+        return {"invalid_surface": has_invalid_surface}
 
     def iter_evidence_rows(self) -> Generator[dict[str, Any], None, None]:
         """Stream read parsed evidence rows from evidence.jsonl."""
