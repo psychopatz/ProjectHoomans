@@ -128,7 +128,38 @@ function Selector.SelectBlock(categoryID, context)
         eligible,
         Selector.Seed(context, "category:" .. tostring(categoryID))
     )
-    return selected, {
+    if selected then
+        return selected, {
+            roll = roll,
+            totalWeight = total,
+            eligibleCount = #eligible,
+            candidates = diagnostics,
+        }
+    end
+
+    if PsychopatzCore and PsychopatzCore.Semantics
+        and type(PsychopatzCore.Semantics.SelectDialogueBlock) == "function"
+    then
+        local coreBlock, coreOutcome = PsychopatzCore.Semantics.SelectDialogueBlock(categoryID, context)
+        if coreBlock then
+            return {
+                id = coreBlock.id,
+                category = coreBlock.category,
+                priority = coreBlock.priority,
+                textKey = coreOutcome and coreOutcome.textKey or coreBlock.textKey,
+                isCoreBlock = true,
+                raw = coreBlock,
+            }, {
+                roll = 1,
+                totalWeight = 1,
+                eligibleCount = 1,
+                candidates = diagnostics,
+                source = "PsychopatzCore.Semantics",
+            }
+        end
+    end
+
+    return nil, {
         roll = roll,
         totalWeight = total,
         eligibleCount = #eligible,
