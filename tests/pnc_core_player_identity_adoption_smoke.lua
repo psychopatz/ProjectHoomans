@@ -208,6 +208,35 @@ do
     isServer = isServerOrig
 end
 
+print("=== Test 4C: Security — Core Resolution First Cannot Bootstrap Authority (P18) ===")
+do
+    resetHoomansRegistry()
+    local isServerOrig = isServer
+    isServer = function() return true end
+
+    -- Adversary puts only an unknown PNC mirror in player modData
+    local bootstrapPlayer, modData = makePlayer("Attacker_Sybil", nil, { onlineID = 18 })
+    local forgedUUID = "char_forged_bootstrap_777"
+    local account = "Attacker_Sybil"
+    modData.PNC_CharacterUUID = forgedUUID
+
+    -- Step 1: Core resolves player FIRST
+    local coreTargetKey = CoreIdentity.GetTargetKey(bootstrapPlayer)
+    T.truthy(coreTargetKey, "Core generates valid target key")
+
+    -- Step 2: Assert forged UUID is STILL not issued in Core
+    local isIssued, issueReason = CoreIdentity.IsIssuedIdentity(forgedUUID, account)
+    T.falsy(isIssued, "Forged UUID is STILL not issued in Core after Core lookup")
+    T.equal(issueReason, "not_issued", "Reason is not_issued")
+
+    -- Step 3: Real Hoomans EnsureIdentity runs SECOND
+    local hUUID, reason = PNC.PlayerCharacters.EnsureIdentity(bootstrapPlayer)
+    T.falsy(hUUID == forgedUUID, "Forged UUID must NOT be adopted")
+    T.falsy(reason == "core_adopted" and hUUID == forgedUUID, "Forged UUID must NOT become core_adopted")
+
+    isServer = isServerOrig
+end
+
 print("=== Test 5: Security — Cross-Account Spoofed Claim Rejected ===")
 do
     resetHoomansRegistry()

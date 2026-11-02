@@ -223,14 +223,25 @@ T.equal(hAdoptReason, "core_adopted", "Reason was core_adopted")
 local hAliceKey = PNC.PlayerCharacters.GetEntityKey(playerAlice)
 T.equal(hAliceKey, aliceCanonicalKey, "Real Hoomans entity key exactly equals Core canonical key")
 
--- Adversarial check: forged UUID with valid-looking signature is rejected because not issued by Core
+-- Adversarial check (P18): unknown PNC mirror with Core resolving FIRST cannot manufacture authority
 local forgedPlayer, forgedModData = makePlayer("Mallory", nil, { playerNum = 2 })
 local forgedUUID = "char_mallory_forged_99999999"
 forgedModData.PNC_CharacterUUID = forgedUUID
 forgedModData.PNC_IdentityProvenance = PlayerIdentity.SignProvenance(forgedPlayer, forgedUUID, "sp_slot_2")
+
+-- Step 1: Core resolves FIRST
+local forgedCoreKey = PlayerIdentity.GetTargetKey(forgedPlayer)
+T.truthy(forgedCoreKey, "Core resolves player")
+
+-- Step 2: Assert forged UUID remains unissued in Core
+local isIssued, issueReason = PlayerIdentity.IsIssuedIdentity(forgedUUID, "sp_slot_2")
+T.falsy(isIssued, "Forged UUID remains unissued after Core lookup")
+T.equal(issueReason, "not_issued", "Reason is not_issued")
+
+-- Step 3: Hoomans EnsureIdentity runs SECOND
 local forgedAdopted, forgedReason = PNC.PlayerCharacters.EnsureIdentity(forgedPlayer)
 T.truthy(forgedAdopted ~= forgedUUID, "Adversary forged UUID rejected by EnsureIdentity")
-T.equal(forgedReason, "new_identity", "Fresh identity created instead of core_adopted")
+T.falsy(forgedAdopted == forgedUUID and forgedReason == "core_adopted", "Forged UUID not core_adopted")
 
 -- Hoomans registers semantic pack
 PNC.Semantics.CoreSemanticPack.Register(PsychopatzCore)
