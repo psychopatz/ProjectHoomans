@@ -55,10 +55,10 @@ RELATIONSHIP_BUCKETS: dict[str, BucketPolicy] = {
     ),
     "relationship.identityTrust": BucketPolicy(
         dimension_id="relationship.identityTrust",
-        values=(0.0, 25.0, 50.0, 75.0, 100.0),
-        thresholds=(50.0,),
-        provenance="PNC_RelationshipConstants.lua",
-        strategy_reason="Covers untrusted, guarded, neutral, trusted, and intimate name/identity disclosure",
+        values=("unknown", "trusted", "untrustworthy"),
+        thresholds=(),
+        provenance="simulation_control_catalog.options",
+        strategy_reason="Production identity trust options: unknown, trusted, untrustworthy",
     ),
 }
 
