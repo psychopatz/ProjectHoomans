@@ -19,6 +19,7 @@ Testing-engine concepts such as smoke/full/pairwise strategy names, batch IDs, r
 - **P1 Foundation & Evidence Contract**:
   - `EVIDENCE_SCHEMA_V1`: compact per-rendered-sentence evidence rows with triggering parameter vectors, output text, semantic template/variant, realization family/variant, phrase ID, translation identity, persona/relationship/state context, selection provenance, and lazy trace handles.
   - Production-backed dimension inventory extracted from live worker catalogs without hardcoded personalities.
+  - Production-backed canonical source ownership: resolves actual authored Lua catalog files (`PNC_SemanticDialogueResponseCatalog_*.lua`), dataset sources (`dialogue_dataset.<topic>`), categories/menu responses (`categories.json`), and clarification fallbacks (`core.fallback`) instead of emitting `UNKNOWN`.
 - **P2 Balanced Coverage Planning**:
   - Round-robin allocation ensures budget fairness across all discovered executable surfaces.
   - Smoke, boundary, pairwise, persona, and balanced review strategies.

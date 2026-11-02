@@ -349,6 +349,14 @@ class SweepP1FoundationTests(unittest.TestCase):
             self.assertEqual(row["identity"]["surfaceStatus"], "MATCHED")
             self.assertIn("wellbeing", row["identity"]["reachedSurface"])
 
+            # Verify production-backed canonical source ownership is resolved
+            canonical_source = row["selectionProvenance"]["canonicalSourceOwner"]
+            self.assertNotEqual(canonical_source, "UNKNOWN")
+            self.assertTrue(
+                "wellbeing" in canonical_source or canonical_source.endswith(".lua"),
+                f"Unexpected canonical source: {canonical_source}"
+            )
+
             # Verify lazy trace handle resolves to full Conversation Inspector view
             view = resolve_trace_handle(
                 row["traceHandle"],

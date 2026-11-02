@@ -333,6 +333,11 @@ class SweepP6UiAndReviewTests(SemanticLabGuiTestCase):
             self.assertIn("pnc_brawler", inspector_text)
             self.assertIn("approval", inspector_text.lower())
             self.assertIn("greeting.reply", inspector_text)
+            self.assertIn("dialogue_dataset.greeting", inspector_text)
+            row_1_vals = app.qs_evidence_tree.item("row_1", "values")
+            self.assertEqual(row_1_vals[5], "dialogue_dataset.greeting")
+            row_2_vals = app.qs_evidence_tree.item("row_2", "values")
+            self.assertEqual(row_2_vals[5], "core.fallback")
 
             app.quality_sweep_is_running = True
             on_qs_cancel(app)

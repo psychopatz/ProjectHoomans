@@ -466,6 +466,43 @@ def _problem_text(row: dict[str, Any]) -> str:
     return ", ".join(names[:3])
 
 
+def _source_owner_text(row: dict[str, Any]) -> str:
+    sel = row.get("selectionProvenance") or {}
+    source = sel.get("canonicalSourceOwner")
+    if source and source != "UNKNOWN":
+        return str(source)
+    # Infer for display if missing from older serialized rows
+    sem = row.get("semanticPath") or {}
+    out = row.get("output") or {}
+    txt = str(out.get("finalText") or "")
+    sem_tpl = str(sem.get("semanticTemplateID") or "")
+    sem_var = str(sem.get("semanticVariantID") or sel.get("selectedVariantID") or "")
+    ren_key = str(out.get("renderedKey") or "")
+    reached = str(sem.get("reachedRoute") or "")
+
+    if (
+        sem_tpl == "semantic.ask_clarification"
+        or reached == "semantic.ask_clarification"
+        or txt == "I'm not sure what you mean."
+    ):
+        return "core.fallback"
+    if ren_key.startswith("response.") or sem_tpl.startswith("response."):
+        return "categories.json"
+    if ".dataset." in sem_var:
+        parts = sem_var.split(".dataset.")[0].split(".")
+        return f"dialogue_dataset.{parts[-1] if parts else 'dialogue'}"
+    if ".dataset." in sem_tpl:
+        parts = sem_tpl.split(".dataset.")[0].split(".")
+        return f"dialogue_dataset.{parts[-1] if parts else 'dialogue'}"
+    if "whats_up" in sem_var or "whats_up" in sem_tpl:
+        return "PNC_SemanticDialogueResponseCatalog_Questions_IdentityActivity.lua"
+    if "greeting" in sem_var or "greeting" in sem_tpl:
+        return "PNC_SemanticDialogueResponseCatalog_FlowGreeting.lua"
+    if "wellbeing" in sem_var or "wellbeing" in sem_tpl:
+        return "PNC_SemanticDialogueResponseCatalog_Questions_WellbeingMedical.lua"
+    return "UNKNOWN"
+
+
 def _populate_evidence_tree(app: Any, rows: Sequence[dict[str, Any]]) -> None:
     tree = getattr(app, "qs_evidence_tree", None)
     if tree is None:
@@ -485,12 +522,7 @@ def _populate_evidence_tree(app: Any, rows: Sequence[dict[str, Any]]) -> None:
                 _context_text(row),
                 str(row.get("identity", {}).get("language") or ""),
                 _problem_text(row),
-                str(
-                    row.get("selectionProvenance", {}).get(
-                        "canonicalSourceOwner"
-                    )
-                    or "UNKNOWN"
-                ),
+                _source_owner_text(row),
             ),
         )
 
@@ -558,7 +590,7 @@ def _populate_evidence_inspector(app: Any, row: dict[str, Any]) -> None:
         json.dumps(flags, indent=2, ensure_ascii=False) if flags else "No automatic flags.",
         "",
         "SOURCE",
-        str(sel.get("canonicalSourceOwner") or "UNKNOWN"),
+        _source_owner_text(row),
         "",
         "RAW CHANGED PARAMETERS",
         json.dumps(trig.get("parameters") or {}, indent=2, ensure_ascii=False),
@@ -686,9 +718,7 @@ def on_qs_locate_source(app: Any) -> None:
     row = getattr(app, "selected_quality_sweep_row", None)
     if not row:
         return
-    owner = row.get("selectionProvenance", {}).get(
-        "canonicalSourceOwner", "UNKNOWN"
-    )
+    owner = _source_owner_text(row)
     if hasattr(app, "_messagebox"):
         app._messagebox.showinfo(
             "Source",

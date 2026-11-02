@@ -14,6 +14,7 @@ Crucial rule: Finite non-selection is NEVER claimed to be globally impossible or
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
+from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 REACHABILITY_SCHEMA_V1 = "pnc.semantic-reachability-report.v1"
@@ -491,6 +492,16 @@ class ReachabilityAnalyzer:
                 source_owner = "UNKNOWN"
                 if lineage_cache and var_id in lineage_cache:
                     source_owner = lineage_cache[var_id]
+                elif v.get("contentOwner"):
+                    source_owner = str(v.get("contentOwner"))
+                elif v.get("sourcePath") and v.get("sourcePath") != "UNKNOWN":
+                    src_p = v.get("sourcePath")
+                    if ".dataset." in var_id:
+                        parts = var_id.split(".dataset.")[0].split(".")
+                        topic = parts[-1] if parts else "dialogue"
+                        source_owner = f"dialogue_dataset.{topic}"
+                    else:
+                        source_owner = Path(src_p).name
 
                 sel_count = selected_variant_counts.get(var_id, 0)
                 cases = selected_variant_cases.get(var_id, [])

@@ -12,6 +12,7 @@ from copy import deepcopy
 from dataclasses import asdict, dataclass, field
 import hashlib
 import json
+from pathlib import Path
 from typing import Any, Mapping
 
 from ..inspection.conversation_inspector import build_conversation_inspector
@@ -367,30 +368,87 @@ def extract_evidence_rows_from_turn(
         selected_variant_id = None
         candidate_count = 0
         candidate_rejections: list[dict[str, Any]] = []
+        best_match: dict[str, Any] | None = None
 
-        if worker is not None and hasattr(worker, "response_key_lookup") and semantic_template_id:
-            lookup = worker.response_key_lookup(str(semantic_template_id))
-            matched = lookup.get("matches", [])
-            candidate_count = lookup.get("matchCount", len(matched))
-            direct = [
-                row for row in matched
-                if row.get("matchKind") == "REGISTERED_VARIANT_ID"
+        plan_source_pool = None
+        if isinstance(payload.get("plan"), dict) and payload["plan"].get("sourcePoolID"):
+            plan_source_pool = payload["plan"]["sourcePoolID"]
+
+        if worker is not None and hasattr(worker, "response_key_lookup"):
+            lookup_keys = [
+                k for k in [
+                    semantic_variant_id,
+                    semantic_template_id,
+                    rendered_key,
+                    plan_source_pool,
+                ] if k
             ]
-            if len(direct) == 1 and lookup.get("matchCount") == 1 and not lookup.get("truncated"):
-                provenance = "EXACT_EMITTED_VARIANT_ID"
-                selected_variant_id = direct[0].get("variantID")
-            elif matched:
-                provenance = "TEMPLATE_CANDIDATES_ONLY"
-        elif semantic_variant_id:
+            for lk in lookup_keys:
+                try:
+                    lookup = worker.response_key_lookup(str(lk))
+                except Exception:
+                    lookup = None
+                if lookup and isinstance(lookup, dict) and lookup.get("ok"):
+                    matched = lookup.get("matches", [])
+                    if matched:
+                        candidate_count = lookup.get("matchCount", len(matched))
+                        direct = [
+                            row for row in matched
+                            if row.get("matchKind") == "REGISTERED_VARIANT_ID"
+                        ]
+                        best_match = direct[0] if direct else matched[0]
+                        if len(direct) == 1 and lookup.get("matchCount") == 1 and not lookup.get("truncated"):
+                            provenance = "EXACT_EMITTED_VARIANT_ID"
+                            selected_variant_id = direct[0].get("variantID")
+                        elif direct:
+                            provenance = "EXACT_EMITTED_VARIANT_ID"
+                            selected_variant_id = direct[0].get("variantID")
+                        else:
+                            provenance = "TEMPLATE_CANDIDATES_ONLY"
+                            selected_variant_id = best_match.get("variantID") or semantic_variant_id
+                        break
+
+        if provenance == "UNKNOWN" and semantic_variant_id:
             provenance = "EXACT_EMITTED_VARIANT_ID"
             selected_variant_id = semantic_variant_id
 
         # Canonical source ownership
         canonical_source = "UNKNOWN"
         if lineage_cache:
-            cache_key = str(selected_variant_id or semantic_variant_id or semantic_template_id or "")
-            if cache_key in lineage_cache:
-                canonical_source = lineage_cache[cache_key]
+            for ck in [selected_variant_id, semantic_variant_id, semantic_template_id, rendered_key, plan_source_pool]:
+                if ck and str(ck) in lineage_cache:
+                    canonical_source = lineage_cache[str(ck)]
+                    break
+
+        if canonical_source == "UNKNOWN" and best_match:
+            src_path = best_match.get("sourcePath")
+            var_id = str(best_match.get("variantID") or selected_variant_id or semantic_variant_id or "")
+            if src_path and src_path != "UNKNOWN":
+                if ".dataset." in var_id:
+                    parts = var_id.split(".dataset.")[0].split(".")
+                    topic = parts[-1] if parts else "dialogue"
+                    canonical_source = f"dialogue_dataset.{topic}"
+                else:
+                    canonical_source = Path(src_path).name
+
+        if canonical_source == "UNKNOWN":
+            if (
+                reached_route == "semantic.ask_clarification"
+                or semantic_template_id == "semantic.ask_clarification"
+                or rendered_key == "semantic.ask_clarification"
+                or final_text == "I'm not sure what you mean."
+            ):
+                canonical_source = "core.fallback"
+            elif payload.get("contentOwner"):
+                canonical_source = str(payload.get("contentOwner"))
+            elif payload.get("domain") == "pnc.system.shared.categories" or str(rendered_key or "").startswith("response."):
+                canonical_source = "categories.json"
+            elif semantic_variant_id and ".dataset." in str(semantic_variant_id):
+                parts = str(semantic_variant_id).split(".dataset.")[0].split(".")
+                canonical_source = f"dialogue_dataset.{parts[-1] if parts else 'dialogue'}"
+            elif semantic_template_id and ".dataset." in str(semantic_template_id):
+                parts = str(semantic_template_id).split(".dataset.")[0].split(".")
+                canonical_source = f"dialogue_dataset.{parts[-1] if parts else 'dialogue'}"
 
         row_id = f"{case_id}:{turn_index}:{msg_idx}"
 
@@ -454,6 +512,8 @@ def extract_evidence_rows_from_turn(
                 "candidateCount": candidate_count,
                 "candidateRejectionReasons": candidate_rejections,
                 "canonicalSourceOwner": canonical_source,
+                "sourcePath": best_match.get("sourcePath") if best_match else None,
+                "sourceKind": best_match.get("sourceKind") if best_match else None,
                 "fingerprints": {
                     "catalogFingerprint": record.get("catalogFingerprint"),
                     "revision": record.get("revision"),
