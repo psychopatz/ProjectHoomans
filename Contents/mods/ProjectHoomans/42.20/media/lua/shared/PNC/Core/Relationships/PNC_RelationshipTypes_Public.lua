@@ -23,6 +23,21 @@ local normalizeInteraction = Internal.NormalizeInteraction
 local normalizeInteractionJournal = Internal.NormalizeInteractionJournal
 local boundedString = Internal.BoundedString
 
+local function copyExtensions(val)
+    if type(val) ~= "table" then return {} end
+    local res = {}
+    for k, v in pairs(val) do
+        if type(v) == "table" then
+            local sub = {}
+            for sk, sv in pairs(v) do sub[sk] = sv end
+            res[k] = sub
+        else
+            res[k] = v
+        end
+    end
+    return res
+end
+
 local function normalizeBond(value)
     local source = type(value) == "table" and value or {}
     local class = tostring(source.class or "none")
@@ -274,6 +289,7 @@ function Types.NormalizeRelationship(value, targetKey)
         lastEvaluatedAt = nonNegative(source.lastEvaluatedAt, 0),
         revision = revision(source.revision),
         bond = normalizeBond(source.bond),
+        extensions = copyExtensions(source.extensions),
     }
 end
 
@@ -341,6 +357,7 @@ function Types.NormalizeSocialState(
         conduct = ConductTypes
             and ConductTypes.NormalizeConductRecord(source.conduct)
             or nil,
+        extensions = copyExtensions(source.extensions),
     }
 end
 

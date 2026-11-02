@@ -213,7 +213,12 @@ local function commit(record, social, targetKey, relationship,
         and PNC.Persistence.CoreSocial.SyncToCore
         and PsychopatzCore and PsychopatzCore.Actors
     then
-        pcall(PNC.Persistence.CoreSocial.SyncToCore, record, PsychopatzCore)
+        local ok, success, reason = pcall(PNC.Persistence.CoreSocial.SyncToCore, record, PsychopatzCore)
+        if not ok or not success then
+            if print then
+                print("[PNC][WARN] SyncToCore failed: " .. tostring(reason or success or "unknown"))
+            end
+        end
     end
     if PNC.RelationshipConsequences
         and PNC.RelationshipConsequences.OnRelationshipChanged

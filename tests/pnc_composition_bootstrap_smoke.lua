@@ -87,7 +87,7 @@ local sharedCalls = capture(
 )
 T.equal(sharedCalls[1], "PNC/Core/Base/PNC_Core",
     "shared composition first dependency")
-T.equal(sharedCalls[#sharedCalls], "PNC/Integrations/PNC_PsychopatzProfiler",
+T.equal(sharedCalls[#sharedCalls], "PNC/Semantics/PNC_CoreSemanticPack",
     "shared composition final dependency")
 local travelIndex = indexOf(sharedCalls, "PNC/Core/Travel/PNC_Travel")
 T.equal(sharedCalls[travelIndex - 1], "PNC/Core/Pathing/PNC_PathService",

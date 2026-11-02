@@ -199,12 +199,127 @@ function Adapter.SyncToCore(record, core)
     if not actorID or not core.Actors.DefaultRegistry:Has(actorID) then
         return false, "core_actor_not_found"
     end
-    local coreSocial, reason = Adapter.ToCoreSocial(record.social, core)
-    if not coreSocial then return false, reason end
+
+    local actor = (core.Actors.Get and core.Actors.Get(actorID))
+        or core.Actors.DefaultRegistry:Get(actorID)
+    if not actor then
+        return false, "core_actor_not_found"
+    end
+
+    local Social = service(core)
+    if not Social then
+        return false, "core_social_unavailable"
+    end
+
+    -- Non-destructive Core-first mutation: operate on existing Core social state
+    local currentSocial = actor.social and clone(actor.social) or Social.NewState()
+
+    -- 1. Preserve foreign top-level extensions, update ProjectHoomans top-level
+    currentSocial.extensions = currentSocial.extensions or {}
+    currentSocial.extensions.ProjectHoomans = {
+        morale = tonumber(record.social.morale) or 0,
+        moraleBaseline = tonumber(record.social.moraleBaseline) or 0,
+        conduct = clone(record.social.conduct),
+        lastEvaluatedAt = tonumber(record.social.lastEvaluatedAt) or 0,
+    }
+
+    -- 2. Non-destructively merge relationships
+    if type(record.social.relationships) == "table" then
+        currentSocial.relationships = currentSocial.relationships or {}
+        for targetKey, hoomRel in pairs(record.social.relationships) do
+            if type(targetKey) == "string" and type(hoomRel) == "table" then
+                local resolvedKey = targetKey
+                if currentSocial.aliases and currentSocial.aliases[targetKey] then
+                    resolvedKey = currentSocial.aliases[targetKey]
+                end
+
+                local rel = currentSocial.relationships[resolvedKey]
+                if not rel then
+                    local createdRel = Social.GetOrCreate(currentSocial, resolvedKey)
+                    rel = createdRel or currentSocial.relationships[resolvedKey]
+                end
+
+                if rel then
+                    local hoomExt = {
+                        baselineApproval = tonumber(hoomRel.baselineApproval) or 0,
+                        baselineRespect = tonumber(hoomRel.baselineRespect) or 0,
+                        state = hoomRel.state,
+                        previousState = hoomRel.previousState,
+                        bond = clone(hoomRel.bond),
+                        saturation = clone(hoomRel.saturation),
+                        cooldowns = clone(hoomRel.cooldowns),
+                        interactionJournal = clone(hoomRel.interactionJournal),
+                        interactionRevision = tonumber(hoomRel.interactionRevision) or 0,
+                        lastInteractionAt = tonumber(hoomRel.lastInteractionAt) or 0,
+                        lastEvaluatedAt = tonumber(hoomRel.lastEvaluatedAt) or 0,
+                    }
+
+                    local relRev = tonumber(rel.revision) or 0
+                    local hoomRev = tonumber(hoomRel.revision) or 0
+                    if hoomRev >= relRev then
+                        if hoomRel.approval ~= nil then
+                            rel.approval = math.max(Social.MIN_APPROVAL or -100,
+                                math.min(Social.MAX_APPROVAL or 100, tonumber(hoomRel.approval) or 0))
+                        end
+                        if hoomRel.respect ~= nil then
+                            rel.respect = math.max(Social.MIN_RESPECT or -100,
+                                math.min(Social.MAX_RESPECT or 100, tonumber(hoomRel.respect) or 0))
+                        end
+                        if hoomRel.familiarity ~= nil then
+                            rel.familiarity = math.max(Social.MIN_FAMILIARITY or 0,
+                                math.min(Social.MAX_FAMILIARITY or 100, tonumber(hoomRel.familiarity) or 0))
+                        end
+                    end
+
+                    rel.lastEventAt = math.max(
+                        tonumber(rel.lastEventAt) or 0,
+                        tonumber(hoomRel.lastInteractionAt) or 0,
+                        tonumber(hoomRel.lastEvaluatedAt) or 0
+                    )
+
+                    -- Preserve any foreign adopter extensions (e.g. DynamicTrading)
+                    rel.extensions = rel.extensions or {}
+                    rel.extensions.ProjectHoomans = hoomExt
+
+                    -- Deduplicating memory merge
+                    rel.memories = rel.memories or {}
+                    local existingMemoryIDs = {}
+                    for _, m in ipairs(rel.memories) do
+                        local mid = m.id or m.eventID
+                        if mid then existingMemoryIDs[mid] = true end
+                    end
+                    for _, m in ipairs(hoomRel.memories or {}) do
+                        local mid = m.id or m.eventID
+                        if mid and not existingMemoryIDs[mid] then
+                            existingMemoryIDs[mid] = true
+                            rel.memories[#rel.memories + 1] = clone(m)
+                        end
+                    end
+                    while #rel.memories > (Social.MAX_MEMORIES or 32) do
+                        table.remove(rel.memories, 1)
+                    end
+
+                    rel.revision = math.max(relRev, hoomRev) + 1
+                end
+            end
+        end
+    end
+
+    currentSocial.revision = (tonumber(currentSocial.revision) or 0) + 1
+
     local committed, commitReason = core.Actors.DefaultRegistry:Commit(actorID, {
-        social = coreSocial,
+        social = currentSocial,
     })
-    return committed ~= nil, commitReason
+    if not committed then
+        return false, commitReason
+    end
+
+    local refreshed = Adapter.FromCoreSocial(committed.social or currentSocial, record.social)
+    if refreshed then
+        record.social = refreshed
+    end
+
+    return true
 end
 
 function Adapter.SyncFromCore(record, core)

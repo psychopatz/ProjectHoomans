@@ -50,7 +50,6 @@ local function getRelationship(record, targetKey)
         and type(social.relationships) == "table"
         and social.relationships or nil
     local rel = relationships and relationships[targetKey] or nil
-    if not rel then return nil end
 
     if PsychopatzCore and PsychopatzCore.Actors and PsychopatzCore.Actors.Social then
         local actorID = record.coreActorID
@@ -60,9 +59,27 @@ local function getRelationship(record, targetKey)
         if actor and actor.social then
             local coreRel = PsychopatzCore.Actors.Social.Get(actor.social, targetKey)
             if coreRel then
-                rel.approval = coreRel.approval
-                rel.respect = coreRel.respect
-                rel.familiarity = coreRel.familiarity
+                if not rel then
+                    if PNC.Persistence and PNC.Persistence.CoreSocial
+                        and PNC.Persistence.CoreSocial.FromCoreSocial
+                    then
+                        local projected = PNC.Persistence.CoreSocial.FromCoreSocial(actor.social, record.social)
+                        if projected and projected.relationships then
+                            record.social = record.social or {}
+                            record.social.relationships = record.social.relationships or {}
+                            for k, v in pairs(projected.relationships) do
+                                record.social.relationships[k] = v
+                            end
+                            rel = record.social.relationships[targetKey]
+                                or (coreRel.targetKey and record.social.relationships[coreRel.targetKey])
+                        end
+                    end
+                else
+                    rel.approval = coreRel.approval
+                    rel.respect = coreRel.respect
+                    rel.familiarity = coreRel.familiarity
+                    rel.revision = math.max(tonumber(rel.revision) or 0, tonumber(coreRel.revision) or 0)
+                end
             end
         end
     end

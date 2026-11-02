@@ -3,6 +3,6 @@
 -- values through the environment, so normal version upgrades need no test edits.
 return {
     projectHoomansRuntime = "42.20",
-    psychopatzCoreRuntime = "42.19",
+    psychopatzCoreRuntime = "42.20",
     psychopatzCoreRepository = "../psychopatzCore",
 }
