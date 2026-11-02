@@ -1,132 +1,130 @@
 # Audit — Semantic Exhaustive Dialogue Quality Sweep
 
-## Post-implementation acceptance audit
+## Current audit baseline
 
-Audit baseline: ProjectHoomans `5af171b079b9652fd1b8c2ef64c18b5bfd07ccab`.
+Current accepted remediation baseline before this documentation update:
 
-The implementation is substantial and preserves the old semantic system, but the prior developer-complete claim is not supported by real acceptance evidence.
+- ProjectHoomans HEAD: `dd9a6dc9a03103becbac2835b2fe85908e8429ca`;
+- local `main` ahead of `origin/main`;
+- worktree clean before this docs update;
+- no native Project Zomboid, source save, or Workshop publication used.
 
-## Verified healthy foundation
+## What the previous implementation got wrong
 
-The audit reran:
+The earlier Quality Sweep exposed testing internals—strategy names, batches, coverage tabs and reachability tables—as the primary UI even though the user primarily wanted to review generated NPC dialogue.
 
-- new sweep suite: **32/32 PASS**;
-- Lua semantic regression: **144/144 PASS**;
-- focused Semantic Test Subsystem/parity set: **27/27 PASS**;
-- Response Observatory set: **30/30 PASS**;
-- Quality Sweep Tk/Xvfb test file: **4/4 PASS**.
+The screenshot/runtime audit found a more serious bug:
 
-This establishes that the agent added real code without obviously regressing existing semantics.
+- the sweep had completed and written evidence rows;
+- the GUI showed `0 of 0`;
+- loading those rows crashed because production `identityTrust` may be categorical (`"unknown"`) while the quality analyzer forced it through `float(...)`.
 
-## Verified acceptance defects
+This proved that a green manifest was not sufficient acceptance.
 
-### A. Stale hard-coded interaction surfaces
+## Verified remediation
 
-Current planner default root-choice names do not match the current live root projection.
+### Sentence-first GUI
 
-A real conversation projection showed choices such as `ask_name`, `recruit`, `goodbye`, `whats_up`, and `companion.orders:open`.
+The normal Quality Sweep workflow is now:
 
-A real smoke sweep nevertheless counted stale `wellbeing`, `orders`, `companion_status`, and `trade` cases as completed after they fell into clarification.
+`Generate Sentences → browse generated lines → filter suspicious/repeated lines → inspect one line`.
 
-**Impact:** the harness can report green coverage without exercising the target semantic feature.
+Default visible controls are limited to:
 
-### B. Full plan is badly distributed
+- Generate Sentences;
+- Stop;
+- Languages;
+- Max examples;
+- Reload Results;
+- Advanced….
 
-A 256-case full plan contained:
+The primary table shows:
 
-- 240 parameterized root-choice cases;
-- 0 parameterized utterance cases;
-- 221 cases on `scenario.rootChoice:wellbeing`.
+- NPC Sentence;
+- Trigger;
+- Context;
+- Lang;
+- Quality / Problem;
+- Source.
 
-Because that surface is stale in the observed root menu, this makes the main broad-combination strategy misleading.
+### Real GUI display
 
-### C. Evidence projection reads outdated paths
+A hermetic real-worker GUI run with 4 cases completed with:
 
-Real Conversation Inspector data exposes relationship/personality/traits/situation under `personaChoices.actorConversationContext` and related social-context structures.
+- 4 evidence rows;
+- 4 visible sentence-table rows.
 
-The compact evidence row for a real `how are you?` turn returned empty persona/state and missing relationship values.
+Example real outputs included:
 
-**Impact:** exactly the parameters needed to explain bad dialogue are absent from the output the LLM/user is supposed to review.
+- `I'm Mara Vale. We already know each other.`
+- `That is a serious promise. We have not built enough trust for me to make it.`
+- `You too.`
+- `Not much. I'm just trying to keep things together.`
 
-### D. Trait options are malformed
+The table also displayed the human-readable trigger and compact relationship/persona/state context.
 
-Production trait options are structured objects with canonical IDs. Current extraction stringifies the object.
+### Evidence analyzer robustness
 
-**Impact:** trait sweep inputs are not trustworthy.
+Categorical `identityTrust` is now tolerated instead of crashing sentence rendering.
 
-### E. Reachability covers only first 64 pools
+A quality heuristic must never be allowed to erase otherwise valid evidence from the GUI.
 
-Production reported:
+### Balanced planning
 
-- `total = 234`;
-- `returned = 64`;
-- `hasMore = true`.
+The prior full planner heavily starved later surfaces.
 
-Current reachability code does not paginate.
+A 128-case EN review plan after remediation distributed parameterized cases across all 9 current non-fallback surfaces, roughly 13–16 cases each.
 
-**Impact:** the reachability report covers only a minority of production pools while appearing comprehensive.
+### Production discovery
 
-### F. Reachability does not perform the required frontier search
+When no explicit surface scope is supplied, the service now uses current production surface discovery rather than only historical hard-coded defaults.
 
-Non-selected variants are primarily checked against one baseline selection explanation.
+### Exact Full Inspector replay
 
-**Impact:** `ELIGIBLE_NOT_SELECTED` / `TESTED_INELIGIBLE` classifications are not a systematic search over approved context buckets.
+The previous GUI reconstructed missing input as `"hello"`, causing a wellbeing row to reopen as a greeting.
 
-### G. Cancel/resume is broken
+The replay path now uses the evidence row's original `identity.input` and scenario parameter vector.
 
-Direct reproduction:
+A real `how are you?` row replays as:
 
-- cancel before execution → manifest `CANCELLED`, batch `CANCELLED`;
-- run again → still `CANCELLED`, 0 completed.
+- intent: QUESTION;
+- subject: WELLBEING;
+- output: `I'm okay. How about you?`.
 
-**Impact:** the restartable batch requirement is not met.
+### Validation
 
-### H. Run-level repetition analysis is absent
+After the remediation:
 
-Multiple real smoke cases rendered the same clarification fallback. Cluster report returned 0 flagged rows / 0 clusters.
+- sweep/service tests: **36/36 PASS**;
+- Quality Sweep GUI tests under Xvfb/Tk: **5/5 PASS**;
+- production Lua semantic regression: **144/144 PASS**;
+- `git diff --check`: clean.
 
-**Impact:** one of the user's primary complaints—robotic/repetitive dialogue—can pass cleanly.
+## Remaining actual product gap
 
-### I. Lazy inspector handle is non-functional
+The main remaining problem is no longer the basic GUI.
 
-Evidence rows contain a marker but no service/UI resolver.
+It is **sentence-space coverage**.
 
-**Impact:** the user/LLM cannot expand a compact row into the promised full explanation.
+The harness needs to find more of the registered production dialogue variants rather than simply generate more combinations of already-observed responses.
 
-### J. P7 demonstrations overclaim real evidence
+The existing reachability code still has important gaps:
 
-Key family, perspective and clustering checks use synthetic row dictionaries. Other assertions check only existence rather than the claimed contrast/change.
+- declared context profiles are not all exercised;
+- frontier exploration is too shallow/fixed;
+- several P7 family/perspective/clustering demonstrations remain synthetic;
+- the current “eligible-but-dominated” proof is actually an ineligible candidate;
+- anti-repeat acceptance is not yet strong enough.
 
-**Impact:** the prior 10-scenario acceptance statement is not valid.
+## Correct next phase
 
-### K. UI is only a partial workbench
+The next phase is **variant-guided sentence expansion**:
 
-The current Simulation sub-tab exists and renders, but lacks the full promised scope/inventory browsing, rich filters, full-inspector/source navigation, and safe responsive long-run execution.
+1. enumerate the full production response registry;
+2. record which variants have appeared in real sentence rows;
+3. target unobserved variants using production explain evidence and relevant context buckets;
+4. execute real Lua;
+5. feed newly reached sentences back into the same simple sentence table;
+6. use those real outputs to close family/perspective/cluster/anti-repeat/eligible-dominated acceptance.
 
-The controller runs sweeps synchronously from the Tk callback.
-
-**Impact:** large runs can block the GUI and make cancel unreliable.
-
-## User-directed architecture expansion
-
-The user now explicitly wants a dedicated GUI for checking the broad sweep.
-
-Approved direction:
-
-- add a first-class **Quality Sweep** workspace inside the existing Semantic Harness;
-- use the same shared services as CLI;
-- browse surfaces, dimensions, pools/variants, coverage gaps, evidence and clusters;
-- support plan/run/cancel/resume/filter/inspect/source/replay/export;
-- keep Simulation for one-scenario/live testing;
-- keep Studio for authoring;
-- do not create a second semantic engine or runner.
-
-See `GUI_WORKBENCH.md`.
-
-## Correct next step
-
-Fix evidence/surface truth first, then build the dedicated GUI on those corrected services.
-
-The recovery sequence is:
-
-`evidence join + option normalization → live surface discovery + reached-surface verification → resume repair → full registry/reachability → run-level quality → dedicated GUI → real P7 acceptance`.
+Do not re-expand the default GUI into a coverage dashboard.

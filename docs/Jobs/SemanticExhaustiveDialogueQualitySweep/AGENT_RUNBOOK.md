@@ -2,128 +2,147 @@
 
 ## Operating goal
 
-Complete the reopened Semantic Exhaustive Dialogue Quality Sweep after the independent audit disproved the prior P7 acceptance claim.
+Finish the sentence-first Semantic Dialogue Quality Sweep.
 
-The target is not merely a runnable batch system. The finished harness must truthfully discover current production surfaces/response pools, execute bounded combinations through real Lua, verify the intended surface was actually reached, preserve full persona/relationship/state provenance, expose run-level quality failures, support reliable cancel/resume, and provide a dedicated Quality Sweep workbench for human inspection.
+The user-facing objective is simple:
 
-Read PROGRESS.md last and start from its Immediate Next Chunk. After each accepted chunk, update progress and continue automatically through all remaining mandatory P1–P7 remediation.
+> Generate as many meaningful production NPC sentence variants as practical, show what triggered each one, and make awkward dialogue easy to spot.
 
-## Checkout and document order
+Do not turn the Quality Sweep back into a testing dashboard.
 
-1. Work only in `/home/psychopatz/Zomboid/Workshop/ProjectHoomans` on existing `main`.
-2. Read root `AGENTS.md`, then this job's:
-   - README.md
-   - AGENT_RUNBOOK.md
-   - ARCHITECTURE.md
-   - GUI_WORKBENCH.md
-   - QUALITY_RUBRIC.md
-   - HARNESS_ACCEPTANCE.md
-   - ROADMAP.md
-   - AUDIT.md
-   - **PROGRESS.md last**
-3. Read current Semantic Test Subsystem and Semantic Observatory docs as authority dependencies.
-4. Inspect branch/HEAD/status/worktrees/upstream before writes. Preserve unrelated or uncertain changes.
-5. Never reset/rebase/auto-stash/blind-pull/force-push/create a branch.
-6. Do not Workshop-publish.
+## Read order
 
-## Critical audit corrections
+1. root `AGENTS.md`
+2. `README.md`
+3. `AGENT_RUNBOOK.md`
+4. `ARCHITECTURE.md`
+5. `GUI_WORKBENCH.md`
+6. `QUALITY_RUBRIC.md`
+7. `HARNESS_ACCEPTANCE.md`
+8. `ROADMAP.md`
+9. `AUDIT.md`
+10. `PROGRESS.md` **last**
 
-Do not trust the previous `COMPLETE` wording.
+Start from the Immediate Next Chunk in PROGRESS and continue automatically through remaining mandatory roadmap work.
 
-Specifically:
+## UX invariant
 
-- a completed worker request does not prove the planned surface was reached;
-- current root-choice names must be discovered/verified from production;
-- evidence must use current Inspector actor-context paths;
-- trait option objects must normalize to canonical values;
-- response-pool reachability must paginate the full registry;
-- cancellation must be resumable;
-- quality analysis must include cross-row duplicates/repetition;
-- a `lazy=true` trace marker is not a functional inspector resolver;
-- synthetic rows do not satisfy end-to-end acceptance.
+Default Quality Sweep workflow must remain:
 
-## Reuse rules
+`Generate Sentences → browse sentences → filter/search → inspect context`.
 
-- Extend existing `tools/semantic_harness/testing/`.
-- Reuse `LuaSemanticWorker`, fixture scenario/session, Response Observatory, Conversation Inspector and source lineage.
-- Production Lua owns semantic behavior.
-- Python may discover/plan contexts, compare planned vs reached routes, project evidence and evaluate text quality. It may not become a semantic oracle.
-- Maintain bounded batch execution and explicit caps.
+Do not make these primary user controls again:
 
-## GUI ownership
+- smoke/full/pairwise strategy;
+- batch IDs;
+- coverage matrices;
+- reachability status tables;
+- plan/resume terminology.
 
-Implement a dedicated top-level **Quality Sweep** workspace in the existing Semantic Harness.
+These belong in Advanced developer tooling only.
 
-- Simulation remains live/single-scenario interaction.
-- Quality Sweep owns broad batch coverage/review.
-- Studio remains authoring.
+## Product priority
 
-The GUI must consume `DialogueQualitySweepService` or its evolved shared service API. Do not create a separate GUI runner.
+When choosing work, prefer in this order:
 
-The current Simulation Quality Sweep sub-tab may be migrated or reduced to a launcher/summary. Do not maintain two full interfaces.
+1. generate more distinct meaningful production sentences;
+2. make trigger/context evidence accurate;
+3. make awkward/repetitive lines obvious;
+4. make source/semantic provenance inspectable;
+5. improve developer diagnostics.
 
-Long-running execution must not block Tk. Use a safe background worker/event queue and marshal UI updates onto the Tk thread.
+A larger dashboard is not progress unless it helps sentence review.
 
-## Validation discipline
+## Production authority
 
-For each chunk:
+- Production Lua owns semantics, eligibility, selection and realization.
+- Python may discover surfaces, plan contexts and target variant-frontier cases.
+- Python may not reimplement semantic eligibility/selection as truth.
+- Use production explain evidence for frontier search.
 
-1. define the production-backed observable;
-2. add negative controls;
-3. implement narrowly;
-4. run focused unit tests;
-5. run real-worker integration;
-6. inspect actual output—not only exit status;
-7. verify planned surface vs reached surface;
-8. update PROGRESS.md;
-9. continue to next mandatory chunk.
+## Current accepted fixes
 
-A test named “real worker” is insufficient if its crucial defect evidence is still synthetic.
+Preserve:
 
-## Acceptance evidence discipline
+- sentence-first top-level Quality Sweep UI;
+- live sentence rows after each completed batch;
+- categorical `identityTrust` handling;
+- production-discovered default surfaces;
+- balanced full/review planning across all surfaces;
+- exact-input Full Inspector replay;
+- working cancel/resume foundation;
+- complete response-pool pagination.
 
-Use precise categories:
+## Immediate technical direction
 
-- real production Lua;
-- production-backed replay fixture;
-- synthetic/unit-only;
-- GUI hermetic;
-- static-only.
+The next major capability is **variant-guided sentence expansion**.
 
-Never describe synthetic dictionaries as real production-Lua demonstrations.
+Use the full response registry and observed selected variants to ask:
 
-For contrast claims, assert the contrast itself. Merely asserting that both outputs exist is not acceptance.
+> Which registered variants have not yet appeared in the sentence review?
 
-## Git/document discipline
+For an unobserved variant:
 
-- Keep root AGENTS.md lean and unchanged unless a repository-wide durable rule changes.
-- Do not create checked-in GOAL_PROMPT.md.
-- PROGRESS.md is current truth, not chronology.
-- Commit coherent accepted work locally after checking status.
-- Push only when explicitly authorized by current workflow/user.
-- Preserve the README workbench direction already present at audit time.
+1. inspect production explain evidence;
+2. identify relevant context constraints;
+3. select bounded candidate values from existing sweep dimensions;
+4. execute real Lua;
+5. record outcome;
+6. add newly reached rendered lines to the normal evidence table.
+
+Do not require the user to manually run a separate reachability mode.
+
+## Quality acceptance discipline
+
+Synthetic rows are unit controls only.
+
+Do not claim real acceptance for family, perspective, clustering, anti-repeat or eligible-but-dominated unless the relevant behavior is exercised by production Lua or a faithful production-backed replay fixture.
+
+For contrast tests, assert the actual contrast.
+
+For anti-repeat, prove actual selection/phrase/history behavior.
+
+For `ELIGIBLE_NOT_SELECTED`, prove production says eligible=true but a different candidate wins.
+
+## GUI discipline
+
+- long operations off Tk thread;
+- UI updates via queue/`after()`;
+- analyzer exceptions must never blank the sentence table;
+- evidence rows remain visible even if optional quality analysis partially fails;
+- Advanced reachability scans must not block normal review;
+- do not mutate remembered user save state.
+
+## Git discipline
+
+- existing `main` only;
+- inspect status/upstream/worktrees before writes;
+- preserve unrelated work;
+- no blind pull/reset/rebase/auto-stash/force-push;
+- no checked-in `GOAL_PROMPT.md`;
+- do not modify root `AGENTS.md` unless a repository-wide durable rule changes;
+- commit coherent accepted chunks;
+- do not push unless explicitly authorized.
+
+## Validation loop
+
+For every chunk:
+
+1. identify real production observable;
+2. implement narrowly;
+3. add focused unit controls;
+4. add/extend real-worker acceptance;
+5. inspect actual rendered sentences;
+6. run relevant regressions;
+7. update PROGRESS.md;
+8. continue automatically.
 
 ## Stop conditions
 
 Stop only when:
 
-1. all reopened ROADMAP and HARNESS_ACCEPTANCE gates pass; or
-2. a genuine blocker prevents safe further work after all independent work is exhausted; or
-3. only explicitly user-owned native acceptance remains.
+- all mandatory roadmap/acceptance gates pass;
+- a real blocker prevents further safe work after independent work is exhausted; or
+- only explicitly user-owned native acceptance remains.
 
-Do not stop because a phase test file passes, the GUI renders, a large sweep completes, or a cluster is found.
-
-## Final report
-
-Report:
-
-- parent status;
-- planned vs reached surface coverage;
-- full pool/variant enumeration totals;
-- real demonstration evidence;
-- cancel/resume evidence;
-- GUI responsiveness/feature evidence;
-- regression counts;
-- performance/storage measurements;
-- commits and publication state;
-- any honest untested categories.
+Do not stop because the GUI renders, a sweep completes, or a large number of cases was generated.
