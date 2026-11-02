@@ -8,9 +8,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I'm drinking that now.",
+                    ["fallback"] = "Taking a drink now.",
                     ["id"] = "phrase.semantic.task.drink.active.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkActiveNeutral01",
+                },
+                {
+                    ["fallback"] = "Drinking some water right now.",
+                    ["id"] = "phrase.semantic.task.drink.active.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkActiveNeutral02",
+                },
+                {
+                    ["fallback"] = "Quenching my thirst. Give me a second.",
+                    ["id"] = "phrase.semantic.task.drink.active.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkActiveNeutral03",
+                },
+                {
+                    ["fallback"] = "Currently having a drink.",
+                    ["id"] = "phrase.semantic.task.drink.active.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkActiveNeutral04",
+                },
+                {
+                    ["fallback"] = "Taking some fluids now.",
+                    ["id"] = "phrase.semantic.task.drink.active.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkActiveNeutral05",
+                },
+                {
+                    ["fallback"] = "Drinking. Needed this badly.",
+                    ["id"] = "phrase.semantic.task.drink.active.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkActiveNeutral06",
+                },
+                {
+                    ["fallback"] = "Getting some water in me.",
+                    ["id"] = "phrase.semantic.task.drink.active.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkActiveNeutral07",
+                },
+                {
+                    ["fallback"] = "Taking a quick drink.",
+                    ["id"] = "phrase.semantic.task.drink.active.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkActiveNeutral08",
+                },
+                {
+                    ["fallback"] = "Drinking now. Won't take long.",
+                    ["id"] = "phrase.semantic.task.drink.active.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkActiveNeutral09",
+                },
+                {
+                    ["fallback"] = "Having a drink as ordered.",
+                    ["id"] = "phrase.semantic.task.drink.active.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkActiveNeutral10",
                 },
             },
         },
@@ -23,9 +68,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I'll drink that.",
+                    ["fallback"] = "I'll have a drink.",
                     ["id"] = "phrase.semantic.task.drink.admitted.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkAdmittedNeutral01",
+                },
+                {
+                    ["fallback"] = "Understood. Getting some water.",
+                    ["id"] = "phrase.semantic.task.drink.admitted.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkAdmittedNeutral02",
+                },
+                {
+                    ["fallback"] = "I could use some water. Drinking now.",
+                    ["id"] = "phrase.semantic.task.drink.admitted.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkAdmittedNeutral03",
+                },
+                {
+                    ["fallback"] = "All right, I'll hydrate.",
+                    ["id"] = "phrase.semantic.task.drink.admitted.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkAdmittedNeutral04",
+                },
+                {
+                    ["fallback"] = "Good call. I was getting thirsty.",
+                    ["id"] = "phrase.semantic.task.drink.admitted.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkAdmittedNeutral05",
+                },
+                {
+                    ["fallback"] = "I'll take a drink from my supply.",
+                    ["id"] = "phrase.semantic.task.drink.admitted.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkAdmittedNeutral06",
+                },
+                {
+                    ["fallback"] = "Understood. Hydrating immediately.",
+                    ["id"] = "phrase.semantic.task.drink.admitted.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkAdmittedNeutral07",
+                },
+                {
+                    ["fallback"] = "Right. Taking a sip.",
+                    ["id"] = "phrase.semantic.task.drink.admitted.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkAdmittedNeutral08",
+                },
+                {
+                    ["fallback"] = "I'll drink that now.",
+                    ["id"] = "phrase.semantic.task.drink.admitted.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkAdmittedNeutral09",
+                },
+                {
+                    ["fallback"] = "Sounds good. Drinking.",
+                    ["id"] = "phrase.semantic.task.drink.admitted.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkAdmittedNeutral10",
                 },
             },
         },
@@ -38,9 +128,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I feel better.",
+                    ["fallback"] = "Much better. Thirst is gone.",
                     ["id"] = "phrase.semantic.task.drink.completed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkCompletedNeutral01",
+                },
+                {
+                    ["fallback"] = "Finished drinking. Feeling refreshed.",
+                    ["id"] = "phrase.semantic.task.drink.completed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkCompletedNeutral02",
+                },
+                {
+                    ["fallback"] = "That hit the spot. Done drinking.",
+                    ["id"] = "phrase.semantic.task.drink.completed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkCompletedNeutral03",
+                },
+                {
+                    ["fallback"] = "Hydrated and ready to move.",
+                    ["id"] = "phrase.semantic.task.drink.completed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkCompletedNeutral04",
+                },
+                {
+                    ["fallback"] = "Finished that drink.",
+                    ["id"] = "phrase.semantic.task.drink.completed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkCompletedNeutral05",
+                },
+                {
+                    ["fallback"] = "Done. Throat isn't parched anymore.",
+                    ["id"] = "phrase.semantic.task.drink.completed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkCompletedNeutral06",
+                },
+                {
+                    ["fallback"] = "All drank. Ready for action.",
+                    ["id"] = "phrase.semantic.task.drink.completed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkCompletedNeutral07",
+                },
+                {
+                    ["fallback"] = "Finished having a drink.",
+                    ["id"] = "phrase.semantic.task.drink.completed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkCompletedNeutral08",
+                },
+                {
+                    ["fallback"] = "Done drinking. Let's keep going.",
+                    ["id"] = "phrase.semantic.task.drink.completed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkCompletedNeutral09",
+                },
+                {
+                    ["fallback"] = "Hydration complete.",
+                    ["id"] = "phrase.semantic.task.drink.completed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkCompletedNeutral10",
                 },
             },
         },
@@ -53,9 +188,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I couldn't drink that.",
+                    ["fallback"] = "I couldn't get a drink.",
                     ["id"] = "phrase.semantic.task.drink.failed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkFailedNeutral01",
+                },
+                {
+                    ["fallback"] = "Failed to drink. Container was empty or tainted.",
+                    ["id"] = "phrase.semantic.task.drink.failed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkFailedNeutral02",
+                },
+                {
+                    ["fallback"] = "Couldn't drink that. It wasn't clean water.",
+                    ["id"] = "phrase.semantic.task.drink.failed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkFailedNeutral03",
+                },
+                {
+                    ["fallback"] = "I was interrupted before I could drink.",
+                    ["id"] = "phrase.semantic.task.drink.failed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkFailedNeutral04",
+                },
+                {
+                    ["fallback"] = "Unable to have a drink right now.",
+                    ["id"] = "phrase.semantic.task.drink.failed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkFailedNeutral05",
+                },
+                {
+                    ["fallback"] = "Spilled it or couldn't reach it. Drinking failed.",
+                    ["id"] = "phrase.semantic.task.drink.failed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkFailedNeutral06",
+                },
+                {
+                    ["fallback"] = "Water container is dry.",
+                    ["id"] = "phrase.semantic.task.drink.failed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkFailedNeutral07",
+                },
+                {
+                    ["fallback"] = "Couldn't drink. Threat forced me to stop.",
+                    ["id"] = "phrase.semantic.task.drink.failed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkFailedNeutral08",
+                },
+                {
+                    ["fallback"] = "Action failed. Still thirsty.",
+                    ["id"] = "phrase.semantic.task.drink.failed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkFailedNeutral09",
+                },
+                {
+                    ["fallback"] = "Failed to take a drink.",
+                    ["id"] = "phrase.semantic.task.drink.failed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkFailedNeutral10",
                 },
             },
         },
@@ -68,9 +248,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I can't drink that right now.",
+                    ["fallback"] = "I'm not thirsty right now.",
                     ["id"] = "phrase.semantic.task.drink.rejected.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkRejectedNeutral01",
+                },
+                {
+                    ["fallback"] = "I don't need to drink at the moment.",
+                    ["id"] = "phrase.semantic.task.drink.rejected.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkRejectedNeutral02",
+                },
+                {
+                    ["fallback"] = "I'm fully hydrated. Saving the water.",
+                    ["id"] = "phrase.semantic.task.drink.rejected.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkRejectedNeutral03",
+                },
+                {
+                    ["fallback"] = "Can't drink right now. Too dangerous to pause.",
+                    ["id"] = "phrase.semantic.task.drink.rejected.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkRejectedNeutral04",
+                },
+                {
+                    ["fallback"] = "Refusing to drink that water. It looks tainted.",
+                    ["id"] = "phrase.semantic.task.drink.rejected.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkRejectedNeutral05",
+                },
+                {
+                    ["fallback"] = "I have plenty of fluids. Don't need to drink.",
+                    ["id"] = "phrase.semantic.task.drink.rejected.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkRejectedNeutral06",
+                },
+                {
+                    ["fallback"] = "No need for a drink yet.",
+                    ["id"] = "phrase.semantic.task.drink.rejected.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkRejectedNeutral07",
+                },
+                {
+                    ["fallback"] = "I'll save our clean water for later.",
+                    ["id"] = "phrase.semantic.task.drink.rejected.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkRejectedNeutral08",
+                },
+                {
+                    ["fallback"] = "Drink order rejected. Not parched.",
+                    ["id"] = "phrase.semantic.task.drink.rejected.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkRejectedNeutral09",
+                },
+                {
+                    ["fallback"] = "Can't drink that right now.",
+                    ["id"] = "phrase.semantic.task.drink.rejected.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskDrinkRejectedNeutral10",
                 },
             },
         },

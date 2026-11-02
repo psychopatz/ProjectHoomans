@@ -8,9 +8,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I'm eating that now.",
+                    ["fallback"] = "Eating now.",
                     ["id"] = "phrase.semantic.task.eat.active.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatActiveNeutral01",
+                },
+                {
+                    ["fallback"] = "Having a bite right now.",
+                    ["id"] = "phrase.semantic.task.eat.active.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatActiveNeutral02",
+                },
+                {
+                    ["fallback"] = "Chewing through some food. Give me a moment.",
+                    ["id"] = "phrase.semantic.task.eat.active.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatActiveNeutral03",
+                },
+                {
+                    ["fallback"] = "Currently eating.",
+                    ["id"] = "phrase.semantic.task.eat.active.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatActiveNeutral04",
+                },
+                {
+                    ["fallback"] = "Getting some calories in me.",
+                    ["id"] = "phrase.semantic.task.eat.active.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatActiveNeutral05",
+                },
+                {
+                    ["fallback"] = "Eating my rations now.",
+                    ["id"] = "phrase.semantic.task.eat.active.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatActiveNeutral06",
+                },
+                {
+                    ["fallback"] = "Taking a meal break as instructed.",
+                    ["id"] = "phrase.semantic.task.eat.active.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatActiveNeutral07",
+                },
+                {
+                    ["fallback"] = "Eating. Needed the energy.",
+                    ["id"] = "phrase.semantic.task.eat.active.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatActiveNeutral08",
+                },
+                {
+                    ["fallback"] = "Having some food now.",
+                    ["id"] = "phrase.semantic.task.eat.active.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatActiveNeutral09",
+                },
+                {
+                    ["fallback"] = "Eating quietly. Won't be long.",
+                    ["id"] = "phrase.semantic.task.eat.active.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatActiveNeutral10",
                 },
             },
         },
@@ -27,6 +72,51 @@ return {
                     ["id"] = "phrase.semantic.task.eat.admitted.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatAdmittedNeutral01",
                 },
+                {
+                    ["fallback"] = "Understood. Getting something to eat.",
+                    ["id"] = "phrase.semantic.task.eat.admitted.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatAdmittedNeutral02",
+                },
+                {
+                    ["fallback"] = "Good call. My stomach was growling.",
+                    ["id"] = "phrase.semantic.task.eat.admitted.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatAdmittedNeutral03",
+                },
+                {
+                    ["fallback"] = "All right, I'll eat some food.",
+                    ["id"] = "phrase.semantic.task.eat.admitted.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatAdmittedNeutral04",
+                },
+                {
+                    ["fallback"] = "Taking a bite to keep my strength up.",
+                    ["id"] = "phrase.semantic.task.eat.admitted.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatAdmittedNeutral05",
+                },
+                {
+                    ["fallback"] = "Understood. Eating now.",
+                    ["id"] = "phrase.semantic.task.eat.admitted.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatAdmittedNeutral06",
+                },
+                {
+                    ["fallback"] = "I'll consume those rations.",
+                    ["id"] = "phrase.semantic.task.eat.admitted.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatAdmittedNeutral07",
+                },
+                {
+                    ["fallback"] = "Right. Time for a meal.",
+                    ["id"] = "phrase.semantic.task.eat.admitted.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatAdmittedNeutral08",
+                },
+                {
+                    ["fallback"] = "I'll eat what you designated.",
+                    ["id"] = "phrase.semantic.task.eat.admitted.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatAdmittedNeutral09",
+                },
+                {
+                    ["fallback"] = "Sounds good. Grabbing food.",
+                    ["id"] = "phrase.semantic.task.eat.admitted.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatAdmittedNeutral10",
+                },
             },
         },
     },
@@ -38,9 +128,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "That hit the spot.",
+                    ["fallback"] = "Finished eating. Feeling much better.",
                     ["id"] = "phrase.semantic.task.eat.completed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatCompletedNeutral01",
+                },
+                {
+                    ["fallback"] = "That food helped a lot. Done.",
+                    ["id"] = "phrase.semantic.task.eat.completed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatCompletedNeutral02",
+                },
+                {
+                    ["fallback"] = "Done eating. Energy restored.",
+                    ["id"] = "phrase.semantic.task.eat.completed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatCompletedNeutral03",
+                },
+                {
+                    ["fallback"] = "Stomach is full. Ready to move.",
+                    ["id"] = "phrase.semantic.task.eat.completed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatCompletedNeutral04",
+                },
+                {
+                    ["fallback"] = "Finished that meal.",
+                    ["id"] = "phrase.semantic.task.eat.completed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatCompletedNeutral05",
+                },
+                {
+                    ["fallback"] = "All eaten. Good to keep going.",
+                    ["id"] = "phrase.semantic.task.eat.completed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatCompletedNeutral06",
+                },
+                {
+                    ["fallback"] = "Done. That tasted better than expected.",
+                    ["id"] = "phrase.semantic.task.eat.completed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatCompletedNeutral07",
+                },
+                {
+                    ["fallback"] = "Meal completed.",
+                    ["id"] = "phrase.semantic.task.eat.completed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatCompletedNeutral08",
+                },
+                {
+                    ["fallback"] = "Finished eating. Back on task.",
+                    ["id"] = "phrase.semantic.task.eat.completed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatCompletedNeutral09",
+                },
+                {
+                    ["fallback"] = "Rations finished. Strength is back.",
+                    ["id"] = "phrase.semantic.task.eat.completed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatCompletedNeutral10",
                 },
             },
         },
@@ -57,6 +192,51 @@ return {
                     ["id"] = "phrase.semantic.task.eat.failed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatFailedNeutral01",
                 },
+                {
+                    ["fallback"] = "Failed to eat. The food was rotten or spoiled.",
+                    ["id"] = "phrase.semantic.task.eat.failed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatFailedNeutral02",
+                },
+                {
+                    ["fallback"] = "Couldn't eat that. It smelled dangerous.",
+                    ["id"] = "phrase.semantic.task.eat.failed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatFailedNeutral03",
+                },
+                {
+                    ["fallback"] = "I was interrupted while trying to eat.",
+                    ["id"] = "phrase.semantic.task.eat.failed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatFailedNeutral04",
+                },
+                {
+                    ["fallback"] = "Unable to eat right now. Area under threat.",
+                    ["id"] = "phrase.semantic.task.eat.failed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatFailedNeutral05",
+                },
+                {
+                    ["fallback"] = "Eating failed. Food was ruined.",
+                    ["id"] = "phrase.semantic.task.eat.failed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatFailedNeutral06",
+                },
+                {
+                    ["fallback"] = "Couldn't stomach that item.",
+                    ["id"] = "phrase.semantic.task.eat.failed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatFailedNeutral07",
+                },
+                {
+                    ["fallback"] = "Dropped or lost the food before eating.",
+                    ["id"] = "phrase.semantic.task.eat.failed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatFailedNeutral08",
+                },
+                {
+                    ["fallback"] = "Action failed. Still starving.",
+                    ["id"] = "phrase.semantic.task.eat.failed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatFailedNeutral09",
+                },
+                {
+                    ["fallback"] = "Failed to consume meal.",
+                    ["id"] = "phrase.semantic.task.eat.failed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatFailedNeutral10",
+                },
             },
         },
     },
@@ -68,9 +248,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I can't eat that right now.",
+                    ["fallback"] = "I'm not hungry right now.",
                     ["id"] = "phrase.semantic.task.eat.rejected.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatRejectedNeutral01",
+                },
+                {
+                    ["fallback"] = "I don't need food at the moment.",
+                    ["id"] = "phrase.semantic.task.eat.rejected.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatRejectedNeutral02",
+                },
+                {
+                    ["fallback"] = "I'm already completely full.",
+                    ["id"] = "phrase.semantic.task.eat.rejected.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatRejectedNeutral03",
+                },
+                {
+                    ["fallback"] = "Save the food. I don't need to eat yet.",
+                    ["id"] = "phrase.semantic.task.eat.rejected.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatRejectedNeutral04",
+                },
+                {
+                    ["fallback"] = "Refusing to eat that. Looks unwholesome.",
+                    ["id"] = "phrase.semantic.task.eat.rejected.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatRejectedNeutral05",
+                },
+                {
+                    ["fallback"] = "Can't eat right now. Too tense.",
+                    ["id"] = "phrase.semantic.task.eat.rejected.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatRejectedNeutral06",
+                },
+                {
+                    ["fallback"] = "I have enough energy. Keeping rations safe.",
+                    ["id"] = "phrase.semantic.task.eat.rejected.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatRejectedNeutral07",
+                },
+                {
+                    ["fallback"] = "No need for a meal yet.",
+                    ["id"] = "phrase.semantic.task.eat.rejected.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatRejectedNeutral08",
+                },
+                {
+                    ["fallback"] = "Eat order rejected. Stomach is satisfied.",
+                    ["id"] = "phrase.semantic.task.eat.rejected.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatRejectedNeutral09",
+                },
+                {
+                    ["fallback"] = "I can't eat that right now.",
+                    ["id"] = "phrase.semantic.task.eat.rejected.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskEatRejectedNeutral10",
                 },
             },
         },

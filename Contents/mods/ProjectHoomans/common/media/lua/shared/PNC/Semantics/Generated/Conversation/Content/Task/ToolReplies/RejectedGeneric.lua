@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.rejected_generic.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric1Neutral01",
                 },
+                {
+                    ["fallback"] = "That went over poorly.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric1Neutral02",
+                },
+                {
+                    ["fallback"] = "That didn't work out.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric1Neutral03",
+                },
+                {
+                    ["fallback"] = "That was not well received.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric1Neutral04",
+                },
+                {
+                    ["fallback"] = "You miscalculated that one.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric1Neutral05",
+                },
+                {
+                    ["fallback"] = "That completely backfired.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric1Neutral06",
+                },
+                {
+                    ["fallback"] = "Not a good approach.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric1Neutral07",
+                },
+                {
+                    ["fallback"] = "That fell flat on its face.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric1Neutral08",
+                },
+                {
+                    ["fallback"] = "That missed completely.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric1Neutral09",
+                },
+                {
+                    ["fallback"] = "That was a mistake.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "I am not taking that from you right now.",
                     ["id"] = "phrase.semantic.tool_reply.rejected_generic.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric2Neutral01",
+                },
+                {
+                    ["fallback"] = "I'm not in the mood for that kind of talk.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric2Neutral02",
+                },
+                {
+                    ["fallback"] = "I'm rejecting that completely.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric2Neutral03",
+                },
+                {
+                    ["fallback"] = "You can keep that nonsense to yourself.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric2Neutral04",
+                },
+                {
+                    ["fallback"] = "I'm not putting up with that today.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric2Neutral05",
+                },
+                {
+                    ["fallback"] = "Not taking that. Walk it back.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric2Neutral06",
+                },
+                {
+                    ["fallback"] = "I refuse to engage with that.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric2Neutral07",
+                },
+                {
+                    ["fallback"] = "I'm shutting that down immediately.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric2Neutral08",
+                },
+                {
+                    ["fallback"] = "Not tolerating that right now.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric2Neutral09",
+                },
+                {
+                    ["fallback"] = "I'm not accepting that from you.",
+                    ["id"] = "phrase.semantic.tool_reply.rejected_generic.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyRejectedGeneric2Neutral10",
                 },
             },
         },

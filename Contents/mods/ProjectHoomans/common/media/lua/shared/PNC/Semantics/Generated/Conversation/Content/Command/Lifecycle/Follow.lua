@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.command.follow.failed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral01",
                 },
+                {
+                    ["fallback"] = "Failed to follow. Path was obstructed.",
+                    ["id"] = "phrase.semantic.command.follow.failed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral02",
+                },
+                {
+                    ["fallback"] = "I tried to follow, but got caught on something.",
+                    ["id"] = "phrase.semantic.command.follow.failed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral03",
+                },
+                {
+                    ["fallback"] = "Lost your trail. Couldn't keep following.",
+                    ["id"] = "phrase.semantic.command.follow.failed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral04",
+                },
+                {
+                    ["fallback"] = "Unable to follow through that passage.",
+                    ["id"] = "phrase.semantic.command.follow.failed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral05",
+                },
+                {
+                    ["fallback"] = "Follow command failed. Way is blocked.",
+                    ["id"] = "phrase.semantic.command.follow.failed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral06",
+                },
+                {
+                    ["fallback"] = "I couldn't match your route.",
+                    ["id"] = "phrase.semantic.command.follow.failed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral07",
+                },
+                {
+                    ["fallback"] = "Blocked off. Can't follow that way.",
+                    ["id"] = "phrase.semantic.command.follow.failed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral08",
+                },
+                {
+                    ["fallback"] = "Attempted to follow, but lost visual.",
+                    ["id"] = "phrase.semantic.command.follow.failed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral09",
+                },
+                {
+                    ["fallback"] = "Can't reach you to follow. Clear the path.",
+                    ["id"] = "phrase.semantic.command.follow.failed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral10",
+                },
             },
         },
     },
@@ -27,6 +72,51 @@ return {
                     ["id"] = "phrase.semantic.command.follow.queued.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral01",
                 },
+                {
+                    ["fallback"] = "Right behind you.",
+                    ["id"] = "phrase.semantic.command.follow.queued.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral02",
+                },
+                {
+                    ["fallback"] = "Following now. Lead the way.",
+                    ["id"] = "phrase.semantic.command.follow.queued.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral03",
+                },
+                {
+                    ["fallback"] = "Understood. Sticking close behind.",
+                    ["id"] = "phrase.semantic.command.follow.queued.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral04",
+                },
+                {
+                    ["fallback"] = "Moving with you. Lead on.",
+                    ["id"] = "phrase.semantic.command.follow.queued.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral05",
+                },
+                {
+                    ["fallback"] = "I'm with you. Let's move.",
+                    ["id"] = "phrase.semantic.command.follow.queued.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral06",
+                },
+                {
+                    ["fallback"] = "Right on your tail. Watching our rear.",
+                    ["id"] = "phrase.semantic.command.follow.queued.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral07",
+                },
+                {
+                    ["fallback"] = "Following your pace. Keep going.",
+                    ["id"] = "phrase.semantic.command.follow.queued.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral08",
+                },
+                {
+                    ["fallback"] = "Understood. Falling in behind you.",
+                    ["id"] = "phrase.semantic.command.follow.queued.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral09",
+                },
+                {
+                    ["fallback"] = "Got it. Moving out with you.",
+                    ["id"] = "phrase.semantic.command.follow.queued.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral10",
+                },
             },
         },
     },
@@ -38,9 +128,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "Of course, I'll follow you.",
+                    ["fallback"] = "Of course, I'll follow you. Right beside you!",
                     ["id"] = "phrase.semantic.command.follow.queued.friendly.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral01",
+                },
+                {
+                    ["fallback"] = "Gladly, friend! Lead the way.",
+                    ["id"] = "phrase.semantic.command.follow.queued.friendly.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral02",
+                },
+                {
+                    ["fallback"] = "Always happy to travel with you. Let's go!",
+                    ["id"] = "phrase.semantic.command.follow.queued.friendly.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral03",
+                },
+                {
+                    ["fallback"] = "I'm right behind you, partner. Let's do this.",
+                    ["id"] = "phrase.semantic.command.follow.queued.friendly.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral04",
+                },
+                {
+                    ["fallback"] = "Right with you, friend! Watch your steps.",
+                    ["id"] = "phrase.semantic.command.follow.queued.friendly.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral05",
+                },
+                {
+                    ["fallback"] = "Wouldn't rather be following anyone else.",
+                    ["id"] = "phrase.semantic.command.follow.queued.friendly.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral06",
+                },
+                {
+                    ["fallback"] = "Lead on! I've got your six covered.",
+                    ["id"] = "phrase.semantic.command.follow.queued.friendly.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral07",
+                },
+                {
+                    ["fallback"] = "Sure thing! Sticking like glue to you, friend.",
+                    ["id"] = "phrase.semantic.command.follow.queued.friendly.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral08",
+                },
+                {
+                    ["fallback"] = "Happy to follow. Keep us safe!",
+                    ["id"] = "phrase.semantic.command.follow.queued.friendly.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral09",
+                },
+                {
+                    ["fallback"] = "Right behind you, partner. Onward!",
+                    ["id"] = "phrase.semantic.command.follow.queued.friendly.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral10",
                 },
             },
         },
@@ -57,6 +192,51 @@ return {
                     ["id"] = "phrase.semantic.command.follow.queued.repeated.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedRepeatedNeutral01",
                 },
+                {
+                    ["fallback"] = "Already following right behind you.",
+                    ["id"] = "phrase.semantic.command.follow.queued.repeated.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedRepeatedNeutral02",
+                },
+                {
+                    ["fallback"] = "Still on your heels. No need to repeat.",
+                    ["id"] = "phrase.semantic.command.follow.queued.repeated.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedRepeatedNeutral03",
+                },
+                {
+                    ["fallback"] = "I haven't gone anywhere. Still right here.",
+                    ["id"] = "phrase.semantic.command.follow.queued.repeated.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedRepeatedNeutral04",
+                },
+                {
+                    ["fallback"] = "Following you already. Just keep walking.",
+                    ["id"] = "phrase.semantic.command.follow.queued.repeated.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedRepeatedNeutral05",
+                },
+                {
+                    ["fallback"] = "I'm right behind you! Look over your shoulder.",
+                    ["id"] = "phrase.semantic.command.follow.queued.repeated.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedRepeatedNeutral06",
+                },
+                {
+                    ["fallback"] = "Still with you. Don't worry.",
+                    ["id"] = "phrase.semantic.command.follow.queued.repeated.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedRepeatedNeutral07",
+                },
+                {
+                    ["fallback"] = "Already in tow. Lead the way.",
+                    ["id"] = "phrase.semantic.command.follow.queued.repeated.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedRepeatedNeutral08",
+                },
+                {
+                    ["fallback"] = "Following you as we speak.",
+                    ["id"] = "phrase.semantic.command.follow.queued.repeated.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedRepeatedNeutral09",
+                },
+                {
+                    ["fallback"] = "I'm already following. Keep moving.",
+                    ["id"] = "phrase.semantic.command.follow.queued.repeated.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedRepeatedNeutral10",
+                },
             },
         },
     },
@@ -71,6 +251,51 @@ return {
                     ["fallback"] = "I know you. I'll follow.",
                     ["id"] = "phrase.semantic.command.follow.queued.trusted.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedTrustedNeutral01",
+                },
+                {
+                    ["fallback"] = "I trust your lead completely. Following you.",
+                    ["id"] = "phrase.semantic.command.follow.queued.trusted.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedTrustedNeutral02",
+                },
+                {
+                    ["fallback"] = "Lead the way, partner. I'm with you to the end.",
+                    ["id"] = "phrase.semantic.command.follow.queued.trusted.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedTrustedNeutral03",
+                },
+                {
+                    ["fallback"] = "You've proven your judgment. I'll follow anywhere.",
+                    ["id"] = "phrase.semantic.command.follow.queued.trusted.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedTrustedNeutral04",
+                },
+                {
+                    ["fallback"] = "Understood. I trust you to keep us alive.",
+                    ["id"] = "phrase.semantic.command.follow.queued.trusted.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedTrustedNeutral05",
+                },
+                {
+                    ["fallback"] = "Right behind you. We watch out for one another.",
+                    ["id"] = "phrase.semantic.command.follow.queued.trusted.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedTrustedNeutral06",
+                },
+                {
+                    ["fallback"] = "I'm at your side, friend. Lead on.",
+                    ["id"] = "phrase.semantic.command.follow.queued.trusted.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedTrustedNeutral07",
+                },
+                {
+                    ["fallback"] = "You make the calls, I back you up. Following.",
+                    ["id"] = "phrase.semantic.command.follow.queued.trusted.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedTrustedNeutral08",
+                },
+                {
+                    ["fallback"] = "I know you have my back. Following your lead.",
+                    ["id"] = "phrase.semantic.command.follow.queued.trusted.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedTrustedNeutral09",
+                },
+                {
+                    ["fallback"] = "Understood, partner. Right behind you.",
+                    ["id"] = "phrase.semantic.command.follow.queued.trusted.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedTrustedNeutral10",
                 },
             },
         },
@@ -87,6 +312,51 @@ return {
                     ["id"] = "phrase.semantic.command.follow.queued.withdrawn.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedWithdrawnNeutral01",
                 },
+                {
+                    ["fallback"] = "Fine. Walking behind you.",
+                    ["id"] = "phrase.semantic.command.follow.queued.withdrawn.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedWithdrawnNeutral02",
+                },
+                {
+                    ["fallback"] = "Following. Whatever.",
+                    ["id"] = "phrase.semantic.command.follow.queued.withdrawn.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedWithdrawnNeutral03",
+                },
+                {
+                    ["fallback"] = "Understood. Moving.",
+                    ["id"] = "phrase.semantic.command.follow.queued.withdrawn.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedWithdrawnNeutral04",
+                },
+                {
+                    ["fallback"] = "Right behind. Don't stop suddenly.",
+                    ["id"] = "phrase.semantic.command.follow.queued.withdrawn.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedWithdrawnNeutral05",
+                },
+                {
+                    ["fallback"] = "I'll keep up.",
+                    ["id"] = "phrase.semantic.command.follow.queued.withdrawn.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedWithdrawnNeutral06",
+                },
+                {
+                    ["fallback"] = "Following. Keep going.",
+                    ["id"] = "phrase.semantic.command.follow.queued.withdrawn.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedWithdrawnNeutral07",
+                },
+                {
+                    ["fallback"] = "All right. Let's go.",
+                    ["id"] = "phrase.semantic.command.follow.queued.withdrawn.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedWithdrawnNeutral08",
+                },
+                {
+                    ["fallback"] = "Behind you.",
+                    ["id"] = "phrase.semantic.command.follow.queued.withdrawn.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedWithdrawnNeutral09",
+                },
+                {
+                    ["fallback"] = "Moving along.",
+                    ["id"] = "phrase.semantic.command.follow.queued.withdrawn.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedWithdrawnNeutral10",
+                },
             },
         },
     },
@@ -101,6 +371,51 @@ return {
                     ["fallback"] = "I can't follow you right now.",
                     ["id"] = "phrase.semantic.command.follow.rejected.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral01",
+                },
+                {
+                    ["fallback"] = "I need to stay here. Can't follow.",
+                    ["id"] = "phrase.semantic.command.follow.rejected.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral02",
+                },
+                {
+                    ["fallback"] = "Refusing to follow into that danger.",
+                    ["id"] = "phrase.semantic.command.follow.rejected.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral03",
+                },
+                {
+                    ["fallback"] = "Too exhausted or injured to keep up. I can't follow.",
+                    ["id"] = "phrase.semantic.command.follow.rejected.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral04",
+                },
+                {
+                    ["fallback"] = "I have business here. You go on ahead.",
+                    ["id"] = "phrase.semantic.command.follow.rejected.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral05",
+                },
+                {
+                    ["fallback"] = "Can't follow. My hands are full.",
+                    ["id"] = "phrase.semantic.command.follow.rejected.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral06",
+                },
+                {
+                    ["fallback"] = "Not following you into that mess.",
+                    ["id"] = "phrase.semantic.command.follow.rejected.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral07",
+                },
+                {
+                    ["fallback"] = "I won't follow you right now.",
+                    ["id"] = "phrase.semantic.command.follow.rejected.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral08",
+                },
+                {
+                    ["fallback"] = "Stay back, I'm not following.",
+                    ["id"] = "phrase.semantic.command.follow.rejected.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral09",
+                },
+                {
+                    ["fallback"] = "Follow order rejected. I'm holding position.",
+                    ["id"] = "phrase.semantic.command.follow.rejected.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral10",
                 },
             },
         },

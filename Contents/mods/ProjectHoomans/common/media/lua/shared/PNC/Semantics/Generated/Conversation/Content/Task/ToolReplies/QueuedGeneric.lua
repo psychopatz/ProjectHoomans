@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.queued_generic.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric1Neutral01",
                 },
+                {
+                    ["fallback"] = "Understood.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric1Neutral02",
+                },
+                {
+                    ["fallback"] = "Message received.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric1Neutral03",
+                },
+                {
+                    ["fallback"] = "Got it.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric1Neutral04",
+                },
+                {
+                    ["fallback"] = "I hear what you said.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric1Neutral05",
+                },
+                {
+                    ["fallback"] = "Heard.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric1Neutral06",
+                },
+                {
+                    ["fallback"] = "Fair enough. I hear you.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric1Neutral07",
+                },
+                {
+                    ["fallback"] = "Point noted.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric1Neutral08",
+                },
+                {
+                    ["fallback"] = "I'm listening.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric1Neutral09",
+                },
+                {
+                    ["fallback"] = "Acknowledged.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "Give me a moment.",
                     ["id"] = "phrase.semantic.tool_reply.queued_generic.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric2Neutral01",
+                },
+                {
+                    ["fallback"] = "Hold on just a second.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric2Neutral02",
+                },
+                {
+                    ["fallback"] = "Let me finish what I'm doing first.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric2Neutral03",
+                },
+                {
+                    ["fallback"] = "Just a minute.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric2Neutral04",
+                },
+                {
+                    ["fallback"] = "Give me a bit of time.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric2Neutral05",
+                },
+                {
+                    ["fallback"] = "Hang on a second.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric2Neutral06",
+                },
+                {
+                    ["fallback"] = "I need a moment to process that.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric2Neutral07",
+                },
+                {
+                    ["fallback"] = "Hold your horses for a minute.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric2Neutral08",
+                },
+                {
+                    ["fallback"] = "Give me a brief moment.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric2Neutral09",
+                },
+                {
+                    ["fallback"] = "One second. I'm wrapped up right now.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_generic.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedGeneric2Neutral10",
                 },
             },
         },

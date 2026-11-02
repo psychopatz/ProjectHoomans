@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.cooldown.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown1Neutral01",
                 },
+                {
+                    ["fallback"] = "Save some of those kind words for tomorrow.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown1Neutral02",
+                },
+                {
+                    ["fallback"] = "You already flattered me enough for one day.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown1Neutral03",
+                },
+                {
+                    ["fallback"] = "Praise limit reached. Let's get back to surviving.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown1Neutral04",
+                },
+                {
+                    ["fallback"] = "I heard you the first few times. Let it rest.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown1Neutral05",
+                },
+                {
+                    ["fallback"] = "We've traded enough compliments for today.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown1Neutral06",
+                },
+                {
+                    ["fallback"] = "Easy on the flattery. Don't overdo it.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown1Neutral07",
+                },
+                {
+                    ["fallback"] = "Give it a rest until tomorrow.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown1Neutral08",
+                },
+                {
+                    ["fallback"] = "One compliment per day is plenty out here.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown1Neutral09",
+                },
+                {
+                    ["fallback"] = "Save your breath. You've hit the limit for now.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "Save the sweet talk for tomorrow.",
                     ["id"] = "phrase.semantic.tool_reply.cooldown.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown2Neutral01",
+                },
+                {
+                    ["fallback"] = "Hold your charm for another time.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown2Neutral02",
+                },
+                {
+                    ["fallback"] = "Too much sweet talk for one afternoon.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown2Neutral03",
+                },
+                {
+                    ["fallback"] = "We've got work to do. Charm me later.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown2Neutral04",
+                },
+                {
+                    ["fallback"] = "Save the smooth lines. Focus on survival.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown2Neutral05",
+                },
+                {
+                    ["fallback"] = "You're pouring on the charm too thick right now.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown2Neutral06",
+                },
+                {
+                    ["fallback"] = "Let's take a break from the flirting.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown2Neutral07",
+                },
+                {
+                    ["fallback"] = "Charm cooldown. Let's get back to reality.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown2Neutral08",
+                },
+                {
+                    ["fallback"] = "I've had my fill of sweet words for today.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown2Neutral09",
+                },
+                {
+                    ["fallback"] = "Hold that thought until tomorrow morning.",
+                    ["id"] = "phrase.semantic.tool_reply.cooldown.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyCooldown2Neutral10",
                 },
             },
         },

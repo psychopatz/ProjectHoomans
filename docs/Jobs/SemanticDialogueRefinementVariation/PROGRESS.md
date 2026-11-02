@@ -102,15 +102,33 @@ This must be raised before the corpus can satisfy the requested minimum.
      - Eligible under-10 style buckets: **360 / 683** (was 585).
      - Remaining under-10 styles in social domain: **0**.
 
-## Immediate Active Phase — P4: Commands and tasks refinement
+4. **Phase 4 (Commands & Tasks Refinement & Expansion) — COMPLETED**:
+   - **P4A (Command Replies)**:
+     - `content/command/replies.json`: expanded all 19 styles to 10 variants each (190 phrases). Replaced cartoon profanity with grounded survivor combat and command dialogue.
+   - **P4B (Command Lifecycle)**:
+     - `content/command/lifecycle/*.json` (`camp.json`, `follow.json`, `return_home.json`, `stay.json`, `stop_following.json`): expanded all 35 styles (5 files * 7 styles) to 10 variants each (350 phrases), covering `acknowledged`, `started`, `blocked`, `failed`, `interrupted`, `completed`, `progress`.
+   - **P4C (Task Lifecycle)**:
+     - `content/task/lifecycle/*.json` (`consume.json`, `drink.json`, `eat.json`, `fetch.json`, `gift.json`, `give.json`, `refill.json`, `wait_at.json`): expanded all 40 styles (8 files * 5 styles) to 10 variants each (400 phrases), covering `started`, `blocked`, `failed`, `interrupted`, `completed`.
+   - **P4D (Task Tool Replies)**:
+     - `content/task/tool_replies/*.json` (21 shards: `cooldown`, `order_camp`, `order_follow`, `order_generic`, `order_rejected`, `order_stay`, `queued_admire`, `queued_apology`, `queued_comfort`, `queued_compliment`, `queued_flirt`, `queued_generic`, `queued_hostile`, `queued_insult`, `queued_praise`, `queued_romantic`, `queued_sexual`, `rejected_game`, `rejected_generic`, `rejected_hostile`, `rejected_sexual`): expanded all 46 styles to 10 variants each (460 phrases). Replaced all English-identical TL strings with authentic Tagalog/Taglish translations.
+   - **Verification**:
+     - Regenerated all 196 Lua modules and EN/TL translation artifacts.
+     - All 25 compiler, context health, content authority, and auditor unit tests pass.
+   - **Corpus Metrics After P4**:
+     - Styles at >=10 phrases: **463 / 729** (was 323).
+     - Eligible under-10 style buckets: **220 / 683** (was 360).
+     - Remaining under-10 styles in command and task domains: **0**.
 
-Expand and refine all canonical NPC command and task execution dialogue shards to >= 10 variants:
-- **P4A**: Command Replies (`content/command/replies.json`: 19 styles).
-- **P4B**: Command Lifecycle (`content/command/lifecycle/*.json`: camp, follow, return_home, stay, stop_following: 35 styles).
-- **P4C**: Task Lifecycle (`content/task/lifecycle/*.json`: consume, drink, eat, fetch, gift, give, refill, wait_at: 40 styles).
-- **P4D**: Task Tool Replies (`content/task/tool_replies/*.json`: order_*, queued_*, rejected_*: 30 styles).
+## Immediate Active Phase — P5: Combat and events refinement
 
-Preserve command/task contracts (accepted vs. queued vs. rejected). Maintain perspective correctness (NPC speaker vs. player commander).
+Expand and refine all canonical NPC combat and world event dialogue shards to >= 10 variants:
+- **P5A**: Player assault reactions (`content/combat/player_assault_reactions.json`: 5 styles).
+- **P5B**: Weapon kill reactions (`content/combat_banter/weapon_kill_reactions.json`: 26 styles).
+- **P5C**: Human kill reactions (`content/combat_human_banter/human_kill_reactions.json`: 21 styles).
+- **P5D**: Events (`content/event/*.json`: 5 files: `combat_horde.json`, `combat_kill_killer.json`, `combat_kill_witness.json`, `medical.json`, `reactions.json`: 104 styles).
+
+Total P5 styles to expand: **156 styles** (1,560 phrases).
+Eliminate repetitive cartoon profanity and action-movie caricatures; ensure combat lines are concise, urgent, natural, and distinct across styles. Maintain exact placeholder parity (e.g. `{name}`, `%s`).
 
 ## Mandatory quality principle
 

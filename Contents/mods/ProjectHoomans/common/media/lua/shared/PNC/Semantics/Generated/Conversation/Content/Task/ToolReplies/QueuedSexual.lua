@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.queued_sexual.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual1Neutral01",
                 },
+                {
+                    ["fallback"] = "Heard that proposition. Let me catch my breath.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual1Neutral02",
+                },
+                {
+                    ["fallback"] = "I heard you clearly. Hold on for a moment.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual1Neutral03",
+                },
+                {
+                    ["fallback"] = "Message received loud and clear. Give me a minute.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual1Neutral04",
+                },
+                {
+                    ["fallback"] = "I heard that. Give me a beat to think.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual1Neutral05",
+                },
+                {
+                    ["fallback"] = "Heard. That's a lot to process right now.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual1Neutral06",
+                },
+                {
+                    ["fallback"] = "I heard what you just proposed. Just hold up.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual1Neutral07",
+                },
+                {
+                    ["fallback"] = "Got that. Let me gather my thoughts.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual1Neutral08",
+                },
+                {
+                    ["fallback"] = "I heard you. Don't rush me.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual1Neutral09",
+                },
+                {
+                    ["fallback"] = "Heard every word. Give me some room.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "That is a bold thing to say.",
                     ["id"] = "phrase.semantic.tool_reply.queued_sexual.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual2Neutral01",
+                },
+                {
+                    ["fallback"] = "You don't waste time with subtlety, do you?",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual2Neutral02",
+                },
+                {
+                    ["fallback"] = "That's about as blunt as it gets out here.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual2Neutral03",
+                },
+                {
+                    ["fallback"] = "You're taking quite a gamble saying that.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual2Neutral04",
+                },
+                {
+                    ["fallback"] = "That's an audacious thing to drop on me.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual2Neutral05",
+                },
+                {
+                    ["fallback"] = "You definitely speak your mind without filters.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual2Neutral06",
+                },
+                {
+                    ["fallback"] = "Bold proposition. Let's see what happens.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual2Neutral07",
+                },
+                {
+                    ["fallback"] = "That takes some serious nerve to put out there.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual2Neutral08",
+                },
+                {
+                    ["fallback"] = "You're playing with high stakes with that talk.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual2Neutral09",
+                },
+                {
+                    ["fallback"] = "Direct and daring. Noted.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_sexual.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedSexual2Neutral10",
                 },
             },
         },

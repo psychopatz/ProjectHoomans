@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.queued_insult.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult1Neutral01",
                 },
+                {
+                    ["fallback"] = "I heard that insult.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult1Neutral02",
+                },
+                {
+                    ["fallback"] = "Caught that remark.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult1Neutral03",
+                },
+                {
+                    ["fallback"] = "I hear the childish jab.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult1Neutral04",
+                },
+                {
+                    ["fallback"] = "Message heard. Doesn't bother me.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult1Neutral05",
+                },
+                {
+                    ["fallback"] = "Heard you. Weak effort.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult1Neutral06",
+                },
+                {
+                    ["fallback"] = "I heard the slander.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult1Neutral07",
+                },
+                {
+                    ["fallback"] = "Heard it. Moving on.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult1Neutral08",
+                },
+                {
+                    ["fallback"] = "I heard that petty comment.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult1Neutral09",
+                },
+                {
+                    ["fallback"] = "I hear your barking.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "Noted.",
                     ["id"] = "phrase.semantic.tool_reply.queued_insult.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult2Neutral01",
+                },
+                {
+                    ["fallback"] = "Noted, and dismissed.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult2Neutral02",
+                },
+                {
+                    ["fallback"] = "Noted. You're wasting your breath.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult2Neutral03",
+                },
+                {
+                    ["fallback"] = "Noted. Doesn't mean a thing to me.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult2Neutral04",
+                },
+                {
+                    ["fallback"] = "Duly noted. Try harder next time.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult2Neutral05",
+                },
+                {
+                    ["fallback"] = "Noted. I've heard worse from strangers.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult2Neutral06",
+                },
+                {
+                    ["fallback"] = "Noted. Water off a duck's back.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult2Neutral07",
+                },
+                {
+                    ["fallback"] = "Noted. Don't expect a reaction.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult2Neutral08",
+                },
+                {
+                    ["fallback"] = "Noted. Moving along.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult2Neutral09",
+                },
+                {
+                    ["fallback"] = "Noted and ignored.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_insult.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedInsult2Neutral10",
                 },
             },
         },

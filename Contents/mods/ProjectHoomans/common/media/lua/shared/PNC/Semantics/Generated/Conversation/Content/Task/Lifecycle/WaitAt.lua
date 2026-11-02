@@ -8,9 +8,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I'm waiting there now.",
+                    ["fallback"] = "Waiting here now.",
                     ["id"] = "phrase.semantic.task.wait_at.active.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtActiveNeutral01",
+                },
+                {
+                    ["fallback"] = "Currently holding position and waiting.",
+                    ["id"] = "phrase.semantic.task.wait_at.active.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtActiveNeutral02",
+                },
+                {
+                    ["fallback"] = "Standing by at the designated spot.",
+                    ["id"] = "phrase.semantic.task.wait_at.active.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtActiveNeutral03",
+                },
+                {
+                    ["fallback"] = "Waiting at this location as ordered.",
+                    ["id"] = "phrase.semantic.task.wait_at.active.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtActiveNeutral04",
+                },
+                {
+                    ["fallback"] = "Keeping watch while waiting right here.",
+                    ["id"] = "phrase.semantic.task.wait_at.active.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtActiveNeutral05",
+                },
+                {
+                    ["fallback"] = "Holding at the marker.",
+                    ["id"] = "phrase.semantic.task.wait_at.active.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtActiveNeutral06",
+                },
+                {
+                    ["fallback"] = "Waiting quietly. Eyes open.",
+                    ["id"] = "phrase.semantic.task.wait_at.active.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtActiveNeutral07",
+                },
+                {
+                    ["fallback"] = "In position and waiting.",
+                    ["id"] = "phrase.semantic.task.wait_at.active.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtActiveNeutral08",
+                },
+                {
+                    ["fallback"] = "Stationary at the post.",
+                    ["id"] = "phrase.semantic.task.wait_at.active.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtActiveNeutral09",
+                },
+                {
+                    ["fallback"] = "Waiting here. Take your time.",
+                    ["id"] = "phrase.semantic.task.wait_at.active.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtActiveNeutral10",
                 },
             },
         },
@@ -23,9 +68,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "Okay, I'll wait there.",
+                    ["fallback"] = "I'll wait there.",
                     ["id"] = "phrase.semantic.task.wait_at.admitted.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtAdmittedNeutral01",
+                },
+                {
+                    ["fallback"] = "Understood. Moving to the waiting spot.",
+                    ["id"] = "phrase.semantic.task.wait_at.admitted.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtAdmittedNeutral02",
+                },
+                {
+                    ["fallback"] = "I'll go stand by over there.",
+                    ["id"] = "phrase.semantic.task.wait_at.admitted.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtAdmittedNeutral03",
+                },
+                {
+                    ["fallback"] = "All right, I'll wait at that position.",
+                    ["id"] = "phrase.semantic.task.wait_at.admitted.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtAdmittedNeutral04",
+                },
+                {
+                    ["fallback"] = "Heading to the waypoint to wait.",
+                    ["id"] = "phrase.semantic.task.wait_at.admitted.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtAdmittedNeutral05",
+                },
+                {
+                    ["fallback"] = "Understood. I will hold that ground.",
+                    ["id"] = "phrase.semantic.task.wait_at.admitted.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtAdmittedNeutral06",
+                },
+                {
+                    ["fallback"] = "Right. Setting up to wait there.",
+                    ["id"] = "phrase.semantic.task.wait_at.admitted.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtAdmittedNeutral07",
+                },
+                {
+                    ["fallback"] = "I'll wait at the assigned marker.",
+                    ["id"] = "phrase.semantic.task.wait_at.admitted.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtAdmittedNeutral08",
+                },
+                {
+                    ["fallback"] = "Moving to wait as ordered.",
+                    ["id"] = "phrase.semantic.task.wait_at.admitted.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtAdmittedNeutral09",
+                },
+                {
+                    ["fallback"] = "Sounds good. Going to wait there.",
+                    ["id"] = "phrase.semantic.task.wait_at.admitted.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtAdmittedNeutral10",
                 },
             },
         },
@@ -38,9 +128,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I'm here.",
+                    ["fallback"] = "Finished waiting.",
                     ["id"] = "phrase.semantic.task.wait_at.completed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtCompletedNeutral01",
+                },
+                {
+                    ["fallback"] = "Done waiting. What's the next move?",
+                    ["id"] = "phrase.semantic.task.wait_at.completed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtCompletedNeutral02",
+                },
+                {
+                    ["fallback"] = "Wait time concluded. Ready for orders.",
+                    ["id"] = "phrase.semantic.task.wait_at.completed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtCompletedNeutral03",
+                },
+                {
+                    ["fallback"] = "Held the spot. Standing down now.",
+                    ["id"] = "phrase.semantic.task.wait_at.completed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtCompletedNeutral04",
+                },
+                {
+                    ["fallback"] = "Waiting task complete.",
+                    ["id"] = "phrase.semantic.task.wait_at.completed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtCompletedNeutral05",
+                },
+                {
+                    ["fallback"] = "Done holding this ground.",
+                    ["id"] = "phrase.semantic.task.wait_at.completed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtCompletedNeutral06",
+                },
+                {
+                    ["fallback"] = "Time is up. Finished waiting here.",
+                    ["id"] = "phrase.semantic.task.wait_at.completed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtCompletedNeutral07",
+                },
+                {
+                    ["fallback"] = "Rejoining you. Wait is over.",
+                    ["id"] = "phrase.semantic.task.wait_at.completed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtCompletedNeutral08",
+                },
+                {
+                    ["fallback"] = "Held the post as long as needed.",
+                    ["id"] = "phrase.semantic.task.wait_at.completed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtCompletedNeutral09",
+                },
+                {
+                    ["fallback"] = "Completed the wait order.",
+                    ["id"] = "phrase.semantic.task.wait_at.completed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtCompletedNeutral10",
                 },
             },
         },
@@ -57,6 +192,51 @@ return {
                     ["id"] = "phrase.semantic.task.wait_at.failed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtFailedNeutral01",
                 },
+                {
+                    ["fallback"] = "Position was overrun. Couldn't keep waiting.",
+                    ["id"] = "phrase.semantic.task.wait_at.failed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtFailedNeutral02",
+                },
+                {
+                    ["fallback"] = "Enemies forced me out of the waiting spot.",
+                    ["id"] = "phrase.semantic.task.wait_at.failed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtFailedNeutral03",
+                },
+                {
+                    ["fallback"] = "Couldn't reach the designated waiting location.",
+                    ["id"] = "phrase.semantic.task.wait_at.failed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtFailedNeutral04",
+                },
+                {
+                    ["fallback"] = "Unable to hold ground there. Too dangerous.",
+                    ["id"] = "phrase.semantic.task.wait_at.failed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtFailedNeutral05",
+                },
+                {
+                    ["fallback"] = "Waiting failed. Had to relocate for safety.",
+                    ["id"] = "phrase.semantic.task.wait_at.failed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtFailedNeutral06",
+                },
+                {
+                    ["fallback"] = "Aborted waiting. Sector became hostile.",
+                    ["id"] = "phrase.semantic.task.wait_at.failed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtFailedNeutral07",
+                },
+                {
+                    ["fallback"] = "I had to abandon the post.",
+                    ["id"] = "phrase.semantic.task.wait_at.failed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtFailedNeutral08",
+                },
+                {
+                    ["fallback"] = "Could not remain stationary there.",
+                    ["id"] = "phrase.semantic.task.wait_at.failed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtFailedNeutral09",
+                },
+                {
+                    ["fallback"] = "Failed to hold the wait point.",
+                    ["id"] = "phrase.semantic.task.wait_at.failed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtFailedNeutral10",
+                },
             },
         },
     },
@@ -71,6 +251,51 @@ return {
                     ["fallback"] = "I can't wait there right now.",
                     ["id"] = "phrase.semantic.task.wait_at.rejected.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtRejectedNeutral01",
+                },
+                {
+                    ["fallback"] = "That spot is in the line of fire. I won't wait there.",
+                    ["id"] = "phrase.semantic.task.wait_at.rejected.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtRejectedNeutral02",
+                },
+                {
+                    ["fallback"] = "Standing out in the open like that is suicide.",
+                    ["id"] = "phrase.semantic.task.wait_at.rejected.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtRejectedNeutral03",
+                },
+                {
+                    ["fallback"] = "Refusing to wait in an unsecured position.",
+                    ["id"] = "phrase.semantic.task.wait_at.rejected.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtRejectedNeutral04",
+                },
+                {
+                    ["fallback"] = "Too many hostiles nearby to just stand around.",
+                    ["id"] = "phrase.semantic.task.wait_at.rejected.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtRejectedNeutral05",
+                },
+                {
+                    ["fallback"] = "I need to stay on the move. Can't wait there.",
+                    ["id"] = "phrase.semantic.task.wait_at.rejected.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtRejectedNeutral06",
+                },
+                {
+                    ["fallback"] = "Wait order rejected. Find a safer spot.",
+                    ["id"] = "phrase.semantic.task.wait_at.rejected.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtRejectedNeutral07",
+                },
+                {
+                    ["fallback"] = "I won't wait in a compromised sector.",
+                    ["id"] = "phrase.semantic.task.wait_at.rejected.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtRejectedNeutral08",
+                },
+                {
+                    ["fallback"] = "Unable to comply. That location has zero cover.",
+                    ["id"] = "phrase.semantic.task.wait_at.rejected.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtRejectedNeutral09",
+                },
+                {
+                    ["fallback"] = "I can't wait at that position.",
+                    ["id"] = "phrase.semantic.task.wait_at.rejected.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtRejectedNeutral10",
                 },
             },
         },

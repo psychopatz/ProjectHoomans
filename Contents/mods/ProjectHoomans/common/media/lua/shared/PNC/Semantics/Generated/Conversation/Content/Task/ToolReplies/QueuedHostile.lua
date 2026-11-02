@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.queued_hostile.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile1Neutral01",
                 },
+                {
+                    ["fallback"] = "Heard that tone. Mind your step.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile1Neutral02",
+                },
+                {
+                    ["fallback"] = "I heard the anger. Keep it in check.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile1Neutral03",
+                },
+                {
+                    ["fallback"] = "I hear you, but don't cross the line.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile1Neutral04",
+                },
+                {
+                    ["fallback"] = "Message heard. Control yourself.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile1Neutral05",
+                },
+                {
+                    ["fallback"] = "Heard that loud and clear. Back off.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile1Neutral06",
+                },
+                {
+                    ["fallback"] = "I heard you. Don't make a mistake you can't undo.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile1Neutral07",
+                },
+                {
+                    ["fallback"] = "I heard the threat. Tread lightly.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile1Neutral08",
+                },
+                {
+                    ["fallback"] = "Noted. Don't let your temper get you killed.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile1Neutral09",
+                },
+                {
+                    ["fallback"] = "I hear you. Watch your back.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "Noted. Choose your next words carefully.",
                     ["id"] = "phrase.semantic.tool_reply.queued_hostile.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile2Neutral01",
+                },
+                {
+                    ["fallback"] = "Be very careful what comes out of your mouth next.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile2Neutral02",
+                },
+                {
+                    ["fallback"] = "You're walking on thin ice with that talk.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile2Neutral03",
+                },
+                {
+                    ["fallback"] = "Think twice before repeating that.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile2Neutral04",
+                },
+                {
+                    ["fallback"] = "Choose your next move with extreme caution.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile2Neutral05",
+                },
+                {
+                    ["fallback"] = "You're testing boundaries that have teeth.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile2Neutral06",
+                },
+                {
+                    ["fallback"] = "Careful now. Words have consequences out here.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile2Neutral07",
+                },
+                {
+                    ["fallback"] = "Watch what you say next.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile2Neutral08",
+                },
+                {
+                    ["fallback"] = "One wrong word and this conversation ends badly.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile2Neutral09",
+                },
+                {
+                    ["fallback"] = "Noted. Mind your tongue.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_hostile.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedHostile2Neutral10",
                 },
             },
         },

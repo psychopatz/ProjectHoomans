@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.order_stay.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay1Neutral01",
                 },
+                {
+                    ["fallback"] = "Holding position right here.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay1Neutral02",
+                },
+                {
+                    ["fallback"] = "Understood. Guarding this spot.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay1Neutral03",
+                },
+                {
+                    ["fallback"] = "I will remain right where I am.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay1Neutral04",
+                },
+                {
+                    ["fallback"] = "Holding ground as ordered.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay1Neutral05",
+                },
+                {
+                    ["fallback"] = "Understood. I won't move an inch.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay1Neutral06",
+                },
+                {
+                    ["fallback"] = "Standing watch right here.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay1Neutral07",
+                },
+                {
+                    ["fallback"] = "I'll keep this position secure.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay1Neutral08",
+                },
+                {
+                    ["fallback"] = "Holding here. Watch yourself out there.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay1Neutral09",
+                },
+                {
+                    ["fallback"] = "Stay order confirmed. Holding ground.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "I will stay put.",
                     ["id"] = "phrase.semantic.tool_reply.order_stay.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay2Neutral01",
+                },
+                {
+                    ["fallback"] = "Staying put until you return.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay2Neutral02",
+                },
+                {
+                    ["fallback"] = "Not moving from this spot.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay2Neutral03",
+                },
+                {
+                    ["fallback"] = "I'll keep my boots planted right here.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay2Neutral04",
+                },
+                {
+                    ["fallback"] = "Staying put. Hurry back.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay2Neutral05",
+                },
+                {
+                    ["fallback"] = "Understood. I will wait right here.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay2Neutral06",
+                },
+                {
+                    ["fallback"] = "Rooted to this spot. Go ahead.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay2Neutral07",
+                },
+                {
+                    ["fallback"] = "Staying put and watching the area.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay2Neutral08",
+                },
+                {
+                    ["fallback"] = "I'll stay right where you left me.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay2Neutral09",
+                },
+                {
+                    ["fallback"] = "Holding still in this position.",
+                    ["id"] = "phrase.semantic.tool_reply.order_stay.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderStay2Neutral10",
                 },
             },
         },

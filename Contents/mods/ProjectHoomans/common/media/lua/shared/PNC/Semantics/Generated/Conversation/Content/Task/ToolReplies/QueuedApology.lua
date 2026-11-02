@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.queued_apology.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology1Neutral01",
                 },
+                {
+                    ["fallback"] = "I hear your apology.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology1Neutral02",
+                },
+                {
+                    ["fallback"] = "Message heard.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology1Neutral03",
+                },
+                {
+                    ["fallback"] = "I heard what you had to say.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology1Neutral04",
+                },
+                {
+                    ["fallback"] = "Got it. I hear you.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology1Neutral05",
+                },
+                {
+                    ["fallback"] = "I hear you owning up.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology1Neutral06",
+                },
+                {
+                    ["fallback"] = "Understood. Heard.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology1Neutral07",
+                },
+                {
+                    ["fallback"] = "I heard your words on that.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology1Neutral08",
+                },
+                {
+                    ["fallback"] = "Noted. I'm listening.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology1Neutral09",
+                },
+                {
+                    ["fallback"] = "Heard your statement.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "We will talk about it.",
                     ["id"] = "phrase.semantic.tool_reply.queued_apology.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology2Neutral01",
+                },
+                {
+                    ["fallback"] = "We'll discuss it once things calm down.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology2Neutral02",
+                },
+                {
+                    ["fallback"] = "We will hash this out later.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology2Neutral03",
+                },
+                {
+                    ["fallback"] = "We'll revisit that when we have a quiet moment.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology2Neutral04",
+                },
+                {
+                    ["fallback"] = "We will talk through that soon.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology2Neutral05",
+                },
+                {
+                    ["fallback"] = "I'll talk to you about it later.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology2Neutral06",
+                },
+                {
+                    ["fallback"] = "We'll sort that out when we're safe.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology2Neutral07",
+                },
+                {
+                    ["fallback"] = "We will clear the air later.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology2Neutral08",
+                },
+                {
+                    ["fallback"] = "We'll have a proper conversation about it.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology2Neutral09",
+                },
+                {
+                    ["fallback"] = "Talk about it when we reach camp.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_apology.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedApology2Neutral10",
                 },
             },
         },

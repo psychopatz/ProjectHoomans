@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.order_rejected.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected1Neutral01",
                 },
+                {
+                    ["fallback"] = "That's not something I can pull off here.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected1Neutral02",
+                },
+                {
+                    ["fallback"] = "Unable to execute that request at this time.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected1Neutral03",
+                },
+                {
+                    ["fallback"] = "I have to decline that order.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected1Neutral04",
+                },
+                {
+                    ["fallback"] = "Not possible under current circumstances.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected1Neutral05",
+                },
+                {
+                    ["fallback"] = "I can't carry that out right now.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected1Neutral06",
+                },
+                {
+                    ["fallback"] = "Unable to comply with that command.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected1Neutral07",
+                },
+                {
+                    ["fallback"] = "I can't do that. Find another solution.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected1Neutral08",
+                },
+                {
+                    ["fallback"] = "Order declined. Conditions won't allow it.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected1Neutral09",
+                },
+                {
+                    ["fallback"] = "I cannot perform that action right now.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "That order is not going to work.",
                     ["id"] = "phrase.semantic.tool_reply.order_rejected.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected2Neutral01",
+                },
+                {
+                    ["fallback"] = "That's a bad plan and it won't succeed.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected2Neutral02",
+                },
+                {
+                    ["fallback"] = "That order makes no sense in this situation.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected2Neutral03",
+                },
+                {
+                    ["fallback"] = "That won't work. We need a different approach.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected2Neutral04",
+                },
+                {
+                    ["fallback"] = "I'm not following an order that leads to failure.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected2Neutral05",
+                },
+                {
+                    ["fallback"] = "That command will only get us killed.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected2Neutral06",
+                },
+                {
+                    ["fallback"] = "Not going to work out. Try another idea.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected2Neutral07",
+                },
+                {
+                    ["fallback"] = "Flawed order. I won't execute it.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected2Neutral08",
+                },
+                {
+                    ["fallback"] = "That plan is dead in the water.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected2Neutral09",
+                },
+                {
+                    ["fallback"] = "That won't work out here. Give a better order.",
+                    ["id"] = "phrase.semantic.tool_reply.order_rejected.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrderRejected2Neutral10",
                 },
             },
         },

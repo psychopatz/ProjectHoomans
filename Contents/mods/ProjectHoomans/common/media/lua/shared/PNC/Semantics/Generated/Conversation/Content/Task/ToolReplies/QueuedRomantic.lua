@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.queued_romantic.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic1Neutral01",
                 },
+                {
+                    ["fallback"] = "I heard that romantic whisper. You have nerve.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic1Neutral02",
+                },
+                {
+                    ["fallback"] = "Heard loud and clear. That was daring of you.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic1Neutral03",
+                },
+                {
+                    ["fallback"] = "I caught your words. You certainly don't hold back.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic1Neutral04",
+                },
+                {
+                    ["fallback"] = "Heard you. That took some real courage to say.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic1Neutral05",
+                },
+                {
+                    ["fallback"] = "I heard every word. You're bolder than most.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic1Neutral06",
+                },
+                {
+                    ["fallback"] = "I hear what you're hinting at. Quite bold.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic1Neutral07",
+                },
+                {
+                    ["fallback"] = "Message heard. You definitely have guts.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic1Neutral08",
+                },
+                {
+                    ["fallback"] = "I caught that soft line. Bold of you.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic1Neutral09",
+                },
+                {
+                    ["fallback"] = "Heard you. You know how to make an impression.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "You certainly know how to get my attention.",
                     ["id"] = "phrase.semantic.tool_reply.queued_romantic.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic2Neutral01",
+                },
+                {
+                    ["fallback"] = "You definitely have my full focus after that.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic2Neutral02",
+                },
+                {
+                    ["fallback"] = "You know just what strings to pull.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic2Neutral03",
+                },
+                {
+                    ["fallback"] = "You have a knack for turning my head your way.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic2Neutral04",
+                },
+                {
+                    ["fallback"] = "You certainly know how to make me listen.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic2Neutral05",
+                },
+                {
+                    ["fallback"] = "That definitely caught my eye and ear.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic2Neutral06",
+                },
+                {
+                    ["fallback"] = "You always find a way to make me look at you.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic2Neutral07",
+                },
+                {
+                    ["fallback"] = "Well, you have my complete attention now.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic2Neutral08",
+                },
+                {
+                    ["fallback"] = "You have a gift for captivating an audience.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic2Neutral09",
+                },
+                {
+                    ["fallback"] = "You know exactly what you're doing with those words.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_romantic.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedRomantic2Neutral10",
                 },
             },
         },

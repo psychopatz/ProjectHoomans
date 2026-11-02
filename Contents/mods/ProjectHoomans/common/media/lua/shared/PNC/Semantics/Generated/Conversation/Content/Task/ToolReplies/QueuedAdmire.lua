@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.queued_admire.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire1Neutral01",
                 },
+                {
+                    ["fallback"] = "Message received.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire1Neutral02",
+                },
+                {
+                    ["fallback"] = "I hear what you're saying.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire1Neutral03",
+                },
+                {
+                    ["fallback"] = "Understood. I heard that.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire1Neutral04",
+                },
+                {
+                    ["fallback"] = "Got your words.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire1Neutral05",
+                },
+                {
+                    ["fallback"] = "Heard and acknowledged.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire1Neutral06",
+                },
+                {
+                    ["fallback"] = "I hear you, loud and clear.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire1Neutral07",
+                },
+                {
+                    ["fallback"] = "Fair enough. I heard that.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire1Neutral08",
+                },
+                {
+                    ["fallback"] = "Noted. I hear you.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire1Neutral09",
+                },
+                {
+                    ["fallback"] = "I'm listening. Heard.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "That got through.",
                     ["id"] = "phrase.semantic.tool_reply.queued_admire.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire2Neutral01",
+                },
+                {
+                    ["fallback"] = "That reached me. Thank you.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire2Neutral02",
+                },
+                {
+                    ["fallback"] = "I took that in.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire2Neutral03",
+                },
+                {
+                    ["fallback"] = "Your message made its mark.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire2Neutral04",
+                },
+                {
+                    ["fallback"] = "I felt that. Thanks.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire2Neutral05",
+                },
+                {
+                    ["fallback"] = "That registered with me.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire2Neutral06",
+                },
+                {
+                    ["fallback"] = "That got through to me.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire2Neutral07",
+                },
+                {
+                    ["fallback"] = "I received that clearly.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire2Neutral08",
+                },
+                {
+                    ["fallback"] = "That landed well. Thank you.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire2Neutral09",
+                },
+                {
+                    ["fallback"] = "Understood. That made an impression.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_admire.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedAdmire2Neutral10",
                 },
             },
         },

@@ -85,7 +85,7 @@ return {
             ["sourceShard"] = "content/combat_human_banter/human_kill_reactions.json",
         },
         {
-            ["bytes"] = 4991,
+            ["bytes"] = 23988,
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/Camp",
@@ -102,7 +102,7 @@ return {
             ["sourceShard"] = "content/command/lifecycle/camp.json",
         },
         {
-            ["bytes"] = 5034,
+            ["bytes"] = 23929,
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/Follow",
@@ -119,7 +119,7 @@ return {
             ["sourceShard"] = "content/command/lifecycle/follow.json",
         },
         {
-            ["bytes"] = 5225,
+            ["bytes"] = 24919,
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/ReturnHome",
@@ -136,7 +136,7 @@ return {
             ["sourceShard"] = "content/command/lifecycle/return_home.json",
         },
         {
-            ["bytes"] = 4945,
+            ["bytes"] = 23863,
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/Stay",
@@ -153,7 +153,7 @@ return {
             ["sourceShard"] = "content/command/lifecycle/stay.json",
         },
         {
-            ["bytes"] = 5376,
+            ["bytes"] = 25565,
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/StopFollowing",
@@ -191,7 +191,7 @@ return {
             ["sourceShard"] = "content/command/player.json",
         },
         {
-            ["bytes"] = 19695,
+            ["bytes"] = 64386,
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Replies",
@@ -961,7 +961,7 @@ return {
             ["sourceShard"] = "content/social_apology.json",
         },
         {
-            ["bytes"] = 3400,
+            ["bytes"] = 16159,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Consume",
@@ -976,7 +976,7 @@ return {
             ["sourceShard"] = "content/task/lifecycle/consume.json",
         },
         {
-            ["bytes"] = 3351,
+            ["bytes"] = 16018,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Drink",
@@ -991,7 +991,7 @@ return {
             ["sourceShard"] = "content/task/lifecycle/drink.json",
         },
         {
-            ["bytes"] = 3287,
+            ["bytes"] = 15748,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Eat",
@@ -1006,7 +1006,7 @@ return {
             ["sourceShard"] = "content/task/lifecycle/eat.json",
         },
         {
-            ["bytes"] = 3351,
+            ["bytes"] = 16017,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Fetch",
@@ -1021,7 +1021,7 @@ return {
             ["sourceShard"] = "content/task/lifecycle/fetch.json",
         },
         {
-            ["bytes"] = 3294,
+            ["bytes"] = 15793,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Gift",
@@ -1036,7 +1036,7 @@ return {
             ["sourceShard"] = "content/task/lifecycle/gift.json",
         },
         {
-            ["bytes"] = 3333,
+            ["bytes"] = 15844,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Give",
@@ -1051,7 +1051,7 @@ return {
             ["sourceShard"] = "content/task/lifecycle/give.json",
         },
         {
-            ["bytes"] = 3385,
+            ["bytes"] = 16281,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Refill",
@@ -1066,7 +1066,7 @@ return {
             ["sourceShard"] = "content/task/lifecycle/refill.json",
         },
         {
-            ["bytes"] = 3407,
+            ["bytes"] = 16356,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/WaitAt",
@@ -1081,7 +1081,7 @@ return {
             ["sourceShard"] = "content/task/lifecycle/wait_at.json",
         },
         {
-            ["bytes"] = 1466,
+            ["bytes"] = 6778,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/Cooldown",
@@ -1093,7 +1093,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/cooldown.json",
         },
         {
-            ["bytes"] = 2181,
+            ["bytes"] = 10074,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderCamp",
@@ -1106,7 +1106,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/order_camp.json",
         },
         {
-            ["bytes"] = 2154,
+            ["bytes"] = 9896,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderFollow",
@@ -1119,7 +1119,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/order_follow.json",
         },
         {
-            ["bytes"] = 2154,
+            ["bytes"] = 9742,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderGeneric",
@@ -1132,7 +1132,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/order_generic.json",
         },
         {
-            ["bytes"] = 1512,
+            ["bytes"] = 6990,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderRejected",
@@ -1144,7 +1144,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/order_rejected.json",
         },
         {
-            ["bytes"] = 1449,
+            ["bytes"] = 6638,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderStay",
@@ -1156,7 +1156,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/order_stay.json",
         },
         {
-            ["bytes"] = 1469,
+            ["bytes"] = 6625,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedAdmire",
@@ -1168,7 +1168,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/queued_admire.json",
         },
         {
-            ["bytes"] = 1486,
+            ["bytes"] = 6761,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedApology",
@@ -1180,7 +1180,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/queued_apology.json",
         },
         {
-            ["bytes"] = 1487,
+            ["bytes"] = 6777,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedComfort",
@@ -1192,7 +1192,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/queued_comfort.json",
         },
         {
-            ["bytes"] = 1539,
+            ["bytes"] = 6908,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedCompliment",
@@ -1204,7 +1204,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/queued_compliment.json",
         },
         {
-            ["bytes"] = 1476,
+            ["bytes"] = 6708,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedFlirt",
@@ -1216,7 +1216,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/queued_flirt.json",
         },
         {
-            ["bytes"] = 1481,
+            ["bytes"] = 6608,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedGeneric",
@@ -1228,7 +1228,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/queued_generic.json",
         },
         {
-            ["bytes"] = 1521,
+            ["bytes"] = 6972,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedHostile",
@@ -1240,7 +1240,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/queued_hostile.json",
         },
         {
-            ["bytes"] = 1459,
+            ["bytes"] = 6660,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedInsult",
@@ -1252,7 +1252,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/queued_insult.json",
         },
         {
-            ["bytes"] = 1473,
+            ["bytes"] = 6732,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedPraise",
@@ -1264,7 +1264,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/queued_praise.json",
         },
         {
-            ["bytes"] = 1556,
+            ["bytes"] = 7146,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedRomantic",
@@ -1276,7 +1276,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/queued_romantic.json",
         },
         {
-            ["bytes"] = 1499,
+            ["bytes"] = 6968,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedSexual",
@@ -1288,7 +1288,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/queued_sexual.json",
         },
         {
-            ["bytes"] = 1472,
+            ["bytes"] = 6787,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedGame",
@@ -1300,7 +1300,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/rejected_game.json",
         },
         {
-            ["bytes"] = 1540,
+            ["bytes"] = 6896,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedGeneric",
@@ -1312,7 +1312,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/rejected_generic.json",
         },
         {
-            ["bytes"] = 1525,
+            ["bytes"] = 6949,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedHostile",
@@ -1324,7 +1324,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/rejected_hostile.json",
         },
         {
-            ["bytes"] = 2230,
+            ["bytes"] = 10525,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedSexual",
@@ -2968,5 +2968,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "5886f83df423b642017f2e85c0bc6b4dbb6b51db210c75f0ec79974e52f7be60",
+    ["wholeModelFingerprint"] = "e5bfb07a431c6126e4b4067af38d3cdd514ce7a264ba204150b008c530119dde",
 }

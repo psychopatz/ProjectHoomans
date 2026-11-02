@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.queued_flirt.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt1Neutral01",
                 },
+                {
+                    ["fallback"] = "I heard that little remark.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt1Neutral02",
+                },
+                {
+                    ["fallback"] = "Caught that.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt1Neutral03",
+                },
+                {
+                    ["fallback"] = "I heard what you whispered.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt1Neutral04",
+                },
+                {
+                    ["fallback"] = "Message heard.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt1Neutral05",
+                },
+                {
+                    ["fallback"] = "I hear where your head is at.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt1Neutral06",
+                },
+                {
+                    ["fallback"] = "Got that loud and clear.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt1Neutral07",
+                },
+                {
+                    ["fallback"] = "I heard you just fine.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt1Neutral08",
+                },
+                {
+                    ["fallback"] = "Heard you. Don't think I missed it.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt1Neutral09",
+                },
+                {
+                    ["fallback"] = "I caught that flirt.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "You are bold, I will give you that.",
                     ["id"] = "phrase.semantic.tool_reply.queued_flirt.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt2Neutral01",
+                },
+                {
+                    ["fallback"] = "You certainly don't lack nerve.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt2Neutral02",
+                },
+                {
+                    ["fallback"] = "Bold move talking like that out here.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt2Neutral03",
+                },
+                {
+                    ["fallback"] = "You have plenty of confidence, I'll say that.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt2Neutral04",
+                },
+                {
+                    ["fallback"] = "That's quite a forward thing to say.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt2Neutral05",
+                },
+                {
+                    ["fallback"] = "You certainly know how to shoot your shot.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt2Neutral06",
+                },
+                {
+                    ["fallback"] = "Bold words for someone in danger.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt2Neutral07",
+                },
+                {
+                    ["fallback"] = "I admire the guts, if nothing else.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt2Neutral08",
+                },
+                {
+                    ["fallback"] = "You're definitely not shy.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt2Neutral09",
+                },
+                {
+                    ["fallback"] = "You like living dangerously, don't you?",
+                    ["id"] = "phrase.semantic.tool_reply.queued_flirt.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedFlirt2Neutral10",
                 },
             },
         },

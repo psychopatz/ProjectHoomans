@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.command.return_home.failed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeFailedNeutral01",
                 },
+                {
+                    ["fallback"] = "The path back home is completely blocked.",
+                    ["id"] = "phrase.semantic.command.return_home.failed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeFailedNeutral02",
+                },
+                {
+                    ["fallback"] = "Failed to return. Too many hostiles along the route.",
+                    ["id"] = "phrase.semantic.command.return_home.failed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeFailedNeutral03",
+                },
+                {
+                    ["fallback"] = "I couldn't find a safe way back to base.",
+                    ["id"] = "phrase.semantic.command.return_home.failed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeFailedNeutral04",
+                },
+                {
+                    ["fallback"] = "Return trip failed. Had to double back.",
+                    ["id"] = "phrase.semantic.command.return_home.failed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeFailedNeutral05",
+                },
+                {
+                    ["fallback"] = "Unable to reach home safely right now.",
+                    ["id"] = "phrase.semantic.command.return_home.failed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeFailedNeutral06",
+                },
+                {
+                    ["fallback"] = "Tried heading back, but the streets were overrun.",
+                    ["id"] = "phrase.semantic.command.return_home.failed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeFailedNeutral07",
+                },
+                {
+                    ["fallback"] = "Lost the route home in the chaos.",
+                    ["id"] = "phrase.semantic.command.return_home.failed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeFailedNeutral08",
+                },
+                {
+                    ["fallback"] = "Can't reach base from this position.",
+                    ["id"] = "phrase.semantic.command.return_home.failed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeFailedNeutral09",
+                },
+                {
+                    ["fallback"] = "Return to base aborted. Route compromised.",
+                    ["id"] = "phrase.semantic.command.return_home.failed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeFailedNeutral10",
+                },
             },
         },
     },
@@ -27,6 +72,51 @@ return {
                     ["id"] = "phrase.semantic.command.return_home.queued.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedNeutral01",
                 },
+                {
+                    ["fallback"] = "Heading back to base now.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedNeutral02",
+                },
+                {
+                    ["fallback"] = "Understood. Moving toward home.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedNeutral03",
+                },
+                {
+                    ["fallback"] = "I'll make my way back to our shelter.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedNeutral04",
+                },
+                {
+                    ["fallback"] = "Returning to camp as ordered.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedNeutral05",
+                },
+                {
+                    ["fallback"] = "Right. Time to head home.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedNeutral06",
+                },
+                {
+                    ["fallback"] = "Understood. Retracing my steps to base.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedNeutral07",
+                },
+                {
+                    ["fallback"] = "On my way back home.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedNeutral08",
+                },
+                {
+                    ["fallback"] = "Got it. Returning to home coordinates.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedNeutral09",
+                },
+                {
+                    ["fallback"] = "Heading inbound for home.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedNeutral10",
+                },
             },
         },
     },
@@ -38,9 +128,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "Sure, I'll head home.",
+                    ["fallback"] = "Sure, I'll head home. See you back there soon!",
                     ["id"] = "phrase.semantic.command.return_home.queued.friendly.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedFriendlyNeutral01",
+                },
+                {
+                    ["fallback"] = "Sounds wonderful, friend. I'll get back to camp safely.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.friendly.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedFriendlyNeutral02",
+                },
+                {
+                    ["fallback"] = "Heading home, partner! Make sure you stay safe too.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.friendly.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedFriendlyNeutral03",
+                },
+                {
+                    ["fallback"] = "I'll go keep the fire warm for when you return.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.friendly.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedFriendlyNeutral04",
+                },
+                {
+                    ["fallback"] = "Great idea! I'll head home and stow our gear.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.friendly.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedFriendlyNeutral05",
+                },
+                {
+                    ["fallback"] = "Happy to head home. Don't stay out too late, friend!",
+                    ["id"] = "phrase.semantic.command.return_home.queued.friendly.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedFriendlyNeutral06",
+                },
+                {
+                    ["fallback"] = "On my way back to our safe place. Take care!",
+                    ["id"] = "phrase.semantic.command.return_home.queued.friendly.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedFriendlyNeutral07",
+                },
+                {
+                    ["fallback"] = "Heading home with a smile. See you shortly, partner.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.friendly.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedFriendlyNeutral08",
+                },
+                {
+                    ["fallback"] = "I'll get things tidy back at base for us.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.friendly.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedFriendlyNeutral09",
+                },
+                {
+                    ["fallback"] = "Heading home! Be careful on your way back.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.friendly.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedFriendlyNeutral10",
                 },
             },
         },
@@ -57,6 +192,51 @@ return {
                     ["id"] = "phrase.semantic.command.return_home.queued.repeated.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedRepeatedNeutral01",
                 },
+                {
+                    ["fallback"] = "Already on my way back. Just navigating the path.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.repeated.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedRepeatedNeutral02",
+                },
+                {
+                    ["fallback"] = "Still traveling toward base. Be there soon.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.repeated.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedRepeatedNeutral03",
+                },
+                {
+                    ["fallback"] = "I haven't stopped moving toward home.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.repeated.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedRepeatedNeutral04",
+                },
+                {
+                    ["fallback"] = "Already heading home. Keep calm.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.repeated.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedRepeatedNeutral05",
+                },
+                {
+                    ["fallback"] = "Still on the road home.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.repeated.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedRepeatedNeutral06",
+                },
+                {
+                    ["fallback"] = "Almost there. Still heading for base.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.repeated.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedRepeatedNeutral07",
+                },
+                {
+                    ["fallback"] = "Already following the return route.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.repeated.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedRepeatedNeutral08",
+                },
+                {
+                    ["fallback"] = "Still en route to home. No need to yell.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.repeated.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedRepeatedNeutral09",
+                },
+                {
+                    ["fallback"] = "I'm already on the way back.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.repeated.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedRepeatedNeutral10",
+                },
             },
         },
     },
@@ -68,9 +248,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "All right, I'm heading home.",
+                    ["fallback"] = "All right, I'm heading home. Guard the rear.",
                     ["id"] = "phrase.semantic.command.return_home.queued.trusted.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedTrustedNeutral01",
+                },
+                {
+                    ["fallback"] = "I trust your call. I'll make sure base is secure.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.trusted.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedTrustedNeutral02",
+                },
+                {
+                    ["fallback"] = "Heading home, partner. Don't take unnecessary risks out here.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.trusted.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedTrustedNeutral03",
+                },
+                {
+                    ["fallback"] = "Understood. I'll be waiting at camp for your return.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.trusted.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedTrustedNeutral04",
+                },
+                {
+                    ["fallback"] = "Heading home. Make sure you come back in one piece.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.trusted.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedTrustedNeutral05",
+                },
+                {
+                    ["fallback"] = "I'll hold down the fort until you get back.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.trusted.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedTrustedNeutral06",
+                },
+                {
+                    ["fallback"] = "Heading back. Trusting you to watch yourself.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.trusted.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedTrustedNeutral07",
+                },
+                {
+                    ["fallback"] = "I'll see you at home, friend. Stay vigilant.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.trusted.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedTrustedNeutral08",
+                },
+                {
+                    ["fallback"] = "Returning to our haven. Stay alive for me.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.trusted.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedTrustedNeutral09",
+                },
+                {
+                    ["fallback"] = "Understood. Heading back to secure our home.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.trusted.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedTrustedNeutral10",
                 },
             },
         },
@@ -87,6 +312,51 @@ return {
                     ["id"] = "phrase.semantic.command.return_home.queued.withdrawn.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedWithdrawnNeutral01",
                 },
+                {
+                    ["fallback"] = "Going back now.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.withdrawn.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedWithdrawnNeutral02",
+                },
+                {
+                    ["fallback"] = "Heading to base.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.withdrawn.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedWithdrawnNeutral03",
+                },
+                {
+                    ["fallback"] = "Understood. Home.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.withdrawn.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedWithdrawnNeutral04",
+                },
+                {
+                    ["fallback"] = "Fine. I'm leaving.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.withdrawn.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedWithdrawnNeutral05",
+                },
+                {
+                    ["fallback"] = "Heading back alone.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.withdrawn.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedWithdrawnNeutral06",
+                },
+                {
+                    ["fallback"] = "Going home. Whatever.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.withdrawn.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedWithdrawnNeutral07",
+                },
+                {
+                    ["fallback"] = "All right. Heading back.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.withdrawn.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedWithdrawnNeutral08",
+                },
+                {
+                    ["fallback"] = "Returning.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.withdrawn.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedWithdrawnNeutral09",
+                },
+                {
+                    ["fallback"] = "Moving toward shelter.",
+                    ["id"] = "phrase.semantic.command.return_home.queued.withdrawn.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeQueuedWithdrawnNeutral10",
+                },
             },
         },
     },
@@ -101,6 +371,51 @@ return {
                     ["fallback"] = "I can't head home right now.",
                     ["id"] = "phrase.semantic.command.return_home.rejected.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeRejectedNeutral01",
+                },
+                {
+                    ["fallback"] = "The road home is cut off by hordes.",
+                    ["id"] = "phrase.semantic.command.return_home.rejected.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeRejectedNeutral02",
+                },
+                {
+                    ["fallback"] = "I'm not leaving you out here alone. Can't go home.",
+                    ["id"] = "phrase.semantic.command.return_home.rejected.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeRejectedNeutral03",
+                },
+                {
+                    ["fallback"] = "Too much danger on the way back right now.",
+                    ["id"] = "phrase.semantic.command.return_home.rejected.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeRejectedNeutral04",
+                },
+                {
+                    ["fallback"] = "Refusing to return home while we're surrounded.",
+                    ["id"] = "phrase.semantic.command.return_home.rejected.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeRejectedNeutral05",
+                },
+                {
+                    ["fallback"] = "I have to finish what we started before I head back.",
+                    ["id"] = "phrase.semantic.command.return_home.rejected.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeRejectedNeutral06",
+                },
+                {
+                    ["fallback"] = "Can't head home. The gates are compromised.",
+                    ["id"] = "phrase.semantic.command.return_home.rejected.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeRejectedNeutral07",
+                },
+                {
+                    ["fallback"] = "Unable to return to base right now.",
+                    ["id"] = "phrase.semantic.command.return_home.rejected.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeRejectedNeutral08",
+                },
+                {
+                    ["fallback"] = "I won't abandon the mission to go home now.",
+                    ["id"] = "phrase.semantic.command.return_home.rejected.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeRejectedNeutral09",
+                },
+                {
+                    ["fallback"] = "Return home rejected. Not safe to travel.",
+                    ["id"] = "phrase.semantic.command.return_home.rejected.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandReturnHomeRejectedNeutral10",
                 },
             },
         },

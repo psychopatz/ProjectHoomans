@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.command.camp.failed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampFailedNeutral01",
                 },
+                {
+                    ["fallback"] = "Failed to establish camp. That spot wasn't viable.",
+                    ["id"] = "phrase.semantic.command.camp.failed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampFailedNeutral02",
+                },
+                {
+                    ["fallback"] = "I tried to camp there, but it didn't work out.",
+                    ["id"] = "phrase.semantic.command.camp.failed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampFailedNeutral03",
+                },
+                {
+                    ["fallback"] = "Couldn't secure that position for a camp.",
+                    ["id"] = "phrase.semantic.command.camp.failed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampFailedNeutral04",
+                },
+                {
+                    ["fallback"] = "Camp setup failed. The area is too exposed.",
+                    ["id"] = "phrase.semantic.command.camp.failed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampFailedNeutral05",
+                },
+                {
+                    ["fallback"] = "Unable to bed down there. Too many issues.",
+                    ["id"] = "phrase.semantic.command.camp.failed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampFailedNeutral06",
+                },
+                {
+                    ["fallback"] = "That campsite didn't pan out. Too dangerous.",
+                    ["id"] = "phrase.semantic.command.camp.failed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampFailedNeutral07",
+                },
+                {
+                    ["fallback"] = "Attempted to camp, but had to pull out.",
+                    ["id"] = "phrase.semantic.command.camp.failed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampFailedNeutral08",
+                },
+                {
+                    ["fallback"] = "Can't pitch camp there. Ground wasn't secure.",
+                    ["id"] = "phrase.semantic.command.camp.failed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampFailedNeutral09",
+                },
+                {
+                    ["fallback"] = "Camping attempt failed. Finding another spot.",
+                    ["id"] = "phrase.semantic.command.camp.failed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampFailedNeutral10",
+                },
             },
         },
     },
@@ -27,6 +72,51 @@ return {
                     ["id"] = "phrase.semantic.command.camp.queued.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedNeutral01",
                 },
+                {
+                    ["fallback"] = "Understood. Setting up our camp now.",
+                    ["id"] = "phrase.semantic.command.camp.queued.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedNeutral02",
+                },
+                {
+                    ["fallback"] = "I'll go get the camp established.",
+                    ["id"] = "phrase.semantic.command.camp.queued.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedNeutral03",
+                },
+                {
+                    ["fallback"] = "On my way to set up camp.",
+                    ["id"] = "phrase.semantic.command.camp.queued.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedNeutral04",
+                },
+                {
+                    ["fallback"] = "Making camp in that spot. Understood.",
+                    ["id"] = "phrase.semantic.command.camp.queued.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedNeutral05",
+                },
+                {
+                    ["fallback"] = "Right. Setting up shelter over there.",
+                    ["id"] = "phrase.semantic.command.camp.queued.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedNeutral06",
+                },
+                {
+                    ["fallback"] = "I'll secure the camp site now.",
+                    ["id"] = "phrase.semantic.command.camp.queued.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedNeutral07",
+                },
+                {
+                    ["fallback"] = "Moving to establish camp as ordered.",
+                    ["id"] = "phrase.semantic.command.camp.queued.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedNeutral08",
+                },
+                {
+                    ["fallback"] = "Got it. Pitching camp.",
+                    ["id"] = "phrase.semantic.command.camp.queued.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedNeutral09",
+                },
+                {
+                    ["fallback"] = "Understood. Heading over to make camp.",
+                    ["id"] = "phrase.semantic.command.camp.queued.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedNeutral10",
+                },
             },
         },
     },
@@ -38,9 +128,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "Sure, I'll set up camp there.",
+                    ["fallback"] = "Sure, I'll set up camp there. Sounds cozy.",
                     ["id"] = "phrase.semantic.command.camp.queued.friendly.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedFriendlyNeutral01",
+                },
+                {
+                    ["fallback"] = "Happy to! Let's get a good fire going.",
+                    ["id"] = "phrase.semantic.command.camp.queued.friendly.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedFriendlyNeutral02",
+                },
+                {
+                    ["fallback"] = "Good call, friend. I'll get our camp ready.",
+                    ["id"] = "phrase.semantic.command.camp.queued.friendly.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedFriendlyNeutral03",
+                },
+                {
+                    ["fallback"] = "Leave it to me! I'll make sure it's safe and comfortable.",
+                    ["id"] = "phrase.semantic.command.camp.queued.friendly.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedFriendlyNeutral04",
+                },
+                {
+                    ["fallback"] = "Great idea. I'll go set up camp for us.",
+                    ["id"] = "phrase.semantic.command.camp.queued.friendly.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedFriendlyNeutral05",
+                },
+                {
+                    ["fallback"] = "Right on! Time to get off our feet. Setting up now.",
+                    ["id"] = "phrase.semantic.command.camp.queued.friendly.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedFriendlyNeutral06",
+                },
+                {
+                    ["fallback"] = "Gladly. I'll have the beds laid out shortly.",
+                    ["id"] = "phrase.semantic.command.camp.queued.friendly.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedFriendlyNeutral07",
+                },
+                {
+                    ["fallback"] = "Sounds wonderful. I'll get our shelter squared away.",
+                    ["id"] = "phrase.semantic.command.camp.queued.friendly.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedFriendlyNeutral08",
+                },
+                {
+                    ["fallback"] = "Sure thing, partner! Camp will be ready in no time.",
+                    ["id"] = "phrase.semantic.command.camp.queued.friendly.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedFriendlyNeutral09",
+                },
+                {
+                    ["fallback"] = "On it, friend! Rest easy, I'll handle camp.",
+                    ["id"] = "phrase.semantic.command.camp.queued.friendly.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedFriendlyNeutral10",
                 },
             },
         },
@@ -57,6 +192,51 @@ return {
                     ["id"] = "phrase.semantic.command.camp.queued.repeated.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedRepeatedNeutral01",
                 },
+                {
+                    ["fallback"] = "Already working on the camp. Give me a minute.",
+                    ["id"] = "phrase.semantic.command.camp.queued.repeated.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedRepeatedNeutral02",
+                },
+                {
+                    ["fallback"] = "Still on it. Setting up takes a little time.",
+                    ["id"] = "phrase.semantic.command.camp.queued.repeated.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedRepeatedNeutral03",
+                },
+                {
+                    ["fallback"] = "I'm already pitching the camp there.",
+                    ["id"] = "phrase.semantic.command.camp.queued.repeated.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedRepeatedNeutral04",
+                },
+                {
+                    ["fallback"] = "Working as fast as I can on that camp.",
+                    ["id"] = "phrase.semantic.command.camp.queued.repeated.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedRepeatedNeutral05",
+                },
+                {
+                    ["fallback"] = "Yeah, I heard you the first time. Still making camp.",
+                    ["id"] = "phrase.semantic.command.camp.queued.repeated.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedRepeatedNeutral06",
+                },
+                {
+                    ["fallback"] = "I'm already in the middle of setting up.",
+                    ["id"] = "phrase.semantic.command.camp.queued.repeated.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedRepeatedNeutral07",
+                },
+                {
+                    ["fallback"] = "Camp setup is already in progress.",
+                    ["id"] = "phrase.semantic.command.camp.queued.repeated.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedRepeatedNeutral08",
+                },
+                {
+                    ["fallback"] = "Still securing the campsite. Hold tight.",
+                    ["id"] = "phrase.semantic.command.camp.queued.repeated.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedRepeatedNeutral09",
+                },
+                {
+                    ["fallback"] = "Almost done with the camp. Don't rush me.",
+                    ["id"] = "phrase.semantic.command.camp.queued.repeated.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedRepeatedNeutral10",
+                },
             },
         },
     },
@@ -71,6 +251,51 @@ return {
                     ["fallback"] = "All right, I'll make camp there.",
                     ["id"] = "phrase.semantic.command.camp.queued.trusted.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedTrustedNeutral01",
+                },
+                {
+                    ["fallback"] = "I trust your eye for good ground. Setting up camp.",
+                    ["id"] = "phrase.semantic.command.camp.queued.trusted.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedTrustedNeutral02",
+                },
+                {
+                    ["fallback"] = "You picked the spot, I'll build the shelter.",
+                    ["id"] = "phrase.semantic.command.camp.queued.trusted.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedTrustedNeutral03",
+                },
+                {
+                    ["fallback"] = "Understood. I'll make sure our campsite is locked down tight.",
+                    ["id"] = "phrase.semantic.command.camp.queued.trusted.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedTrustedNeutral04",
+                },
+                {
+                    ["fallback"] = "I know you've got our safety in mind. Making camp.",
+                    ["id"] = "phrase.semantic.command.camp.queued.trusted.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedTrustedNeutral05",
+                },
+                {
+                    ["fallback"] = "Right away. We'll be secure there together.",
+                    ["id"] = "phrase.semantic.command.camp.queued.trusted.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedTrustedNeutral06",
+                },
+                {
+                    ["fallback"] = "I'll get it ready for both of us.",
+                    ["id"] = "phrase.semantic.command.camp.queued.trusted.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedTrustedNeutral07",
+                },
+                {
+                    ["fallback"] = "Trust your judgment completely. Camp is going up.",
+                    ["id"] = "phrase.semantic.command.camp.queued.trusted.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedTrustedNeutral08",
+                },
+                {
+                    ["fallback"] = "Setting up camp. We earned this rest.",
+                    ["id"] = "phrase.semantic.command.camp.queued.trusted.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedTrustedNeutral09",
+                },
+                {
+                    ["fallback"] = "Good call, partner. I'll secure the camp perimeter.",
+                    ["id"] = "phrase.semantic.command.camp.queued.trusted.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedTrustedNeutral10",
                 },
             },
         },
@@ -87,6 +312,51 @@ return {
                     ["id"] = "phrase.semantic.command.camp.queued.withdrawn.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedWithdrawnNeutral01",
                 },
+                {
+                    ["fallback"] = "Fine. Heading over to camp.",
+                    ["id"] = "phrase.semantic.command.camp.queued.withdrawn.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedWithdrawnNeutral02",
+                },
+                {
+                    ["fallback"] = "Understood. Camping.",
+                    ["id"] = "phrase.semantic.command.camp.queued.withdrawn.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedWithdrawnNeutral03",
+                },
+                {
+                    ["fallback"] = "If you say so. I'll make camp.",
+                    ["id"] = "phrase.semantic.command.camp.queued.withdrawn.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedWithdrawnNeutral04",
+                },
+                {
+                    ["fallback"] = "Going to set it up now.",
+                    ["id"] = "phrase.semantic.command.camp.queued.withdrawn.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedWithdrawnNeutral05",
+                },
+                {
+                    ["fallback"] = "All right. Pitching shelter.",
+                    ["id"] = "phrase.semantic.command.camp.queued.withdrawn.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedWithdrawnNeutral06",
+                },
+                {
+                    ["fallback"] = "I'll do it.",
+                    ["id"] = "phrase.semantic.command.camp.queued.withdrawn.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedWithdrawnNeutral07",
+                },
+                {
+                    ["fallback"] = "Making camp. Leave me to it.",
+                    ["id"] = "phrase.semantic.command.camp.queued.withdrawn.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedWithdrawnNeutral08",
+                },
+                {
+                    ["fallback"] = "Fine. Camping there.",
+                    ["id"] = "phrase.semantic.command.camp.queued.withdrawn.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedWithdrawnNeutral09",
+                },
+                {
+                    ["fallback"] = "Heard. Setting up.",
+                    ["id"] = "phrase.semantic.command.camp.queued.withdrawn.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampQueuedWithdrawnNeutral10",
+                },
             },
         },
     },
@@ -101,6 +371,51 @@ return {
                     ["fallback"] = "I can't set up camp there right now.",
                     ["id"] = "phrase.semantic.command.camp.rejected.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampRejectedNeutral01",
+                },
+                {
+                    ["fallback"] = "That spot is far too dangerous to sleep in.",
+                    ["id"] = "phrase.semantic.command.camp.rejected.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampRejectedNeutral02",
+                },
+                {
+                    ["fallback"] = "No way. It's crawling with dead over there.",
+                    ["id"] = "phrase.semantic.command.camp.rejected.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampRejectedNeutral03",
+                },
+                {
+                    ["fallback"] = "I refuse to camp in that area. Find somewhere safer.",
+                    ["id"] = "phrase.semantic.command.camp.rejected.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampRejectedNeutral04",
+                },
+                {
+                    ["fallback"] = "Too exposed. We'd get ambushed in our sleep.",
+                    ["id"] = "phrase.semantic.command.camp.rejected.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampRejectedNeutral05",
+                },
+                {
+                    ["fallback"] = "Can't camp there. No walls, no fire, no cover.",
+                    ["id"] = "phrase.semantic.command.camp.rejected.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampRejectedNeutral06",
+                },
+                {
+                    ["fallback"] = "Not camping there. That's asking to be eaten alive.",
+                    ["id"] = "phrase.semantic.command.camp.rejected.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampRejectedNeutral07",
+                },
+                {
+                    ["fallback"] = "Unable to comply. That position is totally compromised.",
+                    ["id"] = "phrase.semantic.command.camp.rejected.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampRejectedNeutral08",
+                },
+                {
+                    ["fallback"] = "I won't bed down there. Pick another room.",
+                    ["id"] = "phrase.semantic.command.camp.rejected.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampRejectedNeutral09",
+                },
+                {
+                    ["fallback"] = "Camping rejected. We need real security first.",
+                    ["id"] = "phrase.semantic.command.camp.rejected.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandCampRejectedNeutral10",
                 },
             },
         },

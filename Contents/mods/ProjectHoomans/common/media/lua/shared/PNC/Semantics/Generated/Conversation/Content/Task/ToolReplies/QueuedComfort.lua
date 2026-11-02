@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.queued_comfort.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort1Neutral01",
                 },
+                {
+                    ["fallback"] = "I hear your comfort.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort1Neutral02",
+                },
+                {
+                    ["fallback"] = "Got the message. Thanks.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort1Neutral03",
+                },
+                {
+                    ["fallback"] = "I hear what you're trying to do.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort1Neutral04",
+                },
+                {
+                    ["fallback"] = "Heard and appreciated.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort1Neutral05",
+                },
+                {
+                    ["fallback"] = "I hear your reassurance.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort1Neutral06",
+                },
+                {
+                    ["fallback"] = "Got it. Taking it to heart.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort1Neutral07",
+                },
+                {
+                    ["fallback"] = "I hear you. It helps a bit.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort1Neutral08",
+                },
+                {
+                    ["fallback"] = "Understood. I hear your voice.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort1Neutral09",
+                },
+                {
+                    ["fallback"] = "Heard clearly.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "Thanks for saying that.",
                     ["id"] = "phrase.semantic.tool_reply.queued_comfort.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort2Neutral01",
+                },
+                {
+                    ["fallback"] = "I appreciate you saying that to me.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort2Neutral02",
+                },
+                {
+                    ["fallback"] = "Thank you. That takes some edge off.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort2Neutral03",
+                },
+                {
+                    ["fallback"] = "I needed to hear that. Thank you.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort2Neutral04",
+                },
+                {
+                    ["fallback"] = "Appreciate the soothing words.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort2Neutral05",
+                },
+                {
+                    ["fallback"] = "Thanks for taking the time to say that.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort2Neutral06",
+                },
+                {
+                    ["fallback"] = "Good of you to speak up. Thanks.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort2Neutral07",
+                },
+                {
+                    ["fallback"] = "Thank you for the comfort.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort2Neutral08",
+                },
+                {
+                    ["fallback"] = "Thanks. That means something out here.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort2Neutral09",
+                },
+                {
+                    ["fallback"] = "Appreciate your kindness today.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_comfort.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedComfort2Neutral10",
                 },
             },
         },

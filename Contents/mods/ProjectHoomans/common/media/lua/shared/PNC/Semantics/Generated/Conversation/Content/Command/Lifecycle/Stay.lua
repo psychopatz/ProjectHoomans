@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.command.stay.failed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayFailedNeutral01",
                 },
+                {
+                    ["fallback"] = "Failed to hold position here.",
+                    ["id"] = "phrase.semantic.command.stay.failed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayFailedNeutral02",
+                },
+                {
+                    ["fallback"] = "I tried to stay, but the ground wasn't safe.",
+                    ["id"] = "phrase.semantic.command.stay.failed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayFailedNeutral03",
+                },
+                {
+                    ["fallback"] = "Couldn't lock down this position.",
+                    ["id"] = "phrase.semantic.command.stay.failed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayFailedNeutral04",
+                },
+                {
+                    ["fallback"] = "Stay command failed. Enemies forced me to move.",
+                    ["id"] = "phrase.semantic.command.stay.failed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayFailedNeutral05",
+                },
+                {
+                    ["fallback"] = "Unable to stay put in this area.",
+                    ["id"] = "phrase.semantic.command.stay.failed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayFailedNeutral06",
+                },
+                {
+                    ["fallback"] = "Holding ground failed. Too much incoming fire.",
+                    ["id"] = "phrase.semantic.command.stay.failed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayFailedNeutral07",
+                },
+                {
+                    ["fallback"] = "Can't stay here. Position is untenable.",
+                    ["id"] = "phrase.semantic.command.stay.failed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayFailedNeutral08",
+                },
+                {
+                    ["fallback"] = "Attempted to hold, but got pushed back.",
+                    ["id"] = "phrase.semantic.command.stay.failed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayFailedNeutral09",
+                },
+                {
+                    ["fallback"] = "Could not secure a stay order here.",
+                    ["id"] = "phrase.semantic.command.stay.failed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayFailedNeutral10",
+                },
             },
         },
     },
@@ -27,6 +72,51 @@ return {
                     ["id"] = "phrase.semantic.command.stay.queued.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral01",
                 },
+                {
+                    ["fallback"] = "Holding position right here.",
+                    ["id"] = "phrase.semantic.command.stay.queued.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral02",
+                },
+                {
+                    ["fallback"] = "Understood. Staying put.",
+                    ["id"] = "phrase.semantic.command.stay.queued.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral03",
+                },
+                {
+                    ["fallback"] = "I'll hold this ground.",
+                    ["id"] = "phrase.semantic.command.stay.queued.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral04",
+                },
+                {
+                    ["fallback"] = "Standing guard right here. Understood.",
+                    ["id"] = "phrase.semantic.command.stay.queued.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral05",
+                },
+                {
+                    ["fallback"] = "Right. I won't move from this spot.",
+                    ["id"] = "phrase.semantic.command.stay.queued.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral06",
+                },
+                {
+                    ["fallback"] = "Holding this perimeter. Go ahead.",
+                    ["id"] = "phrase.semantic.command.stay.queued.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral07",
+                },
+                {
+                    ["fallback"] = "Understood. Maintaining this position.",
+                    ["id"] = "phrase.semantic.command.stay.queued.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral08",
+                },
+                {
+                    ["fallback"] = "Got it. Staying right where I am.",
+                    ["id"] = "phrase.semantic.command.stay.queued.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral09",
+                },
+                {
+                    ["fallback"] = "Holding ground as ordered.",
+                    ["id"] = "phrase.semantic.command.stay.queued.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral10",
+                },
             },
         },
     },
@@ -38,9 +128,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "Sure, I'll stay here.",
+                    ["fallback"] = "Sure, I'll stay here. Take your time, friend!",
                     ["id"] = "phrase.semantic.command.stay.queued.friendly.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedFriendlyNeutral01",
+                },
+                {
+                    ["fallback"] = "I'll keep watch right here, partner. Be careful!",
+                    ["id"] = "phrase.semantic.command.stay.queued.friendly.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedFriendlyNeutral02",
+                },
+                {
+                    ["fallback"] = "No problem! I'll guard our spot until you get back.",
+                    ["id"] = "phrase.semantic.command.stay.queued.friendly.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedFriendlyNeutral03",
+                },
+                {
+                    ["fallback"] = "Happy to hold the fort here for you, friend.",
+                    ["id"] = "phrase.semantic.command.stay.queued.friendly.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedFriendlyNeutral04",
+                },
+                {
+                    ["fallback"] = "Sure thing! I'll be waiting right here for you.",
+                    ["id"] = "phrase.semantic.command.stay.queued.friendly.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedFriendlyNeutral05",
+                },
+                {
+                    ["fallback"] = "I won't wander off. Stay safe out there, partner!",
+                    ["id"] = "phrase.semantic.command.stay.queued.friendly.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedFriendlyNeutral06",
+                },
+                {
+                    ["fallback"] = "Holding the line right here with a smile. Go do what you need to do.",
+                    ["id"] = "phrase.semantic.command.stay.queued.friendly.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedFriendlyNeutral07",
+                },
+                {
+                    ["fallback"] = "I'll make sure nobody sneaks past this spot, friend.",
+                    ["id"] = "phrase.semantic.command.stay.queued.friendly.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedFriendlyNeutral08",
+                },
+                {
+                    ["fallback"] = "Resting my feet and keeping watch. See you soon!",
+                    ["id"] = "phrase.semantic.command.stay.queued.friendly.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedFriendlyNeutral09",
+                },
+                {
+                    ["fallback"] = "All good! I'll be right here when you return.",
+                    ["id"] = "phrase.semantic.command.stay.queued.friendly.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedFriendlyNeutral10",
                 },
             },
         },
@@ -57,6 +192,51 @@ return {
                     ["id"] = "phrase.semantic.command.stay.queued.repeated.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedRepeatedNeutral01",
                 },
+                {
+                    ["fallback"] = "Still holding this spot. Haven't budged.",
+                    ["id"] = "phrase.semantic.command.stay.queued.repeated.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedRepeatedNeutral02",
+                },
+                {
+                    ["fallback"] = "I'm already staying put, don't worry.",
+                    ["id"] = "phrase.semantic.command.stay.queued.repeated.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedRepeatedNeutral03",
+                },
+                {
+                    ["fallback"] = "Haven't moved an inch. Still right here.",
+                    ["id"] = "phrase.semantic.command.stay.queued.repeated.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedRepeatedNeutral04",
+                },
+                {
+                    ["fallback"] = "Still guarding this exact position.",
+                    ["id"] = "phrase.semantic.command.stay.queued.repeated.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedRepeatedNeutral05",
+                },
+                {
+                    ["fallback"] = "I heard you before. I'm staying right here.",
+                    ["id"] = "phrase.semantic.command.stay.queued.repeated.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedRepeatedNeutral06",
+                },
+                {
+                    ["fallback"] = "Already holding ground. Go on.",
+                    ["id"] = "phrase.semantic.command.stay.queued.repeated.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedRepeatedNeutral07",
+                },
+                {
+                    ["fallback"] = "Still staying here. No need to remind me.",
+                    ["id"] = "phrase.semantic.command.stay.queued.repeated.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedRepeatedNeutral08",
+                },
+                {
+                    ["fallback"] = "I'm rooted right here. Keep moving.",
+                    ["id"] = "phrase.semantic.command.stay.queued.repeated.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedRepeatedNeutral09",
+                },
+                {
+                    ["fallback"] = "Already staying. I'm watching the area.",
+                    ["id"] = "phrase.semantic.command.stay.queued.repeated.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedRepeatedNeutral10",
+                },
             },
         },
     },
@@ -68,9 +248,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "All right, I'll stay.",
+                    ["fallback"] = "All right, I'll stay. Watch your back out there.",
                     ["id"] = "phrase.semantic.command.stay.queued.trusted.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedTrustedNeutral01",
+                },
+                {
+                    ["fallback"] = "I trust your plan. I'll secure this position.",
+                    ["id"] = "phrase.semantic.command.stay.queued.trusted.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedTrustedNeutral02",
+                },
+                {
+                    ["fallback"] = "Holding this ground for both of us, partner.",
+                    ["id"] = "phrase.semantic.command.stay.queued.trusted.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedTrustedNeutral03",
+                },
+                {
+                    ["fallback"] = "I won't let anything breach this spot while you're away.",
+                    ["id"] = "phrase.semantic.command.stay.queued.trusted.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedTrustedNeutral04",
+                },
+                {
+                    ["fallback"] = "Understood. I'll stay right here until you call.",
+                    ["id"] = "phrase.semantic.command.stay.queued.trusted.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedTrustedNeutral05",
+                },
+                {
+                    ["fallback"] = "You can count on me to hold this room, friend.",
+                    ["id"] = "phrase.semantic.command.stay.queued.trusted.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedTrustedNeutral06",
+                },
+                {
+                    ["fallback"] = "Holding this vantage point. Be careful out there.",
+                    ["id"] = "phrase.semantic.command.stay.queued.trusted.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedTrustedNeutral07",
+                },
+                {
+                    ["fallback"] = "I'll be right here when you return, partner. Stay alive.",
+                    ["id"] = "phrase.semantic.command.stay.queued.trusted.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedTrustedNeutral08",
+                },
+                {
+                    ["fallback"] = "Trusting you to come back safe. Holding the line.",
+                    ["id"] = "phrase.semantic.command.stay.queued.trusted.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedTrustedNeutral09",
+                },
+                {
+                    ["fallback"] = "Understood. I'll hold this post with my life.",
+                    ["id"] = "phrase.semantic.command.stay.queued.trusted.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedTrustedNeutral10",
                 },
             },
         },
@@ -87,6 +312,51 @@ return {
                     ["id"] = "phrase.semantic.command.stay.queued.withdrawn.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedWithdrawnNeutral01",
                 },
+                {
+                    ["fallback"] = "Fine. Staying here.",
+                    ["id"] = "phrase.semantic.command.stay.queued.withdrawn.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedWithdrawnNeutral02",
+                },
+                {
+                    ["fallback"] = "Holding ground.",
+                    ["id"] = "phrase.semantic.command.stay.queued.withdrawn.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedWithdrawnNeutral03",
+                },
+                {
+                    ["fallback"] = "Understood. Staying.",
+                    ["id"] = "phrase.semantic.command.stay.queued.withdrawn.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedWithdrawnNeutral04",
+                },
+                {
+                    ["fallback"] = "I'll stay put.",
+                    ["id"] = "phrase.semantic.command.stay.queued.withdrawn.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedWithdrawnNeutral05",
+                },
+                {
+                    ["fallback"] = "Not moving.",
+                    ["id"] = "phrase.semantic.command.stay.queued.withdrawn.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedWithdrawnNeutral06",
+                },
+                {
+                    ["fallback"] = "Fine by me. Go.",
+                    ["id"] = "phrase.semantic.command.stay.queued.withdrawn.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedWithdrawnNeutral07",
+                },
+                {
+                    ["fallback"] = "Staying right here.",
+                    ["id"] = "phrase.semantic.command.stay.queued.withdrawn.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedWithdrawnNeutral08",
+                },
+                {
+                    ["fallback"] = "Understood. Waiting.",
+                    ["id"] = "phrase.semantic.command.stay.queued.withdrawn.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedWithdrawnNeutral09",
+                },
+                {
+                    ["fallback"] = "Holding position.",
+                    ["id"] = "phrase.semantic.command.stay.queued.withdrawn.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayQueuedWithdrawnNeutral10",
+                },
             },
         },
     },
@@ -101,6 +371,51 @@ return {
                     ["fallback"] = "I can't stay here right now.",
                     ["id"] = "phrase.semantic.command.stay.rejected.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayRejectedNeutral01",
+                },
+                {
+                    ["fallback"] = "Too dangerous to stay put. We need to keep moving.",
+                    ["id"] = "phrase.semantic.command.stay.rejected.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayRejectedNeutral02",
+                },
+                {
+                    ["fallback"] = "I won't stay in an open kill zone.",
+                    ["id"] = "phrase.semantic.command.stay.rejected.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayRejectedNeutral03",
+                },
+                {
+                    ["fallback"] = "Staying here is suicide. I'm coming with you.",
+                    ["id"] = "phrase.semantic.command.stay.rejected.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayRejectedNeutral04",
+                },
+                {
+                    ["fallback"] = "I refuse to hold this spot without adequate cover.",
+                    ["id"] = "phrase.semantic.command.stay.rejected.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayRejectedNeutral05",
+                },
+                {
+                    ["fallback"] = "Cannot stay here. The perimeter is totally exposed.",
+                    ["id"] = "phrase.semantic.command.stay.rejected.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayRejectedNeutral06",
+                },
+                {
+                    ["fallback"] = "I'm not standing like a target. I have to move.",
+                    ["id"] = "phrase.semantic.command.stay.rejected.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayRejectedNeutral07",
+                },
+                {
+                    ["fallback"] = "Unable to hold position. Hostiles are too close.",
+                    ["id"] = "phrase.semantic.command.stay.rejected.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayRejectedNeutral08",
+                },
+                {
+                    ["fallback"] = "I won't stay behind while you need backup.",
+                    ["id"] = "phrase.semantic.command.stay.rejected.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayRejectedNeutral09",
+                },
+                {
+                    ["fallback"] = "Stay order rejected. We must relocate.",
+                    ["id"] = "phrase.semantic.command.stay.rejected.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticCommandStayRejectedNeutral10",
                 },
             },
         },

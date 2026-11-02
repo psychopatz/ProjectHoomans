@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.queued_praise.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise1Neutral01",
                 },
+                {
+                    ["fallback"] = "I hear your praise.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise1Neutral02",
+                },
+                {
+                    ["fallback"] = "Heard and appreciated.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise1Neutral03",
+                },
+                {
+                    ["fallback"] = "I hear what you said about my work.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise1Neutral04",
+                },
+                {
+                    ["fallback"] = "Got that positive feedback.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise1Neutral05",
+                },
+                {
+                    ["fallback"] = "I hear you clearly. Thanks.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise1Neutral06",
+                },
+                {
+                    ["fallback"] = "Praise heard. Good to know.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise1Neutral07",
+                },
+                {
+                    ["fallback"] = "I hear the support.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise1Neutral08",
+                },
+                {
+                    ["fallback"] = "Heard. Glad to help.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise1Neutral09",
+                },
+                {
+                    ["fallback"] = "I hear you. We did good.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "I will remember that.",
                     ["id"] = "phrase.semantic.tool_reply.queued_praise.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise2Neutral01",
+                },
+                {
+                    ["fallback"] = "I'll keep that positive note in mind.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise2Neutral02",
+                },
+                {
+                    ["fallback"] = "I won't forget that you recognized my effort.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise2Neutral03",
+                },
+                {
+                    ["fallback"] = "That will stay with me. Thanks.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise2Neutral04",
+                },
+                {
+                    ["fallback"] = "I'll remember you said that when times get tough.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise2Neutral05",
+                },
+                {
+                    ["fallback"] = "Remembered and valued.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise2Neutral06",
+                },
+                {
+                    ["fallback"] = "I will hold onto that praise.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise2Neutral07",
+                },
+                {
+                    ["fallback"] = "That sticks in my memory. Thank you.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise2Neutral08",
+                },
+                {
+                    ["fallback"] = "I'll remember your good words.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise2Neutral09",
+                },
+                {
+                    ["fallback"] = "Noted in my heart. Thanks.",
+                    ["id"] = "phrase.semantic.tool_reply.queued_praise.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyQueuedPraise2Neutral10",
                 },
             },
         },

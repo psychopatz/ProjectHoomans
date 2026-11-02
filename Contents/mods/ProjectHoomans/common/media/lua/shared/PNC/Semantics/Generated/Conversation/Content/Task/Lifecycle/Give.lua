@@ -8,9 +8,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I'm handing that over now.",
+                    ["fallback"] = "Handing that over now.",
                     ["id"] = "phrase.semantic.task.give.active.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveActiveNeutral01",
+                },
+                {
+                    ["fallback"] = "Passing the item to you right now.",
+                    ["id"] = "phrase.semantic.task.give.active.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveActiveNeutral02",
+                },
+                {
+                    ["fallback"] = "Transferring the supplies.",
+                    ["id"] = "phrase.semantic.task.give.active.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveActiveNeutral03",
+                },
+                {
+                    ["fallback"] = "Giving this to you now.",
+                    ["id"] = "phrase.semantic.task.give.active.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveActiveNeutral04",
+                },
+                {
+                    ["fallback"] = "Currently handing it over.",
+                    ["id"] = "phrase.semantic.task.give.active.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveActiveNeutral05",
+                },
+                {
+                    ["fallback"] = "Reaching out to give you the item.",
+                    ["id"] = "phrase.semantic.task.give.active.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveActiveNeutral06",
+                },
+                {
+                    ["fallback"] = "Giving you what was asked.",
+                    ["id"] = "phrase.semantic.task.give.active.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveActiveNeutral07",
+                },
+                {
+                    ["fallback"] = "In the middle of the handoff.",
+                    ["id"] = "phrase.semantic.task.give.active.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveActiveNeutral08",
+                },
+                {
+                    ["fallback"] = "Handing it off now. Take hold.",
+                    ["id"] = "phrase.semantic.task.give.active.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveActiveNeutral09",
+                },
+                {
+                    ["fallback"] = "Giving it as ordered.",
+                    ["id"] = "phrase.semantic.task.give.active.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveActiveNeutral10",
                 },
             },
         },
@@ -23,9 +68,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "Okay, I'll give that to you.",
+                    ["fallback"] = "I'll give that to you.",
                     ["id"] = "phrase.semantic.task.give.admitted.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral01",
+                },
+                {
+                    ["fallback"] = "Understood. Handing it over.",
+                    ["id"] = "phrase.semantic.task.give.admitted.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral02",
+                },
+                {
+                    ["fallback"] = "Here, I'll pass that to you.",
+                    ["id"] = "phrase.semantic.task.give.admitted.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral03",
+                },
+                {
+                    ["fallback"] = "All right. I'll give you the item.",
+                    ["id"] = "phrase.semantic.task.give.admitted.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral04",
+                },
+                {
+                    ["fallback"] = "Sure thing. Passing it over.",
+                    ["id"] = "phrase.semantic.task.give.admitted.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral05",
+                },
+                {
+                    ["fallback"] = "Understood. You can have it.",
+                    ["id"] = "phrase.semantic.task.give.admitted.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral06",
+                },
+                {
+                    ["fallback"] = "I'll transfer that to your pack.",
+                    ["id"] = "phrase.semantic.task.give.admitted.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral07",
+                },
+                {
+                    ["fallback"] = "Right. Handing it over.",
+                    ["id"] = "phrase.semantic.task.give.admitted.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral08",
+                },
+                {
+                    ["fallback"] = "I'll give you what you requested.",
+                    ["id"] = "phrase.semantic.task.give.admitted.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral09",
+                },
+                {
+                    ["fallback"] = "Sounds good. Giving it now.",
+                    ["id"] = "phrase.semantic.task.give.admitted.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral10",
                 },
             },
         },
@@ -38,9 +128,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "Here you go.",
+                    ["fallback"] = "There you go.",
                     ["id"] = "phrase.semantic.task.give.completed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveCompletedNeutral01",
+                },
+                {
+                    ["fallback"] = "Handed over safely.",
+                    ["id"] = "phrase.semantic.task.give.completed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveCompletedNeutral02",
+                },
+                {
+                    ["fallback"] = "It's yours now.",
+                    ["id"] = "phrase.semantic.task.give.completed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveCompletedNeutral03",
+                },
+                {
+                    ["fallback"] = "Transfer complete.",
+                    ["id"] = "phrase.semantic.task.give.completed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveCompletedNeutral04",
+                },
+                {
+                    ["fallback"] = "All given. Take good care of it.",
+                    ["id"] = "phrase.semantic.task.give.completed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveCompletedNeutral05",
+                },
+                {
+                    ["fallback"] = "Done. It's in your hands.",
+                    ["id"] = "phrase.semantic.task.give.completed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveCompletedNeutral06",
+                },
+                {
+                    ["fallback"] = "Handoff finished.",
+                    ["id"] = "phrase.semantic.task.give.completed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveCompletedNeutral07",
+                },
+                {
+                    ["fallback"] = "Given as requested.",
+                    ["id"] = "phrase.semantic.task.give.completed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveCompletedNeutral08",
+                },
+                {
+                    ["fallback"] = "Item is officially yours.",
+                    ["id"] = "phrase.semantic.task.give.completed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveCompletedNeutral09",
+                },
+                {
+                    ["fallback"] = "Completed the handoff.",
+                    ["id"] = "phrase.semantic.task.give.completed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveCompletedNeutral10",
                 },
             },
         },
@@ -53,9 +188,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I couldn't give that.",
+                    ["fallback"] = "I couldn't give that to you.",
                     ["id"] = "phrase.semantic.task.give.failed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveFailedNeutral01",
+                },
+                {
+                    ["fallback"] = "Handoff failed. You were out of reach.",
+                    ["id"] = "phrase.semantic.task.give.failed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveFailedNeutral02",
+                },
+                {
+                    ["fallback"] = "Your hands or pack were full. Couldn't give it.",
+                    ["id"] = "phrase.semantic.task.give.failed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveFailedNeutral03",
+                },
+                {
+                    ["fallback"] = "Action interrupted. Item not given.",
+                    ["id"] = "phrase.semantic.task.give.failed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveFailedNeutral04",
+                },
+                {
+                    ["fallback"] = "Unable to transfer the item to you.",
+                    ["id"] = "phrase.semantic.task.give.failed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveFailedNeutral05",
+                },
+                {
+                    ["fallback"] = "Failed to hand it over. Something got in the way.",
+                    ["id"] = "phrase.semantic.task.give.failed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveFailedNeutral06",
+                },
+                {
+                    ["fallback"] = "I couldn't complete the give action.",
+                    ["id"] = "phrase.semantic.task.give.failed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveFailedNeutral07",
+                },
+                {
+                    ["fallback"] = "Dropped it during the exchange.",
+                    ["id"] = "phrase.semantic.task.give.failed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveFailedNeutral08",
+                },
+                {
+                    ["fallback"] = "Give task failed.",
+                    ["id"] = "phrase.semantic.task.give.failed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveFailedNeutral09",
+                },
+                {
+                    ["fallback"] = "Could not give that item.",
+                    ["id"] = "phrase.semantic.task.give.failed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveFailedNeutral10",
                 },
             },
         },
@@ -68,9 +248,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I can't give that right now.",
+                    ["fallback"] = "I can't give that to you right now.",
                     ["id"] = "phrase.semantic.task.give.rejected.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveRejectedNeutral01",
+                },
+                {
+                    ["fallback"] = "I need that item to survive. Can't spare it.",
+                    ["id"] = "phrase.semantic.task.give.rejected.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveRejectedNeutral02",
+                },
+                {
+                    ["fallback"] = "That is vital to my loadout. I won't give it away.",
+                    ["id"] = "phrase.semantic.task.give.rejected.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveRejectedNeutral03",
+                },
+                {
+                    ["fallback"] = "Refusing to hand that over.",
+                    ["id"] = "phrase.semantic.task.give.rejected.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveRejectedNeutral04",
+                },
+                {
+                    ["fallback"] = "I don't have that item to give.",
+                    ["id"] = "phrase.semantic.task.give.rejected.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveRejectedNeutral05",
+                },
+                {
+                    ["fallback"] = "Can't give that up under these circumstances.",
+                    ["id"] = "phrase.semantic.task.give.rejected.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveRejectedNeutral06",
+                },
+                {
+                    ["fallback"] = "That's not something I can part with.",
+                    ["id"] = "phrase.semantic.task.give.rejected.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveRejectedNeutral07",
+                },
+                {
+                    ["fallback"] = "Give order rejected. I'm keeping this.",
+                    ["id"] = "phrase.semantic.task.give.rejected.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveRejectedNeutral08",
+                },
+                {
+                    ["fallback"] = "I won't give that item away.",
+                    ["id"] = "phrase.semantic.task.give.rejected.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveRejectedNeutral09",
+                },
+                {
+                    ["fallback"] = "Not giving that. Ask for something else.",
+                    ["id"] = "phrase.semantic.task.give.rejected.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticTaskGiveRejectedNeutral10",
                 },
             },
         },
