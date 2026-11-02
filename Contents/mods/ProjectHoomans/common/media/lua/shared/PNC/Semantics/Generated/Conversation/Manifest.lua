@@ -257,7 +257,7 @@ return {
             ["sourceShard"] = "content/compatibility.json",
         },
         {
-            ["bytes"] = 8827,
+            ["bytes"] = 63434,
             ["domain"] = "conversation",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Conversation",
@@ -426,7 +426,7 @@ return {
             ["sourceShard"] = "content/event/reactions.json",
         },
         {
-            ["bytes"] = 20456,
+            ["bytes"] = 43022,
             ["domain"] = "greeting",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Greeting",
@@ -443,7 +443,7 @@ return {
             ["sourceShard"] = "content/greeting.json",
         },
         {
-            ["bytes"] = 10501,
+            ["bytes"] = 76874,
             ["domain"] = "health",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Health",
@@ -491,7 +491,7 @@ return {
             ["sourceShard"] = "content/navigation.json",
         },
         {
-            ["bytes"] = 8768,
+            ["bytes"] = 46489,
             ["domain"] = "needs",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Needs",
@@ -789,7 +789,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/apology.json",
         },
         {
-            ["bytes"] = 5870,
+            ["bytes"] = 28160,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
@@ -1337,7 +1337,7 @@ return {
             ["sourceShard"] = "content/task/tool_replies/rejected_sexual.json",
         },
         {
-            ["bytes"] = 11158,
+            ["bytes"] = 66838,
             ["domain"] = "wellbeing",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Wellbeing",
@@ -2968,5 +2968,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "c6b3e9dc06099ea08001d85d071c10ca099a7e5b1c6c608144fc7386309a1e87",
+    ["wholeModelFingerprint"] = "9f9785ae763d5501aeef8c89bd7c5c4d8b91215d024ddd551ec0a94b02ecb576",
 }

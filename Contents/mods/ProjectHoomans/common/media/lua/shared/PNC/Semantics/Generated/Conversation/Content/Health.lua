@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.question.health_state.healthy.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded01",
                 },
+                {
+                    ["fallback"] = "Nothing wrong with me. Keep your eyes on the road.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded02",
+                },
+                {
+                    ["fallback"] = "No injuries to report. Step back.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded03",
+                },
+                {
+                    ["fallback"] = "I'm in fighting shape. Don't worry about me.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded04",
+                },
+                {
+                    ["fallback"] = "Not a scratch on me. That's all you get.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded05",
+                },
+                {
+                    ["fallback"] = "I'm completely healthy. Leave it alone.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded06",
+                },
+                {
+                    ["fallback"] = "Body's holding up just fine. Mind your own health.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded07",
+                },
+                {
+                    ["fallback"] = "Clean bill of health. You don't need to inspect me.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded08",
+                },
+                {
+                    ["fallback"] = "I'm intact and able-bodied. Let's move on.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded09",
+                },
+                {
+                    ["fallback"] = "No wounds, no sickness. Keep your distance.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "I'm doing okay.",
                     ["id"] = "phrase.semantic.question.health_state.healthy.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral01",
+                },
+                {
+                    ["fallback"] = "Healthy as can be expected out here.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral02",
+                },
+                {
+                    ["fallback"] = "No wounds or sickness bothering me right now.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral03",
+                },
+                {
+                    ["fallback"] = "Feeling solid. No injuries to speak of.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral04",
+                },
+                {
+                    ["fallback"] = "I'm in good health today, all things considered.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral05",
+                },
+                {
+                    ["fallback"] = "Everything's working the way it should.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral06",
+                },
+                {
+                    ["fallback"] = "No complaints on the physical side today.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral07",
+                },
+                {
+                    ["fallback"] = "Feeling intact and steady. No wounds on me.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral08",
+                },
+                {
+                    ["fallback"] = "Health is holding up fine. Ready for work.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral09",
+                },
+                {
+                    ["fallback"] = "Not carrying any injuries right now.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyNeutral10",
                 },
             },
             ["terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.question.health_state.healthy.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse01",
                 },
+                {
+                    ["fallback"] = "Healthy.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse02",
+                },
+                {
+                    ["fallback"] = "No injuries.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse03",
+                },
+                {
+                    ["fallback"] = "All clear.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse04",
+                },
+                {
+                    ["fallback"] = "Fine.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse05",
+                },
+                {
+                    ["fallback"] = "Uninjured.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse06",
+                },
+                {
+                    ["fallback"] = "Doing fine.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse07",
+                },
+                {
+                    ["fallback"] = "No wounds.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse08",
+                },
+                {
+                    ["fallback"] = "Good shape.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse09",
+                },
+                {
+                    ["fallback"] = "Solid.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "I'm doing okay. Thanks for checking in.",
                     ["id"] = "phrase.semantic.question.health_state.healthy.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm01",
+                },
+                {
+                    ["fallback"] = "Healthy and feeling good today. Truly appreciate you asking.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm02",
+                },
+                {
+                    ["fallback"] = "Not a scratch on me. Glad you're keeping an eye out.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm03",
+                },
+                {
+                    ["fallback"] = "Feeling strong and healthy, friend. Hope you are too.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm04",
+                },
+                {
+                    ["fallback"] = "All intact on my side. Thank you for looking after me.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm05",
+                },
+                {
+                    ["fallback"] = "Doing wonderfully, thank you. It's comforting that you asked.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm06",
+                },
+                {
+                    ["fallback"] = "In great health today. Ready to face whatever comes our way.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm07",
+                },
+                {
+                    ["fallback"] = "Feeling well rested and sound. Appreciate the kind check-in.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm08",
+                },
+                {
+                    ["fallback"] = "No bumps or scrapes today. Thank you for caring.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm09",
+                },
+                {
+                    ["fallback"] = "I'm doing great, honestly. Let's make sure we both stay that way.",
+                    ["id"] = "phrase.semantic.question.health_state.healthy.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateHealthyWarm10",
                 },
             },
         },
@@ -48,12 +228,102 @@ return {
                     ["id"] = "phrase.semantic.question.health_state.injured.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded01",
                 },
+                {
+                    ["fallback"] = "Took some damage. I don't need your pity.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded02",
+                },
+                {
+                    ["fallback"] = "Got injured, but I'm still dangerous. Step back.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded03",
+                },
+                {
+                    ["fallback"] = "Bleeding, but it's under control. Don't hover.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded04",
+                },
+                {
+                    ["fallback"] = "I'm wounded. That doesn't mean I'm helpless.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded05",
+                },
+                {
+                    ["fallback"] = "I can bandage my own wounds, thank you.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded06",
+                },
+                {
+                    ["fallback"] = "It hurts, but you don't need to pry into it.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded07",
+                },
+                {
+                    ["fallback"] = "Just a bad cut. Keep your hands where I can see them.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded08",
+                },
+                {
+                    ["fallback"] = "I'm dealing with the pain. Leave me be.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded09",
+                },
+                {
+                    ["fallback"] = "Injured, yes. Vulnerable, no. Back off.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "I'm hurt, but I'm managing.",
                     ["id"] = "phrase.semantic.question.health_state.injured.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral01",
+                },
+                {
+                    ["fallback"] = "Took a beating earlier. Bandages are holding for now.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral02",
+                },
+                {
+                    ["fallback"] = "Nursing a wound here. Trying not to reopen it.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral03",
+                },
+                {
+                    ["fallback"] = "I've been injured, but nothing that'll take me down.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral04",
+                },
+                {
+                    ["fallback"] = "Got caught in a bad spot. Dealing with the damage.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral05",
+                },
+                {
+                    ["fallback"] = "Bleeding is mostly stopped, but movement is painful.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral06",
+                },
+                {
+                    ["fallback"] = "Stung pretty bad by an attack earlier.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral07",
+                },
+                {
+                    ["fallback"] = "Injuries are slowing me down, but I can keep moving.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral08",
+                },
+                {
+                    ["fallback"] = "Could use some medical supplies when we find them.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral09",
+                },
+                {
+                    ["fallback"] = "I'm hurting right now, but taking it step by step.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredNeutral10",
                 },
             },
             ["terse"] = {
@@ -62,12 +332,102 @@ return {
                     ["id"] = "phrase.semantic.question.health_state.injured.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse01",
                 },
+                {
+                    ["fallback"] = "Wounded.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse02",
+                },
+                {
+                    ["fallback"] = "Need stitches.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse03",
+                },
+                {
+                    ["fallback"] = "Bleeding.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse04",
+                },
+                {
+                    ["fallback"] = "Hurts bad.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse05",
+                },
+                {
+                    ["fallback"] = "Bandaged up.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse06",
+                },
+                {
+                    ["fallback"] = "Still bleeding.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse07",
+                },
+                {
+                    ["fallback"] = "Took damage.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse08",
+                },
+                {
+                    ["fallback"] = "Slowed down.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse09",
+                },
+                {
+                    ["fallback"] = "Managing pain.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "I'm hurt, but I'm managing. Thanks for asking.",
                     ["id"] = "phrase.semantic.question.health_state.injured.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm01",
+                },
+                {
+                    ["fallback"] = "Took a hit out there, but knowing you're here helps a lot.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm02",
+                },
+                {
+                    ["fallback"] = "It hurts, friend, but I promise I'm holding together.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm03",
+                },
+                {
+                    ["fallback"] = "Got banged up a little. Thank you for your care and concern.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm04",
+                },
+                {
+                    ["fallback"] = "Nursing a wound, but seeing you safe gives me strength.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm05",
+                },
+                {
+                    ["fallback"] = "I'll pull through with some rest. Thanks for checking on me.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm06",
+                },
+                {
+                    ["fallback"] = "It's painful, but we'll patch it up together, right?",
+                    ["id"] = "phrase.semantic.question.health_state.injured.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm07",
+                },
+                {
+                    ["fallback"] = "Appreciate the check-in. Don't worry too much about me.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm08",
+                },
+                {
+                    ["fallback"] = "Got scratched up bad, but I'm glad you're by my side.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm09",
+                },
+                {
+                    ["fallback"] = "Hurts like hell, but having good folks around keeps me going.",
+                    ["id"] = "phrase.semantic.question.health_state.injured.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateInjuredWarm10",
                 },
             },
         },
@@ -84,12 +444,102 @@ return {
                     ["id"] = "phrase.semantic.question.health_state.unknown.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded01",
                 },
+                {
+                    ["fallback"] = "Haven't checked properly yet. Mind your own business.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded02",
+                },
+                {
+                    ["fallback"] = "Can't tell right now, and I'm not stripping down to check.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded03",
+                },
+                {
+                    ["fallback"] = "Unsure. I'll evaluate my own condition later.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded04",
+                },
+                {
+                    ["fallback"] = "No idea. Too chaotic out here to be certain.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded05",
+                },
+                {
+                    ["fallback"] = "I don't have that information right now. Stand back.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded06",
+                },
+                {
+                    ["fallback"] = "Hard to tell through the layers. Let it go.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded07",
+                },
+                {
+                    ["fallback"] = "Can't be certain. Focus on your own status.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded08",
+                },
+                {
+                    ["fallback"] = "Not clear yet. Don't crowd me.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded09",
+                },
+                {
+                    ["fallback"] = "Status unknown. I'll deal with it when I'm safe.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "I can't confirm my health status right now.",
                     ["id"] = "phrase.semantic.question.health_state.unknown.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral01",
+                },
+                {
+                    ["fallback"] = "Haven't had a chance to inspect myself thoroughly.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral02",
+                },
+                {
+                    ["fallback"] = "Not entirely sure how bad it is under the gear.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral03",
+                },
+                {
+                    ["fallback"] = "Could be bleeding, could just be a bruise. Hard to tell.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral04",
+                },
+                {
+                    ["fallback"] = "Need a quiet moment to check over my condition.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral05",
+                },
+                {
+                    ["fallback"] = "Uncertain right now. Adrenaline is masking the pain.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral06",
+                },
+                {
+                    ["fallback"] = "Hard to tell without a mirror or better light.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral07",
+                },
+                {
+                    ["fallback"] = "I feel sore all over, but can't verify the specifics.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral08",
+                },
+                {
+                    ["fallback"] = "Can't confirm if anything is broken or sprained yet.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral09",
+                },
+                {
+                    ["fallback"] = "My condition is uncertain at the moment.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownNeutral10",
                 },
             },
             ["terse"] = {
@@ -98,12 +548,102 @@ return {
                     ["id"] = "phrase.semantic.question.health_state.unknown.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse01",
                 },
+                {
+                    ["fallback"] = "Unsure.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse02",
+                },
+                {
+                    ["fallback"] = "Not sure yet.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse03",
+                },
+                {
+                    ["fallback"] = "Need to check.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse04",
+                },
+                {
+                    ["fallback"] = "Unknown.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse05",
+                },
+                {
+                    ["fallback"] = "Hard to say.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse06",
+                },
+                {
+                    ["fallback"] = "Can't tell.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse07",
+                },
+                {
+                    ["fallback"] = "Need a look.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse08",
+                },
+                {
+                    ["fallback"] = "Unchecked.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse09",
+                },
+                {
+                    ["fallback"] = "Too early to tell.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "I can't confirm it right now, but thanks for asking.",
                     ["id"] = "phrase.semantic.question.health_state.unknown.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm01",
+                },
+                {
+                    ["fallback"] = "Not sure how bad it is yet, but I appreciate your concern.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm02",
+                },
+                {
+                    ["fallback"] = "Haven't checked properly, but I'll let you know once I do.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm03",
+                },
+                {
+                    ["fallback"] = "Hard to tell right now, friend. Thanks for watching over me.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm04",
+                },
+                {
+                    ["fallback"] = "I need to check under the bandages, but I'm grateful you asked.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm05",
+                },
+                {
+                    ["fallback"] = "Uncertain for now, but your support means everything to me.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm06",
+                },
+                {
+                    ["fallback"] = "Could be fine, could be bruised. Thanks for caring enough to check.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm07",
+                },
+                {
+                    ["fallback"] = "I'll do a proper check when we're safe. Thank you, truly.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm08",
+                },
+                {
+                    ["fallback"] = "Can't say for sure, but I feel safer with you here.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm09",
+                },
+                {
+                    ["fallback"] = "Not sure yet, but don't worry yourself sick over me.",
+                    ["id"] = "phrase.semantic.question.health_state.unknown.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionHealthStateUnknownWarm10",
                 },
             },
         },
@@ -120,12 +660,102 @@ return {
                     ["id"] = "phrase.semantic.question.medical_bite.negative.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded01",
                 },
+                {
+                    ["fallback"] = "I'm clean. Don't look at me like that.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded02",
+                },
+                {
+                    ["fallback"] = "Not bitten. Stop inspecting me.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded03",
+                },
+                {
+                    ["fallback"] = "No teeth touched my skin. Back off.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded04",
+                },
+                {
+                    ["fallback"] = "I checked thoroughly. I am not infected.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded05",
+                },
+                {
+                    ["fallback"] = "No bite marks anywhere. Put your weapon down.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded06",
+                },
+                {
+                    ["fallback"] = "I know the protocol. I don't have a bite.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded07",
+                },
+                {
+                    ["fallback"] = "Clean skin. Don't jump to conclusions.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded08",
+                },
+                {
+                    ["fallback"] = "Not a single bite mark. Keep your distance regardless.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded09",
+                },
+                {
+                    ["fallback"] = "I am not turning. Drop the interrogation.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeGuarded10",
+                },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "No, I don't have a recorded bite.",
+                    ["fallback"] = "No, I don't have a bite.",
                     ["id"] = "phrase.semantic.question.medical_bite.negative.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral01",
+                },
+                {
+                    ["fallback"] = "Checked myself over. No bites anywhere.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral02",
+                },
+                {
+                    ["fallback"] = "I'm clean. None of them got their teeth in me.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral03",
+                },
+                {
+                    ["fallback"] = "No bite marks at all, thankfully.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral04",
+                },
+                {
+                    ["fallback"] = "Skin's intact. No bites from the dead.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral05",
+                },
+                {
+                    ["fallback"] = "I made sure to inspect every scratch. No bites.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral06",
+                },
+                {
+                    ["fallback"] = "Free and clear of any bite wounds.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral07",
+                },
+                {
+                    ["fallback"] = "Didn't get bitten. The armor held up.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral08",
+                },
+                {
+                    ["fallback"] = "No bites on me, I can assure you.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral09",
+                },
+                {
+                    ["fallback"] = "I checked carefully. No bites, just scratches.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral10",
                 },
             },
             ["terse"] = {
@@ -134,12 +764,102 @@ return {
                     ["id"] = "phrase.semantic.question.medical_bite.negative.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse01",
                 },
+                {
+                    ["fallback"] = "Clean.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse02",
+                },
+                {
+                    ["fallback"] = "Not bitten.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse03",
+                },
+                {
+                    ["fallback"] = "No teeth marks.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse04",
+                },
+                {
+                    ["fallback"] = "Skin intact.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse05",
+                },
+                {
+                    ["fallback"] = "I'm clear.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse06",
+                },
+                {
+                    ["fallback"] = "Negative.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse07",
+                },
+                {
+                    ["fallback"] = "All clear.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse08",
+                },
+                {
+                    ["fallback"] = "No infection.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse09",
+                },
+                {
+                    ["fallback"] = "Not turning.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeTerse10",
+                },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "No, I don't have a recorded bite. Thanks for checking.",
+                    ["fallback"] = "No, I don't have a bite. Thanks for checking.",
                     ["id"] = "phrase.semantic.question.medical_bite.negative.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm01",
+                },
+                {
+                    ["fallback"] = "I'm clean, friend. None of them got through my guard.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm02",
+                },
+                {
+                    ["fallback"] = "No bite marks on me. Good to know you're looking out for camp.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm03",
+                },
+                {
+                    ["fallback"] = "Completely free of bites, thank God. Appreciate the check.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm04",
+                },
+                {
+                    ["fallback"] = "I checked thoroughly, nothing to fear. We're safe.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm05",
+                },
+                {
+                    ["fallback"] = "No bites! Relieved to tell you I'm completely in the clear.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm06",
+                },
+                {
+                    ["fallback"] = "Skin is clean. Thank you for doing the hard safety checks.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm07",
+                },
+                {
+                    ["fallback"] = "You can breathe easy, no bites on me.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm08",
+                },
+                {
+                    ["fallback"] = "All clear on the bite front. Thank you for your care.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm09",
+                },
+                {
+                    ["fallback"] = "Not bitten at all, friend. I'm staying right here with you.",
+                    ["id"] = "phrase.semantic.question.medical_bite.negative.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm10",
                 },
             },
         },
@@ -156,12 +876,102 @@ return {
                     ["id"] = "phrase.semantic.question.medical_bite.positive.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded01",
                 },
+                {
+                    ["fallback"] = "They got me. Don't make a scene.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded02",
+                },
+                {
+                    ["fallback"] = "I was bitten. Keep your gun ready if you must.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded03",
+                },
+                {
+                    ["fallback"] = "Yes, it happened. Stay back from me.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded04",
+                },
+                {
+                    ["fallback"] = "Got teeth in my arm. I know what that means.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded05",
+                },
+                {
+                    ["fallback"] = "Bitten. Don't touch me.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded06",
+                },
+                {
+                    ["fallback"] = "It's true. I don't want your sympathy.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded07",
+                },
+                {
+                    ["fallback"] = "One of them bit me. Step away.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded08",
+                },
+                {
+                    ["fallback"] = "I'm marked. Do what you have to do.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded09",
+                },
+                {
+                    ["fallback"] = "Yes. I won't let myself become a danger to you.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "Yes, I've been bitten.",
                     ["id"] = "phrase.semantic.question.medical_bite.positive.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral01",
+                },
+                {
+                    ["fallback"] = "One of them got their teeth in me. It's bad.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral02",
+                },
+                {
+                    ["fallback"] = "I got bitten during the struggle. No denying it.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral03",
+                },
+                {
+                    ["fallback"] = "There's a bite mark on my shoulder. I'm infected.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral04",
+                },
+                {
+                    ["fallback"] = "It broke the skin. I know what's coming.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral05",
+                },
+                {
+                    ["fallback"] = "Yes, unfortunately. I was bitten.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral06",
+                },
+                {
+                    ["fallback"] = "They got through my sleeve. It's a bite.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral07",
+                },
+                {
+                    ["fallback"] = "I've been bitten. We need to plan for what comes next.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral08",
+                },
+                {
+                    ["fallback"] = "Found the mark earlier. I was bitten.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral09",
+                },
+                {
+                    ["fallback"] = "I'm infected. A walker bit me.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveNeutral10",
                 },
             },
             ["terse"] = {
@@ -170,12 +980,102 @@ return {
                     ["id"] = "phrase.semantic.question.medical_bite.positive.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse01",
                 },
+                {
+                    ["fallback"] = "Bitten.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse02",
+                },
+                {
+                    ["fallback"] = "They got me.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse03",
+                },
+                {
+                    ["fallback"] = "It's a bite.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse04",
+                },
+                {
+                    ["fallback"] = "Infected.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse05",
+                },
+                {
+                    ["fallback"] = "I'm turned.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse06",
+                },
+                {
+                    ["fallback"] = "Bite mark.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse07",
+                },
+                {
+                    ["fallback"] = "Yes.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse08",
+                },
+                {
+                    ["fallback"] = "Skin broke.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse09",
+                },
+                {
+                    ["fallback"] = "It's over.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "Yes. I've been bitten, and I appreciate you checking.",
                     ["id"] = "phrase.semantic.question.medical_bite.positive.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm01",
+                },
+                {
+                    ["fallback"] = "They got me, friend. I'm sorry to bring you this news.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm02",
+                },
+                {
+                    ["fallback"] = "I was bitten. Thank you for caring enough to ask me directly.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm03",
+                },
+                {
+                    ["fallback"] = "It happened. I'm just glad I got to know you before the end.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm04",
+                },
+                {
+                    ["fallback"] = "I've been bitten. Please, keep yourself safe when the time comes.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm05",
+                },
+                {
+                    ["fallback"] = "Yes, they got their teeth in me. Thank you for standing by me.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm06",
+                },
+                {
+                    ["fallback"] = "I won't hide it from you. I was bitten. Take care of yourself.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm07",
+                },
+                {
+                    ["fallback"] = "It's a bite, friend. I appreciate all the times we shared.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm08",
+                },
+                {
+                    ["fallback"] = "I'm infected. Thank you for treating me like a human being.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm09",
+                },
+                {
+                    ["fallback"] = "They bit me. Don't be sad; we fought as hard as we could.",
+                    ["id"] = "phrase.semantic.question.medical_bite.positive.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBitePositiveWarm10",
                 },
             },
         },
@@ -192,12 +1092,102 @@ return {
                     ["id"] = "phrase.semantic.question.medical_bite.unknown.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded01",
                 },
+                {
+                    ["fallback"] = "Haven't checked yet. Keep your distance until I do.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded02",
+                },
+                {
+                    ["fallback"] = "I don't know for sure. Back off and let me look.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded03",
+                },
+                {
+                    ["fallback"] = "Can't tell through this armor. Don't jump to conclusions.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded04",
+                },
+                {
+                    ["fallback"] = "Too much blood to tell whose it is. Back away.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded05",
+                },
+                {
+                    ["fallback"] = "I need a mirror first. Stop staring at me.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded06",
+                },
+                {
+                    ["fallback"] = "Unsure. I'll inspect myself in private.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded07",
+                },
+                {
+                    ["fallback"] = "Can't confirm. Keep your weapon holstered.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded08",
+                },
+                {
+                    ["fallback"] = "I don't know yet. Don't treat me like an infected.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded09",
+                },
+                {
+                    ["fallback"] = "Unknown. Stay where you are until I know.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "I can't confirm whether I've been bitten.",
                     ["id"] = "phrase.semantic.question.medical_bite.unknown.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral01",
+                },
+                {
+                    ["fallback"] = "Haven't had a chance to strip down and check properly.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral02",
+                },
+                {
+                    ["fallback"] = "There were too many hands grabbing at me to be certain.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral03",
+                },
+                {
+                    ["fallback"] = "Felt teeth scrape, but can't see if it broke the skin.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral04",
+                },
+                {
+                    ["fallback"] = "Need someone with good light to inspect my back.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral05",
+                },
+                {
+                    ["fallback"] = "Not sure yet. The wound is covered in dirt and blood.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral06",
+                },
+                {
+                    ["fallback"] = "Could be a scratch, could be teeth. Can't tell yet.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral07",
+                },
+                {
+                    ["fallback"] = "I haven't checked every spot yet. Need a minute.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral08",
+                },
+                {
+                    ["fallback"] = "Cloth is torn, but not sure if the skin is punctured.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral09",
+                },
+                {
+                    ["fallback"] = "Bite status is unknown right now. Waiting to check.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownNeutral10",
                 },
             },
             ["terse"] = {
@@ -206,12 +1196,102 @@ return {
                     ["id"] = "phrase.semantic.question.medical_bite.unknown.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse01",
                 },
+                {
+                    ["fallback"] = "Not sure.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse02",
+                },
+                {
+                    ["fallback"] = "Haven't checked.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse03",
+                },
+                {
+                    ["fallback"] = "Unknown.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse04",
+                },
+                {
+                    ["fallback"] = "Need to look.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse05",
+                },
+                {
+                    ["fallback"] = "Hard to tell.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse06",
+                },
+                {
+                    ["fallback"] = "Torn cloth.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse07",
+                },
+                {
+                    ["fallback"] = "Uncertain.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse08",
+                },
+                {
+                    ["fallback"] = "Can't see it.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse09",
+                },
+                {
+                    ["fallback"] = "Waiting to check.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "I can't confirm it, but thanks for checking.",
                     ["id"] = "phrase.semantic.question.medical_bite.unknown.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm01",
+                },
+                {
+                    ["fallback"] = "I'm not sure yet, friend. I'll check carefully in a safe spot.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm02",
+                },
+                {
+                    ["fallback"] = "Haven't had a proper look, but thank you for looking out for me.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm03",
+                },
+                {
+                    ["fallback"] = "Hard to see back there. Mind helping me take a look soon?",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm04",
+                },
+                {
+                    ["fallback"] = "Unsure right now, but I promise I'll be honest with you.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm05",
+                },
+                {
+                    ["fallback"] = "I pray it's just a tear in my jacket. Thanks for asking gently.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm06",
+                },
+                {
+                    ["fallback"] = "Not certain yet, but let's find shelter before we inspect.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm07",
+                },
+                {
+                    ["fallback"] = "Could be nothing, could be bad. Thank you for staying calm.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm08",
+                },
+                {
+                    ["fallback"] = "I haven't checked every scratch, but your concern warms my heart.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm09",
+                },
+                {
+                    ["fallback"] = "I'll let you know the moment I check. Thank you for your care.",
+                    ["id"] = "phrase.semantic.question.medical_bite.unknown.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteUnknownWarm10",
                 },
             },
         },

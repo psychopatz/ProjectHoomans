@@ -2,8 +2,8 @@
 
 - Total canonical phrase families: **505**
 - Total canonical style buckets: **729**
-- Under-10 style buckets total: **729**
-- Eligible under-10 style buckets (`EXPAND_TO_10`): **683**
+- Under-10 style buckets total: **631**
+- Eligible under-10 style buckets (`EXPAND_TO_10`): **585**
 
 ## Classification counts
 
@@ -15,11 +15,12 @@
 
 ## Phrase count distribution
 
-- Exactly 1 phrase(s): 660
-- Exactly 2 phrase(s): 19
-- Exactly 3 phrase(s): 29
+- Exactly 1 phrase(s): 575
+- Exactly 2 phrase(s): 17
+- Exactly 3 phrase(s): 25
 - Exactly 5 phrase(s): 4
-- Exactly 6 phrase(s): 17
+- Exactly 6 phrase(s): 10
+- Exactly 10 phrase(s): 98
 
 ## Style buckets inventory
 
@@ -169,26 +170,26 @@
 | `content/compatibility.json` | `semantic.compat.projectalife.meta.ambience` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `THIRD_PARTY_COMPAT_DEFERRED` | Third-party mod compatibility (Bandits/Companion Dogs/Necroa) fallback phrases |
 | `content/compatibility.json` | `semantic.compat.projectalife.meta.crash` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `THIRD_PARTY_COMPAT_DEFERRED` | Third-party mod compatibility (Bandits/Companion Dogs/Necroa) fallback phrases |
 | `content/compatibility.json` | `semantic.compat.projectalife.meta.gunfire` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `THIRD_PARTY_COMPAT_DEFERRED` | Third-party mod compatibility (Bandits/Companion Dogs/Necroa) fallback phrases |
-| `content/conversation.json` | `semantic.question.whats_up.busy` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.busy` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.busy` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.busy` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.default` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.default` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.default` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.default` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.default_alt` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.default_alt` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.default_alt` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.default_alt` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.traveling` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.traveling` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.traveling` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.traveling` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.weather` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.weather` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.weather` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/conversation.json` | `semantic.question.whats_up.weather` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.busy` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.busy` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.busy` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.busy` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.default` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.default` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.default` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.default` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.default_alt` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.default_alt` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.default_alt` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.default_alt` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.traveling` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.traveling` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.traveling` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.traveling` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.weather` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.weather` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.weather` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/conversation.json` | `semantic.question.whats_up.weather` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/event/combat_horde_reactions.json` | `semantic.combat.horde.choice.avoid` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/event/combat_horde_reactions.json` | `semantic.combat.horde.choice.engage` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/event/combat_horde_reactions.json` | `semantic.combat.horde.choice.hold` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
@@ -293,43 +294,43 @@
 | `content/event/reactions.json` | `semantic.leader_loss.dissent` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/event/reactions.json` | `semantic.leader_loss.distant` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/event/reactions.json` | `semantic.social.reaction.default` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/greeting.json` | `semantic.flow.greeting.followup.default` | `neutral` | 2 | 2 | 2 | YES | 0 | 2 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/greeting.json` | `semantic.flow.greeting.followup.friendly` | `neutral` | 2 | 2 | 2 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/greeting.json` | `semantic.flow.greeting.opening.default` | `guarded` | 3 | 3 | 3 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/greeting.json` | `semantic.flow.greeting.opening.default` | `neutral` | 6 | 6 | 6 | YES | 0 | 3 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/greeting.json` | `semantic.flow.greeting.opening.default` | `terse` | 6 | 6 | 6 | YES | 0 | 3 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/greeting.json` | `semantic.flow.greeting.opening.default` | `warm` | 6 | 6 | 6 | YES | 0 | 3 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/greeting.json` | `semantic.flow.greeting.opening.friendly` | `guarded` | 6 | 6 | 6 | YES | 0 | 6 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/greeting.json` | `semantic.flow.greeting.opening.friendly` | `neutral` | 6 | 6 | 6 | YES | 0 | 5 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/greeting.json` | `semantic.flow.greeting.opening.friendly` | `terse` | 6 | 6 | 6 | YES | 0 | 6 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/greeting.json` | `semantic.flow.greeting.opening.friendly` | `warm` | 6 | 6 | 6 | YES | 0 | 6 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/greeting.json` | `semantic.flow.greeting.opening.question.default` | `neutral` | 3 | 3 | 3 | YES | 0 | 2 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/greeting.json` | `semantic.flow.greeting.opening.question.friendly` | `neutral` | 3 | 3 | 3 | YES | 0 | 2 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/greeting.json` | `semantic.flow.greeting.opening.rain` | `neutral` | 3 | 3 | 3 | YES | 0 | 2 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.health_state.healthy` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.health_state.healthy` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.health_state.healthy` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.health_state.healthy` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.health_state.injured` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.health_state.injured` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.health_state.injured` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.health_state.injured` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.health_state.unknown` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.health_state.unknown` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.health_state.unknown` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.health_state.unknown` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.medical_bite.negative` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.medical_bite.negative` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.medical_bite.negative` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.medical_bite.negative` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.medical_bite.positive` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.medical_bite.positive` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.medical_bite.positive` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.medical_bite.positive` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.medical_bite.unknown` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.medical_bite.unknown` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.medical_bite.unknown` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/health.json` | `semantic.question.medical_bite.unknown` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/greeting.json` | `semantic.flow.greeting.followup.default` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/greeting.json` | `semantic.flow.greeting.followup.friendly` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/greeting.json` | `semantic.flow.greeting.opening.default` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/greeting.json` | `semantic.flow.greeting.opening.default` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/greeting.json` | `semantic.flow.greeting.opening.default` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/greeting.json` | `semantic.flow.greeting.opening.default` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/greeting.json` | `semantic.flow.greeting.opening.friendly` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/greeting.json` | `semantic.flow.greeting.opening.friendly` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/greeting.json` | `semantic.flow.greeting.opening.friendly` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/greeting.json` | `semantic.flow.greeting.opening.friendly` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/greeting.json` | `semantic.flow.greeting.opening.question.default` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/greeting.json` | `semantic.flow.greeting.opening.question.friendly` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/greeting.json` | `semantic.flow.greeting.opening.rain` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.health_state.healthy` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.health_state.healthy` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.health_state.healthy` | `terse` | 10 | 10 | 9 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.health_state.healthy` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.health_state.injured` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.health_state.injured` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.health_state.injured` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.health_state.injured` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.health_state.unknown` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.health_state.unknown` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.health_state.unknown` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.health_state.unknown` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.medical_bite.negative` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.medical_bite.negative` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.medical_bite.negative` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.medical_bite.negative` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.medical_bite.positive` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.medical_bite.positive` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.medical_bite.positive` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.medical_bite.positive` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.medical_bite.unknown` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.medical_bite.unknown` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.medical_bite.unknown` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/health.json` | `semantic.question.medical_bite.unknown` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/knowledge.json` | `semantic.gossip.unknown` | `bond_guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/knowledge.json` | `semantic.gossip.unknown` | `bond_neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/knowledge.json` | `semantic.gossip.unknown` | `bond_terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
@@ -382,19 +383,19 @@
 | `content/navigation.json` | `semantic.navigation.subject_change` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/navigation.json` | `semantic.navigation.subject_change` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/navigation.json` | `semantic.navigation.subject_change` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/needs.json` | `semantic.question.needs.offer.fatigue` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/needs.json` | `semantic.question.needs.offer.hunger` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/needs.json` | `semantic.question.needs.offer.hunger` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/needs.json` | `semantic.question.needs.offer.hunger` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/needs.json` | `semantic.question.needs.offer.hunger` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/needs.json` | `semantic.question.needs.offer.thirst` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/needs.json` | `semantic.question.needs.offer.unknown` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/needs.json` | `semantic.question.needs.proposal.hunger` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/needs.json` | `semantic.question.needs.proposal.thirst` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/needs.json` | `semantic.question.needs.proposal.unknown` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/needs.json` | `semantic.question.needs.quantity.hunger` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/needs.json` | `semantic.question.needs.quantity.thirst` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/needs.json` | `semantic.question.needs.quantity.unknown` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/needs.json` | `semantic.question.needs.offer.fatigue` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/needs.json` | `semantic.question.needs.offer.hunger` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/needs.json` | `semantic.question.needs.offer.hunger` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/needs.json` | `semantic.question.needs.offer.hunger` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/needs.json` | `semantic.question.needs.offer.hunger` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/needs.json` | `semantic.question.needs.offer.thirst` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/needs.json` | `semantic.question.needs.offer.unknown` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/needs.json` | `semantic.question.needs.proposal.hunger` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/needs.json` | `semantic.question.needs.proposal.thirst` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/needs.json` | `semantic.question.needs.proposal.unknown` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/needs.json` | `semantic.question.needs.quantity.hunger` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/needs.json` | `semantic.question.needs.quantity.thirst` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/needs.json` | `semantic.question.needs.quantity.unknown` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/quest.json` | `semantic.quest.clinic_supplies.accept.failed` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/quest.json` | `semantic.quest.clinic_supplies.accept.queued` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/quest.json` | `semantic.quest.clinic_supplies.accept.rejected` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
@@ -594,14 +595,14 @@
 | `content/social/tool_replies/apology.json` | `semantic.tool_reply.apology.1` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/social/tool_replies/apology.json` | `semantic.tool_reply.apology.2` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/social/tool_replies/apology.json` | `semantic.tool_reply.apology.3` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.named.1` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.named.2` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.named.3` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.prompt` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.rejected.1` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.rejected.2` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.unnamed.1` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.unnamed.2` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.named.1` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.named.2` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.named.3` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.prompt` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.rejected.1` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.rejected.2` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.unnamed.1` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/social/tool_replies/ask_name.json` | `semantic.tool_reply.ask_name.unnamed.2` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/social/tool_replies/comfort.json` | `semantic.tool_reply.comfort.1` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/social/tool_replies/comfort.json` | `semantic.tool_reply.comfort.2` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/social/tool_replies/comfort.json` | `semantic.tool_reply.comfort.3` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
@@ -734,23 +735,23 @@
 | `content/task/tool_replies/rejected_sexual.json` | `semantic.tool_reply.rejected_sexual.1` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/task/tool_replies/rejected_sexual.json` | `semantic.tool_reply.rejected_sexual.2` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
 | `content/task/tool_replies/rejected_sexual.json` | `semantic.tool_reply.rejected_sexual.3` | `neutral` | 1 | 1 | 1 | YES | 0 | 1 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.dataset.getting_by` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.dataset.getting_by` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.dataset.getting_by` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.dataset.getting_by` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.default` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.default` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.default` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.default` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.fatigue` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.fatigue_alt` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.hunger` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.hunger_alt` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.injured` | `guarded` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.injured` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.injured` | `terse` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.injured` | `warm` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.panic` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.stress` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.thirst` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
-| `content/wellbeing.json` | `semantic.question.wellbeing.thirst_alt` | `neutral` | 1 | 1 | 1 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.dataset.getting_by` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.dataset.getting_by` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.dataset.getting_by` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.dataset.getting_by` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.default` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.default` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.default` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.default` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.fatigue` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.fatigue_alt` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.hunger` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.hunger_alt` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.injured` | `guarded` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.injured` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.injured` | `terse` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.injured` | `warm` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.panic` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.stress` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.thirst` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |
+| `content/wellbeing.json` | `semantic.question.wellbeing.thirst_alt` | `neutral` | 10 | 10 | 10 | YES | 0 | 0 | `EXPAND_TO_10` | Active canonical NPC spoken dialogue required to reach minimum 10 variants |

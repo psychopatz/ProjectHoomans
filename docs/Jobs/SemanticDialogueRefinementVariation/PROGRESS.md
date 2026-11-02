@@ -62,26 +62,37 @@ This must be raised before the corpus can satisfy the requested minimum.
      - Under-10 eligible buckets: **683 / 683**.
    - Added unit test suite `test_dialogue_variation_auditor.py` (7 tests, all passing in 0.04s).
 
-## Immediate Active Phase — P2: Core conversation refinement
+2. **Phase 2 (Core Conversation Refinement & Expansion) — COMPLETED**:
+   - **P2A (Greeting / Farewell)**:
+     - `content/greeting.json`: Expanded all 7 families / 13 styles to 10 variants each (130 phrases).
+     - Fixed inappropriate romantic terms ("sweetheart", "love") in guarded/terse/warm styles.
+     - Preserved canonical initial greeting for test backward compatibility.
+   - **P2B (Wellbeing / Health / Needs)**:
+     - `content/wellbeing.json`: Expanded all 11 families / 20 styles to 10 variants each (200 phrases).
+     - `content/health.json`: Expanded all 6 families / 24 styles to 10 variants each (240 phrases). Replaced robotic "recorded bite" lines with grounded survivor speech.
+     - `content/needs.json`: Expanded all 10 families / 13 styles to 10 variants each (130 phrases). Replaced bureaucratic "record a commitment" phrasing.
+   - **P2C (Conversation & Identity / Ask Name)**:
+     - `content/conversation.json`: Expanded all 5 families / 20 styles to 10 variants each (200 phrases).
+     - `content/social/tool_replies/ask_name.json`: Expanded all 8 families / 8 styles to 10 variants each (80 phrases). Fixed fake English TL copies and enforced strict `%s` placeholder parity.
+   - **Compiler & Shard Capacity**:
+     - Raised `CONVERSATION_CONTENT_MAX_SHARD_BYTES` in `dialogue_content.py` and `CONVERSATION_MAX_SHARD_BYTES` in `conversation_compiler.py` to 128KB to support bounded 16-phrase expansion.
+     - Regenerated 196 Lua and JSON translation artifacts across EN and TL with complete parity.
+     - Verified real Lua worker phrase reachability across pool size 10.
+     - All 25 compiler, context health, content authority, and auditor unit tests pass.
+   - **Corpus Metrics After P2**:
+     - Styles at >=10 phrases: **98 / 729** (was 0).
+     - Eligible under-10 style buckets: **585 / 683** (was 683).
 
-Refine and expand high-frequency Quality Sweep surfaces:
-- **P2A**: Greeting / farewell (`content/greeting.json`: 7 families, 13 styles).
-- **P2B**: Wellbeing / health / needs (`content/wellbeing.json`: 11 families, 20 styles; `content/health.json`: 6 families, 24 styles; `content/needs.json`: 10 families, 13 styles).
-- **P2C**: What's Up / general conversation / identity (`content/conversation.json`: 5 families, 20 styles; `content/social/tool_replies/ask_name.json`: 8 families, 8 styles).
+## Immediate Active Phase — P3: Social interaction refinement
 
-Every eligible active style in these core shards must reach **>= 10 meaningful, grounded, context-safe phrase variants** with valid EN/TL parity.
+Expand and refine all canonical social interaction dialogue shards to >= 10 meaningful, relationship-safe variants:
+- **P3A**: Social Reactions (`content/social/reactions.json`: 11 families, 52 styles).
+- **P3B**: Social Emotes (`content/social/emotes/reply.json`: 10 families, 18 styles; `content/social/emotes/conversation.json`: 1 family, 4 styles).
+- **P3C**: Social Interaction & Director (`content/social/interaction/*.json`: scene adopters, memory acknowledge, argument deescalate/retaliate, topic redirects).
+- **P3D**: Social Tool Replies (`content/social/tool_replies/*.json`: apology, comfort, compliment, flirt, hostile, insult, praise, reassurance).
+- **P3E**: Social Apology (`content/social_apology.json`: 4 families, 16 styles).
 
-## First content wave after P1
-
-Prioritize high-frequency Quality Sweep surfaces:
-
-- greeting/farewell;
-- wellbeing;
-- health/needs;
-- What's Up/general conversation;
-- identity/ask-name.
-
-These currently contain many one-phrase style buckets and therefore produce obvious repetition.
+Every eligible active style in these social shards must reach **>= 10 meaningful, grounded, context-safe phrase variants** with valid EN/TL parity.
 
 ## Mandatory quality principle
 

@@ -17,6 +17,46 @@ return {
                     ["id"] = "phrase.semantic.flow.greeting.followup.default.neutral.02",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupDefaultNeutral02",
                 },
+                {
+                    ["fallback"] = "Anytime. Watch your back out there.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.default.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupDefaultNeutral03",
+                },
+                {
+                    ["fallback"] = "Don't mention it. See you around.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.default.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupDefaultNeutral04",
+                },
+                {
+                    ["fallback"] = "Glad to help. Take it easy.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.default.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupDefaultNeutral05",
+                },
+                {
+                    ["fallback"] = "All right. Stay alert today.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.default.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupDefaultNeutral06",
+                },
+                {
+                    ["fallback"] = "No problem at all. Be careful.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.default.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupDefaultNeutral07",
+                },
+                {
+                    ["fallback"] = "Sure thing. Keep your eyes open.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.default.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupDefaultNeutral08",
+                },
+                {
+                    ["fallback"] = "Take care of yourself out there.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.default.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupDefaultNeutral09",
+                },
+                {
+                    ["fallback"] = "Until next time. Stay safe.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.default.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupDefaultNeutral10",
+                },
             },
         },
     },
@@ -37,6 +77,46 @@ return {
                     ["id"] = "phrase.semantic.flow.greeting.followup.friendly.neutral.02",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupFriendlyNeutral02",
                 },
+                {
+                    ["fallback"] = "Always glad to talk. Stay safe out there.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.friendly.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupFriendlyNeutral03",
+                },
+                {
+                    ["fallback"] = "No problem. Holler if you need a hand.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.friendly.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupFriendlyNeutral04",
+                },
+                {
+                    ["fallback"] = "Anytime, friend. Take care of yourself.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.friendly.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupFriendlyNeutral05",
+                },
+                {
+                    ["fallback"] = "Glad we caught up. Catch you in a bit.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.friendly.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupFriendlyNeutral06",
+                },
+                {
+                    ["fallback"] = "No trouble at all. Good to have you around.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.friendly.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupFriendlyNeutral07",
+                },
+                {
+                    ["fallback"] = "Sure thing. Watch yourself out there, alright?",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.friendly.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupFriendlyNeutral08",
+                },
+                {
+                    ["fallback"] = "Take care. We'll talk again soon.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.friendly.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupFriendlyNeutral09",
+                },
+                {
+                    ["fallback"] = "Always. Glad to see you on your feet.",
+                    ["id"] = "phrase.semantic.flow.greeting.followup.friendly.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingFollowupFriendlyNeutral10",
+                },
             },
         },
     },
@@ -53,14 +133,49 @@ return {
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultGuarded01",
                 },
                 {
-                    ["fallback"] = "Keep your distance.",
+                    ["fallback"] = "Hold it right there. What do you want?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.default.guarded.02",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultGuarded02",
                 },
                 {
-                    ["fallback"] = "State your business.",
+                    ["fallback"] = "Hands where I can see them. Who are you?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.default.guarded.03",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultGuarded03",
+                },
+                {
+                    ["fallback"] = "Don't come any closer until I know your business.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultGuarded04",
+                },
+                {
+                    ["fallback"] = "Keep your hands clear. Talk from there.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultGuarded05",
+                },
+                {
+                    ["fallback"] = "I'm watching you. What brings you here?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultGuarded06",
+                },
+                {
+                    ["fallback"] = "Easy now. Step back and speak your piece.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultGuarded07",
+                },
+                {
+                    ["fallback"] = "Keep your distance. Times are too dangerous for strangers.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultGuarded08",
+                },
+                {
+                    ["fallback"] = "That's close enough. What are you looking for?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultGuarded09",
+                },
+                {
+                    ["fallback"] = "Stay where you are. I don't know you yet.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultGuarded10",
                 },
             },
             ["neutral"] = {
@@ -70,7 +185,7 @@ return {
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
                 },
                 {
-                    ["fallback"] = "Hello there. Good to see you.",
+                    ["fallback"] = "Hello there. How are things?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.02",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral02",
                 },
@@ -80,19 +195,39 @@ return {
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral03",
                 },
                 {
-                    ["fallback"] = "Morning.",
+                    ["fallback"] = "Morning. Hope the day treats you well.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.04",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral04",
                 },
                 {
-                    ["fallback"] = "Hey again.",
+                    ["fallback"] = "Hey again. What's going on?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.05",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral05",
                 },
                 {
-                    ["fallback"] = "There you are again.",
+                    ["fallback"] = "There you are. Everything quiet?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.06",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral06",
+                },
+                {
+                    ["fallback"] = "Afternoon. Staying out of trouble?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral07",
+                },
+                {
+                    ["fallback"] = "Hello. Good to run into another living person.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral08",
+                },
+                {
+                    ["fallback"] = "Hey. How's the perimeter looking?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral09",
+                },
+                {
+                    ["fallback"] = "Evening. Still on your feet, I see.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral10",
                 },
             },
             ["terse"] = {
@@ -112,7 +247,7 @@ return {
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse03",
                 },
                 {
-                    ["fallback"] = "Morning, sweetheart.",
+                    ["fallback"] = "Morning.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.default.terse.04",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse04",
                 },
@@ -122,9 +257,29 @@ return {
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse05",
                 },
                 {
-                    ["fallback"] = "Take care of yourself.",
+                    ["fallback"] = "Still here.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.default.terse.06",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse06",
+                },
+                {
+                    ["fallback"] = "Afternoon.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse07",
+                },
+                {
+                    ["fallback"] = "Quiet day.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse08",
+                },
+                {
+                    ["fallback"] = "You good?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse09",
+                },
+                {
+                    ["fallback"] = "Evening.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultTerse10",
                 },
             },
             ["warm"] = {
@@ -134,29 +289,49 @@ return {
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm01",
                 },
                 {
-                    ["fallback"] = "Hey, good to see you.",
+                    ["fallback"] = "Hey, good to see you in one piece.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.02",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm02",
                 },
                 {
-                    ["fallback"] = "Glad to see you.",
+                    ["fallback"] = "Glad to see you. How are you holding up?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.03",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm03",
                 },
                 {
-                    ["fallback"] = "Hey. Stay safe out there.",
+                    ["fallback"] = "Hey. Really glad you made it back safe.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.04",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm04",
                 },
                 {
-                    ["fallback"] = "Back already?",
+                    ["fallback"] = "Back already? Good to have you around.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.05",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm05",
                 },
                 {
-                    ["fallback"] = "Hey, love.",
+                    ["fallback"] = "It's always a relief seeing you walk through.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.06",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm06",
+                },
+                {
+                    ["fallback"] = "Good to see you on your feet today.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm07",
+                },
+                {
+                    ["fallback"] = "Hey there! How's your day been treating you?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm08",
+                },
+                {
+                    ["fallback"] = "Always good seeing a friendly face out here.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm09",
+                },
+                {
+                    ["fallback"] = "Welcome back. Hope things were quiet out there.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.default.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultWarm10",
                 },
             },
         },
@@ -174,29 +349,49 @@ return {
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded01",
                 },
                 {
-                    ["fallback"] = "Good timing. We could use you.",
+                    ["fallback"] = "Good timing. We could use your help.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.02",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded02",
                 },
                 {
-                    ["fallback"] = "Hey again. Everything under control?",
+                    ["fallback"] = "Hey again. Everything quiet around here?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.03",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded03",
                 },
                 {
-                    ["fallback"] = "Back again? Stay safe.",
+                    ["fallback"] = "Back again? Keep your weapon close.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.04",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded04",
                 },
                 {
-                    ["fallback"] = "Hey, love. How are you holding up?",
+                    ["fallback"] = "Hey. You notice anything strange out there?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.05",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded05",
                 },
                 {
-                    ["fallback"] = "Good to see you, sweetheart.",
+                    ["fallback"] = "Good to see you. Stay watchful though.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.06",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded06",
+                },
+                {
+                    ["fallback"] = "You made it back. Keep low and stay alert.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded07",
+                },
+                {
+                    ["fallback"] = "Glad you're safe. We've got to watch the treeline.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded08",
+                },
+                {
+                    ["fallback"] = "Hey. Hope nobody followed you in.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded09",
+                },
+                {
+                    ["fallback"] = "There you are. Let's keep our eyes sharp.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyGuarded10",
                 },
             },
             ["neutral"] = {
@@ -206,7 +401,7 @@ return {
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral01",
                 },
                 {
-                    ["fallback"] = "I was hoping we'd cross paths.",
+                    ["fallback"] = "I was hoping we'd cross paths today.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.neutral.02",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral02",
                 },
@@ -221,14 +416,34 @@ return {
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral04",
                 },
                 {
-                    ["fallback"] = "Back again. How's the work going?",
+                    ["fallback"] = "Back again. How's the scavenging going?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.neutral.05",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral05",
                 },
                 {
-                    ["fallback"] = "Good to see you again. Need anything?",
+                    ["fallback"] = "Good to see you again. Need a hand with anything?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.neutral.06",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral06",
+                },
+                {
+                    ["fallback"] = "Hey there. Glad we ran into each other.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral07",
+                },
+                {
+                    ["fallback"] = "Morning! How are things on your end?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral08",
+                },
+                {
+                    ["fallback"] = "Hey! What's the plan for today?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral09",
+                },
+                {
+                    ["fallback"] = "Good to catch up. How are you doing?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyNeutral10",
                 },
             },
             ["terse"] = {
@@ -248,7 +463,7 @@ return {
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyTerse03",
                 },
                 {
-                    ["fallback"] = "Didn't expect to see you.",
+                    ["fallback"] = "Didn't expect to see you so soon.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.terse.04",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyTerse04",
                 },
@@ -262,37 +477,77 @@ return {
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.terse.06",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyTerse06",
                 },
+                {
+                    ["fallback"] = "Holding steady?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyTerse07",
+                },
+                {
+                    ["fallback"] = "Good. You're here.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyTerse08",
+                },
+                {
+                    ["fallback"] = "All clear?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyTerse09",
+                },
+                {
+                    ["fallback"] = "Hey. Need something?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyTerse10",
+                },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "There you are, love.",
+                    ["fallback"] = "There you are! Good to see you.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm01",
                 },
                 {
-                    ["fallback"] = "I was hoping I'd see you today.",
+                    ["fallback"] = "I was hoping I'd run into you today.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.02",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm02",
                 },
                 {
-                    ["fallback"] = "Back so soon, love?",
+                    ["fallback"] = "Back so soon? Glad you're safe.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.03",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm03",
                 },
                 {
-                    ["fallback"] = "I was hoping you'd come back.",
+                    ["fallback"] = "I was hoping you'd come back in one piece.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.04",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm04",
                 },
                 {
-                    ["fallback"] = "There you are. You doing alright?",
+                    ["fallback"] = "There you are. You doing alright today?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.05",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm05",
                 },
                 {
-                    ["fallback"] = "Good to see you. Come here.",
+                    ["fallback"] = "Good to see you. Pull up a chair.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.06",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm06",
+                },
+                {
+                    ["fallback"] = "Always makes my day better seeing you back safe.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm07",
+                },
+                {
+                    ["fallback"] = "Hey there! Really glad you're around today.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm08",
+                },
+                {
+                    ["fallback"] = "It's good to see your face. How're you feeling?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm09",
+                },
+                {
+                    ["fallback"] = "Welcome back, my friend. Good to see you.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.friendly.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningFriendlyWarm10",
                 },
             },
         },
@@ -315,9 +570,44 @@ return {
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral02",
                 },
                 {
-                    ["fallback"] = "Everything all right?",
+                    ["fallback"] = "Everything all right with you?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.question.default.neutral.03",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral03",
+                },
+                {
+                    ["fallback"] = "How's your day going so far?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.default.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral04",
+                },
+                {
+                    ["fallback"] = "Staying safe out there?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.default.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral05",
+                },
+                {
+                    ["fallback"] = "How are things treating you today?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.default.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral06",
+                },
+                {
+                    ["fallback"] = "Feeling alright today?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.default.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral07",
+                },
+                {
+                    ["fallback"] = "Any trouble on the road?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.default.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral08",
+                },
+                {
+                    ["fallback"] = "How are you managing out here?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.default.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral09",
+                },
+                {
+                    ["fallback"] = "Everything quiet on your end?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.default.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral10",
                 },
             },
         },
@@ -330,19 +620,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "How have you been holding up?",
+                    ["fallback"] = "How have you been holding up lately?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral01",
                 },
                 {
-                    ["fallback"] = "How's the camp holding?",
+                    ["fallback"] = "How's the camp holding together?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly.neutral.02",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral02",
                 },
                 {
-                    ["fallback"] = "Need anything?",
+                    ["fallback"] = "Need anything while we're talking?",
                     ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly.neutral.03",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral03",
+                },
+                {
+                    ["fallback"] = "How's your supply situation looking?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral04",
+                },
+                {
+                    ["fallback"] = "Getting enough rest between runs?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral05",
+                },
+                {
+                    ["fallback"] = "How are you feeling about things around here?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral06",
+                },
+                {
+                    ["fallback"] = "You managing to stay warm and dry?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral07",
+                },
+                {
+                    ["fallback"] = "How are the others treating you?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral08",
+                },
+                {
+                    ["fallback"] = "Everything staying solid with you?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral09",
+                },
+                {
+                    ["fallback"] = "Good to see you. How have things been going?",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionFriendlyNeutral10",
                 },
             },
         },
@@ -360,14 +685,49 @@ return {
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRainNeutral01",
                 },
                 {
-                    ["fallback"] = "Rain's not letting up.",
+                    ["fallback"] = "Rain's not letting up anytime soon.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.rain.neutral.02",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRainNeutral02",
                 },
                 {
-                    ["fallback"] = "Keep dry if you can.",
+                    ["fallback"] = "Keep dry if you can out there.",
                     ["id"] = "phrase.semantic.flow.greeting.opening.rain.neutral.03",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRainNeutral03",
+                },
+                {
+                    ["fallback"] = "Miserable weather, but we're still kicking.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.rain.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRainNeutral04",
+                },
+                {
+                    ["fallback"] = "Ground's completely soaked out there.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.rain.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRainNeutral05",
+                },
+                {
+                    ["fallback"] = "Cold rain like this makes everything harder.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.rain.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRainNeutral06",
+                },
+                {
+                    ["fallback"] = "Watch your footing in this mud.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.rain.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRainNeutral07",
+                },
+                {
+                    ["fallback"] = "Rain makes it hard to hear them coming. Stay alert.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.rain.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRainNeutral08",
+                },
+                {
+                    ["fallback"] = "Good day to stay under a solid roof if you've got one.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.rain.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRainNeutral09",
+                },
+                {
+                    ["fallback"] = "At least the rain washes away the tracks. Stay dry.",
+                    ["id"] = "phrase.semantic.flow.greeting.opening.rain.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRainNeutral10",
                 },
             },
         },

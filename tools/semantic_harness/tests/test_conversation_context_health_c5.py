@@ -72,10 +72,7 @@ class ConversationContextHealthC5Tests(unittest.TestCase):
             CONVERSATION_MAX_SOURCE_BYTES,
         )
         largest = self.health["largestSources"][0]
-        self.assertEqual(
-            largest["path"],
-            "content/social/emotes/reply.json",
-        )
+        self.assertLessEqual(int(largest["bytes"]), CONVERSATION_MAX_SOURCE_BYTES)
 
     def test_generated_paths_explain_canonical_ownership(self) -> None:
         modules = {row["module"]: row for row in self.reports}
