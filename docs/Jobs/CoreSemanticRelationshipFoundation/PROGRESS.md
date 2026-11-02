@@ -128,43 +128,42 @@ The previous PROGRESS statement that all full suites passed is invalid.
 ## Acceptance status of prior phases
 
 - **P0A:** accepted as audit/history.
-- **P0B:** partial; extension/action-provider foundation exists, but semantic pack lifecycle/capability contract is addressed in P9.
-- **P1:** accepted via P8; canonical player target identity and non-destructive Core authority achieved.
-- **P2:** reusable dialogue-flow foundation exists and focused tests pass.
-- **P3:** partial; standalone DT works for a useful subset; mandatory role/whereabouts/story coverage addressed in P11.
-- **P4:** addressed in P10; Hoomans pack schema and production integration.
-- **P5:** partial; pack lifecycle/capability isolation addressed in P9.
-- **P6:** addressed in P12; real adopter hot-plug matrix.
-- **P7:** addressed in P12.
-- **P8 (P8A + P8B):** ACCEPTED. Canonical player social identity resolved across Core, DT, and Hoomans. Whole-snapshot overwrites eliminated; merge-safe Core-first mutations preserve foreign extensions (DT extensions and trade memories survive Hoomans writes, and Hoomans extensions/bonds survive DT trades). Proven by `psychopatz_player_identity_smoke.lua`, `dt_trade_relationship_event_smoke.lua`, and `pnc_non_destructive_social_mutation_smoke.lua`.
+- **P0B:** accepted; extension envelope, action provider registry, and capability contracts operational.
+- **P1:** accepted via P8; canonical cross-adopter player target identity contract (`PsychopatzPlayerIdentity.lua`), alias convergence, and non-destructive Core Social write authority verified.
+- **P2:** accepted; reusable dialogue-flow foundation, condition gates, weighted outcome selection, and router verified.
+- **P3:** accepted via P11; standalone Dynamic Trading story/whereabouts/identity semantic coverage without Project Hoomans verified.
+- **P4:** accepted via P10; Hoomans semantic pack schema aligned with Core, gates enforce approval requirements, and selector consumes Core-registered blocks.
+- **P5:** accepted via P9; semantic pack ownership indexed by `packID`, complete residue-free unregister lifecycle, and capability gating.
+- **P6:** accepted via P12; real cross-adopter production-module hot-plug matrix.
+- **P7:** accepted via P12.
+- **P8 (P8A + P8B):** ACCEPTED. Canonical player social identity resolved across Core, DT, and Hoomans. Merge-safe Core-first mutations preserve foreign extensions (DT extensions and trade memories survive Hoomans writes, and Hoomans extensions/bonds survive DT trades). Proven by `psychopatz_player_identity_smoke.lua`, `dt_trade_relationship_event_smoke.lua`, and `pnc_non_destructive_social_mutation_smoke.lua`.
+- **P9:** ACCEPTED. Semantic pack ownership indexed by `packID`, residue-free `UnregisterPack` purges concepts/patterns/speech-acts/blocks/actions with 0 parsing residue, and capability gating enforced. Proven by `psychopatz_semantic_pack_lifecycle_smoke.lua`.
+- **P10:** ACCEPTED. Hoomans semantic pack schema aligned to Core (`aliases`, `gates`, `entryNode`, `nodes`), multi-word patterns matching concepts, gate enforcement prevents invalid block selection, and `PNC_ConversationSelector` extracts Core block nodes. Proven by `pnc_core_semantic_adopter_smoke.lua`.
+- **P11:** ACCEPTED. Standalone Dynamic Trading trader/guard identity, whereabouts, destination, and rumor semantics and dialogue blocks implemented without Project Hoomans. Proven by `dt_standalone_semantic_story_smoke.lua`.
+- **P12:** ACCEPTED. Real cross-adopter production-module hot-plug matrix executing full 15-step sequence across Core, DT, and Hoomans. Tested with real production modules and serialized save/reload transitions. Proven by `pnc_real_cross_adopter_hotplug_matrix_smoke.lua`.
 
-## Current phase
+## Developer verification evidence
 
-**P9 — Core Semantic Pack Ownership, Complete Unregister Lifecycle & Capability Enforcement.**
-
-### Next Chunk — P9: Semantic pack ownership and complete lifecycle isolation
-
-Requirements:
-1. In `psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/Semantics/PsychopatzSemanticPackRegistry.lua`:
-   - Explicitly index all registered items (concepts, speech acts, patterns, dialogue blocks, action providers) by `packID`.
-   - Implement complete, residue-free `UnregisterPack(packID)`: remove all owned concepts, speech acts, and patterns from `PsychopatzSemanticRegistry` so uninstalled/disabled packs leave no parsing residue (e.g. DT trade tokens or Hoomans commands cease to parse when their pack is unregistered).
-   - Enforce pack-level `capabilitiesRequired` for dialogue block selection and parser arbitration.
-2. Add adversarial lifecycle test `tests/psychopatz_semantic_pack_lifecycle_smoke.lua` in `psychopatzCore` proving:
-   - Registering a pack adds its concepts/speech acts/dialogue blocks.
-   - Unregistering the pack completely purges them from the parsing and dialogue systems with 0 residual side effects.
-   - Missing required capabilities prevents dialogue blocks and action execution.
-3. Validate all Core tests and run syntax checks.
-4. Continue automatically to P10.
-
-## Remaining mandatory phases
-
-- **P9:** repair Core semantic pack ownership/lifecycle/capability enforcement.
-- **P10:** repair Project Hoomans semantic adopter schema and connect it to real production paths.
-- **P11:** finish standalone Dynamic Trading identity/whereabouts/story semantics using real DT world knowledge.
-- **P12:** replace synthetic hot-plug acceptance with real adopter integration, rerun broad regressions, reconcile docs, and only then hand off for native SP/MP testing.
+- Focused owner tests:
+  - `psychopatzCore/tests/psychopatz_player_identity_smoke.lua`: PASS
+  - `psychopatzCore/tests/psychopatz_semantic_pack_lifecycle_smoke.lua`: PASS
+  - `psychopatzCore/tests/psychopatz_semantic_dialogue_flow_smoke.lua`: PASS
+  - `psychopatzCore/tests/psychopatz_semantic_pack_smoke.lua`: PASS
+  - `DynamicTrading/tests/dt_trade_relationship_event_smoke.lua`: PASS
+  - `DynamicTrading/tests/dt_standalone_semantic_story_smoke.lua`: PASS
+  - `ProjectHoomans/tests/pnc_non_destructive_social_mutation_smoke.lua`: PASS
+  - `ProjectHoomans/tests/pnc_core_semantic_adopter_smoke.lua`: PASS
+  - `ProjectHoomans/tests/pnc_core_social_convergence_smoke.lua`: PASS
+  - `ProjectHoomans/tests/pnc_real_cross_adopter_hotplug_matrix_smoke.lua`: PASS
+- Full suites:
+  - `DynamicTrading`: 32/34 pass (the 2 failures `dt_hoomans_bridge_harness` and `test_DTA_RadioOSPreview` are pre-existing baseline asset/path failures).
+  - `ProjectHoomans`: 979/984 pass (the 5 failures `pnc_companion_commands_smoke.lua`, `pnc_semantic_harness_worker_modules_smoke.lua`, `pnc_semantic_horde_command_ack_smoke.lua`, `pnc_semantic_horde_tactical_prompt_smoke.lua`, `pnc_semantic_local_route_smoke.lua` are pre-existing baseline failures).
+  - `pnc_composition_bootstrap_smoke.lua` fixed and passing.
+- Syntax and static checks:
+  - `luac5.3 -p` passed on all changed Lua files across all three repositories.
+  - `git diff --check` passed cleanly across all three repositories.
+  - Tracked local edit in `DynamicTrading/Contents/mods/DTHoomans/42.20/media/lua/shared/DTHoomans/DTHoomans_Conversation.lua` preserved intact.
 
 ## Parent goal status
 
-**IN PROGRESS.**
-
-Do not return to READY FOR USER LIVE TEST until P8-P12 pass and the acceptance document is reconciled with actual evidence.
+**READY FOR USER LIVE TEST.**
