@@ -46,14 +46,17 @@ Also inspect the accepted Core foundation docs under `psychopatzCore/Docs/npc_fo
 
 ## Completion state
 
-**Current state: IN PROGRESS.** A third independent audit after the P13-P15 closeout verified that P14 and most P15 behavior are real, but invalidated two remaining acceptance claims.
+**Current state: IN PROGRESS.** A fourth independent production-path audit after the P16-P17 closeout found that the new Core issuance registry and DT factual policy APIs are useful foundations, but two completion claims remain false.
 
-Retain the accepted foundation, including non-destructive shared-social merging, semantic pack lifecycle, Hoomans semantic adoption, production conversation capability isolation, complete DT parser coverage, bounded uncertainty, and the improved hot-plug matrix.
+Retain all accepted work, especially P8B social integrity, semantic-pack lifecycle, P14 production capability isolation, complete DT parser coverage, bounded uncertainty, real WorldKnowledge road-news/route grounding, the P16 issuance registry itself, and the P17 policy/TalkService integration.
 
-Mandatory P16-P17 work remains for:
+Mandatory P18-P19 work remains for:
 
-- replacing forgeable modData hash provenance with a Core-authoritative identity issuance/adoption contract;
-- grounding factual DT destination/origin/settlement answers in actual production DT policy/world-knowledge state rather than test-only `TalkService.Submit` option injection;
-- updating the final production matrix to prove those two boundaries end-to-end.
+- preventing Core identity lookup from auto-authorizing an unknown `PNC_CharacterUUID` before Hoomans validates it;
+- importing Hoomans-first identities into Core only from the authoritative Hoomans player-character registry/service, never from player mirror modData alone;
+- wiring real excursion/travel lifecycle into canonical DT origin/destination state;
+- resolving canonical settlement/community IDs to human-facing names before factual dialogue realization;
+- proving destination/origin/current-settlement/news state survives a real DT storage save/reload path;
+- upgrading the final matrix around the exact vulnerable call order and live travel lifecycle.
 
-Developer-side completion now requires the full P0-P17 roadmap and current acceptance matrix. Native Project Zomboid SP/MP validation remains user-owned unless explicitly reassigned. Steam Workshop publication is never implied by Git completion.
+Developer-side completion now requires the full P0-P19 roadmap and current acceptance matrix. Native Project Zomboid SP/MP validation remains user-owned unless explicitly reassigned. Steam Workshop publication is never implied by Git completion.

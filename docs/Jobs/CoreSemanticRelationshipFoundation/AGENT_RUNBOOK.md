@@ -79,6 +79,17 @@ A deterministic public hash stored in player modData is not authoritative identi
 
 For factual DT grounding, test setup must publish/set state through the real upstream DT/Core owner. Passing `destination`, `origin`, `settlement`, or `npcGossip` directly into `TalkService.Submit` may remain a unit test of rendering, but cannot satisfy final production grounding acceptance.
 
+Identity authority tests must exercise Core resolution before Hoomans validation. A mandatory adversarial sequence is: forged/unknown `PNC_CharacterUUID` mirror -> Core/DT `GetTargetKey` or `GetCharacterUUID` -> Hoomans `EnsureIdentity`. The forged UUID must remain unissued and must not become `core_adopted`.
+
+Do not let Core self-register an adopter mirror merely because it is syntactically valid. Hoomans-first registration into Core must be initiated from the validated Hoomans player-character registry/service.
+
+For factual DT travel acceptance, calling `Policy.SetDestinationSettlement` directly is only an API-level test. Final production acceptance must drive the actual excursion/travel lifecycle that owns departure, destination, visit and return transitions.
+
+For player-facing settlement dialogue, tests must use representative machine IDs plus separate human-facing names. Friendly strings used directly as IDs are insufficient because they hide presentation-resolution bugs.
+
+A factual-state persistence gate must perform actual DT storage serialization/reload after setting travel/settlement state and publishing/acquiring knowledge, then re-open TalkService and prove the facts remain available.
+
+
 
 No native PZ launch, Workshop upload, republish or destructive save manipulation unless explicitly authorized by the user.
 

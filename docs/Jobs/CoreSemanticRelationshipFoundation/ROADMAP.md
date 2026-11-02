@@ -1,8 +1,8 @@
 # Roadmap — Core Semantic & Relationship Foundation
 
-**Status:** IN PROGRESS — P0-P15 implementation exists. A third independent audit accepted P14 and most P15 behavior but invalidated P13's issuance-trust claim and P15's end-to-end destination/origin/settlement grounding proof. P16-P17 are mandatory final corrections.
+**Status:** IN PROGRESS — P0-P17 implementation exists. A fourth production-path audit retained the P16 issuance registry and P17 policy/grounding foundation but invalidated authority bootstrapping, live travel wiring, place presentation, and factual-state reload acceptance. P18-P19 are mandatory final corrections.
 
-The parent goal completion boundary is now the complete P0-P17 outcome. Preserve accepted P0-P15 implementation; P16-P17 repair only the two remaining boundaries reproduced after the P15 closeout.
+The parent goal completion boundary is now the complete P0-P19 outcome. Preserve accepted P0-P17 implementation; P18-P19 repair only the concrete production-order and live-gameplay gaps reproduced after the P17 closeout.
 
 After every accepted chunk: implement -> validate actual production owners -> update PROGRESS -> commit coherent owner-repository changes -> continue automatically to the next mandatory chunk.
 
@@ -412,7 +412,136 @@ Final validation:
 - `git diff --check`;
 - exact final repository revisions/status including the preserved DT local edit.
 
-Gate: only after P16-P17 pass may the parent goal return to **READY FOR USER LIVE TEST**.
+Historical P17 closeout gate: superseded by the fourth production-path audit. P18-P19 are now mandatory before **READY FOR USER LIVE TEST**.
+
+
+## P18 — Prevent mirror-to-authority identity bootstrapping
+
+### P18A — Remove implicit authorization of unknown PNC mirrors
+
+Retain the P16 Core issuance registry and its persistence API.
+
+Verified fourth-audit bypass:
+
+1. player modData contains only an unknown but syntactically valid `PNC_CharacterUUID`;
+2. `PsychopatzPlayerIdentity.GetTargetKey/GetCharacterUUID` runs before Hoomans validation;
+3. Core's existing PNC-UUID fallback calls `RegisterIssuedIdentity(..., { source = "hoom_adopted" })`;
+4. the formerly unknown UUID is now authoritative in Core;
+5. later real Hoomans `EnsureIdentity` accepts it as `core_adopted`.
+
+Independent reproduction produced:
+
+- before Core resolution: `IsIssuedIdentity = false / not_issued`;
+- after Core resolution: `IsIssuedIdentity = true / source=hoom_adopted`;
+- Hoomans adopted the forged UUID.
+
+Requirements:
+
+- `GetCharacterUUID/GetTargetKey` must never self-register an unknown PNC/adopter mirror;
+- existing Core-issued UUID mirrors continue to resolve normally;
+- if only an unknown PNC mirror exists, Core must not bless it as authoritative;
+- Hoomans-first import into Core must come from the validated Hoomans player-character registry/service after Hoomans has accepted/created that identity;
+- preserve exact UUID/key convergence for legitimate DT-first and Hoomans-first saves;
+- preserve cross-account/dead/retired/duplicate-live-binding safeguards;
+- preserve issuance persistence and idempotence;
+- legacy already-forked aliases continue to converge without duplicate social events.
+
+Mandatory adversarial tests:
+
+1. forged unknown PNC UUID -> Core `GetTargetKey` first -> Core still reports `not_issued`;
+2. same player -> real Hoomans `EnsureIdentity` -> forged UUID is not `core_adopted`;
+3. legitimate DT-first Core-issued UUID -> Core resolution -> Hoomans adoption -> exact UUID/key preserved;
+4. legitimate Hoomans-first registry identity -> explicit registry/service registration into Core -> exact UUID/key preserved;
+5. unknown PNC mirror with no Hoomans registry record cannot silently replace/generate Core authority;
+6. save/reload authoritative issuance and repeat resolution -> same safe behavior.
+
+Gate: player mirrors can never create authority by lookup order.
+
+## P19 — Live travel-derived factual dialogue, place presentation and persistence
+
+### P19A — Wire actual excursion/travel lifecycle into canonical DT policy
+
+Retain P17 policy fields and setters.
+
+Verified fourth-audit gap: production runtime uses `SetHomeSettlement` and `SetCurrentSettlement`, but no production caller currently sets `destinationSettlementID` or `originSettlementID`. The Hoomans excursion payload already knows `homeCommunityID`, `destination.communityID`, and state transitions.
+
+Wire the owning lifecycle so canonical policy reflects the actual trip.
+
+At minimum for the Hoomans resident excursion bridge:
+
+- PREPARING: origin/current home, destination selected community;
+- OUTBOUND: current nil/offsite, origin retained, destination retained;
+- VISITING: current visited community; origin remains actual departure; destination updates only if a next itinerary stop exists;
+- RETURNING_HOME: origin becomes last visited community; destination becomes home community;
+- AT_HOME: current/home set; destination cleared; origin remains historically meaningful as appropriate;
+- FAILED/cancelled paths clear or restore destination/origin consistently.
+
+Use equivalent owner paths for standalone DT travel where present.
+
+### P19B — Resolve canonical IDs to human-facing place names
+
+Do not store display names as canonical IDs merely to make tests readable.
+
+Add/reuse a generic presentation seam so TalkService can resolve:
+
+- DT-native settlement IDs;
+- Hoomans community IDs when the optional adopter is installed;
+- route/place IDs from WorldKnowledge.
+
+The canonical policy should keep stable IDs. Dialogue should emit a known human name such as `Riverside Safehouse`, not a raw machine ID such as `community_367200000_423831`.
+
+No DTCommon dependency on Project Hoomans internals is allowed. Hoomans may register/provide presentation through a public adapter/resolver.
+
+Mandatory tests must use distinct values, e.g.:
+
+- canonical ID: `community_123_456`;
+- display name: `Riverside Safehouse`.
+
+The response must contain the display name and must not expose the machine ID.
+
+### P19C — Prove factual-state persistence through real DT storage
+
+The P17 tests currently set policy state and query immediately. That does not prove the acceptance claim that factual answers survive reload.
+
+Required:
+
+1. establish home/current/origin/destination through the real production owner/lifecycle;
+2. publish/acquire route/news WorldKnowledge through production APIs;
+3. persist using the actual DT storage path that owns trader records and knowledge;
+4. clear/reload runtime state from serialized/persisted data;
+5. reopen TalkService;
+6. ask destination/origin/settlement/route/news questions;
+7. verify same canonical IDs, human-facing names and evidence/fact IDs are restored;
+8. verify no stale destination survives completed/cancelled travel incorrectly.
+
+### P19D — Final production matrix and docs reconciliation
+
+Upgrade the existing matrix rather than replacing useful coverage.
+
+The final matrix must include:
+
+- forged PNC mirror -> Core resolves first -> remains unissued -> Hoomans rejects adoption;
+- legitimate DT-first and Hoomans-first identity flows;
+- P8B interleaved social integrity;
+- P14 production capability isolation;
+- real excursion/travel lifecycle populating origin/destination/current state;
+- machine settlement ID resolved to human display name in dialogue;
+- real WorldKnowledge road-news/route evidence;
+- DT factual-state save/reload;
+- remove/re-add adopters/packs without identity/social/semantic/factual corruption;
+- repeated migration/reload idempotence.
+
+Final validation:
+
+- Core focused identity/social/semantics/conversation suites;
+- Dynamic Trading full runner (fourth-audit baseline: 43/43);
+- Hoomans focused corrective tests;
+- Hoomans broad runner (fourth-audit baseline: 982/987 with the same five pre-existing failures);
+- changed Lua syntax/Kahlua/static checks where tooling exists;
+- `git diff --check`;
+- exact final repository revisions/status, explicitly reporting the preserved tracked DT working-tree edit.
+
+Gate: only after P18-P19 pass may the parent goal return to **READY FOR USER LIVE TEST**.
 
 ## Completion rule
 
@@ -425,4 +554,4 @@ The parent goal is not complete merely because:
 - a synthetic payload survives serialization;
 - focused tests pass.
 
-Completion requires one canonical player relationship identity backed by Core-authoritative issuance/adoption state, non-destructive interleaved adopter writes, residue-free and capability-isolated production conversation semantics, working Hoomans adoption, factual DT route/destination/origin/settlement/news answers derived from canonical upstream production state, and a real production-module hot-plug matrix that exercises those boundaries.
+Completion requires one canonical player relationship identity whose authority cannot be bootstrapped from mirrors, non-destructive interleaved adopter writes, residue-free and capability-isolated production conversation semantics, working Hoomans adoption, factual DT route/destination/origin/settlement/news answers driven by actual gameplay owners and rendered with human-facing place presentation, factual-state persistence across reload, and a real production-module hot-plug matrix that exercises those boundaries.

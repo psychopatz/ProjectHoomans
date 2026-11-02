@@ -84,6 +84,37 @@ Required properties:
 - account/slot ownership, dead/retired status, and duplicate-live-binding safeguards remain intact;
 - persistence/reload preserves issuance authority and adoption idempotence.
 
+## 1D. Mirrors cannot bootstrap authority
+
+Player modData mirrors are discovery hints only.
+
+Core identity lookup must never convert an unknown `PNC_CharacterUUID` or other adopter mirror into an authoritative issuance record merely because the mirror exists. Otherwise an untrusted mirror can bootstrap itself into Core authority before the adopter validates it.
+
+The allowed directions are:
+
+```text
+Core-generated identity
+  -> Core authoritative issuance record
+  -> player mirror
+  -> later Hoomans adoption
+
+validated Hoomans registry identity
+  -> explicit Hoomans-to-Core registration/import
+  -> Core authoritative issuance record
+  -> shared mirrors
+```
+
+The forbidden direction is:
+
+```text
+unknown player mirror UUID
+  -> Core GetCharacterUUID/GetTargetKey
+  -> implicit RegisterIssuedIdentity
+```
+
+An adopter-first import must originate from that adopter's authoritative registry/service after its own validation, not from mirrored player fields.
+
+
 
 ## 2. Base relationship versus adopter extensions
 
@@ -310,3 +341,30 @@ Production state must first exist in a canonical Dynamic Trading/Core owner such
 TalkService then projects that already-existing state into conversation context.
 
 Tests for factual destination/origin/settlement/route/news must create the fact through the same upstream production API/path used by gameplay and then ask the question without injecting the expected answer directly into Submit options.
+
+## 9C. Canonical place identity versus dialogue presentation
+
+Dynamic Trading policy stores stable place identity, not presentation text.
+
+A Hoomans community or other settlement may have a machine-stable ID such as `community_<...>` and a separate human-facing name. Conversation must not concatenate canonical IDs directly into player-facing factual text.
+
+Use a bounded presentation resolver/knowledge projection:
+
+```text
+canonical settlement/community ID
+  -> owning settlement/community/world-knowledge resolver
+  -> human-facing known name
+  -> dialogue realization
+```
+
+The resolver must preserve standalone DT operation. Project Hoomans may register/provide presentation for its community IDs when installed, but DTCommon must not import Hoomans internals.
+
+If a stable ID is known but no safe presentation is available, dialogue should use bounded uncertainty or a generic description rather than expose an internal machine key.
+
+## 9D. Travel lifecycle owns destination/origin transitions
+
+Canonical factual route state must be updated by the actual gameplay lifecycle that knows the trip, not only by tests calling policy setters.
+
+For Hoomans resident excursions, PREPARING/OUTBOUND/VISITING/RETURNING_HOME/AT_HOME transitions should maintain origin, destination and current settlement coherently. Standalone DT travel/excursion owners follow the same principle.
+
+Persistence acceptance must serialize/reload the same canonical trader record/world-knowledge state used by gameplay before re-querying dialogue.

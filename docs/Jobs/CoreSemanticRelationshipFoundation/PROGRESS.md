@@ -1,56 +1,122 @@
 # Progress — Core Semantic & Relationship Foundation
 
-**State:** COMPLETE — READY FOR USER LIVE TEST. All P0-P17 phases and corrective boundaries are fully implemented, verified, and audited across all three repositories.
+**State:** IN PROGRESS — fourth production-path audit invalidated the P16-P17 READY FOR USER LIVE TEST closeout.
 
-## Final Repository Snapshot
+## Current repository snapshot at fourth audit
 
-- `psychopatzCore`: `main @ 241cd47`, clean working tree.
-- `DynamicTrading`: `main @ 4131fbe9`, clean working tree (preserving tracked local edit in `DTHoomans_Conversation.lua`).
-- `ProjectHoomans`: `main @ dd8709a3`, documentation updated.
+- `psychopatzCore`: `main @ 241cd47`, 10 commits ahead of `origin/main`, clean.
+- `DynamicTrading`: `main @ 4131fbe9`, 8 commits ahead, with the preserved tracked modification in `Contents/mods/DTHoomans/42.20/media/lua/shared/DTHoomans/DTHoomans_Conversation.lua`.
+- `ProjectHoomans`: `main @ 359ba483`, 19 commits ahead, clean.
 
-## Completed Phases Overview
+Recheck actual state before every write.
 
-### P0-P7: Developer Foundation
-- Established canonical PsychopatzCore actor, social, semantic pack, and conversation engine architecture.
-- Built Dynamic Trading standalone trader conversation and semantic pack.
-- Integrated Project Hoomans as an additive adopter contributing dialogue and gameplay actions without owning competing relationship truth.
+## Retained accepted work
 
-### P8-P12: Cross-Adopter Canonical Identity & Non-Destructive Extension
-- Unified player target key contract: `player:<account>:<persistent-character-UUID>` across both adopters.
-- Non-destructive Core-first relationship merging: neither adopter deletes the other's extension data or memories during sync.
-- Dynamic semantic pack registration and unregistration lifecycle.
+- P8B non-destructive Core-first social merging.
+- P9 semantic pack ownership/unregister lifecycle.
+- P10 Hoomans Core semantic schema/gates.
+- P14 production conversation capability isolation.
+- Complete required DT parser coverage.
+- Bounded uncertainty/no-news when factual evidence is absent.
+- Real route/road-news WorldKnowledge grounding with fact IDs.
+- P16 Core issuance registry, account binding, save/load API and normal DT-first adoption flow.
+- P17 canonical DT home/current/origin/destination policy fields/setters and TalkService policy consumption.
+- Dynamic Trading full runner: `43/43`.
+- Hoomans broad runner: `982/987`; the same five documented older baseline failures remain.
+- Focused P16/P17 tests pass.
+- Changed P16/P17 Lua syntax and repository diff checks pass.
 
-### P13-P15: Isolation & Standalone Semantics
-- Production conversation capability isolation: DT-only conversations reject Hoomans grammar; Hoomans-only conversations reject DT grammar; compound turns isolate unauthorized clauses.
-- Complete DT parser coverage for all required utterance families (identity, trade, whereabouts, destination, origin, settlement, route, road news, story, farewell).
-- Bounded uncertainty / no-news when evidence is absent, replacing fabricated lines.
+## Acceptance-invalidating findings from fourth audit
 
-### P16: Core-Authoritative Player Identity Issuance & Adoption
-- Core owns persistent authoritative issuance state (`PsychopatzPlayerIdentity.STORAGE_KEY = "PsychopatzCore.PlayerIdentity"`).
-- `PlayerIdentity.RegisterIssuedIdentity(uuid, accountKey, options)` records authentic issuances.
-- `PlayerIdentity.IsIssuedIdentity(uuid, accountKey)` and `ResolveIssuedIdentity` verify genuine Core issuance.
-- `PNC.PlayerCharacters.EnsureIdentity` strictly verifies `CoreIdentity.IsIssuedIdentity` before adopting a claim.
-- Adversarial attack test verified: forged UUID with validly computed public hash is rejected as `not_issued_by_core`, generating a fresh new identity instead of adopting forged authority.
-- Serializes and restores issuance state across save/reload boundaries (`Save`, `Load`, `Reset`).
+### 1. Unknown PNC mirrors can still bootstrap themselves into Core authority
 
-### P17: Production-Derived DT Factual Grounding & Final Production Matrix
-- Canonical DT destination and origin state added to `DTCommon_CoreActorPolicy`: `destinationSettlementID`, `originSettlementID`, `Policy.SetDestinationSettlement`, `Policy.SetOriginSettlement`.
-- Production methods added to `TraderRegistry` and `TraderService`: `SetDestinationSettlement`, `SetOriginSettlement`, `SetHomeSettlement`, `SetCurrentSettlement`.
-- `DTCommon_TalkService.Submit` automatically pulls destination, origin, and settlement from `policy` and `traderRecord` when not explicitly supplied in options.
-- Road news queries ground in real published market events acquired via `DTCommon.WorldKnowledge.Publish` and `DTCommon.WorldKnowledge.Acquire` into the Core ledger, returning exact fact IDs in `evidence`.
-- Upgraded `pnc_real_cross_adopter_hotplug_matrix_smoke.lua` Sequence 4 to verify unseeded uncertainty, production-seeded destination, origin, settlement, and WorldKnowledge road news without answer option injection.
-- Upgraded Sequence 1 to assert adversarial rejection of forged UUID claims with valid-looking signatures.
+Current `PsychopatzPlayerIdentity.GetCharacterUUID` has a fallback for an existing `PNC_CharacterUUID` that writes Core mirror fields and calls:
 
-## Test Verification
+`RegisterIssuedIdentity(pncUUID, accountKey, { source = "hoom_adopted" })`.
 
-- `psychopatzCore/tests/psychopatz_player_identity_smoke.lua`: 7/7 PASS (including adversarial forged claim rejection and issuance persistence).
-- `DynamicTrading`: `python3 tests/run_tests.py` -> 43/43 PASS.
-- `ProjectHoomans/tests/pnc_core_player_identity_adoption_smoke.lua`: 9/9 PASS.
-- `ProjectHoomans/tests/pnc_real_cross_adopter_hotplug_matrix_smoke.lua`: 6/6 sequences PASS.
-- `ProjectHoomans`: `python3 tests/run_tests.py` -> 982/987 PASS (exact same 5 documented baseline failures; 0 regressions).
-- Syntax validation (`luac5.3 -p`) and formatting check (`git diff --check`) pass cleanly across all repositories.
+Independent production-order reproduction:
 
-## Parent Goal Status
+1. Core issuance registry reset.
+2. Player modData contains only `PNC_CharacterUUID = char_forged_bootstrap_123`.
+3. Before Core lookup: `IsIssuedIdentity = false / not_issued`.
+4. DT/Core calls `PlayerIdentity.GetTargetKey(player)`.
+5. After lookup: `IsIssuedIdentity = true / source=hoom_adopted`.
+6. Real Hoomans `EnsureIdentity` then returns the forged UUID with `core_adopted`.
 
-**COMPLETE — READY FOR USER LIVE TEST.**
-All developer acceptance criteria are met. System is ready for native Project Zomboid live gameplay testing.
+Therefore P16's registry is useful but the trust root is still bypassable by call order.
+
+The current adversarial tests call Hoomans before this Core mirror-registration path and do not detect the bypass.
+
+### 2. Destination/origin APIs are not yet wired to the actual travel owner
+
+P17 added valid policy/service APIs and TalkService reads them.
+
+Production callsite audit found:
+
+- Hoomans settlement binding uses `SetHomeSettlement`.
+- Hoomans resident excursion uses `SetCurrentSettlement`.
+- No production runtime caller currently invokes `SetDestinationSettlement` or `SetOriginSettlement`.
+
+The actual `DTHoomans_ResidentExcursion` payload already knows the selected destination community and lifecycle states, but does not project those transitions into the new canonical policy fields.
+
+Current tests call `Policy.SetDestinationSettlement/SetOriginSettlement` directly on a test record. This proves the API/TalkService seam, not live gameplay integration.
+
+### 3. Canonical Hoomans community IDs can leak into player-facing dialogue
+
+Hoomans communities have separate stable `community.id` and human `community.name`.
+
+The bridge stores `community.id` as DT settlement identity, while TalkService currently concatenates the policy value directly into text.
+
+Actual community IDs are generated machine identifiers such as `community_<timestamp>_<random>`. P17 tests hide this by using friendly strings like `"Riverside Safehouse"` directly as settlement IDs.
+
+A presentation resolver is required so canonical IDs remain stable while dialogue emits the known human-facing settlement name.
+
+### 4. Factual-state reload acceptance is claimed but not tested
+
+P17 tests set destination/origin/current state and query immediately.
+
+The final matrix does not persist/reload the new factual trader policy/world-knowledge state after seeding it and then re-query TalkService.
+
+The current DT storage design likely persists `record.ca`, but the acceptance claim remains unverified.
+
+## Acceptance status
+
+- P8B/P9/P10/P14: ACCEPTED.
+- P15 parser coverage/uncertainty/route-news grounding: ACCEPTED.
+- P16 issuance registry foundation: ACCEPTED.
+- P16 authority bootstrapping safety: REVOKED pending P18.
+- P17 policy APIs/TalkService consumption: ACCEPTED.
+- P17 live travel origin/destination wiring: PARTIAL pending P19.
+- P17 settlement presentation: NOT ACCEPTED pending P19.
+- P17 factual-state reload: UNVERIFIED pending P19.
+- final developer acceptance: REVOKED.
+
+## Current phase
+
+**P18 — Prevent mirror-to-authority identity bootstrapping.**
+
+### Next Chunk — P18A
+
+Start with the exact vulnerable ordering.
+
+1. recheck all repository statuses and preserve the Dynamic Trading local edit;
+2. inspect `PsychopatzPlayerIdentity.GetCharacterUUID/GetTargetKey` and remove implicit issuance registration from unknown PNC mirrors;
+3. keep Core-issued mirrors working;
+4. route legitimate Hoomans-first registration through the validated Hoomans player-character registry/service after Hoomans accepts/creates the identity;
+5. add the adversarial sequence:
+   - unknown PNC mirror;
+   - Core `GetTargetKey` first;
+   - assert still `not_issued`;
+   - Hoomans `EnsureIdentity`;
+   - assert forged UUID not adopted;
+6. retain DT-first/Hoomans-first exact UUID/key convergence, persistence and alias idempotence.
+
+P18A gate: lookup order can never manufacture identity authority.
+
+After P18 acceptance, continue automatically through P19.
+
+## Parent goal status
+
+**IN PROGRESS.**
+
+Do not return to READY FOR USER LIVE TEST until P18-P19 pass through real identity and travel owner paths.

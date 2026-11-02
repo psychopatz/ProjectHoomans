@@ -328,3 +328,37 @@ A third independent audit on 2026-11-03 checked the P13-P15 developer-complete c
 2. **P15 production grounding gap:** destination/origin/settlement success tests inject those values directly into `TalkService.Submit`. No production caller was found providing those answer fields. A real acquired route fact grounds `what route`, but `where are you heading` remains uncertain because canonical destination/next-settlement state is not populated.
 
 These findings supersede the P13-P15 READY FOR USER LIVE TEST closeout. See ROADMAP P16-P17 and current PROGRESS.
+
+---
+
+## Fourth independent audit — P18-P19 required
+
+A fourth independent audit on 2026-11-03 checked the P16-P17 developer-complete claim against production call order and live owner wiring.
+
+### Verified positive evidence
+
+- Core's P16 issuance registry, account binding and save/load API exist.
+- Normal legitimate DT-first -> Hoomans identity adoption works.
+- P14 capability isolation remains fixed.
+- P17 policy fields/setters and TalkService policy consumption work at API level.
+- Real WorldKnowledge road-news/route facts return fact-backed responses.
+- Dynamic Trading full runner passes `43/43`.
+- Hoomans focused P16/P17 tests pass.
+- Hoomans broad runner is `982/987`, with the same five older baseline failures.
+- changed Lua syntax and `git diff --check` pass.
+
+### New acceptance-invalidating evidence
+
+1. **Mirror-to-authority bootstrap bypass:** an unknown `PNC_CharacterUUID` is not issued initially, but if Core/DT `GetTargetKey` runs first, `GetCharacterUUID` registers that mirror as `source=hoom_adopted`. Real Hoomans then accepts the forged UUID as `core_adopted`. P16 tests use the safer opposite call order.
+2. **Live destination/origin wiring missing:** no production runtime caller invokes the new destination/origin setters. The resident-excursion lifecycle already owns destination information but only updates current settlement.
+3. **Machine-ID presentation leak:** real Hoomans communities have separate machine `id` and human `name`; DT stores the ID and TalkService concatenates the raw value. Tests use friendly strings as IDs and therefore miss the live presentation problem.
+4. **Factual reload unproven:** destination/origin/current policy is queried immediately after seeding; no P17 final test persists/reloads that factual state before dialogue.
+
+### Independent bypass reproduction
+
+- before Core resolution: forged UUID -> `false / not_issued`;
+- Core `GetTargetKey` -> canonical key containing forged UUID;
+- after Core resolution: `true / source=hoom_adopted`;
+- Hoomans `EnsureIdentity` -> forged UUID / `core_adopted`.
+
+These findings supersede the P16-P17 READY FOR USER LIVE TEST closeout. See ROADMAP P18-P19 and current PROGRESS.
