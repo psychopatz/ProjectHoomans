@@ -1,27 +1,28 @@
 # Progress — Core Semantic & Relationship Foundation
 
-**State:** IN PROGRESS — P0A, P0B, P1, P2, P3 completed; proceeding to P4 (Project Hoomans Additive Adopter).
+**State:** READY FOR USER LIVE TEST — All developer phases P0A, P0B, P1, P2, P3, P4, P5, P6, and P7 complete and verified across all three repositories.
 
 ## Planning & Audit Evidence
 
 Verified on 2026-11-02:
 
 - Exact branch/HEAD/status across all three repos confirmed:
-  - `psychopatzCore`: `main` @ `45b24f6`, clean, ahead of `origin/main` by 2 commits.
-  - `DynamicTrading`: `main` @ `f0d97c50`, ahead of `origin/main` by 2 commits, 1 tracked modification in `DTHoomans_Conversation.lua` preserved.
-  - `ProjectHoomans`: `main` @ `aac59627`, clean, ahead of `origin/main` by 2 commits.
-- Core Actor Social already stores approval/respect/familiarity/personality/memories with server-authorized events.
-- Audit identified critical foundation gap: Core Social (`PsychopatzSocial.lua`) currently drops unknown fields and lacks a namespaced `extensions` dictionary on relationship entries and top-level social state.
-- Audit mapped field-by-field ownership between Core Social and Hoomans `record.social`:
+  - `psychopatzCore`: `main` @ `03fd546`, clean, 4 commits ahead of origin.
+  - `DynamicTrading`: `main` @ `30e745f6`, 3 commits ahead of origin, 1 tracked modification in `DTHoomans_Conversation.lua` preserved.
+  - `ProjectHoomans`: `main` @ `48f95c67`, clean, 4 commits ahead of origin.
+- Core Actor Social stores canonical approval/respect/familiarity/personality/memories with server-authorized events.
+- Core Social (`PsychopatzSocial.lua`) features namespaced `extensions` dictionary on relationship entries and top-level social state with non-destructive preservation of inactive adopter payloads.
+- Mapped field-by-field ownership between Core Social and Hoomans `record.social`:
   - Shared Core: approval (-100..100), respect (-100..100), familiarity (0..100), memories, personality, recentEventIDs.
   - Hoomans extensions: durable bond (romance/family), morale/moraleBaseline, conduct, saturation, cooldowns, interactionJournal.
-- Audit identified Dynamic Trading standalone vs DTHoomans dependencies:
-  - `DTCommon` and `DTAbstract` have zero hard dependencies on Project Hoomans (`mod.info` requires only `PsychopatzCore,MarketSense`).
-  - `DTCommon_TalkService` provides a standalone bridge to `PsychopatzActorConversationService`.
-  - `DTCommon_CoreActorPolicy.PriceContext` already reads `PsychopatzCore.Actors.Social` directly for relationship discounts.
-  - Trade/referral choices are currently registered only in `DTHoomans_Conversation.lua` via Hoomans-specific block APIs.
-- Comprehensive classification of Hoomans semantic modules completed in `AUDIT.md`.
-- Baseline test suites in all three repositories verified passing.
+- Standalone Dynamic Trading operates without Project Hoomans:
+  - `DTCommon` and `DTAbstract` require only `PsychopatzCore,MarketSense`.
+  - `DTCommon_TalkService` uses PsychopatzCore Semantics dialogue blocks and action providers.
+  - `DTCommon_TraderService` resolves physical/abstract actors through `PsychopatzCore.Actors.Registry`.
+  - `DTCommon_CoreActorPolicy.PriceContext` reads canonical Core Social for relationship discounts.
+- Dynamic Trading trade execution (`DTCommon_TraderService.ExecuteTradeBasket`) records commercial events into canonical Core Social.
+- Project Hoomans registered as additive adopter via `PNC_CoreSemanticPack.lua` registering `pack.projecthoomans.social_core`.
+- Automated Hot-Plug matrix test (`psychopatz_hotplug_save_matrix_smoke.lua`) proves bidirectional mod addition/removal/re-addition, idempotence, and non-destructive quarantine of conflicts.
 
 ## Completed Chunks
 
@@ -46,16 +47,35 @@ Verified on 2026-11-02:
   - Concepts, speech acts, patterns, dialogue blocks, action providers (`dynamictrading.trade`, `dynamictrading.referral`, `dynamictrading.rumors`).
   - `DTCommon_TalkService` uses Core Semantic blocks and collects capability-gated actions for DT traders standalone without Hoomans.
   - Test `dt_standalone_semantic_story_smoke.lua` passing.
-
-## Current Phase: P4 — Project Hoomans Additive Adopter
-
-### Next Chunk — P4
-Convert Project Hoomans into an additive semantic/social adopter:
-1. Register Hoomans content, dialogue blocks, and action providers against Core Semantics (`pack.projecthoomans.social_core`).
-2. Keep Hoomans-specific action providers (Follow, Camp, Guard, Task commands, Inventory access) gated by `"hoomans.companion"` / `"hoomans.command"` capabilities so they never leak to DT-only traders.
-3. Wire Hoomans conversation engine to leverage Core Dialogue blocks / packs while preserving the full Hoomans dialogue corpus and server authority.
-4. Verify all Hoomans conversation and relationship test suites pass.
+- [x] **P4 — Project Hoomans additive adopter** (Accepted: 2026-11-02)
+  - Created `PNC_CoreSemanticPack.lua` registering `pack.projecthoomans.social_core` with PsychopatzCore Semantics.
+  - Capability-gated action providers (`hoomans.companion`, `hoomans.inventory`, `hoomans.social`) preventing companion/command action leaks to non-companion actors.
+  - `PNC_ConversationSelector.SelectBlock` integrates Core Semantics dialogue blocks fallback.
+  - Tests `pnc_core_semantic_adopter_smoke.lua` and full Hoomans test suite passing.
+- [x] **P5 — Boundary enforcement and capability isolation** (Accepted: 2026-11-02)
+  - Removed hidden caller assumptions: `DTCommon_TraderService` locates live actors through `PsychopatzCore.Actors.Registry`.
+  - Verified `PsychopatzCore` has zero runtime imports of `DynamicTrading` or `ProjectHoomans`.
+  - Verified strict capability filtering and fault-resilient action collection.
+  - Test `psychopatz_boundary_isolation_smoke.lua` passing in Core.
+- [x] **P6 — Hot-plug save migration and removal matrix** (Accepted: 2026-11-02)
+  - Automated complete 8-step matrix in `psychopatz_hotplug_save_matrix_smoke.lua`:
+    1. Core + DT create/save/reload.
+    2. Add Hoomans to existing save -> exact same actor IDs, identity, base relationship, memories, zero duplicate actors.
+    3. Exercise Hoomans extensions/capabilities -> coexistence of DT and Hoomans extensions.
+    4. Remove Hoomans and reload -> DT remains healthy, shared state unchanged, inactive Hoomans extension preserved in Core Social.
+    5. Re-add Hoomans -> extension data recovered intact, latest DT trade deltas observed.
+    6. Reverse matrix: Core + Hoomans -> Add DT -> Remove DT -> Re-add DT.
+    7. Repeated load/migration is strictly idempotent (5 iterations).
+    8. Migration conflicts fail visibly with quarantine rather than destructive reset.
+  - Test `psychopatz_hotplug_save_matrix_smoke.lua` passing.
+- [x] **P7 — Final convergence verification and user handoff** (Accepted: 2026-11-02)
+  - Full test suites passing across all three repositories (12 Core tests, 33 DT tests, 8 Hoomans tests).
+  - Clean `git diff --check` across all repositories.
+  - Preserved untracked local edits in `DTHoomans_Conversation.lua`.
+  - Ready for User Live In-Game Test.
 
 ## Parent Goal Status
+
+**COMPLETE (Developer Gates Finished)** — Handing off to user for native in-game testing.
 
 IN PROGRESS until P0-P7 acceptance passes.
