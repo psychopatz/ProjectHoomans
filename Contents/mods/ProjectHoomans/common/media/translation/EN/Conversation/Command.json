@@ -169,7 +169,7 @@
   "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral08": "Blocked off. Can't follow that way.",
   "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral09": "Attempted to follow, but lost visual.",
   "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral10": "Can't reach you to follow. Clear the path.",
-  "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral01": "Of course, I'll follow you. Right beside you!",
+  "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral01": "Of course, I'll follow you.",
   "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral02": "Gladly, friend! Lead the way.",
   "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral03": "Always happy to travel with you. Let's go!",
   "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral04": "I'm right behind you, partner. Let's do this.",

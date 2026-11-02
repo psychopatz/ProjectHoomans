@@ -238,7 +238,7 @@ class RuntimeParityP11ATests(SemanticLabGuiTestCase):
             try:
                 wait_until_reopened(lambda: app2.worker_ready)
                 root2.update()
-                self.assertEqual(app2.main_tabs.index(app2.main_tabs.select()), 2)
+                self.assertEqual(app2.main_tabs.index(app2.main_tabs.select()), app2.main_tabs.index(app2.log_tab))
                 self.assertEqual(
                     app2.studio_notebook.index(app2.studio_notebook.select()),
                     len(app2.studio_notebook.tabs()) - 1,

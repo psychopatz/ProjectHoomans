@@ -76,8 +76,8 @@
         "warm": [
           {
             "translations": {
-              "EN": "What are you apologizing for? You're fine.",
-              "TL": "Bakit ka humihingi ng tawad? Ayos ka lang."
+              "EN": "What are you apologizing for?",
+              "TL": "Ano ang hinihingi mo ng tawad?"
             }
           },
           {
@@ -138,8 +138,8 @@
         "terse": [
           {
             "translations": {
-              "EN": "What for?",
-              "TL": "Para saan?"
+              "EN": "What are you apologizing for?",
+              "TL": "Ano ang hinihingi mo ng tawad?"
             }
           },
           {
@@ -200,8 +200,8 @@
         "guarded": [
           {
             "translations": {
-              "EN": "What did you do?",
-              "TL": "Anong ginawa mo?"
+              "EN": "What are you apologizing for?",
+              "TL": "Ano ang hinihingi mo ng tawad?"
             }
           },
           {

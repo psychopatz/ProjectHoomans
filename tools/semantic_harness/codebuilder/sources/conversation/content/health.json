@@ -838,8 +838,8 @@
         "neutral": [
           {
             "translations": {
-              "EN": "No, I don't have a bite.",
-              "TL": "Hindi, wala akong kagat."
+              "EN": "No, I don't have a recorded bite.",
+              "TL": "Hindi, wala akong naitalang kagat."
             }
           },
           {
@@ -962,8 +962,8 @@
         "warm": [
           {
             "translations": {
-              "EN": "No, I don't have a bite. Thanks for checking.",
-              "TL": "Hindi, wala akong kagat. Salamat sa pagsuri."
+              "EN": "No, I don't have a recorded bite. Thanks for checking.",
+              "TL": "Hindi, wala akong naitalang kagat. Salamat sa pagsuri."
             }
           },
           {

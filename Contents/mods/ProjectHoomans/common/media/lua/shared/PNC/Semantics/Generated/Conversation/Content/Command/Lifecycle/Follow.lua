@@ -128,7 +128,7 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "Of course, I'll follow you. Right beside you!",
+                    ["fallback"] = "Of course, I'll follow you.",
                     ["id"] = "phrase.semantic.command.follow.queued.friendly.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedFriendlyNeutral01",
                 },

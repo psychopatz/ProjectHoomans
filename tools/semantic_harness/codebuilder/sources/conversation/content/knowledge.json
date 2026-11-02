@@ -1532,248 +1532,248 @@
         "guarded": [
           {
             "translations": {
-              "EN": "I know about that. Keep it quiet.",
-              "TL": "May alam ako tungkol diyan. Huwag mong ipagsabi."
+              "EN": "I know enough about %1.",
+              "TL": "Sapat ang alam ko tungkol sa %1."
             }
           },
           {
             "translations": {
-              "EN": "I'm aware of it, but don't shout it out loud.",
-              "TL": "Alam ko 'yan, pero huwag mong ipagsigawan."
+              "EN": "I'm aware of %1, but keep it quiet.",
+              "TL": "Alam ko ang %1, pero huwag mong ipagsabi."
             }
           },
           {
             "translations": {
-              "EN": "Yes, I know that. What of it?",
-              "TL": "Oo, alam ko 'yan. Ano naman?"
+              "EN": "I know about %1. Don't shout it out.",
+              "TL": "May alam ako sa %1. Huwag mong ipagsigawan."
             }
           },
           {
             "translations": {
-              "EN": "I have that information. Keep your voice down.",
-              "TL": "Nasa akin ang impormasyong 'yan. Hinaan mo ang boses mo."
+              "EN": "Yes, I know %1. What of it?",
+              "TL": "Oo, alam ko ang %1. Ano naman?"
             }
           },
           {
             "translations": {
-              "EN": "I know what you're referring to. Be cautious.",
-              "TL": "Alam ko ang tinutukoy mo. Mag-ingat ka."
+              "EN": "I have information on %1. Keep your voice down.",
+              "TL": "Nasa akin ang impormasyon sa %1. Hinaan mo ang boses mo."
             }
           },
           {
             "translations": {
-              "EN": "I'm familiar with that matter. Don't spread it around.",
-              "TL": "Pamilyar ako sa bagay na 'yan. Huwag mong ikalat."
+              "EN": "I know what %1 is. Be cautious.",
+              "TL": "Alam ko kung ano ang %1. Mag-ingat ka."
             }
           },
           {
             "translations": {
-              "EN": "Yes, I know. It's dangerous knowledge.",
-              "TL": "Oo, alam ko. Delikadong kaalaman 'yan."
+              "EN": "I'm familiar with %1. Don't spread it around.",
+              "TL": "Pamilyar ako sa %1. Huwag mong ikalat."
             }
           },
           {
             "translations": {
-              "EN": "I know about it. Why are you digging into this?",
-              "TL": "May alam ako diyan. Bakit mo kinakalkal 'to?"
+              "EN": "Yes, I know %1. It's dangerous knowledge.",
+              "TL": "Oo, alam ko ang %1. Delikadong kaalaman 'yan."
             }
           },
           {
             "translations": {
-              "EN": "I have that knowledge. Keep it between us.",
-              "TL": "Alam ko 'yan. Atin-atin lang 'to."
+              "EN": "I know about %1. Keep it between us.",
+              "TL": "May alam ako tungkol sa %1. Atin-atin lang 'to."
             }
           },
           {
             "translations": {
-              "EN": "Yes, I'm aware. Don't bring trouble our way.",
-              "TL": "Oo, alam ko. Huwag kang magdala ng gulo sa atin."
+              "EN": "Yes, I'm aware of %1. Don't bring trouble our way.",
+              "TL": "Oo, alam ko ang tungkol sa %1. Huwag kang magdala ng gulo sa atin."
             }
           }
         ],
         "neutral": [
           {
             "translations": {
-              "EN": "Yes, I know about that.",
-              "TL": "Oo, may alam ako tungkol diyan."
+              "EN": "I know about %1.",
+              "TL": "May alam ako tungkol sa %1."
             }
           },
           {
             "translations": {
-              "EN": "I'm familiar with that information.",
-              "TL": "Pamilyar ako sa impormasyong iyon."
+              "EN": "Yes, I know about %1.",
+              "TL": "Oo, may alam ako tungkol sa %1."
             }
           },
           {
             "translations": {
-              "EN": "I have knowledge of that subject.",
-              "TL": "May kaalaman ako sa paksang 'yan."
+              "EN": "I'm familiar with %1.",
+              "TL": "Pamilyar ako sa %1."
             }
           },
           {
             "translations": {
-              "EN": "Yes, I understand what you're talking about.",
-              "TL": "Oo, nauunawaan ko ang sinasabi mo."
+              "EN": "I have knowledge of %1.",
+              "TL": "May kaalaman ako sa %1."
             }
           },
           {
             "translations": {
-              "EN": "I'm aware of those details.",
-              "TL": "Alam ko ang mga detalyeng 'yon."
+              "EN": "Yes, I understand about %1.",
+              "TL": "Oo, nauunawaan ko ang tungkol sa %1."
             }
           },
           {
             "translations": {
-              "EN": "I know the situation you mean.",
-              "TL": "Alam ko ang sitwasyong tinutukoy mo."
+              "EN": "I'm aware of %1.",
+              "TL": "Batid ko ang tungkol sa %1."
             }
           },
           {
             "translations": {
-              "EN": "That information is known to me.",
-              "TL": "Batid ko ang impormasyong iyon."
+              "EN": "I know the situation with %1.",
+              "TL": "Alam ko ang sitwasyon sa %1."
             }
           },
           {
             "translations": {
-              "EN": "Yes, I've learned about that already.",
-              "TL": "Oo, nalaman ko na 'yan noon pa."
+              "EN": "Information on %1 is known to me.",
+              "TL": "Batid ko ang impormasyon sa %1."
             }
           },
           {
             "translations": {
-              "EN": "I have that on good authority.",
-              "TL": "Maaasahan ang kaalaman ko tungkol diyan."
+              "EN": "Yes, I've learned about %1 already.",
+              "TL": "Oo, nalaman ko na ang tungkol sa %1 noon pa."
             }
           },
           {
             "translations": {
-              "EN": "I know about it. What would you like to know?",
-              "TL": "May alam ako diyan. Ano ang gusto mong malaman?"
+              "EN": "I have reliable word on %1.",
+              "TL": "Maaasahan ang balita ko tungkol sa %1."
             }
           }
         ],
         "terse": [
           {
             "translations": {
-              "EN": "I know.",
-              "TL": "Alam ko."
+              "EN": "I know %1.",
+              "TL": "Alam ko ang %1."
             }
           },
           {
             "translations": {
-              "EN": "Aware.",
-              "TL": "Batid ko."
+              "EN": "Know it: %1.",
+              "TL": "Alam ko: %1."
             }
           },
           {
             "translations": {
-              "EN": "Familiar.",
-              "TL": "Pamilyar."
+              "EN": "Aware of %1.",
+              "TL": "Batid ang %1."
             }
           },
           {
             "translations": {
-              "EN": "Yes.",
-              "TL": "Oo."
+              "EN": "Familiar with %1.",
+              "TL": "Pamilyar sa %1."
             }
           },
           {
             "translations": {
-              "EN": "Heard of it.",
-              "TL": "Narinig ko na."
+              "EN": "Yes, %1.",
+              "TL": "Oo, %1."
             }
           },
           {
             "translations": {
-              "EN": "Got that info.",
-              "TL": "Alam ko na 'yan."
+              "EN": "Heard of %1.",
+              "TL": "Narinig ang %1."
             }
           },
           {
             "translations": {
-              "EN": "Understood.",
-              "TL": "Naintindihan."
+              "EN": "Got info on %1.",
+              "TL": "May balita sa %1."
             }
           },
           {
             "translations": {
-              "EN": "Already know.",
-              "TL": "Alam na."
+              "EN": "Understood: %1.",
+              "TL": "Naintindihan: %1."
             }
           },
           {
             "translations": {
-              "EN": "Know it.",
-              "TL": "Batid."
+              "EN": "Already know %1.",
+              "TL": "Alam na ang %1."
             }
           },
           {
             "translations": {
-              "EN": "Clear on that.",
-              "TL": "Malinaw 'yan."
+              "EN": "Clear on %1.",
+              "TL": "Malinaw sa %1."
             }
           }
         ],
         "warm": [
           {
             "translations": {
-              "EN": "Yes, I know about that! Glad you asked.",
-              "TL": "Oo, may alam ako tungkol diyan! Mabuti at nagtanong ka."
+              "EN": "I know about %1.",
+              "TL": "May alam ako tungkol sa %1."
             }
           },
           {
             "translations": {
-              "EN": "I'm happy to share what I know about that with you.",
-              "TL": "Masaya akong ibahagi sa'yo kung ano ang nalalaman ko."
+              "EN": "Yes, I know about %1! Glad you asked.",
+              "TL": "Oo, may alam ako tungkol sa %1! Mabuti at nagtanong ka."
             }
           },
           {
             "translations": {
-              "EN": "I do know about that, friend. Let's discuss it.",
-              "TL": "May alam ako diyan, kaibigan. Pag-usapan natin."
+              "EN": "I'm happy to share what I know about %1.",
+              "TL": "Masaya akong ibahagi sa'yo kung ano ang nalalaman ko sa %1."
             }
           },
           {
             "translations": {
-              "EN": "I'm quite familiar with that topic. What would you like to know?",
-              "TL": "Pamilyar ako sa paksang 'yan. Ano'ng gusto mong malaman?"
+              "EN": "I do know about %1, friend. Let's discuss it.",
+              "TL": "May alam ako sa %1, kaibigan. Pag-usapan natin."
             }
           },
           {
             "translations": {
-              "EN": "Yes, I've got some good knowledge on that.",
-              "TL": "Oo, may magandang kaalaman ako tungkol diyan."
+              "EN": "I'm quite familiar with %1. What would you like to know?",
+              "TL": "Pamilyar ako sa %1. Ano'ng gusto mong malaman?"
             }
           },
           {
             "translations": {
-              "EN": "I know that well! Always happy to talk it through.",
-              "TL": "Alam na alam ko 'yan! Laging masayang pag-usapan."
+              "EN": "Yes, I've got good knowledge on %1.",
+              "TL": "Oo, may magandang kaalaman ako tungkol sa %1."
             }
           },
           {
             "translations": {
-              "EN": "I can definitely help fill you in on that.",
-              "TL": "Tiyak na matutulungan kitang maunawaan 'yan."
+              "EN": "I know %1 well! Always happy to talk it through.",
+              "TL": "Alam na alam ko ang %1! Laging masayang pag-usapan."
             }
           },
           {
             "translations": {
-              "EN": "I know about that matter. I'm all ears if you have questions.",
-              "TL": "May alam ako sa bagay na 'yan. Nakikinig ako kung may mga tanong ka."
+              "EN": "I can definitely fill you in on %1.",
+              "TL": "Tiyak na matutulungan kita tungkol sa %1."
             }
           },
           {
             "translations": {
-              "EN": "Yes, I'm well acquainted with it, my friend.",
-              "TL": "Oo, kabisado ko 'yan, kaibigan."
+              "EN": "I know about %1, happy to answer your questions.",
+              "TL": "May alam ako sa %1, masayang sagutin ang mga tanong mo."
             }
           },
           {
             "translations": {
-              "EN": "I know that one! Let's talk about it together.",
-              "TL": "Alam ko 'yan! Sabay nating pag-usapan."
+              "EN": "Yes, I'm well acquainted with %1, my friend.",
+              "TL": "Oo, kabisado ko ang %1, kaibigan."
             }
           }
         ]
@@ -1848,8 +1848,8 @@
         "neutral": [
           {
             "translations": {
-              "EN": "I don't know anything about that.",
-              "TL": "Wala akong alam tungkol diyan."
+              "EN": "I don't have reliable information about that.",
+              "TL": "Wala akong maaasahang impormasyon tungkol diyan."
             }
           },
           {

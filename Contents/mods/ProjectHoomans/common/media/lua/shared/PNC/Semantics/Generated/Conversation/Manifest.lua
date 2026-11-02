@@ -102,7 +102,7 @@ return {
             ["sourceShard"] = "content/command/lifecycle/camp.json",
         },
         {
-            ["bytes"] = 23929,
+            ["bytes"] = 23911,
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/Follow",
@@ -443,7 +443,7 @@ return {
             ["sourceShard"] = "content/greeting.json",
         },
         {
-            ["bytes"] = 76874,
+            ["bytes"] = 76892,
             ["domain"] = "health",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Health",
@@ -459,7 +459,7 @@ return {
             ["sourceShard"] = "content/health.json",
         },
         {
-            ["bytes"] = 97394,
+            ["bytes"] = 97215,
             ["domain"] = "knowledge",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Knowledge",
@@ -947,7 +947,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/sexual.json",
         },
         {
-            ["bytes"] = 48498,
+            ["bytes"] = 48518,
             ["domain"] = "apology",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/SocialApology",
@@ -1066,7 +1066,7 @@ return {
             ["sourceShard"] = "content/task/lifecycle/refill.json",
         },
         {
-            ["bytes"] = 16356,
+            ["bytes"] = 16362,
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/WaitAt",
@@ -2968,5 +2968,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "23e1e804506abd5a5317a51fbc6697475ba234b537ae47b3e601484ee99f2563",
+    ["wholeModelFingerprint"] = "54c1b7c64f3c4154ed62c02c69a7f72a0bb548495f9f15f4c9677027020ffc4d",
 }

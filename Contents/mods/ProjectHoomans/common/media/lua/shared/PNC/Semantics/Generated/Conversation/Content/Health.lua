@@ -708,7 +708,7 @@ return {
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "No, I don't have a bite.",
+                    ["fallback"] = "No, I don't have a recorded bite.",
                     ["id"] = "phrase.semantic.question.medical_bite.negative.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral01",
                 },
@@ -812,7 +812,7 @@ return {
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "No, I don't have a bite. Thanks for checking.",
+                    ["fallback"] = "No, I don't have a recorded bite. Thanks for checking.",
                     ["id"] = "phrase.semantic.question.medical_bite.negative.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeWarm01",
                 },

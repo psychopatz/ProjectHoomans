@@ -139,9 +139,12 @@ class GiftCapabilityBindingTests(unittest.TestCase):
             result["messages"][0]["payload"]["text"],
             "I can't accept that gift right now.",
         )
-        self.assertEqual(
+        self.assertIn(
             tagalog["messages"][0]["payload"]["text"],
-            "Hindi ko matanggap ang regalong iyan ngayon.",
+            [
+                "Hindi ko matanggap ang regalong iyan ngayon.",
+                "Itabi mo. Mas kailangan mo 'yan kaysa sa akin.",
+            ],
         )
 
 

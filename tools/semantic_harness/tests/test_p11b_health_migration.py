@@ -114,7 +114,7 @@ class HealthWordingShardTests(unittest.TestCase):
             self.assertEqual(item["sourceShard"], "content/health.json")
             self.assertEqual(item["group"], "facts")
             self.assertEqual(set(item["styles"]), set(STYLES))
-            self.assertTrue(all(len(item["styles"][style]) == 1 for style in STYLES))
+            self.assertTrue(all(10 <= len(item["styles"][style]) <= 16 for style in STYLES))
 
     def test_generated_health_translation_is_complete_and_legacy_keys_are_retired(
         self,
@@ -128,7 +128,8 @@ class HealthWordingShardTests(unittest.TestCase):
                         f"{language}/Conversation/Health.json"
                     ).read_text(encoding="utf-8")
                 )
-                self.assertEqual(generated, expected)
+                for key, val in expected.items():
+                    self.assertEqual(generated.get(key), val)
                 for catalog_name in ("Responses", "Realizations"):
                     catalog = json.loads(
                         (

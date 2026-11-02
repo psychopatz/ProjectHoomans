@@ -8,7 +8,7 @@ return {
         ["styles"] = {
             ["guarded"] = {
                 {
-                    ["fallback"] = "What did you do?",
+                    ["fallback"] = "What are you apologizing for?",
                     ["id"] = "phrase.semantic.social.apology.default.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultGuarded01",
                 },
@@ -112,7 +112,7 @@ return {
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "What for?",
+                    ["fallback"] = "What are you apologizing for?",
                     ["id"] = "phrase.semantic.social.apology.default.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultTerse01",
                 },
@@ -164,7 +164,7 @@ return {
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "What are you apologizing for? You're fine.",
+                    ["fallback"] = "What are you apologizing for?",
                     ["id"] = "phrase.semantic.social.apology.default.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialApologyDefaultWarm01",
                 },

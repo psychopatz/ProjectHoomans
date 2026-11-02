@@ -68,7 +68,7 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I'll wait there.",
+                    ["fallback"] = "Okay, I'll wait there.",
                     ["id"] = "phrase.semantic.task.wait_at.admitted.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticTaskWaitAtAdmittedNeutral01",
                 },
