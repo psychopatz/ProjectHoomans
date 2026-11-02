@@ -223,6 +223,15 @@ T.equal(hAdoptReason, "core_adopted", "Reason was core_adopted")
 local hAliceKey = PNC.PlayerCharacters.GetEntityKey(playerAlice)
 T.equal(hAliceKey, aliceCanonicalKey, "Real Hoomans entity key exactly equals Core canonical key")
 
+-- Adversarial check: forged UUID with valid-looking signature is rejected because not issued by Core
+local forgedPlayer, forgedModData = makePlayer("Mallory", nil, { playerNum = 2 })
+local forgedUUID = "char_mallory_forged_99999999"
+forgedModData.PNC_CharacterUUID = forgedUUID
+forgedModData.PNC_IdentityProvenance = PlayerIdentity.SignProvenance(forgedPlayer, forgedUUID, "sp_slot_2")
+local forgedAdopted, forgedReason = PNC.PlayerCharacters.EnsureIdentity(forgedPlayer)
+T.truthy(forgedAdopted ~= forgedUUID, "Adversary forged UUID rejected by EnsureIdentity")
+T.equal(forgedReason, "new_identity", "Fresh identity created instead of core_adopted")
+
 -- Hoomans registers semantic pack
 PNC.Semantics.CoreSemanticPack.Register(PsychopatzCore)
 
@@ -547,22 +556,7 @@ DTCommon.TraderService = DTCommon.TraderService or {}
 DTCommon.TraderService.GetRecord = function(id) return testTraderRecord end
 DTCommon.TraderService.ValidateTalkAccess = function() return true end
 
--- 4A: Seeded whereabouts query returns grounded text containing 'Rosewood'
-do
-    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
-    T.truthy(session, sessionReason)
-    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "where are you going", {
-        mode = "radio",
-        requestID = "turn-where-grounded",
-        destination = "Rosewood Outpost",
-    })
-    T.truthy(turn and turn.result and turn.result.responses[1], turnErr)
-    local replyText = turn.result.responses[1].text
-    T.truthy(string.find(replyText, "Rosewood"), "Whereabouts contains grounded destination 'Rosewood'")
-    print("PASS: Seeded destination query grounded with evidence: " .. replyText)
-end
-
--- 4B: Unseeded whereabouts query returns bounded uncertainty
+-- 4A: Unseeded whereabouts query returns bounded uncertainty
 do
     local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
     T.truthy(session, sessionReason)
@@ -576,28 +570,53 @@ do
     print("PASS: Unseeded destination query returns bounded uncertainty: " .. replyText)
 end
 
--- 4C: Seeded road news query returns grounded news
+-- 4B: Seeded destination in production Policy state returns grounded text containing 'Rosewood'
 do
+    DTPolicy.SetDestinationSettlement(testTraderRecord, "Rosewood Outpost")
     local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
     T.truthy(session, sessionReason)
-    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "road news", {
+    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "where are you going", {
         mode = "radio",
-        requestID = "turn-news-grounded",
-        npcGossip = {
-            statements = { "The highway through West Point is swarming with bandits." },
-            factRefs = { "fact:report_seq4_news" },
-        },
+        requestID = "turn-where-grounded",
     })
     T.truthy(turn and turn.result and turn.result.responses[1], turnErr)
     local replyText = turn.result.responses[1].text
-    T.truthy(string.find(replyText, "swarming with bandits"), "Road news grounded in WorldKnowledge report")
-    print("PASS: Seeded road news query grounded with active report: " .. replyText)
+    T.truthy(string.find(replyText, "Rosewood"), "Whereabouts contains grounded destination 'Rosewood'")
+    print("PASS: Production-seeded destination query grounded without answer injection: " .. replyText)
 end
 
--- 4D: Unseeded road news query returns bounded fallback
+-- 4C: Seeded origin in production Policy state returns grounded text
 do
-    local wk = DTCommon.WorldKnowledge
-    wk.Reports = {} -- Clear active reports
+    DTPolicy.SetOriginSettlement(testTraderRecord, "March Ridge Depot")
+    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
+    T.truthy(session, sessionReason)
+    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "where did you come from", {
+        mode = "radio",
+        requestID = "turn-orig-grounded",
+    })
+    T.truthy(turn and turn.result and turn.result.responses[1], turnErr)
+    local replyText = turn.result.responses[1].text
+    T.truthy(string.find(replyText, "March Ridge Depot"), "Origin contains grounded text 'March Ridge Depot'")
+    print("PASS: Production-seeded origin query grounded without answer injection: " .. replyText)
+end
+
+-- 4D: Seeded settlement in production Policy state returns grounded text
+do
+    DTPolicy.SetCurrentSettlement(testTraderRecord, "Riverside Safehouse")
+    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
+    T.truthy(session, sessionReason)
+    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "where is the settlement", {
+        mode = "radio",
+        requestID = "turn-sett-grounded",
+    })
+    T.truthy(turn and turn.result and turn.result.responses[1], turnErr)
+    local replyText = turn.result.responses[1].text
+    T.truthy(string.find(replyText, "Riverside Safehouse"), "Settlement contains grounded text 'Riverside Safehouse'")
+    print("PASS: Production-seeded settlement query grounded without answer injection: " .. replyText)
+end
+
+-- 4E: Unseeded road news query returns bounded fallback
+do
     local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
     T.truthy(session, sessionReason)
     local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "road news", {
@@ -610,7 +629,39 @@ do
     print("PASS: Unseeded road news returns bounded fallback")
 end
 
--- 4E: Storytelling returns rich non-factual narrative
+-- 4F: Grounded road news from real published WorldKnowledge fact
+do
+    local publishedFact, pubErr = DTCommon.WorldKnowledge.Publish({
+        factID = "fact:report_seq4_news",
+        kind = "market.event",
+        subject = { id = "westpoint", kind = "settlement" },
+        payload = {
+            eventType = "BANDIT RAID",
+            marketID = "westpoint",
+        },
+    })
+    T.truthy(publishedFact, pubErr)
+    local acquired, acqErr = DTCommon.WorldKnowledge.Acquire(testTraderRecord.id, "fact:report_seq4_news", {
+        authorized = true,
+        provenance = "witnessed",
+        confidence = 90,
+    })
+    T.truthy(acquired, acqErr)
+
+    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
+    T.truthy(session, sessionReason)
+    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "road news", {
+        mode = "radio",
+        requestID = "turn-news-grounded",
+    })
+    T.truthy(turn and turn.result and turn.result.responses[1], turnErr)
+    local resp = turn.result.responses[1]
+    T.equal(resp.evidence, "fact:report_seq4_news", "Exact fact ID attached as evidence")
+    T.truthy(string.find(resp.text, "BANDIT RAID"), "Road news grounded in real published WorldKnowledge event")
+    print("PASS: Production WorldKnowledge road news query grounded with active report: " .. resp.text)
+end
+
+-- 4G: Storytelling returns rich non-factual narrative
 do
     local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
     T.truthy(session, sessionReason)
