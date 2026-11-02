@@ -51,6 +51,39 @@ local function reuseIdentity(
     return record.uuid, "reused"
 end
 
+local function canAdoptCoreIdentity(player, claimedUUID, accountKey)
+    if not player or not claimedUUID or not accountKey then
+        return false, "missing_parameters"
+    end
+    local normalized = Types.NormalizeUUID(claimedUUID)
+    if not normalized then
+        return false, "malformed_uuid"
+    end
+    if PlayerCharacters.Registry.byUUID[normalized] then
+        return false, "already_registered"
+    end
+    local boundPlayer = PlayerCharacters.RuntimeByUUID[normalized]
+    if boundPlayer and boundPlayer ~= player then
+        return false, "duplicate_live_binding"
+    end
+    local CoreIdentity = PsychopatzCore and PsychopatzCore.PlayerIdentity
+        or (function()
+            local ok, mod = pcall(require, "PsychopatzCore/Actors/PsychopatzPlayerIdentity")
+            return ok and mod or nil
+        end)()
+    if not CoreIdentity or type(CoreIdentity.VerifyProvenance) ~= "function" then
+        return false, "core_identity_unavailable"
+    end
+    local ok, verifyReason = CoreIdentity.VerifyProvenance(player, normalized, accountKey)
+    if not ok then
+        return false, verifyReason or "untrusted_core_provenance"
+    end
+    return true, "core_adoptable"
+end
+
+Internal.canAdoptCoreIdentity = canAdoptCoreIdentity
+PlayerCharacters.CanAdoptCoreIdentity = canAdoptCoreIdentity
+
 function PlayerCharacters.EnsureIdentity(player, context)
     local at = worldAgeHours(
         type(context) == "table" and context.worldAgeHours or nil
@@ -103,6 +136,25 @@ function PlayerCharacters.EnsureIdentity(player, context)
         return reuseIdentity(
             player, record, accountKey, at, callback,
             "validated_claim", true)
+    end
+    if claimedUUID ~= nil and reason == "unknown_uuid" then
+        local adoptable, adoptReason = canAdoptCoreIdentity(player, claimedUUID, accountKey)
+        if adoptable then
+            uuid, reason = createIdentity(player, accountKey, at, claimedUUID)
+            if uuid then
+                logIdentity({
+                    callback = callback,
+                    accountKey = accountKey,
+                    characterUUID = uuid,
+                    status = Constants.STATUS_ACTIVE,
+                    worldAgeHours = at,
+                    onlineID = onlineIDFor(player),
+                    result = "adopted",
+                    reason = "core_provenance",
+                })
+                return uuid, "core_adopted"
+            end
+        end
     end
     if claimedUUID ~= nil then
         logIdentity({

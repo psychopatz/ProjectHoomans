@@ -19,14 +19,20 @@ local incrementRegistryRevision = Internal.incrementRegistryRevision
 local indexRecord = Internal.indexRecord
 local bind = Internal.bind
 
-local function createIdentity(player, accountKey, at)
+local function createIdentity(player, accountKey, at, existingUUID)
     local uuid
     local reason
     local info
     local record
-    uuid, reason = PlayerCharacters.GenerateUUID()
-    if not uuid then
-        return nil, reason
+    if existingUUID then
+        uuid = existingUUID
+        reason = "core_adoption"
+    else
+        uuid, reason = PlayerCharacters.GenerateUUID()
+        if not uuid then
+            return nil, reason
+        end
+        reason = "new_identity"
     end
     info = informationalFields(player)
     record = Types.NewCharacterRecord({
@@ -50,7 +56,7 @@ local function createIdentity(player, accountKey, at)
     incrementRegistryRevision()
     setMirror(player, uuid, accountKey)
     bind(player, uuid, accountKey)
-    return uuid, "new_identity"
+    return uuid, reason
 end
 
 

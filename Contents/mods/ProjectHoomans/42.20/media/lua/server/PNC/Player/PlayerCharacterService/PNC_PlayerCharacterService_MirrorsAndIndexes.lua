@@ -24,6 +24,8 @@ local function setMirror(player, uuid, accountKey)
     data[Constants.MODDATA_VERSION_FIELD] =
         Constants.IDENTITY_VERSION
     data[Constants.MODDATA_ACCOUNT_KEY_FIELD] = accountKey
+    data["Core_CharacterUUID"] = uuid
+    data["Core_CharacterAccountKey"] = accountKey
     return true
 end
 
