@@ -46,4 +46,6 @@ Also inspect the accepted Core foundation docs under `psychopatzCore/Docs/npc_fo
 
 ## Completion state
 
-Developer-side completion requires the full roadmap and acceptance matrix. Native Project Zomboid SP/MP validation remains user-owned unless explicitly reassigned. Steam Workshop publication is never implied by Git completion.
+**Current state: IN PROGRESS.** An independent post-P7 audit invalidated the earlier READY FOR USER LIVE TEST claim. The existing P0-P7 implementation is retained, but mandatory corrective P8-P12 work must close canonical player identity, non-destructive relationship writes, semantic pack lifecycle, Hoomans adopter schema/integration, standalone DT coverage and real adopter hot-plug acceptance.
+
+Developer-side completion requires the full current roadmap and acceptance matrix. Native Project Zomboid SP/MP validation remains user-owned unless explicitly reassigned. Steam Workshop publication is never implied by Git completion.

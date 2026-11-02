@@ -37,6 +37,14 @@ Each change belongs to its canonical owner:
 
 Do not solve coupling by copying the same state or parser into multiple repositories.
 
+## Cross-adopter relationship write safety
+
+Treat Core Social as live canonical state. Do not commit a complete social snapshot reconstructed from an adopter-local cache if another adopter may have changed Core since that cache was produced.
+
+Use Core-owned target identity and bounded mutation/merge APIs. Preserve foreign extensions and memories by construction. Add adversarial interleaving tests whenever a relationship write path changes.
+
+Do not swallow a failed canonical relationship write with `pcall` and continue as though the mutation was durable.
+
 ## Migration discipline
 
 Migrations must be versioned, idempotent, non-destructive and retry-safe.
@@ -58,6 +66,8 @@ For each phase run:
 - `git diff --check`.
 
 Explicitly distinguish synthetic/headless acceptance from native Project Zomboid acceptance.
+
+Synthetic payload preservation is not cross-adopter acceptance. Hot-plug gates must load and exercise the actual production adapters/services for each adopter and interleave their real writes.
 
 No native PZ launch, Workshop upload, republish or destructive save manipulation unless explicitly authorized by the user.
 

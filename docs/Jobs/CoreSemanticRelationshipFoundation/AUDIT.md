@@ -249,3 +249,29 @@ Inventory of Hoomans semantic and conversation subsystems grouped by role:
   - `python3 tests/run_tests.py pnc_conversation_smoke --jobs 1` -> PASS
   - `python3 tests/run_tests.py pnc_conversation_authority_smoke --jobs 1` -> PASS
   - `python3 tests/run_tests.py pnc_conversation_category_eligibility_smoke --jobs 1` -> PASS
+---
+
+## Post-P7 independent verification — acceptance reopened
+
+A second source/test audit on 2026-11-02 checked the agent's completion claim against current production code and adversarial probes.
+
+### Verified repository/test state
+
+- Core `03fd546`: clean, ahead 4.
+- DynamicTrading `30e745f6`: ahead 3; the pre-existing tracked `DTHoomans_Conversation.lua` edit remains preserved.
+- ProjectHoomans `aa9895ca`: clean, ahead 5.
+- Dynamic Trading full suite: `43/43`.
+- Hoomans focused new tests: `2/2` under the intended runner.
+- Hoomans broad suite: `978/984`; `pnc_composition_bootstrap_smoke` is directly stale because of this job's new composition import, while the other five failures predate this job's touched files and require baseline classification.
+- Changed runtime Lua parses with `luac5.3 -p`; changed committed diffs pass `git diff --check`.
+
+### Acceptance-invalidating evidence
+
+1. **Player identity fork:** DT uses `player:online:<id>` / `player:user:<name>`; Hoomans uses persistent `player:<account>:<characterUUID>` / SP-slot + UUID. The same player can therefore receive separate Core relationships.
+2. **Destructive stale Hoomans sync:** a direct reproduction showed `SyncToCore` can report success while deleting a newer DT memory and `DynamicTrading` extension from Core.
+3. **Hoomans pack schema mismatch:** its concepts/dialogue blocks/multi-word patterns do not conform to Core's actual registry/matcher contract. A wellbeing-good block registered with no gates/nodes/text and could win at approval -100.
+4. **Semantic pack residue:** pack-level capabilities are not enforced for dialogue/parser content; unregistering the DT pack still leaves `trade` parsing as DT `TRADE`.
+5. **Incomplete standalone DT semantic coverage:** greeting/trade/rumor work, but representative identity/whereabouts utterances such as `who are you`, `where are you heading`, and `where did you come from` have no intended semantic result.
+6. **P6 test scope mismatch:** the existing hot-plug smoke manipulates Core payloads directly and does not exercise real DT/Hoomans production lifecycle/adapters.
+
+These findings supersede the earlier P7 developer-complete claim. See PROGRESS P8 and ROADMAP P8-P12.

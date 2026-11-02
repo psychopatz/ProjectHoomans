@@ -44,6 +44,16 @@ Core Actor
 
 Provider/body IDs are bindings to the Core actor, not alternative identities.
 
+## 1A. Canonical player social target identity
+
+Relationship target identity is also Core-owned.
+
+A player character must resolve to the same persistent social target key whether the active adopter set is Core-only, Dynamic Trading, Project Hoomans, or both. Transient online IDs and username-only convenience keys may be lookup aliases, but they must not become competing canonical relationship identities.
+
+Core must provide or own the durable target-key contract and alias/migration mechanism. Project Hoomans may contribute/migrate its existing persistent character UUID data, but Dynamic Trading cannot depend on Hoomans to resolve the key.
+
+Legacy keys converge into the canonical key through an idempotent merge that preserves memories, scores and every adopter extension without double-applying events.
+
 ## 2. Base relationship versus adopter extensions
 
 Core owns shared values that must survive across mods:
@@ -140,6 +150,14 @@ Only registered and eligible action providers may become executable choices.
 
 With DT only, Hoomans commands must be absent, not merely disabled after selection.
 
+## 4A. Semantic pack lifecycle
+
+A pack is an ownership/lifecycle unit, not only a grouping label.
+
+Core tracks every semantic registration owned by a pack: concepts, speech acts, patterns, context resolvers/flavors, dialogue blocks and action providers. Deactivation/unregistration must remove or disable the complete owned surface without leaving parser or dialogue residue.
+
+Pack capability/activation requirements apply to all relevant semantic surfaces, not only executable actions. Inactive adopter content must not win parser arbitration or dialogue selection.
+
 ## 5. Hot-plug and removal model
 
 ### DT first, Hoomans added later
@@ -205,6 +223,16 @@ Hoomans rescue event
 ```
 
 Core never invents the domain meaning of a trade, rescue, insult or faction action.
+
+## 7A. Core-first mutation rule
+
+Adopters never replace the complete Core Social snapshot from an adopter-local cache.
+
+Every shared relationship mutation operates against the latest canonical Core actor/social record through bounded event/patch APIs with revision/conflict handling. Adopter-local representations such as Hoomans `record.social` are projections or compatibility caches.
+
+A Hoomans write may update shared fields through Core and its own `ProjectHoomans` extension, but it must preserve `DynamicTrading` data and unrelated memories. Dynamic Trading has the symmetric restriction.
+
+Best-effort mirroring that can silently lose newer Core state is not an accepted authority boundary.
 
 ## 8. Persistence ownership
 
