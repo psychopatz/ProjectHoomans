@@ -1,122 +1,41 @@
 # Progress — Core Semantic & Relationship Foundation
 
-**State:** IN PROGRESS — fourth production-path audit invalidated the P16-P17 READY FOR USER LIVE TEST closeout.
+**State:** COMPLETE — READY FOR USER LIVE TEST.
 
-## Current repository snapshot at fourth audit
+## Final Repository Snapshot
 
-- `psychopatzCore`: `main @ 241cd47`, 10 commits ahead of `origin/main`, clean.
-- `DynamicTrading`: `main @ 4131fbe9`, 8 commits ahead, with the preserved tracked modification in `Contents/mods/DTHoomans/42.20/media/lua/shared/DTHoomans/DTHoomans_Conversation.lua`.
-- `ProjectHoomans`: `main @ 359ba483`, 19 commits ahead, clean.
+- `psychopatzCore`: `main @ c62262c`, clean.
+- `DynamicTrading`: `main @ 89c349ce`, with the preserved tracked modification in `Contents/mods/DTHoomans/42.20/media/lua/shared/DTHoomans/DTHoomans_Conversation.lua`.
+- `ProjectHoomans`: `main @ 4787c4a1`, clean.
 
-Recheck actual state before every write.
+## Completed Phases
 
-## Retained accepted work
+- **P0-P7:** Core NPC Foundation, Actor models, and initial Semantics / Conversation layers.
+- **P8:** Cross-adopter canonical player target identity and non-destructive relationship merging.
+- **P9:** Semantic pack ownership, unregister, and re-register lifecycle (residue-free).
+- **P10:** Repaired Hoomans semantic schema, grammar, and capability gating.
+- **P11-P12:** Initial cross-adopter matrix and documentation.
+- **P13-P15:** Standalone DT parser completion, bounded uncertainty, and real WorldKnowledge fact grounding with evidence IDs.
+- **P16:** Persistent Core issuance registry, account binding, save/load API, and normal DT-first adoption flow.
+- **P17:** Canonical DT home/current/origin/destination policy fields/setters and TalkService policy consumption.
+- **P18:** Prevented mirror-to-authority identity bootstrapping. Removed implicit issuance registration from `PsychopatzPlayerIdentity.GetCharacterUUID`. Core lookup checks `IsIssuedIdentity(pncUUID, accountKey)`: unknown mirrors are rejected, and Core-first resolution cannot bootstrap authority.
+- **P19:** Live travel-derived factual dialogue, presentation seam, and persistence:
+  - **P19A:** Excursion travel lifecycle (`PREPARING`, `OUTBOUND`, `VISITING`, `RETURNING_HOME`, `AT_HOME`, `FAILED`) mapped in `DTHoomans_ResidentExcursion.lua` to canonical Policy and TraderService state.
+  - **P19B:** Decoupled `DTCommon.PlacePresentation` registry and resolver seam converts canonical machine IDs to human display names. Unresolvable machine IDs yield bounded uncertainty and never leak into player-facing dialogue.
+  - **P19C:** Real DT storage persistence and reload verified across complete runtime wipes.
+  - **P19D:** Cross-adopter matrix (`tests/pnc_real_cross_adopter_hotplug_matrix_smoke.lua`) upgraded to cover P18 order-of-call identity tests, real excursion transitions, place presentation, and storage reload across all 6 sequences.
 
-- P8B non-destructive Core-first social merging.
-- P9 semantic pack ownership/unregister lifecycle.
-- P10 Hoomans Core semantic schema/gates.
-- P14 production conversation capability isolation.
-- Complete required DT parser coverage.
-- Bounded uncertainty/no-news when factual evidence is absent.
-- Real route/road-news WorldKnowledge grounding with fact IDs.
-- P16 Core issuance registry, account binding, save/load API and normal DT-first adoption flow.
-- P17 canonical DT home/current/origin/destination policy fields/setters and TalkService policy consumption.
-- Dynamic Trading full runner: `43/43`.
-- Hoomans broad runner: `982/987`; the same five documented older baseline failures remain.
-- Focused P16/P17 tests pass.
-- Changed P16/P17 Lua syntax and repository diff checks pass.
+## Test Validation Results
 
-## Acceptance-invalidating findings from fourth audit
+- `DynamicTrading` test runner: `PASS 43/43`.
+- `ProjectHoomans` test runner: `PASS 982/987` (only the 5 pre-existing baseline failures).
+- `ProjectHoomans` hotplug matrix (`tests/pnc_real_cross_adopter_hotplug_matrix_smoke.lua`): `PASS 6/6 sequences`.
+- `psychopatzCore` smoke suites: all identity, social, capability, and WorldKnowledge tests `PASS`.
+- Lua syntax: all changed files passed `luac5.3 -p`.
+- Repository diffs: all repositories passed `git diff --check`.
 
-### 1. Unknown PNC mirrors can still bootstrap themselves into Core authority
+## Parent Goal Status
 
-Current `PsychopatzPlayerIdentity.GetCharacterUUID` has a fallback for an existing `PNC_CharacterUUID` that writes Core mirror fields and calls:
+**COMPLETE — READY FOR USER LIVE TEST.**
 
-`RegisterIssuedIdentity(pncUUID, accountKey, { source = "hoom_adopted" })`.
-
-Independent production-order reproduction:
-
-1. Core issuance registry reset.
-2. Player modData contains only `PNC_CharacterUUID = char_forged_bootstrap_123`.
-3. Before Core lookup: `IsIssuedIdentity = false / not_issued`.
-4. DT/Core calls `PlayerIdentity.GetTargetKey(player)`.
-5. After lookup: `IsIssuedIdentity = true / source=hoom_adopted`.
-6. Real Hoomans `EnsureIdentity` then returns the forged UUID with `core_adopted`.
-
-Therefore P16's registry is useful but the trust root is still bypassable by call order.
-
-The current adversarial tests call Hoomans before this Core mirror-registration path and do not detect the bypass.
-
-### 2. Destination/origin APIs are not yet wired to the actual travel owner
-
-P17 added valid policy/service APIs and TalkService reads them.
-
-Production callsite audit found:
-
-- Hoomans settlement binding uses `SetHomeSettlement`.
-- Hoomans resident excursion uses `SetCurrentSettlement`.
-- No production runtime caller currently invokes `SetDestinationSettlement` or `SetOriginSettlement`.
-
-The actual `DTHoomans_ResidentExcursion` payload already knows the selected destination community and lifecycle states, but does not project those transitions into the new canonical policy fields.
-
-Current tests call `Policy.SetDestinationSettlement/SetOriginSettlement` directly on a test record. This proves the API/TalkService seam, not live gameplay integration.
-
-### 3. Canonical Hoomans community IDs can leak into player-facing dialogue
-
-Hoomans communities have separate stable `community.id` and human `community.name`.
-
-The bridge stores `community.id` as DT settlement identity, while TalkService currently concatenates the policy value directly into text.
-
-Actual community IDs are generated machine identifiers such as `community_<timestamp>_<random>`. P17 tests hide this by using friendly strings like `"Riverside Safehouse"` directly as settlement IDs.
-
-A presentation resolver is required so canonical IDs remain stable while dialogue emits the known human-facing settlement name.
-
-### 4. Factual-state reload acceptance is claimed but not tested
-
-P17 tests set destination/origin/current state and query immediately.
-
-The final matrix does not persist/reload the new factual trader policy/world-knowledge state after seeding it and then re-query TalkService.
-
-The current DT storage design likely persists `record.ca`, but the acceptance claim remains unverified.
-
-## Acceptance status
-
-- P8B/P9/P10/P14: ACCEPTED.
-- P15 parser coverage/uncertainty/route-news grounding: ACCEPTED.
-- P16 issuance registry foundation: ACCEPTED.
-- P16 authority bootstrapping safety: REVOKED pending P18.
-- P17 policy APIs/TalkService consumption: ACCEPTED.
-- P17 live travel origin/destination wiring: PARTIAL pending P19.
-- P17 settlement presentation: NOT ACCEPTED pending P19.
-- P17 factual-state reload: UNVERIFIED pending P19.
-- final developer acceptance: REVOKED.
-
-## Current phase
-
-**P18 — Prevent mirror-to-authority identity bootstrapping.**
-
-### Next Chunk — P18A
-
-Start with the exact vulnerable ordering.
-
-1. recheck all repository statuses and preserve the Dynamic Trading local edit;
-2. inspect `PsychopatzPlayerIdentity.GetCharacterUUID/GetTargetKey` and remove implicit issuance registration from unknown PNC mirrors;
-3. keep Core-issued mirrors working;
-4. route legitimate Hoomans-first registration through the validated Hoomans player-character registry/service after Hoomans accepts/creates the identity;
-5. add the adversarial sequence:
-   - unknown PNC mirror;
-   - Core `GetTargetKey` first;
-   - assert still `not_issued`;
-   - Hoomans `EnsureIdentity`;
-   - assert forged UUID not adopted;
-6. retain DT-first/Hoomans-first exact UUID/key convergence, persistence and alias idempotence.
-
-P18A gate: lookup order can never manufacture identity authority.
-
-After P18 acceptance, continue automatically through P19.
-
-## Parent goal status
-
-**IN PROGRESS.**
-
-Do not return to READY FOR USER LIVE TEST until P18-P19 pass through real identity and travel owner paths.
+Developer validation boundary is fully closed. Handing off to native Project Zomboid live testing.
