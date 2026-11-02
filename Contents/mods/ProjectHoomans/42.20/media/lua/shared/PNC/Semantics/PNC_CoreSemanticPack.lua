@@ -25,11 +25,14 @@ function Pack.Register(core)
         version = Pack.VERSION,
         capabilitiesRequired = { "hoomans.social" },
         concepts = {
-            { id = "hoomans.concept.companion", domain = "social", labels = { "companion", "follower" } },
-            { id = "hoomans.concept.command", domain = "command", labels = { "order", "task", "instruction" } },
-            { id = "hoomans.concept.settlement", domain = "social", labels = { "settlement", "home", "colony" } },
-            { id = "hoomans.concept.wellbeing", domain = "social", labels = { "health", "feeling", "morale" } },
-            { id = "hoomans.concept.gift", domain = "social", labels = { "gift", "present", "offering" } },
+            { id = "hoomans.concept.companion", domain = "social", aliases = { "companion", "follower" } },
+            { id = "hoomans.concept.command", domain = "command", aliases = { "order", "task", "instruction" } },
+            { id = "hoomans.concept.settlement", domain = "social", aliases = { "settlement", "home", "colony" } },
+            { id = "hoomans.concept.wellbeing", domain = "social", aliases = { "health", "feeling", "morale", "how are you" } },
+            { id = "hoomans.concept.gift", domain = "social", aliases = { "gift", "present", "offering" } },
+            { id = "hoomans.concept.follow", domain = "command", aliases = { "follow", "follow me", "come with me" } },
+            { id = "hoomans.concept.recruit", domain = "social", aliases = { "join me", "join us", "recruit" } },
+            { id = "hoomans.concept.camp", domain = "command", aliases = { "make camp", "camp", "rest here" } },
         },
         speechActs = {
             { id = "RECRUIT", intent = "RECRUIT", polarity = "positive", tone = "friendly" },
@@ -44,29 +47,29 @@ function Pack.Register(core)
                 id = "hoomans.pattern.recruit",
                 intent = "RECRUIT",
                 priority = 10,
-                match = { { kind = "literal", value = "join me" } },
-                emit = { intent = "RECRUIT" },
+                match = { { concept = "hoomans.concept.recruit" } },
+                emit = { intent = "RECRUIT", speechAct = "RECRUIT" },
             },
             {
                 id = "hoomans.pattern.follow",
                 intent = "COMMAND",
                 priority = 10,
-                match = { { kind = "literal", value = "follow me" } },
-                emit = { intent = "COMMAND", command = "follow" },
+                match = { { concept = "hoomans.concept.follow" } },
+                emit = { intent = "COMMAND", command = "follow", speechAct = "COMMAND" },
             },
             {
                 id = "hoomans.pattern.camp",
                 intent = "CAMP",
                 priority = 10,
-                match = { { kind = "literal", value = "make camp" } },
-                emit = { intent = "CAMP" },
+                match = { { concept = "hoomans.concept.camp" } },
+                emit = { intent = "CAMP", speechAct = "CAMP" },
             },
             {
                 id = "hoomans.pattern.wellbeing",
                 intent = "ASK_WELLBEING",
                 priority = 5,
-                match = { { kind = "literal", value = "how are you" } },
-                emit = { intent = "ASK_WELLBEING" },
+                match = { { concept = "hoomans.concept.wellbeing" } },
+                emit = { intent = "ASK_WELLBEING", speechAct = "ASK_WELLBEING" },
             },
         },
         dialogueBlocks = {
@@ -74,55 +77,80 @@ function Pack.Register(core)
                 id = "hoomans_block_greeting_friendly",
                 category = "GREETING",
                 priority = 20,
-                conditions = {
+                gates = {
                     { field = "relationship.approval", op = ">=", value = 30 },
                 },
-                outcomes = {
-                    { textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultFriendly01", weight = 100 },
+                entryNode = "opening",
+                textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultFriendly01",
+                nodes = {
+                    opening = {
+                        textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultFriendly01",
+                        choices = {},
+                    },
                 },
             },
             {
                 id = "hoomans_block_greeting_neutral",
                 category = "GREETING",
                 priority = 10,
-                conditions = {
+                gates = {
                     { field = "relationship.approval", op = ">=", value = -20 },
                 },
-                outcomes = {
-                    { textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01", weight = 100 },
+                entryNode = "opening",
+                textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
+                nodes = {
+                    opening = {
+                        textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
+                        choices = {},
+                    },
                 },
             },
             {
                 id = "hoomans_block_greeting_wary",
                 category = "GREETING",
                 priority = 15,
-                conditions = {
+                gates = {
                     { field = "relationship.approval", op = "<", value = -20 },
                 },
-                outcomes = {
-                    { textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningWary01", weight = 100 },
+                entryNode = "opening",
+                textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningWary01",
+                nodes = {
+                    opening = {
+                        textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningWary01",
+                        choices = {},
+                    },
                 },
             },
             {
                 id = "hoomans_block_wellbeing_good",
                 category = "WELLBEING",
                 priority = 10,
-                conditions = {
+                gates = {
                     { field = "relationship.approval", op = ">=", value = 20 },
                 },
-                outcomes = {
-                    { textKey = "UI_PNC_Conversation_Content_SemanticFlowWellbeingGood01", weight = 100 },
+                entryNode = "opening",
+                textKey = "UI_PNC_Conversation_Content_SemanticFlowWellbeingGood01",
+                nodes = {
+                    opening = {
+                        textKey = "UI_PNC_Conversation_Content_SemanticFlowWellbeingGood01",
+                        choices = {},
+                    },
                 },
             },
             {
                 id = "hoomans_block_wellbeing_neutral",
                 category = "WELLBEING",
                 priority = 5,
-                conditions = {
+                gates = {
                     { field = "relationship.approval", op = ">=", value = -20 },
                 },
-                outcomes = {
-                    { textKey = "UI_PNC_Conversation_Content_SemanticFlowWellbeingNeutral01", weight = 100 },
+                entryNode = "opening",
+                textKey = "UI_PNC_Conversation_Content_SemanticFlowWellbeingNeutral01",
+                nodes = {
+                    opening = {
+                        textKey = "UI_PNC_Conversation_Content_SemanticFlowWellbeingNeutral01",
+                        choices = {},
+                    },
                 },
             },
         },

@@ -142,11 +142,17 @@ function Selector.SelectBlock(categoryID, context)
     then
         local coreBlock, coreOutcome = PsychopatzCore.Semantics.SelectDialogueBlock(categoryID, context)
         if coreBlock then
+            local entryNode = coreBlock.entryNode or "opening"
+            local node = coreBlock.nodes and coreBlock.nodes[entryNode]
+            local textKey = coreBlock.textKey or (node and node.textKey) or (coreOutcome and coreOutcome.textKey)
             return {
                 id = coreBlock.id,
                 category = coreBlock.category,
                 priority = coreBlock.priority,
-                textKey = coreOutcome and coreOutcome.textKey or coreBlock.textKey,
+                textKey = textKey,
+                entryNode = entryNode,
+                nodes = coreBlock.nodes,
+                gates = coreBlock.gates,
                 isCoreBlock = true,
                 raw = coreBlock,
             }, {

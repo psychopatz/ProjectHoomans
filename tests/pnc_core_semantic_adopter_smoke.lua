@@ -135,4 +135,38 @@ T.truthy(selectedBlock, "Dialogue block selected for WELLBEING via Core fallback
 T.equal(selectedBlock.id, "hoomans_block_wellbeing_good", "Correct block chosen based on approval >= 20")
 T.equal(meta.source, "PsychopatzCore.Semantics", "Source provenance is PsychopatzCore.Semantics")
 
+-- Verify gate enforcement: negative approval cannot select wellbeing_good
+local hostileContext = {
+    relationship = { approval = -50 },
+}
+local hostileBlock = PNC.Conversation.Selector.SelectBlock("WELLBEING", hostileContext)
+T.falsy(hostileBlock, "Approval -50 is rejected by gates (no block eligible)")
+
+local neutralContext = {
+    relationship = { approval = 0 },
+}
+local neutralBlock = PNC.Conversation.Selector.SelectBlock("WELLBEING", neutralContext)
+T.truthy(neutralBlock, "Approval 0 selects wellbeing_neutral")
+T.equal(neutralBlock.id, "hoomans_block_wellbeing_neutral")
+
+-- 5. Concept & Parser verification
+T.truthy(CoreSemantics.Registry.GetConcept("hoomans.concept.companion"), "Concept companion registered")
+T.truthy(CoreSemantics.Registry.GetConcept("hoomans.concept.wellbeing"), "Concept wellbeing registered")
+
+local parseFollow = CoreSemantics.Parse("follow me", { capabilities = { ["hoomans.social"] = true } })
+T.truthy(parseFollow, "Parses 'follow me'")
+T.equal(parseFollow.intent, "COMMAND", "Follow me intent is COMMAND")
+
+local parseRecruit = CoreSemantics.Parse("join me", { capabilities = { ["hoomans.social"] = true } })
+T.truthy(parseRecruit, "Parses 'join me'")
+T.equal(parseRecruit.intent, "RECRUIT", "Join me intent is RECRUIT")
+
+local parseCamp = CoreSemantics.Parse("make camp", { capabilities = { ["hoomans.social"] = true } })
+T.truthy(parseCamp, "Parses 'make camp'")
+T.equal(parseCamp.intent, "CAMP", "Make camp intent is CAMP")
+
+local parseWellbeing = CoreSemantics.Parse("how are you", { capabilities = { ["hoomans.social"] = true } })
+T.truthy(parseWellbeing, "Parses 'how are you'")
+T.equal(parseWellbeing.intent, "ASK_WELLBEING", "How are you intent is ASK_WELLBEING")
+
 T.finish("pnc_core_semantic_adopter_smoke")
