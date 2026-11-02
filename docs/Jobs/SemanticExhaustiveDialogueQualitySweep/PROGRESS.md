@@ -4,23 +4,22 @@
 
 ## Current repository baseline
 
-- ProjectHoomans local main: 3b597b97273f91d819127c76f3cd8f29de110719 before this documentation commit.
-- Worktree was clean at audit start.
-- After explicit fetch, local main was **17 commits ahead of origin/main, 0 behind**.
-- Preserve the existing unpublished local history; do not rewrite/sync it destructively.
-- No native Project Zomboid, source-save mutation or Workshop operation occurred during planning.
+- ProjectHoomans local main: c6d4b602 before P1 foundation commits.
+- Worktree clean before edits.
+- Local main is ahead of origin/main by 18 commits (preserved, unpublished).
+- No native Project Zomboid, source-save mutation or Workshop publication occurred.
 
 ## Phase state
 
 | Phase | State | Current evidence |
 | --- | --- | --- |
 | P0 — Source audit / contract freeze | **COMPLETE (planning)** | Current Test Subsystem, Observatory, matrix limits, dimension catalogs and trace fields audited at baseline HEAD; gaps recorded in AUDIT.md. |
-| P1 — Evidence + dimension inventory | **NOT STARTED** | No new sweep-specific evidence schema/service exists yet. |
-| P2 — Buckets + planner | **NOT STARTED** | Existing generic matrix expansion is not yet a broad coverage planner. |
-| P3 — Batch/resume | **NOT STARTED** | No large sweep manifest/resume system yet. |
-| P4 — Reachability/provenance frontier | **NOT STARTED** | Existing coverage helpers are bounded/manual; no sweep frontier. |
-| P5 — Quality flags/clusters | **NOT STARTED** | No dedicated dialogue-quality analyzer/cluster report. |
-| P6 — CLI/review/UI | **NOT STARTED** | No sweep CLI workflow or Simulation Quality Sweep surface. |
+| P1 — Evidence + dimension inventory | **COMPLETE** | `pnc.semantic-dialogue-quality-evidence.v1` defined in `sweep_evidence.py`; production-backed dimension inventory extracted from `simulation_control_catalog()` and `persona_catalog()` in `sweep_dimensions.py`; 8 tests pass in `test_sweep_p1_foundation.py` (3.3s) including real-worker projection and lazy trace handles. |
+| P2 — Buckets + planner | **IN PROGRESS** | Designing semantic bucket policies and deterministic coverage planner (smoke, boundary, pairwise, persona, full-bounded). |
+| P3 — Batch/resume | **NOT STARTED** | Requires P2. |
+| P4 — Reachability/provenance frontier | **NOT STARTED** | Requires P2/P3. |
+| P5 — Quality flags/clusters | **NOT STARTED** | Requires P1–P4. |
+| P6 — CLI/review/UI | **NOT STARTED** | Requires P1–P5. |
 | P7 — Integrated acceptance | **NOT STARTED** | Requires P1–P6. |
 
 ## Preserved accepted foundations
@@ -35,24 +34,28 @@ Do not regress or rebuild:
 - existing CodeBuilder/Dialogue Content canonical source ownership;
 - existing GUI isolation and Simulation-vs-Studio ownership rules.
 
-## Immediate Next Chunk — P1A/P1B foundation
+## Immediate Next Chunk — P2 (Semantic Buckets & Deterministic Coverage Planner)
 
-Implement the smallest coherent foundation that proves the future sweeper can be production-backed:
-
-1. define pnc.semantic-dialogue-quality-evidence.v1, or reconcile the name with existing schema conventions, for a compact per-rendered-sentence evidence row;
-2. build it by joining an already executed real-worker turn through current Observatory/Conversation Inspector data—do not reimplement selection;
-3. include deterministic case identity, changed parameter vector, final text, semantic template/variant, realization family/variant, phrase/translation identity, relevant persona/relationship/bond summary, selection/source fingerprints and bounded authority/effect summary;
-4. expose a lazy case/turn handle for full inspector replay rather than embedding the full trace;
-5. add production-backed dimension inventory extraction from simulation_control_catalog() / persona_catalog() with type/options/path/source/prerequisite metadata;
-6. prove at least needs, personality, traits, relationship/bond/identity trust and authority controls are discoverable or explicitly diagnosed;
-7. add focused tests for deterministic row output, boundedness, UNKNOWN provenance, read-only control rejection and prerequisite handling;
-8. run representative real-worker integration and record exact results here.
-
-Do **not** begin the GUI before the machine-readable evidence/dimension contracts are accepted.
-
-## Remaining mandatory gap after Next Chunk
-
-P2–P7 remain mandatory. After P1 acceptance the agent must continue automatically into semantic buckets/planning, batch/resume, reachability, quality flags/clustering, CLI/review/Simulation UI and integrated performance/regression acceptance.
+Implement P2A and P2B in `tools/semantic_harness/testing/`:
+1. `sweep_buckets.py`:
+   - Bounded semantic bucket policies for numeric/enum dimensions (endpoints, neutral/default, documented production thresholds, just-below/at/just-above neighbor values).
+   - Provenance and rationale recorded for each bucket policy (e.g. relationship standing thresholds, survival need urgency thresholds, personality extremes/midpoints).
+   - Threshold-neighbor validation proving expected branch/eligibility boundary points.
+2. `sweep_planner.py`:
+   - Deterministic coverage strategies:
+     - Smoke: 1 representative/baseline case per target surface.
+     - Boundary: each dimension swept through its bucket values while other dimensions remain at baseline, plus threshold neighbors.
+     - Pairwise: deterministic covering array ensuring every valid pair of bucket values across selected dimensions is covered at least once.
+     - Persona/relationship: targeted personality/traits/bond/relationship matrix without explosion.
+     - Full-bounded: deterministic deduplicated union of declared strategies.
+   - Stable deterministic case ID computation (`sweep_id:strategy:surface:hash`).
+   - Case count estimation and batch count estimation before execution.
+   - Configurable max cases cap and scope filtering.
+3. Unit tests in `test_sweep_p2_planner.py`:
+   - Verify pairwise property (100% 2-way pair coverage across selected dimensions).
+   - Verify deterministic case ID stability across runs.
+   - Verify threshold-neighbor generation.
+   - Verify cap enforcement and batch estimation.
 
 ## Stop rules
 
