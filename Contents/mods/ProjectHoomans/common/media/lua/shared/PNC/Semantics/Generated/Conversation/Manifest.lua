@@ -3,7 +3,7 @@ return {
     ["schema"] = "pnc.conversation.runtime-manifest.v1",
     ["shards"] = {
         {
-            ["bytes"] = 5248,
+            ["bytes"] = 17310,
             ["domain"] = "combat",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Combat/PlayerAssaultReactions",
@@ -18,7 +18,7 @@ return {
             ["sourceShard"] = "content/combat/player_assault_reactions.json",
         },
         {
-            ["bytes"] = 20217,
+            ["bytes"] = 94781,
             ["domain"] = "combat_banter",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/CombatBanter/WeaponKillReactions",
@@ -54,7 +54,7 @@ return {
             ["sourceShard"] = "content/combat_banter/weapon_kill_reactions.json",
         },
         {
-            ["bytes"] = 15682,
+            ["bytes"] = 74112,
             ["domain"] = "combat_human_banter",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/CombatHumanBanter/HumanKillReactions",
@@ -272,7 +272,7 @@ return {
             ["sourceShard"] = "content/conversation.json",
         },
         {
-            ["bytes"] = 7708,
+            ["bytes"] = 37401,
             ["domain"] = "event",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
@@ -293,7 +293,7 @@ return {
             ["sourceShard"] = "content/event/combat_horde_reactions.json",
         },
         {
-            ["bytes"] = 16114,
+            ["bytes"] = 75748,
             ["domain"] = "event",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
@@ -324,7 +324,7 @@ return {
             ["sourceShard"] = "content/event/combat_kill_killer_reactions.json",
         },
         {
-            ["bytes"] = 16328,
+            ["bytes"] = 76905,
             ["domain"] = "event",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
@@ -355,7 +355,7 @@ return {
             ["sourceShard"] = "content/event/combat_kill_witness_reactions.json",
         },
         {
-            ["bytes"] = 23685,
+            ["bytes"] = 115246,
             ["domain"] = "event",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Event/Medical",
@@ -397,7 +397,7 @@ return {
             ["sourceShard"] = "content/event/medical.json",
         },
         {
-            ["bytes"] = 13215,
+            ["bytes"] = 64089,
             ["domain"] = "event",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
@@ -2968,5 +2968,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "e5bfb07a431c6126e4b4067af38d3cdd514ce7a264ba204150b008c530119dde",
+    ["wholeModelFingerprint"] = "64c9a6d03943e9618de8ea235a72877f96d852965967c2716b5a89f272d60c5b",
 }

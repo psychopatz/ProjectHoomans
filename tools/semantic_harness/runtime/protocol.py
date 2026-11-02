@@ -7,10 +7,10 @@ from typing import Any
 
 
 PROTOCOL_VERSION = 1
-# The generated production flow catalog is currently about 270 KiB. Keep the
-# JSON-lines envelope bounded while leaving room for one catalog response and
-# its registered-flow metadata.
-DEFAULT_MAX_MESSAGE_BYTES = 512 * 1024
+# The expanded phrase-family variation catalog across all domains requires a
+# bounded JSON-lines envelope that accommodates the complete response/flow catalog
+# and registered metadata.
+DEFAULT_MAX_MESSAGE_BYTES = 1024 * 1024
 
 
 class ProtocolError(ValueError):

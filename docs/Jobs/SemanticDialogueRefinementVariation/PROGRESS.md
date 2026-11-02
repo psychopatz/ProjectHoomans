@@ -119,16 +119,40 @@ This must be raised before the corpus can satisfy the requested minimum.
      - Eligible under-10 style buckets: **220 / 683** (was 360).
      - Remaining under-10 styles in command and task domains: **0**.
 
-## Immediate Active Phase — P5: Combat and events refinement
+5. **Phase 5 (Combat & Events Refinement & Expansion) — COMPLETED**:
+   - **P5A (Player Assault Reactions)**:
+     - `content/combat/player_assault_reactions.json`: expanded all 5 styles to 10 variants each (50 phrases), providing distinct survivor reactions across shaken, aggressive, brave, reserved, and default personalities.
+   - **P5B (Weapon Kill Reactions)**:
+     - `content/combat_banter/weapon_kill_reactions.json`: expanded all 26 styles to 10 variants each (260 phrases). Preserved `{combatWeaponDisplayName}` in all 10 EN and 10 TL realizations of `firearm_high_named_01`. Replaced cartoon profanity caricatures with visceral, grounded zombie takedown dialogue.
+   - **P5C (Human Kill Reactions)**:
+     - `content/combat_human_banter/human_kill_reactions.json`: expanded all 21 styles to 10 variants each (210 phrases), addressing the psychological gravity of taking human lives across aggressive, supportive, shaken, brave, reserved, cold, and practical personalities.
+   - **P5D (Horde Reactions & Kill Events)**:
+     - `content/event/combat_horde_reactions.json`: expanded all 11 styles to 10 variants each (110 phrases) across horde encounter phases (started, escalated, deescalated, prompts, and tactical choices).
+     - `content/event/combat_kill_killer_reactions.json`: expanded all 21 styles to 10 variants each (210 phrases).
+     - `content/event/combat_kill_witness_reactions.json`: expanded all 21 styles to 10 variants each (210 phrases).
+     - `content/event/reactions.json`: expanded all 19 styles to 10 variants each (190 phrases). Eliminated 19 suspicious English-identical TL lines by authoring authentic Tagalog/Taglish localizations.
+   - **P5E (Medical Distress & Treatment)**:
+     - `content/event/medical.json`: expanded all 32 styles to 10 variants each (320 phrases). Replaced robotic clinical announcements with urgent, visceral distress calls (bandage, bleedout, dehydration, starvation, exhaustion, rescue, mercy) and authentic Tagalog localizations.
+   - **Infrastructure**:
+     - Raised `DEFAULT_MAX_MESSAGE_BYTES` in `tools/semantic_harness/runtime/protocol.py` and `tools/semantic_harness/lua/worker/Protocol.lua` from 512KB to 1024KB (1MB) to support the larger serialized flow and phrase catalog on worker startup.
+     - Regenerated 196 Lua modules and translation artifacts; all 25 unit tests passed in 29.9s.
+   - **Corpus Metrics After P5**:
+     - Styles at >=10 phrases: **619 / 729** (was 463).
+     - Eligible under-10 style buckets: **64 / 683** (was 220).
+     - Remaining under-10 styles in combat and event domains: **0**.
 
-Expand and refine all canonical NPC combat and world event dialogue shards to >= 10 variants:
-- **P5A**: Player assault reactions (`content/combat/player_assault_reactions.json`: 5 styles).
-- **P5B**: Weapon kill reactions (`content/combat_banter/weapon_kill_reactions.json`: 26 styles).
-- **P5C**: Human kill reactions (`content/combat_human_banter/human_kill_reactions.json`: 21 styles).
-- **P5D**: Events (`content/event/*.json`: 5 files: `combat_horde.json`, `combat_kill_killer.json`, `combat_kill_witness.json`, `medical.json`, `reactions.json`: 104 styles).
+## Immediate Active Phase — P6: Remaining corpus, knowledge, quest, navigation, and exemption reconciliation
 
-Total P5 styles to expand: **156 styles** (1,560 phrases).
-Eliminate repetitive cartoon profanity and action-movie caricatures; ensure combat lines are concise, urgent, natural, and distinct across styles. Maintain exact placeholder parity (e.g. `{name}`, `%s`).
+Expand and refine all remaining canonical NPC dialogue shards:
+- **P6A**: Quest dialogue (`content/quest.json`: 12 styles).
+- **P6B**: Knowledge dialogue (`content/knowledge.json`: 32 styles).
+- **P6C**: Navigation dialogue (`content/navigation.json`: 20 styles).
+Total remaining eligible styles to expand: **64 styles** (640 phrases).
+
+Reconcile and formally verify all exemption classifications:
+- `THIRD_PARTY_COMPAT_DEFERRED`: 27 styles (`content/compatibility.json`).
+- `PLAYER_UI_OUT_OF_SCOPE`: 19 styles (`content/command/player.json`, `content/social/emotes/player.json`).
+Ensure 0 unclassified or ambiguous records remain. Target eligible under-10 count: **0**.
 
 ## Mandatory quality principle
 

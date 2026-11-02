@@ -8,9 +8,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I am hurt and down. Please patch me up.",
+                    ["fallback"] = "I'm hurt and down! Need a bandage over here!",
                     ["id"] = "phrase.semantic.medical.distress.call.bandage.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBandageNeutral01",
+                },
+                {
+                    ["fallback"] = "Deep cut... I need a bandage now!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bandage.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBandageNeutral02",
+                },
+                {
+                    ["fallback"] = "I can't stop this wound alone! Bring a bandage!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bandage.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBandageNeutral03",
+                },
+                {
+                    ["fallback"] = "Patch me up, please! I'm losing blood!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bandage.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBandageNeutral04",
+                },
+                {
+                    ["fallback"] = "I'm down! Does anyone have a clean rag or bandage?!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bandage.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBandageNeutral05",
+                },
+                {
+                    ["fallback"] = "Gash on my leg... need wrapping right now!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bandage.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBandageNeutral06",
+                },
+                {
+                    ["fallback"] = "Help! I need these wounds dressed!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bandage.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBandageNeutral07",
+                },
+                {
+                    ["fallback"] = "I'm on the floor, bleeding! Get a bandage over here!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bandage.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBandageNeutral08",
+                },
+                {
+                    ["fallback"] = "Need a patch immediately! I'm grounded!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bandage.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBandageNeutral09",
+                },
+                {
+                    ["fallback"] = "Bandage, quick! I can't get up without one!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bandage.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBandageNeutral10",
                 },
             },
         },
@@ -23,9 +68,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I am bleeding out. I need a bandage now.",
+                    ["fallback"] = "I'm bleeding out! I need a tourniquet or bandage now!",
                     ["id"] = "phrase.semantic.medical.distress.call.bleedout.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBleedoutNeutral01",
+                },
+                {
+                    ["fallback"] = "Dying here! The blood won't stop flowing!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bleedout.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBleedoutNeutral02",
+                },
+                {
+                    ["fallback"] = "I'm losing too much blood... getting cold!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bleedout.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBleedoutNeutral03",
+                },
+                {
+                    ["fallback"] = "Hit an artery! Put pressure on this right now!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bleedout.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBleedoutNeutral04",
+                },
+                {
+                    ["fallback"] = "Everything's going dark... stop the bleeding, please!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bleedout.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBleedoutNeutral05",
+                },
+                {
+                    ["fallback"] = "I'm bleeding through my clothes! Help me!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bleedout.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBleedoutNeutral06",
+                },
+                {
+                    ["fallback"] = "Blood everywhere... please, I don't want to die here!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bleedout.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBleedoutNeutral07",
+                },
+                {
+                    ["fallback"] = "Losing consciousness... plug this wound!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bleedout.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBleedoutNeutral08",
+                },
+                {
+                    ["fallback"] = "Hurry! I'm bleeding out on the dirt!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bleedout.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBleedoutNeutral09",
+                },
+                {
+                    ["fallback"] = "Can't feel my fingers... stop the blood!",
+                    ["id"] = "phrase.semantic.medical.distress.call.bleedout.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallBleedoutNeutral10",
                 },
             },
         },
@@ -38,9 +128,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I am down. I need help.",
+                    ["fallback"] = "I'm down! I need help over here!",
                     ["id"] = "phrase.semantic.medical.distress.call.default.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDefaultNeutral01",
+                },
+                {
+                    ["fallback"] = "Can't stand! Someone help me up!",
+                    ["id"] = "phrase.semantic.medical.distress.call.default.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDefaultNeutral02",
+                },
+                {
+                    ["fallback"] = "I'm hit! Get over here!",
+                    ["id"] = "phrase.semantic.medical.distress.call.default.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDefaultNeutral03",
+                },
+                {
+                    ["fallback"] = "Need medical attention immediately!",
+                    ["id"] = "phrase.semantic.medical.distress.call.default.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDefaultNeutral04",
+                },
+                {
+                    ["fallback"] = "Down and helpless! Don't leave me!",
+                    ["id"] = "phrase.semantic.medical.distress.call.default.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDefaultNeutral05",
+                },
+                {
+                    ["fallback"] = "I took a bad fall! Help me!",
+                    ["id"] = "phrase.semantic.medical.distress.call.default.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDefaultNeutral06",
+                },
+                {
+                    ["fallback"] = "Can't get back on my feet! Help!",
+                    ["id"] = "phrase.semantic.medical.distress.call.default.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDefaultNeutral07",
+                },
+                {
+                    ["fallback"] = "Hurt bad! Over here, please!",
+                    ["id"] = "phrase.semantic.medical.distress.call.default.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDefaultNeutral08",
+                },
+                {
+                    ["fallback"] = "I'm down on the ground! Need a hand!",
+                    ["id"] = "phrase.semantic.medical.distress.call.default.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDefaultNeutral09",
+                },
+                {
+                    ["fallback"] = "Injured and stranded! Come help!",
+                    ["id"] = "phrase.semantic.medical.distress.call.default.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDefaultNeutral10",
                 },
             },
         },
@@ -53,9 +188,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I am too weak to move. I need water.",
+                    ["fallback"] = "So thirsty... I need water before I pass out.",
                     ["id"] = "phrase.semantic.medical.distress.call.dehydration.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDehydrationNeutral01",
+                },
+                {
+                    ["fallback"] = "Throat is completely parched... please, any water?",
+                    ["id"] = "phrase.semantic.medical.distress.call.dehydration.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDehydrationNeutral02",
+                },
+                {
+                    ["fallback"] = "Drying out... can barely swallow. Water, please.",
+                    ["id"] = "phrase.semantic.medical.distress.call.dehydration.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDehydrationNeutral03",
+                },
+                {
+                    ["fallback"] = "I'm too dehydrated to move my legs. Water...",
+                    ["id"] = "phrase.semantic.medical.distress.call.dehydration.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDehydrationNeutral04",
+                },
+                {
+                    ["fallback"] = "Give me a sip of water... dying of thirst.",
+                    ["id"] = "phrase.semantic.medical.distress.call.dehydration.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDehydrationNeutral05",
+                },
+                {
+                    ["fallback"] = "Lips are cracked and bleeding... need clean water.",
+                    ["id"] = "phrase.semantic.medical.distress.call.dehydration.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDehydrationNeutral06",
+                },
+                {
+                    ["fallback"] = "Can't walk anymore... please bring a water bottle.",
+                    ["id"] = "phrase.semantic.medical.distress.call.dehydration.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDehydrationNeutral07",
+                },
+                {
+                    ["fallback"] = "Head is pounding from dehydration... need a drink.",
+                    ["id"] = "phrase.semantic.medical.distress.call.dehydration.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDehydrationNeutral08",
+                },
+                {
+                    ["fallback"] = "I'm collapsing... just a few drops of water.",
+                    ["id"] = "phrase.semantic.medical.distress.call.dehydration.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDehydrationNeutral09",
+                },
+                {
+                    ["fallback"] = "Water... please, someone hand me water.",
+                    ["id"] = "phrase.semantic.medical.distress.call.dehydration.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallDehydrationNeutral10",
                 },
             },
         },
@@ -68,9 +248,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I pushed too far. I need a moment to recover.",
+                    ["fallback"] = "Pushed too far. I can't lift my arms.",
                     ["id"] = "phrase.semantic.medical.distress.call.exhaustion.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallExhaustionNeutral01",
+                },
+                {
+                    ["fallback"] = "Completely spent... give me a moment to recover.",
+                    ["id"] = "phrase.semantic.medical.distress.call.exhaustion.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallExhaustionNeutral02",
+                },
+                {
+                    ["fallback"] = "Legs gave out beneath me. Need to sit.",
+                    ["id"] = "phrase.semantic.medical.distress.call.exhaustion.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallExhaustionNeutral03",
+                },
+                {
+                    ["fallback"] = "Can't move another step. Total exhaustion.",
+                    ["id"] = "phrase.semantic.medical.distress.call.exhaustion.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallExhaustionNeutral04",
+                },
+                {
+                    ["fallback"] = "Breathing hurts. I need rest right now.",
+                    ["id"] = "phrase.semantic.medical.distress.call.exhaustion.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallExhaustionNeutral05",
+                },
+                {
+                    ["fallback"] = "Collapsed from fatigue... give me five minutes.",
+                    ["id"] = "phrase.semantic.medical.distress.call.exhaustion.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallExhaustionNeutral06",
+                },
+                {
+                    ["fallback"] = "Muscles are locking up. Can't stand.",
+                    ["id"] = "phrase.semantic.medical.distress.call.exhaustion.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallExhaustionNeutral07",
+                },
+                {
+                    ["fallback"] = "I have nothing left in the tank. Need a break.",
+                    ["id"] = "phrase.semantic.medical.distress.call.exhaustion.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallExhaustionNeutral08",
+                },
+                {
+                    ["fallback"] = "Vision is swimming from exhaustion. Give me time.",
+                    ["id"] = "phrase.semantic.medical.distress.call.exhaustion.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallExhaustionNeutral09",
+                },
+                {
+                    ["fallback"] = "Body won't respond... let me rest a second.",
+                    ["id"] = "phrase.semantic.medical.distress.call.exhaustion.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallExhaustionNeutral10",
                 },
             },
         },
@@ -83,9 +308,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I am down. Please let me live.",
+                    ["fallback"] = "I'm down! Please, don't kill me!",
                     ["id"] = "phrase.semantic.medical.distress.call.mercy.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallMercyNeutral01",
+                },
+                {
+                    ["fallback"] = "Mercy, please! I'm completely unarmed!",
+                    ["id"] = "phrase.semantic.medical.distress.call.mercy.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallMercyNeutral02",
+                },
+                {
+                    ["fallback"] = "Don't shoot! I'm already defeated!",
+                    ["id"] = "phrase.semantic.medical.distress.call.mercy.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallMercyNeutral03",
+                },
+                {
+                    ["fallback"] = "Please let me live! I surrender!",
+                    ["id"] = "phrase.semantic.medical.distress.call.mercy.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallMercyNeutral04",
+                },
+                {
+                    ["fallback"] = "Spare me, please! I have nothing left!",
+                    ["id"] = "phrase.semantic.medical.distress.call.mercy.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallMercyNeutral05",
+                },
+                {
+                    ["fallback"] = "I beg you... don't finish me off!",
+                    ["id"] = "phrase.semantic.medical.distress.call.mercy.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallMercyNeutral06",
+                },
+                {
+                    ["fallback"] = "I yield! Don't strike again!",
+                    ["id"] = "phrase.semantic.medical.distress.call.mercy.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallMercyNeutral07",
+                },
+                {
+                    ["fallback"] = "Show mercy! I'm bleeding out on the floor!",
+                    ["id"] = "phrase.semantic.medical.distress.call.mercy.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallMercyNeutral08",
+                },
+                {
+                    ["fallback"] = "Don't hurt me anymore, please!",
+                    ["id"] = "phrase.semantic.medical.distress.call.mercy.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallMercyNeutral09",
+                },
+                {
+                    ["fallback"] = "Have a heart... let me survive this.",
+                    ["id"] = "phrase.semantic.medical.distress.call.mercy.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallMercyNeutral10",
                 },
             },
         },
@@ -98,9 +368,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I cannot move. I need help over here.",
+                    ["fallback"] = "I'm trapped here! I need help over here!",
                     ["id"] = "phrase.semantic.medical.distress.call.rescue.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallRescueNeutral01",
+                },
+                {
+                    ["fallback"] = "Can't move on my own! Pull me out!",
+                    ["id"] = "phrase.semantic.medical.distress.call.rescue.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallRescueNeutral02",
+                },
+                {
+                    ["fallback"] = "Pinned down and injured! Come get me!",
+                    ["id"] = "phrase.semantic.medical.distress.call.rescue.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallRescueNeutral03",
+                },
+                {
+                    ["fallback"] = "Over here! Don't leave me stranded!",
+                    ["id"] = "phrase.semantic.medical.distress.call.rescue.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallRescueNeutral04",
+                },
+                {
+                    ["fallback"] = "I'm stuck behind rubble! Need someone to clear it!",
+                    ["id"] = "phrase.semantic.medical.distress.call.rescue.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallRescueNeutral05",
+                },
+                {
+                    ["fallback"] = "Can't crawl any further! Help me!",
+                    ["id"] = "phrase.semantic.medical.distress.call.rescue.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallRescueNeutral06",
+                },
+                {
+                    ["fallback"] = "I'm over here, behind cover! Pull me back!",
+                    ["id"] = "phrase.semantic.medical.distress.call.rescue.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallRescueNeutral07",
+                },
+                {
+                    ["fallback"] = "Rescue me, please! They're getting closer!",
+                    ["id"] = "phrase.semantic.medical.distress.call.rescue.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallRescueNeutral08",
+                },
+                {
+                    ["fallback"] = "I need extraction! Can't walk out of here!",
+                    ["id"] = "phrase.semantic.medical.distress.call.rescue.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallRescueNeutral09",
+                },
+                {
+                    ["fallback"] = "Help me get out! My leg is broken!",
+                    ["id"] = "phrase.semantic.medical.distress.call.rescue.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallRescueNeutral10",
                 },
             },
         },
@@ -113,9 +428,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I am too weak to move. I need food.",
+                    ["fallback"] = "Haven't eaten in days... I'm starving to death.",
                     ["id"] = "phrase.semantic.medical.distress.call.starvation.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallStarvationNeutral01",
+                },
+                {
+                    ["fallback"] = "Too weak from hunger to stand up. Food, please.",
+                    ["id"] = "phrase.semantic.medical.distress.call.starvation.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallStarvationNeutral02",
+                },
+                {
+                    ["fallback"] = "Stomach is eating itself... any crumbs left?",
+                    ["id"] = "phrase.semantic.medical.distress.call.starvation.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallStarvationNeutral03",
+                },
+                {
+                    ["fallback"] = "Starving... can't even hold my weapon.",
+                    ["id"] = "phrase.semantic.medical.distress.call.starvation.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallStarvationNeutral04",
+                },
+                {
+                    ["fallback"] = "Please, just a bite of anything edible.",
+                    ["id"] = "phrase.semantic.medical.distress.call.starvation.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallStarvationNeutral05",
+                },
+                {
+                    ["fallback"] = "Fainting from lack of calories. I need food.",
+                    ["id"] = "phrase.semantic.medical.distress.call.starvation.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallStarvationNeutral06",
+                },
+                {
+                    ["fallback"] = "Hunger cramps are tearing me apart. Help me.",
+                    ["id"] = "phrase.semantic.medical.distress.call.starvation.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallStarvationNeutral07",
+                },
+                {
+                    ["fallback"] = "I can't go on like this without food in my belly.",
+                    ["id"] = "phrase.semantic.medical.distress.call.starvation.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallStarvationNeutral08",
+                },
+                {
+                    ["fallback"] = "Empty for days... please bring me something to eat.",
+                    ["id"] = "phrase.semantic.medical.distress.call.starvation.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallStarvationNeutral09",
+                },
+                {
+                    ["fallback"] = "Starving on the floor... spare a ration, please.",
+                    ["id"] = "phrase.semantic.medical.distress.call.starvation.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressCallStarvationNeutral10",
                 },
             },
         },
@@ -132,6 +492,51 @@ return {
                     ["id"] = "phrase.semantic.medical.distress.default.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressDefaultNeutral01",
                 },
+                {
+                    ["fallback"] = "Hurting pretty badly here. Need aid.",
+                    ["id"] = "phrase.semantic.medical.distress.default.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressDefaultNeutral02",
+                },
+                {
+                    ["fallback"] = "Got injured. Can someone look at this?",
+                    ["id"] = "phrase.semantic.medical.distress.default.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressDefaultNeutral03",
+                },
+                {
+                    ["fallback"] = "Need medical attention before this gets worse.",
+                    ["id"] = "phrase.semantic.medical.distress.default.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressDefaultNeutral04",
+                },
+                {
+                    ["fallback"] = "Wound is throbbing. I need a hand.",
+                    ["id"] = "phrase.semantic.medical.distress.default.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressDefaultNeutral05",
+                },
+                {
+                    ["fallback"] = "Took some damage. Could use first aid.",
+                    ["id"] = "phrase.semantic.medical.distress.default.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressDefaultNeutral06",
+                },
+                {
+                    ["fallback"] = "This cut is nasty. Help me clean it.",
+                    ["id"] = "phrase.semantic.medical.distress.default.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressDefaultNeutral07",
+                },
+                {
+                    ["fallback"] = "I'm in pain here. Need medical supplies.",
+                    ["id"] = "phrase.semantic.medical.distress.default.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressDefaultNeutral08",
+                },
+                {
+                    ["fallback"] = "Injured and slowing down. Need treatment.",
+                    ["id"] = "phrase.semantic.medical.distress.default.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressDefaultNeutral09",
+                },
+                {
+                    ["fallback"] = "Got banged up pretty good. Help me patch up.",
+                    ["id"] = "phrase.semantic.medical.distress.default.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressDefaultNeutral10",
+                },
             },
         },
     },
@@ -143,9 +548,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "Please. I need help with this wound.",
+                    ["fallback"] = "Please. I need help with this wound, don't let me die.",
                     ["id"] = "phrase.semantic.medical.distress.mercy.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressMercyNeutral01",
+                },
+                {
+                    ["fallback"] = "Have mercy on me... patch me up, please.",
+                    ["id"] = "phrase.semantic.medical.distress.mercy.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressMercyNeutral02",
+                },
+                {
+                    ["fallback"] = "I won't survive this cut without your mercy.",
+                    ["id"] = "phrase.semantic.medical.distress.mercy.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressMercyNeutral03",
+                },
+                {
+                    ["fallback"] = "Please help... I'm begging for aid.",
+                    ["id"] = "phrase.semantic.medical.distress.mercy.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressMercyNeutral04",
+                },
+                {
+                    ["fallback"] = "Don't leave me to bleed out like an animal.",
+                    ["id"] = "phrase.semantic.medical.distress.mercy.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressMercyNeutral05",
+                },
+                {
+                    ["fallback"] = "Show some kindness. This wound is killing me.",
+                    ["id"] = "phrase.semantic.medical.distress.mercy.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressMercyNeutral06",
+                },
+                {
+                    ["fallback"] = "Please, just dress the wound. That's all I ask.",
+                    ["id"] = "phrase.semantic.medical.distress.mercy.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressMercyNeutral07",
+                },
+                {
+                    ["fallback"] = "I'm at your mercy. Help stop this pain.",
+                    ["id"] = "phrase.semantic.medical.distress.mercy.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressMercyNeutral08",
+                },
+                {
+                    ["fallback"] = "Spare my life and treat this injury, please.",
+                    ["id"] = "phrase.semantic.medical.distress.mercy.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressMercyNeutral09",
+                },
+                {
+                    ["fallback"] = "I have so much to live for... please help me.",
+                    ["id"] = "phrase.semantic.medical.distress.mercy.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressMercyNeutral10",
                 },
             },
         },
@@ -158,9 +608,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I still need these wounds patched.",
+                    ["fallback"] = "I still need these wounds patched! Hurry!",
                     ["id"] = "phrase.semantic.medical.distress.repeat.bandage.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBandageNeutral01",
+                },
+                {
+                    ["fallback"] = "Where's that bandage?! Still bleeding out here!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bandage.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBandageNeutral02",
+                },
+                {
+                    ["fallback"] = "Don't forget about me! I need a wrap now!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bandage.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBandageNeutral03",
+                },
+                {
+                    ["fallback"] = "Still waiting on that bandage! It's soaking through!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bandage.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBandageNeutral04",
+                },
+                {
+                    ["fallback"] = "Please, hurry with the bandages! I'm fading!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bandage.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBandageNeutral05",
+                },
+                {
+                    ["fallback"] = "I asked for a bandage! Did you find one?!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bandage.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBandageNeutral06",
+                },
+                {
+                    ["fallback"] = "Wound is still open! Bring the dressing over!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bandage.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBandageNeutral07",
+                },
+                {
+                    ["fallback"] = "Can someone please patch me up already?!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bandage.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBandageNeutral08",
+                },
+                {
+                    ["fallback"] = "Blood is still pooling! Get that bandage on me!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bandage.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBandageNeutral09",
+                },
+                {
+                    ["fallback"] = "Still bleeding here! Hurry with the cloth!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bandage.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBandageNeutral10",
                 },
             },
         },
@@ -173,9 +668,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I am still losing blood. Please help.",
+                    ["fallback"] = "I am still losing blood! Please, help me!",
                     ["id"] = "phrase.semantic.medical.distress.repeat.bleedout.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBleedoutNeutral01",
+                },
+                {
+                    ["fallback"] = "Pressure isn't working! The bleeding won't stop!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bleedout.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBleedoutNeutral02",
+                },
+                {
+                    ["fallback"] = "I don't have much time left... blood is gushing!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bleedout.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBleedoutNeutral03",
+                },
+                {
+                    ["fallback"] = "Hurry, damn it! I'm going to bleed to death!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bleedout.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBleedoutNeutral04",
+                },
+                {
+                    ["fallback"] = "My pulse is getting weak... stop the bleed!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bleedout.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBleedoutNeutral05",
+                },
+                {
+                    ["fallback"] = "Still bleeding out! Don't let me die on this floor!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bleedout.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBleedoutNeutral06",
+                },
+                {
+                    ["fallback"] = "I'm freezing cold from blood loss... hurry!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bleedout.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBleedoutNeutral07",
+                },
+                {
+                    ["fallback"] = "Blood won't clot! I need immediate help!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bleedout.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBleedoutNeutral08",
+                },
+                {
+                    ["fallback"] = "Everything is fading... stop the bleeding, please!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bleedout.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBleedoutNeutral09",
+                },
+                {
+                    ["fallback"] = "Hurry up! I can't hold my own artery closed!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.bleedout.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatBleedoutNeutral10",
                 },
             },
         },
@@ -188,9 +728,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I am not up yet. Please help me.",
+                    ["fallback"] = "I'm not up yet. Please help me.",
                     ["id"] = "phrase.semantic.medical.distress.repeat.default.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDefaultNeutral01",
+                },
+                {
+                    ["fallback"] = "Still down here! Don't leave me behind!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.default.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDefaultNeutral02",
+                },
+                {
+                    ["fallback"] = "I still need assistance to get on my feet.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.default.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDefaultNeutral03",
+                },
+                {
+                    ["fallback"] = "Can someone help me up? Still grounded.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.default.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDefaultNeutral04",
+                },
+                {
+                    ["fallback"] = "I'm still incapacitated! Come over here!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.default.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDefaultNeutral05",
+                },
+                {
+                    ["fallback"] = "Still hurting, still stuck. Give me a hand.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.default.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDefaultNeutral06",
+                },
+                {
+                    ["fallback"] = "Haven't moved an inch. Need someone to help.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.default.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDefaultNeutral07",
+                },
+                {
+                    ["fallback"] = "Please, I'm still on the ground waiting.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.default.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDefaultNeutral08",
+                },
+                {
+                    ["fallback"] = "Still can't stand. Don't forget I'm down.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.default.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDefaultNeutral09",
+                },
+                {
+                    ["fallback"] = "I'm still here! Help me up already!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.default.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDefaultNeutral10",
                 },
             },
         },
@@ -203,9 +788,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I still need water to recover.",
+                    ["fallback"] = "I still need water to recover. My throat is on fire.",
                     ["id"] = "phrase.semantic.medical.distress.repeat.dehydration.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDehydrationNeutral01",
+                },
+                {
+                    ["fallback"] = "Still dying of thirst... did you find any bottle?",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.dehydration.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDehydrationNeutral02",
+                },
+                {
+                    ["fallback"] = "Water, please! I can't take this parched feeling.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.dehydration.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDehydrationNeutral03",
+                },
+                {
+                    ["fallback"] = "I asked for water... please tell me you have some.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.dehydration.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDehydrationNeutral04",
+                },
+                {
+                    ["fallback"] = "Tongue feels like sandpaper. Bring water quickly.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.dehydration.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDehydrationNeutral05",
+                },
+                {
+                    ["fallback"] = "Still completely dehydrated. I can't stand up like this.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.dehydration.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDehydrationNeutral06",
+                },
+                {
+                    ["fallback"] = "Water... I'm begging you, just one cup.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.dehydration.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDehydrationNeutral07",
+                },
+                {
+                    ["fallback"] = "Still dry as bone. Please bring hydration.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.dehydration.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDehydrationNeutral08",
+                },
+                {
+                    ["fallback"] = "I can't recover without liquids. Help me.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.dehydration.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDehydrationNeutral09",
+                },
+                {
+                    ["fallback"] = "Still waiting for a drink... head is pounding.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.dehydration.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatDehydrationNeutral10",
                 },
             },
         },
@@ -222,6 +852,51 @@ return {
                     ["id"] = "phrase.semantic.medical.distress.repeat.exhaustion.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatExhaustionNeutral01",
                 },
+                {
+                    ["fallback"] = "Can't rush this. My muscles are completely dead.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.exhaustion.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatExhaustionNeutral02",
+                },
+                {
+                    ["fallback"] = "Still catching my breath. Give me another minute.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.exhaustion.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatExhaustionNeutral03",
+                },
+                {
+                    ["fallback"] = "Body won't budge yet. Just a bit more rest.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.exhaustion.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatExhaustionNeutral04",
+                },
+                {
+                    ["fallback"] = "Still wiped out. Don't force me to stand yet.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.exhaustion.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatExhaustionNeutral05",
+                },
+                {
+                    ["fallback"] = "Heart is still racing. Need more time sitting down.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.exhaustion.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatExhaustionNeutral06",
+                },
+                {
+                    ["fallback"] = "Not ready to move yet. Fatigue is overwhelming.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.exhaustion.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatExhaustionNeutral07",
+                },
+                {
+                    ["fallback"] = "Give me another thirty seconds... almost there.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.exhaustion.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatExhaustionNeutral08",
+                },
+                {
+                    ["fallback"] = "Still completely spent. Let my legs rest.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.exhaustion.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatExhaustionNeutral09",
+                },
+                {
+                    ["fallback"] = "Can't run yet. Need a little more recovery.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.exhaustion.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatExhaustionNeutral10",
+                },
             },
         },
     },
@@ -233,9 +908,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I am still asking you to spare me.",
+                    ["fallback"] = "I am still asking you to spare me. Please.",
                     ["id"] = "phrase.semantic.medical.distress.repeat.mercy.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatMercyNeutral01",
+                },
+                {
+                    ["fallback"] = "Please don't change your mind... let me live.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.mercy.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatMercyNeutral02",
+                },
+                {
+                    ["fallback"] = "I'm still begging for mercy. Don't shoot.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.mercy.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatMercyNeutral03",
+                },
+                {
+                    ["fallback"] = "Show mercy once more. I mean you no harm.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.mercy.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatMercyNeutral04",
+                },
+                {
+                    ["fallback"] = "I am defenseless. Please keep your weapon down.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.mercy.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatMercyNeutral05",
+                },
+                {
+                    ["fallback"] = "Don't finish me off. I surrender completely.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.mercy.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatMercyNeutral06",
+                },
+                {
+                    ["fallback"] = "Still pleading for my life. Have pity on me.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.mercy.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatMercyNeutral07",
+                },
+                {
+                    ["fallback"] = "Please... I just want to survive.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.mercy.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatMercyNeutral08",
+                },
+                {
+                    ["fallback"] = "I'm at your feet. Spare me, I beg you.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.mercy.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatMercyNeutral09",
+                },
+                {
+                    ["fallback"] = "Don't execute me. Let me crawl away.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.mercy.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatMercyNeutral10",
                 },
             },
         },
@@ -248,9 +968,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I am still down here. Do not leave me.",
+                    ["fallback"] = "I am still down here! Do not leave me!",
                     ["id"] = "phrase.semantic.medical.distress.repeat.rescue.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatRescueNeutral01",
+                },
+                {
+                    ["fallback"] = "Don't abandon me! Come back and pull me out!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.rescue.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatRescueNeutral02",
+                },
+                {
+                    ["fallback"] = "Still trapped in this spot! Need someone here!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.rescue.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatRescueNeutral03",
+                },
+                {
+                    ["fallback"] = "Where are you going?! I can't walk!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.rescue.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatRescueNeutral04",
+                },
+                {
+                    ["fallback"] = "Please come back! I'm completely stranded!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.rescue.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatRescueNeutral05",
+                },
+                {
+                    ["fallback"] = "Don't walk away from my cries! Help me!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.rescue.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatRescueNeutral06",
+                },
+                {
+                    ["fallback"] = "Still stuck under this weight! Lift it off!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.rescue.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatRescueNeutral07",
+                },
+                {
+                    ["fallback"] = "I'm still here! Get me out before they find me!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.rescue.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatRescueNeutral08",
+                },
+                {
+                    ["fallback"] = "Rescue me, damn it! I can't drag myself!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.rescue.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatRescueNeutral09",
+                },
+                {
+                    ["fallback"] = "Don't leave me behind to rot! Come back!",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.rescue.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatRescueNeutral10",
                 },
             },
         },
@@ -263,9 +1028,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I still need something to eat.",
+                    ["fallback"] = "I still need something to eat. I'm fading fast.",
                     ["id"] = "phrase.semantic.medical.distress.repeat.starvation.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatStarvationNeutral01",
+                },
+                {
+                    ["fallback"] = "Still starving... any canned food, anything?",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.starvation.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatStarvationNeutral02",
+                },
+                {
+                    ["fallback"] = "Can't recover without calories. Bring food, please.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.starvation.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatStarvationNeutral03",
+                },
+                {
+                    ["fallback"] = "Stomach pains won't stop. I need nourishment.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.starvation.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatStarvationNeutral04",
+                },
+                {
+                    ["fallback"] = "Still starving to the bone. Did you find a ration?",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.starvation.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatStarvationNeutral05",
+                },
+                {
+                    ["fallback"] = "Please hurry with some food. I'm too dizzy to stand.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.starvation.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatStarvationNeutral06",
+                },
+                {
+                    ["fallback"] = "Hunger is unbearable now. Help me.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.starvation.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatStarvationNeutral07",
+                },
+                {
+                    ["fallback"] = "Still haven't eaten. Don't let me starve on this floor.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.starvation.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatStarvationNeutral08",
+                },
+                {
+                    ["fallback"] = "Need a meal to get back on my feet.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.starvation.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatStarvationNeutral09",
+                },
+                {
+                    ["fallback"] = "Still empty... please, just a cracker or some beans.",
+                    ["id"] = "phrase.semantic.medical.distress.repeat.starvation.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressRepeatStarvationNeutral10",
                 },
             },
         },
@@ -278,9 +1088,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "They are hurt. Stay with them while I cover you.",
+                    ["fallback"] = "They are hurt! Stay with them while I cover you.",
                     ["id"] = "phrase.semantic.medical.distress.teammate.default.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateDefaultNeutral01",
+                },
+                {
+                    ["fallback"] = "Our companion is down! Tend to them, I've got guard.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.default.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateDefaultNeutral02",
+                },
+                {
+                    ["fallback"] = "They're injured! Get them patched up while I watch.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.default.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateDefaultNeutral03",
+                },
+                {
+                    ["fallback"] = "Check on them right now! I'll hold off the threats.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.default.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateDefaultNeutral04",
+                },
+                {
+                    ["fallback"] = "They took a hit! See to their wounds, I'm watching.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.default.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateDefaultNeutral05",
+                },
+                {
+                    ["fallback"] = "Partner is wounded! Apply first aid, I've got your back.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.default.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateDefaultNeutral06",
+                },
+                {
+                    ["fallback"] = "They're bleeding! Patch them while I keep perimeter.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.default.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateDefaultNeutral07",
+                },
+                {
+                    ["fallback"] = "Help them up! I'll keep the lane clear.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.default.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateDefaultNeutral08",
+                },
+                {
+                    ["fallback"] = "They need attention! Administer aid, I'll protect you both.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.default.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateDefaultNeutral09",
+                },
+                {
+                    ["fallback"] = "Our friend is hurt! Help them, I'm standing sentry.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.default.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateDefaultNeutral10",
                 },
             },
         },
@@ -297,6 +1152,51 @@ return {
                     ["id"] = "phrase.semantic.medical.distress.teammate.found.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateFoundNeutral01",
                 },
+                {
+                    ["fallback"] = "Got a dressing right here. Wrapping the wound now.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.found.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateFoundNeutral02",
+                },
+                {
+                    ["fallback"] = "Found medical supplies! Hold on, I'm dressing the injury.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.found.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateFoundNeutral03",
+                },
+                {
+                    ["fallback"] = "I've got clean cloth. Hold steady while I bind it.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.found.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateFoundNeutral04",
+                },
+                {
+                    ["fallback"] = "Located a bandage. Applying pressure to their cut now.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.found.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateFoundNeutral05",
+                },
+                {
+                    ["fallback"] = "I've got medical wrap. Don't squirm, I'm securing it.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.found.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateFoundNeutral06",
+                },
+                {
+                    ["fallback"] = "Found supplies for them. Wrapping it up tightly now.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.found.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateFoundNeutral07",
+                },
+                {
+                    ["fallback"] = "Got the bandage ready. Applying it to the laceration.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.found.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateFoundNeutral08",
+                },
+                {
+                    ["fallback"] = "I have aid gear. Hold still, you'll be stable in a minute.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.found.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateFoundNeutral09",
+                },
+                {
+                    ["fallback"] = "Bandage in hand! Dressing their wounds right now.",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.found.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateFoundNeutral10",
+                },
             },
         },
     },
@@ -308,9 +1208,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I am out of bandages. Can someone spare one for them?",
+                    ["fallback"] = "I am out of bandages! Can someone spare one for them?",
                     ["id"] = "phrase.semantic.medical.distress.teammate.missing.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateMissingNeutral01",
+                },
+                {
+                    ["fallback"] = "No more medical cloth! Does anyone have a bandage?!",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.missing.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateMissingNeutral02",
+                },
+                {
+                    ["fallback"] = "My pack is empty of dressings! Help them, quick!",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.missing.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateMissingNeutral03",
+                },
+                {
+                    ["fallback"] = "I can't treat this wound without supplies! Check your packs!",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.missing.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateMissingNeutral04",
+                },
+                {
+                    ["fallback"] = "We're out of first aid! Who has a clean rag?!",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.missing.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateMissingNeutral05",
+                },
+                {
+                    ["fallback"] = "I don't have what I need to stop their bleeding! Find supplies!",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.missing.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateMissingNeutral06",
+                },
+                {
+                    ["fallback"] = "Zero bandages left! Someone hand me medical gear!",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.missing.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateMissingNeutral07",
+                },
+                {
+                    ["fallback"] = "I'm empty-handed! We need bandages for our friend now!",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.missing.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateMissingNeutral08",
+                },
+                {
+                    ["fallback"] = "No antiseptic, no bandages. Search the drawers, fast!",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.missing.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateMissingNeutral09",
+                },
+                {
+                    ["fallback"] = "I can't patch them up alone! Who has medical tools?!",
+                    ["id"] = "phrase.semantic.medical.distress.teammate.missing.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTeammateMissingNeutral10",
                 },
             },
         },
@@ -327,6 +1272,51 @@ return {
                     ["id"] = "phrase.semantic.medical.distress.treatment.bandage.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentBandageNeutral01",
                 },
+                {
+                    ["fallback"] = "Bandaged up tight. Good to go when you are.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.bandage.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentBandageNeutral02",
+                },
+                {
+                    ["fallback"] = "Bleeding has stopped. Ready to step out.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.bandage.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentBandageNeutral03",
+                },
+                {
+                    ["fallback"] = "Dressings are secure. I can walk now.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.bandage.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentBandageNeutral04",
+                },
+                {
+                    ["fallback"] = "That did the trick. I'm back on my feet.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.bandage.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentBandageNeutral05",
+                },
+                {
+                    ["fallback"] = "Wrapped up properly. Lead on.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.bandage.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentBandageNeutral06",
+                },
+                {
+                    ["fallback"] = "Wound is stabilized. Ready for your call.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.bandage.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentBandageNeutral07",
+                },
+                {
+                    ["fallback"] = "Bandage is holding. Let's get moving.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.bandage.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentBandageNeutral08",
+                },
+                {
+                    ["fallback"] = "Cleanly wrapped. I'm ready to follow.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.bandage.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentBandageNeutral09",
+                },
+                {
+                    ["fallback"] = "All patched up. Let's hit the road.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.bandage.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentBandageNeutral10",
+                },
             },
         },
     },
@@ -341,6 +1331,51 @@ return {
                     ["fallback"] = "Thank you. That treatment helped.",
                     ["id"] = "phrase.semantic.medical.distress.treatment.default.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentDefaultNeutral01",
+                },
+                {
+                    ["fallback"] = "Feeling much better. I appreciate the aid.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.default.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentDefaultNeutral02",
+                },
+                {
+                    ["fallback"] = "Much better now. Thank you for patching me up.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.default.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentDefaultNeutral03",
+                },
+                {
+                    ["fallback"] = "Pain is subsiding. Thanks for taking care of it.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.default.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentDefaultNeutral04",
+                },
+                {
+                    ["fallback"] = "Good work on that treatment. I'm indebted to you.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.default.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentDefaultNeutral05",
+                },
+                {
+                    ["fallback"] = "That took the edge off. Thank you.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.default.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentDefaultNeutral06",
+                },
+                {
+                    ["fallback"] = "I can function again. Thanks for the quick aid.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.default.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentDefaultNeutral07",
+                },
+                {
+                    ["fallback"] = "Appreciate the medical help. I owe you one.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.default.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentDefaultNeutral08",
+                },
+                {
+                    ["fallback"] = "Thanks, that helped a lot. Ready to move.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.default.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentDefaultNeutral09",
+                },
+                {
+                    ["fallback"] = "You saved my skin with that aid. Thank you.",
+                    ["id"] = "phrase.semantic.medical.distress.treatment.default.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressTreatmentDefaultNeutral10",
                 },
             },
         },
@@ -357,6 +1392,51 @@ return {
                     ["id"] = "phrase.semantic.medical.distress.update.bandage.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBandageNeutral01",
                 },
+                {
+                    ["fallback"] = "Still on the floor. Where is that bandage?",
+                    ["id"] = "phrase.semantic.medical.distress.update.bandage.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBandageNeutral02",
+                },
+                {
+                    ["fallback"] = "Wound is still unbandaged. Need it wrapped soon.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bandage.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBandageNeutral03",
+                },
+                {
+                    ["fallback"] = "Still waiting for someone to bind this cut.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bandage.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBandageNeutral04",
+                },
+                {
+                    ["fallback"] = "Blood is still seeping through. Need that wrap.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bandage.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBandageNeutral05",
+                },
+                {
+                    ["fallback"] = "Still grounded until these wounds get dressed.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bandage.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBandageNeutral06",
+                },
+                {
+                    ["fallback"] = "Waiting on clean cloth. Can't stand like this.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bandage.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBandageNeutral07",
+                },
+                {
+                    ["fallback"] = "Still down here waiting for first aid.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bandage.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBandageNeutral08",
+                },
+                {
+                    ["fallback"] = "Unpatched and bleeding. Please hurry.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bandage.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBandageNeutral09",
+                },
+                {
+                    ["fallback"] = "Still need that dressing applied. Don't delay.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bandage.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBandageNeutral10",
+                },
             },
         },
     },
@@ -371,6 +1451,51 @@ return {
                     ["fallback"] = "The bleeding has not stopped. I still need a bandage.",
                     ["id"] = "phrase.semantic.medical.distress.update.bleedout.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBleedoutNeutral01",
+                },
+                {
+                    ["fallback"] = "Still hemorrhaging. I need pressure and a wrap immediately.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bleedout.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBleedoutNeutral02",
+                },
+                {
+                    ["fallback"] = "Bleeding is continuing. I'm getting lightheaded.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bleedout.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBleedoutNeutral03",
+                },
+                {
+                    ["fallback"] = "Blood is still flowing. Please get that bandage on me.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bleedout.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBleedoutNeutral04",
+                },
+                {
+                    ["fallback"] = "Hasn't stopped bleeding yet. Running out of time.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bleedout.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBleedoutNeutral05",
+                },
+                {
+                    ["fallback"] = "Still losing red. My clothes are soaked.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bleedout.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBleedoutNeutral06",
+                },
+                {
+                    ["fallback"] = "The wound won't seal itself. Need a dressing now.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bleedout.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBleedoutNeutral07",
+                },
+                {
+                    ["fallback"] = "Still bleeding steadily. Hurry up with the aid.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bleedout.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBleedoutNeutral08",
+                },
+                {
+                    ["fallback"] = "Losing blood by the second. Please hurry.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bleedout.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBleedoutNeutral09",
+                },
+                {
+                    ["fallback"] = "The cut won't stop bleeding. Wrap it, please.",
+                    ["id"] = "phrase.semantic.medical.distress.update.bleedout.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateBleedoutNeutral10",
                 },
             },
         },
@@ -387,6 +1512,51 @@ return {
                     ["id"] = "phrase.semantic.medical.distress.update.default.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDefaultNeutral01",
                 },
+                {
+                    ["fallback"] = "Still incapacitated on the ground. Please assist.",
+                    ["id"] = "phrase.semantic.medical.distress.update.default.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDefaultNeutral02",
+                },
+                {
+                    ["fallback"] = "Haven't recovered yet. Still need a hand.",
+                    ["id"] = "phrase.semantic.medical.distress.update.default.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDefaultNeutral03",
+                },
+                {
+                    ["fallback"] = "Still down here. Don't leave me alone.",
+                    ["id"] = "phrase.semantic.medical.distress.update.default.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDefaultNeutral04",
+                },
+                {
+                    ["fallback"] = "Status unchanged: still injured and waiting.",
+                    ["id"] = "phrase.semantic.medical.distress.update.default.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDefaultNeutral05",
+                },
+                {
+                    ["fallback"] = "Still grounded. I need someone to help me up.",
+                    ["id"] = "phrase.semantic.medical.distress.update.default.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDefaultNeutral06",
+                },
+                {
+                    ["fallback"] = "Can't move on my own yet. Still need aid.",
+                    ["id"] = "phrase.semantic.medical.distress.update.default.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDefaultNeutral07",
+                },
+                {
+                    ["fallback"] = "Still unable to stand. Waiting for help.",
+                    ["id"] = "phrase.semantic.medical.distress.update.default.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDefaultNeutral08",
+                },
+                {
+                    ["fallback"] = "I'm still down in the dirt. Please assist me.",
+                    ["id"] = "phrase.semantic.medical.distress.update.default.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDefaultNeutral09",
+                },
+                {
+                    ["fallback"] = "Still waiting for support. Don't forget me.",
+                    ["id"] = "phrase.semantic.medical.distress.update.default.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDefaultNeutral10",
+                },
             },
         },
     },
@@ -401,6 +1571,51 @@ return {
                     ["fallback"] = "I still need water before I can move.",
                     ["id"] = "phrase.semantic.medical.distress.update.dehydration.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDehydrationNeutral01",
+                },
+                {
+                    ["fallback"] = "Thirst is still crippling me. Bring hydration.",
+                    ["id"] = "phrase.semantic.medical.distress.update.dehydration.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDehydrationNeutral02",
+                },
+                {
+                    ["fallback"] = "Can't stand until I drink something clean.",
+                    ["id"] = "phrase.semantic.medical.distress.update.dehydration.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDehydrationNeutral03",
+                },
+                {
+                    ["fallback"] = "Still parched and dizzy. Where is the water?",
+                    ["id"] = "phrase.semantic.medical.distress.update.dehydration.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDehydrationNeutral04",
+                },
+                {
+                    ["fallback"] = "Dehydration hasn't improved. I need fluids now.",
+                    ["id"] = "phrase.semantic.medical.distress.update.dehydration.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDehydrationNeutral05",
+                },
+                {
+                    ["fallback"] = "Still desperately thirsty. Bring a bottle over.",
+                    ["id"] = "phrase.semantic.medical.distress.update.dehydration.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDehydrationNeutral06",
+                },
+                {
+                    ["fallback"] = "Throat is still locked up dry. Need water.",
+                    ["id"] = "phrase.semantic.medical.distress.update.dehydration.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDehydrationNeutral07",
+                },
+                {
+                    ["fallback"] = "Can't make progress without hydration. Help me.",
+                    ["id"] = "phrase.semantic.medical.distress.update.dehydration.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDehydrationNeutral08",
+                },
+                {
+                    ["fallback"] = "Still waiting on that drink. Feeling very weak.",
+                    ["id"] = "phrase.semantic.medical.distress.update.dehydration.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDehydrationNeutral09",
+                },
+                {
+                    ["fallback"] = "Need fluids before my legs will work again.",
+                    ["id"] = "phrase.semantic.medical.distress.update.dehydration.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateDehydrationNeutral10",
                 },
             },
         },
@@ -417,6 +1632,51 @@ return {
                     ["id"] = "phrase.semantic.medical.distress.update.exhaustion.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateExhaustionNeutral01",
                 },
+                {
+                    ["fallback"] = "Stamina is still drained. Catching my breath.",
+                    ["id"] = "phrase.semantic.medical.distress.update.exhaustion.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateExhaustionNeutral02",
+                },
+                {
+                    ["fallback"] = "Still exhausted. Give me a little more time.",
+                    ["id"] = "phrase.semantic.medical.distress.update.exhaustion.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateExhaustionNeutral03",
+                },
+                {
+                    ["fallback"] = "Muscles are still aching. Recovering slowly.",
+                    ["id"] = "phrase.semantic.medical.distress.update.exhaustion.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateExhaustionNeutral04",
+                },
+                {
+                    ["fallback"] = "Lungs still burning from running. Give me a moment.",
+                    ["id"] = "phrase.semantic.medical.distress.update.exhaustion.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateExhaustionNeutral05",
+                },
+                {
+                    ["fallback"] = "Fatigue hasn't cleared yet. Still resting here.",
+                    ["id"] = "phrase.semantic.medical.distress.update.exhaustion.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateExhaustionNeutral06",
+                },
+                {
+                    ["fallback"] = "Energy is very low. Still need a few breaths.",
+                    ["id"] = "phrase.semantic.medical.distress.update.exhaustion.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateExhaustionNeutral07",
+                },
+                {
+                    ["fallback"] = "Legs are still shaking from exhaustion. Give me time.",
+                    ["id"] = "phrase.semantic.medical.distress.update.exhaustion.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateExhaustionNeutral08",
+                },
+                {
+                    ["fallback"] = "Still spent. Don't rush me to run again.",
+                    ["id"] = "phrase.semantic.medical.distress.update.exhaustion.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateExhaustionNeutral09",
+                },
+                {
+                    ["fallback"] = "Recharging my stamina. Just a little longer.",
+                    ["id"] = "phrase.semantic.medical.distress.update.exhaustion.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateExhaustionNeutral10",
+                },
             },
         },
     },
@@ -431,6 +1691,51 @@ return {
                     ["fallback"] = "I am still down. Please do not finish me.",
                     ["id"] = "phrase.semantic.medical.distress.update.mercy.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateMercyNeutral01",
+                },
+                {
+                    ["fallback"] = "Still helpless here. Spare my life, please.",
+                    ["id"] = "phrase.semantic.medical.distress.update.mercy.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateMercyNeutral02",
+                },
+                {
+                    ["fallback"] = "I'm still no threat to you. Please have mercy.",
+                    ["id"] = "phrase.semantic.medical.distress.update.mercy.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateMercyNeutral03",
+                },
+                {
+                    ["fallback"] = "Still begging for survival. Don't hurt me.",
+                    ["id"] = "phrase.semantic.medical.distress.update.mercy.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateMercyNeutral04",
+                },
+                {
+                    ["fallback"] = "Plea remains: spare me and let me crawl away.",
+                    ["id"] = "phrase.semantic.medical.distress.update.mercy.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateMercyNeutral05",
+                },
+                {
+                    ["fallback"] = "I surrender completely. Please do not execute me.",
+                    ["id"] = "phrase.semantic.medical.distress.update.mercy.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateMercyNeutral06",
+                },
+                {
+                    ["fallback"] = "Still at your mercy. Please keep that weapon away.",
+                    ["id"] = "phrase.semantic.medical.distress.update.mercy.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateMercyNeutral07",
+                },
+                {
+                    ["fallback"] = "I have surrendered. Don't strike a downed person.",
+                    ["id"] = "phrase.semantic.medical.distress.update.mercy.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateMercyNeutral08",
+                },
+                {
+                    ["fallback"] = "Please honor your mercy. Don't kill me.",
+                    ["id"] = "phrase.semantic.medical.distress.update.mercy.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateMercyNeutral09",
+                },
+                {
+                    ["fallback"] = "Still alive, still pleading. Let me survive this.",
+                    ["id"] = "phrase.semantic.medical.distress.update.mercy.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateMercyNeutral10",
                 },
             },
         },
@@ -447,6 +1752,51 @@ return {
                     ["id"] = "phrase.semantic.medical.distress.update.rescue.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral01",
                 },
+                {
+                    ["fallback"] = "Still trapped in place. Waiting for your rescue.",
+                    ["id"] = "phrase.semantic.medical.distress.update.rescue.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral02",
+                },
+                {
+                    ["fallback"] = "Don't leave me stranded! I'm still where you left me.",
+                    ["id"] = "phrase.semantic.medical.distress.update.rescue.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral03",
+                },
+                {
+                    ["fallback"] = "Still cannot walk out alone. Come help me.",
+                    ["id"] = "phrase.semantic.medical.distress.update.rescue.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral04",
+                },
+                {
+                    ["fallback"] = "Waiting on rescue here. Hurry before dead arrive.",
+                    ["id"] = "phrase.semantic.medical.distress.update.rescue.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral05",
+                },
+                {
+                    ["fallback"] = "Still pinned down. Please extract me.",
+                    ["id"] = "phrase.semantic.medical.distress.update.rescue.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral06",
+                },
+                {
+                    ["fallback"] = "Don't forget me here! Still need someone to pull me out.",
+                    ["id"] = "phrase.semantic.medical.distress.update.rescue.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral07",
+                },
+                {
+                    ["fallback"] = "Status unchanged: trapped and waiting for assistance.",
+                    ["id"] = "phrase.semantic.medical.distress.update.rescue.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral08",
+                },
+                {
+                    ["fallback"] = "Still waiting for someone to drag me to safety.",
+                    ["id"] = "phrase.semantic.medical.distress.update.rescue.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral09",
+                },
+                {
+                    ["fallback"] = "I'm still right here. Please don't leave me behind.",
+                    ["id"] = "phrase.semantic.medical.distress.update.rescue.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateRescueNeutral10",
+                },
             },
         },
     },
@@ -462,6 +1812,51 @@ return {
                     ["id"] = "phrase.semantic.medical.distress.update.starvation.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral01",
                 },
+                {
+                    ["fallback"] = "Starvation is worsening. Did you find anything edible?",
+                    ["id"] = "phrase.semantic.medical.distress.update.starvation.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral02",
+                },
+                {
+                    ["fallback"] = "Still too weak from hunger to stand.",
+                    ["id"] = "phrase.semantic.medical.distress.update.starvation.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral03",
+                },
+                {
+                    ["fallback"] = "Can't move on an empty stomach. Bring food.",
+                    ["id"] = "phrase.semantic.medical.distress.update.starvation.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral04",
+                },
+                {
+                    ["fallback"] = "Still starving on the floor. Please bring a ration.",
+                    ["id"] = "phrase.semantic.medical.distress.update.starvation.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral05",
+                },
+                {
+                    ["fallback"] = "Body needs calories right now. I'm fading.",
+                    ["id"] = "phrase.semantic.medical.distress.update.starvation.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral06",
+                },
+                {
+                    ["fallback"] = "Still waiting for a meal. Stomach cramps are brutal.",
+                    ["id"] = "phrase.semantic.medical.distress.update.starvation.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral07",
+                },
+                {
+                    ["fallback"] = "Can't regain strength without food. Help me.",
+                    ["id"] = "phrase.semantic.medical.distress.update.starvation.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral08",
+                },
+                {
+                    ["fallback"] = "Still starving here. Any can of beans or soup?",
+                    ["id"] = "phrase.semantic.medical.distress.update.starvation.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral09",
+                },
+                {
+                    ["fallback"] = "Need nourishment before I can take a step.",
+                    ["id"] = "phrase.semantic.medical.distress.update.starvation.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUpdateStarvationNeutral10",
+                },
             },
         },
     },
@@ -473,9 +1868,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I am hurt. I need help now.",
+                    ["fallback"] = "I am hurt! I need help now!",
                     ["id"] = "phrase.semantic.medical.distress.urgent.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral01",
+                },
+                {
+                    ["fallback"] = "Emergency! I need immediate medical attention!",
+                    ["id"] = "phrase.semantic.medical.distress.urgent.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral02",
+                },
+                {
+                    ["fallback"] = "Hit bad! Come over here right now!",
+                    ["id"] = "phrase.semantic.medical.distress.urgent.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral03",
+                },
+                {
+                    ["fallback"] = "Urgent! I'm bleeding and falling down!",
+                    ["id"] = "phrase.semantic.medical.distress.urgent.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral04",
+                },
+                {
+                    ["fallback"] = "I need aid this second! Hurry!",
+                    ["id"] = "phrase.semantic.medical.distress.urgent.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral05",
+                },
+                {
+                    ["fallback"] = "Severe injury! Drop what you're doing and help me!",
+                    ["id"] = "phrase.semantic.medical.distress.urgent.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral06",
+                },
+                {
+                    ["fallback"] = "I won't last long without treatment! Now!",
+                    ["id"] = "phrase.semantic.medical.distress.urgent.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral07",
+                },
+                {
+                    ["fallback"] = "Critical wound! Bandage me now!",
+                    ["id"] = "phrase.semantic.medical.distress.urgent.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral08",
+                },
+                {
+                    ["fallback"] = "I'm going down hard! Medic, help me!",
+                    ["id"] = "phrase.semantic.medical.distress.urgent.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral09",
+                },
+                {
+                    ["fallback"] = "Urgent distress! Someone patch me up right now!",
+                    ["id"] = "phrase.semantic.medical.distress.urgent.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticMedicalDistressUrgentNeutral10",
                 },
             },
         },

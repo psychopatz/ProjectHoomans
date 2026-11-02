@@ -7,9 +7,9 @@
 local Protocol = {
     VERSION = 1,
     -- Keep this aligned with runtime.protocol.DEFAULT_MAX_MESSAGE_BYTES.
-    -- Real-save Player/NPC imports can carry a selected persisted record plus
-    -- bounded provenance and provider metadata above 256 KiB.
-    MAX_MESSAGE_BYTES = 512 * 1024,
+    -- Real-save Player/NPC imports and expanded phrase catalogs can carry
+    -- registered-flow metadata above 512 KiB.
+    MAX_MESSAGE_BYTES = 1024 * 1024,
 }
 
 -- Lua tables with only nil-valued fields are indistinguishable from empty
