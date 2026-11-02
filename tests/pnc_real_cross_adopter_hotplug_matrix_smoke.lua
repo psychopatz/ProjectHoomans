@@ -78,7 +78,7 @@ T.load(SERVER_ROOT .. "Player/PNC_PlayerCharacterDebug.lua")
 T.load(SERVER_ROOT .. "Player/PNC_PlayerCharacterService.lua")
 
 local function resetHoomansPlayerRegistry()
-    globalModData = {}
+    globalModData["PNC.PlayerCharacters"] = nil
     PNC.PlayerCharacters.Registry = PNC.PlayerCharacterTypes.NewRegistry()
     PNC.PlayerCharacters.RuntimeByPlayer = setmetatable({}, { __mode = "k" })
     PNC.PlayerCharacters.RuntimeByUUID = {}

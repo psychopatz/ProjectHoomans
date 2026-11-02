@@ -71,12 +71,24 @@ local function canAdoptCoreIdentity(player, claimedUUID, accountKey)
             local ok, mod = pcall(require, "PsychopatzCore/Actors/PsychopatzPlayerIdentity")
             return ok and mod or nil
         end)()
-    if not CoreIdentity or type(CoreIdentity.VerifyProvenance) ~= "function" then
+    if not CoreIdentity then
         return false, "core_identity_unavailable"
     end
-    local ok, verifyReason = CoreIdentity.VerifyProvenance(player, normalized, accountKey)
-    if not ok then
-        return false, verifyReason or "untrusted_core_provenance"
+    -- Authoritative Issuance Check: Core must have actually issued or adopted this identity!
+    if type(CoreIdentity.IsIssuedIdentity) == "function" then
+        local issued, issueReason = CoreIdentity.IsIssuedIdentity(normalized, accountKey)
+        if not issued then
+            return false, issueReason or "not_issued_by_core"
+        end
+    else
+        return false, "core_issuance_unsupported"
+    end
+    -- Secondary provenance check on modData
+    if type(CoreIdentity.VerifyProvenance) == "function" then
+        local ok, verifyReason = CoreIdentity.VerifyProvenance(player, normalized, accountKey)
+        if not ok then
+            return false, verifyReason or "untrusted_core_provenance"
+        end
     end
     return true, "core_adoptable"
 end

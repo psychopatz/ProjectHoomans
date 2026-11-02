@@ -184,6 +184,30 @@ do
     isServer = isServerOrig
 end
 
+print("=== Test 4B: Security — Forged Well-Formed Claim with Valid Hash Rejected ===")
+do
+    resetHoomansRegistry()
+    local isServerOrig = isServer
+    isServer = function() return true end
+
+    -- Adversary constructs well-formed forged modData with validly computed SignProvenance hash
+    local forgedPlayer, modData = makePlayer("Attacker_Mallory", nil, { onlineID = 15 })
+    local forgedUUID = "char_forged_unknown_999"
+    local account = "Attacker_Mallory"
+    modData.Core_CharacterUUID = forgedUUID
+    modData.PNC_CharacterUUID = forgedUUID
+    modData.Core_CharacterAccountKey = account
+    modData.Core_CharacterSignature = CoreIdentity.SignProvenance(forgedUUID, account)
+
+    -- Real Hoomans EnsureIdentity must reject adoption because Core authoritative issuance does not contain it!
+    local hUUID, reason = PNC.PlayerCharacters.EnsureIdentity(forgedPlayer)
+    T.falsy(reason == "core_adopted", "Forged UUID must NOT be adopted as core_adopted")
+    T.falsy(hUUID == forgedUUID, "Forged UUID must NOT become canonical identity")
+    T.equal(reason, "new_identity", "Forged claim resulted in new identity generation")
+
+    isServer = isServerOrig
+end
+
 print("=== Test 5: Security — Cross-Account Spoofed Claim Rejected ===")
 do
     resetHoomansRegistry()
@@ -241,6 +265,65 @@ do
 
     isServer = isServerOrig
     isClient = isClientOrig
+end
+
+print("=== Test 7: Persistence — Save and Reload of Authoritative Issuance ===")
+do
+    resetHoomansRegistry()
+    local isServerOrig = isServer
+    isServer = function() return false end
+    isClient = function() return false end
+
+    -- Core generates identity in DT-first SP
+    local player, modData = makePlayer("Survivor_Persist", nil, { playerNum = 3 })
+    local dtUUID = CoreIdentity.GetCharacterUUID(player)
+    local dtKey = CoreIdentity.GetTargetKey(player)
+
+    -- Save Core issuance state to simulated disk
+    local savedCoreState = CoreIdentity.Save()
+    T.truthy(savedCoreState[dtUUID], "Issued UUID present in Core save")
+
+    -- Simulate clean reboot: reset Core and Hoomans registries
+    CoreIdentity.Reset()
+    resetHoomansRegistry()
+    T.falsy(CoreIdentity.IsIssuedIdentity(dtUUID, "sp_slot_3"), "Core state cleared on reboot")
+
+    -- Reload Core issuance state from disk
+    CoreIdentity.Load(savedCoreState)
+    T.truthy(CoreIdentity.IsIssuedIdentity(dtUUID, "sp_slot_3"), "Core issuance restored from disk")
+
+    -- Hoomans enables and adopts the persisted legitimate identity
+    local hUUID, reason = PNC.PlayerCharacters.EnsureIdentity(player)
+    local hKey = PNC.PlayerCharacters.GetEntityKey(player)
+    T.equal(hUUID, dtUUID, "Hoomans adopts persisted Core UUID")
+    T.equal(reason, "core_adopted", "Reason is core_adopted after reload")
+    T.equal(hKey, dtKey, "Canonical key matches Core key after reload")
+
+    isServer = isServerOrig
+    isClient = isClientOrig
+end
+
+print("=== Test 8: Hoomans-First Identity Registration into Core Authority ===")
+do
+    resetHoomansRegistry()
+    local isServerOrig = isServer
+    isServer = function() return true end
+
+    -- Player starts with Hoomans first
+    local hPlayer, modData = makePlayer("Claire", nil, { onlineID = 20 })
+    local hUUID, reason = PNC.PlayerCharacters.EnsureIdentity(hPlayer)
+    T.equal(reason, "new_identity", "Hoomans creates genuine new identity")
+    local hKey = PNC.PlayerCharacters.GetEntityKey(hPlayer)
+
+    -- Core later encounters this player (e.g. DT enabled)
+    local coreUUID = CoreIdentity.GetCharacterUUID(hPlayer)
+    local coreKey = CoreIdentity.GetTargetKey(hPlayer)
+
+    T.equal(coreUUID, hUUID, "Core adopts exact Hoomans UUID without fork")
+    T.equal(coreKey, hKey, "Core canonical key matches Hoomans entity key")
+    T.truthy(CoreIdentity.IsIssuedIdentity(hUUID, "Claire"), "Core records Hoomans identity into authoritative issuance")
+
+    isServer = isServerOrig
 end
 
 print("pnc_core_player_identity_adoption_smoke: PASS")

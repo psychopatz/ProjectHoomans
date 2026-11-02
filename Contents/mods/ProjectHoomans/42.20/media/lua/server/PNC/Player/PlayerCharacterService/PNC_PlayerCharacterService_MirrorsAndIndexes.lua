@@ -26,6 +26,17 @@ local function setMirror(player, uuid, accountKey)
     data[Constants.MODDATA_ACCOUNT_KEY_FIELD] = accountKey
     data["Core_CharacterUUID"] = uuid
     data["Core_CharacterAccountKey"] = accountKey
+    local CoreIdentity = PsychopatzCore and PsychopatzCore.PlayerIdentity
+        or (function()
+            local ok, mod = pcall(require, "PsychopatzCore/Actors/PsychopatzPlayerIdentity")
+            return ok and mod or nil
+        end)()
+    if CoreIdentity and type(CoreIdentity.RegisterIssuedIdentity) == "function" then
+        CoreIdentity.RegisterIssuedIdentity(uuid, accountKey, { source = "hoom_created" })
+        if type(CoreIdentity.SignProvenance) == "function" then
+            data["Core_CharacterSignature"] = CoreIdentity.SignProvenance(uuid, accountKey)
+        end
+    end
     return true
 end
 
