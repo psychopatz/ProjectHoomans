@@ -33,35 +33,43 @@ This must be raised before the corpus can satisfy the requested minimum.
 | Phase | State |
 | --- | --- |
 | P0 — audit / contract | **COMPLETE (planning)** |
-| P1 — capacity + inventory tooling | **NOT STARTED** |
-| P2 — core conversation | **NOT STARTED** |
+| P1 — capacity + inventory tooling | **COMPLETE** |
+| P2 — core conversation | **IN PROGRESS** |
 | P3 — social | **NOT STARTED** |
 | P4 — commands/tasks | **NOT STARTED** |
 | P5 — events/combat | **NOT STARTED** |
 | P6 — remaining corpus / exemptions | **NOT STARTED** |
 | P7 — corpus-wide acceptance | **NOT STARTED** |
 
-## Immediate Next Chunk — P1A/P1B
+## Accepted P1 Evidence
 
-Start with infrastructure and a truthful inventory before writing thousands of phrases.
+1. **Bounded phrase capacity raised (P1A)**:
+   - Raised `MAX_PHRASES_PER_STYLE` from 6 to 16 in `tools/semantic_harness/codebuilder/dialogue_content.py`.
+   - Compiler enforces 1..16 bounds and rejects >16 with compile errors.
+   - Verified existing <=6 content regenerates with 100% byte-for-byte idempotent parity (`git diff` clean).
+   - Added capacity unit tests in `test_dialogue_variation_auditor.py` covering boundary checks (16 accepted, 17 rejected, empty rejected).
 
-1. raise the bounded phrase cap from 6 to 16 unless benchmark evidence establishes another safe >=10 bound;
-2. update compiler/unit tests for the new bound;
-3. implement the machine-readable corpus variation auditor;
-4. report every phrase family/style with:
-   - source shard;
-   - semanticTemplateID;
-   - style;
-   - phrase count;
-   - normalized unique EN/TL counts;
-   - placeholder parity;
-   - duplicate/near-duplicate suspicion;
-   - source owner;
-   - classification;
-5. create the initial classification ledger for all 729 current style buckets;
-6. prove unchanged existing content compiles/regenerates identically under the higher bound;
-7. record exact results here;
-8. continue automatically into P2 core conversation refinement.
+2. **Machine-readable corpus variation auditor (P1B & P1C)**:
+   - Implemented `tools/semantic_harness/codebuilder/variation_auditor.py` with `audit_corpus()`, normalization, placeholder parity, duplication checks, EN-identical TL checks, Quality Sweep evidence integration, and Markdown ledger generation.
+   - Exposed CLI interface via `app.py`: `--variation-audit`, `--variation-audit-json`, `--variation-audit-ledger`, `--variation-audit-shard`, `--variation-audit-under-10`.
+   - Audited all 505 canonical phrase families and all 729 canonical style buckets across all 21 manifest content shards (85 registered JSON shard files).
+   - Generated initial classification ledger at `docs/Jobs/SemanticDialogueRefinementVariation/CLASSIFICATION_LEDGER.md`:
+     - `EXPAND_TO_10`: 683 style buckets (NPC spoken dialogue across core, social, commands, tasks, events, combat, quest, knowledge, navigation).
+     - `THIRD_PARTY_COMPAT_DEFERRED`: 27 style buckets (external third-party compatibility fallback phrases in `content/compatibility.json`).
+     - `PLAYER_UI_OUT_OF_SCOPE`: 19 style buckets (player avatar command and emote callouts in `content/command/player.json` and `content/social/emotes/player.json`).
+     - `ATOMIC_EXEMPT`: 0.
+     - `STRUCTURAL_NOT_PHRASE`: 0.
+     - Under-10 eligible buckets: **683 / 683**.
+   - Added unit test suite `test_dialogue_variation_auditor.py` (7 tests, all passing in 0.04s).
+
+## Immediate Active Phase — P2: Core conversation refinement
+
+Refine and expand high-frequency Quality Sweep surfaces:
+- **P2A**: Greeting / farewell (`content/greeting.json`: 7 families, 13 styles).
+- **P2B**: Wellbeing / health / needs (`content/wellbeing.json`: 11 families, 20 styles; `content/health.json`: 6 families, 24 styles; `content/needs.json`: 10 families, 13 styles).
+- **P2C**: What's Up / general conversation / identity (`content/conversation.json`: 5 families, 20 styles; `content/social/tool_replies/ask_name.json`: 8 families, 8 styles).
+
+Every eligible active style in these core shards must reach **>= 10 meaningful, grounded, context-safe phrase variants** with valid EN/TL parity.
 
 ## First content wave after P1
 

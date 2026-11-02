@@ -77,6 +77,7 @@ CLI_OPERATIONS = (
     "sweep_status",
     "sweep_report",
     "sweep_replay",
+    "variation_audit",
 )
 
 
@@ -617,6 +618,37 @@ def cli(arguments: argparse.Namespace) -> int:
                 _print_result(replay_manifest.to_dict(), arguments.jsonl)
                 emit_activity()
                 return 0 if replay_manifest.status == "COMPLETED" else 3
+        if getattr(arguments, "variation_audit", False):
+            from .codebuilder.variation_auditor import (
+                audit_corpus,
+                render_markdown_ledger,
+            )
+
+            report = audit_corpus(repository=authoring_service.repository)
+            if getattr(arguments, "variation_audit_shard", None):
+                shard_filter = arguments.variation_audit_shard
+                report.records = [
+                    r for r in report.records if shard_filter in r.source_shard
+                ]
+            if getattr(arguments, "variation_audit_under_10", False):
+                report.records = [
+                    r for r in report.records if r.phrase_count < 10
+                ]
+            if getattr(arguments, "variation_audit_json", False) or arguments.jsonl:
+                _print_result(report.to_dict(), arguments.jsonl)
+            elif getattr(arguments, "variation_audit_ledger", False):
+                print(render_markdown_ledger(report), end="")
+            else:
+                _print_result({
+                    "total_families": report.total_families,
+                    "total_styles": report.total_styles,
+                    "under_10_count": report.under_10_count,
+                    "eligible_under_10_count": report.eligible_under_10_count,
+                    "classifications": report.classification_counts,
+                    "phrase_distribution": report.phrase_distribution,
+                }, False)
+            emit_activity()
+            return 0
         if arguments.run_semantic_tests or arguments.semantic_test_files:
             from .testing.loader import discover_cases, load_cases_from_file
             from .testing.executor import execute_case
@@ -1267,6 +1299,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--sweep-bundle", action="store_true", help="emit LLM review bundle instead of cluster report")
     parser.add_argument("--sweep-reachability", action="store_true", help="emit variant reachability report")
     parser.add_argument("--sweep-sentences", action="store_true", help="output generated sentence rows instead of cluster report")
+    parser.add_argument("--variation-audit", action="store_true", help="run comprehensive canonical conversation phrase variation audit")
+    parser.add_argument("--variation-audit-json", action="store_true", help="emit machine-readable JSON for variation audit")
+    parser.add_argument("--variation-audit-ledger", action="store_true", help="emit markdown classification ledger for variation audit")
+    parser.add_argument("--variation-audit-shard", help="filter variation audit by canonical source shard")
+    parser.add_argument("--variation-audit-under-10", action="store_true", help="filter variation audit to only under-10 style buckets")
     parser.add_argument("--input", action="append", default=[], help="chat input; repeatable")
     parser.add_argument("--timeout", type=float, default=5.0, help="per-request timeout in seconds")
     parser.add_argument("--startup-timeout", type=float, default=8.0, help="worker startup timeout in seconds")
