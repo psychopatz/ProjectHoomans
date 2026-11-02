@@ -1,57 +1,51 @@
 # Progress — Core Semantic & Relationship Foundation
 
-**State:** IN PROGRESS — planning complete; production implementation not started by this documentation change.
+**State:** IN PROGRESS — P0A accepted; proceeding to P0B contract implementation.
 
-## Planning evidence
+## Planning & Audit Evidence
 
 Verified on 2026-11-02:
 
-- Core already has semantic IR/parser/registry/router/dialogue-turn machinery.
-- Core capability catalog already exposes semantics, conversation, translation and actors.
+- Exact branch/HEAD/status across all three repos confirmed:
+  - `psychopatzCore`: `main` @ `0100bf4`, clean, up to date with `origin/main`.
+  - `DynamicTrading`: `main` @ `c97ee132`, up to date with `origin/main`, 1 tracked modification in `DTHoomans_Conversation.lua` preserved.
+  - `ProjectHoomans`: `main` @ `02ab2b41`, clean, up to date with `origin/main`.
 - Core Actor Social already stores approval/respect/familiarity/personality/memories with server-authorized events.
-- Accepted Core NPC Foundation already establishes Core actor/social/provider-switching ownership developer-side.
-- Hoomans still has a richer RelationshipService/social stack and extensive Hoomans-specific semantic action/runtime behavior.
-- DTCommon depends on Core; DTAbstract has no audited direct PNC gameplay dependency; DTHoomans remains the optional Hoomans bridge.
-- DTHoomans conversation currently uses Hoomans semantic/conversation APIs, demonstrating why standalone DT needs its own Core-registered semantic pack.
+- Audit identified critical foundation gap: Core Social (`PsychopatzSocial.lua`) currently drops unknown fields and lacks a namespaced `extensions` dictionary on relationship entries and top-level social state.
+- Audit mapped field-by-field ownership between Core Social and Hoomans `record.social`:
+  - Shared Core: approval (-100..100), respect (-100..100), familiarity (0..100), memories, personality, recentEventIDs.
+  - Hoomans extensions: durable bond (romance/family), morale/moraleBaseline, conduct, saturation, cooldowns, interactionJournal.
+- Audit identified Dynamic Trading standalone vs DTHoomans dependencies:
+  - `DTCommon` and `DTAbstract` have zero hard dependencies on Project Hoomans (`mod.info` requires only `PsychopatzCore,MarketSense`).
+  - `DTCommon_TalkService` provides a standalone bridge to `PsychopatzActorConversationService`.
+  - `DTCommon_CoreActorPolicy.PriceContext` already reads `PsychopatzCore.Actors.Social` directly for relationship discounts.
+  - Trade/referral choices are currently registered only in `DTHoomans_Conversation.lua` via Hoomans-specific block APIs.
+- Comprehensive classification of Hoomans semantic modules completed in `AUDIT.md`.
+- Baseline test suites in all three repositories verified passing.
 
-## Repository state observed during planning
+## Completed Chunks
 
-- ProjectHoomans: existing `main`, locally ahead of origin at planning time.
-- DynamicTrading: existing `main` with a tracked local modification in `DTHoomans_Conversation.lua` at planning time.
-- PsychopatzCore: existing `main`, clean at planning time.
+- [x] **P0A — Cross-repository convergence audit** (Accepted: 2026-11-02)
+  - Detailed source truth, API inventory, field-by-field matrix, DT dependency map, semantic module classification, and migration hazard ledger documented in `AUDIT.md`.
 
-These are planning observations only. Recheck before every write; never assume they remain current.
+## Current Phase: P0B — Freeze Public Contracts
 
-## Accepted dependency
+### Next Chunk — P0B
+Implement and test the smallest stable, reusable public contracts in `PsychopatzCore` without loading Project Hoomans:
+1. **Core Relationship Extension & Query Contract:**
+   - Update `PsychopatzSocial.lua` to support namespaced adopter `extensions` on both top-level social state and individual relationship entries.
+   - Preserve unknown/inactive adopter extension payloads across `normalizeRelationship`, `NewState`, `Validate`, `ToPayload`, and `RecordAuthorizedEvent`.
+   - Add `Social.GetExtension(state, targetKey, extensionID)` and `Social.SetExtension(state, targetKey, extensionID, payload, authority, expectedRevision)`.
+2. **Core Semantic Pack & Capability Contract:**
+   - Add generic Semantic Pack registration in `PsychopatzCore.Semantics` (`PsychopatzSemanticPackRegistry.lua`):
+     - `Semantics.RegisterPack(spec)` / `UnregisterPack(packID)` / `GetPack(packID)` / `ListPacks()`.
+   - Add capability-gated action provider contract and filtering helper in `PsychopatzCore.Semantics`.
+3. **Relationship-Aware Conversation Context Helper:**
+   - Ensure `PsychopatzActorConversationService` and `PsychopatzSocialFlavor` provide clean projection of shared relationship and adopter extensions into conversation context.
+4. **Focused Unit Tests:**
+   - Create `tests/psychopatz_social_extension_smoke.lua` and `tests/psychopatz_semantic_pack_smoke.lua` in `psychopatzCore` verifying these contracts standalone.
+   - Verify all existing Core, DT, and Hoomans baseline tests remain passing.
 
-`psychopatzCore/Docs/npc_foundation/` P0A-P9 is accepted developer foundation and must not be restarted absent a concrete regression.
+## Parent Goal Status
 
-`ProjectHoomans/docs/Jobs/DomainContextArchitectureRefactor/` is also recorded developer-complete and supplies the current domain/public-boundary discipline.
-
-## Current phase
-
-**P0 — Cross-repository convergence audit and contracts.**
-
-### Next Chunk — P0A
-
-Perform a fresh source-backed three-repository ownership/convergence audit before production edits.
-
-Required output:
-
-1. exact branch/HEAD/status/upstream for Core, DT and Hoomans;
-2. inventory of Core public actor/social/semantic/conversation APIs actually available now;
-3. field-by-field mapping of Core Social versus Hoomans RelationshipService shared/common and Hoomans-only state;
-4. call/dependency map for DT standalone conversation versus DTHoomans/Hoomans integration;
-5. list of Hoomans semantic runtime modules classified as:
-   - generic mechanism candidate for Core,
-   - Hoomans content/policy that must remain,
-   - compatibility/adapter,
-   - obsolete/duplicate;
-6. migration hazards and baseline focused tests;
-7. update this PROGRESS with the smallest safe P0B contract implementation chunk.
-
-Do not move production ownership during P0A merely to make the audit cleaner.
-
-## Parent goal status
-
-Still IN PROGRESS until P0-P7 acceptance passes. A completed audit or Core API addition does not complete the goal.
+IN PROGRESS until P0-P7 acceptance passes.
