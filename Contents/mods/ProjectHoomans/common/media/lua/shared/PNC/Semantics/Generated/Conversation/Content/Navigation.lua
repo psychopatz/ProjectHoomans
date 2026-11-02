@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.navigation.camp.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampGuarded01",
                 },
+                {
+                    ["fallback"] = "Which spot are you eyeing? Better be defendable.",
+                    ["id"] = "phrase.semantic.navigation.camp.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampGuarded02",
+                },
+                {
+                    ["fallback"] = "Make sure it has more than one exit.",
+                    ["id"] = "phrase.semantic.navigation.camp.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampGuarded03",
+                },
+                {
+                    ["fallback"] = "Where do you want to hole up? Don't pick a trap.",
+                    ["id"] = "phrase.semantic.navigation.camp.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampGuarded04",
+                },
+                {
+                    ["fallback"] = "Which site? I don't want us cornered.",
+                    ["id"] = "phrase.semantic.navigation.camp.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampGuarded05",
+                },
+                {
+                    ["fallback"] = "Pick carefully. A bad camp gets us killed.",
+                    ["id"] = "phrase.semantic.navigation.camp.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampGuarded06",
+                },
+                {
+                    ["fallback"] = "Where? I need to see the choke points first.",
+                    ["id"] = "phrase.semantic.navigation.camp.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampGuarded07",
+                },
+                {
+                    ["fallback"] = "Where are you planning to bed down? Watch the perimeter.",
+                    ["id"] = "phrase.semantic.navigation.camp.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampGuarded08",
+                },
+                {
+                    ["fallback"] = "Show me where. I'll inspect the sightlines.",
+                    ["id"] = "phrase.semantic.navigation.camp.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampGuarded09",
+                },
+                {
+                    ["fallback"] = "Where? We need high ground or solid barricades.",
+                    ["id"] = "phrase.semantic.navigation.camp.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "Where should we set up?",
                     ["id"] = "phrase.semantic.navigation.camp.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampNeutral01",
+                },
+                {
+                    ["fallback"] = "Which location are you considering for camp?",
+                    ["id"] = "phrase.semantic.navigation.camp.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampNeutral02",
+                },
+                {
+                    ["fallback"] = "Where do you want to establish our rest site?",
+                    ["id"] = "phrase.semantic.navigation.camp.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampNeutral03",
+                },
+                {
+                    ["fallback"] = "Where are we making camp today?",
+                    ["id"] = "phrase.semantic.navigation.camp.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampNeutral04",
+                },
+                {
+                    ["fallback"] = "Point out the spot you have in mind.",
+                    ["id"] = "phrase.semantic.navigation.camp.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampNeutral05",
+                },
+                {
+                    ["fallback"] = "Where should we pitch our camp?",
+                    ["id"] = "phrase.semantic.navigation.camp.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampNeutral06",
+                },
+                {
+                    ["fallback"] = "Which area looks suitable for stopping?",
+                    ["id"] = "phrase.semantic.navigation.camp.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampNeutral07",
+                },
+                {
+                    ["fallback"] = "Where do you want to place the campsite?",
+                    ["id"] = "phrase.semantic.navigation.camp.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampNeutral08",
+                },
+                {
+                    ["fallback"] = "Tell me where you want to settle down.",
+                    ["id"] = "phrase.semantic.navigation.camp.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampNeutral09",
+                },
+                {
+                    ["fallback"] = "Where are we setting our base for the night?",
+                    ["id"] = "phrase.semantic.navigation.camp.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampNeutral10",
                 },
             },
             ["terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.navigation.camp.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampTerse01",
                 },
+                {
+                    ["fallback"] = "Which spot?",
+                    ["id"] = "phrase.semantic.navigation.camp.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampTerse02",
+                },
+                {
+                    ["fallback"] = "Camp where?",
+                    ["id"] = "phrase.semantic.navigation.camp.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampTerse03",
+                },
+                {
+                    ["fallback"] = "Location?",
+                    ["id"] = "phrase.semantic.navigation.camp.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampTerse04",
+                },
+                {
+                    ["fallback"] = "Point it out.",
+                    ["id"] = "phrase.semantic.navigation.camp.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampTerse05",
+                },
+                {
+                    ["fallback"] = "Which site?",
+                    ["id"] = "phrase.semantic.navigation.camp.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampTerse06",
+                },
+                {
+                    ["fallback"] = "Where to?",
+                    ["id"] = "phrase.semantic.navigation.camp.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampTerse07",
+                },
+                {
+                    ["fallback"] = "Name the spot.",
+                    ["id"] = "phrase.semantic.navigation.camp.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampTerse08",
+                },
+                {
+                    ["fallback"] = "Where at?",
+                    ["id"] = "phrase.semantic.navigation.camp.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampTerse09",
+                },
+                {
+                    ["fallback"] = "Show me.",
+                    ["id"] = "phrase.semantic.navigation.camp.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "Where should we set up camp?",
                     ["id"] = "phrase.semantic.navigation.camp.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampWarm01",
+                },
+                {
+                    ["fallback"] = "Where would you like us to settle down, friend?",
+                    ["id"] = "phrase.semantic.navigation.camp.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampWarm02",
+                },
+                {
+                    ["fallback"] = "Found a cozy spot for us to rest?",
+                    ["id"] = "phrase.semantic.navigation.camp.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampWarm03",
+                },
+                {
+                    ["fallback"] = "Where shall we make our camp today?",
+                    ["id"] = "phrase.semantic.navigation.camp.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampWarm04",
+                },
+                {
+                    ["fallback"] = "I'm happy to camp wherever you feel safe.",
+                    ["id"] = "phrase.semantic.navigation.camp.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampWarm05",
+                },
+                {
+                    ["fallback"] = "Lead on to our camp spot. I'm right with you.",
+                    ["id"] = "phrase.semantic.navigation.camp.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampWarm06",
+                },
+                {
+                    ["fallback"] = "Where do you think we can rest easy tonight?",
+                    ["id"] = "phrase.semantic.navigation.camp.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampWarm07",
+                },
+                {
+                    ["fallback"] = "Any spot you choose works for me.",
+                    ["id"] = "phrase.semantic.navigation.camp.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampWarm08",
+                },
+                {
+                    ["fallback"] = "Let's find somewhere warm and secure to camp.",
+                    ["id"] = "phrase.semantic.navigation.camp.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampWarm09",
+                },
+                {
+                    ["fallback"] = "Where would you like to put down our packs?",
+                    ["id"] = "phrase.semantic.navigation.camp.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampWarm10",
                 },
             },
         },
@@ -48,12 +228,102 @@ return {
                     ["id"] = "phrase.semantic.navigation.camp_empty.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyGuarded01",
                 },
+                {
+                    ["fallback"] = "This place is wide open. We'd get slaughtered.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyGuarded02",
+                },
+                {
+                    ["fallback"] = "No cover, no defenses. We can't stay here.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyGuarded03",
+                },
+                {
+                    ["fallback"] = "I won't camp in this death trap. Move on.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyGuarded04",
+                },
+                {
+                    ["fallback"] = "Zero security here. We'd be sitting ducks.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyGuarded05",
+                },
+                {
+                    ["fallback"] = "Not a single defensible corner. Keep walking.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyGuarded06",
+                },
+                {
+                    ["fallback"] = "Sleeping here is suicide. Find real shelter.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyGuarded07",
+                },
+                {
+                    ["fallback"] = "Nothing here keeps the dead out. No camp.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyGuarded08",
+                },
+                {
+                    ["fallback"] = "Too exposed. I refuse to rest here.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyGuarded09",
+                },
+                {
+                    ["fallback"] = "Nowhere to hide if a horde passes. Move.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "I don't see a good place to set up here.",
                     ["id"] = "phrase.semantic.navigation.camp_empty.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyNeutral01",
+                },
+                {
+                    ["fallback"] = "This area lacks suitable spots for a camp.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyNeutral02",
+                },
+                {
+                    ["fallback"] = "Nowhere practical to establish camp around here.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyNeutral03",
+                },
+                {
+                    ["fallback"] = "We should look elsewhere. No good campsites here.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyNeutral04",
+                },
+                {
+                    ["fallback"] = "Doesn't look like we can camp in this vicinity.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyNeutral05",
+                },
+                {
+                    ["fallback"] = "There are no secure structures or clear ground here.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyNeutral06",
+                },
+                {
+                    ["fallback"] = "Can't find a decent place to bed down here.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyNeutral07",
+                },
+                {
+                    ["fallback"] = "No campsite available here. Let's keep searching.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyNeutral08",
+                },
+                {
+                    ["fallback"] = "This location isn't viable for setting up camp.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyNeutral09",
+                },
+                {
+                    ["fallback"] = "Nothing suitable nearby. We need to move on.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyNeutral10",
                 },
             },
             ["terse"] = {
@@ -62,12 +332,102 @@ return {
                     ["id"] = "phrase.semantic.navigation.camp_empty.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyTerse01",
                 },
+                {
+                    ["fallback"] = "Nothing here.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyTerse02",
+                },
+                {
+                    ["fallback"] = "Unsuitable.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyTerse03",
+                },
+                {
+                    ["fallback"] = "Can't camp here.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyTerse04",
+                },
+                {
+                    ["fallback"] = "No spots.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyTerse05",
+                },
+                {
+                    ["fallback"] = "Too bare.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyTerse06",
+                },
+                {
+                    ["fallback"] = "Nowhere to rest.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyTerse07",
+                },
+                {
+                    ["fallback"] = "Move on.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyTerse08",
+                },
+                {
+                    ["fallback"] = "Not here.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyTerse09",
+                },
+                {
+                    ["fallback"] = "Bad ground.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "I don't see a safe place to set up here.",
                     ["id"] = "phrase.semantic.navigation.camp_empty.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyWarm01",
+                },
+                {
+                    ["fallback"] = "I'd rather find us a warmer, safer spot than this.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyWarm02",
+                },
+                {
+                    ["fallback"] = "Nothing comfortable or secure around here, I'm afraid.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyWarm03",
+                },
+                {
+                    ["fallback"] = "Let's keep looking. You deserve a better resting spot.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyWarm04",
+                },
+                {
+                    ["fallback"] = "This area doesn't feel right for us. Let's walk a bit more.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyWarm05",
+                },
+                {
+                    ["fallback"] = "We can do better than this place. Let's find real shelter.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyWarm06",
+                },
+                {
+                    ["fallback"] = "I want us both safe tonight. No good camp here.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyWarm07",
+                },
+                {
+                    ["fallback"] = "Let's find somewhere cozy before we stop.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyWarm08",
+                },
+                {
+                    ["fallback"] = "I don't think we'd get any peaceful sleep here.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyWarm09",
+                },
+                {
+                    ["fallback"] = "Come on, let's look further ahead for a proper camp.",
+                    ["id"] = "phrase.semantic.navigation.camp_empty.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationCampEmptyWarm10",
                 },
             },
         },
@@ -84,12 +444,102 @@ return {
                     ["id"] = "phrase.semantic.navigation.default.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultGuarded01",
                 },
+                {
+                    ["fallback"] = "What is it? Keep it short.",
+                    ["id"] = "phrase.semantic.navigation.default.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultGuarded02",
+                },
+                {
+                    ["fallback"] = "Make it quick. We're exposed.",
+                    ["id"] = "phrase.semantic.navigation.default.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultGuarded03",
+                },
+                {
+                    ["fallback"] = "What do you want? Eyes open.",
+                    ["id"] = "phrase.semantic.navigation.default.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultGuarded04",
+                },
+                {
+                    ["fallback"] = "Speak up, but don't draw attention.",
+                    ["id"] = "phrase.semantic.navigation.default.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultGuarded05",
+                },
+                {
+                    ["fallback"] = "What's on your mind? Watch the street.",
+                    ["id"] = "phrase.semantic.navigation.default.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultGuarded06",
+                },
+                {
+                    ["fallback"] = "What now? We can't linger here.",
+                    ["id"] = "phrase.semantic.navigation.default.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultGuarded07",
+                },
+                {
+                    ["fallback"] = "I'm listening, but keep scanning.",
+                    ["id"] = "phrase.semantic.navigation.default.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultGuarded08",
+                },
+                {
+                    ["fallback"] = "State your business quickly.",
+                    ["id"] = "phrase.semantic.navigation.default.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultGuarded09",
+                },
+                {
+                    ["fallback"] = "What is it? Trouble?",
+                    ["id"] = "phrase.semantic.navigation.default.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "All right. What would you like to discuss?",
                     ["id"] = "phrase.semantic.navigation.default.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultNeutral01",
+                },
+                {
+                    ["fallback"] = "I'm listening. What did you want to talk about?",
+                    ["id"] = "phrase.semantic.navigation.default.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultNeutral02",
+                },
+                {
+                    ["fallback"] = "What's on your mind?",
+                    ["id"] = "phrase.semantic.navigation.default.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultNeutral03",
+                },
+                {
+                    ["fallback"] = "Go ahead. What do you need to discuss?",
+                    ["id"] = "phrase.semantic.navigation.default.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultNeutral04",
+                },
+                {
+                    ["fallback"] = "I'm here. What would you like to say?",
+                    ["id"] = "phrase.semantic.navigation.default.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultNeutral05",
+                },
+                {
+                    ["fallback"] = "What are you thinking?",
+                    ["id"] = "phrase.semantic.navigation.default.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultNeutral06",
+                },
+                {
+                    ["fallback"] = "Ready when you are. What's up?",
+                    ["id"] = "phrase.semantic.navigation.default.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultNeutral07",
+                },
+                {
+                    ["fallback"] = "Yes? What did you want to bring up?",
+                    ["id"] = "phrase.semantic.navigation.default.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultNeutral08",
+                },
+                {
+                    ["fallback"] = "I have a moment. What is it?",
+                    ["id"] = "phrase.semantic.navigation.default.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultNeutral09",
+                },
+                {
+                    ["fallback"] = "Sure, what's on your mind?",
+                    ["id"] = "phrase.semantic.navigation.default.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultNeutral10",
                 },
             },
             ["terse"] = {
@@ -98,12 +548,102 @@ return {
                     ["id"] = "phrase.semantic.navigation.default.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultTerse01",
                 },
+                {
+                    ["fallback"] = "Yes?",
+                    ["id"] = "phrase.semantic.navigation.default.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultTerse02",
+                },
+                {
+                    ["fallback"] = "Speak.",
+                    ["id"] = "phrase.semantic.navigation.default.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultTerse03",
+                },
+                {
+                    ["fallback"] = "What?",
+                    ["id"] = "phrase.semantic.navigation.default.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultTerse04",
+                },
+                {
+                    ["fallback"] = "Go on.",
+                    ["id"] = "phrase.semantic.navigation.default.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultTerse05",
+                },
+                {
+                    ["fallback"] = "Listening.",
+                    ["id"] = "phrase.semantic.navigation.default.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultTerse06",
+                },
+                {
+                    ["fallback"] = "What's up?",
+                    ["id"] = "phrase.semantic.navigation.default.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultTerse07",
+                },
+                {
+                    ["fallback"] = "Say it.",
+                    ["id"] = "phrase.semantic.navigation.default.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultTerse08",
+                },
+                {
+                    ["fallback"] = "Make it quick.",
+                    ["id"] = "phrase.semantic.navigation.default.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultTerse09",
+                },
+                {
+                    ["fallback"] = "Talk.",
+                    ["id"] = "phrase.semantic.navigation.default.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "Sure. What would you like to discuss?",
                     ["id"] = "phrase.semantic.navigation.default.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultWarm01",
+                },
+                {
+                    ["fallback"] = "Always glad to talk with you. What's on your mind?",
+                    ["id"] = "phrase.semantic.navigation.default.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultWarm02",
+                },
+                {
+                    ["fallback"] = "I'm all ears. What did you want to share?",
+                    ["id"] = "phrase.semantic.navigation.default.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultWarm03",
+                },
+                {
+                    ["fallback"] = "Take your time. What would you like to discuss?",
+                    ["id"] = "phrase.semantic.navigation.default.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultWarm04",
+                },
+                {
+                    ["fallback"] = "Happy to chat. What's going on?",
+                    ["id"] = "phrase.semantic.navigation.default.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultWarm05",
+                },
+                {
+                    ["fallback"] = "Good to talk to you. What's on your heart?",
+                    ["id"] = "phrase.semantic.navigation.default.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultWarm06",
+                },
+                {
+                    ["fallback"] = "I'm right here with you. What did you need?",
+                    ["id"] = "phrase.semantic.navigation.default.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultWarm07",
+                },
+                {
+                    ["fallback"] = "Whatever you need to talk about, I'm listening.",
+                    ["id"] = "phrase.semantic.navigation.default.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultWarm08",
+                },
+                {
+                    ["fallback"] = "Sure thing. What did you want to talk through?",
+                    ["id"] = "phrase.semantic.navigation.default.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultWarm09",
+                },
+                {
+                    ["fallback"] = "It's always nice catching up with you. What is it?",
+                    ["id"] = "phrase.semantic.navigation.default.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationDefaultWarm10",
                 },
             },
         },
@@ -120,12 +660,102 @@ return {
                     ["id"] = "phrase.semantic.navigation.orders.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersGuarded01",
                 },
+                {
+                    ["fallback"] = "What order? Keep it realistic.",
+                    ["id"] = "phrase.semantic.navigation.orders.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersGuarded02",
+                },
+                {
+                    ["fallback"] = "What do you want me to do? Nothing reckless.",
+                    ["id"] = "phrase.semantic.navigation.orders.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersGuarded03",
+                },
+                {
+                    ["fallback"] = "Give the order, but watch my back.",
+                    ["id"] = "phrase.semantic.navigation.orders.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersGuarded04",
+                },
+                {
+                    ["fallback"] = "What's the directive? Make it sensible.",
+                    ["id"] = "phrase.semantic.navigation.orders.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersGuarded05",
+                },
+                {
+                    ["fallback"] = "I'm listening to commands, but I judge safety.",
+                    ["id"] = "phrase.semantic.navigation.orders.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersGuarded06",
+                },
+                {
+                    ["fallback"] = "What do you need done? Don't waste my time.",
+                    ["id"] = "phrase.semantic.navigation.orders.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersGuarded07",
+                },
+                {
+                    ["fallback"] = "State the command quickly.",
+                    ["id"] = "phrase.semantic.navigation.orders.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersGuarded08",
+                },
+                {
+                    ["fallback"] = "What's the plan? Don't get us trapped.",
+                    ["id"] = "phrase.semantic.navigation.orders.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersGuarded09",
+                },
+                {
+                    ["fallback"] = "What are your orders?",
+                    ["id"] = "phrase.semantic.navigation.orders.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "All right. What do you need?",
                     ["id"] = "phrase.semantic.navigation.orders.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersNeutral01",
+                },
+                {
+                    ["fallback"] = "What are your orders?",
+                    ["id"] = "phrase.semantic.navigation.orders.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersNeutral02",
+                },
+                {
+                    ["fallback"] = "I'm ready for instructions. What should I do?",
+                    ["id"] = "phrase.semantic.navigation.orders.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersNeutral03",
+                },
+                {
+                    ["fallback"] = "What do you need me to handle?",
+                    ["id"] = "phrase.semantic.navigation.orders.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersNeutral04",
+                },
+                {
+                    ["fallback"] = "Give me the task.",
+                    ["id"] = "phrase.semantic.navigation.orders.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersNeutral05",
+                },
+                {
+                    ["fallback"] = "What are our next steps?",
+                    ["id"] = "phrase.semantic.navigation.orders.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersNeutral06",
+                },
+                {
+                    ["fallback"] = "Standing by for orders.",
+                    ["id"] = "phrase.semantic.navigation.orders.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersNeutral07",
+                },
+                {
+                    ["fallback"] = "What would you like me to do next?",
+                    ["id"] = "phrase.semantic.navigation.orders.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersNeutral08",
+                },
+                {
+                    ["fallback"] = "Tell me what needs doing.",
+                    ["id"] = "phrase.semantic.navigation.orders.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersNeutral09",
+                },
+                {
+                    ["fallback"] = "Awaiting your directive.",
+                    ["id"] = "phrase.semantic.navigation.orders.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersNeutral10",
                 },
             },
             ["terse"] = {
@@ -134,12 +764,102 @@ return {
                     ["id"] = "phrase.semantic.navigation.orders.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersTerse01",
                 },
+                {
+                    ["fallback"] = "Orders?",
+                    ["id"] = "phrase.semantic.navigation.orders.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersTerse02",
+                },
+                {
+                    ["fallback"] = "Command?",
+                    ["id"] = "phrase.semantic.navigation.orders.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersTerse03",
+                },
+                {
+                    ["fallback"] = "Directive?",
+                    ["id"] = "phrase.semantic.navigation.orders.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersTerse04",
+                },
+                {
+                    ["fallback"] = "What's next?",
+                    ["id"] = "phrase.semantic.navigation.orders.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersTerse05",
+                },
+                {
+                    ["fallback"] = "Task?",
+                    ["id"] = "phrase.semantic.navigation.orders.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersTerse06",
+                },
+                {
+                    ["fallback"] = "Say the word.",
+                    ["id"] = "phrase.semantic.navigation.orders.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersTerse07",
+                },
+                {
+                    ["fallback"] = "What now?",
+                    ["id"] = "phrase.semantic.navigation.orders.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersTerse08",
+                },
+                {
+                    ["fallback"] = "Instructions?",
+                    ["id"] = "phrase.semantic.navigation.orders.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersTerse09",
+                },
+                {
+                    ["fallback"] = "Give order.",
+                    ["id"] = "phrase.semantic.navigation.orders.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "Sure. What do you need?",
                     ["id"] = "phrase.semantic.navigation.orders.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersWarm01",
+                },
+                {
+                    ["fallback"] = "Whatever you need, I'm glad to help.",
+                    ["id"] = "phrase.semantic.navigation.orders.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersWarm02",
+                },
+                {
+                    ["fallback"] = "Just tell me what to do and I'll see to it.",
+                    ["id"] = "phrase.semantic.navigation.orders.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersWarm03",
+                },
+                {
+                    ["fallback"] = "Ready to work together. What's the plan?",
+                    ["id"] = "phrase.semantic.navigation.orders.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersWarm04",
+                },
+                {
+                    ["fallback"] = "What would you like me to take care of?",
+                    ["id"] = "phrase.semantic.navigation.orders.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersWarm05",
+                },
+                {
+                    ["fallback"] = "Always happy to lend a hand. What's the task?",
+                    ["id"] = "phrase.semantic.navigation.orders.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersWarm06",
+                },
+                {
+                    ["fallback"] = "Tell me how I can help you right now.",
+                    ["id"] = "phrase.semantic.navigation.orders.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersWarm07",
+                },
+                {
+                    ["fallback"] = "I'm with you all the way. What do you need?",
+                    ["id"] = "phrase.semantic.navigation.orders.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersWarm08",
+                },
+                {
+                    ["fallback"] = "Happy to follow your lead. What's next?",
+                    ["id"] = "phrase.semantic.navigation.orders.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersWarm09",
+                },
+                {
+                    ["fallback"] = "Give me a job and I'll do my best.",
+                    ["id"] = "phrase.semantic.navigation.orders.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationOrdersWarm10",
                 },
             },
         },
@@ -156,12 +876,102 @@ return {
                     ["id"] = "phrase.semantic.navigation.subject_change.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeGuarded01",
                 },
+                {
+                    ["fallback"] = "Changing topics? Fine, make it quick.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeGuarded02",
+                },
+                {
+                    ["fallback"] = "What else do you want to bring up?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeGuarded03",
+                },
+                {
+                    ["fallback"] = "Switching subjects. What now?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeGuarded04",
+                },
+                {
+                    ["fallback"] = "Go ahead, but keep your head on a swivel.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeGuarded05",
+                },
+                {
+                    ["fallback"] = "Different topic? Keep it relevant to surviving.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeGuarded06",
+                },
+                {
+                    ["fallback"] = "What else? We don't have all day.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeGuarded07",
+                },
+                {
+                    ["fallback"] = "Say what you need to say.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeGuarded08",
+                },
+                {
+                    ["fallback"] = "New subject? What is it?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeGuarded09",
+                },
+                {
+                    ["fallback"] = "Listening, but don't waste time.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "All right. What did you want to talk about?",
                     ["id"] = "phrase.semantic.navigation.subject_change.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeNeutral01",
+                },
+                {
+                    ["fallback"] = "Sure, what else did you want to discuss?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeNeutral02",
+                },
+                {
+                    ["fallback"] = "Changing subject. What's on your mind?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeNeutral03",
+                },
+                {
+                    ["fallback"] = "What other topic would you like to cover?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeNeutral04",
+                },
+                {
+                    ["fallback"] = "I'm open. What did you want to talk about next?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeNeutral05",
+                },
+                {
+                    ["fallback"] = "Understood. What else is on your mind?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeNeutral06",
+                },
+                {
+                    ["fallback"] = "Switching gears. What's the next matter?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeNeutral07",
+                },
+                {
+                    ["fallback"] = "Go ahead with what you wanted to say.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeNeutral08",
+                },
+                {
+                    ["fallback"] = "Sure thing. What did you want to bring up?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeNeutral09",
+                },
+                {
+                    ["fallback"] = "What's the next topic?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeNeutral10",
                 },
             },
             ["terse"] = {
@@ -170,12 +980,102 @@ return {
                     ["id"] = "phrase.semantic.navigation.subject_change.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeTerse01",
                 },
+                {
+                    ["fallback"] = "Next topic?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeTerse02",
+                },
+                {
+                    ["fallback"] = "What now?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeTerse03",
+                },
+                {
+                    ["fallback"] = "Go on.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeTerse04",
+                },
+                {
+                    ["fallback"] = "Different topic?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeTerse05",
+                },
+                {
+                    ["fallback"] = "What is it?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeTerse06",
+                },
+                {
+                    ["fallback"] = "Speak.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeTerse07",
+                },
+                {
+                    ["fallback"] = "Next?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeTerse08",
+                },
+                {
+                    ["fallback"] = "Listening.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeTerse09",
+                },
+                {
+                    ["fallback"] = "Say it.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "Sure. What did you want to talk about?",
                     ["id"] = "phrase.semantic.navigation.subject_change.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeWarm01",
+                },
+                {
+                    ["fallback"] = "I'd love to chat about whatever you like.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeWarm02",
+                },
+                {
+                    ["fallback"] = "What else would you like to talk through, friend?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeWarm03",
+                },
+                {
+                    ["fallback"] = "Always happy to hear what's on your mind.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeWarm04",
+                },
+                {
+                    ["fallback"] = "Sure thing! What other thoughts do you have?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeWarm05",
+                },
+                {
+                    ["fallback"] = "Take your time. What should we talk about next?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeWarm06",
+                },
+                {
+                    ["fallback"] = "I'm glad to discuss whatever matters to you.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeWarm07",
+                },
+                {
+                    ["fallback"] = "Go right ahead, I'm listening closely.",
+                    ["id"] = "phrase.semantic.navigation.subject_change.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeWarm08",
+                },
+                {
+                    ["fallback"] = "What else is on your heart today?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeWarm09",
+                },
+                {
+                    ["fallback"] = "I'm right here with you. What's next?",
+                    ["id"] = "phrase.semantic.navigation.subject_change.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticNavigationSubjectChangeWarm10",
                 },
             },
         },

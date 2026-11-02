@@ -459,7 +459,7 @@ return {
             ["sourceShard"] = "content/health.json",
         },
         {
-            ["bytes"] = 13168,
+            ["bytes"] = 97394,
             ["domain"] = "knowledge",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Knowledge",
@@ -476,7 +476,7 @@ return {
             ["sourceShard"] = "content/knowledge.json",
         },
         {
-            ["bytes"] = 8150,
+            ["bytes"] = 58756,
             ["domain"] = "navigation",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Navigation",
@@ -511,7 +511,7 @@ return {
             ["sourceShard"] = "content/needs.json",
         },
         {
-            ["bytes"] = 9237,
+            ["bytes"] = 44407,
             ["domain"] = "quest",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Quest",
@@ -2968,5 +2968,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "64c9a6d03943e9618de8ea235a72877f96d852965967c2716b5a89f272d60c5b",
+    ["wholeModelFingerprint"] = "23e1e804506abd5a5317a51fbc6697475ba234b537ae47b3e601484ee99f2563",
 }

@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.gossip.unknown.bond_guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondGuarded01",
                 },
+                {
+                    ["fallback"] = "%s, haven't heard any reliable rumors.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondGuarded02",
+                },
+                {
+                    ["fallback"] = "Keep your head down, %s. No news out there.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondGuarded03",
+                },
+                {
+                    ["fallback"] = "%s, nothing trustworthy has reached my ears.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondGuarded04",
+                },
+                {
+                    ["fallback"] = "Not much word going around, %s.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondGuarded05",
+                },
+                {
+                    ["fallback"] = "%s, gossip gets people killed. I have none.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondGuarded06",
+                },
+                {
+                    ["fallback"] = "Nothing to report, %s. Stay on your guard.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondGuarded07",
+                },
+                {
+                    ["fallback"] = "%s, nobody's talking about anything useful.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondGuarded08",
+                },
+                {
+                    ["fallback"] = "I haven't heard any safe news, %s.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondGuarded09",
+                },
+                {
+                    ["fallback"] = "%s, keep to our business. No rumors here.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondGuarded10",
+                },
             },
             ["bond_neutral"] = {
                 {
                     ["fallback"] = "%s, I haven't heard any news lately.",
                     ["id"] = "phrase.semantic.gossip.unknown.bond_neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondNeutral01",
+                },
+                {
+                    ["fallback"] = "%s, things have been quiet on the gossip front.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondNeutral02",
+                },
+                {
+                    ["fallback"] = "Nothing new to pass along, %s.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondNeutral03",
+                },
+                {
+                    ["fallback"] = "%s, haven't picked up any fresh word.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondNeutral04",
+                },
+                {
+                    ["fallback"] = "I don't have any updates right now, %s.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondNeutral05",
+                },
+                {
+                    ["fallback"] = "%s, no recent rumors to speak of.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondNeutral06",
+                },
+                {
+                    ["fallback"] = "Haven't caught any news from the others, %s.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondNeutral07",
+                },
+                {
+                    ["fallback"] = "%s, it's been quiet around here lately.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondNeutral08",
+                },
+                {
+                    ["fallback"] = "No rumors have reached me yet, %s.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondNeutral09",
+                },
+                {
+                    ["fallback"] = "%s, I'll let you know if I hear anything.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondNeutral10",
                 },
             },
             ["bond_terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.gossip.unknown.bond_terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondTerse01",
                 },
+                {
+                    ["fallback"] = "Nothing, %s.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondTerse02",
+                },
+                {
+                    ["fallback"] = "%s, heard nothing.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondTerse03",
+                },
+                {
+                    ["fallback"] = "Quiet, %s.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondTerse04",
+                },
+                {
+                    ["fallback"] = "%s, no rumors.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondTerse05",
+                },
+                {
+                    ["fallback"] = "No word, %s.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondTerse06",
+                },
+                {
+                    ["fallback"] = "%s, all quiet.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondTerse07",
+                },
+                {
+                    ["fallback"] = "Nothing to share, %s.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondTerse08",
+                },
+                {
+                    ["fallback"] = "%s, zero news.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondTerse09",
+                },
+                {
+                    ["fallback"] = "Blank slate, %s.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondTerse10",
+                },
             },
             ["bond_warm"] = {
                 {
                     ["fallback"] = "%s, I haven't heard any news, sorry.",
                     ["id"] = "phrase.semantic.gossip.unknown.bond_warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondWarm01",
+                },
+                {
+                    ["fallback"] = "Wish I had something to tell you, %s, but it's quiet.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondWarm02",
+                },
+                {
+                    ["fallback"] = "%s, haven't heard a peep from the other camps.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondWarm03",
+                },
+                {
+                    ["fallback"] = "Sorry, %s, no interesting stories today.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondWarm04",
+                },
+                {
+                    ["fallback"] = "%s, I'll definitely share the moment I hear anything.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondWarm05",
+                },
+                {
+                    ["fallback"] = "Nothing new reaching my ears, %s. Hope you're well.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondWarm06",
+                },
+                {
+                    ["fallback"] = "%s, all's quiet on my end, my friend.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondWarm07",
+                },
+                {
+                    ["fallback"] = "Haven't caught any rumors, %s, but I'll keep listening.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondWarm08",
+                },
+                {
+                    ["fallback"] = "%s, nothing yet, but stay safe out there.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondWarm09",
+                },
+                {
+                    ["fallback"] = "I'd love to share news with you, %s, but nothing yet.",
+                    ["id"] = "phrase.semantic.gossip.unknown.bond_warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownBondWarm10",
                 },
             },
             ["guarded"] = {
@@ -40,12 +220,102 @@ return {
                     ["id"] = "phrase.semantic.gossip.unknown.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownGuarded01",
                 },
+                {
+                    ["fallback"] = "I don't traffic in rumors. Keep moving.",
+                    ["id"] = "phrase.semantic.gossip.unknown.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownGuarded02",
+                },
+                {
+                    ["fallback"] = "No news worth risking our necks over.",
+                    ["id"] = "phrase.semantic.gossip.unknown.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownGuarded03",
+                },
+                {
+                    ["fallback"] = "I keep my ears open for danger, not talk.",
+                    ["id"] = "phrase.semantic.gossip.unknown.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownGuarded04",
+                },
+                {
+                    ["fallback"] = "Haven't heard anything reliable. Watch yourself.",
+                    ["id"] = "phrase.semantic.gossip.unknown.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownGuarded05",
+                },
+                {
+                    ["fallback"] = "Rumors are cheap and usually wrong. Nothing to say.",
+                    ["id"] = "phrase.semantic.gossip.unknown.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownGuarded06",
+                },
+                {
+                    ["fallback"] = "I don't listen to chatter. Mind your business.",
+                    ["id"] = "phrase.semantic.gossip.unknown.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownGuarded07",
+                },
+                {
+                    ["fallback"] = "No word that concerns you.",
+                    ["id"] = "phrase.semantic.gossip.unknown.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownGuarded08",
+                },
+                {
+                    ["fallback"] = "Nothing to share. Keep your guard up.",
+                    ["id"] = "phrase.semantic.gossip.unknown.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownGuarded09",
+                },
+                {
+                    ["fallback"] = "Don't ask me for gossip.",
+                    ["id"] = "phrase.semantic.gossip.unknown.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "I haven't heard any news lately.",
                     ["id"] = "phrase.semantic.gossip.unknown.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownNeutral01",
+                },
+                {
+                    ["fallback"] = "Things have been fairly quiet on that front.",
+                    ["id"] = "phrase.semantic.gossip.unknown.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownNeutral02",
+                },
+                {
+                    ["fallback"] = "No recent rumors have reached me.",
+                    ["id"] = "phrase.semantic.gossip.unknown.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownNeutral03",
+                },
+                {
+                    ["fallback"] = "Haven't picked up any word from other survivors.",
+                    ["id"] = "phrase.semantic.gossip.unknown.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownNeutral04",
+                },
+                {
+                    ["fallback"] = "I don't have any updates to share right now.",
+                    ["id"] = "phrase.semantic.gossip.unknown.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownNeutral05",
+                },
+                {
+                    ["fallback"] = "Nothing new to report on that topic.",
+                    ["id"] = "phrase.semantic.gossip.unknown.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownNeutral06",
+                },
+                {
+                    ["fallback"] = "Word travels slow. Haven't heard anything.",
+                    ["id"] = "phrase.semantic.gossip.unknown.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownNeutral07",
+                },
+                {
+                    ["fallback"] = "I haven't caught any talk recently.",
+                    ["id"] = "phrase.semantic.gossip.unknown.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownNeutral08",
+                },
+                {
+                    ["fallback"] = "No gossip on my radar at the moment.",
+                    ["id"] = "phrase.semantic.gossip.unknown.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownNeutral09",
+                },
+                {
+                    ["fallback"] = "Haven't heard much of anything lately.",
+                    ["id"] = "phrase.semantic.gossip.unknown.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownNeutral10",
                 },
             },
             ["terse"] = {
@@ -54,12 +324,102 @@ return {
                     ["id"] = "phrase.semantic.gossip.unknown.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownTerse01",
                 },
+                {
+                    ["fallback"] = "Heard nothing.",
+                    ["id"] = "phrase.semantic.gossip.unknown.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownTerse02",
+                },
+                {
+                    ["fallback"] = "Nothing.",
+                    ["id"] = "phrase.semantic.gossip.unknown.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownTerse03",
+                },
+                {
+                    ["fallback"] = "Quiet.",
+                    ["id"] = "phrase.semantic.gossip.unknown.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownTerse04",
+                },
+                {
+                    ["fallback"] = "No rumors.",
+                    ["id"] = "phrase.semantic.gossip.unknown.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownTerse05",
+                },
+                {
+                    ["fallback"] = "No word.",
+                    ["id"] = "phrase.semantic.gossip.unknown.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownTerse06",
+                },
+                {
+                    ["fallback"] = "Nothing new.",
+                    ["id"] = "phrase.semantic.gossip.unknown.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownTerse07",
+                },
+                {
+                    ["fallback"] = "All quiet.",
+                    ["id"] = "phrase.semantic.gossip.unknown.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownTerse08",
+                },
+                {
+                    ["fallback"] = "Zero news.",
+                    ["id"] = "phrase.semantic.gossip.unknown.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownTerse09",
+                },
+                {
+                    ["fallback"] = "Blank.",
+                    ["id"] = "phrase.semantic.gossip.unknown.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "I haven't heard any news, sorry.",
                     ["id"] = "phrase.semantic.gossip.unknown.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownWarm01",
+                },
+                {
+                    ["fallback"] = "Wish I had something interesting to tell you.",
+                    ["id"] = "phrase.semantic.gossip.unknown.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownWarm02",
+                },
+                {
+                    ["fallback"] = "Haven't heard any rumors, but I'll let you know.",
+                    ["id"] = "phrase.semantic.gossip.unknown.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownWarm03",
+                },
+                {
+                    ["fallback"] = "All quiet on my side, but I'll keep an ear out.",
+                    ["id"] = "phrase.semantic.gossip.unknown.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownWarm04",
+                },
+                {
+                    ["fallback"] = "Sorry, no fresh news today, my friend.",
+                    ["id"] = "phrase.semantic.gossip.unknown.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownWarm05",
+                },
+                {
+                    ["fallback"] = "Nothing reaching my ears lately. Hope all is well.",
+                    ["id"] = "phrase.semantic.gossip.unknown.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownWarm06",
+                },
+                {
+                    ["fallback"] = "I'll be sure to tell you if I hear anything new.",
+                    ["id"] = "phrase.semantic.gossip.unknown.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownWarm07",
+                },
+                {
+                    ["fallback"] = "Quiet days out there. No rumors to report.",
+                    ["id"] = "phrase.semantic.gossip.unknown.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownWarm08",
+                },
+                {
+                    ["fallback"] = "Nothing to share right now, but stay safe.",
+                    ["id"] = "phrase.semantic.gossip.unknown.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownWarm09",
+                },
+                {
+                    ["fallback"] = "I haven't heard any stories, but I'm glad you asked.",
+                    ["id"] = "phrase.semantic.gossip.unknown.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticGossipUnknownWarm10",
                 },
             },
         },
@@ -72,30 +432,210 @@ return {
         ["styles"] = {
             ["guarded"] = {
                 {
-                    ["fallback"] = "I'm keeping busy. Don't distract me.",
+                    ["fallback"] = "We need to keep moving. Sitting still will get us killed.",
                     ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingGuarded01",
+                },
+                {
+                    ["fallback"] = "Don't loiter. The dead migrate toward stillness.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingGuarded02",
+                },
+                {
+                    ["fallback"] = "Keep your boots moving. Danger is everywhere.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingGuarded03",
+                },
+                {
+                    ["fallback"] = "We stay on the road. Tarrying is suicide.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingGuarded04",
+                },
+                {
+                    ["fallback"] = "Keep moving. Eyes on the woodline.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingGuarded05",
+                },
+                {
+                    ["fallback"] = "No resting in the open. Walk.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingGuarded06",
+                },
+                {
+                    ["fallback"] = "Movement keeps us alive. Don't freeze up.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingGuarded07",
+                },
+                {
+                    ["fallback"] = "Keep marching. We're too exposed right here.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingGuarded08",
+                },
+                {
+                    ["fallback"] = "Keep going. Resting here is asking for trouble.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingGuarded09",
+                },
+                {
+                    ["fallback"] = "Step lively. A static survivor is a dead survivor.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingGuarded10",
                 },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "I'm doing what I can to keep things moving.",
+                    ["fallback"] = "We should keep moving. It's not safe to linger.",
                     ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingNeutral01",
+                },
+                {
+                    ["fallback"] = "Staying mobile is our best option right now.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingNeutral02",
+                },
+                {
+                    ["fallback"] = "We need to continue forward and find shelter.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingNeutral03",
+                },
+                {
+                    ["fallback"] = "It's best if we keep moving down this route.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingNeutral04",
+                },
+                {
+                    ["fallback"] = "Let's keep the pace. We have ground to cover.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingNeutral05",
+                },
+                {
+                    ["fallback"] = "We shouldn't remain stationary for too long.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingNeutral06",
+                },
+                {
+                    ["fallback"] = "Keep walking. We need to reach our objective.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingNeutral07",
+                },
+                {
+                    ["fallback"] = "Moving along is the safest strategy right now.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingNeutral08",
+                },
+                {
+                    ["fallback"] = "Let's continue on our way.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingNeutral09",
+                },
+                {
+                    ["fallback"] = "We should maintain our momentum and keep moving.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingNeutral10",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "Keeping busy.",
+                    ["fallback"] = "Keep moving.",
                     ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingTerse01",
+                },
+                {
+                    ["fallback"] = "Move.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingTerse02",
+                },
+                {
+                    ["fallback"] = "Don't stop.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingTerse03",
+                },
+                {
+                    ["fallback"] = "Walk.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingTerse04",
+                },
+                {
+                    ["fallback"] = "Keep pace.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingTerse05",
+                },
+                {
+                    ["fallback"] = "Forward.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingTerse06",
+                },
+                {
+                    ["fallback"] = "Keep going.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingTerse07",
+                },
+                {
+                    ["fallback"] = "Step up.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingTerse08",
+                },
+                {
+                    ["fallback"] = "Don't linger.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingTerse09",
+                },
+                {
+                    ["fallback"] = "On the move.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "I'm doing what I can to keep things moving. Thanks for asking.",
+                    ["fallback"] = "Let's keep moving together, friend. We'll find safety.",
                     ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingWarm01",
+                },
+                {
+                    ["fallback"] = "We should keep going. I'll stay right by your side.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingWarm02",
+                },
+                {
+                    ["fallback"] = "Let's keep our feet moving. A warm fire awaits us eventually.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingWarm03",
+                },
+                {
+                    ["fallback"] = "Keep up the good pace. We're doing fine.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingWarm04",
+                },
+                {
+                    ["fallback"] = "Let's keep walking together. We're safer on the move.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingWarm05",
+                },
+                {
+                    ["fallback"] = "We'll get through this path. Just keep moving with me.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingWarm06",
+                },
+                {
+                    ["fallback"] = "Let's keep going, one step at a time.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingWarm07",
+                },
+                {
+                    ["fallback"] = "I'm with you. Let's keep walking until we find shelter.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingWarm08",
+                },
+                {
+                    ["fallback"] = "Keep moving forward. We've got this.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingWarm09",
+                },
+                {
+                    ["fallback"] = "Let's keep our spirits up and keep walking.",
+                    ["id"] = "phrase.semantic.question.activity.dataset.keep_moving.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityDatasetKeepMovingWarm10",
                 },
             },
         },
@@ -108,16 +648,106 @@ return {
         ["styles"] = {
             ["guarded"] = {
                 {
-                    ["fallback"] = "I'm fishing. Don't distract me.",
+                    ["fallback"] = "Fishing leaves you exposed by the water. Watch your back.",
                     ["id"] = "phrase.semantic.question.activity.fishing.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingGuarded01",
+                },
+                {
+                    ["fallback"] = "Water draws the dead. Keep your weapon close while casting.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingGuarded02",
+                },
+                {
+                    ["fallback"] = "Don't get tunnel vision looking at the bobber.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingGuarded03",
+                },
+                {
+                    ["fallback"] = "Fish fast and leave. Banks are ambush territory.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingGuarded04",
+                },
+                {
+                    ["fallback"] = "Quiet catches only. Splashing brings infected.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingGuarded05",
+                },
+                {
+                    ["fallback"] = "Watch the treeline while you work the line.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingGuarded06",
+                },
+                {
+                    ["fallback"] = "If something rustles in the reeds, drop the rod and draw.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingGuarded07",
+                },
+                {
+                    ["fallback"] = "Fishing is risky out here. Keep eyes peeled.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingGuarded08",
+                },
+                {
+                    ["fallback"] = "Get the protein and get off the shore.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingGuarded09",
+                },
+                {
+                    ["fallback"] = "Don't get dragged in. Watch the water.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingGuarded10",
                 },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "I'm trying to catch something.",
+                    ["fallback"] = "Fishing is a solid way to secure fresh food.",
                     ["id"] = "phrase.semantic.question.activity.fishing.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingNeutral01",
+                },
+                {
+                    ["fallback"] = "We can catch fish here if we have rod and bait.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingNeutral02",
+                },
+                {
+                    ["fallback"] = "The water looks promising for catching dinner.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingNeutral03",
+                },
+                {
+                    ["fallback"] = "Fishing requires patience, but it provides calories.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingNeutral04",
+                },
+                {
+                    ["fallback"] = "A good spot to cast a line and get some food.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingNeutral05",
+                },
+                {
+                    ["fallback"] = "We should try fishing if our rations are running low.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingNeutral06",
+                },
+                {
+                    ["fallback"] = "Fish are clean protein out here in the wild.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingNeutral07",
+                },
+                {
+                    ["fallback"] = "Check the line and bait. We could catch something good.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingNeutral08",
+                },
+                {
+                    ["fallback"] = "Fishing by the river is a viable survival task.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingNeutral09",
+                },
+                {
+                    ["fallback"] = "We can cast a line here while the area is clear.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingNeutral10",
                 },
             },
             ["terse"] = {
@@ -126,12 +756,102 @@ return {
                     ["id"] = "phrase.semantic.question.activity.fishing.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingTerse01",
                 },
+                {
+                    ["fallback"] = "Cast a line.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingTerse02",
+                },
+                {
+                    ["fallback"] = "Need bait.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingTerse03",
+                },
+                {
+                    ["fallback"] = "Watch the water.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingTerse04",
+                },
+                {
+                    ["fallback"] = "Good food source.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingTerse05",
+                },
+                {
+                    ["fallback"] = "Fish quietly.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingTerse06",
+                },
+                {
+                    ["fallback"] = "Cast here.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingTerse07",
+                },
+                {
+                    ["fallback"] = "Rod and reel.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingTerse08",
+                },
+                {
+                    ["fallback"] = "Catch dinner.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingTerse09",
+                },
+                {
+                    ["fallback"] = "Fresh fish.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingTerse10",
+                },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "I'm trying to catch something. Give me a moment.",
+                    ["fallback"] = "Fishing by the water sounds peaceful right now.",
                     ["id"] = "phrase.semantic.question.activity.fishing.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingWarm01",
+                },
+                {
+                    ["fallback"] = "I'd love to catch some fresh fish for us to cook.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingWarm02",
+                },
+                {
+                    ["fallback"] = "A nice fresh catch would make a wonderful meal for us.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingWarm03",
+                },
+                {
+                    ["fallback"] = "It feels good to take a moment by the water and fish.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingWarm04",
+                },
+                {
+                    ["fallback"] = "Let's see if we can catch something tasty together.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingWarm05",
+                },
+                {
+                    ["fallback"] = "Fishing reminds me of quieter times. Let's cast a line.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingWarm06",
+                },
+                {
+                    ["fallback"] = "A warm fire and fresh fish would do wonders for our mood.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingWarm07",
+                },
+                {
+                    ["fallback"] = "I'll keep watch while you fish, or we can take turns.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingWarm08",
+                },
+                {
+                    ["fallback"] = "Fresh catch would be a real treat for both of us.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingWarm09",
+                },
+                {
+                    ["fallback"] = "Let's catch a good meal and share it tonight.",
+                    ["id"] = "phrase.semantic.question.activity.fishing.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionActivityFishingWarm10",
                 },
             },
         },
@@ -144,30 +864,210 @@ return {
         ["styles"] = {
             ["guarded"] = {
                 {
-                    ["fallback"] = "I don't share my name yet. What's yours?",
+                    ["fallback"] = "Who's asking? Names can be dangerous out here.",
                     ["id"] = "phrase.semantic.question.identity.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityGuarded01",
+                },
+                {
+                    ["fallback"] = "Why do you need to know who I am?",
+                    ["id"] = "phrase.semantic.question.identity.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityGuarded02",
+                },
+                {
+                    ["fallback"] = "Just a survivor trying not to die. Leave it at that.",
+                    ["id"] = "phrase.semantic.question.identity.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityGuarded03",
+                },
+                {
+                    ["fallback"] = "I don't give my background to just anyone.",
+                    ["id"] = "phrase.semantic.question.identity.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityGuarded04",
+                },
+                {
+                    ["fallback"] = "A survivor with a weapon. That's all that matters.",
+                    ["id"] = "phrase.semantic.question.identity.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityGuarded05",
+                },
+                {
+                    ["fallback"] = "Don't pry into my identity. Keep focused on the road.",
+                    ["id"] = "phrase.semantic.question.identity.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityGuarded06",
+                },
+                {
+                    ["fallback"] = "Names don't keep the infected away. What do you want?",
+                    ["id"] = "phrase.semantic.question.identity.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityGuarded07",
+                },
+                {
+                    ["fallback"] = "You don't need my life story to walk beside me.",
+                    ["id"] = "phrase.semantic.question.identity.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityGuarded08",
+                },
+                {
+                    ["fallback"] = "I keep my identity to myself until I know I can trust you.",
+                    ["id"] = "phrase.semantic.question.identity.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityGuarded09",
+                },
+                {
+                    ["fallback"] = "I am who I need to be to survive.",
+                    ["id"] = "phrase.semantic.question.identity.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityGuarded10",
                 },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "I'll tell you my name once we've established some trust. What's yours?",
+                    ["fallback"] = "I'm just a survivor trying to make it through.",
                     ["id"] = "phrase.semantic.question.identity.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityNeutral01",
+                },
+                {
+                    ["fallback"] = "I used to be someone else before all this fell apart.",
+                    ["id"] = "phrase.semantic.question.identity.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityNeutral02",
+                },
+                {
+                    ["fallback"] = "Just another person looking for shelter and food.",
+                    ["id"] = "phrase.semantic.question.identity.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityNeutral03",
+                },
+                {
+                    ["fallback"] = "I'm surviving day by day, same as you.",
+                    ["id"] = "phrase.semantic.question.identity.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityNeutral04",
+                },
+                {
+                    ["fallback"] = "Not much to tell. Just doing what it takes to live.",
+                    ["id"] = "phrase.semantic.question.identity.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityNeutral05",
+                },
+                {
+                    ["fallback"] = "I'm a survivor out here in the county.",
+                    ["id"] = "phrase.semantic.question.identity.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityNeutral06",
+                },
+                {
+                    ["fallback"] = "Just someone trying to stay one step ahead of the dead.",
+                    ["id"] = "phrase.semantic.question.identity.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityNeutral07",
+                },
+                {
+                    ["fallback"] = "I've been on the road since the outbreak started.",
+                    ["id"] = "phrase.semantic.question.identity.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityNeutral08",
+                },
+                {
+                    ["fallback"] = "Simple survivor. That's about the extent of it.",
+                    ["id"] = "phrase.semantic.question.identity.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityNeutral09",
+                },
+                {
+                    ["fallback"] = "Trying to stay breathing, same as everyone else.",
+                    ["id"] = "phrase.semantic.question.identity.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityNeutral10",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "Not yet. Your name?",
+                    ["fallback"] = "A survivor.",
                     ["id"] = "phrase.semantic.question.identity.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityTerse01",
+                },
+                {
+                    ["fallback"] = "Just me.",
+                    ["id"] = "phrase.semantic.question.identity.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityTerse02",
+                },
+                {
+                    ["fallback"] = "Doesn't matter.",
+                    ["id"] = "phrase.semantic.question.identity.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityTerse03",
+                },
+                {
+                    ["fallback"] = "Another wanderer.",
+                    ["id"] = "phrase.semantic.question.identity.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityTerse04",
+                },
+                {
+                    ["fallback"] = "Just surviving.",
+                    ["id"] = "phrase.semantic.question.identity.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityTerse05",
+                },
+                {
+                    ["fallback"] = "Nobody special.",
+                    ["id"] = "phrase.semantic.question.identity.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityTerse06",
+                },
+                {
+                    ["fallback"] = "A fighter.",
+                    ["id"] = "phrase.semantic.question.identity.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityTerse07",
+                },
+                {
+                    ["fallback"] = "Same as you.",
+                    ["id"] = "phrase.semantic.question.identity.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityTerse08",
+                },
+                {
+                    ["fallback"] = "Just a stranger.",
+                    ["id"] = "phrase.semantic.question.identity.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityTerse09",
+                },
+                {
+                    ["fallback"] = "Still breathing.",
+                    ["id"] = "phrase.semantic.question.identity.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "I'll tell you my name once we know each other. What should I call you?",
+                    ["fallback"] = "I'm glad to share this road with you, friend.",
                     ["id"] = "phrase.semantic.question.identity.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityWarm01",
+                },
+                {
+                    ["fallback"] = "Just an old soul trying to do some good in a ruined world.",
+                    ["id"] = "phrase.semantic.question.identity.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityWarm02",
+                },
+                {
+                    ["fallback"] = "I'm someone who values good company out here.",
+                    ["id"] = "phrase.semantic.question.identity.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityWarm03",
+                },
+                {
+                    ["fallback"] = "Call me a friend. We're in this struggle together.",
+                    ["id"] = "phrase.semantic.question.identity.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityWarm04",
+                },
+                {
+                    ["fallback"] = "I used to have a regular life, but now I have people I care about.",
+                    ["id"] = "phrase.semantic.question.identity.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityWarm05",
+                },
+                {
+                    ["fallback"] = "Just someone grateful to have found you in all this chaos.",
+                    ["id"] = "phrase.semantic.question.identity.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityWarm06",
+                },
+                {
+                    ["fallback"] = "A friend and ally. That's who I want to be for you.",
+                    ["id"] = "phrase.semantic.question.identity.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityWarm07",
+                },
+                {
+                    ["fallback"] = "I'm just happy to be standing here talking to you.",
+                    ["id"] = "phrase.semantic.question.identity.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityWarm08",
+                },
+                {
+                    ["fallback"] = "We're partners out here. That's all that matters to me.",
+                    ["id"] = "phrase.semantic.question.identity.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityWarm09",
+                },
+                {
+                    ["fallback"] = "A loyal companion on the long road ahead.",
+                    ["id"] = "phrase.semantic.question.identity.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityWarm10",
                 },
             },
         },
@@ -184,12 +1084,102 @@ return {
                     ["id"] = "phrase.semantic.question.identity.known.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownGuarded01",
                 },
+                {
+                    ["fallback"] = "It's %s. Don't act like you forgot.",
+                    ["id"] = "phrase.semantic.question.identity.known.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownGuarded02",
+                },
+                {
+                    ["fallback"] = "You know my name, %s. Don't play games.",
+                    ["id"] = "phrase.semantic.question.identity.known.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownGuarded03",
+                },
+                {
+                    ["fallback"] = "Still %s. Nothing has changed.",
+                    ["id"] = "phrase.semantic.question.identity.known.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownGuarded04",
+                },
+                {
+                    ["fallback"] = "I'm %s. Stop asking questions you know the answers to.",
+                    ["id"] = "phrase.semantic.question.identity.known.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownGuarded05",
+                },
+                {
+                    ["fallback"] = "Name's %s. Keep your head focused on our perimeter.",
+                    ["id"] = "phrase.semantic.question.identity.known.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownGuarded06",
+                },
+                {
+                    ["fallback"] = "I am %s. We've walked together long enough for you to know.",
+                    ["id"] = "phrase.semantic.question.identity.known.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownGuarded07",
+                },
+                {
+                    ["fallback"] = "Still %s. Keep your eyes sharp.",
+                    ["id"] = "phrase.semantic.question.identity.known.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownGuarded08",
+                },
+                {
+                    ["fallback"] = "You know me, %s. What's the real question?",
+                    ["id"] = "phrase.semantic.question.identity.known.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownGuarded09",
+                },
+                {
+                    ["fallback"] = "I'm %s. Let's get back to surviving.",
+                    ["id"] = "phrase.semantic.question.identity.known.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "I'm %s. We already know each other.",
                     ["id"] = "phrase.semantic.question.identity.known.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownNeutral01",
+                },
+                {
+                    ["fallback"] = "My name is %s, as you know.",
+                    ["id"] = "phrase.semantic.question.identity.known.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownNeutral02",
+                },
+                {
+                    ["fallback"] = "I'm %s. We've met before.",
+                    ["id"] = "phrase.semantic.question.identity.known.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownNeutral03",
+                },
+                {
+                    ["fallback"] = "It's me, %s.",
+                    ["id"] = "phrase.semantic.question.identity.known.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownNeutral04",
+                },
+                {
+                    ["fallback"] = "You remember me, right? %s.",
+                    ["id"] = "phrase.semantic.question.identity.known.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownNeutral05",
+                },
+                {
+                    ["fallback"] = "I'm %s. Good to speak with you again.",
+                    ["id"] = "phrase.semantic.question.identity.known.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownNeutral06",
+                },
+                {
+                    ["fallback"] = "Still %s, same as yesterday.",
+                    ["id"] = "phrase.semantic.question.identity.known.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownNeutral07",
+                },
+                {
+                    ["fallback"] = "I'm %s. We're on the same team.",
+                    ["id"] = "phrase.semantic.question.identity.known.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownNeutral08",
+                },
+                {
+                    ["fallback"] = "You know me well enough, I'm %s.",
+                    ["id"] = "phrase.semantic.question.identity.known.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownNeutral09",
+                },
+                {
+                    ["fallback"] = "It's %s. Just checking in?",
+                    ["id"] = "phrase.semantic.question.identity.known.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownNeutral10",
                 },
             },
             ["terse"] = {
@@ -198,12 +1188,102 @@ return {
                     ["id"] = "phrase.semantic.question.identity.known.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownTerse01",
                 },
+                {
+                    ["fallback"] = "I'm %s.",
+                    ["id"] = "phrase.semantic.question.identity.known.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownTerse02",
+                },
+                {
+                    ["fallback"] = "Still %s.",
+                    ["id"] = "phrase.semantic.question.identity.known.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownTerse03",
+                },
+                {
+                    ["fallback"] = "%s. That's me.",
+                    ["id"] = "phrase.semantic.question.identity.known.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownTerse04",
+                },
+                {
+                    ["fallback"] = "It's %s.",
+                    ["id"] = "phrase.semantic.question.identity.known.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownTerse05",
+                },
+                {
+                    ["fallback"] = "Name's %s.",
+                    ["id"] = "phrase.semantic.question.identity.known.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownTerse06",
+                },
+                {
+                    ["fallback"] = "Me. %s.",
+                    ["id"] = "phrase.semantic.question.identity.known.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownTerse07",
+                },
+                {
+                    ["fallback"] = "Remember? %s.",
+                    ["id"] = "phrase.semantic.question.identity.known.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownTerse08",
+                },
+                {
+                    ["fallback"] = "Just %s.",
+                    ["id"] = "phrase.semantic.question.identity.known.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownTerse09",
+                },
+                {
+                    ["fallback"] = "%s.",
+                    ["id"] = "phrase.semantic.question.identity.known.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "I'm %s. Good to see you again.",
                     ["id"] = "phrase.semantic.question.identity.known.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownWarm01",
+                },
+                {
+                    ["fallback"] = "You know it's me, %s! Always glad to be by your side.",
+                    ["id"] = "phrase.semantic.question.identity.known.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownWarm02",
+                },
+                {
+                    ["fallback"] = "It's %s, my friend. I'm right here.",
+                    ["id"] = "phrase.semantic.question.identity.known.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownWarm03",
+                },
+                {
+                    ["fallback"] = "I'm %s. It's truly a pleasure knowing you.",
+                    ["id"] = "phrase.semantic.question.identity.known.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownWarm04",
+                },
+                {
+                    ["fallback"] = "You know your friend %s. How are you holding up?",
+                    ["id"] = "phrase.semantic.question.identity.known.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownWarm05",
+                },
+                {
+                    ["fallback"] = "Still %s, and always here to watch your back.",
+                    ["id"] = "phrase.semantic.question.identity.known.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownWarm06",
+                },
+                {
+                    ["fallback"] = "It's me, %s. So glad we're traveling together.",
+                    ["id"] = "phrase.semantic.question.identity.known.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownWarm07",
+                },
+                {
+                    ["fallback"] = "I'm %s, your companion through all of this.",
+                    ["id"] = "phrase.semantic.question.identity.known.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownWarm08",
+                },
+                {
+                    ["fallback"] = "You know me, %s. Let's keep each other safe.",
+                    ["id"] = "phrase.semantic.question.identity.known.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownWarm09",
+                },
+                {
+                    ["fallback"] = "It's %s! Always happy when you say hello.",
+                    ["id"] = "phrase.semantic.question.identity.known.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionIdentityKnownWarm10",
                 },
             },
         },
@@ -216,30 +1296,210 @@ return {
         ["styles"] = {
             ["guarded"] = {
                 {
-                    ["fallback"] = "I know enough about %1.",
+                    ["fallback"] = "I know about that. Keep it quiet.",
                     ["id"] = "phrase.semantic.question.knowledge.known.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownGuarded01",
+                },
+                {
+                    ["fallback"] = "I'm aware of it, but don't shout it out loud.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownGuarded02",
+                },
+                {
+                    ["fallback"] = "Yes, I know that. What of it?",
+                    ["id"] = "phrase.semantic.question.knowledge.known.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownGuarded03",
+                },
+                {
+                    ["fallback"] = "I have that information. Keep your voice down.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownGuarded04",
+                },
+                {
+                    ["fallback"] = "I know what you're referring to. Be cautious.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownGuarded05",
+                },
+                {
+                    ["fallback"] = "I'm familiar with that matter. Don't spread it around.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownGuarded06",
+                },
+                {
+                    ["fallback"] = "Yes, I know. It's dangerous knowledge.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownGuarded07",
+                },
+                {
+                    ["fallback"] = "I know about it. Why are you digging into this?",
+                    ["id"] = "phrase.semantic.question.knowledge.known.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownGuarded08",
+                },
+                {
+                    ["fallback"] = "I have that knowledge. Keep it between us.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownGuarded09",
+                },
+                {
+                    ["fallback"] = "Yes, I'm aware. Don't bring trouble our way.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownGuarded10",
                 },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "I know about %1.",
+                    ["fallback"] = "Yes, I know about that.",
                     ["id"] = "phrase.semantic.question.knowledge.known.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownNeutral01",
+                },
+                {
+                    ["fallback"] = "I'm familiar with that information.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownNeutral02",
+                },
+                {
+                    ["fallback"] = "I have knowledge of that subject.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownNeutral03",
+                },
+                {
+                    ["fallback"] = "Yes, I understand what you're talking about.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownNeutral04",
+                },
+                {
+                    ["fallback"] = "I'm aware of those details.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownNeutral05",
+                },
+                {
+                    ["fallback"] = "I know the situation you mean.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownNeutral06",
+                },
+                {
+                    ["fallback"] = "That information is known to me.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownNeutral07",
+                },
+                {
+                    ["fallback"] = "Yes, I've learned about that already.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownNeutral08",
+                },
+                {
+                    ["fallback"] = "I have that on good authority.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownNeutral09",
+                },
+                {
+                    ["fallback"] = "I know about it. What would you like to know?",
+                    ["id"] = "phrase.semantic.question.knowledge.known.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownNeutral10",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "I know %1.",
+                    ["fallback"] = "I know.",
                     ["id"] = "phrase.semantic.question.knowledge.known.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownTerse01",
+                },
+                {
+                    ["fallback"] = "Aware.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownTerse02",
+                },
+                {
+                    ["fallback"] = "Familiar.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownTerse03",
+                },
+                {
+                    ["fallback"] = "Yes.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownTerse04",
+                },
+                {
+                    ["fallback"] = "Heard of it.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownTerse05",
+                },
+                {
+                    ["fallback"] = "Got that info.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownTerse06",
+                },
+                {
+                    ["fallback"] = "Understood.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownTerse07",
+                },
+                {
+                    ["fallback"] = "Already know.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownTerse08",
+                },
+                {
+                    ["fallback"] = "Know it.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownTerse09",
+                },
+                {
+                    ["fallback"] = "Clear on that.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "I know about %1.",
+                    ["fallback"] = "Yes, I know about that! Glad you asked.",
                     ["id"] = "phrase.semantic.question.knowledge.known.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownWarm01",
+                },
+                {
+                    ["fallback"] = "I'm happy to share what I know about that with you.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownWarm02",
+                },
+                {
+                    ["fallback"] = "I do know about that, friend. Let's discuss it.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownWarm03",
+                },
+                {
+                    ["fallback"] = "I'm quite familiar with that topic. What would you like to know?",
+                    ["id"] = "phrase.semantic.question.knowledge.known.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownWarm04",
+                },
+                {
+                    ["fallback"] = "Yes, I've got some good knowledge on that.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownWarm05",
+                },
+                {
+                    ["fallback"] = "I know that well! Always happy to talk it through.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownWarm06",
+                },
+                {
+                    ["fallback"] = "I can definitely help fill you in on that.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownWarm07",
+                },
+                {
+                    ["fallback"] = "I know about that matter. I'm all ears if you have questions.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownWarm08",
+                },
+                {
+                    ["fallback"] = "Yes, I'm well acquainted with it, my friend.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownWarm09",
+                },
+                {
+                    ["fallback"] = "I know that one! Let's talk about it together.",
+                    ["id"] = "phrase.semantic.question.knowledge.known.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeKnownWarm10",
                 },
             },
         },
@@ -252,30 +1512,210 @@ return {
         ["styles"] = {
             ["guarded"] = {
                 {
-                    ["fallback"] = "I don't know that. Don't guess.",
+                    ["fallback"] = "I don't know anything about that.",
                     ["id"] = "phrase.semantic.question.knowledge.unknown.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownGuarded01",
+                },
+                {
+                    ["fallback"] = "Haven't heard of it. Don't waste time on wild goose chases.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownGuarded02",
+                },
+                {
+                    ["fallback"] = "No idea. Keep your thoughts on what's in front of us.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownGuarded03",
+                },
+                {
+                    ["fallback"] = "I know nothing about that topic. Drop it.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownGuarded04",
+                },
+                {
+                    ["fallback"] = "Never crossed my path. Stay alert.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownGuarded05",
+                },
+                {
+                    ["fallback"] = "Can't help you there. Don't get distracted.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownGuarded06",
+                },
+                {
+                    ["fallback"] = "I'm in the dark on that. Watch the road.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownGuarded07",
+                },
+                {
+                    ["fallback"] = "No clue. Don't go looking for things that aren't there.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownGuarded08",
+                },
+                {
+                    ["fallback"] = "Nothing I've ever encountered. Move along.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownGuarded09",
+                },
+                {
+                    ["fallback"] = "I don't know and I don't care to guess.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownGuarded10",
                 },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "I don't have reliable information about that.",
+                    ["fallback"] = "I don't know anything about that.",
                     ["id"] = "phrase.semantic.question.knowledge.unknown.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownNeutral01",
+                },
+                {
+                    ["fallback"] = "I'm not familiar with that subject.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownNeutral02",
+                },
+                {
+                    ["fallback"] = "I haven't encountered that information before.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownNeutral03",
+                },
+                {
+                    ["fallback"] = "I have no knowledge on that matter.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownNeutral04",
+                },
+                {
+                    ["fallback"] = "That's unfamiliar to me, sorry.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownNeutral05",
+                },
+                {
+                    ["fallback"] = "I can't answer that. I simply don't know.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownNeutral06",
+                },
+                {
+                    ["fallback"] = "Haven't come across that in my travels.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownNeutral07",
+                },
+                {
+                    ["fallback"] = "I don't have the answers on that one.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownNeutral08",
+                },
+                {
+                    ["fallback"] = "I'm unaware of that topic.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownNeutral09",
+                },
+                {
+                    ["fallback"] = "Sorry, that's outside my knowledge.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownNeutral10",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "I don't know.",
+                    ["fallback"] = "Don't know.",
                     ["id"] = "phrase.semantic.question.knowledge.unknown.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownTerse01",
+                },
+                {
+                    ["fallback"] = "No idea.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownTerse02",
+                },
+                {
+                    ["fallback"] = "Unfamiliar.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownTerse03",
+                },
+                {
+                    ["fallback"] = "Never heard of it.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownTerse04",
+                },
+                {
+                    ["fallback"] = "Can't say.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownTerse05",
+                },
+                {
+                    ["fallback"] = "Unknown.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownTerse06",
+                },
+                {
+                    ["fallback"] = "No clue.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownTerse07",
+                },
+                {
+                    ["fallback"] = "Not a clue.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownTerse08",
+                },
+                {
+                    ["fallback"] = "Nothing.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownTerse09",
+                },
+                {
+                    ["fallback"] = "Blank on that.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "I don't know enough about that to help.",
+                    ["fallback"] = "I wish I knew, but I don't know anything about that.",
                     ["id"] = "phrase.semantic.question.knowledge.unknown.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownWarm01",
+                },
+                {
+                    ["fallback"] = "I'm sorry, friend, I haven't heard about that.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownWarm02",
+                },
+                {
+                    ["fallback"] = "I wish I could help you with that, but I'm unfamiliar.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownWarm03",
+                },
+                {
+                    ["fallback"] = "I don't know, but we can try to find out together.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownWarm04",
+                },
+                {
+                    ["fallback"] = "Sorry I can't be more helpful on that topic.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownWarm05",
+                },
+                {
+                    ["fallback"] = "That's new to me! I wish I had more answers for you.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownWarm06",
+                },
+                {
+                    ["fallback"] = "I haven't learned about that yet, my friend.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownWarm07",
+                },
+                {
+                    ["fallback"] = "Wish I could answer that, but I'm in the dark too.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownWarm08",
+                },
+                {
+                    ["fallback"] = "I don't know about that, but let's keep learning together.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownWarm09",
+                },
+                {
+                    ["fallback"] = "Sorry to disappoint, but that's unfamiliar to me.",
+                    ["id"] = "phrase.semantic.question.knowledge.unknown.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticQuestionKnowledgeUnknownWarm10",
                 },
             },
         },
