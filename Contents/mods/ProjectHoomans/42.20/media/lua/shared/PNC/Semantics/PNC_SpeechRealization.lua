@@ -98,14 +98,28 @@ local function selectPhrase(templateID, styleVariant, context, salt, localSelect
     local existing = localSelections and localSelections[key]
     if existing then return existing end
 
+    local isSeeded = type(context) == "table" and (
+        context.phraseSalt ~= nil
+        or context.variationSeed ~= nil
+        or context.seed ~= nil
+        or context.caseID ~= nil
+    )
+    local isStrict = (type(context) == "table" and context.strictCanonical == true)
+        or salt == "canonical"
+
     local previous = phraseHistory[key]
     local index
     local reason
     if previous == nil then
-        -- The first migration turn is intentionally the accepted canonical
-        -- wording. Subsequent turns use the stable salt and anti-repeat rule.
-        index = 1
-        reason = "initial_canonical"
+        if isSeeded and not isStrict then
+            index = (hash(tostring(salt or "") .. ":" .. key) % #phrases) + 1
+            reason = "initial_seeded"
+        else
+            -- The default unseeded initial turn uses the accepted canonical
+            -- wording (index 1). Subsequent turns use the stable salt and anti-repeat rule.
+            index = 1
+            reason = "initial_canonical"
+        end
     else
         index = (hash(tostring(salt or "") .. ":" .. key) % #phrases) + 1
         if #phrases > 1 and tostring(phrases[index].id) == tostring(previous) then
@@ -382,7 +396,12 @@ function Realization.Apply(response, context)
     local turn
     local blocked = {}
     local localSelections = {}
-    local phraseSalt = context and context.phraseSalt or response.selectionID
+    local phraseSalt = (type(context) == "table" and (
+        context.phraseSalt
+        or context.variationSeed
+        or context.seed
+        or context.caseID
+    )) or response.selectionID
 
     if response.selectionID == "semantic.refuse.default" then
         blocked["semantic.social.acknowledged"] = true

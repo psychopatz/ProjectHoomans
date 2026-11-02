@@ -445,7 +445,10 @@ class SweepBatchExecutor:
     ) -> dict[str, Any]:
         """Execute a planned case against LuaSemanticWorker and stream rows."""
         scenario = self.inventory.project_to_scenario(case.parameters, DEFAULT_SCENARIO)
+        phrase_salt = f"{case.case_id}:{case.strategy}"
         scenario.setdefault("runtime", {})["language"] = case.language
+        scenario["runtime"]["phraseSalt"] = phrase_salt
+        scenario["runtime"]["caseID"] = case.case_id
 
         has_invalid_surface = False
 
@@ -507,6 +510,7 @@ class SweepBatchExecutor:
                     strategy=case.strategy,
                     parameters=case.parameters,
                     language=case.language,
+                    salt=phrase_salt,
                     input_spec=turn_spec,
                     planned_surface=case.surface,
                     surface_missing=surface_missing,

@@ -42,7 +42,8 @@ function RecruitmentResponse.Reject(state, rejection, details)
             args.npcID,
             rejection,
             nil,
-            worldAgeHours()
+            worldAgeHours(),
+            state.requestID or (args and args.requestID) or (state.context and state.context.phraseSalt)
         )
     end
     send(state.player, PNC.Const.CMD_CONVERSATION_RECRUIT_RESULT, payload)
@@ -63,7 +64,8 @@ function RecruitmentResponse.Send(state)
             args.npcID,
             nil,
             result and result.route,
-            context.worldAgeHours
+            context.worldAgeHours,
+            state.requestID or (args and args.requestID) or (context and context.phraseSalt)
         ),
         relationship = result and result.relationship,
         registryFingerprint = Registry.GetFingerprint(),

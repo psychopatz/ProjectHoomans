@@ -94,6 +94,18 @@ function Builder.build(context)
             or (priorContext and priorContext.locationObservation)),
         saveSeed = world.seedString or world.worldSeedString
             or world.worldSeed,
+        phraseSalt = (scenario.runtime and scenario.runtime.phraseSalt)
+            or scenario.phraseSalt
+            or (priorContext and priorContext.phraseSalt),
+        caseID = (scenario.runtime and scenario.runtime.caseID)
+            or scenario.caseID
+            or (priorContext and priorContext.caseID),
+        variationSeed = (scenario.runtime and scenario.runtime.variationSeed)
+            or scenario.variationSeed
+            or (priorContext and priorContext.variationSeed),
+        strictCanonical = (scenario.runtime and scenario.runtime.strictCanonical)
+            or scenario.strictCanonical
+            or (priorContext and priorContext.strictCanonical),
         identityState = effectiveIdentityState,
         identity = copy(npc.identity),
         npcName = npcName,

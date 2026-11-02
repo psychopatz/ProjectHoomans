@@ -78,6 +78,13 @@ local RECRUIT_REPLY_VARIANTS = {
         "response.recruit.reject.relationship.1",
         "response.recruit.reject.relationship.2",
         "response.recruit.reject.relationship.3",
+        "response.recruit.reject.relationship.4",
+        "response.recruit.reject.relationship.5",
+        "response.recruit.reject.relationship.6",
+        "response.recruit.reject.relationship.7",
+        "response.recruit.reject.relationship.8",
+        "response.recruit.reject.relationship.9",
+        "response.recruit.reject.relationship.10",
     },
     leader = {
         "response.recruit.reject.leader.1",
@@ -115,7 +122,7 @@ local function stableVariantIndex(value, count)
     return (hash % count) + 1
 end
 
-local function recruitReplyKey(npcID, reason, route, worldAgeHours)
+local function recruitReplyKey(npcID, reason, route, worldAgeHours, salt)
     local group
     if reason == "already_recruited"
         or reason == "npc_not_debug_recruitable"
@@ -145,6 +152,7 @@ local function recruitReplyKey(npcID, reason, route, worldAgeHours)
     local index = stableVariantIndex(table.concat({
         tostring(npcID or ""), tostring(reason or ""), tostring(route or ""),
         tostring(math.floor(tonumber(worldAgeHours) or 0) / 24),
+        tostring(salt or ""),
     }, ":"), #variants)
     return variants[index]
 end

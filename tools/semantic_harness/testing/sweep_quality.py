@@ -47,6 +47,14 @@ ALLOWED_SHORT_WORDS = frozenset({
     "ayos.",
     "salamat",
     "salamat.",
+    "you too",
+    "you too.",
+    "kayo rin",
+    "kayo rin.",
+    "ikaw rin",
+    "ikaw rin.",
+    "ingat",
+    "ingat.",
 })
 
 FAMILY_TERMS_PATTERN = re.compile(
