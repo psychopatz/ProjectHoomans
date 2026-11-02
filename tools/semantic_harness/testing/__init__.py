@@ -62,11 +62,20 @@ from .sweep_planner import (
     CoveragePlanner,
     PlannedCase,
 )
+from .sweep_reachability import (
+    ALLOWED_REACHABILITY_SCHEMAS,
+    REACHABILITY_SCHEMA_V1,
+    ReachabilityAnalyzer,
+    ReachabilityReport,
+    VariantReachabilityRecord,
+    VariantReachabilityState,
+)
 
 __all__ = [
     "ABSENT",
     "ALLOWED_EVIDENCE_SCHEMAS",
     "ALLOWED_MANIFEST_SCHEMAS",
+    "ALLOWED_REACHABILITY_SCHEMAS",
     "AssertionFailure",
     "BucketPolicy",
     "CaseResult",
@@ -86,8 +95,11 @@ __all__ = [
     "PlannedCase",
     "PrerequisiteDimensionError",
     "QualityFlag",
+    "REACHABILITY_SCHEMA_V1",
     "RELATIONSHIP_BUCKETS",
     "ReadOnlyDimensionError",
+    "ReachabilityAnalyzer",
+    "ReachabilityReport",
     "SCHEMA_V1",
     "SchemaValidationError",
     "SemanticCase",
@@ -102,6 +114,8 @@ __all__ = [
     "SweepManifest",
     "TurnResult",
     "UnsupportedDimensionError",
+    "VariantReachabilityRecord",
+    "VariantReachabilityState",
     "build_bucket_inventory",
     "compare_value",
     "detect_conflicts",
