@@ -8,9 +8,54 @@ return {
         ["styles"] = {
             ["guarded"] = {
                 {
-                    ["fallback"] = "Area's clear for now. Don't relax too much.",
+                    ["fallback"] = "Don't relax yet. Scan for stragglers.",
                     ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearGuarded01",
+                },
+                {
+                    ["fallback"] = "Down, but keep your weapon ready. More could be coming.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearGuarded02",
+                },
+                {
+                    ["fallback"] = "Check your perimeter before you start celebrating.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearGuarded03",
+                },
+                {
+                    ["fallback"] = "Check every corpse. Make sure they stay down.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearGuarded04",
+                },
+                {
+                    ["fallback"] = "Gunfire brings more of them. We need to be ready to move.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearGuarded05",
+                },
+                {
+                    ["fallback"] = "Wipe your blade and reload immediately.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearGuarded06",
+                },
+                {
+                    ["fallback"] = "Are you bitten? Answer me right now.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearGuarded07",
+                },
+                {
+                    ["fallback"] = "Threat is dead, but noise travels fast out here.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearGuarded08",
+                },
+                {
+                    ["fallback"] = "Keep low. Don't silhouette yourself in the doorway.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearGuarded09",
+                },
+                {
+                    ["fallback"] = "Clear for now. Expect a second wave.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearGuarded10",
                 },
             },
             ["neutral"] = {
@@ -19,19 +64,154 @@ return {
                     ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearNeutral01",
                 },
+                {
+                    ["fallback"] = "Area is secure. Check yourselves for injuries.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearNeutral02",
+                },
+                {
+                    ["fallback"] = "They're all down. Take a breath and reload.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearNeutral03",
+                },
+                {
+                    ["fallback"] = "Fight's over. Good work holding the line.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearNeutral04",
+                },
+                {
+                    ["fallback"] = "Looks like the immediate threat is dealt with.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearNeutral05",
+                },
+                {
+                    ["fallback"] = "Clear. Everyone still in one piece?",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearNeutral06",
+                },
+                {
+                    ["fallback"] = "Threat neutralized. Let's recover our stamina.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearNeutral07",
+                },
+                {
+                    ["fallback"] = "It's quiet again. Stay alert for stragglers.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearNeutral08",
+                },
+                {
+                    ["fallback"] = "Combat is finished. Reload and bandage up.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearNeutral09",
+                },
+                {
+                    ["fallback"] = "We held them off. Area appears clear.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearNeutral10",
+                },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "Clear. Hell of a mess.",
+                    ["fallback"] = "Clear.",
                     ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearTerse01",
+                },
+                {
+                    ["fallback"] = "All down.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearTerse02",
+                },
+                {
+                    ["fallback"] = "Reload.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearTerse03",
+                },
+                {
+                    ["fallback"] = "Check wounds.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearTerse04",
+                },
+                {
+                    ["fallback"] = "Secure.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearTerse05",
+                },
+                {
+                    ["fallback"] = "Done.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearTerse06",
+                },
+                {
+                    ["fallback"] = "Quiet now.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearTerse07",
+                },
+                {
+                    ["fallback"] = "Hold positions.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearTerse08",
+                },
+                {
+                    ["fallback"] = "Breathe.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearTerse09",
+                },
+                {
+                    ["fallback"] = "Threat gone.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "We're clear. Everyone still with me?",
+                    ["fallback"] = "We made it through! Is everyone okay?",
                     ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearWarm01",
+                },
+                {
+                    ["fallback"] = "Thank goodness you're alive. That was terrifying.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearWarm02",
+                },
+                {
+                    ["fallback"] = "Great fighting, partner! I'm so glad we survived that.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearWarm03",
+                },
+                {
+                    ["fallback"] = "Come here, let me check you over for bites or scratches.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearWarm04",
+                },
+                {
+                    ["fallback"] = "We did it together. Nobody got left behind.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearWarm05",
+                },
+                {
+                    ["fallback"] = "Take a breath, friend. We held the line.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearWarm06",
+                },
+                {
+                    ["fallback"] = "I was worried for a second there, but you fought bravely.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearWarm07",
+                },
+                {
+                    ["fallback"] = "Proud to stand beside you in that fight. We're safe now.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearWarm08",
+                },
+                {
+                    ["fallback"] = "Rest for a minute. You earned it after that mess.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearWarm09",
+                },
+                {
+                    ["fallback"] = "All clear! Hugely relieved we're both standing.",
+                    ["id"] = "phrase.semantic.interaction.scene.post_combat_clear.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionScenePostCombatClearWarm10",
                 },
             },
         },
@@ -44,9 +224,54 @@ return {
         ["styles"] = {
             ["guarded"] = {
                 {
-                    ["fallback"] = "Work's assigned. I'll handle my part.",
+                    ["fallback"] = "I'll do the work. Watch my back while I do.",
                     ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedGuarded01",
+                },
+                {
+                    ["fallback"] = "I'll handle it, but keep an eye on our surroundings.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedGuarded02",
+                },
+                {
+                    ["fallback"] = "Understood. Don't crowd me while I'm working.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedGuarded03",
+                },
+                {
+                    ["fallback"] = "I'll do my share. Make sure you do yours.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedGuarded04",
+                },
+                {
+                    ["fallback"] = "Getting on it. Stay alert for threats.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedGuarded05",
+                },
+                {
+                    ["fallback"] = "I'll get it done. Just make sure the perimeter is secure.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedGuarded06",
+                },
+                {
+                    ["fallback"] = "Task noted. I'll finish it without distraction.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedGuarded07",
+                },
+                {
+                    ["fallback"] = "Fine. I'll see to the task.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedGuarded08",
+                },
+                {
+                    ["fallback"] = "I'll handle this. Keep your weapon ready.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedGuarded09",
+                },
+                {
+                    ["fallback"] = "Understood. Don't let anything sneak up on me.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedGuarded10",
                 },
             },
             ["neutral"] = {
@@ -55,19 +280,154 @@ return {
                     ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedNeutral01",
                 },
+                {
+                    ["fallback"] = "Understood. Starting on the task now.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedNeutral02",
+                },
+                {
+                    ["fallback"] = "Task received. I'll take care of this.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedNeutral03",
+                },
+                {
+                    ["fallback"] = "Right. Getting down to business.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedNeutral04",
+                },
+                {
+                    ["fallback"] = "I'm on it. Shouldn't take too long.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedNeutral05",
+                },
+                {
+                    ["fallback"] = "Understood. I will handle this duty.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedNeutral06",
+                },
+                {
+                    ["fallback"] = "Got my assignment. Moving out to work.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedNeutral07",
+                },
+                {
+                    ["fallback"] = "Fair enough. Time to get my hands dirty.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedNeutral08",
+                },
+                {
+                    ["fallback"] = "I'll see that this gets done properly.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedNeutral09",
+                },
+                {
+                    ["fallback"] = "Acknowledged. Working on the assigned job.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedNeutral10",
+                },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "Got a job. On it.",
+                    ["fallback"] = "On it.",
                     ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedTerse01",
+                },
+                {
+                    ["fallback"] = "Working.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedTerse02",
+                },
+                {
+                    ["fallback"] = "Understood.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedTerse03",
+                },
+                {
+                    ["fallback"] = "Doing it.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedTerse04",
+                },
+                {
+                    ["fallback"] = "Got it.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedTerse05",
+                },
+                {
+                    ["fallback"] = "Assigned.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedTerse06",
+                },
+                {
+                    ["fallback"] = "Starting.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedTerse07",
+                },
+                {
+                    ["fallback"] = "Handling it.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedTerse08",
+                },
+                {
+                    ["fallback"] = "Right.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedTerse09",
+                },
+                {
+                    ["fallback"] = "Moving.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "I've got this job. I'll take care of it.",
+                    ["fallback"] = "Happy to help with this! I'll get right on it.",
                     ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedWarm01",
+                },
+                {
+                    ["fallback"] = "Leave it to me, friend. I'll make sure it's done right.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedWarm02",
+                },
+                {
+                    ["fallback"] = "Glad to contribute to our camp. Heading over now.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedWarm03",
+                },
+                {
+                    ["fallback"] = "You can count on me. I'll take good care of it.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedWarm04",
+                },
+                {
+                    ["fallback"] = "On it! Always happy to do my part for the team.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedWarm05",
+                },
+                {
+                    ["fallback"] = "Consider it handled, partner. Be back soon.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedWarm06",
+                },
+                {
+                    ["fallback"] = "Happy to take this off your hands. Working on it now.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedWarm07",
+                },
+                {
+                    ["fallback"] = "I'll pour my best effort into this for all of us.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedWarm08",
+                },
+                {
+                    ["fallback"] = "Got the task! Thanks for trusting me with it.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedWarm09",
+                },
+                {
+                    ["fallback"] = "Right away, friend! Let's keep our home running.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_assigned.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkAssignedWarm10",
                 },
             },
         },
@@ -80,9 +440,54 @@ return {
         ["styles"] = {
             ["guarded"] = {
                 {
-                    ["fallback"] = "Task's finished. Moving on.",
+                    ["fallback"] = "Task is done. I'm taking a breather.",
                     ["id"] = "phrase.semantic.interaction.scene.task_work_completed.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedGuarded01",
+                },
+                {
+                    ["fallback"] = "Finished. Inspect it if you want to be sure.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedGuarded02",
+                },
+                {
+                    ["fallback"] = "It's completed. Now keep your eyes open.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedGuarded03",
+                },
+                {
+                    ["fallback"] = "That job is handled. Back to guarding the perimeter.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedGuarded04",
+                },
+                {
+                    ["fallback"] = "Finished my duty. Nobody snuck up on us, right?",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedGuarded05",
+                },
+                {
+                    ["fallback"] = "Done. Let's make sure it wasn't for nothing.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedGuarded06",
+                },
+                {
+                    ["fallback"] = "Work is complete. Back on defensive watch.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedGuarded07",
+                },
+                {
+                    ["fallback"] = "It's finished. Keep quiet and stay alert.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedGuarded08",
+                },
+                {
+                    ["fallback"] = "Task completed. Don't waste the resources I secured.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedGuarded09",
+                },
+                {
+                    ["fallback"] = "Done. What's the next threat we need to manage?",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedGuarded10",
                 },
             },
             ["neutral"] = {
@@ -91,19 +496,154 @@ return {
                     ["id"] = "phrase.semantic.interaction.scene.task_work_completed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedNeutral01",
                 },
+                {
+                    ["fallback"] = "Finished the task. All wrapped up.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedNeutral02",
+                },
+                {
+                    ["fallback"] = "Job is complete. What's next?",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedNeutral03",
+                },
+                {
+                    ["fallback"] = "That takes care of that assignment.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedNeutral04",
+                },
+                {
+                    ["fallback"] = "All done here. Everything looks in order.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedNeutral05",
+                },
+                {
+                    ["fallback"] = "Task is completed to the best of my ability.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedNeutral06",
+                },
+                {
+                    ["fallback"] = "Wrapped that up. Ready for the next priority.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedNeutral07",
+                },
+                {
+                    ["fallback"] = "Done. That should hold up fine.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedNeutral08",
+                },
+                {
+                    ["fallback"] = "The work is finished. Moving on.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedNeutral09",
+                },
+                {
+                    ["fallback"] = "Completed. Duty handled.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedNeutral10",
+                },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "Job's done.",
+                    ["fallback"] = "Done.",
                     ["id"] = "phrase.semantic.interaction.scene.task_work_completed.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedTerse01",
+                },
+                {
+                    ["fallback"] = "Finished.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedTerse02",
+                },
+                {
+                    ["fallback"] = "Completed.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedTerse03",
+                },
+                {
+                    ["fallback"] = "Handled.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedTerse04",
+                },
+                {
+                    ["fallback"] = "Sorted.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedTerse05",
+                },
+                {
+                    ["fallback"] = "All set.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedTerse06",
+                },
+                {
+                    ["fallback"] = "Wrapped up.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedTerse07",
+                },
+                {
+                    ["fallback"] = "Next?",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedTerse08",
+                },
+                {
+                    ["fallback"] = "Cleared.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedTerse09",
+                },
+                {
+                    ["fallback"] = "Ready.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "Finished that job. We're good here.",
+                    ["fallback"] = "All finished! Glad I could help get this done.",
                     ["id"] = "phrase.semantic.interaction.scene.task_work_completed.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedWarm01",
+                },
+                {
+                    ["fallback"] = "That's taken care of, friend. Turned out great!",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedWarm02",
+                },
+                {
+                    ["fallback"] = "Proud to have this knocked out for the camp.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedWarm03",
+                },
+                {
+                    ["fallback"] = "Finished! We're making our home a little better every day.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedWarm04",
+                },
+                {
+                    ["fallback"] = "Done and dusted! Let me know if you need another hand.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedWarm05",
+                },
+                {
+                    ["fallback"] = "Completed with care. Hope it meets your expectations, partner.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedWarm06",
+                },
+                {
+                    ["fallback"] = "That was tough, but we did it! All finished.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedWarm07",
+                },
+                {
+                    ["fallback"] = "One more step toward surviving comfortably. All done!",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedWarm08",
+                },
+                {
+                    ["fallback"] = "Done! Happy to do my part for our people.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedWarm09",
+                },
+                {
+                    ["fallback"] = "All set! Feels good to get something productive accomplished.",
+                    ["id"] = "phrase.semantic.interaction.scene.task_work_completed.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionSceneTaskWorkCompletedWarm10",
                 },
             },
         },

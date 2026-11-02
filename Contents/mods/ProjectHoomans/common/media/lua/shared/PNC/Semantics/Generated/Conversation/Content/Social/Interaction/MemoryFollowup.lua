@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.memory.followup.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupGuarded01",
                 },
+                {
+                    ["fallback"] = "What's the point of bringing that up now?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupGuarded02",
+                },
+                {
+                    ["fallback"] = "Are you testing my reaction?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupGuarded03",
+                },
+                {
+                    ["fallback"] = "Who else knows about that story?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupGuarded04",
+                },
+                {
+                    ["fallback"] = "Why share something so personal with me?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupGuarded05",
+                },
+                {
+                    ["fallback"] = "Sounds like an angle. What do you really want?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupGuarded06",
+                },
+                {
+                    ["fallback"] = "Does that story have anything to do with our safety here?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupGuarded07",
+                },
+                {
+                    ["fallback"] = "Be careful what details you hand out to people.",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupGuarded08",
+                },
+                {
+                    ["fallback"] = "Are you trying to gauge where my loyalties lie?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupGuarded09",
+                },
+                {
+                    ["fallback"] = "Keep your personal history to yourself.",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "You did? What happened after that?",
                     ["id"] = "phrase.semantic.interaction.memory.followup.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupNeutral01",
+                },
+                {
+                    ["fallback"] = "How did you manage to get through it?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupNeutral02",
+                },
+                {
+                    ["fallback"] = "Did anyone else make it out with you?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupNeutral03",
+                },
+                {
+                    ["fallback"] = "Where did you go once that went down?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupNeutral04",
+                },
+                {
+                    ["fallback"] = "What made you think of that just now?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupNeutral05",
+                },
+                {
+                    ["fallback"] = "How long ago was that?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupNeutral06",
+                },
+                {
+                    ["fallback"] = "Were there many casualties back then?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupNeutral07",
+                },
+                {
+                    ["fallback"] = "What did you end up doing about it?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupNeutral08",
+                },
+                {
+                    ["fallback"] = "That sounds intense. What came next?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupNeutral09",
+                },
+                {
+                    ["fallback"] = "Did you ever go back to that place?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupNeutral10",
                 },
             },
             ["terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.memory.followup.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupTerse01",
                 },
+                {
+                    ["fallback"] = "What happened?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupTerse02",
+                },
+                {
+                    ["fallback"] = "After that?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupTerse03",
+                },
+                {
+                    ["fallback"] = "How so?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupTerse04",
+                },
+                {
+                    ["fallback"] = "Who survived?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupTerse05",
+                },
+                {
+                    ["fallback"] = "When?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupTerse06",
+                },
+                {
+                    ["fallback"] = "Outcome?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupTerse07",
+                },
+                {
+                    ["fallback"] = "Next?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupTerse08",
+                },
+                {
+                    ["fallback"] = "Details?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupTerse09",
+                },
+                {
+                    ["fallback"] = "End result?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "Really? Tell me more about that.",
                     ["id"] = "phrase.semantic.interaction.memory.followup.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupWarm01",
+                },
+                {
+                    ["fallback"] = "That sounds like quite a memory. How did it feel?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupWarm02",
+                },
+                {
+                    ["fallback"] = "I'd love to hear the rest of that story if you want to share.",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupWarm03",
+                },
+                {
+                    ["fallback"] = "It must have taken real courage. How did you hold up?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupWarm04",
+                },
+                {
+                    ["fallback"] = "You went through so much. I'm glad you're here to talk about it.",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupWarm05",
+                },
+                {
+                    ["fallback"] = "Were you able to save anything from back then?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupWarm06",
+                },
+                {
+                    ["fallback"] = "I'm listening, friend. Take all the time you need.",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupWarm07",
+                },
+                {
+                    ["fallback"] = "That sounds like someone who mattered deeply to you.",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupWarm08",
+                },
+                {
+                    ["fallback"] = "What a journey. What kept you holding on?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupWarm09",
+                },
+                {
+                    ["fallback"] = "Thank you for trusting me with that memory. What happened next?",
+                    ["id"] = "phrase.semantic.interaction.memory.followup.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryFollowupWarm10",
                 },
             },
         },

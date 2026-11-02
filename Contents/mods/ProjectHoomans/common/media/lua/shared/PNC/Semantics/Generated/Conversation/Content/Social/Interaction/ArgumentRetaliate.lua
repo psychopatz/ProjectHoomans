@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.argument.retaliate.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateGuarded01",
                 },
+                {
+                    ["fallback"] = "You want to push this? I will push back harder.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateGuarded02",
+                },
+                {
+                    ["fallback"] = "Don't make threats you can't survive.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateGuarded03",
+                },
+                {
+                    ["fallback"] = "Try me. See what happens to you.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateGuarded04",
+                },
+                {
+                    ["fallback"] = "You're digging your own grave with that talk.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateGuarded05",
+                },
+                {
+                    ["fallback"] = "Keep running that mouth and find out.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateGuarded06",
+                },
+                {
+                    ["fallback"] = "I'm not the one to mess with out here.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateGuarded07",
+                },
+                {
+                    ["fallback"] = "Push one more inch and we have bloodshed.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateGuarded08",
+                },
+                {
+                    ["fallback"] = "Say it one more time. I dare you.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateGuarded09",
+                },
+                {
+                    ["fallback"] = "You will regret crossing me.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "You're really testing me right now.",
                     ["id"] = "phrase.semantic.interaction.argument.retaliate.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateNeutral01",
+                },
+                {
+                    ["fallback"] = "Don't push your luck any further.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateNeutral02",
+                },
+                {
+                    ["fallback"] = "You're out of line, and I won't stand for it.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateNeutral03",
+                },
+                {
+                    ["fallback"] = "You started this, but I'll finish it if I have to.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateNeutral04",
+                },
+                {
+                    ["fallback"] = "You're making a massive mistake talking to me like that.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateNeutral05",
+                },
+                {
+                    ["fallback"] = "Think very carefully about what you say next.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateNeutral06",
+                },
+                {
+                    ["fallback"] = "I've had about enough of your disrespect.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateNeutral07",
+                },
+                {
+                    ["fallback"] = "You're crossing a boundary you can't walk back.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateNeutral08",
+                },
+                {
+                    ["fallback"] = "Back down before this escalates completely.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateNeutral09",
+                },
+                {
+                    ["fallback"] = "I'm answering in kind: knock it off.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateNeutral10",
                 },
             },
             ["terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.argument.retaliate.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateTerse01",
                 },
+                {
+                    ["fallback"] = "Try it.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateTerse02",
+                },
+                {
+                    ["fallback"] = "Dare you.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateTerse03",
+                },
+                {
+                    ["fallback"] = "Push me.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateTerse04",
+                },
+                {
+                    ["fallback"] = "Wrong move.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateTerse05",
+                },
+                {
+                    ["fallback"] = "Big mistake.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateTerse06",
+                },
+                {
+                    ["fallback"] = "Last chance.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateTerse07",
+                },
+                {
+                    ["fallback"] = "Bring it.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateTerse08",
+                },
+                {
+                    ["fallback"] = "Don't test me.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateTerse09",
+                },
+                {
+                    ["fallback"] = "Watch yourself.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "You're pushing this too far.",
                     ["id"] = "phrase.semantic.interaction.argument.retaliate.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateWarm01",
+                },
+                {
+                    ["fallback"] = "I've been patient with you, but you're crossing the line.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateWarm02",
+                },
+                {
+                    ["fallback"] = "Don't make me treat you like a stranger.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateWarm03",
+                },
+                {
+                    ["fallback"] = "I didn't think you would turn on me like this.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateWarm04",
+                },
+                {
+                    ["fallback"] = "You're hurting someone who actually cared about you.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateWarm05",
+                },
+                {
+                    ["fallback"] = "Stop pushing me away with this cruelty.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateWarm06",
+                },
+                {
+                    ["fallback"] = "If you keep attacking me, I will protect myself.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateWarm07",
+                },
+                {
+                    ["fallback"] = "You're throwing our bond away right in front of me.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateWarm08",
+                },
+                {
+                    ["fallback"] = "I expected better from you. Don't push me further.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateWarm09",
+                },
+                {
+                    ["fallback"] = "Check yourself. I won't just stand here and take abuse.",
+                    ["id"] = "phrase.semantic.interaction.argument.retaliate.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateWarm10",
                 },
             },
         },

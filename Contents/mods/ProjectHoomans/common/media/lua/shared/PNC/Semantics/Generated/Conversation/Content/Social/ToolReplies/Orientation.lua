@@ -8,9 +8,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "That is not the kind of interest I have in you.",
+                    ["fallback"] = "That is not really how I swing.",
                     ["id"] = "phrase.semantic.tool_reply.orientation.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation1Neutral01",
+                },
+                {
+                    ["fallback"] = "I do not lean that way, just so you know.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation1Neutral02",
+                },
+                {
+                    ["fallback"] = "Not my preference, but thanks for being open.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation1Neutral03",
+                },
+                {
+                    ["fallback"] = "I appreciate the honesty, but that is not for me.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation1Neutral04",
+                },
+                {
+                    ["fallback"] = "That is not my type of thing.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation1Neutral05",
+                },
+                {
+                    ["fallback"] = "Just so we are clear, I do not look at you that way.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation1Neutral06",
+                },
+                {
+                    ["fallback"] = "I am not interested in that kind of arrangement.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation1Neutral07",
+                },
+                {
+                    ["fallback"] = "Fair enough, but that is not my direction.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation1Neutral08",
+                },
+                {
+                    ["fallback"] = "I keep things strictly platonic here.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation1Neutral09",
+                },
+                {
+                    ["fallback"] = "Good to know where you stand, but I do not swing that way.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation1Neutral10",
                 },
             },
         },
@@ -23,9 +68,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "Do not mistake my kindness for an invitation.",
+                    ["fallback"] = "I prefer to keep things simple between us.",
                     ["id"] = "phrase.semantic.tool_reply.orientation.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation2Neutral01",
+                },
+                {
+                    ["fallback"] = "Let us just keep this uncomplicated.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation2Neutral02",
+                },
+                {
+                    ["fallback"] = "Survival is messy enough without adding that.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation2Neutral03",
+                },
+                {
+                    ["fallback"] = "I like where we are at. Let us not complicate it.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation2Neutral04",
+                },
+                {
+                    ["fallback"] = "We work best when things stay straightforward.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation2Neutral05",
+                },
+                {
+                    ["fallback"] = "I am not looking for anything complicated out here.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation2Neutral06",
+                },
+                {
+                    ["fallback"] = "Simple is safe. Let us keep it that way.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation2Neutral07",
+                },
+                {
+                    ["fallback"] = "I value this partnership too much to make it awkward.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation2Neutral08",
+                },
+                {
+                    ["fallback"] = "Let us stay focused on staying alive instead.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation2Neutral09",
+                },
+                {
+                    ["fallback"] = "Keeping it clear and simple works best for both of us.",
+                    ["id"] = "phrase.semantic.tool_reply.orientation.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyOrientation2Neutral10",
                 },
             },
         },

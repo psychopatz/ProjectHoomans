@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.world_event.warning.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningGuarded01",
                 },
+                {
+                    ["fallback"] = "Weapons drawn, now. Danger outside.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningGuarded02",
+                },
+                {
+                    ["fallback"] = "Shut up and listen. Something is coming.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningGuarded03",
+                },
+                {
+                    ["fallback"] = "Lock the doors and watch every angle.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningGuarded04",
+                },
+                {
+                    ["fallback"] = "If it moves through that entrance, put it down.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningGuarded05",
+                },
+                {
+                    ["fallback"] = "Trouble's coming. Don't freeze up on me.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningGuarded06",
+                },
+                {
+                    ["fallback"] = "Get into defensive positions immediately.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningGuarded07",
+                },
+                {
+                    ["fallback"] = "Keep quiet. You don't want to draw them here.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningGuarded08",
+                },
+                {
+                    ["fallback"] = "Threat incoming. Expect the worst.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningGuarded09",
+                },
+                {
+                    ["fallback"] = "Eyes on the perimeter. Shoot on sight.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "Heads up. Something's wrong out there.",
                     ["id"] = "phrase.semantic.interaction.world_event.warning.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningNeutral01",
+                },
+                {
+                    ["fallback"] = "Look alive. The situation outside is shifting.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningNeutral02",
+                },
+                {
+                    ["fallback"] = "Pay attention. We have unexpected movement outside.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningNeutral03",
+                },
+                {
+                    ["fallback"] = "Warning. Something big is happening nearby.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningNeutral04",
+                },
+                {
+                    ["fallback"] = "Heads up, everyone. Check your gear.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningNeutral05",
+                },
+                {
+                    ["fallback"] = "Listen close. An event is unfolding out there.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningNeutral06",
+                },
+                {
+                    ["fallback"] = "Alert. We need to be ready for trouble.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningNeutral07",
+                },
+                {
+                    ["fallback"] = "Keep your eyes open. That sound wasn't normal.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningNeutral08",
+                },
+                {
+                    ["fallback"] = "Stay sharp. The perimeter is showing activity.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningNeutral09",
+                },
+                {
+                    ["fallback"] = "Heads up. Let's not get caught unprepared.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningNeutral10",
                 },
             },
             ["terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.world_event.warning.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningTerse01",
                 },
+                {
+                    ["fallback"] = "Incoming!",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningTerse02",
+                },
+                {
+                    ["fallback"] = "Danger!",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningTerse03",
+                },
+                {
+                    ["fallback"] = "Look out!",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningTerse04",
+                },
+                {
+                    ["fallback"] = "Alert!",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningTerse05",
+                },
+                {
+                    ["fallback"] = "Listen!",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningTerse06",
+                },
+                {
+                    ["fallback"] = "Trouble!",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningTerse07",
+                },
+                {
+                    ["fallback"] = "Ready weapons!",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningTerse08",
+                },
+                {
+                    ["fallback"] = "Movement!",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningTerse09",
+                },
+                {
+                    ["fallback"] = "Cover!",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "Stay close. Something's wrong out there.",
                     ["id"] = "phrase.semantic.interaction.world_event.warning.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningWarm01",
+                },
+                {
+                    ["fallback"] = "Stick by me, friend. We have trouble brewing outside.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningWarm02",
+                },
+                {
+                    ["fallback"] = "Don't wander off. Something bad is moving out there.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningWarm03",
+                },
+                {
+                    ["fallback"] = "Keep close and stay low. I'll protect you.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningWarm04",
+                },
+                {
+                    ["fallback"] = "Hey, stay behind me until we know what that was.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningWarm05",
+                },
+                {
+                    ["fallback"] = "Careful, everyone! Let's look out for one another.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningWarm06",
+                },
+                {
+                    ["fallback"] = "Hold on to each other. Danger is nearby.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningWarm07",
+                },
+                {
+                    ["fallback"] = "Stay safe by my side. Trouble is coming.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningWarm08",
+                },
+                {
+                    ["fallback"] = "Heads up, partner. Whatever happens, we stick together.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningWarm09",
+                },
+                {
+                    ["fallback"] = "Keep close. I don't want anyone getting separated.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningWarm10",
                 },
             },
         },

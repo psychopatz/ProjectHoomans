@@ -8,9 +8,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "That kind of attention is not welcome from me.",
+                    ["fallback"] = "That is just how I am wired.",
                     ["id"] = "phrase.semantic.tool_reply.personality.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality1Neutral01",
+                },
+                {
+                    ["fallback"] = "Take me or leave me, that is who I am.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality1Neutral02",
+                },
+                {
+                    ["fallback"] = "I have always been like this. It keeps me alive.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality1Neutral03",
+                },
+                {
+                    ["fallback"] = "Not going to apologize for how I operate.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality1Neutral04",
+                },
+                {
+                    ["fallback"] = "Everyone is built differently out here.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality1Neutral05",
+                },
+                {
+                    ["fallback"] = "It is what it is. I am not changing overnight.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality1Neutral06",
+                },
+                {
+                    ["fallback"] = "That is just my nature.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality1Neutral07",
+                },
+                {
+                    ["fallback"] = "I am too old to pretend to be someone else.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality1Neutral08",
+                },
+                {
+                    ["fallback"] = "Like it or not, this is me.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality1Neutral09",
+                },
+                {
+                    ["fallback"] = "I do things my own way. Has not failed me yet.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality1Neutral10",
                 },
             },
         },
@@ -23,9 +68,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "You are reading me wrong.",
+                    ["fallback"] = "The world changed. I changed with it.",
                     ["id"] = "phrase.semantic.tool_reply.personality.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality2Neutral01",
+                },
+                {
+                    ["fallback"] = "You adapt or you end up dead. This is who I had to become.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality2Neutral02",
+                },
+                {
+                    ["fallback"] = "Survival hardens people. I am no exception.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality2Neutral03",
+                },
+                {
+                    ["fallback"] = "I used to be different before all this fell apart.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality2Neutral04",
+                },
+                {
+                    ["fallback"] = "You learn to live with who you become out here.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality2Neutral05",
+                },
+                {
+                    ["fallback"] = "This world does not leave much room for soft edges.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality2Neutral06",
+                },
+                {
+                    ["fallback"] = "I became what I needed to be to see tomorrow.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality2Neutral07",
+                },
+                {
+                    ["fallback"] = "We are all shaped by what we had to survive.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality2Neutral08",
+                },
+                {
+                    ["fallback"] = "Hard times make hard survivors.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality2Neutral09",
+                },
+                {
+                    ["fallback"] = "I did what I had to. It made me who I am now.",
+                    ["id"] = "phrase.semantic.tool_reply.personality.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyPersonality2Neutral10",
                 },
             },
         },

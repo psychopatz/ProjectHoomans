@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.memory.acknowledge.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeGuarded01",
                 },
+                {
+                    ["fallback"] = "I remember, but let's not dwell on the past.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeGuarded02",
+                },
+                {
+                    ["fallback"] = "Past is past. Keep your focus here.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeGuarded03",
+                },
+                {
+                    ["fallback"] = "I know what happened. No need to rehash it.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeGuarded04",
+                },
+                {
+                    ["fallback"] = "Noted. But don't expect me to get sentimental.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeGuarded05",
+                },
+                {
+                    ["fallback"] = "Yeah, I remember. Why bring it up now?",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeGuarded06",
+                },
+                {
+                    ["fallback"] = "I haven't forgotten. I never forget.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeGuarded07",
+                },
+                {
+                    ["fallback"] = "Heard. Let's move on.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeGuarded08",
+                },
+                {
+                    ["fallback"] = "I remember the lesson it taught us.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeGuarded09",
+                },
+                {
+                    ["fallback"] = "All right. Keep that to yourself moving forward.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "I hear you.",
                     ["id"] = "phrase.semantic.interaction.memory.acknowledge.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeNeutral01",
+                },
+                {
+                    ["fallback"] = "I remember that.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeNeutral02",
+                },
+                {
+                    ["fallback"] = "Sounds familiar.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeNeutral03",
+                },
+                {
+                    ["fallback"] = "Makes sense given what happened.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeNeutral04",
+                },
+                {
+                    ["fallback"] = "I recall that well.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeNeutral05",
+                },
+                {
+                    ["fallback"] = "Yes, that was quite an event.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeNeutral06",
+                },
+                {
+                    ["fallback"] = "I understand why you bring that up.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeNeutral07",
+                },
+                {
+                    ["fallback"] = "Right. That was a significant moment.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeNeutral08",
+                },
+                {
+                    ["fallback"] = "I hear what you're saying about that.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeNeutral09",
+                },
+                {
+                    ["fallback"] = "Fair enough. That memory tracks.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeNeutral10",
                 },
             },
             ["terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.memory.acknowledge.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeTerse01",
                 },
+                {
+                    ["fallback"] = "Remember.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeTerse02",
+                },
+                {
+                    ["fallback"] = "Recall it.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeTerse03",
+                },
+                {
+                    ["fallback"] = "Yeah.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeTerse04",
+                },
+                {
+                    ["fallback"] = "Heard.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeTerse05",
+                },
+                {
+                    ["fallback"] = "Right.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeTerse06",
+                },
+                {
+                    ["fallback"] = "Got it.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeTerse07",
+                },
+                {
+                    ["fallback"] = "True.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeTerse08",
+                },
+                {
+                    ["fallback"] = "Yep.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeTerse09",
+                },
+                {
+                    ["fallback"] = "Understood.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "Yeah. I can see why that stayed with you.",
                     ["id"] = "phrase.semantic.interaction.memory.acknowledge.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeWarm01",
+                },
+                {
+                    ["fallback"] = "I remember that too. It meant a lot to me.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeWarm02",
+                },
+                {
+                    ["fallback"] = "That was a special moment between us. Glad you remember.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeWarm03",
+                },
+                {
+                    ["fallback"] = "It stayed in my heart as well, friend.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeWarm04",
+                },
+                {
+                    ["fallback"] = "Thanks for reminding me of that. Good times.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeWarm05",
+                },
+                {
+                    ["fallback"] = "Those memories keep us human out here.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeWarm06",
+                },
+                {
+                    ["fallback"] = "I smile every time I think back on that day.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeWarm07",
+                },
+                {
+                    ["fallback"] = "We made it through that together. I won't forget it.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeWarm08",
+                },
+                {
+                    ["fallback"] = "I'm glad we share that memory.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeWarm09",
+                },
+                {
+                    ["fallback"] = "That really stuck with both of us, didn't it?",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeWarm10",
                 },
             },
         },

@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.news.acknowledge.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeGuarded01",
                 },
+                {
+                    ["fallback"] = "Where did you hear that from?",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeGuarded02",
+                },
+                {
+                    ["fallback"] = "I'll believe it when I see it with my own eyes.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeGuarded03",
+                },
+                {
+                    ["fallback"] = "Rumors can get people killed out here. Be sure of your facts.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeGuarded04",
+                },
+                {
+                    ["fallback"] = "Noted, but I'll verify that myself.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeGuarded05",
+                },
+                {
+                    ["fallback"] = "Could be a setup. Don't act on rumors too quickly.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeGuarded06",
+                },
+                {
+                    ["fallback"] = "Who gave you that information?",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeGuarded07",
+                },
+                {
+                    ["fallback"] = "I'll take it under advisement, but keep my distance.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeGuarded08",
+                },
+                {
+                    ["fallback"] = "Don't spread that around until we know it's solid.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeGuarded09",
+                },
+                {
+                    ["fallback"] = "Heard. I'll watch for confirming signs.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "That's good to know.",
                     ["id"] = "phrase.semantic.interaction.news.acknowledge.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeNeutral01",
+                },
+                {
+                    ["fallback"] = "Appreciate the update.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeNeutral02",
+                },
+                {
+                    ["fallback"] = "I'll keep that intelligence in mind.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeNeutral03",
+                },
+                {
+                    ["fallback"] = "Good to have fresh news from the area.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeNeutral04",
+                },
+                {
+                    ["fallback"] = "Thanks for passing that along.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeNeutral05",
+                },
+                {
+                    ["fallback"] = "Understood. That changes how we look at the sector.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeNeutral06",
+                },
+                {
+                    ["fallback"] = "Good information. We'll plan around it.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeNeutral07",
+                },
+                {
+                    ["fallback"] = "Noted. Reliable news is hard to come by.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeNeutral08",
+                },
+                {
+                    ["fallback"] = "Thanks for keeping me informed.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeNeutral09",
+                },
+                {
+                    ["fallback"] = "That helps clear up a few rumors. Thanks.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeNeutral10",
                 },
             },
             ["terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.news.acknowledge.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeTerse01",
                 },
+                {
+                    ["fallback"] = "Noted.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeTerse02",
+                },
+                {
+                    ["fallback"] = "Heard.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeTerse03",
+                },
+                {
+                    ["fallback"] = "Good info.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeTerse04",
+                },
+                {
+                    ["fallback"] = "Understood.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeTerse05",
+                },
+                {
+                    ["fallback"] = "Clear.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeTerse06",
+                },
+                {
+                    ["fallback"] = "Thanks.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeTerse07",
+                },
+                {
+                    ["fallback"] = "Right.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeTerse08",
+                },
+                {
+                    ["fallback"] = "Acknowledged.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeTerse09",
+                },
+                {
+                    ["fallback"] = "Useful.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "Thanks for telling me. I'll keep that in mind.",
                     ["id"] = "phrase.semantic.interaction.news.acknowledge.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeWarm01",
+                },
+                {
+                    ["fallback"] = "That's huge news, friend! Thank you for sharing.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeWarm02",
+                },
+                {
+                    ["fallback"] = "Always glad to know you're looking out for me with news like this.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeWarm03",
+                },
+                {
+                    ["fallback"] = "You have great sources! Thanks a ton.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeWarm04",
+                },
+                {
+                    ["fallback"] = "I really appreciate you giving me the heads up first.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeWarm05",
+                },
+                {
+                    ["fallback"] = "Good news is worth its weight in gold out here. Thanks!",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeWarm06",
+                },
+                {
+                    ["fallback"] = "Thanks for sharing that with me. It gives me hope.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeWarm07",
+                },
+                {
+                    ["fallback"] = "I'm relieved to hear that. Thank you so much, partner.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeWarm08",
+                },
+                {
+                    ["fallback"] = "That's fantastic information. Appreciate you keeping us safe.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeWarm09",
+                },
+                {
+                    ["fallback"] = "Thanks! Let's make sure the others hear this too.",
+                    ["id"] = "phrase.semantic.interaction.news.acknowledge.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionNewsAcknowledgeWarm10",
                 },
             },
         },

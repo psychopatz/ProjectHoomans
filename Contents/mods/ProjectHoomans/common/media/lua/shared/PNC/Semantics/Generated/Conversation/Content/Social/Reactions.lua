@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.social.acknowledged.bond_guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondGuarded01",
                 },
+                {
+                    ["fallback"] = "%s, I hear you. Let's keep our heads on.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondGuarded02",
+                },
+                {
+                    ["fallback"] = "%s, message received. Eyes open.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondGuarded03",
+                },
+                {
+                    ["fallback"] = "%s, got it. No need to push further.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondGuarded04",
+                },
+                {
+                    ["fallback"] = "%s, all right. Let's watch the perimeter.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondGuarded05",
+                },
+                {
+                    ["fallback"] = "%s, acknowledged. We keep our guard up.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondGuarded06",
+                },
+                {
+                    ["fallback"] = "%s, I take your point. Let's be smart about this.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondGuarded07",
+                },
+                {
+                    ["fallback"] = "%s, clear enough. Leaving it at that.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondGuarded08",
+                },
+                {
+                    ["fallback"] = "%s, noted. We stay sharp.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondGuarded09",
+                },
+                {
+                    ["fallback"] = "%s, fair enough. Let's move carefully.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondGuarded10",
+                },
             },
             ["bond_neutral"] = {
                 {
                     ["fallback"] = "%s, all right.",
                     ["id"] = "phrase.semantic.social.acknowledged.bond_neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondNeutral01",
+                },
+                {
+                    ["fallback"] = "%s, understood.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondNeutral02",
+                },
+                {
+                    ["fallback"] = "%s, I hear what you're saying.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondNeutral03",
+                },
+                {
+                    ["fallback"] = "%s, got it. Makes sense.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondNeutral04",
+                },
+                {
+                    ["fallback"] = "%s, sounds reasonable.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondNeutral05",
+                },
+                {
+                    ["fallback"] = "%s, message received.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondNeutral06",
+                },
+                {
+                    ["fallback"] = "%s, fair enough. We'll roll with that.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondNeutral07",
+                },
+                {
+                    ["fallback"] = "%s, acknowledged. Let's get to work.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondNeutral08",
+                },
+                {
+                    ["fallback"] = "%s, point taken.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondNeutral09",
+                },
+                {
+                    ["fallback"] = "%s, right with you on that.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondNeutral10",
                 },
             },
             ["bond_terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.social.acknowledged.bond_terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondTerse01",
                 },
+                {
+                    ["fallback"] = "%s, understood.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondTerse02",
+                },
+                {
+                    ["fallback"] = "%s, got it.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondTerse03",
+                },
+                {
+                    ["fallback"] = "%s, heard.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondTerse04",
+                },
+                {
+                    ["fallback"] = "%s, clear.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondTerse05",
+                },
+                {
+                    ["fallback"] = "%s, right.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondTerse06",
+                },
+                {
+                    ["fallback"] = "%s, noted.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondTerse07",
+                },
+                {
+                    ["fallback"] = "%s, good.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondTerse08",
+                },
+                {
+                    ["fallback"] = "%s, agreed.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondTerse09",
+                },
+                {
+                    ["fallback"] = "%s, done.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondTerse10",
+                },
             },
             ["bond_warm"] = {
                 {
                     ["fallback"] = "%s, all right. I hear you.",
                     ["id"] = "phrase.semantic.social.acknowledged.bond_warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondWarm01",
+                },
+                {
+                    ["fallback"] = "%s, got it. Always good to talk with you.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondWarm02",
+                },
+                {
+                    ["fallback"] = "%s, understood completely. I'm with you on this.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondWarm03",
+                },
+                {
+                    ["fallback"] = "%s, sounds like a solid plan, partner.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondWarm04",
+                },
+                {
+                    ["fallback"] = "%s, I hear you loud and clear. Take care.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondWarm05",
+                },
+                {
+                    ["fallback"] = "%s, you've got my support. Let's do it.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondWarm06",
+                },
+                {
+                    ["fallback"] = "%s, glad we're in agreement. Stay safe.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondWarm07",
+                },
+                {
+                    ["fallback"] = "%s, noted with thanks. Good thinking.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondWarm08",
+                },
+                {
+                    ["fallback"] = "%s, clear as day. Glad you're on my side.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondWarm09",
+                },
+                {
+                    ["fallback"] = "%s, got your back. Let's make it count.",
+                    ["id"] = "phrase.semantic.social.acknowledged.bond_warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedBondWarm10",
                 },
             },
             ["guarded"] = {
@@ -40,12 +220,102 @@ return {
                     ["id"] = "phrase.semantic.social.acknowledged.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedGuarded01",
                 },
+                {
+                    ["fallback"] = "I hear you. Don't press it any further.",
+                    ["id"] = "phrase.semantic.social.acknowledged.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedGuarded02",
+                },
+                {
+                    ["fallback"] = "Message received. Keep your distance.",
+                    ["id"] = "phrase.semantic.social.acknowledged.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedGuarded03",
+                },
+                {
+                    ["fallback"] = "Got it. Let's stay alert.",
+                    ["id"] = "phrase.semantic.social.acknowledged.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedGuarded04",
+                },
+                {
+                    ["fallback"] = "Understood. No need for more words.",
+                    ["id"] = "phrase.semantic.social.acknowledged.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedGuarded05",
+                },
+                {
+                    ["fallback"] = "All right. Watching my back, you watch yours.",
+                    ["id"] = "phrase.semantic.social.acknowledged.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedGuarded06",
+                },
+                {
+                    ["fallback"] = "Noted. Keep your eyes on the road.",
+                    ["id"] = "phrase.semantic.social.acknowledged.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedGuarded07",
+                },
+                {
+                    ["fallback"] = "Heard. Leaving it at that.",
+                    ["id"] = "phrase.semantic.social.acknowledged.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedGuarded08",
+                },
+                {
+                    ["fallback"] = "Clear enough. Let's focus on surviving.",
+                    ["id"] = "phrase.semantic.social.acknowledged.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedGuarded09",
+                },
+                {
+                    ["fallback"] = "Fair enough. Step back a bit.",
+                    ["id"] = "phrase.semantic.social.acknowledged.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedGuarded10",
+                },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "All right.",
+                    ["fallback"] = "All right. Understood.",
                     ["id"] = "phrase.semantic.social.acknowledged.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedNeutral01",
+                },
+                {
+                    ["fallback"] = "I hear you. Makes sense.",
+                    ["id"] = "phrase.semantic.social.acknowledged.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedNeutral02",
+                },
+                {
+                    ["fallback"] = "Got it. We can work with that.",
+                    ["id"] = "phrase.semantic.social.acknowledged.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedNeutral03",
+                },
+                {
+                    ["fallback"] = "Message received. Moving forward.",
+                    ["id"] = "phrase.semantic.social.acknowledged.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedNeutral04",
+                },
+                {
+                    ["fallback"] = "Sounds fair to me.",
+                    ["id"] = "phrase.semantic.social.acknowledged.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedNeutral05",
+                },
+                {
+                    ["fallback"] = "Point taken.",
+                    ["id"] = "phrase.semantic.social.acknowledged.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedNeutral06",
+                },
+                {
+                    ["fallback"] = "Understood. Let's proceed.",
+                    ["id"] = "phrase.semantic.social.acknowledged.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedNeutral07",
+                },
+                {
+                    ["fallback"] = "All right. We're on the same page.",
+                    ["id"] = "phrase.semantic.social.acknowledged.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedNeutral08",
+                },
+                {
+                    ["fallback"] = "Fair enough. Good to know.",
+                    ["id"] = "phrase.semantic.social.acknowledged.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedNeutral09",
+                },
+                {
+                    ["fallback"] = "Acknowledged. Let's get it done.",
+                    ["id"] = "phrase.semantic.social.acknowledged.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedNeutral10",
                 },
             },
             ["terse"] = {
@@ -54,12 +324,102 @@ return {
                     ["id"] = "phrase.semantic.social.acknowledged.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedTerse01",
                 },
+                {
+                    ["fallback"] = "Understood.",
+                    ["id"] = "phrase.semantic.social.acknowledged.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedTerse02",
+                },
+                {
+                    ["fallback"] = "Heard.",
+                    ["id"] = "phrase.semantic.social.acknowledged.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedTerse03",
+                },
+                {
+                    ["fallback"] = "Got it.",
+                    ["id"] = "phrase.semantic.social.acknowledged.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedTerse04",
+                },
+                {
+                    ["fallback"] = "Clear.",
+                    ["id"] = "phrase.semantic.social.acknowledged.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedTerse05",
+                },
+                {
+                    ["fallback"] = "Right.",
+                    ["id"] = "phrase.semantic.social.acknowledged.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedTerse06",
+                },
+                {
+                    ["fallback"] = "Noted.",
+                    ["id"] = "phrase.semantic.social.acknowledged.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedTerse07",
+                },
+                {
+                    ["fallback"] = "Good.",
+                    ["id"] = "phrase.semantic.social.acknowledged.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedTerse08",
+                },
+                {
+                    ["fallback"] = "Done.",
+                    ["id"] = "phrase.semantic.social.acknowledged.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedTerse09",
+                },
+                {
+                    ["fallback"] = "Agreed.",
+                    ["id"] = "phrase.semantic.social.acknowledged.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "All right. I hear you.",
                     ["id"] = "phrase.semantic.social.acknowledged.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedWarm01",
+                },
+                {
+                    ["fallback"] = "Got it, friend. Glad we talked.",
+                    ["id"] = "phrase.semantic.social.acknowledged.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedWarm02",
+                },
+                {
+                    ["fallback"] = "I completely understand. Thanks for explaining.",
+                    ["id"] = "phrase.semantic.social.acknowledged.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedWarm03",
+                },
+                {
+                    ["fallback"] = "Sounds great. Glad we're in this together.",
+                    ["id"] = "phrase.semantic.social.acknowledged.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedWarm04",
+                },
+                {
+                    ["fallback"] = "Understood. Take care of yourself out there.",
+                    ["id"] = "phrase.semantic.social.acknowledged.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedWarm05",
+                },
+                {
+                    ["fallback"] = "I'm with you on that. Good call.",
+                    ["id"] = "phrase.semantic.social.acknowledged.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedWarm06",
+                },
+                {
+                    ["fallback"] = "Heard and appreciated. We've got this.",
+                    ["id"] = "phrase.semantic.social.acknowledged.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedWarm07",
+                },
+                {
+                    ["fallback"] = "Clear as crystal. Happy to follow your lead.",
+                    ["id"] = "phrase.semantic.social.acknowledged.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedWarm08",
+                },
+                {
+                    ["fallback"] = "Got it. Always a pleasure working with you.",
+                    ["id"] = "phrase.semantic.social.acknowledged.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedWarm09",
+                },
+                {
+                    ["fallback"] = "All right. Let's look out for each other.",
+                    ["id"] = "phrase.semantic.social.acknowledged.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialAcknowledgedWarm10",
                 },
             },
         },
@@ -76,26 +436,206 @@ return {
                     ["id"] = "phrase.semantic.social.dispute_friendly.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyGuarded01",
                 },
+                {
+                    ["fallback"] = "I see it differently. Don't push it.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyGuarded02",
+                },
+                {
+                    ["fallback"] = "We don't agree on this. Drop it.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyGuarded03",
+                },
+                {
+                    ["fallback"] = "Not buying that. Let's move on.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyGuarded04",
+                },
+                {
+                    ["fallback"] = "I'm not on board with that idea.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyGuarded05",
+                },
+                {
+                    ["fallback"] = "I disagree, and I'm not budging.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyGuarded06",
+                },
+                {
+                    ["fallback"] = "That won't work for me. End of story.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyGuarded07",
+                },
+                {
+                    ["fallback"] = "You have your view, I have mine. Back off.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyGuarded08",
+                },
+                {
+                    ["fallback"] = "I dispute that. We leave it alone.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyGuarded09",
+                },
+                {
+                    ["fallback"] = "No. I don't see it that way at all.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyGuarded10",
+                },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "I see it differently, but we're okay.",
+                    ["fallback"] = "I disagree, but I hear what you're saying.",
                     ["id"] = "phrase.semantic.social.dispute_friendly.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyNeutral01",
+                },
+                {
+                    ["fallback"] = "I see things differently on this one.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyNeutral02",
+                },
+                {
+                    ["fallback"] = "We'll have to agree to disagree here.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyNeutral03",
+                },
+                {
+                    ["fallback"] = "I don't think that's the best way forward.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyNeutral04",
+                },
+                {
+                    ["fallback"] = "I have reservations about that plan.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyNeutral05",
+                },
+                {
+                    ["fallback"] = "Fair point, but I still see a problem with it.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyNeutral06",
+                },
+                {
+                    ["fallback"] = "I respectfully disagree with your take.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyNeutral07",
+                },
+                {
+                    ["fallback"] = "That's not how I read the situation.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyNeutral08",
+                },
+                {
+                    ["fallback"] = "I don't see it that way, honestly.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyNeutral09",
+                },
+                {
+                    ["fallback"] = "We have different opinions on this. That's fine.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyNeutral10",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "I disagree.",
+                    ["fallback"] = "Disagree.",
                     ["id"] = "phrase.semantic.social.dispute_friendly.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyTerse01",
+                },
+                {
+                    ["fallback"] = "No.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyTerse02",
+                },
+                {
+                    ["fallback"] = "Not how I see it.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyTerse03",
+                },
+                {
+                    ["fallback"] = "Don't agree.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyTerse04",
+                },
+                {
+                    ["fallback"] = "Doubtful.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyTerse05",
+                },
+                {
+                    ["fallback"] = "Not buying it.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyTerse06",
+                },
+                {
+                    ["fallback"] = "Different take.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyTerse07",
+                },
+                {
+                    ["fallback"] = "Negative.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyTerse08",
+                },
+                {
+                    ["fallback"] = "Pass on that.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyTerse09",
+                },
+                {
+                    ["fallback"] = "Nope.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "I see it differently, but we're still okay.",
+                    ["fallback"] = "I disagree, friend, but I respect your perspective.",
                     ["id"] = "phrase.semantic.social.dispute_friendly.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyWarm01",
+                },
+                {
+                    ["fallback"] = "We don't see eye to eye on this, but we're still good.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyWarm02",
+                },
+                {
+                    ["fallback"] = "I see where you're coming from, but I look at it differently.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyWarm03",
+                },
+                {
+                    ["fallback"] = "No hard feelings, but I'd handle it another way.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyWarm04",
+                },
+                {
+                    ["fallback"] = "I value your thoughts, even when we don't agree.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyWarm05",
+                },
+                {
+                    ["fallback"] = "We're allowed to differ. We still have each other's backs.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyWarm06",
+                },
+                {
+                    ["fallback"] = "I don't agree with the plan, but I trust you as a comrade.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyWarm07",
+                },
+                {
+                    ["fallback"] = "Let's talk through it without getting worked up.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyWarm08",
+                },
+                {
+                    ["fallback"] = "I disagree, but I'm glad you felt comfortable saying it.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyWarm09",
+                },
+                {
+                    ["fallback"] = "We can disagree and still keep each other alive.",
+                    ["id"] = "phrase.semantic.social.dispute_friendly.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeFriendlyWarm10",
                 },
             },
         },
@@ -112,26 +652,206 @@ return {
                     ["id"] = "phrase.semantic.social.dispute_stressed.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedGuarded01",
                 },
+                {
+                    ["fallback"] = "We don't have time to fight. Stand down.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedGuarded02",
+                },
+                {
+                    ["fallback"] = "Too much on the line to argue. Shut it down.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedGuarded03",
+                },
+                {
+                    ["fallback"] = "I'm stressed, you're stressed. Drop it.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedGuarded04",
+                },
+                {
+                    ["fallback"] = "Don't push an argument while we're in danger.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedGuarded05",
+                },
+                {
+                    ["fallback"] = "One more word about this and I walk away.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedGuarded06",
+                },
+                {
+                    ["fallback"] = "Save the bickering before it gets us killed.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedGuarded07",
+                },
+                {
+                    ["fallback"] = "Not the time. Eyes forward.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedGuarded08",
+                },
+                {
+                    ["fallback"] = "I'm done debating under pressure.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedGuarded09",
+                },
+                {
+                    ["fallback"] = "Cut the argument right now.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedGuarded10",
+                },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "I hear you, but I need a moment.",
+                    ["fallback"] = "Tensions are high. Let's table this for later.",
                     ["id"] = "phrase.semantic.social.dispute_stressed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedNeutral01",
+                },
+                {
+                    ["fallback"] = "We're both stressed. Let's not make bad calls right now.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedNeutral02",
+                },
+                {
+                    ["fallback"] = "Now isn't the moment to hash this out.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedNeutral03",
+                },
+                {
+                    ["fallback"] = "Let's catch our breath before we argue further.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedNeutral04",
+                },
+                {
+                    ["fallback"] = "We need clear heads right now, not arguments.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedNeutral05",
+                },
+                {
+                    ["fallback"] = "I understand you're upset, but we need to survive first.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedNeutral06",
+                },
+                {
+                    ["fallback"] = "Let's put a pin in this until we're safe.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedNeutral07",
+                },
+                {
+                    ["fallback"] = "Arguing right now only helps the dead.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedNeutral08",
+                },
+                {
+                    ["fallback"] = "I hear the frustration. Let's focus on the threat.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedNeutral09",
+                },
+                {
+                    ["fallback"] = "We can settle this once we're behind walls.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedNeutral10",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "Need a moment.",
+                    ["fallback"] = "Not now.",
                     ["id"] = "phrase.semantic.social.dispute_stressed.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedTerse01",
+                },
+                {
+                    ["fallback"] = "Stop.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedTerse02",
+                },
+                {
+                    ["fallback"] = "Cool it.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedTerse03",
+                },
+                {
+                    ["fallback"] = "Later.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedTerse04",
+                },
+                {
+                    ["fallback"] = "Drop it.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedTerse05",
+                },
+                {
+                    ["fallback"] = "Too tense.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedTerse06",
+                },
+                {
+                    ["fallback"] = "Hold your tongue.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedTerse07",
+                },
+                {
+                    ["fallback"] = "Focus.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedTerse08",
+                },
+                {
+                    ["fallback"] = "Enough.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedTerse09",
+                },
+                {
+                    ["fallback"] = "Quiet.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "I hear you, but I need a moment before we continue.",
+                    ["fallback"] = "Hey, we're both frayed right now. Let's take a breath.",
                     ["id"] = "phrase.semantic.social.dispute_stressed.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedWarm01",
+                },
+                {
+                    ["fallback"] = "I know you're hurting and tense. I'm right here. Let's pause.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedWarm02",
+                },
+                {
+                    ["fallback"] = "Don't let the stress tear us apart. We're partners.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedWarm03",
+                },
+                {
+                    ["fallback"] = "I hear your worry, but let's get somewhere safe first.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedWarm04",
+                },
+                {
+                    ["fallback"] = "I care about what you think, just not while we're in danger.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedWarm05",
+                },
+                {
+                    ["fallback"] = "Let's take a second to reset. We're on the same side.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedWarm06",
+                },
+                {
+                    ["fallback"] = "Breathe with me. We'll work through this disagreement later.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedWarm07",
+                },
+                {
+                    ["fallback"] = "I'm not fighting you. Let's keep each other alive.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedWarm08",
+                },
+                {
+                    ["fallback"] = "Stress is talking right now. Let's be gentle on each other.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedWarm09",
+                },
+                {
+                    ["fallback"] = "We'll talk this through when the dust settles, I promise.",
+                    ["id"] = "phrase.semantic.social.dispute_stressed.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeStressedWarm10",
                 },
             },
         },
@@ -148,26 +868,206 @@ return {
                     ["id"] = "phrase.semantic.social.dispute_trusted.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedGuarded01",
                 },
+                {
+                    ["fallback"] = "Even between us, I draw the line here.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedGuarded02",
+                },
+                {
+                    ["fallback"] = "I trust you, but I won't back this decision.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedGuarded03",
+                },
+                {
+                    ["fallback"] = "We've been through a lot, but I disagree on this.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedGuarded04",
+                },
+                {
+                    ["fallback"] = "Don't lean on our history to push a bad idea.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedGuarded05",
+                },
+                {
+                    ["fallback"] = "I trust your survival skills, not this specific take.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedGuarded06",
+                },
+                {
+                    ["fallback"] = "Stand down on this. I won't follow blindly.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedGuarded07",
+                },
+                {
+                    ["fallback"] = "Trust goes both ways. Hear my disagreement.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedGuarded08",
+                },
+                {
+                    ["fallback"] = "I won't let friendship blind me to a bad risk.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedGuarded09",
+                },
+                {
+                    ["fallback"] = "We're close, but on this, you're dead wrong.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedGuarded10",
+                },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "I respect that. I still don't agree.",
+                    ["fallback"] = "I trust your judgment usually, but not on this.",
                     ["id"] = "phrase.semantic.social.dispute_trusted.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedNeutral01",
+                },
+                {
+                    ["fallback"] = "We've earned the right to speak plainly: I disagree.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedNeutral02",
+                },
+                {
+                    ["fallback"] = "Because I trust you, I'm telling you this is a mistake.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedNeutral03",
+                },
+                {
+                    ["fallback"] = "I value our track record, but I have to push back here.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedNeutral04",
+                },
+                {
+                    ["fallback"] = "You're one of the best survivors I know, but I disagree.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedNeutral05",
+                },
+                {
+                    ["fallback"] = "Let's examine the facts together. Something doesn't add up.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedNeutral06",
+                },
+                {
+                    ["fallback"] = "I respect you too much to nod along when you're wrong.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedNeutral07",
+                },
+                {
+                    ["fallback"] = "We see this from two different angles.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedNeutral08",
+                },
+                {
+                    ["fallback"] = "Hear me out before you lock in your stance.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedNeutral09",
+                },
+                {
+                    ["fallback"] = "We have solid trust, so let's weigh the risks properly.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedNeutral10",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "I still disagree.",
+                    ["fallback"] = "Not this time.",
                     ["id"] = "phrase.semantic.social.dispute_trusted.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedTerse01",
+                },
+                {
+                    ["fallback"] = "Trust you, but no.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedTerse02",
+                },
+                {
+                    ["fallback"] = "Bad call.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedTerse03",
+                },
+                {
+                    ["fallback"] = "Disagree, partner.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedTerse04",
+                },
+                {
+                    ["fallback"] = "Can't back it.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedTerse05",
+                },
+                {
+                    ["fallback"] = "Wrong move.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedTerse06",
+                },
+                {
+                    ["fallback"] = "Reconsider.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedTerse07",
+                },
+                {
+                    ["fallback"] = "I'm out on that.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedTerse08",
+                },
+                {
+                    ["fallback"] = "No dice.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedTerse09",
+                },
+                {
+                    ["fallback"] = "Think again.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "I respect that. I still don't agree, but we can talk it through.",
+                    ["fallback"] = "You know I'd follow you through hell, but not into this.",
                     ["id"] = "phrase.semantic.social.dispute_trusted.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedWarm01",
+                },
+                {
+                    ["fallback"] = "I love how bold you are, but this risk is too steep.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedWarm02",
+                },
+                {
+                    ["fallback"] = "Because I care about you, I have to say no to this.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedWarm03",
+                },
+                {
+                    ["fallback"] = "We've kept each other alive this long. Trust me on this disagreement.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedWarm04",
+                },
+                {
+                    ["fallback"] = "You're my closest ally, so listen to my gut on this one.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedWarm05",
+                },
+                {
+                    ["fallback"] = "I'm telling you this because I want us both to live to see tomorrow.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedWarm06",
+                },
+                {
+                    ["fallback"] = "No matter what happens, we're solid. But I disagree here.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedWarm07",
+                },
+                {
+                    ["fallback"] = "Let's find a compromise that keeps both of us safe.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedWarm08",
+                },
+                {
+                    ["fallback"] = "I value our bond above any single disagreement.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedWarm09",
+                },
+                {
+                    ["fallback"] = "We'll work it out together like we always do.",
+                    ["id"] = "phrase.semantic.social.dispute_trusted.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeTrustedWarm10",
                 },
             },
         },
@@ -184,26 +1084,206 @@ return {
                     ["id"] = "phrase.semantic.social.dispute_withdrawn.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnGuarded01",
                 },
+                {
+                    ["fallback"] = "I'm not arguing with you anymore.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnGuarded02",
+                },
+                {
+                    ["fallback"] = "Done talking about this.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnGuarded03",
+                },
+                {
+                    ["fallback"] = "Subject is closed. Back off.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnGuarded04",
+                },
+                {
+                    ["fallback"] = "I've said my piece. Leave it alone.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnGuarded05",
+                },
+                {
+                    ["fallback"] = "Drop it before I get angry.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnGuarded06",
+                },
+                {
+                    ["fallback"] = "Nothing more to say.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnGuarded07",
+                },
+                {
+                    ["fallback"] = "We're done here.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnGuarded08",
+                },
+                {
+                    ["fallback"] = "Walk away.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnGuarded09",
+                },
+                {
+                    ["fallback"] = "I'm finished with this conversation.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnGuarded10",
+                },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "Let's leave it there.",
+                    ["fallback"] = "All right. Let's step back from this.",
                     ["id"] = "phrase.semantic.social.dispute_withdrawn.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnNeutral01",
+                },
+                {
+                    ["fallback"] = "We're not getting anywhere. Let's move on.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnNeutral02",
+                },
+                {
+                    ["fallback"] = "I think we've said enough on the matter.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnNeutral03",
+                },
+                {
+                    ["fallback"] = "Let's take a break from this topic.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnNeutral04",
+                },
+                {
+                    ["fallback"] = "Fair enough. Let's focus on other priorities.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnNeutral05",
+                },
+                {
+                    ["fallback"] = "No point spinning our wheels. Let's work.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnNeutral06",
+                },
+                {
+                    ["fallback"] = "Understood. We'll leave it at that.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnNeutral07",
+                },
+                {
+                    ["fallback"] = "Agreed. Moving past it now.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnNeutral08",
+                },
+                {
+                    ["fallback"] = "We can revisit this when things settle down.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnNeutral09",
+                },
+                {
+                    ["fallback"] = "All right. Let's put our energy elsewhere.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnNeutral10",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "Leave it.",
+                    ["fallback"] = "Drop it.",
                     ["id"] = "phrase.semantic.social.dispute_withdrawn.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnTerse01",
+                },
+                {
+                    ["fallback"] = "Done.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnTerse02",
+                },
+                {
+                    ["fallback"] = "Enough.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnTerse03",
+                },
+                {
+                    ["fallback"] = "No more.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnTerse04",
+                },
+                {
+                    ["fallback"] = "Moving on.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnTerse05",
+                },
+                {
+                    ["fallback"] = "Leave it.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnTerse06",
+                },
+                {
+                    ["fallback"] = "Finished.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnTerse07",
+                },
+                {
+                    ["fallback"] = "Closed.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnTerse08",
+                },
+                {
+                    ["fallback"] = "End of it.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnTerse09",
+                },
+                {
+                    ["fallback"] = "Drop the topic.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "Let's leave it there for now.",
+                    ["fallback"] = "Let's leave it there for now, friend. We're still good.",
                     ["id"] = "phrase.semantic.social.dispute_withdrawn.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnWarm01",
+                },
+                {
+                    ["fallback"] = "I don't want this to come between us. Let's rest on it.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnWarm02",
+                },
+                {
+                    ["fallback"] = "We've said what we needed to say. All love here.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnWarm03",
+                },
+                {
+                    ["fallback"] = "Let's pause this. You're more important to me than this argument.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnWarm04",
+                },
+                {
+                    ["fallback"] = "All good. Let's go grab a drink and clear our heads.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnWarm05",
+                },
+                {
+                    ["fallback"] = "I hear you, and I respect you. Let's let the dust settle.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnWarm06",
+                },
+                {
+                    ["fallback"] = "We don't need to fight. We're on the same team.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnWarm07",
+                },
+                {
+                    ["fallback"] = "It's all right. We can let this one slide.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnWarm08",
+                },
+                {
+                    ["fallback"] = "I value our partnership too much to push this.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnWarm09",
+                },
+                {
+                    ["fallback"] = "We'll be okay. Let's take a breather.",
+                    ["id"] = "phrase.semantic.social.dispute_withdrawn.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialDisputeWithdrawnWarm10",
                 },
             },
         },
@@ -220,26 +1300,206 @@ return {
                     ["id"] = "phrase.semantic.social.hostile_boundary.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryGuarded01",
                 },
+                {
+                    ["fallback"] = "Check yourself before you speak to me again.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryGuarded02",
+                },
+                {
+                    ["fallback"] = "You're stepping way out of line.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryGuarded03",
+                },
+                {
+                    ["fallback"] = "Mind your mouth around me.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryGuarded04",
+                },
+                {
+                    ["fallback"] = "I don't take disrespect from anyone.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryGuarded05",
+                },
+                {
+                    ["fallback"] = "You cross that boundary again and see what happens.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryGuarded06",
+                },
+                {
+                    ["fallback"] = "Watch how you address me.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryGuarded07",
+                },
+                {
+                    ["fallback"] = "Keep your tone in check.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryGuarded08",
+                },
+                {
+                    ["fallback"] = "You are playing with a short fuse.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryGuarded09",
+                },
+                {
+                    ["fallback"] = "Back off that attitude.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryGuarded10",
+                },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "Don't talk to me like that.",
+                    ["fallback"] = "That tone isn't acceptable.",
                     ["id"] = "phrase.semantic.social.hostile_boundary.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral01",
+                },
+                {
+                    ["fallback"] = "Speak to me with respect or don't speak to me at all.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral02",
+                },
+                {
+                    ["fallback"] = "We need to keep this professional and decent.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral03",
+                },
+                {
+                    ["fallback"] = "There's no call for hostility here.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral04",
+                },
+                {
+                    ["fallback"] = "I won't be spoken to that way.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral05",
+                },
+                {
+                    ["fallback"] = "Keep your hostility out of this conversation.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral06",
+                },
+                {
+                    ["fallback"] = "We have boundaries here. Respect them.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral07",
+                },
+                {
+                    ["fallback"] = "That kind of talk isn't going to get you anywhere.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral08",
+                },
+                {
+                    ["fallback"] = "Lower your voice and adjust your attitude.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral09",
+                },
+                {
+                    ["fallback"] = "I expect basic decency from the people around me.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral10",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "Don't.",
+                    ["fallback"] = "Watch it.",
                     ["id"] = "phrase.semantic.social.hostile_boundary.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryTerse01",
+                },
+                {
+                    ["fallback"] = "Out of line.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryTerse02",
+                },
+                {
+                    ["fallback"] = "Stop.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryTerse03",
+                },
+                {
+                    ["fallback"] = "Tone it down.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryTerse04",
+                },
+                {
+                    ["fallback"] = "Respect.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryTerse05",
+                },
+                {
+                    ["fallback"] = "Check yourself.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryTerse06",
+                },
+                {
+                    ["fallback"] = "Enough.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryTerse07",
+                },
+                {
+                    ["fallback"] = "Not with me.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryTerse08",
+                },
+                {
+                    ["fallback"] = "Line crossed.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryTerse09",
+                },
+                {
+                    ["fallback"] = "Back off.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "Please don't talk to me like that.",
+                    ["fallback"] = "Hey, where is this hostility coming from? We're allies.",
                     ["id"] = "phrase.semantic.social.hostile_boundary.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryWarm01",
+                },
+                {
+                    ["fallback"] = "Don't snap at me like that. I've only ever helped you.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryWarm02",
+                },
+                {
+                    ["fallback"] = "I care about you, but that doesn't mean you can disrespect me.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryWarm03",
+                },
+                {
+                    ["fallback"] = "Please, let's treat each other better than this.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryWarm04",
+                },
+                {
+                    ["fallback"] = "That hurt, coming from you. Let's dial it back.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryWarm05",
+                },
+                {
+                    ["fallback"] = "We've got enough enemies out there without turning on each other.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryWarm06",
+                },
+                {
+                    ["fallback"] = "Take a breath. I'm not your enemy.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryWarm07",
+                },
+                {
+                    ["fallback"] = "I don't deserve that kind of anger from you.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryWarm08",
+                },
+                {
+                    ["fallback"] = "Let's remember who we are to each other.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryWarm09",
+                },
+                {
+                    ["fallback"] = "Don't burn this bridge over a bad temper.",
+                    ["id"] = "phrase.semantic.social.hostile_boundary.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryWarm10",
                 },
             },
         },
@@ -256,26 +1516,206 @@ return {
                     ["id"] = "phrase.semantic.social.hostile_short.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortGuarded01",
                 },
+                {
+                    ["fallback"] = "Shut your mouth before I shut it for you.",
+                    ["id"] = "phrase.semantic.social.hostile_short.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortGuarded02",
+                },
+                {
+                    ["fallback"] = "You're pushing me. Stop.",
+                    ["id"] = "phrase.semantic.social.hostile_short.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortGuarded03",
+                },
+                {
+                    ["fallback"] = "One more word out of you.",
+                    ["id"] = "phrase.semantic.social.hostile_short.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortGuarded04",
+                },
+                {
+                    ["fallback"] = "Mind yourself right now.",
+                    ["id"] = "phrase.semantic.social.hostile_short.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortGuarded05",
+                },
+                {
+                    ["fallback"] = "You're testing the wrong survivor.",
+                    ["id"] = "phrase.semantic.social.hostile_short.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortGuarded06",
+                },
+                {
+                    ["fallback"] = "Quiet. Before things get violent.",
+                    ["id"] = "phrase.semantic.social.hostile_short.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortGuarded07",
+                },
+                {
+                    ["fallback"] = "You want trouble? Keep talking.",
+                    ["id"] = "phrase.semantic.social.hostile_short.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortGuarded08",
+                },
+                {
+                    ["fallback"] = "Hold your tongue.",
+                    ["id"] = "phrase.semantic.social.hostile_short.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortGuarded09",
+                },
+                {
+                    ["fallback"] = "Bite your tongue now.",
+                    ["id"] = "phrase.semantic.social.hostile_short.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortGuarded10",
+                },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "Watch your mouth.",
+                    ["fallback"] = "Watch your language.",
                     ["id"] = "phrase.semantic.social.hostile_short.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortNeutral01",
+                },
+                {
+                    ["fallback"] = "That kind of talk is dangerous here.",
+                    ["id"] = "phrase.semantic.social.hostile_short.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortNeutral02",
+                },
+                {
+                    ["fallback"] = "Keep your words civil.",
+                    ["id"] = "phrase.semantic.social.hostile_short.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortNeutral03",
+                },
+                {
+                    ["fallback"] = "I'm warning you to calm down.",
+                    ["id"] = "phrase.semantic.social.hostile_short.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortNeutral04",
+                },
+                {
+                    ["fallback"] = "Don't escalate this situation.",
+                    ["id"] = "phrase.semantic.social.hostile_short.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortNeutral05",
+                },
+                {
+                    ["fallback"] = "Control your temper.",
+                    ["id"] = "phrase.semantic.social.hostile_short.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortNeutral06",
+                },
+                {
+                    ["fallback"] = "There's no place for that attitude here.",
+                    ["id"] = "phrase.semantic.social.hostile_short.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortNeutral07",
+                },
+                {
+                    ["fallback"] = "Watch your mouth and think before you speak.",
+                    ["id"] = "phrase.semantic.social.hostile_short.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortNeutral08",
+                },
+                {
+                    ["fallback"] = "You need to rein that in.",
+                    ["id"] = "phrase.semantic.social.hostile_short.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortNeutral09",
+                },
+                {
+                    ["fallback"] = "Keep it civil or step away.",
+                    ["id"] = "phrase.semantic.social.hostile_short.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortNeutral10",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "Watch it.",
+                    ["fallback"] = "Shut it.",
                     ["id"] = "phrase.semantic.social.hostile_short.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortTerse01",
+                },
+                {
+                    ["fallback"] = "Watch it.",
+                    ["id"] = "phrase.semantic.social.hostile_short.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortTerse02",
+                },
+                {
+                    ["fallback"] = "Enough.",
+                    ["id"] = "phrase.semantic.social.hostile_short.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortTerse03",
+                },
+                {
+                    ["fallback"] = "Quiet.",
+                    ["id"] = "phrase.semantic.social.hostile_short.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortTerse04",
+                },
+                {
+                    ["fallback"] = "Careful.",
+                    ["id"] = "phrase.semantic.social.hostile_short.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortTerse05",
+                },
+                {
+                    ["fallback"] = "Bite it.",
+                    ["id"] = "phrase.semantic.social.hostile_short.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortTerse06",
+                },
+                {
+                    ["fallback"] = "Stop.",
+                    ["id"] = "phrase.semantic.social.hostile_short.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortTerse07",
+                },
+                {
+                    ["fallback"] = "Cool it.",
+                    ["id"] = "phrase.semantic.social.hostile_short.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortTerse08",
+                },
+                {
+                    ["fallback"] = "Done.",
+                    ["id"] = "phrase.semantic.social.hostile_short.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortTerse09",
+                },
+                {
+                    ["fallback"] = "Last warning.",
+                    ["id"] = "phrase.semantic.social.hostile_short.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "Watch your mouth, please.",
+                    ["fallback"] = "Hey, watch your mouth, friend. We're better than that.",
                     ["id"] = "phrase.semantic.social.hostile_short.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortWarm01",
+                },
+                {
+                    ["fallback"] = "Don't talk like that. You're better than this anger.",
+                    ["id"] = "phrase.semantic.social.hostile_short.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortWarm02",
+                },
+                {
+                    ["fallback"] = "Come on, watch your tone with me.",
+                    ["id"] = "phrase.semantic.social.hostile_short.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortWarm03",
+                },
+                {
+                    ["fallback"] = "Take a breath before you say something you'll regret.",
+                    ["id"] = "phrase.semantic.social.hostile_short.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortWarm04",
+                },
+                {
+                    ["fallback"] = "I know you're frustrated, but don't lash out at me.",
+                    ["id"] = "phrase.semantic.social.hostile_short.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortWarm05",
+                },
+                {
+                    ["fallback"] = "Easy now. We're on the same team.",
+                    ["id"] = "phrase.semantic.social.hostile_short.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortWarm06",
+                },
+                {
+                    ["fallback"] = "Check yourself, partner. I'm with you, not against you.",
+                    ["id"] = "phrase.semantic.social.hostile_short.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortWarm07",
+                },
+                {
+                    ["fallback"] = "Don't let the anger win today. Stay with me.",
+                    ["id"] = "phrase.semantic.social.hostile_short.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortWarm08",
+                },
+                {
+                    ["fallback"] = "I'm giving you space, but watch what you say.",
+                    ["id"] = "phrase.semantic.social.hostile_short.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortWarm09",
+                },
+                {
+                    ["fallback"] = "Hold your words. We can talk when you're calmer.",
+                    ["id"] = "phrase.semantic.social.hostile_short.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileShortWarm10",
                 },
             },
         },
@@ -292,26 +1732,206 @@ return {
                     ["id"] = "phrase.semantic.social.hostile_stressed.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedGuarded01",
                 },
+                {
+                    ["fallback"] = "Get back before I make you.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedGuarded02",
+                },
+                {
+                    ["fallback"] = "Give me space right now.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedGuarded03",
+                },
+                {
+                    ["fallback"] = "Step back and keep your hands where I can see them.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedGuarded04",
+                },
+                {
+                    ["fallback"] = "I am armed and exhausted. Back off.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedGuarded05",
+                },
+                {
+                    ["fallback"] = "Back away from me immediately.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedGuarded06",
+                },
+                {
+                    ["fallback"] = "Don't crowd me while my nerves are on edge.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedGuarded07",
+                },
+                {
+                    ["fallback"] = "Move back now.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedGuarded08",
+                },
+                {
+                    ["fallback"] = "I'm not warning you again. Step back.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedGuarded09",
+                },
+                {
+                    ["fallback"] = "Stay five paces away from me.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedGuarded10",
+                },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "That's enough. Keep it up and we're done.",
+                    ["fallback"] = "That's enough. Everyone needs to step back.",
                     ["id"] = "phrase.semantic.social.hostile_stressed.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedNeutral01",
+                },
+                {
+                    ["fallback"] = "Please give me some space to cool off.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedNeutral02",
+                },
+                {
+                    ["fallback"] = "We're all too stressed for this. Step away.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedNeutral03",
+                },
+                {
+                    ["fallback"] = "Back up. Let's not make things worse.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedNeutral04",
+                },
+                {
+                    ["fallback"] = "I need room to think. Step back.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedNeutral05",
+                },
+                {
+                    ["fallback"] = "Let's put some distance between us right now.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedNeutral06",
+                },
+                {
+                    ["fallback"] = "Back away until tempers settle down.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedNeutral07",
+                },
+                {
+                    ["fallback"] = "Stop crowding me. Take a few steps back.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedNeutral08",
+                },
+                {
+                    ["fallback"] = "We need space right now. Move back.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedNeutral09",
+                },
+                {
+                    ["fallback"] = "Give it some breathing room.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedNeutral10",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "Enough. Back off.",
+                    ["fallback"] = "Back off.",
                     ["id"] = "phrase.semantic.social.hostile_stressed.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedTerse01",
+                },
+                {
+                    ["fallback"] = "Step back.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedTerse02",
+                },
+                {
+                    ["fallback"] = "Space.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedTerse03",
+                },
+                {
+                    ["fallback"] = "Away.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedTerse04",
+                },
+                {
+                    ["fallback"] = "Back up.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedTerse05",
+                },
+                {
+                    ["fallback"] = "Not close.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedTerse06",
+                },
+                {
+                    ["fallback"] = "Distance.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedTerse07",
+                },
+                {
+                    ["fallback"] = "Enough.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedTerse08",
+                },
+                {
+                    ["fallback"] = "Move.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedTerse09",
+                },
+                {
+                    ["fallback"] = "Off me.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "That's enough. Step back and we'll keep this calm.",
+                    ["fallback"] = "Hey, please, give me some space. I'm overwhelmed.",
                     ["id"] = "phrase.semantic.social.hostile_stressed.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedWarm01",
+                },
+                {
+                    ["fallback"] = "I don't want to snap at you, so please step back for a moment.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedWarm02",
+                },
+                {
+                    ["fallback"] = "I love you as a friend, but I really need room to breathe right now.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedWarm03",
+                },
+                {
+                    ["fallback"] = "Let's put a little distance between us so we don't say things we regret.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedWarm04",
+                },
+                {
+                    ["fallback"] = "I'm asking gently: please back away for a minute.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedWarm05",
+                },
+                {
+                    ["fallback"] = "I'm on the verge of breaking. Give me a minute alone.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedWarm06",
+                },
+                {
+                    ["fallback"] = "Step back, partner. Let's both catch our breath.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedWarm07",
+                },
+                {
+                    ["fallback"] = "We're going to be okay, but I need physical space right now.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedWarm08",
+                },
+                {
+                    ["fallback"] = "Please, just let me sit with my thoughts for a bit.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedWarm09",
+                },
+                {
+                    ["fallback"] = "Back away for now. We'll talk when my head clears.",
+                    ["id"] = "phrase.semantic.social.hostile_stressed.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileStressedWarm10",
                 },
             },
         },
@@ -328,26 +1948,206 @@ return {
                     ["id"] = "phrase.semantic.social.hostile_withdrawn.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnGuarded01",
                 },
+                {
+                    ["fallback"] = "Get out of my sight.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnGuarded02",
+                },
+                {
+                    ["fallback"] = "Don't come near me.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnGuarded03",
+                },
+                {
+                    ["fallback"] = "I have nothing to say to you. Go.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnGuarded04",
+                },
+                {
+                    ["fallback"] = "Walk away while you still can.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnGuarded05",
+                },
+                {
+                    ["fallback"] = "Leave me be.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnGuarded06",
+                },
+                {
+                    ["fallback"] = "I'm done with you. Get lost.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnGuarded07",
+                },
+                {
+                    ["fallback"] = "Stay away from my corner.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnGuarded08",
+                },
+                {
+                    ["fallback"] = "Leave. Immediately.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnGuarded09",
+                },
+                {
+                    ["fallback"] = "Don't speak to me.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnGuarded10",
+                },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "Then leave me alone.",
+                    ["fallback"] = "Please leave me alone.",
                     ["id"] = "phrase.semantic.social.hostile_withdrawn.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnNeutral01",
+                },
+                {
+                    ["fallback"] = "I need to be on my own right now.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnNeutral02",
+                },
+                {
+                    ["fallback"] = "I'm asking for privacy. Please respect it.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnNeutral03",
+                },
+                {
+                    ["fallback"] = "Go on. I'll be fine by myself.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnNeutral04",
+                },
+                {
+                    ["fallback"] = "Let's not interact for the rest of today.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnNeutral05",
+                },
+                {
+                    ["fallback"] = "I'd prefer not to speak to anyone right now.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnNeutral06",
+                },
+                {
+                    ["fallback"] = "Please walk away.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnNeutral07",
+                },
+                {
+                    ["fallback"] = "Give me time to myself.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnNeutral08",
+                },
+                {
+                    ["fallback"] = "I need some quiet. Leave me be.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnNeutral09",
+                },
+                {
+                    ["fallback"] = "We're done talking for now.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnNeutral10",
                 },
             },
             ["terse"] = {
                 {
-                    ["fallback"] = "Leave me alone.",
+                    ["fallback"] = "Leave.",
                     ["id"] = "phrase.semantic.social.hostile_withdrawn.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnTerse01",
+                },
+                {
+                    ["fallback"] = "Go.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnTerse02",
+                },
+                {
+                    ["fallback"] = "Away.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnTerse03",
+                },
+                {
+                    ["fallback"] = "Alone.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnTerse04",
+                },
+                {
+                    ["fallback"] = "Out.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnTerse05",
+                },
+                {
+                    ["fallback"] = "Walk.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnTerse06",
+                },
+                {
+                    ["fallback"] = "Done.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnTerse07",
+                },
+                {
+                    ["fallback"] = "Quiet.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnTerse08",
+                },
+                {
+                    ["fallback"] = "Not now.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnTerse09",
+                },
+                {
+                    ["fallback"] = "Get lost.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnTerse10",
                 },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "Please leave me alone for now.",
+                    ["fallback"] = "I just need some time alone, friend. Please.",
                     ["id"] = "phrase.semantic.social.hostile_withdrawn.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnWarm01",
+                },
+                {
+                    ["fallback"] = "It's not you, I promise. I just need to be by myself.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnWarm02",
+                },
+                {
+                    ["fallback"] = "Please give me some quiet time. We'll talk later.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnWarm03",
+                },
+                {
+                    ["fallback"] = "I'm in a dark headspace. I don't want to bring you down with me.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnWarm04",
+                },
+                {
+                    ["fallback"] = "I need to withdraw for a little while. Take care of yourself.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnWarm05",
+                },
+                {
+                    ["fallback"] = "Let me sit in the quiet. I'll find you when I'm ready.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnWarm06",
+                },
+                {
+                    ["fallback"] = "Thank you for understanding. I just need space today.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnWarm07",
+                },
+                {
+                    ["fallback"] = "Don't worry about me, but please let me be for now.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnWarm08",
+                },
+                {
+                    ["fallback"] = "I promise I'll be okay. Just give me this time.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnWarm09",
+                },
+                {
+                    ["fallback"] = "See you later, friend. I need the silence right now.",
+                    ["id"] = "phrase.semantic.social.hostile_withdrawn.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialHostileWithdrawnWarm10",
                 },
             },
         },
@@ -364,12 +2164,102 @@ return {
                     ["id"] = "phrase.semantic.social.offer_friendly.bond_guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondGuarded01",
                 },
+                {
+                    ["fallback"] = "%s, I appreciate the thought, but I've got this.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondGuarded02",
+                },
+                {
+                    ["fallback"] = "%s, keep your supplies. I can manage.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondGuarded03",
+                },
+                {
+                    ["fallback"] = "%s, no need. Save it for when we really need it.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondGuarded04",
+                },
+                {
+                    ["fallback"] = "%s, I'll pass for now, but thanks.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondGuarded05",
+                },
+                {
+                    ["fallback"] = "%s, thanks, but I don't need charity.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondGuarded06",
+                },
+                {
+                    ["fallback"] = "%s, I'm good on my own, thanks.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondGuarded07",
+                },
+                {
+                    ["fallback"] = "%s, hold onto that. You might need it more.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondGuarded08",
+                },
+                {
+                    ["fallback"] = "%s, no thanks. Let's stay focused.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondGuarded09",
+                },
+                {
+                    ["fallback"] = "%s, appreciated, but I prefer to carry my own weight.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondGuarded10",
+                },
             },
             ["bond_neutral"] = {
                 {
                     ["fallback"] = "%s, that's kind of you. I'll keep it in mind.",
                     ["id"] = "phrase.semantic.social.offer_friendly.bond_neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondNeutral01",
+                },
+                {
+                    ["fallback"] = "%s, thanks for the offer. I'll think about it.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondNeutral02",
+                },
+                {
+                    ["fallback"] = "%s, I appreciate the offer. Let's see how things go.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondNeutral03",
+                },
+                {
+                    ["fallback"] = "%s, good to know. Thank you.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondNeutral04",
+                },
+                {
+                    ["fallback"] = "%s, I might take you up on that later.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondNeutral05",
+                },
+                {
+                    ["fallback"] = "%s, thanks for putting that on the table.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondNeutral06",
+                },
+                {
+                    ["fallback"] = "%s, that's helpful. Thanks.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondNeutral07",
+                },
+                {
+                    ["fallback"] = "%s, generous offer. Appreciate it.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondNeutral08",
+                },
+                {
+                    ["fallback"] = "%s, noted with thanks. I'll let you know.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondNeutral09",
+                },
+                {
+                    ["fallback"] = "%s, thanks for looking out for me.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondNeutral10",
                 },
             },
             ["bond_terse"] = {
@@ -378,6 +2268,51 @@ return {
                     ["id"] = "phrase.semantic.social.offer_friendly.bond_terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondTerse01",
                 },
+                {
+                    ["fallback"] = "%s, got it.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondTerse02",
+                },
+                {
+                    ["fallback"] = "%s, noted.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondTerse03",
+                },
+                {
+                    ["fallback"] = "%s, I'm good.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondTerse04",
+                },
+                {
+                    ["fallback"] = "%s, keep it.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondTerse05",
+                },
+                {
+                    ["fallback"] = "%s, pass.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondTerse06",
+                },
+                {
+                    ["fallback"] = "%s, appreciated.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondTerse07",
+                },
+                {
+                    ["fallback"] = "%s, good.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondTerse08",
+                },
+                {
+                    ["fallback"] = "%s, later maybe.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondTerse09",
+                },
+                {
+                    ["fallback"] = "%s, thank you.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondTerse10",
+                },
             },
             ["bond_warm"] = {
                 {
@@ -385,19 +2320,154 @@ return {
                     ["id"] = "phrase.semantic.social.offer_friendly.bond_warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondWarm01",
                 },
+                {
+                    ["fallback"] = "%s, you're always so generous. Thank you, friend.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondWarm02",
+                },
+                {
+                    ["fallback"] = "%s, that means a lot coming from you. Thanks!",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondWarm03",
+                },
+                {
+                    ["fallback"] = "%s, I truly appreciate the gesture. You're great.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondWarm04",
+                },
+                {
+                    ["fallback"] = "%s, you don't have to share, but thank you so much.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondWarm05",
+                },
+                {
+                    ["fallback"] = "%s, thanks! It's rare to find such kindness out here.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondWarm06",
+                },
+                {
+                    ["fallback"] = "%s, warm thanks. We always take care of our own.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondWarm07",
+                },
+                {
+                    ["fallback"] = "%s, that touches my heart. Thank you, partner.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondWarm08",
+                },
+                {
+                    ["fallback"] = "%s, you're a lifesaver. I appreciate you.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondWarm09",
+                },
+                {
+                    ["fallback"] = "%s, thanks a million! I'll return the favor.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.bond_warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyBondWarm10",
+                },
             },
             ["guarded"] = {
                 {
-                    ["fallback"] = "No, thanks. I'll handle it.",
+                    ["fallback"] = "No thanks. I can handle it.",
                     ["id"] = "phrase.semantic.social.offer_friendly.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyGuarded01",
+                },
+                {
+                    ["fallback"] = "I don't need hand-outs. Thanks anyway.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyGuarded02",
+                },
+                {
+                    ["fallback"] = "Keep your supplies. You'll need them more than me.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyGuarded03",
+                },
+                {
+                    ["fallback"] = "I prefer to rely on myself, but thanks.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyGuarded04",
+                },
+                {
+                    ["fallback"] = "No thank you. What's the catch?",
+                    ["id"] = "phrase.semantic.social.offer_friendly.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyGuarded05",
+                },
+                {
+                    ["fallback"] = "I'm managing fine on my own.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyGuarded06",
+                },
+                {
+                    ["fallback"] = "Pass. I carry what I need.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyGuarded07",
+                },
+                {
+                    ["fallback"] = "Thanks, but no. Save it.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyGuarded08",
+                },
+                {
+                    ["fallback"] = "I'll take care of my own needs.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyGuarded09",
+                },
+                {
+                    ["fallback"] = "Not interested, but thanks for offering.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyGuarded10",
                 },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "That's kind of you. I'll keep it in mind.",
+                    ["fallback"] = "Thanks. I'll keep that in mind.",
                     ["id"] = "phrase.semantic.social.offer_friendly.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyNeutral01",
+                },
+                {
+                    ["fallback"] = "Thank you for the offer.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyNeutral02",
+                },
+                {
+                    ["fallback"] = "I appreciate you offering. I'll let you know.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyNeutral03",
+                },
+                {
+                    ["fallback"] = "Good to know. I might take you up on that.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyNeutral04",
+                },
+                {
+                    ["fallback"] = "Thanks. That's a helpful gesture.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyNeutral05",
+                },
+                {
+                    ["fallback"] = "I'll consider it. Thanks.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyNeutral06",
+                },
+                {
+                    ["fallback"] = "Much obliged for the thought.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyNeutral07",
+                },
+                {
+                    ["fallback"] = "Appreciate the option. Thank you.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyNeutral08",
+                },
+                {
+                    ["fallback"] = "Thanks. We'll see how the day goes.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyNeutral09",
+                },
+                {
+                    ["fallback"] = "Kind offer. Thank you.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyNeutral10",
                 },
             },
             ["terse"] = {
@@ -406,12 +2476,102 @@ return {
                     ["id"] = "phrase.semantic.social.offer_friendly.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyTerse01",
                 },
+                {
+                    ["fallback"] = "I'm good.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyTerse02",
+                },
+                {
+                    ["fallback"] = "Keep it.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyTerse03",
+                },
+                {
+                    ["fallback"] = "Pass.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyTerse04",
+                },
+                {
+                    ["fallback"] = "Noted.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyTerse05",
+                },
+                {
+                    ["fallback"] = "Appreciated.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyTerse06",
+                },
+                {
+                    ["fallback"] = "Got it.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyTerse07",
+                },
+                {
+                    ["fallback"] = "No thanks.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyTerse08",
+                },
+                {
+                    ["fallback"] = "Maybe later.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyTerse09",
+                },
+                {
+                    ["fallback"] = "Thank you.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyTerse10",
+                },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "Thank you. I'll keep it in mind.",
+                    ["fallback"] = "Thank you, I appreciate the offer.",
                     ["id"] = "phrase.semantic.social.offer_friendly.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyWarm01",
+                },
+                {
+                    ["fallback"] = "That is so kind of you! Thank you so much.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyWarm02",
+                },
+                {
+                    ["fallback"] = "I'm grateful for that. You're a true friend.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyWarm03",
+                },
+                {
+                    ["fallback"] = "That makes life a little easier out here. Thanks!",
+                    ["id"] = "phrase.semantic.social.offer_friendly.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyWarm04",
+                },
+                {
+                    ["fallback"] = "Always generous. Thank you, partner.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyWarm05",
+                },
+                {
+                    ["fallback"] = "Thank you! I won't forget your kindness.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyWarm06",
+                },
+                {
+                    ["fallback"] = "You didn't have to, but thank you from the bottom of my heart.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyWarm07",
+                },
+                {
+                    ["fallback"] = "That's wonderful of you. Thank you!",
+                    ["id"] = "phrase.semantic.social.offer_friendly.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyWarm08",
+                },
+                {
+                    ["fallback"] = "Appreciate you so much. Let me return the favor soon.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyWarm09",
+                },
+                {
+                    ["fallback"] = "Thank you, friend. We look after one another.",
+                    ["id"] = "phrase.semantic.social.offer_friendly.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialOfferFriendlyWarm10",
                 },
             },
         },
@@ -428,12 +2588,102 @@ return {
                     ["id"] = "phrase.semantic.social.threat_boundary.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryGuarded01",
                 },
+                {
+                    ["fallback"] = "Take one more step and find out.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryGuarded02",
+                },
+                {
+                    ["fallback"] = "Keep your hands off your weapon and step back.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryGuarded03",
+                },
+                {
+                    ["fallback"] = "You're threatening the wrong survivor.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryGuarded04",
+                },
+                {
+                    ["fallback"] = "Back up before I put you down.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryGuarded05",
+                },
+                {
+                    ["fallback"] = "I am not afraid to defend myself. Back off.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryGuarded06",
+                },
+                {
+                    ["fallback"] = "Last chance to walk away alive.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryGuarded07",
+                },
+                {
+                    ["fallback"] = "You don't want this fight. Step back.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryGuarded08",
+                },
+                {
+                    ["fallback"] = "Back away immediately.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryGuarded09",
+                },
+                {
+                    ["fallback"] = "Hands where I can see them. Back off.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryGuarded10",
+                },
             },
             ["neutral"] = {
                 {
-                    ["fallback"] = "Back off.",
+                    ["fallback"] = "Step back or we have a problem.",
                     ["id"] = "phrase.semantic.social.threat_boundary.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryNeutral01",
+                },
+                {
+                    ["fallback"] = "You need to back off right now.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryNeutral02",
+                },
+                {
+                    ["fallback"] = "Keep your distance. Don't make this turn ugly.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryNeutral03",
+                },
+                {
+                    ["fallback"] = "I'm giving you fair warning: stand down.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryNeutral04",
+                },
+                {
+                    ["fallback"] = "Back away. Neither of us needs this fight.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryNeutral05",
+                },
+                {
+                    ["fallback"] = "Step down. Let's not do something stupid.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryNeutral06",
+                },
+                {
+                    ["fallback"] = "I won't hesitate if you keep advancing.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryNeutral07",
+                },
+                {
+                    ["fallback"] = "Hold your ground right there. Do not advance.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryNeutral08",
+                },
+                {
+                    ["fallback"] = "Lower your weapon and step back.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryNeutral09",
+                },
+                {
+                    ["fallback"] = "This is your only warning. Back off.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryNeutral10",
                 },
             },
             ["terse"] = {
@@ -442,12 +2692,102 @@ return {
                     ["id"] = "phrase.semantic.social.threat_boundary.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryTerse01",
                 },
+                {
+                    ["fallback"] = "Step back.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryTerse02",
+                },
+                {
+                    ["fallback"] = "Stand down.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryTerse03",
+                },
+                {
+                    ["fallback"] = "Don't.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryTerse04",
+                },
+                {
+                    ["fallback"] = "Back away.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryTerse05",
+                },
+                {
+                    ["fallback"] = "Hands up.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryTerse06",
+                },
+                {
+                    ["fallback"] = "Stop.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryTerse07",
+                },
+                {
+                    ["fallback"] = "Freeze.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryTerse08",
+                },
+                {
+                    ["fallback"] = "Last warning.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryTerse09",
+                },
+                {
+                    ["fallback"] = "Drop it.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryTerse10",
+                },
             },
             ["warm"] = {
                 {
-                    ["fallback"] = "Step back, please.",
+                    ["fallback"] = "Hey, please, don't do this. Step back.",
                     ["id"] = "phrase.semantic.social.threat_boundary.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryWarm01",
+                },
+                {
+                    ["fallback"] = "We don't need blood spilled today. Put it down.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryWarm02",
+                },
+                {
+                    ["fallback"] = "Listen to reason, friend. Step away before someone gets hurt.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryWarm03",
+                },
+                {
+                    ["fallback"] = "I don't want to hurt you. Please, back off.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryWarm04",
+                },
+                {
+                    ["fallback"] = "Don't throw your life away over this. Stand down.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryWarm05",
+                },
+                {
+                    ["fallback"] = "We can still walk away peacefully. Step back.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryWarm06",
+                },
+                {
+                    ["fallback"] = "Take a breath and think about what you're doing. Back up.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryWarm07",
+                },
+                {
+                    ["fallback"] = "I value your life, but I will protect mine. Please stop.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryWarm08",
+                },
+                {
+                    ["fallback"] = "Don't make me do something we'll both regret. Step back.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryWarm09",
+                },
+                {
+                    ["fallback"] = "We're both survivors. Let's keep it that way. Back down.",
+                    ["id"] = "phrase.semantic.social.threat_boundary.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticSocialThreatBoundaryWarm10",
                 },
             },
         },

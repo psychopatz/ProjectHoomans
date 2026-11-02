@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.hostile.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile1Neutral01",
                 },
+                {
+                    ["fallback"] = "Check your tone.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile1Neutral02",
+                },
+                {
+                    ["fallback"] = "You do not want to talk to me like that.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile1Neutral03",
+                },
+                {
+                    ["fallback"] = "Mind how you speak to me.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile1Neutral04",
+                },
+                {
+                    ["fallback"] = "Lower your voice and watch your words.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile1Neutral05",
+                },
+                {
+                    ["fallback"] = "You are crossing a line with that mouth.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile1Neutral06",
+                },
+                {
+                    ["fallback"] = "Bite your tongue before I lose patience.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile1Neutral07",
+                },
+                {
+                    ["fallback"] = "Watch it.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile1Neutral08",
+                },
+                {
+                    ["fallback"] = "That mouth of yours is going to get you hurt.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile1Neutral09",
+                },
+                {
+                    ["fallback"] = "Careful what comes out of your mouth next.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile1Neutral10",
+                },
             },
         },
     },
@@ -27,6 +72,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.hostile.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile2Neutral01",
                 },
+                {
+                    ["fallback"] = "Say that one more time. I dare you.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile2Neutral02",
+                },
+                {
+                    ["fallback"] = "Push me again and find out.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile2Neutral03",
+                },
+                {
+                    ["fallback"] = "Do not test my patience.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile2Neutral04",
+                },
+                {
+                    ["fallback"] = "Keep pushing. See where it lands you.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile2Neutral05",
+                },
+                {
+                    ["fallback"] = "One more step out of line and we have a problem.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile2Neutral06",
+                },
+                {
+                    ["fallback"] = "You really want to go down this road?",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile2Neutral07",
+                },
+                {
+                    ["fallback"] = "Try it. See how fast this goes south.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile2Neutral08",
+                },
+                {
+                    ["fallback"] = "You are gambling with your safety right now.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile2Neutral09",
+                },
+                {
+                    ["fallback"] = "Last warning. Back off.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile2Neutral10",
+                },
             },
         },
     },
@@ -38,9 +128,54 @@ return {
         ["styles"] = {
             ["neutral"] = {
                 {
-                    ["fallback"] = "I have heard worse, but do not make a habit of it.",
+                    ["fallback"] = "You need to back off right now.",
                     ["id"] = "phrase.semantic.tool_reply.hostile.3.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile3Neutral01",
+                },
+                {
+                    ["fallback"] = "Step back.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.3.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile3Neutral02",
+                },
+                {
+                    ["fallback"] = "Give me space before things get ugly.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.3.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile3Neutral03",
+                },
+                {
+                    ["fallback"] = "Back away from me.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.3.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile3Neutral04",
+                },
+                {
+                    ["fallback"] = "I said back off.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.3.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile3Neutral05",
+                },
+                {
+                    ["fallback"] = "Keep your distance.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.3.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile3Neutral06",
+                },
+                {
+                    ["fallback"] = "Get out of my face.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.3.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile3Neutral07",
+                },
+                {
+                    ["fallback"] = "You have about two seconds to back up.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.3.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile3Neutral08",
+                },
+                {
+                    ["fallback"] = "Take a step back while you still can.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.3.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile3Neutral09",
+                },
+                {
+                    ["fallback"] = "Back off. I will not say it again.",
+                    ["id"] = "phrase.semantic.tool_reply.hostile.3.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyHostile3Neutral10",
                 },
             },
         },

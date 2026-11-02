@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.interaction.context.clarify.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionContextClarifyNeutral01",
                 },
+                {
+                    ["fallback"] = "Can you clarify what you mean?",
+                    ["id"] = "phrase.semantic.interaction.context.clarify.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionContextClarifyNeutral02",
+                },
+                {
+                    ["fallback"] = "What specifically are you talking about?",
+                    ["id"] = "phrase.semantic.interaction.context.clarify.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionContextClarifyNeutral03",
+                },
+                {
+                    ["fallback"] = "I'm not following. Explain what you mean.",
+                    ["id"] = "phrase.semantic.interaction.context.clarify.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionContextClarifyNeutral04",
+                },
+                {
+                    ["fallback"] = "Give me some more context on that.",
+                    ["id"] = "phrase.semantic.interaction.context.clarify.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionContextClarifyNeutral05",
+                },
+                {
+                    ["fallback"] = "What do you mean by that exactly?",
+                    ["id"] = "phrase.semantic.interaction.context.clarify.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionContextClarifyNeutral06",
+                },
+                {
+                    ["fallback"] = "Which situation are you talking about?",
+                    ["id"] = "phrase.semantic.interaction.context.clarify.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionContextClarifyNeutral07",
+                },
+                {
+                    ["fallback"] = "Could you break that down for me?",
+                    ["id"] = "phrase.semantic.interaction.context.clarify.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionContextClarifyNeutral08",
+                },
+                {
+                    ["fallback"] = "I need more details before I understand.",
+                    ["id"] = "phrase.semantic.interaction.context.clarify.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionContextClarifyNeutral09",
+                },
+                {
+                    ["fallback"] = "What are you getting at?",
+                    ["id"] = "phrase.semantic.interaction.context.clarify.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionContextClarifyNeutral10",
+                },
             },
         },
     },

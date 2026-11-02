@@ -83,16 +83,34 @@ This must be raised before the corpus can satisfy the requested minimum.
      - Styles at >=10 phrases: **98 / 729** (was 0).
      - Eligible under-10 style buckets: **585 / 683** (was 683).
 
-## Immediate Active Phase — P3: Social interaction refinement
+3. **Phase 3 (Social Interaction Refinement & Expansion) — COMPLETED**:
+   - **P3A (Social Tool Replies & Social Apology)**:
+     - 14 tool reply shards (accepted_generic, admire, apology, comfort, compliment, flirt, hostile, insult, orientation, personality, praise, relationship, romantic, sexual): expanded all 32 styles to 10 variants each (320 phrases). Replaced fake English TL copies with natural Tagalog/Taglish.
+     - `content/social_apology.json`: expanded all 4 families / 16 styles to 10 variants each (160 phrases), differentiating neutral/warm/terse/guarded voices and eliminating identical default lines.
+   - **P3B (Social Emotes & Reactions)**:
+     - `content/social/emotes/reply.json` (18 styles) & `conversation.json` (4 styles): expanded to 10 variants each (220 phrases). Removed forbidden "love" pet-name from warm salute; authored authentic TL lines.
+     - `content/social/reactions.json`: expanded all 11 families / 52 styles to 10 variants each (520 phrases), preserving `%s` placeholder signatures in all 8 `bond_*` styles.
+   - **P3C (Social Interaction & Director / Scene Runtime Adopters)**:
+     - 11 interaction shards (argument_deescalate, argument_retaliate, context_clarify, first_contact_challenge, memory_acknowledge, memory_acknowledge_flavor, memory_followup, news_acknowledge, world_event_warning, world_event_warning_flavor, social_conversation_director): expanded all 49 styles to 10 variants each (490 phrases).
+     - `content/social/interaction/scene_runtime_adopters.json`: expanded all 15 families / 48 styles to 10 variants each (480 phrases). Replaced cartoon profanity caricature lines with grounded survivor speech; preserved `{clock}` and `{relative}` placeholders across both EN and TL.
+   - **Compiler & Shard Bounds**:
+     - Raised `CONVERSATION_MAX_SOURCE_BYTES` to 128KB and `CONVERSATION_MAX_SHARD_BYTES` to 192KB to accommodate bounded 10-phrase expansion in 52-style shards like `reactions.json`.
+     - Regenerated all 196 Lua modules and EN/TL translation artifacts.
+     - All 25 compiler, context health, content authority, and auditor unit tests pass.
+   - **Corpus Metrics After P3**:
+     - Styles at >=10 phrases: **323 / 729** (was 98).
+     - Eligible under-10 style buckets: **360 / 683** (was 585).
+     - Remaining under-10 styles in social domain: **0**.
 
-Expand and refine all canonical social interaction dialogue shards to >= 10 meaningful, relationship-safe variants:
-- **P3A**: Social Reactions (`content/social/reactions.json`: 11 families, 52 styles).
-- **P3B**: Social Emotes (`content/social/emotes/reply.json`: 10 families, 18 styles; `content/social/emotes/conversation.json`: 1 family, 4 styles).
-- **P3C**: Social Interaction & Director (`content/social/interaction/*.json`: scene adopters, memory acknowledge, argument deescalate/retaliate, topic redirects).
-- **P3D**: Social Tool Replies (`content/social/tool_replies/*.json`: apology, comfort, compliment, flirt, hostile, insult, praise, reassurance).
-- **P3E**: Social Apology (`content/social_apology.json`: 4 families, 16 styles).
+## Immediate Active Phase — P4: Commands and tasks refinement
 
-Every eligible active style in these social shards must reach **>= 10 meaningful, grounded, context-safe phrase variants** with valid EN/TL parity.
+Expand and refine all canonical NPC command and task execution dialogue shards to >= 10 variants:
+- **P4A**: Command Replies (`content/command/replies.json`: 19 styles).
+- **P4B**: Command Lifecycle (`content/command/lifecycle/*.json`: camp, follow, return_home, stay, stop_following: 35 styles).
+- **P4C**: Task Lifecycle (`content/task/lifecycle/*.json`: consume, drink, eat, fetch, gift, give, refill, wait_at: 40 styles).
+- **P4D**: Task Tool Replies (`content/task/tool_replies/*.json`: order_*, queued_*, rejected_*: 30 styles).
+
+Preserve command/task contracts (accepted vs. queued vs. rejected). Maintain perspective correctness (NPC speaker vs. player commander).
 
 ## Mandatory quality principle
 

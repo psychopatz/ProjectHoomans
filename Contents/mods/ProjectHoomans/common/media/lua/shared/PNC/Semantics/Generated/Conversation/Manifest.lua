@@ -533,7 +533,7 @@ return {
             ["sourceShard"] = "content/quest.json",
         },
         {
-            ["bytes"] = 1892,
+            ["bytes"] = 12972,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Conversation",
@@ -562,7 +562,7 @@ return {
             ["sourceShard"] = "content/social/emotes/player.json",
         },
         {
-            ["bytes"] = 25774,
+            ["bytes"] = 54031,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
@@ -582,7 +582,7 @@ return {
             ["sourceShard"] = "content/social/emotes/reply.json",
         },
         {
-            ["bytes"] = 1858,
+            ["bytes"] = 12907,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ArgumentDeescalate",
@@ -593,7 +593,7 @@ return {
             ["sourceShard"] = "content/social/interaction/argument_deescalate.json",
         },
         {
-            ["bytes"] = 1850,
+            ["bytes"] = 12857,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ArgumentRetaliate",
@@ -604,7 +604,7 @@ return {
             ["sourceShard"] = "content/social/interaction/argument_retaliate.json",
         },
         {
-            ["bytes"] = 806,
+            ["bytes"] = 3522,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ContextClarify",
@@ -615,7 +615,7 @@ return {
             ["sourceShard"] = "content/social/interaction/context_clarify.json",
         },
         {
-            ["bytes"] = 1885,
+            ["bytes"] = 13208,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/FirstContactChallenge",
@@ -626,7 +626,7 @@ return {
             ["sourceShard"] = "content/social/interaction/first_contact_challenge.json",
         },
         {
-            ["bytes"] = 1809,
+            ["bytes"] = 12598,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/MemoryAcknowledge",
@@ -637,7 +637,7 @@ return {
             ["sourceShard"] = "content/social/interaction/memory_acknowledge.json",
         },
         {
-            ["bytes"] = 1964,
+            ["bytes"] = 13905,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/MemoryAcknowledgeFlavor",
@@ -648,7 +648,7 @@ return {
             ["sourceShard"] = "content/social/interaction/memory_acknowledge_flavor.json",
         },
         {
-            ["bytes"] = 1798,
+            ["bytes"] = 12571,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/MemoryFollowup",
@@ -659,7 +659,7 @@ return {
             ["sourceShard"] = "content/social/interaction/memory_followup.json",
         },
         {
-            ["bytes"] = 1801,
+            ["bytes"] = 12661,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/NewsAcknowledge",
@@ -670,7 +670,7 @@ return {
             ["sourceShard"] = "content/social/interaction/news_acknowledge.json",
         },
         {
-            ["bytes"] = 25877,
+            ["bytes"] = 161275,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
@@ -695,7 +695,7 @@ return {
             ["sourceShard"] = "content/social/interaction/scene_runtime_adopters.json",
         },
         {
-            ["bytes"] = 5595,
+            ["bytes"] = 39721,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SocialConversationDirector",
@@ -708,7 +708,7 @@ return {
             ["sourceShard"] = "content/social/interaction/social_conversation_director.json",
         },
         {
-            ["bytes"] = 1856,
+            ["bytes"] = 12887,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEventWarning",
@@ -719,7 +719,7 @@ return {
             ["sourceShard"] = "content/social/interaction/world_event_warning.json",
         },
         {
-            ["bytes"] = 1986,
+            ["bytes"] = 13969,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEventWarningFlavor",
@@ -730,7 +730,7 @@ return {
             ["sourceShard"] = "content/social/interaction/world_event_warning_flavor.json",
         },
         {
-            ["bytes"] = 20823,
+            ["bytes"] = 155813,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Reactions",
@@ -751,7 +751,7 @@ return {
             ["sourceShard"] = "content/social/reactions.json",
         },
         {
-            ["bytes"] = 1513,
+            ["bytes"] = 6768,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AcceptedGeneric",
@@ -763,7 +763,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/accepted_generic.json",
         },
         {
-            ["bytes"] = 2096,
+            ["bytes"] = 9854,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Admire",
@@ -776,7 +776,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/admire.json",
         },
         {
-            ["bytes"] = 2088,
+            ["bytes"] = 9777,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Apology",
@@ -807,7 +807,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/ask_name.json",
         },
         {
-            ["bytes"] = 2093,
+            ["bytes"] = 9923,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Comfort",
@@ -820,7 +820,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/comfort.json",
         },
         {
-            ["bytes"] = 2143,
+            ["bytes"] = 10075,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Compliment",
@@ -833,7 +833,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/compliment.json",
         },
         {
-            ["bytes"] = 2087,
+            ["bytes"] = 9821,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Flirt",
@@ -846,7 +846,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/flirt.json",
         },
         {
-            ["bytes"] = 2114,
+            ["bytes"] = 9734,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Hostile",
@@ -859,7 +859,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/hostile.json",
         },
         {
-            ["bytes"] = 2096,
+            ["bytes"] = 9741,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Insult",
@@ -872,7 +872,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/insult.json",
         },
         {
-            ["bytes"] = 1511,
+            ["bytes"] = 6992,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Orientation",
@@ -884,7 +884,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/orientation.json",
         },
         {
-            ["bytes"] = 1490,
+            ["bytes"] = 6929,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Personality",
@@ -896,7 +896,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/personality.json",
         },
         {
-            ["bytes"] = 2072,
+            ["bytes"] = 9842,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Praise",
@@ -909,7 +909,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/praise.json",
         },
         {
-            ["bytes"] = 1489,
+            ["bytes"] = 6957,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Relationship",
@@ -921,7 +921,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/relationship.json",
         },
         {
-            ["bytes"] = 2141,
+            ["bytes"] = 10287,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Romantic",
@@ -934,7 +934,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/romantic.json",
         },
         {
-            ["bytes"] = 2106,
+            ["bytes"] = 10008,
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Sexual",
@@ -947,7 +947,7 @@ return {
             ["sourceShard"] = "content/social/tool_replies/sexual.json",
         },
         {
-            ["bytes"] = 6743,
+            ["bytes"] = 48498,
             ["domain"] = "apology",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/SocialApology",
@@ -2968,5 +2968,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "9f9785ae763d5501aeef8c89bd7c5c4d8b91215d024ddd551ec0a94b02ecb576",
+    ["wholeModelFingerprint"] = "5886f83df423b642017f2e85c0bc6b4dbb6b51db210c75f0ec79974e52f7be60",
 }

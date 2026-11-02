@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorGuarded01",
                 },
+                {
+                    ["fallback"] = "The listener watches closely without revealing their thoughts.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorGuarded02",
+                },
+                {
+                    ["fallback"] = "A cautious look crosses the listener's eyes.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorGuarded03",
+                },
+                {
+                    ["fallback"] = "The listener stiffens slightly as the past is mentioned.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorGuarded04",
+                },
+                {
+                    ["fallback"] = "A slow, guarded nod shows the words were registered.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorGuarded05",
+                },
+                {
+                    ["fallback"] = "The listener's hand rests near their belt during the pause.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorGuarded06",
+                },
+                {
+                    ["fallback"] = "The listener narrows their eyes, weighing the intent behind the words.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorGuarded07",
+                },
+                {
+                    ["fallback"] = "A tight, reserved expression settles on the listener's face.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorGuarded08",
+                },
+                {
+                    ["fallback"] = "The listener gives nothing away, nodding once carefully.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorGuarded09",
+                },
+                {
+                    ["fallback"] = "The listener keeps their guard up while acknowledging the memory.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "The listener gives a small acknowledging nod.",
                     ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorNeutral01",
+                },
+                {
+                    ["fallback"] = "The listener listens thoughtfully and nods.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorNeutral02",
+                },
+                {
+                    ["fallback"] = "A steady nod shows the listener remembers.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorNeutral03",
+                },
+                {
+                    ["fallback"] = "The listener absorbs the words and dips their head.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorNeutral04",
+                },
+                {
+                    ["fallback"] = "The listener acknowledges the shared recollection quietly.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorNeutral05",
+                },
+                {
+                    ["fallback"] = "A quiet look of recognition passes over the listener's face.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorNeutral06",
+                },
+                {
+                    ["fallback"] = "The listener blinks slowly, recalling the moment.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorNeutral07",
+                },
+                {
+                    ["fallback"] = "The listener gives a calm, measured gesture of understanding.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorNeutral08",
+                },
+                {
+                    ["fallback"] = "A brief pause precedes an acknowledging nod.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorNeutral09",
+                },
+                {
+                    ["fallback"] = "The listener tilts their head in silent agreement.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorNeutral10",
                 },
             },
             ["terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorTerse01",
                 },
+                {
+                    ["fallback"] = "A curt dip of the chin confirms it.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorTerse02",
+                },
+                {
+                    ["fallback"] = "The listener grunts in assent.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorTerse03",
+                },
+                {
+                    ["fallback"] = "A sharp single nod.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorTerse04",
+                },
+                {
+                    ["fallback"] = "The listener barely shifts.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorTerse05",
+                },
+                {
+                    ["fallback"] = "Eyes narrow briefly in recognition.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorTerse06",
+                },
+                {
+                    ["fallback"] = "A quick jerk of the head acknowledges it.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorTerse07",
+                },
+                {
+                    ["fallback"] = "The listener's jaw sets firmly.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorTerse08",
+                },
+                {
+                    ["fallback"] = "A momentary pause, nothing more.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorTerse09",
+                },
+                {
+                    ["fallback"] = "A flat nod ends the topic.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "The listener softens and nods with quiet understanding.",
                     ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorWarm01",
+                },
+                {
+                    ["fallback"] = "A faint, gentle smile touches the listener's lips.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorWarm02",
+                },
+                {
+                    ["fallback"] = "The listener's eyes warm as the memory settles in.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorWarm03",
+                },
+                {
+                    ["fallback"] = "The listener gives a warm, reassuring nod.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorWarm04",
+                },
+                {
+                    ["fallback"] = "A fond look washes over the listener's tired features.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorWarm05",
+                },
+                {
+                    ["fallback"] = "The listener reaches out slightly, comforted by the recollection.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorWarm06",
+                },
+                {
+                    ["fallback"] = "A soft breath escapes the listener as they remember.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorWarm07",
+                },
+                {
+                    ["fallback"] = "The listener's shoulders relax with affectionate recognition.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorWarm08",
+                },
+                {
+                    ["fallback"] = "The listener nods warmly, visibly moved by the memory.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorWarm09",
+                },
+                {
+                    ["fallback"] = "A quiet sense of camaraderie passes between them.",
+                    ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionMemoryAcknowledgeFlavorWarm10",
                 },
             },
         },

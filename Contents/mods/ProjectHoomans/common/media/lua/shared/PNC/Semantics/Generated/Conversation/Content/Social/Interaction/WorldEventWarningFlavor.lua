@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorGuarded01",
                 },
+                {
+                    ["fallback"] = "The NPC drops behind cover, weapon ready.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorGuarded02",
+                },
+                {
+                    ["fallback"] = "The NPC checks their weapon chamber with a grim expression.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorGuarded03",
+                },
+                {
+                    ["fallback"] = "The NPC scans every window and doorway with cold vigilance.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorGuarded04",
+                },
+                {
+                    ["fallback"] = "The NPC backs slowly into a defensive choke point.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorGuarded05",
+                },
+                {
+                    ["fallback"] = "The NPC eyes their companions to ensure everyone is armed.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorGuarded06",
+                },
+                {
+                    ["fallback"] = "A calculating glare fixes on the direction of the noise.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorGuarded07",
+                },
+                {
+                    ["fallback"] = "The NPC prepares for an immediate fight with grim resolve.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorGuarded08",
+                },
+                {
+                    ["fallback"] = "The NPC's posture turns deadly and guarded.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorGuarded09",
+                },
+                {
+                    ["fallback"] = "The NPC remains motionless, waiting for the first sign of hostiles.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "The NPC snaps to attention and scans the area.",
                     ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorNeutral01",
+                },
+                {
+                    ["fallback"] = "The NPC pauses and listens intently to distant noise.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorNeutral02",
+                },
+                {
+                    ["fallback"] = "The NPC raises a hand to signal sudden awareness.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorNeutral03",
+                },
+                {
+                    ["fallback"] = "The NPC turns sharply toward the source of the disturbance.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorNeutral04",
+                },
+                {
+                    ["fallback"] = "A tense hush falls as the NPC monitors the perimeter.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorNeutral05",
+                },
+                {
+                    ["fallback"] = "The NPC shifts their stance, ready to react.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorNeutral06",
+                },
+                {
+                    ["fallback"] = "The NPC points toward the horizon with furrowed brows.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorNeutral07",
+                },
+                {
+                    ["fallback"] = "The NPC squints into the distance, assessing the threat.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorNeutral08",
+                },
+                {
+                    ["fallback"] = "The NPC signals caution to everyone nearby.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorNeutral09",
+                },
+                {
+                    ["fallback"] = "The NPC's posture straightens instantly at the sound.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorNeutral10",
                 },
             },
             ["terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorTerse01",
                 },
+                {
+                    ["fallback"] = "A sharp signal cuts the air.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorTerse02",
+                },
+                {
+                    ["fallback"] = "The NPC stiffens instantly.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorTerse03",
+                },
+                {
+                    ["fallback"] = "A hand shoots up in alarm.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorTerse04",
+                },
+                {
+                    ["fallback"] = "The NPC's head snaps toward the danger.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorTerse05",
+                },
+                {
+                    ["fallback"] = "A low hiss demands silence.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorTerse06",
+                },
+                {
+                    ["fallback"] = "The NPC drops into a crouch.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorTerse07",
+                },
+                {
+                    ["fallback"] = "A quick wave commands cover.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorTerse08",
+                },
+                {
+                    ["fallback"] = "The NPC draws their weapon in one motion.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorTerse09",
+                },
+                {
+                    ["fallback"] = "Eyes wide, the NPC freezes.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "The NPC motions for the others to stay close.",
                     ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorWarm01",
+                },
+                {
+                    ["fallback"] = "The NPC places a protective hand out, urging allies to gather.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorWarm02",
+                },
+                {
+                    ["fallback"] = "The NPC steps forward to shield their companions from view.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorWarm03",
+                },
+                {
+                    ["fallback"] = "The NPC gives an urgent, reassuring glance to their partners.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorWarm04",
+                },
+                {
+                    ["fallback"] = "The NPC whispers a quiet encouragement while staying watchful.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorWarm05",
+                },
+                {
+                    ["fallback"] = "The NPC gestures for the group to huddle together safely.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorWarm06",
+                },
+                {
+                    ["fallback"] = "The NPC keeps one eye on the threat and one on their friends.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorWarm07",
+                },
+                {
+                    ["fallback"] = "The NPC gently pulls their ally behind solid cover.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorWarm08",
+                },
+                {
+                    ["fallback"] = "The NPC nods determinedly to protect those nearby.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorWarm09",
+                },
+                {
+                    ["fallback"] = "The NPC stays tightly flanked with their companions.",
+                    ["id"] = "phrase.semantic.interaction.world_event.warning_flavor.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionWorldEventWarningFlavorWarm10",
                 },
             },
         },

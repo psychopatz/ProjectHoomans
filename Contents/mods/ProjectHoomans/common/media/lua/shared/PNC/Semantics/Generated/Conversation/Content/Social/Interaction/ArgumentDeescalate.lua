@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.argument.deescalate.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateGuarded01",
                 },
+                {
+                    ["fallback"] = "Lower your tone before you draw attention.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateGuarded02",
+                },
+                {
+                    ["fallback"] = "Stop yelling. You want every dead head hearing this?",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateGuarded03",
+                },
+                {
+                    ["fallback"] = "All right. Keep it down and back off.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateGuarded04",
+                },
+                {
+                    ["fallback"] = "Enough. Lower the volume right now.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateGuarded05",
+                },
+                {
+                    ["fallback"] = "I heard you. Now drop the shouting.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateGuarded06",
+                },
+                {
+                    ["fallback"] = "Shh! Keep your voice down.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateGuarded07",
+                },
+                {
+                    ["fallback"] = "Keep it civil and quiet. We're in danger.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateGuarded08",
+                },
+                {
+                    ["fallback"] = "Lower your voice. I'm not deaf.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateGuarded09",
+                },
+                {
+                    ["fallback"] = "Fine. Just tone it down.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "Easy. We don't need to make this worse.",
                     ["id"] = "phrase.semantic.interaction.argument.deescalate.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateNeutral01",
+                },
+                {
+                    ["fallback"] = "Let's calm down and talk this through reasonably.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateNeutral02",
+                },
+                {
+                    ["fallback"] = "Take a breath. Bickering won't fix anything.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateNeutral03",
+                },
+                {
+                    ["fallback"] = "No need for tempers to flare. Let's settle it.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateNeutral04",
+                },
+                {
+                    ["fallback"] = "Easy does it. We're on the same side here.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateNeutral05",
+                },
+                {
+                    ["fallback"] = "Let's step back and look at the situation calmly.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateNeutral06",
+                },
+                {
+                    ["fallback"] = "We can resolve this without shouting.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateNeutral07",
+                },
+                {
+                    ["fallback"] = "Keep cool. Let's find a workable solution.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateNeutral08",
+                },
+                {
+                    ["fallback"] = "Easy now. Don't lose your head over this.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateNeutral09",
+                },
+                {
+                    ["fallback"] = "Hold on. Let's de-escalate before someone gets hurt.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateNeutral10",
                 },
             },
             ["terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.argument.deescalate.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateTerse01",
                 },
+                {
+                    ["fallback"] = "Calm down.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateTerse02",
+                },
+                {
+                    ["fallback"] = "Drop it.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateTerse03",
+                },
+                {
+                    ["fallback"] = "Quiet.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateTerse04",
+                },
+                {
+                    ["fallback"] = "Breathe.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateTerse05",
+                },
+                {
+                    ["fallback"] = "Cool off.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateTerse06",
+                },
+                {
+                    ["fallback"] = "Steady.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateTerse07",
+                },
+                {
+                    ["fallback"] = "Enough.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateTerse08",
+                },
+                {
+                    ["fallback"] = "Hold up.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateTerse09",
+                },
+                {
+                    ["fallback"] = "Stop.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "Calm down. This isn't helping either of us.",
                     ["id"] = "phrase.semantic.interaction.argument.deescalate.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateWarm01",
+                },
+                {
+                    ["fallback"] = "Hey, look at me. We're friends, remember?",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateWarm02",
+                },
+                {
+                    ["fallback"] = "Take a breath. I'm right here with you. Let's work it out.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateWarm03",
+                },
+                {
+                    ["fallback"] = "I know you're stressed. Let's pause and decompress.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateWarm04",
+                },
+                {
+                    ["fallback"] = "Don't let the anger take over. We care about each other.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateWarm05",
+                },
+                {
+                    ["fallback"] = "We're going to get through this, I promise. Calm down.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateWarm06",
+                },
+                {
+                    ["fallback"] = "I hear your pain. Let's talk gently.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateWarm07",
+                },
+                {
+                    ["fallback"] = "It's all right. I'm listening. Just bring the energy down.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateWarm08",
+                },
+                {
+                    ["fallback"] = "We've survived too much together to fight like this.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateWarm09",
+                },
+                {
+                    ["fallback"] = "Peace, friend. We are stronger together.",
+                    ["id"] = "phrase.semantic.interaction.argument.deescalate.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionArgumentDeescalateWarm10",
                 },
             },
         },

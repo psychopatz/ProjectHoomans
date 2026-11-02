@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.first_contact.challenge.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeGuarded01",
                 },
+                {
+                    ["fallback"] = "Hands where I can see them. Who are you?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeGuarded02",
+                },
+                {
+                    ["fallback"] = "Stop right there. State your business.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeGuarded03",
+                },
+                {
+                    ["fallback"] = "Keep your distance. What brings you over here?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeGuarded04",
+                },
+                {
+                    ["fallback"] = "Don't take another step. Who sent you?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeGuarded05",
+                },
+                {
+                    ["fallback"] = "Hold it. Are you armed?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeGuarded06",
+                },
+                {
+                    ["fallback"] = "Stay where you are. Why are you approaching me?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeGuarded07",
+                },
+                {
+                    ["fallback"] = "Hold ground. What are you after?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeGuarded08",
+                },
+                {
+                    ["fallback"] = "Keep your hands clear of your waist. Who are you?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeGuarded09",
+                },
+                {
+                    ["fallback"] = "One wrong twitch and we have a problem. Speak up.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "Hold it. Who are you?",
                     ["id"] = "phrase.semantic.interaction.first_contact.challenge.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeNeutral01",
+                },
+                {
+                    ["fallback"] = "Hold up a second. What's your name?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeNeutral02",
+                },
+                {
+                    ["fallback"] = "Who goes there? Speak up.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeNeutral03",
+                },
+                {
+                    ["fallback"] = "Stop there for a moment. Are you friendly?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeNeutral04",
+                },
+                {
+                    ["fallback"] = "Hold on. What brings you to this area?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeNeutral05",
+                },
+                {
+                    ["fallback"] = "State who you are and what you're doing here.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeNeutral06",
+                },
+                {
+                    ["fallback"] = "Hold it right there. Let's talk before you come closer.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeNeutral07",
+                },
+                {
+                    ["fallback"] = "Who are you and who are you with?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeNeutral08",
+                },
+                {
+                    ["fallback"] = "Stop there. Just want to make sure you're not a threat.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeNeutral09",
+                },
+                {
+                    ["fallback"] = "Hold up. Give me a name and a reason you're here.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeNeutral10",
                 },
             },
             ["terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.interaction.first_contact.challenge.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeTerse01",
                 },
+                {
+                    ["fallback"] = "Halt.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeTerse02",
+                },
+                {
+                    ["fallback"] = "Identify.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeTerse03",
+                },
+                {
+                    ["fallback"] = "Stop.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeTerse04",
+                },
+                {
+                    ["fallback"] = "Name?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeTerse05",
+                },
+                {
+                    ["fallback"] = "Hands up.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeTerse06",
+                },
+                {
+                    ["fallback"] = "Purpose?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeTerse07",
+                },
+                {
+                    ["fallback"] = "Freeze.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeTerse08",
+                },
+                {
+                    ["fallback"] = "State business.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeTerse09",
+                },
+                {
+                    ["fallback"] = "Who's there?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "Easy. I don't know you yet.",
                     ["id"] = "phrase.semantic.interaction.first_contact.challenge.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeWarm01",
+                },
+                {
+                    ["fallback"] = "Hold on there, stranger. Let's introduce ourselves first.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeWarm02",
+                },
+                {
+                    ["fallback"] = "Easy does it. Are you alone out here?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeWarm03",
+                },
+                {
+                    ["fallback"] = "Hey there. Don't be frightened, just tell me your name.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeWarm04",
+                },
+                {
+                    ["fallback"] = "Slow down, friend. Let's see who we're talking to.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeWarm05",
+                },
+                {
+                    ["fallback"] = "Peace. Just hold up so we can get acquainted.",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeWarm06",
+                },
+                {
+                    ["fallback"] = "Hello. I don't recognize your face—who might you be?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeWarm07",
+                },
+                {
+                    ["fallback"] = "Easy now. Just looking out for safety. Who are you?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeWarm08",
+                },
+                {
+                    ["fallback"] = "Stay there a second, stranger. Where are you heading?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeWarm09",
+                },
+                {
+                    ["fallback"] = "Welcome, but take it slow. What's your story?",
+                    ["id"] = "phrase.semantic.interaction.first_contact.challenge.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticInteractionFirstContactChallengeWarm10",
                 },
             },
         },

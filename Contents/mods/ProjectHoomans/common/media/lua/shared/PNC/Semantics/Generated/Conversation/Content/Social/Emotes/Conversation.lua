@@ -12,12 +12,102 @@ return {
                     ["id"] = "phrase.semantic.conversation.acknowledged.default.guarded.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultGuarded01",
                 },
+                {
+                    ["fallback"] = "Heard. That's enough talk for now.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.guarded.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultGuarded02",
+                },
+                {
+                    ["fallback"] = "Message received. Keep your distance.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.guarded.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultGuarded03",
+                },
+                {
+                    ["fallback"] = "Got it. Let's keep our heads on our shoulders.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.guarded.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultGuarded04",
+                },
+                {
+                    ["fallback"] = "I heard what you said. Leaving it at that.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.guarded.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultGuarded05",
+                },
+                {
+                    ["fallback"] = "All right. Eyes open.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.guarded.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultGuarded06",
+                },
+                {
+                    ["fallback"] = "I take your point. Let's stay alert.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.guarded.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultGuarded07",
+                },
+                {
+                    ["fallback"] = "Clear enough. No more discussion needed.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.guarded.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultGuarded08",
+                },
+                {
+                    ["fallback"] = "Understood. Keep sharp.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.guarded.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultGuarded09",
+                },
+                {
+                    ["fallback"] = "Noted. Back to watching the perimeter.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.guarded.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultGuarded10",
+                },
             },
             ["neutral"] = {
                 {
                     ["fallback"] = "All right. Ask if you want to talk more.",
                     ["id"] = "phrase.semantic.conversation.acknowledged.default.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultNeutral01",
+                },
+                {
+                    ["fallback"] = "Understood. Let me know if you need anything else.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultNeutral02",
+                },
+                {
+                    ["fallback"] = "Sounds good. We can pick this up later.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultNeutral03",
+                },
+                {
+                    ["fallback"] = "Got it. Let's get back to what we were doing.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultNeutral04",
+                },
+                {
+                    ["fallback"] = "Fair enough. Holler if something comes up.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultNeutral05",
+                },
+                {
+                    ["fallback"] = "All right. We're on the same page.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultNeutral06",
+                },
+                {
+                    ["fallback"] = "Understood. Take care.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultNeutral07",
+                },
+                {
+                    ["fallback"] = "Clear. We'll talk again soon.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultNeutral08",
+                },
+                {
+                    ["fallback"] = "Got it. I'm around if you need to talk.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultNeutral09",
+                },
+                {
+                    ["fallback"] = "Right. We'll leave it there for now.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultNeutral10",
                 },
             },
             ["terse"] = {
@@ -26,12 +116,102 @@ return {
                     ["id"] = "phrase.semantic.conversation.acknowledged.default.terse.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultTerse01",
                 },
+                {
+                    ["fallback"] = "Understood.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.terse.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultTerse02",
+                },
+                {
+                    ["fallback"] = "Heard.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.terse.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultTerse03",
+                },
+                {
+                    ["fallback"] = "Got it.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.terse.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultTerse04",
+                },
+                {
+                    ["fallback"] = "Right.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.terse.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultTerse05",
+                },
+                {
+                    ["fallback"] = "Done.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.terse.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultTerse06",
+                },
+                {
+                    ["fallback"] = "Clear.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.terse.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultTerse07",
+                },
+                {
+                    ["fallback"] = "Good.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.terse.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultTerse08",
+                },
+                {
+                    ["fallback"] = "Okay.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.terse.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultTerse09",
+                },
+                {
+                    ["fallback"] = "Noted.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.terse.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultTerse10",
+                },
             },
             ["warm"] = {
                 {
                     ["fallback"] = "All right. I'm here if you want to talk more.",
                     ["id"] = "phrase.semantic.conversation.acknowledged.default.warm.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultWarm01",
+                },
+                {
+                    ["fallback"] = "Glad we talked. Holler anytime you need to chat.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.warm.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultWarm02",
+                },
+                {
+                    ["fallback"] = "I hear you loud and clear. Take care of yourself.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.warm.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultWarm03",
+                },
+                {
+                    ["fallback"] = "Good talking with you. We'll catch up again soon.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.warm.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultWarm04",
+                },
+                {
+                    ["fallback"] = "Understood. Always good to touch base with you.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.warm.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultWarm05",
+                },
+                {
+                    ["fallback"] = "Anytime you want to talk, you know where to find me.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.warm.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultWarm06",
+                },
+                {
+                    ["fallback"] = "Got it. Stay safe out there today.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.warm.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultWarm07",
+                },
+                {
+                    ["fallback"] = "Always happy to listen. Take it easy.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.warm.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultWarm08",
+                },
+                {
+                    ["fallback"] = "All right. Glad we got that sorted out together.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.warm.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultWarm09",
+                },
+                {
+                    ["fallback"] = "Thanks for taking the time to talk. Catch you later.",
+                    ["id"] = "phrase.semantic.conversation.acknowledged.default.warm.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticConversationAcknowledgedDefaultWarm10",
                 },
             },
         },

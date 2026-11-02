@@ -12,6 +12,51 @@ return {
                     ["id"] = "phrase.semantic.tool_reply.accepted_generic.1.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral01",
                 },
+                {
+                    ["fallback"] = "Got it.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.1.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral02",
+                },
+                {
+                    ["fallback"] = "Fair enough.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.1.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral03",
+                },
+                {
+                    ["fallback"] = "Understood.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.1.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral04",
+                },
+                {
+                    ["fallback"] = "I hear what you are saying.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.1.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral05",
+                },
+                {
+                    ["fallback"] = "Message received.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.1.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral06",
+                },
+                {
+                    ["fallback"] = "Makes sense to me.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.1.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral07",
+                },
+                {
+                    ["fallback"] = "Point taken.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.1.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral08",
+                },
+                {
+                    ["fallback"] = "I am listening.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.1.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral09",
+                },
+                {
+                    ["fallback"] = "All right. I hear you.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.1.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric1Neutral10",
+                },
             },
         },
     },
@@ -26,6 +71,51 @@ return {
                     ["fallback"] = "I will keep that in mind.",
                     ["id"] = "phrase.semantic.tool_reply.accepted_generic.2.neutral.01",
                     ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral01",
+                },
+                {
+                    ["fallback"] = "I will remember that.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.2.neutral.02",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral02",
+                },
+                {
+                    ["fallback"] = "Good to know. I will think about it.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.2.neutral.03",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral03",
+                },
+                {
+                    ["fallback"] = "I will note that down in my head.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.2.neutral.04",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral04",
+                },
+                {
+                    ["fallback"] = "Thanks for telling me. I will keep it in mind.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.2.neutral.05",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral05",
+                },
+                {
+                    ["fallback"] = "I will hold onto that thought.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.2.neutral.06",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral06",
+                },
+                {
+                    ["fallback"] = "I will factor that in.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.2.neutral.07",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral07",
+                },
+                {
+                    ["fallback"] = "Duly noted.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.2.neutral.08",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral08",
+                },
+                {
+                    ["fallback"] = "I will be mindful of that.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.2.neutral.09",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral09",
+                },
+                {
+                    ["fallback"] = "Right. I will keep that in mind moving forward.",
+                    ["id"] = "phrase.semantic.tool_reply.accepted_generic.2.neutral.10",
+                    ["key"] = "UI_PNC_Conversation_Content_SemanticToolReplyAcceptedGeneric2Neutral10",
                 },
             },
         },
