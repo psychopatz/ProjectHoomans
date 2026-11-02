@@ -37,6 +37,13 @@ from .sweep_buckets import (
     build_bucket_inventory,
     get_bucket_policy,
 )
+from .sweep_cluster import (
+    ALLOWED_CLUSTER_SCHEMAS,
+    CLUSTER_SCHEMA_V1,
+    ClusterAggregator,
+    DialogueClusterReport,
+    DialogueQualityCluster,
+)
 from .sweep_dimensions import (
     EXPLICIT_SCENARIO_ADAPTERS,
     InvalidDimensionValueError,
@@ -62,6 +69,10 @@ from .sweep_planner import (
     CoveragePlanner,
     PlannedCase,
 )
+from .sweep_quality import (
+    ALLOWED_SHORT_WORDS,
+    QualityAnalyzer,
+)
 from .sweep_reachability import (
     ALLOWED_REACHABILITY_SCHEMAS,
     REACHABILITY_SCHEMA_V1,
@@ -73,16 +84,22 @@ from .sweep_reachability import (
 
 __all__ = [
     "ABSENT",
+    "ALLOWED_CLUSTER_SCHEMAS",
     "ALLOWED_EVIDENCE_SCHEMAS",
     "ALLOWED_MANIFEST_SCHEMAS",
     "ALLOWED_REACHABILITY_SCHEMAS",
+    "ALLOWED_SHORT_WORDS",
     "AssertionFailure",
     "BucketPolicy",
+    "CLUSTER_SCHEMA_V1",
     "CaseResult",
+    "ClusterAggregator",
     "ConflictLedger",
     "CoveragePlan",
     "CoveragePlanner",
     "DEFAULT_SURFACES",
+    "DialogueClusterReport",
+    "DialogueQualityCluster",
     "EVIDENCE_SCHEMA_V1",
     "EXPLICIT_SCENARIO_ADAPTERS",
     "HarnessCase",
@@ -94,6 +111,7 @@ __all__ = [
     "PERSONALITY_DIMENSIONS",
     "PlannedCase",
     "PrerequisiteDimensionError",
+    "QualityAnalyzer",
     "QualityFlag",
     "REACHABILITY_SCHEMA_V1",
     "RELATIONSHIP_BUCKETS",

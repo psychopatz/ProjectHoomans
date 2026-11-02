@@ -4,9 +4,9 @@
 
 ## Current repository baseline
 
-- ProjectHoomans local main: 25ef210b after P3 commit.
+- ProjectHoomans local main: b2c75991 after P4 commit.
 - Worktree clean before edits.
-- Local main is ahead of origin/main by 21 commits (preserved, unpublished).
+- Local main is ahead of origin/main by 22 commits (preserved, unpublished).
 - No native Project Zomboid, source-save mutation or Workshop publication occurred.
 
 ## Phase state
@@ -18,8 +18,8 @@
 | P2 — Buckets + planner | **COMPLETE** | `sweep_buckets.py` provides bounded policies and production thresholds (PNC_RelationshipConstants, NEED_METER_THRESHOLDS); `sweep_planner.py` implements smoke, boundary, pairwise covering array (100% 2-way pair coverage), persona, and full-bounded union with stable IDs; 7 tests pass in `test_sweep_p2_planner.py` (0.014s). |
 | P3 — Batch/resume | **COMPLETE** | `sweep_batch.py` implements `SweepManifest` (`pnc.semantic-dialogue-quality-manifest.v1`), bounded batch execution (<=64 cases), atomic manifest saving, streaming `evidence.jsonl`, cancellation callback, and `StaleFingerprintError` protection; 5 tests pass in `test_sweep_p3_batch.py` (4.2s) including real Lua execution and safe resume. |
 | P4 — Reachability/provenance frontier | **COMPLETE** | `sweep_reachability.py` provides truthful 5-state variant reachability analysis (`UNTESTED`, `TESTED_INELIGIBLE`, `ELIGIBLE_NOT_SELECTED`, `SELECTED`, `SELECTED_UNDER_SUSPICIOUS_CONTEXT`) without overclaiming global unreachability; 3 tests pass in `test_sweep_p4_reachability.py` (1.4s). |
-| P5 — Quality flags/clusters | **IN PROGRESS** | Designing deterministic dialogue quality analyzer, known defect classes (`family` term without bond), and canonical-source clustering. |
-| P6 — CLI/review/UI | **NOT STARTED** | Requires P5. |
+| P5 — Quality flags/clusters | **COMPLETE** | `sweep_quality.py` implements deterministic quality flags with mandatory positive/negative controls (empty, fragments, leaks, unsupported family terms without bond, intimacy without bond); `sweep_cluster.py` clusters defects by canonical source cause and surfaces representative examples and affected case IDs; 3 tests pass in `test_sweep_p5_quality.py` (0.001s). |
+| P6 — CLI/review/UI | **IN PROGRESS** | Designing CLI commands, LLM review bundles, targeted replay, and Simulation Quality Sweep UI tab. |
 | P7 — Integrated acceptance | **NOT STARTED** | Requires P1–P6. |
 
 ## Preserved accepted foundations
@@ -34,36 +34,22 @@ Do not regress or rebuild:
 - existing CodeBuilder/Dialogue Content canonical source ownership;
 - existing GUI isolation and Simulation-vs-Studio ownership rules.
 
-## Immediate Next Chunk — P5 (Dialogue Quality Analyzer & Canonical-Source Clustering)
+## Immediate Next Chunk — P6 (Agent CLI, Review Bundles, Targeted Replay, and Simulation UI)
 
-Implement P5A, P5B, and P5C in `tools/semantic_harness/testing/sweep_quality.py` and `sweep_cluster.py`:
-1. `QualityAnalyzer`:
-   - High-confidence deterministic flags with severity (`CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, `INFO`) and confidence (`DEFINITE`, `SUSPECT`, `REVIEW`):
-     - `EMPTY_RESPONSE`
-     - `ONE_WORD_RESPONSE`
-     - `VERY_SHORT_FRAGMENT`
-     - `EXCESSIVE_LENGTH`
-     - `PLACEHOLDER_LEAK` (e.g. `{0}`, `%s`, `<var>`, `NaN`, `nil`)
-     - `TRANSLATION_KEY_LEAK` (e.g. strings starting with `IGUI_` or `UI_`)
-     - `MISSING_REQUIRED_ARGUMENT`
-     - `DUPLICATE_RENDERED_TEXT`
-     - `REPEATED_RECENT_TEXT`
-     - `UNSUPPORTED_FAMILY_REFERENCE` (e.g. "family", "sister", "brother", "mother", "father" when bond context is not a family bond!)
-     - `RELATIONSHIP_TERM_WITHOUT_BOND` (intimacy/romantic terms when bond is not lover)
-     - `IDENTITY_TERM_WITHOUT_KNOWLEDGE` (private name usage when familiarity < 5 or identityTrust < 50)
-     - `PERSPECTIVE_SUSPECT` (uses semantic subject/referent information)
-     - `GENERIC_ACKNOWLEDGEMENT_SUSPECT`
-   - Mandatory negative controls:
-     - Short valid words ("Yeah.", "No.", "Right.") are NOT flagged as fragments if intentional.
-     - Family terms ("family", "sister", "brother") are NOT flagged when supported by valid family bond context!
-2. Canonical-source Clustering (`sweep_cluster.py`):
-   - Clusters rows by root cause:
-     - `canonicalSourceOwner + phraseID / semanticVariantID`
-     - `responsePool + realizationFamily`
-     - `qualityFlagSignature`
-   - Surfaces representative examples, affected context ranges, affected case IDs, and suggested remedy.
-3. User-observed defect demonstration:
-   - Prove the one-word "family" defect class: when rendered text is "family" (or contains family address) but bond is None or not family, it is flagged as `UNSUPPORTED_FAMILY_REFERENCE` (CRITICAL / DEFINITE). When bond is "sister" or "family", it passes cleanly as supported.
+Implement P6A, P6B, and P6C:
+1. `tools/semantic_harness/testing/sweep_review.py`:
+   - LLM review bundles: token-efficient summaries of defective clusters (3-10 representative examples, context ranges, canonical source owners, contrast examples).
+   - Targeted affected replay: loads affected case IDs from clusters or filter criteria and replays them into a new targeted batch run.
+2. `tools/semantic_harness/testing/sweep_service.py` & CLI integration (`tools/semantic_harness/cli.py`):
+   - `sweep plan --strategy <smoke|boundary|pairwise|persona|full> --sweep-id <id>`
+   - `sweep run --sweep-id <id> [--resume] [--batch-size 64]`
+   - `sweep status --sweep-id <id>`
+   - `sweep report --sweep-id <id> [--severity <sev>] [--flag <flag>] [--bundle]`
+   - `sweep replay --sweep-id <id> --cluster-id <cid> | --case-id <cid>`
+3. Simulation Quality Sweep GUI:
+   - Added inside existing Simulation workbench (`tools/semantic_harness/ui/simulation_sweep_panel.py`).
+   - Strategy selector, plan estimate, batch progress bar, cluster list with severity badges, compact evidence table, lazy Conversation Inspector link, and targeted replay button.
+   - Hermetic UI tests in `test_sweep_p6_ui.py`.
 
 ## Stop rules
 
