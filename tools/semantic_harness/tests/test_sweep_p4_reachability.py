@@ -9,10 +9,13 @@ from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.testing.sweep_reachability import (
     REACHABILITY_SCHEMA_V1,
+    ObservedVariantLedger,
     ReachabilityAnalyzer,
     ReachabilityReport,
     VariantReachabilityRecord,
     VariantReachabilityState,
+    find_frontier_targets,
+    synthesize_condition_contexts,
 )
 
 
@@ -118,6 +121,122 @@ class SweepP4ReachabilityTests(unittest.TestCase):
             )
             self.assertEqual(report.total_pools, 5)
             self.assertGreater(report.total_variants, 0)
+
+
+    def test_observed_variant_ledger(self) -> None:
+        """Verify that ObservedVariantLedger aggregates execution truth correctly."""
+        ledger = ObservedVariantLedger()
+        row1 = {
+            "identity": {"caseID": "c1", "language": "EN", "plannedSurface": "utterance:hello"},
+            "selectionProvenance": {"selectedVariantID": "variant.hello.01", "selectedPoolID": "pool.hello"},
+            "trigger": {"parameters": {"player.needs.hunger": 0.2}},
+            "output": {"finalText": "Hello there."},
+        }
+        row2 = {
+            "identity": {"caseID": "c2", "language": "TL", "plannedSurface": "utterance:hello"},
+            "selectionProvenance": {"selectedVariantID": "variant.hello.01", "selectedPoolID": "pool.hello"},
+            "trigger": {"parameters": {"player.needs.hunger": 0.8}},
+            "output": {"finalText": "Kamusta ka."},
+        }
+        row3 = {
+            "identity": {"caseID": "c3", "language": "EN", "plannedSurface": "utterance:bye"},
+            "selectionProvenance": {"selectedVariantID": "variant.bye.01", "selectedPoolID": "pool.bye"},
+            "trigger": {"parameters": {}},
+            "output": {"finalText": "Goodbye."},
+        }
+
+        self.assertEqual(ledger.record_row(row1), "variant.hello.01")
+        self.assertEqual(ledger.record_rows([row2, row3]), 2)
+        self.assertEqual(ledger.total_observed_variants(), 2)
+        self.assertTrue(ledger.is_observed("variant.hello.01"))
+        self.assertTrue(ledger.is_observed("variant.bye.01"))
+        self.assertFalse(ledger.is_observed("variant.unseen.01"))
+
+        entry = ledger.get_entry("variant.hello.01")
+        self.assertIsNotNone(entry)
+        self.assertEqual(entry.count, 2)
+        self.assertEqual(entry.languages, {"EN", "TL"})
+        self.assertEqual(entry.surfaces, {"utterance:hello"})
+        self.assertEqual(len(entry.rendered_sentences), 2)
+        self.assertEqual(len(entry.context_vectors), 2)
+
+        d = ledger.to_dict()
+        self.assertEqual(d["totalObservedVariants"], 2)
+        self.assertIn("variant.hello.01", d["entries"])
+
+    def test_condition_guided_frontier_search_reaches_unobserved_variants(self) -> None:
+        """Verify that condition-guided search uses failed checks to reach unobserved variants."""
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            analyzer = ReachabilityAnalyzer(worker)
+
+            # Analyze pool semantic.flow.farewell where initially no rows exist
+            report = analyzer.analyze_reachability(
+                [],
+                worker=worker,
+                target_pools=["semantic.flow.farewell"],
+            )
+            rec_map = {r.variant_id: r for r in report.pool_records["semantic.flow.farewell"]}
+
+            # Both variants should be reached/classified through frontier evaluation
+            self.assertIn("semantic.flow.farewell.default", rec_map)
+            self.assertIn("semantic.flow.farewell.friendly", rec_map)
+
+            # semantic.flow.farewell.friendly requires socialStyle='friendly', which condition synthesis solves!
+            friendly_rec = rec_map["semantic.flow.farewell.friendly"]
+            self.assertEqual(friendly_rec.status, VariantReachabilityState.SELECTED)
+            self.assertFalse(friendly_rec.global_unreachable_claim)
+
+            # Report includes ledger metadata
+            self.assertIn("ledger", report.to_dict())
+
+    def test_genuine_eligible_not_selected_variant(self) -> None:
+        """Verify a genuine ELIGIBLE_NOT_SELECTED variant where candidate is eligible but another variant wins."""
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            # Under empty context, semantic.combat.human_kill.aggressive has 3 eligible variants, but line_02 wins tiebreak
+            exp = worker.explain_response_selection("semantic.combat.human_kill.aggressive", {})
+            self.assertTrue(exp.get("ok"))
+            sel_id = exp.get("selectedID")
+            candidates = exp.get("candidates", [])
+
+            eligible_not_selected = [
+                c for c in candidates
+                if c.get("eligible") and c.get("id") != sel_id
+            ]
+            self.assertGreaterEqual(len(eligible_not_selected), 1)
+
+            target = eligible_not_selected[0]
+            self.assertTrue(target["eligible"])
+            self.assertNotEqual(target["id"], sel_id)
+
+            # Analyzer reflects ELIGIBLE_NOT_SELECTED on target variant
+            analyzer = ReachabilityAnalyzer(worker)
+            report = analyzer.analyze_reachability(
+                [],
+                worker=worker,
+                target_pools=["semantic.combat.human_kill.aggressive"],
+            )
+            rec_map = {r.variant_id: r for r in report.pool_records["semantic.combat.human_kill.aggressive"]}
+            self.assertEqual(rec_map[target["id"]].status, VariantReachabilityState.ELIGIBLE_NOT_SELECTED)
+            self.assertFalse(rec_map[target["id"]].global_unreachable_claim)
+
+    def test_find_frontier_targets(self) -> None:
+        """Verify find_frontier_targets discovers unobserved variants with reachable contexts."""
+        with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
+            ledger = ObservedVariantLedger()
+            # Only record default
+            ledger.entries["semantic.flow.farewell.default"] = True
+
+            targets = find_frontier_targets(
+                worker,
+                ledger,
+                pool_ids=["semantic.flow.farewell"],
+                limit=5,
+            )
+            self.assertGreaterEqual(len(targets), 1)
+            target = targets[0]
+            self.assertEqual(target["poolID"], "semantic.flow.farewell")
+            self.assertEqual(target["variantID"], "semantic.flow.farewell.friendly")
+            self.assertIn("socialStyle", target["context"])
 
 
 if __name__ == "__main__":

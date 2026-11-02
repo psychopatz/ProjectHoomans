@@ -553,6 +553,30 @@ def cli(arguments: argparse.Namespace) -> int:
                     _print_result(reachability.to_dict(), arguments.jsonl)
                     emit_activity()
                     return 0
+                if getattr(arguments, "sweep_sentences", False):
+                    rows = service.load_evidence_rows(sweep_id)
+                    service.quality_analyzer.analyze_run(rows)
+                    lang_filter = getattr(arguments, "sweep_language", None)
+                    if lang_filter:
+                        rows = [
+                            r for r in rows
+                            if r.get("identity", {}).get("language", "").upper() == lang_filter.upper()
+                        ]
+                    flag_filter = getattr(arguments, "sweep_flag", None)
+                    if flag_filter:
+                        rows = [
+                            r for r in rows
+                            if any(f.get("name") == flag_filter for f in r.get("quality", {}).get("flags", []))
+                        ]
+                    _print_result({
+                        "ok": True,
+                        "type": "sweep_sentences",
+                        "sweepID": sweep_id,
+                        "count": len(rows),
+                        "sentences": rows,
+                    }, arguments.jsonl)
+                    emit_activity()
+                    return 0
                 cluster_report = service.generate_cluster_report(sweep_id)
                 filtered = cluster_report.filter_by(
                     severity=getattr(arguments, "sweep_severity", None),
@@ -560,6 +584,9 @@ def cli(arguments: argparse.Namespace) -> int:
                     pool=getattr(arguments, "sweep_pool", None),
                     source=getattr(arguments, "sweep_source", None),
                 )
+                if getattr(arguments, "sweep_language", None):
+                    lang_req = arguments.sweep_language.upper()
+                    filtered = [c for c in filtered if lang_req in c.languages]
                 rep_dict = cluster_report.to_dict()
                 rep_dict["clusters"] = [c.to_dict() for c in filtered]
                 _print_result(rep_dict, arguments.jsonl)
@@ -1225,7 +1252,7 @@ def _parser() -> argparse.ArgumentParser:
     sweep_ops.add_argument("--sweep-report", action="store_true", help="output defect cluster report")
     sweep_ops.add_argument("--sweep-replay", action="store_true", help="replay affected cases from clusters")
     parser.add_argument("--sweep-id", default="dialogue_sweep_v1", help="unique sweep ID")
-    parser.add_argument("--sweep-strategy", default="smoke", choices=["smoke", "boundary", "pairwise", "persona", "full"], help="sweep coverage strategy")
+    parser.add_argument("--sweep-strategy", default="smoke", choices=["smoke", "boundary", "pairwise", "persona", "full", "review"], help="sweep coverage strategy")
     parser.add_argument("--sweep-batch-size", type=int, default=64, help="cases per batch (<= 64)")
     parser.add_argument("--sweep-max-cases", type=int, default=512, help="maximum cases cap")
     parser.add_argument("--sweep-cluster-id", help="filter or replay specific cluster ID")
@@ -1234,10 +1261,12 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--sweep-flag", help="filter cluster report by flag name")
     parser.add_argument("--sweep-source", help="filter cluster report by canonical source owner")
     parser.add_argument("--sweep-pool", help="filter cluster report by pool ID")
+    parser.add_argument("--sweep-language", help="filter cluster or sentence report by language (EN/TL)")
     parser.add_argument("--sweep-surfaces", nargs="*", help="interaction surfaces to target")
     parser.add_argument("--sweep-languages", nargs="*", help="languages to target (e.g. EN TL)")
     parser.add_argument("--sweep-bundle", action="store_true", help="emit LLM review bundle instead of cluster report")
     parser.add_argument("--sweep-reachability", action="store_true", help="emit variant reachability report")
+    parser.add_argument("--sweep-sentences", action="store_true", help="output generated sentence rows instead of cluster report")
     parser.add_argument("--input", action="append", default=[], help="chat input; repeatable")
     parser.add_argument("--timeout", type=float, default=5.0, help="per-request timeout in seconds")
     parser.add_argument("--startup-timeout", type=float, default=8.0, help="worker startup timeout in seconds")

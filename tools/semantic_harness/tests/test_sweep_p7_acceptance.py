@@ -178,49 +178,62 @@ class SweepP7AcceptanceTests(unittest.TestCase):
             self.assertEqual(rows_friendly[0]["trigger"]["relationshipSummary"]["approval"], 75.0)
 
             # --- Demonstration 4: Supported family wording vs unsupported-family defect class ---
-            # Supported family:
-            row_supported_sister = {
-                "identity": {"caseID": "c4_supported"},
-                "output": {"finalText": "You are my sister, I've got your back."},
-                "trigger": {"relationshipSummary": {"bondKind": "sister", "bondClass": "family"}},
-                "semanticPath": {"semanticTemplateID": "wellbeing.reply"},
-                "quality": {},
-            }
+            # 1. Supported family: real worker turn with sister bond
+            sc_sister = self.inventory.project_to_scenario(
+                {"persona.bondKind": "sister", "relationship.approval": 80.0}
+            )
+            with LuaSemanticWorker(sc_sister) as sister_worker:
+                rec_sister = sister_worker.input("how are you?")
+                rows_sister = extract_evidence_rows_from_turn(
+                    rec_sister,
+                    turn_index=0,
+                    case_id="c4_sister_real",
+                    parameters={"persona.bondKind": "sister"},
+                    worker=sister_worker,
+                )
+            self.assertGreaterEqual(len(rows_sister), 1)
+            row_sister = rows_sister[0]
+            self.assertEqual(row_sister["trigger"]["relationshipSummary"]["bondKind"], "sister")
+            # When family wording is present with supported family bond, it is NOT flagged
+            row_supported_sister = deepcopy(row_sister)
+            row_supported_sister["output"]["finalText"] = "You are my sister, I've got your back."
             flags_supported = analyzer.analyze_row(row_supported_sister)
             self.assertFalse(any(f.name == "UNSUPPORTED_FAMILY_REFERENCE" for f in flags_supported))
 
-            # Unsupported family (user-observed defect class):
-            row_unsupported_family = {
-                "identity": {"caseID": "c4_unsupported"},
-                "output": {"finalText": "family"},
-                "trigger": {"relationshipSummary": {"bondKind": "none", "bondClass": "none"}},
-                "semanticPath": {"semanticTemplateID": "wellbeing.reply"},
-                "quality": {},
-            }
+            # 2. Unsupported family: real worker turn with stranger/no bond
+            sc_stranger = self.inventory.project_to_scenario({"relationship.approval": 0.0})
+            with LuaSemanticWorker(sc_stranger) as stranger_worker:
+                rec_stranger = stranger_worker.input("how are you?")
+                rows_stranger = extract_evidence_rows_from_turn(
+                    rec_stranger,
+                    turn_index=0,
+                    case_id="c4_stranger_real",
+                    parameters={},
+                    worker=stranger_worker,
+                )
+            self.assertGreaterEqual(len(rows_stranger), 1)
+            row_stranger = rows_stranger[0]
+            self.assertEqual(row_stranger["trigger"]["relationshipSummary"].get("bondKind", "none"), "none")
+            # When family reference occurs without family bond, it is flagged as UNSUPPORTED_FAMILY_REFERENCE
+            row_unsupported_family = deepcopy(row_stranger)
+            row_unsupported_family["output"]["finalText"] = "family"
             flags_unsupported = analyzer.analyze_row(row_unsupported_family)
             flag_names = {f.name for f in flags_unsupported}
             self.assertIn("UNSUPPORTED_FAMILY_REFERENCE", flag_names)
             self.assertIn("ONE_WORD_RESPONSE", flag_names)
 
             # --- Demonstration 5: Perspective check: known-good vs wrong-perspective ---
-            row_good_perspective = {
-                "identity": {"caseID": "c5_good"},
-                "output": {"finalText": "I'm doing alright, thanks."},
-                "trigger": {},
-                "semanticPath": {"intent": "WELLBEING_RESPONSE"},
-                "quality": {},
-            }
-            flags_good = analyzer.analyze_row(row_good_perspective)
+            rec_good = worker.input("how are you?")
+            rows_good = extract_evidence_rows_from_turn(
+                rec_good, turn_index=0, case_id="c5_good_real", worker=worker
+            )
+            row_good = rows_good[0]
+            flags_good = analyzer.analyze_row(row_good)
             self.assertFalse(any(f.name == "PERSPECTIVE_SUSPECT" for f in flags_good))
 
-            row_bad_perspective = {
-                "identity": {"caseID": "c5_bad"},
-                "output": {"finalText": "You are feeling sick and tired."},
-                "trigger": {},
-                "semanticPath": {"intent": "WELLBEING_RESPONSE"},
-                "quality": {},
-            }
-            flags_bad = analyzer.analyze_row(row_bad_perspective)
+            row_bad = deepcopy(row_good)
+            row_bad["output"]["finalText"] = "You are feeling sick and tired."
+            flags_bad = analyzer.analyze_row(row_bad)
             self.assertTrue(any(f.name == "PERSPECTIVE_SUSPECT" for f in flags_bad))
 
             # --- Demonstration 6: EN and TL language parity ---
@@ -239,12 +252,17 @@ class SweepP7AcceptanceTests(unittest.TestCase):
             worker.set_language("EN")
             rec_turn1 = worker.input("hello")
             rec_turn2 = worker.input("hello")
-            rows_turn1 = extract_evidence_rows_from_turn(rec_turn1, turn_index=0, case_id="c7_anti_repeat", worker=worker)
-            rows_turn2 = extract_evidence_rows_from_turn(rec_turn2, turn_index=1, case_id="c7_anti_repeat", worker=worker)
+            rows_turn1 = extract_evidence_rows_from_turn(rec_turn1, turn_index=0, case_id="c7_anti_repeat_1", worker=worker)
+            rows_turn2 = extract_evidence_rows_from_turn(rec_turn2, turn_index=1, case_id="c7_anti_repeat_2", worker=worker)
             self.assertGreaterEqual(len(rows_turn1), 1)
             self.assertGreaterEqual(len(rows_turn2), 1)
-            # Prove payload anti-repeat tracking
-            self.assertIn("phraseAntiRepeatReason", rec_turn1["messages"][0]["payload"])
+            p1 = rec_turn1["messages"][0]["payload"]
+            p2 = rec_turn2["messages"][0]["payload"]
+            # Prove actual phrase rotation and selection penalty from live history
+            self.assertNotEqual(p1.get("phraseID"), p2.get("phraseID"))
+            self.assertNotEqual(p1.get("text"), p2.get("text"))
+            self.assertEqual(p1.get("phraseAntiRepeatReason"), "initial_canonical")
+            self.assertEqual(p2.get("phraseAntiRepeatReason"), "deterministic_hash")
 
             # --- Demonstration 8: Response variant selected under more than one context ---
             # Distinct parameter vectors player.hunger=0.2 and 0.8 reaching same response
@@ -259,36 +277,45 @@ class SweepP7AcceptanceTests(unittest.TestCase):
                 r2[0]["semanticPath"]["semanticTemplateID"],
             )
 
-            # --- Demonstration 9: Truly ELIGIBLE_NOT_SELECTED or TESTED_INELIGIBLE variant via explain ---
-            exp_accept = worker.explain_response_selection("semantic.accept", {})
-            self.assertEqual(exp_accept.get("selectedID"), "semantic.accept.default")
-            cands = {c["id"]: c for c in exp_accept.get("candidates", [])}
-            self.assertIn("semantic.accept.default", cands)
-            self.assertIn("semantic.accept.request", cands)
-            self.assertTrue(cands["semantic.accept.default"]["eligible"])
-            self.assertFalse(cands["semantic.accept.request"]["eligible"])
-            self.assertEqual(cands["semantic.accept.request"]["reason"], "condition_mismatch")
+            # --- Demonstration 9: Truly ELIGIBLE_NOT_SELECTED variant via explain ---
+            exp_combat = worker.explain_response_selection("semantic.combat.human_kill.aggressive", {})
+            self.assertTrue(exp_combat.get("ok"))
+            sel_id = exp_combat.get("selectedID")
+            cands = exp_combat.get("candidates", [])
+            eligible_cands = [c for c in cands if c.get("eligible")]
+            self.assertGreaterEqual(len(eligible_cands), 2)
+            target_cand = next(c for c in eligible_cands if c["id"] != sel_id)
+            self.assertTrue(target_cand["eligible"])
+            self.assertNotEqual(target_cand["id"], sel_id)
 
-            # --- Demonstration 10: Canonical cluster from one phrase defect + targeted replay ---
-            cluster_rows = [
-                {
-                    "identity": {"caseID": f"c10_case_{i}", "language": "EN"},
-                    "output": {"finalText": "family"},
-                    "trigger": {
-                        "parameters": {"player.needs.hunger": i * 0.1},
-                        "relationshipSummary": {"bondKind": "none"},
-                    },
-                    "semanticPath": {
-                        "semanticTemplateID": "wellbeing.reply",
-                        "phraseID": "phrase_defective_family",
-                    },
-                    "selectionProvenance": {
-                        "canonicalSourceOwner": "dialogue_dataset.wellbeing",
-                    },
-                    "quality": {},
-                }
-                for i in range(4)
-            ]
+            analyzer_r = ReachabilityAnalyzer(worker)
+            report_r = analyzer_r.analyze_reachability(
+                [],
+                worker=worker,
+                target_pools=["semantic.combat.human_kill.aggressive"],
+            )
+            records_r = {r.variant_id: r for r in report_r.pool_records["semantic.combat.human_kill.aggressive"]}
+            self.assertEqual(records_r[target_cand["id"]].status, VariantReachabilityState.ELIGIBLE_NOT_SELECTED)
+            self.assertFalse(records_r[target_cand["id"]].global_unreachable_claim)
+
+            # --- Demonstration 10: Canonical cluster from defect + targeted replay ---
+            cluster_rows = []
+            for i in range(4):
+                sc_c10 = self.inventory.project_to_scenario({"player.needs.hunger": i * 0.2})
+                with LuaSemanticWorker(sc_c10) as w10:
+                    rec_10 = w10.input("how are you?")
+                    r_10 = extract_evidence_rows_from_turn(
+                        rec_10,
+                        turn_index=0,
+                        case_id=f"c10_case_{i}",
+                        parameters={"player.needs.hunger": i * 0.2},
+                        worker=w10,
+                    )[0]
+                    # Simulate unreplaced family text on this source owner
+                    r_10["output"]["finalText"] = "family"
+                    r_10["selectionProvenance"]["canonicalSourceOwner"] = "dialogue_dataset.wellbeing"
+                    cluster_rows.append(r_10)
+
             cluster_report = aggregator.aggregate_rows(cluster_rows, sweep_id="demo_c10")
             fam_clusters = cluster_report.filter_by(flag="UNSUPPORTED_FAMILY_REFERENCE")
             self.assertEqual(len(fam_clusters), 1)
@@ -303,17 +330,35 @@ class SweepP7AcceptanceTests(unittest.TestCase):
                 plan_digest="orig_dig",
                 catalog_fingerprint=self.inventory.production_fingerprint,
                 cases=[
-                    PlannedCase(case_id=f"c10_case_{i}", sweep_id="demo_c10", strategy="smoke", surface="s", parameters={})
-                    for i in range(10)
+                    PlannedCase(
+                        case_id=f"c10_case_{i}",
+                        sweep_id="demo_c10",
+                        strategy="smoke",
+                        surface="utterance:how are you?",
+                        parameters={"player.needs.hunger": i * 0.2},
+                        turns=({"text": "how are you?"},),
+                    )
+                    for i in range(4)
                 ],
-                total_cases=10,
+                total_cases=4,
                 estimated_batches=1,
                 batch_size=64,
             )
             affected_cases = cluster_report.get_affected_case_ids([c.cluster_id])
             replay_plan = self.service.plan_replay(orig_plan, affected_cases)
             self.assertEqual(replay_plan.total_cases, 4)
-            self.assertEqual([case.metadata.get("originalCaseID") for case in replay_plan.cases], [f"c10_case_{i}" for i in range(4)])
+            self.assertEqual(
+                [case.metadata.get("originalCaseID") for case in replay_plan.cases],
+                [f"c10_case_{i}" for i in range(4)],
+            )
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                svc_rep = DialogueQualitySweepService(base_dir=tmp_dir)
+                rep_manifest = svc_rep.run_sweep(
+                    replay_plan,
+                    inventory=self.inventory,
+                    batch_size=64,
+                )
+                self.assertEqual(rep_manifest.completed_cases, 4)
 
             # --- Demonstration 11: Stale/missing planned surface detected as invalid surface ---
             with tempfile.TemporaryDirectory() as tmp_dir:
@@ -405,6 +450,38 @@ class SweepP7AcceptanceTests(unittest.TestCase):
             total_reported = first_page.get("total", 234)
             self.assertEqual(len(all_pools), total_reported)
             self.assertEqual(len(all_pools), 234)
+
+    def test_frontier_expansion_discovers_unique_variant(self) -> None:
+        """Verify that frontier expansion discovers at least one additional unique selected variant beyond baseline review."""
+        from tools.semantic_harness.testing.sweep_reachability import ObservedVariantLedger
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            svc = DialogueQualitySweepService(base_dir=tmp_dir)
+            smoke_plan = svc.plan_sweep(
+                strategy="smoke",
+                sweep_id="demo_frontier_expand",
+                languages=["EN"],
+            )
+            svc.run_sweep(smoke_plan)
+            baseline_rows = svc.load_evidence_rows("demo_frontier_expand")
+            baseline_ledger = ObservedVariantLedger()
+            baseline_ledger.record_rows(baseline_rows)
+            baseline_variants = baseline_ledger.observed_variant_ids()
+
+            # Expand frontier
+            new_rows = svc.expand_frontier_sentences("demo_frontier_expand", max_new_cases=4)
+            self.assertGreaterEqual(len(new_rows), 1)
+
+            expanded_rows = svc.load_evidence_rows("demo_frontier_expand")
+            expanded_ledger = ObservedVariantLedger()
+            expanded_ledger.record_rows(expanded_rows)
+            expanded_variants = expanded_ledger.observed_variant_ids()
+
+            new_unique = expanded_variants - baseline_variants
+            self.assertGreaterEqual(
+                len(new_unique), 1,
+                f"Frontier targeting must discover at least 1 new unique variant beyond baseline: {new_unique}"
+            )
 
 
 if __name__ == "__main__":

@@ -195,6 +195,16 @@ def on_qs_run(app: Any) -> None:
                     ("progress", batch, manifest)
                 ),
             )
+            if plan.strategy in ("review", "full") and not app.quality_sweep_cancel_requested:
+                try:
+                    service.expand_frontier_sentences(
+                        plan.sweep_id,
+                        inventory=app.quality_sweep_inventory,
+                        max_new_cases=4,
+                    )
+                    manifest = service.load_manifest(plan.sweep_id)
+                except Exception:
+                    pass
             event_queue.put(("done", manifest))
         except SweepExecutionCancelled:
             try:

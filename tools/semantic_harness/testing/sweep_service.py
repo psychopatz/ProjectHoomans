@@ -237,3 +237,117 @@ class DialogueQualitySweepService:
                 parameters=parameters,
                 inventory=inv,
             )
+
+    def expand_frontier_sentences(
+        self,
+        sweep_id: str,
+        *,
+        max_new_cases: int = 16,
+        worker: Any | None = None,
+        inventory: SweepDimensionInventory | None = None,
+    ) -> list[dict[str, Any]]:
+        """Discover unobserved variants, execute targeted frontier cases, and append evidence rows."""
+        from .sweep_evidence import extract_evidence_rows_from_turn
+        from .sweep_reachability import ObservedVariantLedger, find_frontier_targets
+
+        manifest = self.load_manifest(sweep_id)
+        evidence_path = self.base_dir / sweep_id / "evidence.jsonl"
+        manifest_path = self.base_dir / sweep_id / "manifest.json"
+        existing_rows = self.load_evidence_rows(sweep_id)
+
+        ledger = ObservedVariantLedger()
+        ledger.record_rows(existing_rows)
+
+        inv = inventory or self.get_dimension_inventory(worker)
+
+        def run_frontier_with_worker(active_worker: Any) -> list[dict[str, Any]]:
+            pools_to_search = [
+                "semantic.flow.greeting.opening",
+                "semantic.flow.farewell",
+                "semantic.question.identity",
+                "semantic.question.wellbeing",
+                "semantic.question.whats_up",
+            ]
+            targets = find_frontier_targets(
+                active_worker,
+                ledger,
+                pool_ids=pools_to_search,
+                limit=max_new_cases,
+            )
+            if not targets:
+                return []
+
+            new_rows: list[dict[str, Any]] = []
+
+            for i, target in enumerate(targets):
+                pool_id = target["poolID"]
+                ctx = target["context"]
+                surface = "utterance:hello"
+                turn_text = "hello"
+
+                if "farewell" in pool_id:
+                    surface = "utterance:goodbye"
+                    turn_text = "goodbye"
+                elif "identity" in pool_id:
+                    surface = "utterance:who are you?"
+                    turn_text = "who are you?"
+                elif "wellbeing" in pool_id:
+                    surface = "utterance:how are you?"
+                    turn_text = "how are you?"
+                elif "whats_up" in pool_id:
+                    surface = "utterance:what's up?"
+                    turn_text = "what's up?"
+
+                params: dict[str, Any] = {}
+                if "socialStyle" in ctx:
+                    params["persona.socialStyle"] = ctx["socialStyle"]
+                if "relationship" in ctx:
+                    rel = ctx["relationship"]
+                    if "approval" in rel:
+                        params["relationship.approval"] = float(rel["approval"])
+                    if "respect" in rel:
+                        params["relationship.respect"] = float(rel["respect"])
+                    if "familiarity" in rel:
+                        params["relationship.familiarity"] = float(rel["familiarity"])
+                if "bond" in ctx:
+                    bond = ctx["bond"]
+                    if "kind" in bond:
+                        params["persona.bondKind"] = str(bond["kind"])
+                if "identityTrust" in ctx:
+                    params["relationship.identityTrust"] = str(ctx["identityTrust"])
+
+                case_id = f"{sweep_id}:frontier:{pool_id.replace('.', '_')}:{i}"
+                case_scenario = inv.project_to_scenario(params, DEFAULT_SCENARIO)
+
+                with self.worker_factory(case_scenario) as case_worker:
+                    rec = case_worker.input(turn_text)
+                    extracted = extract_evidence_rows_from_turn(
+                        rec,
+                        turn_index=0,
+                        case_id=case_id,
+                        sweep_id=sweep_id,
+                        strategy="frontier",
+                        parameters=params,
+                        planned_surface=surface,
+                        worker=case_worker,
+                    )
+                    for r in extracted:
+                        new_rows.append(r)
+                        ledger.record_row(r)
+
+            if new_rows:
+                with open(evidence_path, "a", encoding="utf-8") as f:
+                    for r in new_rows:
+                        f.write(json.dumps(r) + "\n")
+
+                # Update manifest
+                manifest.completed_cases += len(new_rows)
+                manifest.total_cases += len(new_rows)
+                manifest.save(self.base_dir / sweep_id)
+
+            return new_rows
+
+        if worker is not None:
+            return run_frontier_with_worker(worker)
+        with self.worker_factory(DEFAULT_SCENARIO) as temp_worker:
+            return run_frontier_with_worker(temp_worker)

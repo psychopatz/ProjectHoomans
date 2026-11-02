@@ -210,7 +210,10 @@ class QualityAnalyzer:
 
         # 8. PERSPECTIVE_SUSPECT
         intent = str(semantic_path.get("intent") or "").lower()
-        if "wellbeing" in intent and final_text.lower().startswith("you are "):
+        subject = str(semantic_path.get("subject") or "").lower()
+        template_id = str(semantic_path.get("semanticTemplateID") or "").lower()
+        is_wellbeing = "wellbeing" in intent or "wellbeing" in subject or "wellbeing" in template_id
+        if is_wellbeing and final_text.lower().startswith("you are "):
             flags.append(
                 QualityFlag(
                     name="PERSPECTIVE_SUSPECT",
