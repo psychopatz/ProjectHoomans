@@ -282,6 +282,33 @@ class SweepP2PlannerTests(unittest.TestCase):
         self.assertEqual(plan1.plan_digest, plan2.plan_digest)
         self.assertEqual([c.case_id for c in plan1.cases], [c.case_id for c in plan2.cases])
 
+
+    def test_full_bounded_balances_parameterized_cases_across_surfaces(self) -> None:
+        surfaces = (
+            "scenario.rootChoice:ask_name",
+            "scenario.rootChoice:recruit",
+            "scenario.utterance:hello",
+            "scenario.utterance:how are you?",
+        )
+        plan = self.planner.plan_full(
+            surfaces=surfaces,
+            languages=("EN",),
+            max_cases=64,
+        )
+        parameterized = {
+            surface: sum(
+                1 for case in plan.cases
+                if case.surface == surface and bool(case.parameters)
+            )
+            for surface in surfaces
+        }
+        self.assertTrue(all(count > 0 for count in parameterized.values()), parameterized)
+        self.assertLessEqual(
+            max(parameterized.values()) - min(parameterized.values()),
+            3,
+            parameterized,
+        )
+
     def test_batch_estimation(self) -> None:
         plan = self.planner.plan_smoke(
             surfaces=["scenario.rootChoice:ask_name"] * 10,

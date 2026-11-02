@@ -435,42 +435,111 @@ class CoveragePlanner:
         languages: Sequence[str] = ("EN", "TL"),
         max_cases: int = 1024,
     ) -> CoveragePlan:
-        """Full-bounded strategy: deterministic deduplicated union of smoke, boundary, pairwise, and persona."""
-        smoke_plan = self.plan_smoke(surfaces=surfaces, languages=languages)
-        boundary_plan = self.plan_boundary(surfaces=surfaces[:4], languages=languages, max_cases=max_cases // 3)
-        pairwise_plan = self.plan_pairwise(surfaces=surfaces[:2], languages=languages[:1], max_cases=max_cases // 3)
-        persona_plan = self.plan_persona(surfaces=surfaces[:3], languages=languages, max_cases=max_cases // 3)
+        """Balanced full-bounded review across every selected surface.
+
+        Earlier implementations exhausted the cap on the first one or two
+        surfaces.  The sentence-review workflow instead builds each strategy
+        across the complete surface set, then round-robins surfaces so the
+        bounded cap cannot starve later dialogue families.
+        """
+        surface_list = list(dict.fromkeys(surfaces))
+        language_list = list(dict.fromkeys(languages))
+        if not surface_list or not language_list or max_cases <= 0:
+            return self._build_plan("full", [])
+
+        # Generate enough candidate material for every surface. Planning is
+        # cheap; execution remains bounded by max_cases.
+        candidate_cap = max(
+            max_cases * 8,
+            len(surface_list) * max(1, len(language_list)) * 256,
+        )
+        smoke_plan = self.plan_smoke(
+            surfaces=surface_list,
+            languages=language_list,
+        )
+        boundary_plan = self.plan_boundary(
+            surfaces=surface_list,
+            languages=language_list,
+            max_cases=candidate_cap,
+        )
+        pairwise_plan = self.plan_pairwise(
+            surfaces=surface_list,
+            languages=language_list,
+            max_cases=candidate_cap,
+        )
+        persona_plan = self.plan_persona(
+            surfaces=surface_list,
+            languages=language_list,
+            max_cases=candidate_cap,
+        )
 
         combined_cases: list[PlannedCase] = []
         seen_keys: set[str] = set()
 
-        for plan in (smoke_plan, boundary_plan, pairwise_plan, persona_plan):
-            for c in plan.cases:
-                # Key by surface, language, and serialized parameters
-                param_key = json.dumps(sorted(c.parameters.items()), sort_keys=True)
-                dedup_key = f"{c.surface}:{c.language}:{param_key}"
-                if dedup_key not in seen_keys:
-                    seen_keys.add(dedup_key)
-                    case_id = _make_case_id(self.sweep_id, "full", c.surface, c.parameters, c.language)
-                    combined_cases.append(
-                        PlannedCase(
-                            case_id=case_id,
-                            sweep_id=self.sweep_id,
-                            strategy="full",
-                            surface=c.surface,
-                            parameters=c.parameters,
-                            language=c.language,
-                            turns=c.turns,
-                            metadata=c.metadata,
-                        )
-                    )
-                if len(combined_cases) >= max_cases:
-                    break
+        def add_case(c: PlannedCase) -> bool:
+            param_key = json.dumps(sorted(c.parameters.items()), sort_keys=True)
+            dedup_key = f"{c.surface}:{c.language}:{param_key}"
+            if dedup_key in seen_keys:
+                return False
+            seen_keys.add(dedup_key)
+            case_id = _make_case_id(
+                self.sweep_id, "full", c.surface, c.parameters, c.language
+            )
+            combined_cases.append(
+                PlannedCase(
+                    case_id=case_id,
+                    sweep_id=self.sweep_id,
+                    strategy="full",
+                    surface=c.surface,
+                    parameters=c.parameters,
+                    language=c.language,
+                    turns=c.turns,
+                    metadata=c.metadata,
+                )
+            )
+            return True
+
+        # Always seed each surface/language with its baseline before spending
+        # the remaining budget on richer contexts.
+        for c in smoke_plan.cases:
             if len(combined_cases) >= max_cases:
                 break
+            add_case(c)
 
-        # Stably sort by case_id for absolute reproducibility
-        combined_cases.sort(key=lambda x: x.case_id)
+        candidate_plans = (boundary_plan, pairwise_plan, persona_plan)
+        grouped: list[dict[str, list[PlannedCase]]] = []
+        for plan in candidate_plans:
+            by_surface: dict[str, list[PlannedCase]] = {
+                surface: [] for surface in surface_list
+            }
+            for c in plan.cases:
+                by_surface.setdefault(c.surface, []).append(c)
+            grouped.append(by_surface)
+
+        cursors: list[dict[str, int]] = [
+            {surface: 0 for surface in surface_list}
+            for _ in candidate_plans
+        ]
+
+        made_progress = True
+        while len(combined_cases) < max_cases and made_progress:
+            made_progress = False
+            for surface in surface_list:
+                for plan_idx, by_surface in enumerate(grouped):
+                    rows = by_surface.get(surface, [])
+                    cursor = cursors[plan_idx].get(surface, 0)
+                    while cursor < len(rows):
+                        candidate = rows[cursor]
+                        cursor += 1
+                        cursors[plan_idx][surface] = cursor
+                        if add_case(candidate):
+                            made_progress = True
+                            break
+                    if len(combined_cases) >= max_cases:
+                        break
+                if len(combined_cases) >= max_cases:
+                    break
+
         return self._build_plan("full", combined_cases)
 
     def _build_plan(self, strategy: str, cases: list[PlannedCase]) -> CoveragePlan:

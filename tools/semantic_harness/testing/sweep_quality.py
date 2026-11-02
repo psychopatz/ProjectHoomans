@@ -70,6 +70,16 @@ TRANSLATION_KEY_PATTERN = re.compile(
 VALID_FAMILY_BONDS = frozenset({"mother", "father", "sister", "brother"})
 
 
+def _optional_float(value: Any) -> float | None:
+    """Return a numeric value without crashing on categorical production states."""
+    if value is None or isinstance(value, bool):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 class QualityAnalyzer:
     """Evaluates evidence rows and attaches deterministic quality flags."""
 
@@ -83,8 +93,10 @@ class QualityAnalyzer:
         rel_summary = trigger.get("relationshipSummary", {})
         bond_kind = str(rel_summary.get("bondKind") or "none").lower()
         bond_class = str(rel_summary.get("bondClass") or "").lower()
-        familiarity = float(rel_summary.get("familiarity") or 0.0)
-        identity_trust = float(rel_summary.get("identityTrust") or 0.0)
+        familiarity = _optional_float(rel_summary.get("familiarity")) or 0.0
+        identity_trust_raw = rel_summary.get("identityTrust")
+        identity_trust = _optional_float(identity_trust_raw)
+        identity_trust_state = str(identity_trust_raw or "unknown").strip().lower()
 
         # 1. EMPTY_RESPONSE
         if not final_text:
@@ -174,7 +186,16 @@ class QualityAnalyzer:
         # Check if NPC uses player name when stranger / low trust
         player_id = trigger.get("actorSummary", {}).get("listenerID") or ""
         if player_id and len(player_id) > 2 and player_id.lower() in final_text.lower():
-            if familiarity < 5.0 or identity_trust < 50.0:
+            trust_is_low = (
+                (identity_trust is not None and identity_trust < 50.0)
+                or identity_trust_state in {"unknown", "untrusted", "none"}
+            )
+            if familiarity < 5.0 or trust_is_low:
+                trust_detail = (
+                    f"{identity_trust:.1f}"
+                    if identity_trust is not None
+                    else identity_trust_state
+                )
                 flags.append(
                     QualityFlag(
                         name="IDENTITY_TERM_WITHOUT_KNOWLEDGE",
@@ -182,7 +203,7 @@ class QualityAnalyzer:
                         confidence="SUSPECT",
                         detail=(
                             f"Name '{player_id}' used with low familiarity ({familiarity:.1f} < 5) "
-                            f"or low identity trust ({identity_trust:.1f} < 50)."
+                            f"or insufficient identity trust ({trust_detail})."
                         ),
                     )
                 )

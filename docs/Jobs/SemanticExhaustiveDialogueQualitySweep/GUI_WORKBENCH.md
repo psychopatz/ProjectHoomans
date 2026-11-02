@@ -1,296 +1,184 @@
-# Dedicated Quality Sweep Workbench
+# Quality Sweep Workbench — Sentence-First UX
 
 ## Purpose
 
-Provide a first-class GUI inside the existing Semantic Harness for broad semantic dialogue coverage and quality review.
+The Quality Sweep exists primarily to help a human quickly find bad NPC dialogue.
 
-This is **not** a second harness. It is a human-facing client of the same `DialogueQualitySweepService` / sweep planner / executor / report services used by CLI.
+The default workflow must answer:
 
-## Workspace ownership
+> What sentences can the semantic system produce, what triggered each sentence, and which ones look awkward, robotic, repetitive, or contextually wrong?
 
-### Simulation
+The user should **not** need to understand test-engine concepts such as smoke, full, pairwise, batch IDs, reachability states, or coverage matrices to perform this task.
 
-Use for:
+## Primary workflow
 
-- one current scenario;
-- interactive conversation;
-- live actor/context editing;
-- immediate Conversation Inspector work.
+The default Quality Sweep page is:
 
-### Quality Sweep
+`Generate Sentences → browse all rendered NPC lines → filter/search → inspect trigger/context`.
 
-Use for:
+### Primary controls
 
-- broad/batched semantic coverage;
-- surface/dimension/variant inventory;
-- run progress;
-- dialogue-quality triage;
-- reachability/coverage gaps;
-- targeted replay.
+Expose only:
 
-### Studio
+- **Generate Sentences**
+- **Stop**
+- Languages
+- Max examples
+- Reload Results
+- Advanced…
 
-Use for:
+Generation automatically plans broad balanced production-backed coverage and resumes a stopped in-memory run when possible.
 
-- canonical content/source authoring;
-- reviewed text changes;
-- source lineage editing workflows.
+Do not expose Run/Resume, Plan, strategy comboboxes or batch controls as primary workflow concepts.
 
-The existing Simulation Quality Sweep sub-tab should be migrated into this workbench or reduced to a compact **Open Quality Sweep** launcher/status summary. Do not maintain two separate full sweep interfaces.
-
-## Proposed layout
-
-A dedicated top-level harness tab/page named **Quality Sweep**.
-
-### 1. Sweep configuration header
-
-Controls:
-
-- Sweep ID;
-- strategy: Smoke / Boundary / Pairwise / Persona / Reachability / Full;
-- languages;
-- max cases;
-- batch size;
-- scope preset;
-- Plan;
-- Run;
-- Cancel;
-- Resume;
-- Refresh.
-
-Show before running:
-
-- discovered surface count;
-- selected surface count;
-- selected dimension count;
-- response pool / variant totals;
-- estimated cases;
-- estimated batches;
-- truncation/cap warnings.
-
-### 2. Coverage Explorer
-
-Tabs or panes:
-
-#### Surfaces
-
-Columns:
-
-- surface ID;
-- source/provider;
-- type;
-- eligible/executable;
-- planned count;
-- reached count;
-- invalid/mismatch count;
-- last observed semantic route.
-
-Allow selecting surfaces to include/exclude.
-
-#### Dimensions
-
-Columns:
-
-- dimension ID;
-- type;
-- source;
-- bucket values;
-- prerequisite;
-- selected for coverage;
-- covered values/pairs.
-
-Trait values should display friendly labels while retaining canonical IDs.
-
-#### Response Pools / Variants
-
-Hierarchical or paged browser:
-
-- pool ID;
-- variant ID;
-- registered conditions summary;
-- reachability state;
-- selected count;
-- eligible-not-selected count;
-- tested contexts;
-- source owner.
-
-Must reflect the **full paginated production registry**.
-
-#### Batches
-
-Show:
-
-- batch ID;
-- status;
-- valid;
-- invalid-surface;
-- failed;
-- cancelled/incomplete;
-- duration.
-
-### 3. Results / Evidence table
+## Main sentence table
 
 One row per rendered NPC output.
 
-Recommended columns:
+Required visible columns:
 
-- severity;
-- flag/review state;
-- rendered text;
-- planned surface;
-- reached semantic route;
-- language;
-- response template;
-- semantic variant;
-- realization family/variant;
-- phrase ID;
-- bond/relationship state;
-- persona/style;
-- batch/case ID;
-- source owner.
+- **NPC Sentence**
+- **Trigger**
+- **Context**
+- **Lang**
+- **Quality / Problem**
+- **Source**
 
-Filters:
+### Trigger
 
-- free text;
-- severity;
-- flag;
-- language;
-- planned/reached surface;
-- response pool/template;
-- variant;
-- phrase;
-- source;
-- strategy;
-- batch;
+Show a human-readable cause such as:
+
+- `Player: "how are you?"`
+- `Player: "hello"`
+- `Menu: recruit`
+- `Menu: ask_name`
+
+Do not require the user to interpret internal surface IDs.
+
+### Context
+
+Show a compact useful summary, for example:
+
+`bond=sister · approval=75 · style=guarded · traits=reserved · need=thirst:MINOR`
+
+The full detailed context remains available in the right-hand inspector.
+
+### Quality / Problem
+
+Show automatic flags when present, such as:
+
+- unsupported family reference;
+- one-word response;
+- perspective suspect;
+- duplicate rendered text;
+- fallback saturation;
+- variant collapse.
+
+Clean rows show a neutral dash rather than technical status noise.
+
+## Direct filters
+
+Default filters should support the actual review task:
+
+- free-text search;
+- only suspicious / flagged lines;
+- only duplicates / repeated lines;
+- language.
+
+Do not make pool IDs, batch IDs, reachability states or strategy names part of the normal filtering experience.
+
+## Evidence detail panel
+
+Selecting a sentence should immediately explain **why it happened**.
+
+Show:
+
+- exact rendered sentence;
+- player/menu trigger;
 - relationship/bond;
-- reachability state;
-- only invalid surfaces;
-- only repeated/duplicate text.
+- approval/respect/familiarity/identity trust;
+- persona/style/traits;
+- needs/health/activity/behavior;
+- semantic intent/subject/speech act;
+- template/variant;
+- realization/phrase/translation;
+- quality flags;
+- canonical source owner;
+- changed parameter vector.
 
-### 4. Cluster view
+Primary actions:
 
-Show canonical-cause clusters with:
+- Open Full Inspector
+- Copy Evidence
 
-- primary flag;
-- severity/confidence;
-- count;
-- source;
-- phrase/variant;
-- affected context ranges;
-- representative outputs.
+## Advanced developer tooling
 
-Actions:
+Advanced… may expose:
 
-- inspect examples;
-- select affected cases;
-- replay cluster;
-- export review bundle;
-- open canonical source when verified.
+- internal coverage strategy;
+- sweep ID;
+- batch size;
+- response-pool/variant reachability scan;
+- review-bundle export;
+- technical plan digest/status.
 
-### 5. Evidence detail inspector
+These controls must remain secondary and hidden by default.
 
-For the selected evidence row, show bounded structured sections:
+The default page must never again look like a batch/coverage dashboard.
 
-- **Trigger** — changed parameters;
-- **Persona** — dimensions/style/traits;
-- **Relationship** — approval/respect/familiarity/trust/bond;
-- **Situation** — needs/health/activity/behavior;
-- **Semantic Path** — intent/speech act/subject/flow/template/variant;
-- **Realization** — family/variant/phrase/translation/fallback;
-- **Selection** — selected candidate and rejection summary;
-- **Authority/Effects**;
-- **Quality** — flags and reasons;
-- **Source** — canonical owner/fingerprint.
+## Generation behavior
 
-Buttons:
+The sentence review planner should:
 
-- Open Full Conversation Inspector;
-- Replay Case;
-- Open/Locate Source;
-- Copy Compact Evidence;
-- Export Selected Evidence.
+1. discover current production interaction surfaces;
+2. exclude expected fallback probes from normal review unless explicitly requested;
+3. seed every selected surface with baseline cases;
+4. distribute persona/relationship/boundary/pairwise contexts across all surfaces fairly;
+5. avoid consuming the entire case cap on early surfaces;
+6. progressively incorporate variant-frontier targets as reachability improves.
+
+“Max examples” is an execution bound, not a promise of mathematical exhaustiveness.
+
+## Live results
+
+Evidence rows are written incrementally.
+
+After each completed engine batch, the GUI should reload and display available sentences immediately.
+
+A completed manifest with an empty sentence table is a failure.
+
+The analyzer must tolerate actual production types such as categorical `identityTrust="unknown"`; a quality heuristic must never crash the results display.
 
 ## Full Inspector behavior
 
-The Open Full Conversation Inspector action must resolve the selected compact row's trace handle using the shared service.
+Open Full Inspector must recreate the selected sentence, not a generic replacement turn.
 
-It should either:
+Replay must use:
 
-1. load a compatible persisted bounded trace if available; or
-2. deterministically replay the exact case/turn under matching fingerprints.
+- the row's original `identity.input`;
+- language;
+- changed parameter vector;
+- compatible production inventory/fingerprint where available.
 
-If fingerprints are stale, show that explicitly rather than silently inspecting a different revision.
+A wellbeing row must not reopen as a greeting.
 
-## Source navigation
+## Threading
 
-When canonical source lineage is verified, expose:
+Long sentence generation and advanced reachability analysis must not block Tk.
 
-- source owner;
-- path/content identity;
-- optional line/location where supported.
+Use background workers and marshal UI updates through Tk's event loop.
 
-A source navigation action should use existing Studio/source-lineage mechanisms rather than parsing generated Lua independently.
+## Acceptance
 
-UNKNOWN remains an honest valid state.
+The GUI is accepted only when:
 
-## Responsive execution
-
-The GUI must remain usable during a long run.
-
-Required pattern:
-
-- sweep execution on background worker/thread/task;
-- worker emits progress events into a thread-safe queue;
-- Tk polls the queue with `after()`;
-- only Tk thread mutates widgets;
-- Cancel sets a checked cancellation token;
-- completed cases are persisted incrementally;
-- Resume reconstructs from manifest.
-
-Do not call the complete sweep synchronously from a button callback.
-
-## Status and progress
-
-Always show:
-
-- planned cases;
-- completed-valid;
-- invalid-surface;
-- failed;
-- cancelled/incomplete;
-- flagged rows;
-- clusters;
-- elapsed time;
-- current batch/case where bounded.
-
-A manifest saying COMPLETED must not imply all cases were semantically valid.
-
-## Exports
-
-Support bounded:
-
-- evidence JSONL;
-- filtered evidence JSON/JSONL;
-- cluster report;
-- reachability report;
-- LLM review bundle;
-- replay case list.
-
-No giant full-inspector dump by default.
-
-## GUI acceptance
-
-Tests must prove:
-
-- workspace exists as first-class harness page;
-- production-backed inventory populates;
-- plan estimate renders;
-- long-running execution does not block Tk event processing;
-- Cancel works while running;
-- Resume finishes cancelled work;
-- filters operate on real report data;
-- selecting a row populates trigger/persona/relationship/semantic/source detail;
-- Open Full Inspector resolves a real case;
-- cluster replay creates/runs only affected cases;
-- source action handles verified and UNKNOWN source states safely;
-- Xvfb/Tk tests are hermetic and do not touch user save-selection state.
+1. a real worker run produces visible sentence rows;
+2. each row shows its human-readable trigger;
+3. each row shows compact context;
+4. filtering flagged/duplicate lines works;
+5. selecting a row populates detailed context;
+6. Full Inspector recreates the same semantic route/input;
+7. Stop preserves completed sentence evidence;
+8. generation remains responsive;
+9. broad review coverage is balanced across selected triggers;
+10. Advanced diagnostics are not required for ordinary dialogue review.

@@ -122,6 +122,23 @@ class SweepP5QualityTests(unittest.TestCase):
             "Supported romantic wording with lover bond was falsely flagged",
         )
 
+
+    def test_categorical_identity_trust_is_supported(self) -> None:
+        row = {
+            "output": {"finalText": "I'm okay. How about you?"},
+            "trigger": {
+                "relationshipSummary": {
+                    "bondKind": "none",
+                    "familiarity": 0,
+                    "identityTrust": "unknown",
+                },
+                "actorSummary": {"listenerID": "player"},
+            },
+            "semanticPath": {"intent": "WELLBEING_RESPONSE"},
+        }
+        flags = self.analyzer.analyze_row(row)
+        self.assertIsInstance(flags, list)
+
     def test_canonical_source_clustering(self) -> None:
         # 5 rows caused by the same canonical phrase defect
         rows = [

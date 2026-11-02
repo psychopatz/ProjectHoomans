@@ -13,7 +13,7 @@ from ..runtime.scenario import DEFAULT_SCENARIO
 from ..runtime.worker import LuaSemanticWorker
 from .sweep_batch import SweepBatch, SweepBatchExecutor, SweepManifest
 from .sweep_cluster import ClusterAggregator, DialogueClusterReport
-from .sweep_dimensions import SweepDimensionInventory, extract_dimension_inventory
+from .sweep_dimensions import SweepDimensionInventory, discover_interaction_surfaces, extract_dimension_inventory
 from .sweep_planner import CoveragePlan, CoveragePlanner, MAX_BATCH_SIZE
 from .sweep_quality import QualityAnalyzer
 from .sweep_reachability import ReachabilityAnalyzer, ReachabilityReport
@@ -58,7 +58,26 @@ class DialogueQualitySweepService:
     ) -> CoveragePlan:
         """Generate a deterministic coverage plan."""
         inv = inventory or self.get_dimension_inventory(worker)
+
+        # Default to the current production interaction inventory rather than a
+        # historical hard-coded surface list.  Expected fallback probes stay
+        # available to explicit callers but are excluded from the user-facing
+        # sentence review by default.
+        resolved_surfaces = list(surfaces) if surfaces else None
+        if resolved_surfaces is None:
+            if worker is not None:
+                discovered = discover_interaction_surfaces(worker)
+            else:
+                with self.worker_factory(DEFAULT_SCENARIO) as temp_worker:
+                    discovered = discover_interaction_surfaces(temp_worker)
+            resolved_surfaces = [
+                item.surface_id
+                for item in discovered
+                if item.executable and not item.expect_fallback
+            ]
+
         planner = CoveragePlanner(inv, sweep_id=sweep_id)
+        surfaces = resolved_surfaces
 
         strat_lower = strategy.lower()
         if strat_lower == "smoke":
@@ -93,7 +112,7 @@ class DialogueQualitySweepService:
             if languages:
                 kwargs["languages"] = languages
             return planner.plan_persona(**kwargs)
-        if strat_lower == "full":
+        if strat_lower in ("full", "review"):
             kwargs = {"max_cases": max_cases}
             if surfaces:
                 kwargs["surfaces"] = surfaces
@@ -191,10 +210,30 @@ class DialogueQualitySweepService:
         worker: Any | None = None,
         turn_input_spec: dict[str, Any] | None = None,
         language: str = "EN",
+        parameters: Mapping[str, Any] | None = None,
+        inventory: SweepDimensionInventory | None = None,
     ) -> dict[str, Any]:
-        """Resolve a lazy trace handle into full Conversation Inspector data."""
+        """Resolve a lazy trace handle into the matching full Inspector context."""
         from .sweep_evidence import resolve_trace_handle
+
         if worker is not None:
-            return resolve_trace_handle(trace_handle, worker=worker, input_spec=turn_input_spec, language=language)
-        with self.worker_factory(DEFAULT_SCENARIO) as temp_worker:
-            return resolve_trace_handle(trace_handle, worker=temp_worker, input_spec=turn_input_spec, language=language)
+            return resolve_trace_handle(
+                trace_handle,
+                worker=worker,
+                input_spec=turn_input_spec,
+                language=language,
+                parameters=parameters,
+                inventory=inventory,
+            )
+
+        inv = inventory or self.get_dimension_inventory()
+        scenario = inv.project_to_scenario(parameters or {}, DEFAULT_SCENARIO)
+        with self.worker_factory(scenario) as temp_worker:
+            return resolve_trace_handle(
+                trace_handle,
+                worker=temp_worker,
+                input_spec=turn_input_spec,
+                language=language,
+                parameters=parameters,
+                inventory=inv,
+            )

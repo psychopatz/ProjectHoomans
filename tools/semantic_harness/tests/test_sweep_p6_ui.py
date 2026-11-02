@@ -207,15 +207,17 @@ class SweepP6UiAndReviewTests(SemanticLabGuiTestCase):
 
         try:
             root.geometry("1200x800")
-            # 1. Verify Quality Sweep is present as a top-level tab in main_tabs
             main_tab_names = [app.main_tabs.tab(t, "text") for t in app.main_tabs.tabs()]
             self.assertIn("Quality Sweep", main_tab_names)
-
-            # Switch to Quality Sweep tab
             app.main_tabs.select(app.quality_sweep_tab)
             root.update_idletasks()
 
-            # Ensure hermetic catalogs
+            # Sentence-first controls are the primary workflow.
+            self.assertTrue(hasattr(app, "qs_generate_button"))
+            self.assertTrue(hasattr(app, "qs_evidence_tree"))
+            self.assertTrue(hasattr(app, "qs_inspector_text"))
+            self.assertFalse(app.qs_advanced_visible)
+
             app.simulation_control_catalog = {
                 "controls": [
                     {
@@ -228,53 +230,49 @@ class SweepP6UiAndReviewTests(SemanticLabGuiTestCase):
             }
             app.persona_catalog = {"relationshipKinds": []}
 
-            # 2. Test Plan Generation & Coverage Explorer Population
             app.quality_sweep_strategy_var.set("smoke")
             on_qs_plan(app)
             self.assertIsNotNone(app.quality_sweep_plan)
-            self.assertIn("Planned", app.quality_sweep_summary_var.get())
+            self.assertIn("examples", app.quality_sweep_summary_var.get())
+            self.assertIn("triggers", app.quality_sweep_summary_var.get())
 
-            # Verify Coverage Explorer treeviews populated
-            surf_items = app.qs_surfaces_tree.get_children()
-            self.assertGreater(len(surf_items), 0)
-
-            dim_items = app.qs_dimensions_tree.get_children()
-            self.assertGreater(len(dim_items), 0)
-
-            batch_items = app.qs_batches_tree.get_children()
-            self.assertGreater(len(batch_items), 0)
-
-            # 3. Test Evidence Row Filtering & Treeview Population
             mock_rows = [
                 {
                     "rowID": "row_1",
                     "identity": {
                         "caseID": "case_smoke_1",
-                        "plannedSurface": "ask_name",
-                        "reachedSurface": "ask_name",
+                        "plannedSurface": "scenario.utterance:hello",
+                        "reachedSurface": "semantic.greeting",
                         "surfaceStatus": "MATCHED",
                         "language": "EN",
+                        "input": {"text": "hello"},
                     },
                     "trigger": {
-                        "parameters": {"player.hunger": 0.5},
-                        "actorConversationContext": {
-                            "archetype": "survivor",
+                        "parameters": {"relationship.approval": 10},
+                        "personaSummary": {
                             "traits": ["pnc_brawler"],
-                            "personality": "stoic",
+                            "socialStyle": "neutral",
+                            "personality": {"aggression": 0.5},
                         },
                         "relationshipSummary": {
                             "bondKind": "none",
                             "approval": 10,
                             "respect": 20,
                         },
+                        "stateSummary": {
+                            "activeBehavior": "idle",
+                            "npcNeeds": {"highest": "thirst", "level": "MINOR"},
+                        },
                     },
                     "semanticPath": {
-                        "semanticTemplateID": "name.reply",
+                        "semanticTemplateID": "greeting.reply",
                         "semanticVariantID": "var_default",
-                        "phraseID": "phrase_name_01",
+                        "phraseID": "phrase_hello_01",
                     },
-                    "output": {"finalText": "I'm Mara."},
-                    "selectionProvenance": {"canonicalSourceOwner": "dialogue_dataset.name"},
+                    "output": {"finalText": "Hey there."},
+                    "selectionProvenance": {
+                        "canonicalSourceOwner": "dialogue_dataset.greeting"
+                    },
                     "authority": {},
                     "quality": {"flags": []},
                 },
@@ -282,61 +280,67 @@ class SweepP6UiAndReviewTests(SemanticLabGuiTestCase):
                     "rowID": "row_2",
                     "identity": {
                         "caseID": "case_smoke_2",
-                        "plannedSurface": "wellbeing",
+                        "plannedSurface": "scenario.utterance:wellbeing",
                         "reachedSurface": "semantic.ask_clarification",
                         "surfaceStatus": "INVALID_SURFACE",
                         "language": "EN",
+                        "input": {"text": "how are you?"},
                     },
                     "trigger": {
                         "parameters": {},
-                        "actorConversationContext": {},
+                        "personaSummary": {},
                         "relationshipSummary": {"bondKind": "none"},
+                        "stateSummary": {},
                     },
                     "semanticPath": {
                         "semanticTemplateID": "semantic.ask_clarification",
                         "semanticVariantID": "var_fallback",
                     },
                     "output": {"finalText": "I'm not sure what you mean."},
-                    "selectionProvenance": {"canonicalSourceOwner": "core.fallback"},
+                    "selectionProvenance": {
+                        "canonicalSourceOwner": "core.fallback"
+                    },
                     "authority": {},
                     "quality": {
                         "flags": [
-                            {"name": "INVALID_SURFACE", "severity": "HIGH", "confidence": "DEFINITE"}
+                            {
+                                "name": "INVALID_SURFACE",
+                                "severity": "HIGH",
+                                "confidence": "DEFINITE",
+                            }
                         ]
                     },
                 },
             ]
             app.quality_sweep_evidence_rows = mock_rows
-
-            # Apply filter for invalid surfaces only
-            app.qs_filter_invalid_only_var.set(True)
-            on_qs_apply_filter(app)
-            self.assertEqual(len(app.quality_sweep_filtered_rows), 1)
-            self.assertEqual(app.quality_sweep_filtered_rows[0]["rowID"], "row_2")
-
-            # Reset filter
-            app.qs_filter_invalid_only_var.set(False)
             on_qs_apply_filter(app)
             self.assertEqual(len(app.quality_sweep_filtered_rows), 2)
+            self.assertEqual(len(app.qs_evidence_tree.get_children()), 2)
 
-            # 4. Test Selecting Evidence Row Populates Structured Inspector
+            app.qs_filter_flagged_only_var.set(True)
+            on_qs_apply_filter(app)
+            self.assertEqual(
+                [r["rowID"] for r in app.quality_sweep_filtered_rows],
+                ["row_2"],
+            )
+
+            app.qs_filter_flagged_only_var.set(False)
+            on_qs_apply_filter(app)
             app.qs_evidence_tree.selection_set("row_1")
             on_qs_evidence_select(app)
-            self.assertIsNotNone(app.selected_quality_sweep_row)
             inspector_text = app.qs_inspector_text.get("1.0", "end")
-            self.assertIn("Mara", inspector_text)
-            self.assertIn("survivor", inspector_text)
+            self.assertIn("Hey there.", inspector_text)
             self.assertIn("pnc_brawler", inspector_text)
-            self.assertIn("name.reply", inspector_text)
+            self.assertIn("approval", inspector_text.lower())
+            self.assertIn("greeting.reply", inspector_text)
 
-            # 5. Test Cancellation State Transition
             app.quality_sweep_is_running = True
             on_qs_cancel(app)
             self.assertTrue(app.quality_sweep_cancel_requested)
-            self.assertIn("Cancellation requested", app.quality_sweep_status_var.get())
-
+            self.assertIn("Stopping safely", app.quality_sweep_status_var.get())
         finally:
             root.destroy()
+
 
 
 if __name__ == "__main__":
