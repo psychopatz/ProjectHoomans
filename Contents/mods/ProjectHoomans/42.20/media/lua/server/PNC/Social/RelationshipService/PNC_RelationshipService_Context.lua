@@ -49,7 +49,24 @@ local function getRelationship(record, targetKey)
     local relationships = social
         and type(social.relationships) == "table"
         and social.relationships or nil
-    return relationships and relationships[targetKey] or nil
+    local rel = relationships and relationships[targetKey] or nil
+    if not rel then return nil end
+
+    if PsychopatzCore and PsychopatzCore.Actors and PsychopatzCore.Actors.Social then
+        local actorID = record.coreActorID
+            or (record.runtime and record.runtime.coreActorID)
+            or record.id
+        local actor = actorID and PsychopatzCore.Actors.Get and PsychopatzCore.Actors.Get(actorID)
+        if actor and actor.social then
+            local coreRel = PsychopatzCore.Actors.Social.Get(actor.social, targetKey)
+            if coreRel then
+                rel.approval = coreRel.approval
+                rel.respect = coreRel.respect
+                rel.familiarity = coreRel.familiarity
+            end
+        end
+    end
+    return rel
 end
 
 local function buildMemorySpec(memorySpec, targetKey)

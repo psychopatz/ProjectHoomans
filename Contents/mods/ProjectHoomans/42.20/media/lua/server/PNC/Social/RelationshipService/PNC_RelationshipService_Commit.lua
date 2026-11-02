@@ -209,6 +209,12 @@ local function commit(record, social, targetKey, relationship,
     if Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "social")
     end
+    if PNC.Persistence and PNC.Persistence.CoreSocial
+        and PNC.Persistence.CoreSocial.SyncToCore
+        and PsychopatzCore and PsychopatzCore.Actors
+    then
+        pcall(PNC.Persistence.CoreSocial.SyncToCore, record, PsychopatzCore)
+    end
     if PNC.RelationshipConsequences
         and PNC.RelationshipConsequences.OnRelationshipChanged
     then
