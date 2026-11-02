@@ -143,6 +143,16 @@ function Choices.Build(context, options, greetingBlock)
         "choice.goodbye", "response.goodbye",
     })
     if goodbyeValid then
+        local goodbyeKey = "response.goodbye"
+        local salt = context and (context.phraseSalt or context.caseID or context.utterancePlanSalt)
+        if salt then
+            local saltHash = 0
+            local saltStr = tostring(salt)
+            for i = 1, #saltStr do
+                saltHash = (saltHash * 31 + string.byte(saltStr, i)) % 2147483647
+            end
+            goodbyeKey = "response.goodbye." .. tostring((saltHash % 10) + 1)
+        end
         choices[#choices + 1] = {
             id = "goodbye",
             text = dialoguePayload(
@@ -154,7 +164,7 @@ function Choices.Build(context, options, greetingBlock)
                 groupID = "conversation_utilities",
             },
             response = dialoguePayload(
-                GOODBYE_SOURCE, "response.goodbye", context
+                GOODBYE_SOURCE, goodbyeKey, context
             ),
             close = true,
             closeReason = "goodbye",

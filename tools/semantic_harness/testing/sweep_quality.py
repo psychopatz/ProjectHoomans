@@ -370,7 +370,14 @@ class QualityAnalyzer:
                             r["quality"]["reviewState"] = "FLAGGED"
 
             # 4. Duplicate rendered text across distinct cases (general)
-            if len(distinct_cases) >= 3 and text_lower not in ALLOWED_SHORT_WORDS:
+            # Flags abnormal repetition exceeding the 10-variant uniform distribution expectation.
+            # Across 50+ cases testing a prompt, a 10-variant pool expects ~5-6 occurrences per phrase.
+            # Concentration is defective when an exact string appears in >= 8 distinct cases,
+            # or represents an excessive concentration in targeted test suites (>= 4 cases and >= 20% of run).
+            is_heavy_concentration = len(distinct_cases) >= 8
+            is_targeted_run_collapse = len(distinct_cases) >= 4 and (len(group_rows) / max(1, len(rows))) >= 0.20
+
+            if (is_heavy_concentration or is_targeted_run_collapse) and text_lower not in ALLOWED_SHORT_WORDS:
                 for r in group_rows:
                     existing_flag_names = {f["name"] for f in r.get("quality", {}).get("flags", [])}
                     if "DUPLICATE_RENDERED_TEXT" not in existing_flag_names:
