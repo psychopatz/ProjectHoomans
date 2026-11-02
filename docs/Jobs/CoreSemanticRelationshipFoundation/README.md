@@ -46,12 +46,14 @@ Also inspect the accepted Core foundation docs under `psychopatzCore/Docs/npc_fo
 
 ## Completion state
 
-**Current state: IN PROGRESS.** A second production-path audit after the P8-P12 closeout invalidated READY FOR USER LIVE TEST.
+**Current state: IN PROGRESS.** A third independent audit after the P13-P15 closeout verified that P14 and most P15 behavior are real, but invalidated two remaining acceptance claims.
 
-Accepted and retained foundation includes non-destructive Core-first social merging, semantic pack ownership/unregister lifecycle, and the repaired Hoomans Core semantic schema/gates. Mandatory P13-P15 work remains for:
+Retain the accepted foundation, including non-destructive shared-social merging, semantic pack lifecycle, Hoomans semantic adoption, production conversation capability isolation, complete DT parser coverage, bounded uncertainty, and the improved hot-plug matrix.
 
-- trusted adoption of Core-issued DT-first player identity into the real Hoomans player-character registry;
-- propagation of effective conversation capabilities into Core parsing so installed-but-ineligible adopter grammar cannot leak;
-- complete, evidence-grounded Dynamic Trading whereabouts/story/farewell coverage and a stricter production-path hot-plug matrix.
+Mandatory P16-P17 work remains for:
 
-Developer-side completion now requires the full P0-P15 roadmap and current acceptance matrix. Native Project Zomboid SP/MP validation remains user-owned unless explicitly reassigned. Steam Workshop publication is never implied by Git completion.
+- replacing forgeable modData hash provenance with a Core-authoritative identity issuance/adoption contract;
+- grounding factual DT destination/origin/settlement answers in actual production DT policy/world-knowledge state rather than test-only `TalkService.Submit` option injection;
+- updating the final production matrix to prove those two boundaries end-to-end.
+
+Developer-side completion now requires the full P0-P17 roadmap and current acceptance matrix. Native Project Zomboid SP/MP validation remains user-owned unless explicitly reassigned. Steam Workshop publication is never implied by Git completion.

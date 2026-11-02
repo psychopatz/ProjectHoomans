@@ -68,6 +68,23 @@ The trust boundary is explicit:
 
 A DT-first save followed by enabling Hoomans must therefore keep the exact same player target key.
 
+## 1C. Authoritative identity issuance proof
+
+Identity adoption trust must come from canonical Core authority, not from values that an arbitrary player modData payload can reproduce.
+
+A deterministic public hash such as `hash(accountKey, uuid)` stored beside the UUID is an integrity marker only; it is not proof that Core actually issued the identity. Hoomans must not treat such a value as an authoritative issuance credential.
+
+The accepted design must use a Core-owned issuance/identity registry or equivalent server-authoritative record that can answer whether a UUID/account pairing was actually issued/adopted by Core. The adoption check must therefore validate against Core authoritative state in addition to the player mirror.
+
+Required properties:
+
+- arbitrary modData cannot manufacture a new authoritative Core-issued identity by computing a public function;
+- trusted Core-issued DT-first identities remain adoptable by Hoomans;
+- existing Hoomans-first identities can be registered/adopted into the same Core authority without duplication;
+- account/slot ownership, dead/retired status, and duplicate-live-binding safeguards remain intact;
+- persistence/reload preserves issuance authority and adoption idempotence.
+
+
 ## 2. Base relationship versus adopter extensions
 
 Core owns shared values that must survive across mods:
@@ -279,3 +296,17 @@ Adopter-owned story/whereabouts responses distinguish authored flavor from factu
 Dynamic Trading may use authored flavor for greetings and generic atmosphere, but location, destination, route, settlement, trader whereabouts, origin, and current road-news claims must be derived from actual Dynamic Trading/Core world-knowledge evidence when presented as facts.
 
 When evidence is unavailable, the response must be uncertain/unknown rather than inventing a named or implied route such as a fictional outpost or market. Parser coverage and response grounding are separate acceptance gates.
+
+## 9B. Production evidence must originate upstream of TalkService
+
+A factual answer is not considered end-to-end grounded merely because a test passes `destination`, `origin`, `settlement`, `npcGossip`, or `worldKnowledge` directly into `TalkService.Submit`.
+
+Production state must first exist in a canonical Dynamic Trading/Core owner such as:
+
+- trader policy/current route state;
+- typed Core/DT WorldKnowledge facts with provenance;
+- an authoritative settlement/route/trader-location service.
+
+TalkService then projects that already-existing state into conversation context.
+
+Tests for factual destination/origin/settlement/route/news must create the fact through the same upstream production API/path used by gameplay and then ask the question without injecting the expected answer directly into Submit options.

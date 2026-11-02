@@ -301,3 +301,30 @@ A second independent audit after commits through Core `bc1f7a8`, DynamicTrading 
 4. **P12 final matrix misses all three boundaries above.** It is useful for interleaved social-state preservation but is not sufficient final hot-plug acceptance.
 
 These findings supersede the P8-P12 READY FOR USER LIVE TEST closeout. See ROADMAP P13-P15 and current PROGRESS.
+
+---
+
+## Third independent audit — P16-P17 required
+
+A third independent audit on 2026-11-03 checked the P13-P15 developer-complete claim against actual production paths.
+
+### Verified positive evidence
+
+- P14 is genuinely fixed in production orchestration. With real DT and Hoomans packs registered together:
+  - DT-only capabilities + `follow me` -> no Hoomans intent;
+  - Hoomans-only capabilities + `trade` -> no DT intent;
+  - Hoomans capabilities + `follow me` -> Hoomans COMMAND.
+- Required DT utterance families now parse with fuzzy matching disabled.
+- The old fabricated southern-outpost/central-market factual line is gone.
+- No-evidence destination/news responses are bounded uncertainty/no-news.
+- A real published/acquired `market.route` WorldKnowledge fact grounds a generic route answer and returns the real fact ID.
+- Dynamic Trading full runner passes `43/43`.
+- Project Hoomans broad runner is `982/987`, with the same five older baseline failures.
+- Focused Core/Hoomans corrective suites pass; changed Lua and diff checks are clean.
+
+### Remaining acceptance-invalidating evidence
+
+1. **Forgeable P13 provenance:** Core's public deterministic `SignProvenance` can be computed for an arbitrary unknown UUID. When the corresponding fields are placed in player modData, the real Core verifier reports `valid_provenance` and the real Hoomans service accepts the forged UUID as `core_adopted`. The current mechanism is not authoritative proof of Core issuance.
+2. **P15 production grounding gap:** destination/origin/settlement success tests inject those values directly into `TalkService.Submit`. No production caller was found providing those answer fields. A real acquired route fact grounds `what route`, but `where are you heading` remains uncertain because canonical destination/next-settlement state is not populated.
+
+These findings supersede the P13-P15 READY FOR USER LIVE TEST closeout. See ROADMAP P16-P17 and current PROGRESS.

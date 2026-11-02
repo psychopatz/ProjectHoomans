@@ -75,6 +75,11 @@ Semantic capability acceptance must exercise `PsychopatzActorConversationService
 
 Dynamic Trading factual whereabouts/story acceptance must assert provenance/evidence from DT/Core world-knowledge state. A hardcoded plausible sentence is not proof of grounded whereabouts.
 
+A deterministic public hash stored in player modData is not authoritative identity issuance proof. Identity-adoption tests must attempt a forged-but-well-formed claim and prove the real Hoomans service rejects it because Core authoritative issuance state does not contain that identity.
+
+For factual DT grounding, test setup must publish/set state through the real upstream DT/Core owner. Passing `destination`, `origin`, `settlement`, or `npcGossip` directly into `TalkService.Submit` may remain a unit test of rendering, but cannot satisfy final production grounding acceptance.
+
+
 No native PZ launch, Workshop upload, republish or destructive save manipulation unless explicitly authorized by the user.
 
 ## Performance discipline

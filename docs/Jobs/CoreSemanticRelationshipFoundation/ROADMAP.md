@@ -1,8 +1,8 @@
 # Roadmap — Core Semantic & Relationship Foundation
 
-**Status:** IN PROGRESS — P0-P12 implementation exists, but a second production-path audit invalidated P8A, production-orchestration capability isolation, parts of P11, and P12 final acceptance. P13-P15 are mandatory corrective continuation.
+**Status:** IN PROGRESS — P0-P15 implementation exists. A third independent audit accepted P14 and most P15 behavior but invalidated P13's issuance-trust claim and P15's end-to-end destination/origin/settlement grounding proof. P16-P17 are mandatory final corrections.
 
-The parent goal completion boundary is now the complete P0-P15 outcome. P0-P12 remain implementation history/foundation. Preserve accepted pieces; P13-P15 repair only the production-boundary failures independently reproduced after the P12 closeout.
+The parent goal completion boundary is now the complete P0-P17 outcome. Preserve accepted P0-P15 implementation; P16-P17 repair only the two remaining boundaries reproduced after the P15 closeout.
 
 After every accepted chunk: implement -> validate actual production owners -> update PROGRESS -> commit coherent owner-repository changes -> continue automatically to the next mandatory chunk.
 
@@ -302,7 +302,117 @@ Final validation:
 - `git diff --check`;
 - exact repository revisions/status and preserved DT local edit reported.
 
-Gate: only after P13-P15 pass may the job return to **READY FOR USER LIVE TEST**.
+Historical P15 closeout gate: superseded by the third independent audit. P16-P17 are now mandatory before **READY FOR USER LIVE TEST**.
+
+
+## P16 — Core-authoritative player identity issuance and adoption
+
+### P16A — Replace forgeable provenance with authoritative issuance state
+
+Retain the working DT-first UUID/key adoption flow, but replace its trust decision.
+
+Verified third-audit failure:
+
+- Core exposes public `SignProvenance(uuid, accountKey)`;
+- the signature is a deterministic hash with no secret or authoritative issuance lookup;
+- an arbitrary unknown UUID can be placed into player modData;
+- the public signature can be computed for it;
+- `VerifyProvenance` returns `valid_provenance`;
+- real `PNC.PlayerCharacters.EnsureIdentity` accepts it as `core_adopted`.
+
+Therefore the current mechanism proves self-consistency of modData, not actual Core issuance.
+
+Requirements:
+
+- Core owns persistent authoritative player-identity issuance/adoption state;
+- provide a bounded API such as `IsIssuedIdentity(uuid, accountKey)` / `ResolveIssuedIdentity` or equivalent;
+- generating a Core player identity records it authoritatively;
+- adopting an existing Hoomans-first identity records/links it authoritatively without changing its UUID;
+- Hoomans DT-first adoption checks the authoritative Core record, not only player modData;
+- player modData mirrors remain useful for lookup/recovery but are not the trust root;
+- arbitrary forged UUID + correctly computed public hash remains rejected;
+- cross-account, retired/dead, malformed, and duplicate-live-binding cases remain rejected;
+- persistence/save/reload keeps issuance records;
+- migration from already-created P13 identities is bounded and idempotent.
+
+Mandatory tests:
+
+1. real DT-first SP identity -> authoritative record exists -> Hoomans adopts exact UUID/key;
+2. real DT-first MP identity -> same;
+3. arbitrary unknown UUID + forged public signature -> real Hoomans service rejects adoption;
+4. cross-account reuse -> rejected;
+5. save/reload Core issuance state -> identity still adoptable;
+6. Hoomans-first identity -> Core registers/adopts same UUID without fork;
+7. repeated import/adoption -> idempotent;
+8. legacy already-forked aliases still converge without duplicate social events.
+
+Gate: Hoomans can distinguish "Core actually issued/adopted this identity" from "modData merely contains a reproducible hash".
+
+## P17 — Production-derived DT factual route/destination grounding and final re-close
+
+### P17A — Define canonical DT route/destination fact ownership
+
+Retain P15 parser coverage and bounded uncertainty.
+
+Establish the production owner/path for factual:
+
+- current settlement;
+- origin/last settlement;
+- destination/next settlement;
+- active route/direction;
+- trader location;
+- road news.
+
+Use existing DT policy/world-knowledge mechanisms where possible rather than inventing a parallel dialogue-only store.
+
+If destination/next-settlement does not currently exist in standalone DT policy, add the smallest canonical field/service or typed WorldKnowledge fact required by actual gameplay.
+
+### P17B — TalkService consumes upstream production evidence
+
+Requirements:
+
+- gameplay/DT services publish or update route/destination/origin/settlement state before conversation;
+- `TalkService.Submit` builds context from that production state;
+- tests must not need `options.destination`, `options.origin`, `options.settlement`, or hand-built `options.npcGossip` to prove final grounding;
+- direct option injection may remain supported for bounded unit tests/debugging, but is not the canonical production evidence path;
+- factual replies include inspectable evidence/fact refs where the source is WorldKnowledge;
+- no evidence -> bounded uncertainty/no-news;
+- generic authored caravan stories remain allowed as clearly non-current fiction/flavor.
+
+Mandatory end-to-end tests:
+
+1. publish/set a destination through the canonical DT production API -> ask `where are you heading` with no answer injection -> exact grounded destination/evidence;
+2. set/persist origin/last settlement through production state -> ask `where did you come from` -> grounded answer;
+3. set current/home settlement -> ask `where is the settlement` -> grounded answer;
+4. publish/acquire a real route WorldKnowledge fact -> `what route` returns the fact and fact ID;
+5. publish/acquire road-news fact -> `road news` returns fact-backed statement and fact ID;
+6. no destination/news evidence -> uncertainty/no-news, never fabricated location;
+7. save/reload DT state -> factual answers remain grounded.
+
+### P17C — Final production matrix and documentation reconciliation
+
+Upgrade the final cross-adopter matrix so it proves both P16 and P17 through real owner paths:
+
+- DT-first identity created through Core authoritative issuance;
+- real Hoomans EnsureIdentity adopts it;
+- forged well-formed unknown identity is rejected;
+- P8B interleaved social writes still preserve both adopters;
+- P14 capability isolation remains green through ActorConversationService;
+- DT destination/origin/settlement/route/news are seeded through canonical production APIs, not Submit answer options;
+- remove/re-add adopters/packs preserves identity, relationships, extensions, semantic isolation, and factual state;
+- migrations/reloads remain idempotent.
+
+Final validation:
+
+- Core focused identity/social/semantics/conversation suites;
+- Dynamic Trading full runner (third-audit baseline: 43/43);
+- Hoomans focused corrective tests;
+- Hoomans broad runner (third-audit baseline: 982/987 with the same five pre-existing failures);
+- changed Lua syntax/Kahlua/static checks where tooling exists;
+- `git diff --check`;
+- exact final repository revisions/status including the preserved DT local edit.
+
+Gate: only after P16-P17 pass may the parent goal return to **READY FOR USER LIVE TEST**.
 
 ## Completion rule
 
@@ -315,4 +425,4 @@ The parent goal is not complete merely because:
 - a synthetic payload survives serialization;
 - focused tests pass.
 
-Completion requires one canonical player relationship identity through the real Hoomans identity service, non-destructive interleaved adopter writes, residue-free and capability-isolated production conversation semantics, working Hoomans adoption, evidence-grounded standalone DT story/whereabouts coverage, and a real production-module hot-plug matrix that exercises those boundaries.
+Completion requires one canonical player relationship identity backed by Core-authoritative issuance/adoption state, non-destructive interleaved adopter writes, residue-free and capability-isolated production conversation semantics, working Hoomans adoption, factual DT route/destination/origin/settlement/news answers derived from canonical upstream production state, and a real production-module hot-plug matrix that exercises those boundaries.
