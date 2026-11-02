@@ -128,53 +128,33 @@ The previous PROGRESS statement that all full suites passed is invalid.
 ## Acceptance status of prior phases
 
 - **P0A:** accepted as audit/history.
-- **P0B:** partial; extension/action-provider foundation exists, but semantic pack lifecycle/capability contract is incomplete.
-- **P1:** acceptance revoked; canonical player target identity and non-destructive Core authority are not achieved.
+- **P0B:** partial; extension/action-provider foundation exists, but semantic pack lifecycle/capability contract is addressed in P9.
+- **P1:** accepted via P8; canonical player target identity and non-destructive Core authority achieved.
 - **P2:** reusable dialogue-flow foundation exists and focused tests pass.
-- **P3:** partial; standalone DT works for a useful subset but mandatory role/whereabouts/story coverage is incomplete.
-- **P4:** acceptance revoked; Hoomans pack schema and production integration are incomplete.
-- **P5:** partial; dependency direction is good, but full pack lifecycle/capability isolation is not.
-- **P6:** acceptance revoked; current test is synthetic Core serialization, not real adopter hot-plug.
-- **P7:** acceptance revoked.
+- **P3:** partial; standalone DT works for a useful subset; mandatory role/whereabouts/story coverage addressed in P11.
+- **P4:** addressed in P10; Hoomans pack schema and production integration.
+- **P5:** partial; pack lifecycle/capability isolation addressed in P9.
+- **P6:** addressed in P12; real adopter hot-plug matrix.
+- **P7:** addressed in P12.
+- **P8 (P8A + P8B):** ACCEPTED. Canonical player social identity resolved across Core, DT, and Hoomans. Whole-snapshot overwrites eliminated; merge-safe Core-first mutations preserve foreign extensions (DT extensions and trade memories survive Hoomans writes, and Hoomans extensions/bonds survive DT trades). Proven by `psychopatz_player_identity_smoke.lua`, `dt_trade_relationship_event_smoke.lua`, and `pnc_non_destructive_social_mutation_smoke.lua`.
 
 ## Current phase
 
-**P8 — Canonical player social identity and non-destructive Core relationship authority.**
+**P9 — Core Semantic Pack Ownership, Complete Unregister Lifecycle & Capability Enforcement.**
 
-### Next Chunk — P8A: canonical cross-adopter player target identity
+### Next Chunk — P9: Semantic pack ownership and complete lifecycle isolation
 
-Before changing relationship data paths:
-
-1. audit Core and Hoomans existing persistent player-character identity sources in SP and MP;
-2. define one Core-owned canonical social target-key contract that works when only Core + Dynamic Trading are installed and remains the same after Hoomans is added;
-3. prefer a persistent Core-owned identifier over transient online ID or username-only identity;
-4. define migration/alias handling for existing DT keys and existing Hoomans player-character keys without relationship duplication or data loss;
-5. make DT pricing, trade events and talk context use the canonical Core target-key resolver;
-6. make Hoomans relationship/social paths resolve the same canonical key rather than maintaining a separate identity namespace;
-7. add SP/MP-style headless fixtures proving both adopters resolve the exact same target key for the same player character;
-8. preserve unrelated Dynamic Trading `DTHoomans_Conversation.lua` working-tree changes.
-
-P8A gate:
-
-- one player character produces exactly one canonical Core Social target key in Core-only/DT-only/Hoomans/combined configurations;
-- transient online IDs cannot create a parallel relationship entry;
-- legacy aliases migrate/merge once and idempotently.
-
-After P8A, continue automatically to P8B rather than stopping.
-
-### P8B — merge-safe Core-first relationship mutation
-
-Replace whole-snapshot stale mirroring with explicit Core-authoritative mutation/merge contracts.
-
-Required adversarial regression:
-
-`DT trade -> Hoomans relationship mutation -> DT memory + DynamicTrading extension survive exactly`
-
-and reverse:
-
-`Hoomans social mutation -> DT trade -> ProjectHoomans extension + Hoomans shared state survive exactly`.
-
-Hoomans local `record.social` may remain as a compatibility projection/cache only if it cannot overwrite newer Core truth.
+Requirements:
+1. In `psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/Semantics/PsychopatzSemanticPackRegistry.lua`:
+   - Explicitly index all registered items (concepts, speech acts, patterns, dialogue blocks, action providers) by `packID`.
+   - Implement complete, residue-free `UnregisterPack(packID)`: remove all owned concepts, speech acts, and patterns from `PsychopatzSemanticRegistry` so uninstalled/disabled packs leave no parsing residue (e.g. DT trade tokens or Hoomans commands cease to parse when their pack is unregistered).
+   - Enforce pack-level `capabilitiesRequired` for dialogue block selection and parser arbitration.
+2. Add adversarial lifecycle test `tests/psychopatz_semantic_pack_lifecycle_smoke.lua` in `psychopatzCore` proving:
+   - Registering a pack adds its concepts/speech acts/dialogue blocks.
+   - Unregistering the pack completely purges them from the parsing and dialogue systems with 0 residual side effects.
+   - Missing required capabilities prevents dialogue blocks and action execution.
+3. Validate all Core tests and run syntax checks.
+4. Continue automatically to P10.
 
 ## Remaining mandatory phases
 
