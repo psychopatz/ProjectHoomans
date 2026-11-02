@@ -117,6 +117,12 @@ local Semantics = require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local PackRegistry = Semantics.PackRegistry
 local ActorConversationService = require "PsychopatzCore/Conversation/PsychopatzActorConversationService"
 
+-- Initialize DTCommon and Storage before loading DT modules
+DTCommon = DTCommon or {}
+DTCommon.Storage = DTCommon.Storage or {
+    IsAuthority = function() return true end,
+}
+
 -- Load DT Modules
 T.load("../DynamicTrading/Contents/mods/DTCommon/42.20/media/lua/shared/DTCommon/DTCommon_CoreActorPolicy.lua")
 T.load("../DynamicTrading/Contents/mods/DTCommon/42.20/media/lua/shared/DTCommon/DTCommon_TraderService.lua")
@@ -547,8 +553,12 @@ print("[P15C] Sequence 3 PASSED.")
 -- =========================================================================
 print("[P15C] Starting Sequence 4: Grounded DT Whereabouts, Road News, and Storytelling")
 
+local simulatedDTStorage = { v = 1, r = 0, t = {} }
 DTCommon.Storage = {
     IsAuthority = function() return true end,
+    GetData = function() return simulatedDTStorage end,
+    Touch = function() simulatedDTStorage.r = simulatedDTStorage.r + 1 end,
+    Transmit = function() end,
 }
 
 local traderTestActor = PsychopatzCore.Actors.DefaultRegistry:Create({
@@ -560,18 +570,51 @@ local traderTestActor = PsychopatzCore.Actors.DefaultRegistry:Create({
 
 local testTraderRecord = {
     id = "trader:hotplug:test",
+    traderID = "trader:hotplug:test",
     ca = { actorID = traderTestActor.actorId, providerRevision = 1, role = "trader" },
 }
+simulatedDTStorage.t["trader:hotplug:test"] = testTraderRecord
 
 DTCommon.TraderService = DTCommon.TraderService or {}
-DTCommon.TraderService.GetRecord = function(id) return testTraderRecord end
+DTCommon.TraderService.GetRecord = function(id)
+    if simulatedDTStorage.t and simulatedDTStorage.t[id] then
+        return simulatedDTStorage.t[id]
+    end
+    return testTraderRecord
+end
 DTCommon.TraderService.ValidateTalkAccess = function() return true end
+
+-- Setup DTHoomans excursion bridge environment
+DTHoomans = DTHoomans or {}
+DTHoomans.Settlement = DTHoomans.Settlement or {}
+DTHoomans.Settlement.TraderIDForFaction = function(factionID)
+    if factionID == "faction_test_resident" then
+        return "trader:hotplug:test"
+    end
+    return nil
+end
+DTHoomans.Settlement.MarkTraderVisit = function(traderID, destination, options)
+    return true
+end
+DTHoomans.Settlement.ActiveCommunityForFaction = function(factionID)
+    return { id = "community_home_123", status = "active" }
+end
+
+T.load("../DynamicTrading/Contents/mods/DTHoomans/42.20/media/lua/server/DTHoomans/DTHoomans_ResidentExcursion.lua")
+
+-- Register presentation resolver for human-facing place names (P19B)
+DTCommon.PlacePresentation.RegisterResolver("matrix_community_resolver", function(id)
+    if id == "community_home_123" then return "Riverside Safehouse" end
+    if id == "community_dest_789" then return "Rosewood Outpost" end
+    if id == "community_orig_456" then return "March Ridge Depot" end
+    return nil
+end, 100)
 
 -- 4A: Unseeded whereabouts query returns bounded uncertainty
 do
-    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
+    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, "trader:hotplug:test", "radio")
     T.truthy(session, sessionReason)
-    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "where are you going", {
+    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "where are you going", {
         mode = "radio",
         requestID = "turn-where-unk",
     })
@@ -581,56 +624,123 @@ do
     print("PASS: Unseeded destination query returns bounded uncertainty: " .. replyText)
 end
 
--- 4B: Seeded destination in production Policy state returns grounded text containing 'Rosewood'
+-- 4B: Live Excursion Lifecycle: PREPARING -> Destination grounded with display name, no machine ID leak
 do
-    DTPolicy.SetDestinationSettlement(testTraderRecord, "Rosewood Outpost")
-    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
+    local ok, reason = DTHoomans.ResidentExcursion.OnExcursion({
+        state = "PREPARING",
+        purpose = "commercial_run",
+        factionID = "faction_test_resident",
+        homeCommunityID = "community_home_123",
+        destination = { communityID = "community_dest_789" },
+    })
+    T.truthy(ok, reason)
+
+    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, "trader:hotplug:test", "radio")
     T.truthy(session, sessionReason)
-    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "where are you going", {
+    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "where are you going", {
         mode = "radio",
-        requestID = "turn-where-grounded",
+        requestID = "turn-where-prep",
+    })
+    T.truthy(turn and turn.result and turn.result.responses[1], turnErr)
+    local resp = turn.result.responses[1]
+    T.truthy(string.find(resp.text, "Rosewood Outpost"), "Whereabouts contains human display name 'Rosewood Outpost'")
+    T.falsy(string.find(resp.text, "community_dest_789"), "Whereabouts does NOT leak machine ID 'community_dest_789'")
+    T.equal(resp.evidence, "community_dest_789", "Canonical machine ID preserved in evidence")
+    print("PASS: PREPARING excursion destination query resolved display name: " .. resp.text)
+end
+
+-- 4C: Live Excursion Lifecycle: OUTBOUND & VISITING transitions
+do
+    -- OUTBOUND: current settlement cleared while traveling
+    DTHoomans.ResidentExcursion.OnExcursion({
+        state = "OUTBOUND",
+        purpose = "commercial_run",
+        factionID = "faction_test_resident",
+        homeCommunityID = "community_home_123",
+        destination = { communityID = "community_dest_789" },
+    })
+    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, "trader:hotplug:test", "radio")
+    T.truthy(session, sessionReason)
+    local turnDest, destErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "where are you going", {
+        mode = "radio",
+        requestID = "turn-where-outbound",
+    })
+    T.truthy(turnDest and turnDest.result and turnDest.result.responses[1], destErr)
+    T.truthy(string.find(turnDest.result.responses[1].text, "Rosewood Outpost"), "Outbound heading toward Rosewood Outpost")
+
+    -- VISITING: current settlement set to visited community
+    DTHoomans.ResidentExcursion.OnExcursion({
+        state = "VISITING",
+        purpose = "commercial_run",
+        factionID = "faction_test_resident",
+        destination = { communityID = "community_dest_789" },
+        id = "run_visiting_1",
+    })
+    local turnSett, settErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "where is the settlement", {
+        mode = "radio",
+        requestID = "turn-sett-visiting",
+    })
+    T.truthy(turnSett and turnSett.result and turnSett.result.responses[1], settErr)
+    T.truthy(string.find(turnSett.result.responses[1].text, "Rosewood Outpost"), "Visiting trader current settlement is Rosewood Outpost")
+    print("PASS: OUTBOUND and VISITING excursion states successfully ground dialogue")
+end
+
+-- 4D: Live Excursion Lifecycle: RETURNING_HOME and AT_HOME transitions
+do
+    -- RETURNING_HOME: heading back to homeCommunityID, origin was destination
+    DTHoomans.ResidentExcursion.OnExcursion({
+        state = "RETURNING_HOME",
+        purpose = "commercial_run",
+        factionID = "faction_test_resident",
+        homeCommunityID = "community_home_123",
+        visitedCommunityID = "community_dest_789",
+    })
+    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, "trader:hotplug:test", "radio")
+    T.truthy(session, sessionReason)
+    local turnReturn, retErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "where are you going", {
+        mode = "radio",
+        requestID = "turn-where-return",
+    })
+    T.truthy(turnReturn and turnReturn.result and turnReturn.result.responses[1], retErr)
+    T.truthy(string.find(turnReturn.result.responses[1].text, "Riverside Safehouse"), "Returning home heading toward Riverside Safehouse")
+
+    -- AT_HOME: destination cleared, current is homeCommunityID
+    DTHoomans.ResidentExcursion.OnExcursion({
+        state = "AT_HOME",
+        purpose = "commercial_run",
+        factionID = "faction_test_resident",
+        homeCommunityID = "community_home_123",
+    })
+    local turnHomeDest, homeDestErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "where are you going", {
+        mode = "radio",
+        requestID = "turn-where-athome",
+    })
+    T.truthy(homeDestDest and homeDestErr or turnHomeDest, homeDestErr)
+    T.truthy(string.find(turnHomeDest.result.responses[1].text, "cannot confirm"), "Destination cleared at home returns bounded uncertainty")
+    print("PASS: RETURNING_HOME and AT_HOME excursion transitions successfully clear destination")
+end
+
+-- 4E: Unresolvable machine ID produces bounded uncertainty instead of leaking raw machine string
+do
+    DTPolicy.SetDestinationSettlement(testTraderRecord, "community_999_raw")
+    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, "trader:hotplug:test", "radio")
+    T.truthy(session, sessionReason)
+    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "where are you going", {
+        mode = "radio",
+        requestID = "turn-unres-dest",
     })
     T.truthy(turn and turn.result and turn.result.responses[1], turnErr)
     local replyText = turn.result.responses[1].text
-    T.truthy(string.find(replyText, "Rosewood"), "Whereabouts contains grounded destination 'Rosewood'")
-    print("PASS: Production-seeded destination query grounded without answer injection: " .. replyText)
+    T.truthy(string.find(replyText, "cannot confirm"), "Unresolvable machine ID yields bounded uncertainty")
+    T.falsy(string.find(replyText, "community_999_raw"), "Raw machine ID never leaks into dialogue")
+    print("PASS: Unresolvable machine ID yields bounded uncertainty without string leak: " .. replyText)
 end
 
--- 4C: Seeded origin in production Policy state returns grounded text
+-- 4F: Unseeded road news query returns bounded fallback
 do
-    DTPolicy.SetOriginSettlement(testTraderRecord, "March Ridge Depot")
-    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
+    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, "trader:hotplug:test", "radio")
     T.truthy(session, sessionReason)
-    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "where did you come from", {
-        mode = "radio",
-        requestID = "turn-orig-grounded",
-    })
-    T.truthy(turn and turn.result and turn.result.responses[1], turnErr)
-    local replyText = turn.result.responses[1].text
-    T.truthy(string.find(replyText, "March Ridge Depot"), "Origin contains grounded text 'March Ridge Depot'")
-    print("PASS: Production-seeded origin query grounded without answer injection: " .. replyText)
-end
-
--- 4D: Seeded settlement in production Policy state returns grounded text
-do
-    DTPolicy.SetCurrentSettlement(testTraderRecord, "Riverside Safehouse")
-    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
-    T.truthy(session, sessionReason)
-    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "where is the settlement", {
-        mode = "radio",
-        requestID = "turn-sett-grounded",
-    })
-    T.truthy(turn and turn.result and turn.result.responses[1], turnErr)
-    local replyText = turn.result.responses[1].text
-    T.truthy(string.find(replyText, "Riverside Safehouse"), "Settlement contains grounded text 'Riverside Safehouse'")
-    print("PASS: Production-seeded settlement query grounded without answer injection: " .. replyText)
-end
-
--- 4E: Unseeded road news query returns bounded fallback
-do
-    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
-    T.truthy(session, sessionReason)
-    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "road news", {
+    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "road news", {
         mode = "radio",
         requestID = "turn-no-news",
     })
@@ -640,7 +750,7 @@ do
     print("PASS: Unseeded road news returns bounded fallback")
 end
 
--- 4F: Grounded road news from real published WorldKnowledge fact
+-- 4G: Grounded road news from real published WorldKnowledge fact
 do
     local publishedFact, pubErr = DTCommon.WorldKnowledge.Publish({
         factID = "fact:report_seq4_news",
@@ -652,16 +762,16 @@ do
         },
     })
     T.truthy(publishedFact, pubErr)
-    local acquired, acqErr = DTCommon.WorldKnowledge.Acquire(testTraderRecord.id, "fact:report_seq4_news", {
+    local acquired, acqErr = DTCommon.WorldKnowledge.Acquire("trader:hotplug:test", "fact:report_seq4_news", {
         authorized = true,
         provenance = "witnessed",
         confidence = 90,
     })
     T.truthy(acquired, acqErr)
 
-    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
+    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, "trader:hotplug:test", "radio")
     T.truthy(session, sessionReason)
-    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "road news", {
+    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "road news", {
         mode = "radio",
         requestID = "turn-news-grounded",
     })
@@ -672,11 +782,11 @@ do
     print("PASS: Production WorldKnowledge road news query grounded with active report: " .. resp.text)
 end
 
--- 4G: Storytelling returns rich non-factual narrative
+-- 4H: Storytelling returns rich non-factual narrative
 do
-    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, testTraderRecord.id, "radio")
+    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, "trader:hotplug:test", "radio")
     T.truthy(session, sessionReason)
-    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, testTraderRecord.id, session.sessionID, "tell me a caravan story", {
+    local turn, turnErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "tell me a caravan story", {
         mode = "radio",
         requestID = "turn-story",
     })
@@ -684,6 +794,71 @@ do
     local replyText = turn.result.responses[1].text
     T.truthy(string.find(replyText, "road") or string.find(replyText, "caravan") or string.find(replyText, "fog"), "Storytelling returned narrative")
     print("PASS: Caravan story returned rich narrative: " .. replyText)
+end
+
+-- 4I: Real Persistence & Reload (P19C / P19D)
+do
+    -- Set known state
+    DTPolicy.SetDestinationSettlement(testTraderRecord, "community_dest_789")
+    DTPolicy.SetOriginSettlement(testTraderRecord, "community_orig_456")
+    DTPolicy.SetCurrentSettlement(testTraderRecord, "community_home_123")
+
+    -- Save trader and WorldKnowledge
+    simulatedDTStorage.t["trader:hotplug:test"] = testTraderRecord
+    local savedPayload = DTCommon.WorldKnowledge.Save()
+    T.truthy(savedPayload, "WorldKnowledge successfully saved")
+
+    -- Reset in-memory sessions, CoreWK, and local reference
+    DTCommon.TalkService.Sessions = {}
+    PsychopatzCore.WorldKnowledge.Reset({ maxFacts = 16, maxActors = 8, maxRefs = 8 })
+    testTraderRecord = nil
+
+    -- Verify reloading from storage restores state and evidence
+    local reloadedTrader = DTCommon.Storage.GetData().t["trader:hotplug:test"]
+    T.truthy(reloadedTrader, "Trader record recovered from simulated persistent storage")
+    local loadOk, loadErr = DTCommon.WorldKnowledge.Load()
+    T.truthy(loadOk, loadErr)
+
+    local session, sessionReason = DTCommon.TalkService.Open(playerAlice, "trader:hotplug:test", "radio")
+    T.truthy(session, sessionReason)
+
+    -- Destination
+    local turnDest, turnDestErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "where are you going", {
+        mode = "radio",
+        requestID = "turn-dest-reloaded",
+    })
+    T.truthy(turnDest and turnDest.result and turnDest.result.responses[1], turnDestErr)
+    T.equal(turnDest.result.responses[1].text, "We are heading toward Rosewood Outpost.", "Reloaded destination resolves display name")
+    T.equal(turnDest.result.responses[1].evidence, "community_dest_789", "Reloaded destination preserves canonical evidence")
+
+    -- Origin
+    local turnOrig, turnOrigErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "where did you come from", {
+        mode = "radio",
+        requestID = "turn-orig-reloaded",
+    })
+    T.truthy(turnOrig and turnOrig.result and turnOrig.result.responses[1], turnOrigErr)
+    T.equal(turnOrig.result.responses[1].text, "We came from March Ridge Depot.", "Reloaded origin resolves display name")
+    T.equal(turnOrig.result.responses[1].evidence, "community_orig_456", "Reloaded origin preserves canonical evidence")
+
+    -- Settlement
+    local turnSett, turnSettErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "where is the settlement", {
+        mode = "radio",
+        requestID = "turn-sett-reloaded",
+    })
+    T.truthy(turnSett and turnSett.result and turnSett.result.responses[1], turnSettErr)
+    T.equal(turnSett.result.responses[1].text, "Our primary trading settlement is Riverside Safehouse.", "Reloaded settlement resolves display name")
+    T.equal(turnSett.result.responses[1].evidence, "community_home_123", "Reloaded settlement preserves canonical evidence")
+
+    -- Road news
+    local turnNews, turnNewsErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "road news", {
+        mode = "radio",
+        requestID = "turn-news-reloaded",
+    })
+    T.truthy(turnNews and turnNews.result and turnNews.result.responses[1], turnNewsErr)
+    T.truthy(string.find(turnNews.result.responses[1].text, "BANDIT RAID"), "Reloaded road news preserves fact content")
+    T.equal(turnNews.result.responses[1].evidence, "fact:report_seq4_news", "Reloaded road news preserves exact fact evidence")
+
+    print("PASS: Real persistence and reload preserves all factual state, place presentation, and evidence")
 end
 
 print("[P15C] Sequence 4 PASSED.")
