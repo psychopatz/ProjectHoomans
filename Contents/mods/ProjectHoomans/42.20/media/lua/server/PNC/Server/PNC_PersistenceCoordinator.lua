@@ -42,6 +42,14 @@ function Coordinator.Commit(reason)
         identity = PNC.PlayerCharacters and PNC.PlayerCharacters.Dirty == true,
         knowledge = PNC.NPCKnowledge and PNC.NPCKnowledge.Dirty == true,
         factions = PNC.Factions and PNC.Factions.Dirty == true,
+        survivorWorld = PNC.SurvivorWorldExtensions
+            and (
+                PNC.SurvivorWorldExtensions.Dirty == true
+                or PNC.Factions and PNC.Factions.Dirty == true
+                or PNC.Communities and PNC.Communities.Dirty == true
+                or PNC.AbstractWorldStore
+                    and PNC.AbstractWorldStore.Dirty == true
+            ) or false,
         projectALifeRelations = PNC.Compatibility
             and PNC.Compatibility.ProjectALifePolicy
             and PNC.Compatibility.ProjectALifePolicy.Dirty == true,
@@ -83,7 +91,14 @@ function Coordinator.Commit(reason)
         if PNC.NPCKnowledge and initialDirty.knowledge then
             PNC.NPCKnowledge.Dirty = true
         end
-        if PNC.Factions and initialDirty.factions then PNC.Factions.Dirty = true end
+        if PNC.Factions and initialDirty.factions then
+            PNC.Factions.Dirty = true
+        end
+        if PNC.SurvivorWorldExtensions
+            and initialDirty.survivorWorld
+        then
+            PNC.SurvivorWorldExtensions.Dirty = true
+        end
         if PNC.Compatibility
             and PNC.Compatibility.ProjectALifePolicy
             and initialDirty.projectALifeRelations
@@ -163,16 +178,40 @@ function Coordinator.Commit(reason)
         return true
     end
 
+    local function saveSurvivorWorld()
+        local extensions = PNC.SurvivorWorldExtensions
+        if extensions and extensions.Save then
+            local ok, why = save("survivorWorld", extensions)
+            if not ok then return false, why end
+
+            -- Preserve existing diagnostic/result keys without re-running
+            -- three legacy save authorities. All three aliases describe the
+            -- same Core + Hoomans-extension commit.
+            local result = copy(results.survivorWorld)
+            results.factions = copy(result)
+            results.communities = copy(result)
+            results.abstractWorld = copy(result)
+            return true
+        end
+
+        -- Detached/legacy test runtimes that do not compose SurvivorWorld can
+        -- still exercise the old services. Production composition always
+        -- loads SurvivorWorldExtensions before this coordinator.
+        local ok, why = save("factions", PNC.Factions)
+        if not ok then return false, why end
+        ok, why = save("communities", PNC.Communities)
+        if not ok then return false, why end
+        return save("abstractWorld", PNC.AbstractWorldStore)
+    end
+
     local ok, why = save("identity", PNC.PlayerCharacters)
     if not ok then return failure(why) end
     ok, why = save("knowledge", PNC.NPCKnowledge)
     if not ok then return failure(why) end
-    ok, why = save("factions", PNC.Factions)
+    ok, why = saveSurvivorWorld()
     if not ok then return failure(why) end
     ok, why = save("projectALifeRelations", PNC.Compatibility
         and PNC.Compatibility.ProjectALifePolicy)
-    if not ok then return failure(why) end
-    ok, why = save("communities", PNC.Communities)
     if not ok then return failure(why) end
     ok, why = save("recipeKnowledge", PNC.KnowledgeRepository)
     if not ok then return failure(why) end
@@ -193,8 +232,6 @@ function Coordinator.Commit(reason)
     ok, why = save("colonyStorage", PNC.ColonyStorageRepository)
     if not ok then return failure(why) end
     ok, why = save("settlements", PNC.SettlementRepository)
-    if not ok then return failure(why) end
-    ok, why = save("abstractWorld", PNC.AbstractWorldStore)
     if not ok then return failure(why) end
     ok, why = save("worldDiscovery", PNC.WorldDiscovery)
     if not ok then return failure(why) end

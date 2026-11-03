@@ -142,4 +142,43 @@ T.equal(dirtyReasons[2], "communities_save", "community dirty reason")
 T.equal(dirtyReasons[3], "abstract_world_save",
     "abstract dirty reason")
 
+-- Once Core authority is composed, a missing/inactive cutover must fail
+-- closed instead of resurrecting a legacy generic ModData writer.
+PNC = {
+    Core = {},
+    Factions = {
+        Internal = {
+            authority = function() return true end,
+            copy = function(value) return value end,
+            rebuildIndexes = function() end,
+        },
+        Registry = { revision = 1, byID = {} },
+        Loaded = true,
+        Dirty = true,
+    },
+    FactionConstants = {
+        REGISTRY_MODDATA_KEY = "PNC_Factions",
+        REGISTRY_SCHEMA_VERSION = 6,
+        ID_GENERATION_RETRIES = 1,
+    },
+    FactionTypes = {
+        NormalizeFactionRegistry = function(value) return value end,
+        AreEqual = function() return true end,
+        IsValidFactionID = function() return true end,
+    },
+    FactionArchetypes = {},
+    EntityRef = {},
+    ModDataStore = reset,
+    CoreSurvivorWorldAuthority = {},
+}
+T.load("ProjectHoomans", "server",
+    "PNC/Factions/FactionService/PNC_FactionService_RegistryPersistence.lua")
+saved, reason = PNC.Factions.Save()
+T.falsy(saved,
+    "Core-composed runtime must not fall back to legacy faction writes")
+T.equal(reason, "survivor_world_cutover_unavailable",
+    "missing cutover fails closed")
+T.equal(#legacyWrites, 0,
+    "fail-closed save still writes no legacy generic root")
+
 T.finish("pnc_survivor_world_legacy_save_redirect_smoke")

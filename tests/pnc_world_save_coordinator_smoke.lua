@@ -55,6 +55,18 @@ PNC.NPCKnowledge = service("NPCKnowledge")
 PNC.Factions = service("Factions")
 PNC.Communities = service("Communities")
 PNC.AbstractWorldStore = service("AbstractWorldStore")
+PNC.SurvivorWorldExtensions = service("SurvivorWorldExtensions")
+PNC.SurvivorWorldExtensions.Save = function(flushGlobal)
+    T.equal(flushGlobal, false,
+        "SurvivorWorldExtensions defers global flush")
+    calls.SurvivorWorldExtensions =
+        (calls.SurvivorWorldExtensions or 0) + 1
+    PNC.SurvivorWorldExtensions.Dirty = false
+    PNC.Factions.Dirty = false
+    PNC.Communities.Dirty = false
+    PNC.AbstractWorldStore.Dirty = false
+    return true, "saved"
+end
 PNC.WorldDiscovery = service("WorldDiscovery")
 PNC.Conversation = { History = service("ConversationHistory") }
 -- The generic mock looks services up directly on PNC.
@@ -66,12 +78,18 @@ T.equal(type(saveHook), "function", "coordinator registers world-save hook")
 saveHook()
 
 for _, name in ipairs({
-    "PlayerCharacters", "NPCKnowledge", "Factions", "Communities",
-    "AbstractWorldStore", "WorldDiscovery", "ConversationHistory",
-    "Registry",
+    "PlayerCharacters", "NPCKnowledge",
+    "SurvivorWorldExtensions", "WorldDiscovery",
+    "ConversationHistory", "Registry",
 }) do
     T.equal(calls[name], 1, name .. " saved once")
 end
+T.equal(calls.Factions, nil,
+    "factions no longer own an active persistence write")
+T.equal(calls.Communities, nil,
+    "communities no longer own an active persistence write")
+T.equal(calls.AbstractWorldStore, nil,
+    "abstract world no longer owns an active persistence write")
 T.equal(globalSaves, 1, "all services share one GlobalModData flush")
 T.finish("pnc_world_save_coordinator_smoke")
 

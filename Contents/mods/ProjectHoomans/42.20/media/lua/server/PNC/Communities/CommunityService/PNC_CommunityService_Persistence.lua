@@ -77,9 +77,15 @@ function Communities.Save()
     Communities.EnsureLoaded()
     if not Communities.Dirty then return false, "not_dirty" end
     local extensions = PNC.SurvivorWorldExtensions
-    if extensions and extensions.Active and extensions.Save then
+    if extensions and extensions.Save then
+        if extensions.Active ~= true then
+            return false, "survivor_world_cutover_inactive"
+        end
         extensions.MarkDirty("communities_save")
         return extensions.Save()
+    end
+    if PNC.CoreSurvivorWorldAuthority then
+        return false, "survivor_world_cutover_unavailable"
     end
     normalized = Types.NormalizeRegistry(Communities.Registry)
     local written = Reset.Write(Constants.REGISTRY_MODDATA_KEY,
