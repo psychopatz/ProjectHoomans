@@ -46,17 +46,22 @@ Also inspect the accepted Core foundation docs under `psychopatzCore/Docs/npc_fo
 
 ## Completion state
 
-**Current state: IN PROGRESS.** A fourth independent production-path audit after the P16-P17 closeout found that the new Core issuance registry and DT factual policy APIs are useful foundations, but two completion claims remain false.
+**Current state: IN PROGRESS.** A fifth independent production-path audit after the P18-P19 closeout accepted P18 and the main P19 happy-path travel/presentation work, but reproduced one remaining live lifecycle defect and found that the trader-record reload proof is still synthetic.
 
-Retain all accepted work, especially P8B social integrity, semantic-pack lifecycle, P14 production capability isolation, complete DT parser coverage, bounded uncertainty, real WorldKnowledge road-news/route grounding, the P16 issuance registry itself, and the P17 policy/TalkService integration.
+Retain all accepted work. In particular:
 
-Mandatory P18-P19 work remains for:
+- P18 mirror-to-authority bootstrap protection is independently verified;
+- legitimate DT-first and Hoomans-first identity convergence remains accepted;
+- P14 production capability isolation remains accepted;
+- P19 PREPARING/OUTBOUND/VISITING/RETURNING_HOME/AT_HOME travel projection works;
+- canonical machine settlement IDs resolve to human-facing names without leaking raw IDs;
+- route/news WorldKnowledge grounding and bounded uncertainty remain accepted.
 
-- preventing Core identity lookup from auto-authorizing an unknown `PNC_CharacterUUID` before Hoomans validates it;
-- importing Hoomans-first identities into Core only from the authoritative Hoomans player-character registry/service, never from player mirror modData alone;
-- wiring real excursion/travel lifecycle into canonical DT origin/destination state;
-- resolving canonical settlement/community IDs to human-facing names before factual dialogue realization;
-- proving destination/origin/current-settlement/news state survives a real DT storage save/reload path;
-- upgrading the final matrix around the exact vulnerable call order and live travel lifecycle.
+Mandatory P20 work remains for:
 
-Developer-side completion now requires the full P0-P19 roadmap and current acceptance matrix. Native Project Zomboid SP/MP validation remains user-owned unless explicitly reassigned. Steam Workshop publication is never implied by Git completion.
+- correcting FAILED excursion semantics when normalized numeric timestamps use `0` for "not completed";
+- adding failure-state regressions for before-departure and after-departure cases;
+- strengthening factual trader-record persistence acceptance so reload reconstructs state from a persisted snapshot rather than retaining the same Lua table/object;
+- reconciling Git-history documentation: the formerly preserved `DTHoomans_Conversation.lua` local edit is now committed in Dynamic Trading commit `be9e8e10`, and all three worktrees are currently clean.
+
+Developer-side completion now requires P20 and its acceptance matrix. Native Project Zomboid SP/MP validation remains user-owned after developer acceptance. Steam Workshop publication is never implied by Git completion.

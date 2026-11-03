@@ -1,8 +1,8 @@
 # Roadmap — Core Semantic & Relationship Foundation
 
-**Status:** IN PROGRESS — P0-P17 implementation exists. A fourth production-path audit retained the P16 issuance registry and P17 policy/grounding foundation but invalidated authority bootstrapping, live travel wiring, place presentation, and factual-state reload acceptance. P18-P19 are mandatory final corrections.
+**Status:** IN PROGRESS — P0-P19 implementation exists. A fifth production-path audit accepted P18 and most P19 behavior but reproduced a FAILED-after-departure lifecycle defect and found the trader-record reload proof still reuses the same backing Lua table. P20 is the mandatory final correction.
 
-The parent goal completion boundary is now the complete P0-P19 outcome. Preserve accepted P0-P17 implementation; P18-P19 repair only the concrete production-order and live-gameplay gaps reproduced after the P17 closeout.
+The parent goal completion boundary is now the complete P0-P20 outcome. Preserve accepted P0-P19 implementation; P20 repairs only the remaining failure-state and persistence-evidence gaps reproduced after the P19 closeout.
 
 After every accepted chunk: implement -> validate actual production owners -> update PROGRESS -> commit coherent owner-repository changes -> continue automatically to the next mandatory chunk.
 
@@ -541,7 +541,109 @@ Final validation:
 - `git diff --check`;
 - exact final repository revisions/status, explicitly reporting the preserved tracked DT working-tree edit.
 
-Gate: only after P18-P19 pass may the parent goal return to **READY FOR USER LIVE TEST**.
+Historical P19 closeout gate: superseded by the fifth production-path audit. P20 is mandatory before **READY FOR USER LIVE TEST**.
+
+
+## P20 — Failure-state correctness and reconstructed persistence acceptance
+
+### P20A — Correct FAILED excursion lifecycle semantics
+
+Retain the accepted PREPARING/OUTBOUND/VISITING/RETURNING_HOME/AT_HOME mapping.
+
+Verified fifth-audit defect:
+
+Project Hoomans normalizes excursion timestamps to numeric values:
+
+- `departedAt = tonumber(...) or 0`;
+- `completedAt = tonumber(...) or 0`.
+
+Current DTHoomans FAILED handling checks:
+
+```lua
+if payload.departedAt ~= nil
+    and not payload.completedAt
+then
+    ...
+end
+```
+
+This is incorrect in Lua because `0` is truthy.
+
+Independent production-handler reproduction:
+
+- before FAILED: current=nil, origin=home, destination=selected destination;
+- payload: `departedAt=12`, `completedAt=0`;
+- current implementation incorrectly restores `currentSettlementID=home` and clears destination as though departure never happened.
+
+Requirements:
+
+- use numeric lifecycle meaning, not truthiness;
+- failure before departure may restore/remain at home and restore availability;
+- failure after departure must not fabricate home/current state;
+- failure after visiting or while returning must preserve/derive the best authoritative origin/current/destination state;
+- availability after failure must reflect whether the trader is actually home/usable;
+- retry/recovery must not inherit stale destination incorrectly;
+- no new Hoomans gameplay ownership should move into DTCommon.
+
+Mandatory regressions:
+
+1. PREPARING -> FAILED before departure -> home/current restored, destination cleared, availability consistent.
+2. OUTBOUND -> FAILED with `departedAt > 0, completedAt = 0` -> trader is not reported home and is not incorrectly available.
+3. VISITING -> FAILED -> current/origin/destination remain coherent with the last authoritative visit state.
+4. RETURNING_HOME -> FAILED -> do not falsely mark home until exact-home completion occurs.
+5. retry/new PREPARING after FAILED -> old destination does not leak into the new trip.
+6. normal happy path remains unchanged.
+
+Gate: FAILED/cancelled travel can never create a false factual "at home" state.
+
+### P20B — Reconstructed trader-record persistence acceptance
+
+Retain the accepted WorldKnowledge `Save/Load` coverage.
+
+Strengthen trader-record persistence proof.
+
+Current matrix and standalone semantic test put the trader record in a simulated storage table, set one local record variable to nil, then retrieve the same table/object from that storage. That demonstrates storage lookup continuity but not reconstruction from persisted state.
+
+Required headless acceptance:
+
+1. establish home/current/origin/destination through the production owner/lifecycle;
+2. publish/acquire route/news facts;
+3. obtain the real DT storage representation;
+4. create a persisted snapshot/deep copy that represents what Global ModData would retain;
+5. tear down/reset relevant TalkService/session/runtime references;
+6. replace/reinitialize the storage backing with a fresh table reconstructed from the snapshot;
+7. prove the reloaded trader record is not the same Lua object as the pre-save record;
+8. run WorldKnowledge `Load` from the reconstructed storage;
+9. re-open TalkService;
+10. verify destination/origin/settlement/route/news output and evidence;
+11. verify completed/failed trip cleanup is also represented correctly after reload.
+
+Native engine serialization is not required for this developer gate, but same-object reuse is not accepted as a reload proof.
+
+### P20C — Final regression matrix and documentation truth
+
+Upgrade existing tests minimally rather than replacing accepted coverage.
+
+Required final validation:
+
+- exact P18 Core-first forged-mirror adversarial test remains green;
+- P20 failure-state regressions pass;
+- reconstructed persistence regression passes;
+- production DTHoomans community presentation resolver remains verified;
+- Dynamic Trading full runner remains at the fifth-audit baseline of `43/43` or improves;
+- Hoomans broad runner remains at `982/987` with the same five documented baseline failures unless touched causes legitimately change;
+- Core focused identity/social/conversation suites pass;
+- changed Lua passes syntax/static/Kahlua checks where available;
+- `git diff --check` passes;
+- exact repository revisions/worktree statuses are recorded.
+
+Git-history reconciliation:
+
+- Dynamic Trading is currently clean at `89c349ce`;
+- the formerly uncommitted `DTHoomans_Conversation.lua` semantic-hub edit was incorporated into commit `be9e8e10`;
+- do not report it as an outstanding preserved tracked working-tree edit.
+
+Gate: after P20A-P20C pass, the parent goal may return to **READY FOR USER LIVE TEST**.
 
 ## Completion rule
 
@@ -554,4 +656,4 @@ The parent goal is not complete merely because:
 - a synthetic payload survives serialization;
 - focused tests pass.
 
-Completion requires one canonical player relationship identity whose authority cannot be bootstrapped from mirrors, non-destructive interleaved adopter writes, residue-free and capability-isolated production conversation semantics, working Hoomans adoption, factual DT route/destination/origin/settlement/news answers driven by actual gameplay owners and rendered with human-facing place presentation, factual-state persistence across reload, and a real production-module hot-plug matrix that exercises those boundaries.
+Completion requires one canonical player relationship identity whose authority cannot be bootstrapped from mirrors, non-destructive interleaved adopter writes, residue-free and capability-isolated production conversation semantics, working Hoomans adoption, factual DT route/destination/origin/settlement/news answers driven by actual gameplay owners and rendered with human-facing place presentation, failure-state travel correctness, reconstructed factual-state persistence across reload, and a real production-module hot-plug matrix that exercises those boundaries.

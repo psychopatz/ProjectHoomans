@@ -362,3 +362,28 @@ A fourth independent audit on 2026-11-03 checked the P16-P17 developer-complete 
 - Hoomans `EnsureIdentity` -> forged UUID / `core_adopted`.
 
 These findings supersede the P16-P17 READY FOR USER LIVE TEST closeout. See ROADMAP P18-P19 and current PROGRESS.
+
+---
+
+## Fifth independent audit — P20 required
+
+A fifth independent production-path audit on 2026-11-03 checked the P18-P19 completion claim.
+
+### Accepted evidence
+
+- P18 is genuinely fixed. An unknown `PNC_CharacterUUID` remains `not_issued` after Core `GetTargetKey` runs first; Core generates a fresh authoritative UUID and Hoomans adopts that UUID rather than the forged mirror.
+- Production resident excursion now updates canonical DT origin/destination/current state for PREPARING, OUTBOUND, VISITING, RETURNING_HOME and AT_HOME.
+- DTHoomans place presentation resolves Hoomans community machine IDs to `community.name`; unresolvable machine IDs are suppressed rather than exposed.
+- P14 capability isolation remains green.
+- Dynamic Trading full runner passes `43/43`.
+- Hoomans focused P18/P19 tests pass.
+- Hoomans broad runner remains `982/987` with the same five known baseline failures.
+- changed Lua syntax and repository diff checks pass.
+
+### Remaining acceptance-invalidating evidence
+
+1. **FAILED-after-departure bug.** Hoomans normalizes `completedAt` to numeric `0`, but DTHoomans checks `not payload.completedAt`. In Lua `0` is truthy. A real production-handler probe with `departedAt=12, completedAt=0` incorrectly restored current settlement to home and cleared destination.
+2. **Persistence proof is same-object continuity.** The trader-record tests retain the same backing simulated storage table/object across the alleged reload. Clearing a local variable does not demonstrate reconstruction from persisted state. WorldKnowledge `Save/Load` is real, but trader-record reload acceptance is still synthetic.
+3. **Documentation history was stale.** Dynamic Trading is clean at `89c349ce`; the previously preserved `DTHoomans_Conversation.lua` semantic-hub edit was incorporated into commit `be9e8e10`.
+
+These findings supersede the P18-P19 READY FOR USER LIVE TEST closeout. See ROADMAP P20 and current PROGRESS.

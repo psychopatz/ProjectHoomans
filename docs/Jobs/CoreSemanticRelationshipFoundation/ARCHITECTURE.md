@@ -368,3 +368,33 @@ Canonical factual route state must be updated by the actual gameplay lifecycle t
 For Hoomans resident excursions, PREPARING/OUTBOUND/VISITING/RETURNING_HOME/AT_HOME transitions should maintain origin, destination and current settlement coherently. Standalone DT travel/excursion owners follow the same principle.
 
 Persistence acceptance must serialize/reload the same canonical trader record/world-knowledge state used by gameplay before re-querying dialogue.
+
+## 9E. Failure-state timestamps are numeric state
+
+Project Hoomans excursion public status normalizes lifecycle timestamps to numbers and uses `0` for "not yet happened".
+
+Dynamic Trading integration must therefore compare lifecycle timestamps numerically. Lua truthiness is not a valid state test because `0` is truthy.
+
+For example:
+
+```text
+departedAt > 0 and completedAt <= 0
+```
+
+means the excursion departed but did not complete. A check such as `not payload.completedAt` is invalid for this payload contract.
+
+FAILED/cancelled transitions must distinguish at least:
+
+- failure before departure: trader remains/restores home context and may become available;
+- failure after departure: trader must not be fabricated as home merely because completion time is `0`;
+- failure after visiting/while returning: origin/current/destination/availability must reflect the best authoritative travel state available.
+
+## 9F. Persistence acceptance must reconstruct persisted state
+
+Keeping the same Lua table behind a storage stub while clearing one local variable is not a reload proof.
+
+Headless persistence acceptance must snapshot/copy the storage representation, tear down or replace relevant runtime/module references, reconstruct a fresh storage/runtime view from the snapshot, then re-open the real service and query it.
+
+For Project Zomboid Global ModData-backed trader records, a deep-copied persisted table fixture is sufficient developer-side evidence when native engine serialization is out of scope. The test must prove the reloaded trader record is a distinct Lua object from the pre-save record while preserving canonical policy fields.
+
+WorldKnowledge must continue to exercise its real `Save/Load` contract and evidence/fact IDs.

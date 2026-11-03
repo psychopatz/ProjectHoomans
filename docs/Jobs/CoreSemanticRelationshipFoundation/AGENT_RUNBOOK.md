@@ -89,6 +89,13 @@ For player-facing settlement dialogue, tests must use representative machine IDs
 
 A factual-state persistence gate must perform actual DT storage serialization/reload after setting travel/settlement state and publishing/acquiring knowledge, then re-open TalkService and prove the facts remain available.
 
+Excursion timestamp fields are numeric and may be `0`; never use Lua truthiness to decide whether departure/completion happened. Failure-path acceptance must explicitly cover `departedAt > 0, completedAt = 0`.
+
+For headless trader-record persistence, the persisted storage fixture must be reconstructed from a snapshot/deep copy and the reloaded record must be a distinct object. Reusing the same backing table/object after setting a local variable to nil is not sufficient evidence.
+
+When repository status changes because a formerly uncommitted edit was intentionally committed, update durable docs to describe the actual commit/history. Do not continue claiming the worktree modification is still preserved locally.
+
+
 
 
 No native PZ launch, Workshop upload, republish or destructive save manipulation unless explicitly authorized by the user.
