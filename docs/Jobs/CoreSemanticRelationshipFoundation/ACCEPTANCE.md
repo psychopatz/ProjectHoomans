@@ -1,92 +1,81 @@
 # Acceptance — Core Semantic & Relationship Foundation
 
-**Current status:** READY FOR USER LIVE TEST. P20 failure-state numeric lifecycle corrections, mandatory failure-state regressions, and reconstructed trader-record persistence proofs pass across all production handlers and matrix runners.
+**Developer status:** COMPLETE — READY FOR USER LIVE TEST.
 
-## A. Ownership and canonical identity
+Native Project Zomboid SP/MP acceptance remains user-owned and has not been claimed by the developer test harness.
 
-- [x] PsychopatzCore owns shared actor/base social state and canonical target-key shape.
-- [x] Core has a persistent issuance registry and save/load API.
-- [x] legitimate DT-first Core-issued UUIDs are adopted by the real Hoomans service without UUID/key replacement.
-- [x] Core `GetCharacterUUID/GetTargetKey` does not auto-register an unknown `PNC_CharacterUUID` mirror.
-- [x] forged unknown PNC mirror -> Core resolves first -> forged identity remains `not_issued`.
-- [x] real Hoomans `EnsureIdentity` does not adopt that forged UUID.
-- [x] Hoomans-first Core registration originates from validated Hoomans identity authority.
-- [x] cross-account and repeat-adoption protections remain intact.
+## Developer acceptance
 
-## B. Core-first relationship integrity
+### Canonical identity and relationships
 
-- [x] DT/Hoomans interleaved writes preserve foreign extensions/memories.
-- [x] stale Hoomans state cannot erase newer Core/DT social state.
-- [x] alias convergence and repeated synchronization remain idempotent.
+- [x] Core owns canonical actor/player social identity and persistent issuance state.
+- [x] unknown `PNC_CharacterUUID` mirrors cannot bootstrap Core authority.
+- [x] DT-first and Hoomans-first identity adoption preserve the same UUID/key.
+- [x] cross-account/repeat-adoption protections remain intact.
+- [x] DT/Hoomans interleaved social writes preserve foreign extensions, memories, and newer shared state.
+- [x] alias convergence and repeated synchronization are idempotent.
 
-## C. Semantic lifecycle and isolation
+### Semantic lifecycle and adopter isolation
 
-- [x] pack lifecycle remains residue-free.
-- [x] production ActorConversationService propagates effective capabilities.
-- [x] DT-only conversations reject Hoomans grammar.
-- [x] Hoomans-only conversations reject DT grammar.
+- [x] semantic-pack ownership/unregister/re-register is residue-free.
+- [x] production `ActorConversationService` propagates effective capabilities into parsing.
+- [x] DT-only conversations reject Hoomans-only grammar.
+- [x] Hoomans-only conversations reject DT-only grammar.
 - [x] compound turns preserve capability isolation.
+- [x] required standalone DT identity/trade/whereabouts/news/story/farewell parser coverage is complete.
 
-## D. Dynamic Trading factual semantics and presentation
+### Factual travel dialogue and presentation
 
-- [x] required parser families are complete.
-- [x] no-evidence destination/news uses bounded uncertainty.
+- [x] canonical home/current/origin/destination state is owned by DT policy.
+- [x] production excursion lifecycle updates travel state.
 - [x] route/news WorldKnowledge facts produce evidence-backed responses.
-- [x] canonical home/current/origin/destination policy fields exist.
-- [x] TalkService consumes canonical policy state.
-- [x] production resident excursion wires PREPARING/OUTBOUND/VISITING/RETURNING_HOME/AT_HOME.
-- [x] canonical community IDs resolve to human-facing names through a bounded resolver.
+- [x] missing evidence produces bounded uncertainty/no-news.
+- [x] canonical machine settlement/community IDs resolve to human-facing names.
 - [x] unresolved machine IDs do not leak into dialogue.
-- [x] FAILED before departure is explicitly regression-tested and restores coherent home state.
-- [x] FAILED after departure with numeric `completedAt = 0` does not falsely report the trader home/available.
+- [x] FAILED before departure restores coherent home state.
+- [x] FAILED after departure with numeric `completedAt = 0` does not fabricate home/availability.
 - [x] FAILED while visiting/returning preserves coherent authoritative travel facts.
-- [x] retry after FAILED does not inherit stale destination/origin incorrectly.
+- [x] retry after failure does not inherit stale destination/origin state.
 
-## E. Persistence
+### Persistence and hot-plug behavior
 
-- [x] WorldKnowledge real `Save/Load` path is exercised with fact IDs/evidence.
-- [x] DT storage contains canonical trader policy state.
-- [x] headless reload reconstructs trader records from a persisted snapshot/fresh backing table.
-- [x] the reloaded trader record is proven to be a distinct Lua object from the pre-save record.
-- [x] reconstructed reload preserves destination/origin/current settlement and human presentation.
-- [x] completed/failed travel cleanup remains correct after reconstructed reload.
+- [x] WorldKnowledge real `Save/Load` path preserves fact/evidence data.
+- [x] trader-record headless reload reconstructs from a deep-copied persisted snapshot/fresh backing table.
+- [x] reloaded trader record is a distinct Lua object from the pre-save record.
+- [x] reconstructed reload preserves factual policy and human-facing presentation.
+- [x] completed/failed travel cleanup remains coherent after reload.
+- [x] production hot-plug matrix covers real identity service, interleaved social writes, capability isolation, pack lifecycle, travel state, and migration idempotence.
 
-## F. Real hot-plug/removal matrix
+### Performance and validation
 
-- [x] real Hoomans identity service is exercised.
-- [x] forged PNC mirror -> Core-first resolution -> Hoomans-second validation is covered.
-- [x] P8B relationship interleaving remains covered.
-- [x] P14 production capability isolation remains covered.
-- [x] live happy-path excursion transitions and place presentation are covered.
-- [x] pack unregister/re-register and migration idempotence remain covered.
-- [x] FAILED/cancelled lifecycle coverage is included.
-- [x] factual-state reload uses reconstructed persistence rather than same-object storage reuse.
-
-## G. Performance
-
-- [x] no global per-tick semantic scan.
-- [x] no periodic full relationship reconciliation.
-- [x] identity/travel/presentation work remains bounded to explicit lifecycle/load/conversation events.
-- [x] P20 correction preserves bounded behavior.
-
-## H. Developer validation
-
-- [x] fifth audit independently verified P18 attack-order fix.
-- [x] Core focused identity/social/conversation tests pass.
+- [x] no global per-tick semantic scan was introduced.
+- [x] no periodic full relationship reconciliation was introduced.
+- [x] identity/travel/presentation work remains bounded to explicit lifecycle/load/conversation boundaries.
+- [x] Core focused identity/social/conversation/semantic checks pass.
 - [x] Dynamic Trading full runner passes `43/43`.
-- [x] Hoomans focused P18/P19 tests pass.
-- [x] Hoomans broad runner remains `982/987` with the same five known baseline failures.
-- [x] changed P18/P19/P20 Lua passes `luac5.3 -p`; all repos pass `git diff --check`.
-- [x] P20 failure-state regressions pass.
-- [x] P20 reconstructed persistence regression passes.
-- [x] final exact revisions/worktree status are recorded accurately.
+- [x] Hoomans full runner remains `982/987` with the same five documented pre-existing baseline failures.
+- [x] changed P20 Lua passes `luac5.3 -p`.
+- [x] all three repositories pass `git diff --check`.
+- [x] final repository revisions/worktree state are recorded in `PROGRESS.md`.
 
-## Repository-history note
+## Known baseline failures outside this parent goal
 
-Dynamic Trading is currently clean. The former tracked local `DTHoomans_Conversation.lua` semantic-hub edit was incorporated into commit `be9e8e10`; it is no longer an outstanding working-tree modification.
+- `pnc_companion_commands_smoke.lua`
+- `pnc_semantic_harness_worker_modules_smoke.lua`
+- `pnc_semantic_horde_command_ack_smoke.lua`
+- `pnc_semantic_horde_tactical_prompt_smoke.lua`
+- `pnc_semantic_local_route_smoke.lua`
 
-## User-owned native handoff
+These remain classified as pre-existing/unrelated baseline failures based on the completed audits.
 
-Do not hand this goal to native SP/MP testing until P20 developer gates pass.
+## User-owned native acceptance
 
-After P20, native acceptance covers representative DT-only/combined/add-remove-readd saves, real excursion failure/recovery behavior, settlement naming, relationship continuity and UI/dialogue quality.
+- [ ] native SP Core + DT behavior;
+- [ ] native MP Core + DT behavior;
+- [ ] combined DT + Hoomans identity/relationship continuity;
+- [ ] add/remove/re-add adopter behavior across real saves/restarts;
+- [ ] excursion departure/visit/return/failure/retry in the native runtime;
+- [ ] human-readable settlement/location dialogue in live gameplay;
+- [ ] real UI/dialogue quality and multiplayer lifecycle acceptance.
+
+Native acceptance is the next step. No Steam Workshop publication is implied.

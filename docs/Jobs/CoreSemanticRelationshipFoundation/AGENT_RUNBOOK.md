@@ -4,14 +4,9 @@
 
 Treat the complete cross-repository objective in README/ROADMAP as one implementation assignment.
 
-The immediate Next Chunk in PROGRESS is only the starting responsibility. After each accepted chunk:
+While the job is active, PROGRESS may name an immediate Next Chunk. That chunk is only the starting responsibility: validate the actual owner modules, update PROGRESS, commit coherent changes in the owning repository, and continue through remaining mandatory gates.
 
-1. validate the actual owner modules;
-2. update PROGRESS;
-3. commit coherent changes in the owning repository;
-4. continue automatically to the next mandatory chunk.
-
-Do not stop merely because one phase, migration, test suite, or repository is complete.
+When PROGRESS is `READY FOR USER LIVE TEST`, there is no implementation Next Chunk. Reopen only from concrete native/regression evidence or an explicit new user goal.
 
 ## Repository safety
 
@@ -19,13 +14,9 @@ Work on existing `main` only. Never create branches.
 
 Before writes in any repository, inspect branch/HEAD/status/upstream and preserve unrelated work.
 
-Current planning-time hazards that must be rechecked rather than assumed:
+Repository state is never assumed from this document. Recheck all three repositories before any future write, because branch position, ahead/behind counts, and local modifications may change after this job closes.
 
-- ProjectHoomans main had local commits ahead of origin;
-- DynamicTrading had a tracked local edit in `DTHoomans_Conversation.lua`;
-- PsychopatzCore was clean at planning time.
-
-Never reset, stash, discard, rebase away, or overwrite uncertain work. If the Dynamic Trading conversation edit overlaps this job, inspect its intent and integrate around it; do not replace it wholesale.
+Never reset, stash, discard, rebase away, or overwrite uncertain work. Treat any future local modification as user/agent-owned until its intent is understood.
 
 ## Cross-repository authority discipline
 
