@@ -82,27 +82,21 @@ if Layers and Layers.Register then
     })
 end
 
-if ISWorldMap and not ISWorldMap._pncCommunitySitesPatched then
-    ISWorldMap._pncCommunitySitesPatched = true
-    local originalRightMouseUp =
-        ISWorldMap.onRightMouseUp
-    function ISWorldMap:onRightMouseUp(x, y)
+local MapHost = require "PsychopatzCore/UI/Map/PsychopatzMapHost"
+MapHost.Events.Register("ProjectHoomans:community_sites", {
+    order = 100,
+    onRightMouseUp = function(map, x, y)
         if isVisible()
-            and not (
-                PNC.MapCommands
-                and PNC.MapCommands.Active
-            )
+            and not (PNC.MapCommands and PNC.MapCommands.Active)
         then
-            local worldX =
-                self.mapAPI:uiToWorldX(x, y)
-            local worldY =
-                self.mapAPI:uiToWorldY(x, y)
+            local worldX = map.mapAPI:uiToWorldX(x, y)
+            local worldY = map.mapAPI:uiToWorldY(x, y)
             local site = vacantSiteAt(worldX, worldY)
             if site then
                 local context = ISContextMenu.get(
-                    tonumber(self.playerNum) or 0,
-                    x + self:getAbsoluteX(),
-                    y + self:getAbsoluteY()
+                    tonumber(map.playerNum) or 0,
+                    x + map:getAbsoluteX(),
+                    y + map:getAbsoluteY()
                 )
                 context:addOption(
                     text(
@@ -115,9 +109,8 @@ if ISWorldMap and not ISWorldMap._pncCommunitySitesPatched then
                 return true
             end
         end
-        return originalRightMouseUp(self, x, y)
-    end
-end
-
+        return false
+    end,
+})
 
 return CommunityLayer

@@ -114,20 +114,13 @@ if Layers and Layers.Register then
     })
 end
 
-if ISWorldMap and not ISWorldMap._pncMapCommandsPatched then
-    ISWorldMap._pncMapCommandsPatched = true
-    local originalMouseDown = ISWorldMap.onMouseDown
-    local originalMouseMove = ISWorldMap.onMouseMove
-    local originalMouseMoveOutside = ISWorldMap.onMouseMoveOutside
-    local originalMouseUp = ISWorldMap.onMouseUp
-    local originalMouseUpOutside = ISWorldMap.onMouseUpOutside
-    local originalRightMouseDown = ISWorldMap.onRightMouseDown
-    local originalRightMouseUp = ISWorldMap.onRightMouseUp
-    local originalClose = ISWorldMap.close
-    function ISWorldMap:onMouseDown(x, y)
+local MapHost = require "PsychopatzCore/UI/Map/PsychopatzMapHost"
+MapHost.Events.Register("ProjectHoomans:map_commands", {
+    order = 50,
+    onMouseDown = function(map, x, y)
         local state = Commands.RegionSelection
-        if state and state.map == self then
-            local point = mapPoint(self, x, y, state.z)
+        if state and state.map == map then
+            local point = mapPoint(map, x, y, state.z)
             if point then
                 state.dragging = true
                 state.startX, state.startY = point.x, point.y
@@ -135,89 +128,76 @@ if ISWorldMap and not ISWorldMap._pncMapCommandsPatched then
             end
             return true
         end
-        if originalMouseDown then return originalMouseDown(self, x, y) end
         return false
-    end
-    function ISWorldMap:onMouseMove(dx, dy)
+    end,
+    onMouseMove = function(map)
         local state = Commands.RegionSelection
-        if state and state.map == self then
+        if state and state.map == map then
             if state.dragging then
-                local point = mapPoint(self, self:getMouseX(),
-                    self:getMouseY(), state.z)
+                local point = mapPoint(map, map:getMouseX(),
+                    map:getMouseY(), state.z)
                 if point then
                     state.currentX, state.currentY = point.x, point.y
                 end
             end
             return true
         end
-        if originalMouseMove then return originalMouseMove(self, dx, dy) end
         return false
-    end
-    function ISWorldMap:onMouseMoveOutside(dx, dy)
+    end,
+    onMouseMoveOutside = function(map)
         local state = Commands.RegionSelection
-        if state and state.map == self then
+        if state and state.map == map then
             if state.dragging then
-                local point = mapPoint(self, self:getMouseX(),
-                    self:getMouseY(), state.z)
+                local point = mapPoint(map, map:getMouseX(),
+                    map:getMouseY(), state.z)
                 if point then
                     state.currentX, state.currentY = point.x, point.y
                 end
             end
             return true
         end
-        if originalMouseMoveOutside then
-            return originalMouseMoveOutside(self, dx, dy)
-        end
         return false
-    end
-    function ISWorldMap:onMouseUp(x, y)
+    end,
+    onMouseUp = function(map, x, y)
         if Commands.RegionSelection
-            and Commands.RegionSelection.map == self
+            and Commands.RegionSelection.map == map
         then
-            return finishRegionSelection(self, x, y)
+            return finishRegionSelection(map, x, y)
         end
-        if originalMouseUp then return originalMouseUp(self, x, y) end
         return false
-    end
-    function ISWorldMap:onMouseUpOutside(x, y)
+    end,
+    onMouseUpOutside = function(map, x, y)
         if Commands.RegionSelection
-            and Commands.RegionSelection.map == self
+            and Commands.RegionSelection.map == map
         then
-            return finishRegionSelection(self, x, y)
-        end
-        if originalMouseUpOutside then
-            return originalMouseUpOutside(self, x, y)
+            return finishRegionSelection(map, x, y)
         end
         return false
-    end
-    function ISWorldMap:onRightMouseDown(x, y)
-        if Commands.Active and #Commands.Selection > 0 then
+    end,
+    onRightMouseDown = function()
+        return Commands.Active and #Commands.Selection > 0
+    end,
+    onRightMouseUp = function(map, x, y)
+        if not Commands.Active or #Commands.Selection <= 0 then
+            return false
+        end
+        if Commands.RegionSelection then
+            Commands.CancelRegionSelection()
             return true
         end
-        return originalRightMouseDown(self, x, y)
-    end
-    function ISWorldMap:onRightMouseUp(x, y)
-        if Commands.Active and #Commands.Selection > 0 then
-            if Commands.RegionSelection then
-                Commands.CancelRegionSelection()
-                return true
-            end
-            local target = {
-                x = self.mapAPI:uiToWorldX(x, y),
-                y = self.mapAPI:uiToWorldY(x, y),
-                z = 0,
-            }
-            Commands.BuildContext(self, x, y, target)
-            return true
-        end
-        return originalRightMouseUp(self, x, y)
-    end
-    function ISWorldMap:close()
-        self._pncCommandMode = nil
+        local target = {
+            x = map.mapAPI:uiToWorldX(x, y),
+            y = map.mapAPI:uiToWorldY(x, y),
+            z = 0,
+        }
+        Commands.BuildContext(map, x, y, target)
+        return true
+    end,
+    onClose = function(map)
+        map._pncCommandMode = nil
         Commands.ClearSelection()
-        if originalClose then return originalClose(self) end
         return false
-    end
-end
+    end,
+})
 
 return Commands

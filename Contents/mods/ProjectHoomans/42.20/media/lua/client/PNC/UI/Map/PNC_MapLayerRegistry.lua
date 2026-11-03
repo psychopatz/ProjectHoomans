@@ -1,27 +1,26 @@
---[[
-    Ordered transient world-map layer registry.
+-- Hoomans compatibility facade over the shared PsychopatzCore map host.
+-- Hoomans layers keep their existing registration API while Core owns the
+-- single production ISWorldMap hook.
 
-    Travel is only the first consumer. Jobs, threats, colonies, trade routes,
-    and encounter areas can register independent renderers without stacking
-    additional ISWorldMap monkey patches.
-]]
-
-require "ISUI/Maps/ISWorldMap"
+local Host = require "PsychopatzCore/UI/Map/PsychopatzMapHost"
 
 PNC = PNC or {}
 PNC.MapLayers = PNC.MapLayers or {}
 
 local Layers = PNC.MapLayers
-local Core = PNC.Core
+local CoreOverlays = Host.Overlays or PsychopatzCore.MapOverlayRegistry
 
 Layers.ByID = Layers.ByID or {}
 Layers.Ordered = Layers.Ordered or {}
 
+local function coreID(id)
+    return "ProjectHoomans:" .. tostring(id or "")
+end
+
 local function rebuildOrder()
     local output = {}
-    local _, layer
-    for _, layer in pairs(Layers.ByID) do
-        output[#output + 1] = layer
+    for _, definition in pairs(Layers.ByID) do
+        output[#output + 1] = definition
     end
     table.sort(output, function(left, right)
         local leftOrder = tonumber(left.order) or 100
@@ -41,10 +40,31 @@ function Layers.Register(id, definition)
     then
         return false
     end
+
     definition.id = id
+    definition.order = tonumber(definition.order) or 100
     Layers.ByID[id] = definition
     rebuildOrder()
-    return true
+
+    return CoreOverlays.Register(coreID(id), {
+        order = definition.order,
+        enabled = definition.enabled,
+        isVisible = definition.isVisible,
+        render = function(map)
+            local ok, err = pcall(definition.render, map)
+            if not ok then
+                if PNC.Core and PNC.Core.LogWarn then
+                    PNC.Core.LogWarn(
+                        "PNC map layer failed id=" .. tostring(id)
+                            .. " error=" .. tostring(err)
+                    )
+                end
+                return false
+            end
+            return true
+        end,
+        owner = "ProjectHoomans",
+    })
 end
 
 function Layers.Unregister(id)
@@ -52,42 +72,29 @@ function Layers.Unregister(id)
     if id == "" or not Layers.ByID[id] then return false end
     Layers.ByID[id] = nil
     rebuildOrder()
+    CoreOverlays.Unregister(coreID(id))
     return true
 end
 
+-- Retained for focused Hoomans tests and callers that explicitly ask the
+-- facade to render. Production ISWorldMap rendering is owned by Core.
 function Layers.Render(map)
-    local i
-    local layer
-    local visible
-    local ok
-    local layerError
-    for i = 1, #Layers.Ordered do
-        layer = Layers.Ordered[i]
-        visible = layer.enabled ~= false
+    for index = 1, #Layers.Ordered do
+        local layer = Layers.Ordered[index]
+        local visible = layer.enabled ~= false
         if visible and type(layer.isVisible) == "function" then
-            ok, visible = pcall(layer.isVisible, map)
-            visible = ok and visible ~= false
+            local ok, result = pcall(layer.isVisible, map)
+            visible = ok and result ~= false
         end
         if visible then
-            ok, layerError = pcall(layer.render, map)
-            if not ok and Core and Core.LogWarn then
-                Core.LogWarn(
+            local ok, err = pcall(layer.render, map)
+            if not ok and PNC.Core and PNC.Core.LogWarn then
+                PNC.Core.LogWarn(
                     "PNC map layer failed id=" .. tostring(layer.id)
-                        .. " error=" .. tostring(layerError)
+                        .. " error=" .. tostring(err)
                 )
             end
         end
-    end
-end
-
-if ISWorldMap and not ISWorldMap._pncMapLayersPatched then
-    ISWorldMap._pncMapLayersPatched = true
-    local originalRender = ISWorldMap.render
-    function ISWorldMap:render()
-        originalRender(self)
-        -- UIWorldMap paints its terrain after prerender. Transient markers must
-        -- be drawn here or the Java map surface covers them completely.
-        Layers.Render(self)
     end
 end
 
