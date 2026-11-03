@@ -40,7 +40,7 @@ function Internal.ValidLateStreamHint(record)
         )
 end
 
-function Internal.IsLegacyStrongLateStreamHint(record)
+function Internal.IsStrongRestartCarrierHint(record)
     local hint = hintOf(record)
     return hasLateStreamBaseProof(hint)
         and hint.wasLive ~= true

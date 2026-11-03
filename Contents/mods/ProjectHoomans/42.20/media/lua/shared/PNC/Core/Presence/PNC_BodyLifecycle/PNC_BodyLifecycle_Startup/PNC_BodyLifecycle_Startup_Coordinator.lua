@@ -38,8 +38,8 @@ local function finalizeRehydrationMisses(now)
                     missed = missed + 1
                 end
             elseif serverRuntime
-                and Internal.IsLegacyStrongLateStreamHint
-                and Internal.IsLegacyStrongLateStreamHint(record)
+                and Internal.IsStrongRestartCarrierHint
+                and Internal.IsStrongRestartCarrierHint(record)
                 and Lifecycle.ArmLateStreamRehydrate
                 and Lifecycle.ArmLateStreamRehydrate(record, now)
             then
@@ -50,7 +50,7 @@ local function finalizeRehydrationMisses(now)
                 record.runtime.lifecycle =
                     record.runtime.lifecycle or {}
                 record.runtime.lifecycle.lastReason =
-                    "startup_legacy_carrier_late_stream"
+                    "startup_restart_carrier_late_stream"
                 record.runtime.lifecycle.lastTransitionAt = now
                 lateStream = lateStream + 1
                 legacyStrong = legacyStrong + 1

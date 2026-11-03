@@ -343,8 +343,8 @@ local function configureRelationships(state)
     end
     -- SAVE worlds delegate proposal eligibility and mutation to the
     -- production RelationshipService.  The synthetic branch above is kept
-    -- only for explicit Developer/Test fixtures while P12 compatibility is
-    -- being retired from the normal save-backed path.
+    -- only for explicit Developer/Test fixtures; normal save-backed worlds
+    -- delegate to the production relationship authority.
     if sourceKind == "SAVE"
         and type(productionEvaluateProposal) == "function"
     then

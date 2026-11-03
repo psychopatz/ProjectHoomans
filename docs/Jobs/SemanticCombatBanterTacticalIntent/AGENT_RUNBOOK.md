@@ -9,7 +9,7 @@ Read root `AGENTS.md`, then this job's `AUDIT.md`, `ARCHITECTURE.md`, `ROADMAP.m
 Also read the accepted foundation only when needed:
 - `docs/Jobs/OpenEndedSemanticCombatAwareness/PROGRESS.md`;
 - `docs/Jobs/PragmaticDialogueBeatDirector/ARCHITECTURE.md`;
-- `docs/Jobs/SemanticInteractionLifecycle/ARCHITECTURE.md`.
+- `docs/Jobs/UnifiedSemanticDialogueAuthority/ARCHITECTURE.md`.
 
 Do not reload completed-job history wholesale.
 

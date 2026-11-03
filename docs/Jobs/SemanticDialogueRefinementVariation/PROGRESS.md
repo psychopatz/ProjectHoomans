@@ -173,9 +173,9 @@ Current compiler bound:
      - EN/TL placeholder signatures strictly matched across `{name}`, `%s`, `{clock}`, `{relative}`, `{combatWeaponDisplayName}`, and `%1`.
      - Zero suspicious English-identical TL strings in expanded dialogue content.
    - **Regression Suite Verification**:
-     - All 4 P11B migration contracts (`test_p11b_health_migration.py`, `test_p11b_needs_migration.py`, `test_p11b_social_apology_migration.py`, `test_p11b_wellbeing_migration.py`) pass 100%.
+     - All 4 P11B migration contracts (`test_health_wording_authority.py`, `test_needs_wording_authority.py`, `test_social_apology_wording_authority.py`, `test_wellbeing_wording_authority.py`) pass 100%.
      - `test_conversational_competence_c7a.py`, `c7b.py`, `c7c.py`, `c7d.py`, `c7g.py` pass 100%.
-     - `test_automatic_flow_generation.py`, `test_gift_capability_binding.py`, `test_contextual_runtime_parity_p11a.py` pass 100%.
+     - `test_automatic_flow_generation.py`, `test_gift_capability_binding.py`, `test_contextual_bond_catalog_runtime.py` pass 100%.
      - Quality Sweep test suite (`test_sweep_*.py`) passes 100%.
      - Variation auditor test suite (`test_dialogue_variation_auditor.py`) passes 100%.
 

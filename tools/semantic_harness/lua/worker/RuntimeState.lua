@@ -20,7 +20,7 @@ end
 function RuntimeState.new()
     return {
         scenario = nil,
-        -- P12 source/working-world boundary.  sourceSnapshot is only read
+        -- Source/working-world boundary. sourceSnapshot is only read
         -- through Values.copy; production services receive Runtime.scenario,
         -- which is the detached mutable working projection.
         sourceSnapshot = nil,

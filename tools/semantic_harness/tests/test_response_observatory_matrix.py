@@ -256,8 +256,8 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                 )
                 explanation = worker.explain_response_selection(
                     "semantic.flow.greeting.opening",
-                    {"npcID": "p6-promoted", "socialStyle": "neutral"},
-                    "p6-promoted",
+                    {"npcID": "promoted-fixture", "socialStyle": "neutral"},
+                    "promoted-fixture",
                 )
                 self.assertEqual(
                     explanation["selectedID"],

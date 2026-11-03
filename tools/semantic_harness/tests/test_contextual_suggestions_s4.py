@@ -220,7 +220,7 @@ class ContextualSuggestionsS4Tests(SemanticLabGuiTestCase):
             self.assertFalse(app.suggestion_group_box.winfo_ismapped())
 
             # Reconfigure the live worker through Tk, then replay the utterance
-            # through the regular input surface. Apply + Replay is P10E work.
+            # through the regular input surface. Apply + Replay is handled by the workbench path.
             injured_family = deepcopy(app.scenario)
             injured_family["npc"]["healthState"] = "injured"
             injured_family["npc"]["startingRelationship"] = {

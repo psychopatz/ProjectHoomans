@@ -208,7 +208,7 @@ do
     isServer = isServerOrig
 end
 
-print("=== Test 4C: Security — Core Resolution First Cannot Bootstrap Authority (P18) ===")
+print("=== Test 4C: Security — Core Resolution First Cannot Bootstrap Authority ===")
 do
     resetHoomansRegistry()
     local isServerOrig = isServer

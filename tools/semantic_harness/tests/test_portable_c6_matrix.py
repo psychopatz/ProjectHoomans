@@ -36,7 +36,7 @@ class PortableC6MatrixTests(unittest.TestCase):
             "EN": {
                 "where do you live": "I don't have a confirmed home to tell you about.",
                 "why is it so?": "I don't know why that is; I only know what I can confirm.",
-                # P6 canonical greeting wording is preserved as phrase 01;
+                # canonical greeting wording is preserved as phrase 01;
                 # the phrase layer varies only subsequent turns.
                 "hello": "Hey there. Good to see you.",
                 "im fine, how about you": "Doing okay, all things considered.",

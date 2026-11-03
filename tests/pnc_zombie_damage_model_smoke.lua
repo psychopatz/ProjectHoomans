@@ -328,7 +328,7 @@ T.equal(attackResult.outcome, "wounded", "legacy attack outcome")
 T.truthy(legacyVictim.health.body.wounds[attackResult.partId],
     "legacy attack records its body-part wound")
 T.contains(zombieDebugMessages[#zombieDebugMessages],
-    "health.zombie_attack route=legacy")
+    "health.zombie_attack route=direct")
 T.contains(zombieDebugMessages[#zombieDebugMessages],
     "status=applied reason=wounded")
 T.contains(zombieDebugMessages[#zombieDebugMessages],

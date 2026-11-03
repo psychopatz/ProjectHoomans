@@ -1,4 +1,4 @@
--- Real Cross-Adopter Production-Module Hot-Plug Integration Matrix (P15C)
+-- Real Cross-Adopter Production-Module Hot-Plug Integration Matrix
 --
 -- Exercises real production modules across PsychopatzCore, DynamicTrading, and ProjectHoomans:
 -- Sequence 1: DT-only save -> Save/Reload -> Add Hoomans -> Save/Reload -> Remove Hoomans -> DT Trade -> Re-add Hoomans.
@@ -162,7 +162,7 @@ end
 -- =========================================================================
 -- SEQUENCE 1: Core + DT Save -> Add Hoomans -> Remove Hoomans -> Re-add Hoomans
 -- =========================================================================
-print("[P15C] Starting Sequence 1: DT First -> Add Hoomans -> Remove Hoomans -> Re-add Hoomans")
+print("[cross-adopter] Starting Sequence 1: DT First -> Add Hoomans -> Remove Hoomans -> Re-add Hoomans")
 
 local registry1 = CoreActors.NewRegistry()
 PsychopatzCore = PsychopatzCore or {}
@@ -229,7 +229,7 @@ T.equal(hAdoptReason, "core_adopted", "Reason was core_adopted")
 local hAliceKey = PNC.PlayerCharacters.GetEntityKey(playerAlice)
 T.equal(hAliceKey, aliceCanonicalKey, "Real Hoomans entity key exactly equals Core canonical key")
 
--- Adversarial check (P18): unknown PNC mirror with Core resolving FIRST cannot manufacture authority
+-- Adversarial identity-authority check: unknown PNC mirror with Core resolving FIRST cannot manufacture authority
 local forgedPlayer, forgedModData = makePlayer("Mallory", nil, { playerNum = 2 })
 local forgedUUID = "char_mallory_forged_99999999"
 forgedModData.PNC_CharacterUUID = forgedUUID
@@ -342,12 +342,12 @@ T.equal(hoomansRelReadded.approval, 33, "Re-added Hoomans reads latest approval 
 T.equal(hoomansRelReadded.extensions.DynamicTrading.totalTrades, 2, "Re-added Hoomans reads DT trade count 2")
 T.equal(hoomansRelReadded.bond.class, "friend", "Re-added Hoomans restores previous bond")
 
-print("[P15C] Sequence 1 PASSED.")
+print("[cross-adopter] Sequence 1 PASSED.")
 
 -- =========================================================================
 -- SEQUENCE 2: Core + Hoomans Save -> Add DT -> Remove DT -> Re-add DT
 -- =========================================================================
-print("[P15C] Starting Sequence 2: Hoomans First -> Add DT -> Remove DT -> Re-add DT")
+print("[cross-adopter] Starting Sequence 2: Hoomans First -> Add DT -> Remove DT -> Re-add DT")
 
 local registry2 = CoreActors.NewRegistry()
 PsychopatzCore.Actors.DefaultRegistry = registry2
@@ -476,12 +476,12 @@ T.equal(finalBobRel.approval, 50, "Final approval is 45 + 5 = 50")
 T.equal(finalBobRel.extensions.DynamicTrading.totalTrades, 2, "DT totalTrades is 2")
 T.equal(finalBobRel.extensions.ProjectHoomans.bond.class, "friend", "Hoomans bond intact after DT re-add")
 
-print("[P15C] Sequence 2 PASSED.")
+print("[cross-adopter] Sequence 2 PASSED.")
 
 -- =========================================================================
 -- SEQUENCE 3: Production Conversation Capability Isolation
 -- =========================================================================
-print("[P15C] Starting Sequence 3: Conversation Capability Isolation")
+print("[cross-adopter] Starting Sequence 3: Conversation Capability Isolation")
 
 local convActor = {
     actorId = "actor:hotplug:conv_test",
@@ -546,12 +546,12 @@ do
     print("PASS: Hoomans-only conversation isolated from DT TRADE")
 end
 
-print("[P15C] Sequence 3 PASSED.")
+print("[cross-adopter] Sequence 3 PASSED.")
 
 -- =========================================================================
 -- SEQUENCE 4: Grounded DT Whereabouts, Road News, and Storytelling
 -- =========================================================================
-print("[P15C] Starting Sequence 4: Grounded DT Whereabouts, Road News, and Storytelling")
+print("[cross-adopter] Starting Sequence 4: Grounded DT Whereabouts, Road News, and Storytelling")
 
 local simulatedDTStorage = { v = 1, r = 0, t = {} }
 DTCommon.Storage = {
@@ -602,7 +602,7 @@ end
 
 T.load("../DynamicTrading/Contents/mods/DTHoomans/42.20/media/lua/server/DTHoomans/DTHoomans_ResidentExcursion.lua")
 
--- Register presentation resolver for human-facing place names (P19B)
+-- Register presentation resolver for human-facing place names
 DTCommon.PlacePresentation.RegisterResolver("matrix_community_resolver", function(id)
     if id == "community_home_123" then return "Riverside Safehouse" end
     if id == "community_dest_789" then return "Rosewood Outpost" end
@@ -796,7 +796,7 @@ do
     print("PASS: Caravan story returned rich narrative: " .. replyText)
 end
 
--- 4I: Real Persistence & Reload (P20B)
+-- 4I: Reconstructed Persistence & Reload
 do
     local function deepCopy(value)
         if type(value) ~= "table" then return value end
@@ -957,12 +957,12 @@ do
     print("PASS: Reconstructed persistence and reload preserves all factual state, distinct object identity, place presentation, evidence, and failure/completion states")
 end
 
-print("[P15C] Sequence 4 PASSED.")
+print("[cross-adopter] Sequence 4 PASSED.")
 
 -- =========================================================================
 -- SEQUENCE 5: Pack Unregister / Re-register Lifecycle Residue Check
 -- =========================================================================
-print("[P15C] Starting Sequence 5: Pack Unregister / Re-register Lifecycle")
+print("[cross-adopter] Starting Sequence 5: Pack Unregister / Re-register Lifecycle")
 
 do
     T.truthy(PackRegistry.GetPack("pack.dynamictrading.trader_story") ~= nil, "DT pack initially registered")
@@ -1000,12 +1000,12 @@ do
     print("PASS: Pack unregister and re-register lifecycle is residue-free")
 end
 
-print("[P15C] Sequence 5 PASSED.")
+print("[cross-adopter] Sequence 5 PASSED.")
 
 -- =========================================================================
 -- SEQUENCE 6: Repeated Migration & Sync Idempotence
 -- =========================================================================
-print("[P15C] Starting Sequence 6: Repeated Migration & Sync Idempotence")
+print("[cross-adopter] Starting Sequence 6: Repeated Migration & Sync Idempotence")
 
 do
     local actorTest = PsychopatzCore.Actors.DefaultRegistry:Create({
@@ -1062,6 +1062,6 @@ do
     print("PASS: Repeated sync is completely idempotent without memory duplication or score inflation")
 end
 
-print("[P15C] Sequence 6 PASSED.")
+print("[cross-adopter] Sequence 6 PASSED.")
 
 T.finish("pnc_real_cross_adopter_hotplug_matrix_smoke")

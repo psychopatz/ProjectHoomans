@@ -47,11 +47,11 @@ Testing-engine concepts such as smoke/full/pairwise strategy names, batch IDs, r
 ## Validation
 
 - Full test suite: **46/46 PASS** in 82.87s
-  - `test_sweep_p1_foundation.py`
-  - `test_sweep_p2_planner.py`
-  - `test_sweep_p3_batch.py`
-  - `test_sweep_p4_reachability.py` (8/8 PASS)
-  - `test_sweep_p5_quality.py`
-  - `test_sweep_p6_ui.py` (5/5 PASS under Xvfb/Tk)
-  - `test_sweep_p7_acceptance.py` (3/3 PASS, exercising all 13 HARNESS_ACCEPTANCE demonstrations and frontier expansion)
+  - `test_sweep_foundation.py`
+  - `test_sweep_planner.py`
+  - `test_sweep_batch.py`
+  - `test_sweep_reachability.py` (8/8 PASS)
+  - `test_sweep_quality.py`
+  - `test_sweep_ui.py` (5/5 PASS under Xvfb/Tk)
+  - `test_sweep_acceptance.py` (3/3 PASS, exercising all 13 HARNESS_ACCEPTANCE demonstrations and frontier expansion)
 - `git diff --check`: clean (0 whitespace or format errors).

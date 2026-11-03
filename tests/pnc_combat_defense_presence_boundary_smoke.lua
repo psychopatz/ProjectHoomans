@@ -10,7 +10,7 @@ local providers = {
     "PNC_Combat_Defense_DamageChance",
     "PNC_Combat_Defense_NearMiss",
     "PNC_Combat_Defense_DamageModel",
-    "PNC_Combat_Defense_Legacy",
+    "PNC_Combat_Defense_Avoidance",
     "PNC_Combat_Defense_Resolve",
 }
 local publicFunctions = {

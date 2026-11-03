@@ -24,7 +24,7 @@
 ## P3C acceptance evidence
 
 - Shared `gui_test_support.py` constructs ordinary `SemanticHarnessApp` instances with temporary `--ui-state` and reset fixture intent, owns cleanup, and provides bounded worker/Explore/operation waits. No ordinary GUI test relies on the developer’s default state file.
-- `test_p3c_test_isolation.py` poisons an isolated default-state home with a remembered SAVE target and proves the ordinary helper still starts in FIXTURE mode. It also proves automatic Explore loading leaves foreground `app.busy` false.
+- `test_gui_test_isolation.py` poisons an isolated default-state home with a remembered SAVE target and proves the ordinary helper still starts in FIXTURE mode. It also proves automatic Explore loading leaves foreground `app.busy` false.
 - Studio Explore uses the existing serialized `WorkerSession` through a background read-only lifecycle and reports local `Loading catalog…`; Simulation readiness and controls do not wait for catalog population. Search, paging bounds, lazy detail loading, and actionable catalog errors remain intact.
 - P3B real-worker lifecycle coverage remains green: fresh startup has zero fake Response Channel buttons, native open rows match production IDs/labels/enabled state/frames, SAVE continuity survives worker restart and app recreation, invalid/reset/explicit-source precedence is safe, and the first bounded Explore page auto-loads.
 

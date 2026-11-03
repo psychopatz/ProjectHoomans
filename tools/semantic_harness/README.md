@@ -237,7 +237,7 @@ The production-worker tests for these scenarios are:
 python3 -m unittest tools.semantic_harness.tests.test_wellbeing_projection -v
 ```
 
-Refer to `docs/Jobs/ContextualSemanticIntelligence/HARNESS_ACCEPTANCE.md`
+Refer to `docs/Jobs/UnifiedSemanticDialogueAuthority/HARNESS_ACCEPTANCE.md`
 for the complete acceptance matrix and real-game limitations.
 
 ## Diagnostics

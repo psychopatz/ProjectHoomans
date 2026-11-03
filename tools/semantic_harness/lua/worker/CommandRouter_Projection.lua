@@ -42,7 +42,7 @@ local function productionInventoryFixture(context, payload)
     end
 
     local ok, result = pcall(function()
-        local npcID = "npcP14B_" .. string.lower(mode)
+        local npcID = "npc_inventory_fixture_" .. string.lower(mode)
         local raw = {
             schemaVersion = PNC.Const and PNC.Const.PERSISTENCE_VERSION or 16,
             recordRevision = 1,
@@ -50,12 +50,12 @@ local function productionInventoryFixture(context, payload)
             tacticalClass = "neutral",
             persist = true,
             identity = {
-                displayName = "P14B " .. mode,
+                displayName = "Inventory Fixture " .. mode,
                 isFemale = false,
                 archetypeID = "General",
                 seed = 1402,
                 survivor = {
-                    forename = "P14B",
+                    forename = "Inventory",
                     surname = mode,
                 },
             },

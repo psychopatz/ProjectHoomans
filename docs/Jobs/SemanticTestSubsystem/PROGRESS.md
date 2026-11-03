@@ -10,7 +10,7 @@
   - Zero regressions across the full Lua regression harness.
 - **Python Harness Suite Baseline:**
   - 197 test modules in `tools/semantic_harness/tests/`. Verified runners: `python_runner.py` executes isolated processes with serial exclusive lanes for source authoring.
-  - Baseline passes verified: `test_worker_session` (0.15s), `test_runner` (0.10s), `test_c0a_baseline` (0.62s), `test_response_observatory` (15.17s), `test_response_observatory_matrix` (92.23s), `test_semantic_test_subsystem` (1.42s), `test_pilot_parity` (51.18s), `test_p3_observatory_c0a_parity` (60.19s), `test_p4_behavior_parity` (44.02s), `test_app` (0.28s), `test_cli_parity_p13f` (29.26s), `test_lint` (0.09s).
+  - Baseline passes verified: `test_worker_session` (0.15s), `test_runner` (0.10s), `test_c0a_baseline` (0.62s), `test_response_observatory` (15.17s), `test_response_observatory_matrix` (92.23s), `test_semantic_test_subsystem` (1.42s), `test_pilot_parity` (51.18s), `test_observatory_fixture_parity` (60.19s), `test_behavior_fixture_parity` (44.02s), `test_app` (0.28s), `test_cli_parity` (29.26s), `test_lint` (0.09s).
 - **Existing Fixture Families (9 files):**
   - 5 Observatory fixtures: `observatory_core_en_tl.json`, `observatory_lifecycle_en_tl.json`, `observatory_health_authority_en_tl.json`, `observatory_permission_rejections_en_tl.json`, `observatory_greeting_selection.json`.
   - 4 C0A fixtures: `semantic_corpus.json` (23 cases), `multi_turn_scenarios.json` (5 cases), `suggestion_cases.json` (3 cases), `reply_realization_cases.json` (6 cases).
@@ -26,10 +26,10 @@
   - Verified with `test_pilot_parity.py` (51.18s, 4/4 suites pass).
 - **Multi-turn and Existing Families Migration (P3) Verified:**
   - 38 cases across 7 fixture files in `tools/semantic_harness/fixtures/v1/` (`c0a/multi_turn.json`, `c0a/suggestions.json`, `c0a/reply_realization.json`, `c0a/semantic_corpus.json`, `observatory/lifecycle.json`, `observatory/health_authority.json`, `observatory/permission_rejections.json`, `observatory/core.json`).
-  - Verified with `test_p3_observatory_c0a_parity.py` (60.19s, all 7 suites pass).
+  - Verified with `test_observatory_fixture_parity.py` (60.19s, all 7 suites pass).
 - **Broad Safe Behaviour Migration (P4) Verified:**
   - 31 cases across 4 modular fixture files in `tools/semantic_harness/fixtures/v1/behavior/` (`commands.json`, `questions.json`, `social_dialogue.json`, `inventory_dialogue.json`).
-  - Verified with `test_p4_behavior_parity.py` (44.02s, 4/4 suites pass).
+  - Verified with `test_behavior_fixture_parity.py` (44.02s, 4/4 suites pass).
   - Retained low-level imperative Lua contract tests for service mocks, cognition boundary facts, action plan providers, and internal memory providers.
 - **Tooling Integration (P5) Verified:**
   - Integrated into `tools.semantic_harness.cli` (`--run-semantic-tests`, `--semantic-test-file`, `--semantic-test-suite`, `--semantic-test-filter`).
@@ -43,7 +43,7 @@
 - **End-to-End Developer Acceptance (P7) Verified:**
   - Gate 1 (Linter): `python3 -m tools.semantic_harness.testing.lint` checked 17 files, 116 cases cleanly with zero duplicate IDs or schema violations.
   - Gate 2 (Lua Smoke Regression): `python3 tests/run_tests.py pnc_semantic` (PASS 146/146 in 3.38s) and `python3 tests/run_tests.py semantic` (PASS 153/153 in 3.40s).
-  - Gate 3 (Unit & Parity Subsystem Tests): `test_semantic_test_subsystem.py`, `test_lint.py`, `test_pilot_parity.py`, `test_p3_observatory_c0a_parity.py`, `test_p4_behavior_parity.py` all passed 100%.
+  - Gate 3 (Unit & Parity Subsystem Tests): `test_semantic_test_subsystem.py`, `test_lint.py`, `test_pilot_parity.py`, `test_observatory_fixture_parity.py`, `test_behavior_fixture_parity.py` all passed 100%.
   - Gate 4 (Runner Execution): Runner CLI executes filtered/tagged suites (`python3 -m tools.semantic_harness.testing.cli --tag pilot` passed 24/24 in 36.88s).
   - Gate 5 (Git Tree & Safety Policy): Clean working tree on `main`, zero branch creations, zero staging leaks in `media/`, zero changes to root `AGENTS.md`.
 

@@ -15,5 +15,5 @@ function Defense.ResolveZombieAttack(record, npcBody, zombie, now)
             record, npcBody, zombie, now
         )
     end
-    return Internal.ResolveLegacyAttack(record, npcBody, zombie, now)
+    return Internal.ResolveAvoidanceAttack(record, npcBody, zombie, now)
 end

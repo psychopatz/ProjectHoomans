@@ -12,7 +12,7 @@
 | Inspection | tools/semantic_harness/inspection/conversation_inspector.py; conversation_inspector_response.py | Real-worker acceptance chain, selected flow, final response, execution/effects and grounded fact provenance already projected; needs direct response-variant and source mapping. |
 | Response rules | 42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Core.lua; _Selection.lua; _Registration.lua | Pool ID and variant normalization, conditions, priority and specificity selector, bounded last choice tracking. MAX_POOLS=256, MAX_VARIANTS=16, MAX_LAST_VARIANTS=256, fallback text capped at 256 chars. |
 | Content ownership | 42.20/media/lua/shared/PNC/Semantics/SemanticDialogueResponseCatalog/*.lua; _Generated.lua; codebuilder/sources/*.json; common translation assets | Actual authored Lua pools coexist with generated/reviewed definitions and canonical translation assets. A new editable content database would compete with these owners. |
-| Regression foundation | tools/semantic_harness/tests/test_conversation_inspector.py; test_contextual_runtime_graph_p11f.py; test_codebuilder_consolidation.py; test_whats_up_semantic_response_p12h.py | Prior focused audit at the same HEAD ran 23/23 passing with tools/semantic_harness/.venv/bin/python (3.12); default Homebrew Python 3.14 could not import _tkinter. Record as previous-run evidence, not current implementation acceptance. |
+| Regression foundation | tools/semantic_harness/tests/test_conversation_inspector.py; test_contextual_runtime_graph.py; test_codebuilder_consolidation.py; test_whats_up_semantic_response.py | Prior focused audit at the same HEAD ran 23/23 passing with tools/semantic_harness/.venv/bin/python (3.12); default Homebrew Python 3.14 could not import _tkinter. Record as previous-run evidence, not current implementation acceptance. |
 
 Current repo root policy was read; root AGENTS.md permits a job-local roadmap and chat-only /goal, prohibits new branches, destructive Git changes, native PZ control and Workshop publication without authorization. At job creation, main was clean and synchronized with origin/main (0 ahead / 0 behind after explicit fetch).
 
@@ -40,6 +40,6 @@ Current repo root policy was read; root AGENTS.md permits a job-local roadmap an
 - docs/Jobs/ContextualDialogueQuestFramework/SEMANTIC_STUDIO_CONSOLIDATION.md
 - docs/Jobs/ContextualDialogueQuestFramework/HARNESS_ACCEPTANCE.md
 - docs/Jobs/ContextualDialogueQuestFramework/DATASET_CONVERSATION_PIPELINE.md
-- docs/Jobs/SemanticInteractionLifecycle/PROGRESS.md
+- docs/Jobs/UnifiedSemanticDialogueAuthority/PROGRESS.md
 
 **Audit conclusion:** preserve all accepted Lua/CodeBuilder/Studio/worker infrastructure. Build an observability and measurable quality layer **on top**; this is a new product goal, not evidence that old Studio V1–V5 acceptance failed.
