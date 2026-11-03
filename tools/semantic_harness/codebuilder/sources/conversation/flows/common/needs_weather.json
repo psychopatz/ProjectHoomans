@@ -153,6 +153,7 @@
   "source": {
     "contentLicense": "Project Hoomans authored content",
     "name": "Project Hoomans Common Interaction Seed",
+    "owner": "ProjectHoomans",
     "references": [
       {
         "license": "ACL Anthology terms; metadata-only reference",

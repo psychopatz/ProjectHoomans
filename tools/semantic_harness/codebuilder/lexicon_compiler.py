@@ -353,7 +353,11 @@ def _render_provenance_header(compiled: CompiledLexicon) -> list[str]:
     for name, digest in sorted(compiled.source_hashes.items()):
         lines.append(f"-- SHA256 {name}: {digest}")
     lines.append("-- Begin WordNet 3.0 license notice.")
-    lines.extend("-- " + line if line else "--" for line in compiled.license_text.splitlines())
+    lines.extend(
+        "-- " + cleaned if cleaned else "--"
+        for line in compiled.license_text.splitlines()
+        for cleaned in (line.rstrip(),)
+    )
     lines.append("-- End WordNet 3.0 license notice.")
     return lines
 

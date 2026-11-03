@@ -122,7 +122,11 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="project-hoomans-f4-") as directory:
             root = Path(directory)
             self._isolated_repository(root)
-            service = SemanticLabAuthoringService(repository=root, runtime_root=REPOSITORY)
+            service = SemanticLabAuthoringService(
+                repository=root,
+                runtime_root=REPOSITORY,
+                core_repository=root / "psychopatzCore",
+            )
 
             preview = service.preview_workflow(
                 "grounded_personal",

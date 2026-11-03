@@ -83,7 +83,7 @@ class ConversationContextHealthC5Tests(unittest.TestCase):
                 "content/social/tool_replies/hostile.json",
             "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Eat":
                 "content/task/lifecycle/eat.json",
-            "PNC/Semantics/Generated/Conversation/Patterns/Common/GreetingWhatsUp":
+            "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/GreetingWhatsUp":
                 "patterns/common/greeting_whats_up.json",
             "PNC/Semantics/Generated/Conversation/Behaviors/Social/RetaliateVerbally":
                 "behaviors/social/retaliate_verbally.json",

@@ -33,6 +33,11 @@ def initialize_app(app: Any, root: Any, arguments: argparse.Namespace) -> None:
     app.authoring_service = SemanticLabAuthoringService(
         repository=repository,
         runtime_root=repository,
+        core_repository=(
+            Path(arguments.core_repository)
+            if getattr(arguments, "core_repository", None)
+            else None
+        ),
     )
     app.activity_log = ActivityLog(
         path=default_activity_path(

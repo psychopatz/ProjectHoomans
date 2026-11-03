@@ -44,6 +44,7 @@ from .conversation_compiler import (
     render_conversation_runtime_plan,
 )
 from .lexicon_compiler import CompileError
+from .generation_ownership import resolve_core_repository
 
 
 class SemanticLabAuthoringService:
@@ -54,11 +55,17 @@ class SemanticLabAuthoringService:
         repository: Path | None = None,
         *,
         runtime_root: Path | None = None,
+        core_repository: Path | None = None,
     ) -> None:
         self.repository = (repository or authoring.REPOSITORY).expanduser().resolve()
         self.runtime_root = (
             runtime_root or self.repository
         ).expanduser().resolve()
+        self.core_repository = resolve_core_repository(
+            self.repository,
+            explicit=core_repository,
+            runtime_root=self.runtime_root,
+        )
         self.dataset_catalog = SemanticDatasetCatalog(
             self.repository,
             self.runtime_root,
@@ -72,6 +79,7 @@ class SemanticLabAuthoringService:
             self.block_registry,
             self.repository,
             self.runtime_root,
+            self.core_repository,
         )
 
     def list_dataset_sources(self) -> list[dict[str, Any]]:
@@ -308,7 +316,7 @@ class SemanticLabAuthoringService:
             from .build import write_conversation_output
 
             model = self._conversation_model()
-            written = write_conversation_output(self.repository, model)
+            written = write_conversation_output(self.repository, model, core_repository=self.core_repository)
         except (OSError, ValueError, TypeError, CompileError) as error:
             return {
                 **preview,
@@ -628,7 +636,7 @@ class SemanticLabAuthoringService:
             from .build import write_conversation_output
 
             model = self._conversation_model()
-            generated = write_conversation_output(self.repository, model)
+            generated = write_conversation_output(self.repository, model, core_repository=self.core_repository)
         except (OSError, ValueError, TypeError, CompileError) as error:
             return {
                 **report,
@@ -941,6 +949,7 @@ class SemanticLabAuthoringService:
             generated = write_conversation_output(
                 self.repository,
                 self._conversation_model(),
+                core_repository=self.core_repository,
             )
         except (OSError, ValueError, TypeError, CompileError) as error:
             return {

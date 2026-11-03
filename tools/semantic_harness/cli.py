@@ -395,6 +395,11 @@ def cli(arguments: argparse.Namespace) -> int:
         authoring_service = SemanticLabAuthoringService(
             repository=repository,
             runtime_root=repository,
+            core_repository=(
+                Path(arguments.core_repository)
+                if getattr(arguments, "core_repository", None)
+                else None
+            ),
         )
         activity_log = ActivityLog(
             path=default_activity_path(

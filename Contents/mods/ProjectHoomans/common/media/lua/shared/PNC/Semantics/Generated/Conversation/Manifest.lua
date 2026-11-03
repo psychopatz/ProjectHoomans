@@ -7,6 +7,7 @@ return {
             ["domain"] = "combat",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Combat/PlayerAssaultReactions",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.combat.player_assaulted.aggressive",
@@ -22,6 +23,7 @@ return {
             ["domain"] = "combat_banter",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/CombatBanter/WeaponKillReactions",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 26,
             ["recordIDs"] = {
                 "phrase.semantic.combat.kill.killer.aggressive.axe_head_01",
@@ -58,6 +60,7 @@ return {
             ["domain"] = "combat_human_banter",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/CombatHumanBanter/HumanKillReactions",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 21,
             ["recordIDs"] = {
                 "phrase.semantic.combat.human_kill.aggressive.line_01",
@@ -89,6 +92,7 @@ return {
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/Camp",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 7,
             ["recordIDs"] = {
                 "phrase.semantic.command.camp.failed",
@@ -106,6 +110,7 @@ return {
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/Follow",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 7,
             ["recordIDs"] = {
                 "phrase.semantic.command.follow.failed",
@@ -123,6 +128,7 @@ return {
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/ReturnHome",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 7,
             ["recordIDs"] = {
                 "phrase.semantic.command.return_home.failed",
@@ -140,6 +146,7 @@ return {
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/Stay",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 7,
             ["recordIDs"] = {
                 "phrase.semantic.command.stay.failed",
@@ -157,6 +164,7 @@ return {
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Lifecycle/StopFollowing",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 7,
             ["recordIDs"] = {
                 "phrase.semantic.command.stop_following.failed",
@@ -174,6 +182,7 @@ return {
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Player",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 11,
             ["recordIDs"] = {
                 "phrase.semantic.command.player.attack_auto",
@@ -195,6 +204,7 @@ return {
             ["domain"] = "command",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Command/Replies",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 19,
             ["recordIDs"] = {
                 "phrase.semantic.combat.horde.ack.avoid_default",
@@ -224,6 +234,7 @@ return {
             ["domain"] = "compatibility",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Compatibility",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 27,
             ["recordIDs"] = {
                 "phrase.semantic.compat.bandits.hooman_hurt.colonist",
@@ -261,6 +272,7 @@ return {
             ["domain"] = "conversation",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Conversation",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.question.whats_up.busy",
@@ -276,6 +288,7 @@ return {
             ["domain"] = "event",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 11,
             ["recordIDs"] = {
                 "phrase.semantic.combat.horde.choice.avoid",
@@ -297,6 +310,7 @@ return {
             ["domain"] = "event",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillKillerReactions",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 21,
             ["recordIDs"] = {
                 "phrase.semantic.combat.reaction.kill_killer_aggressive_01",
@@ -328,6 +342,7 @@ return {
             ["domain"] = "event",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 21,
             ["recordIDs"] = {
                 "phrase.semantic.combat.reaction.kill_witness_aggressive_01",
@@ -359,6 +374,7 @@ return {
             ["domain"] = "event",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Event/Medical",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 32,
             ["recordIDs"] = {
                 "phrase.semantic.medical.distress.call.bandage",
@@ -401,6 +417,7 @@ return {
             ["domain"] = "event",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 19,
             ["recordIDs"] = {
                 "phrase.semantic.combat.reaction.default",
@@ -430,6 +447,7 @@ return {
             ["domain"] = "greeting",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Greeting",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 7,
             ["recordIDs"] = {
                 "phrase.semantic.flow.greeting.followup.default",
@@ -447,6 +465,7 @@ return {
             ["domain"] = "health",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Health",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 6,
             ["recordIDs"] = {
                 "phrase.semantic.question.health_state.healthy",
@@ -463,6 +482,7 @@ return {
             ["domain"] = "knowledge",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Knowledge",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 7,
             ["recordIDs"] = {
                 "phrase.semantic.gossip.unknown",
@@ -480,6 +500,7 @@ return {
             ["domain"] = "navigation",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Navigation",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.navigation.camp",
@@ -495,6 +516,7 @@ return {
             ["domain"] = "needs",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Needs",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 10,
             ["recordIDs"] = {
                 "phrase.semantic.question.needs.offer.fatigue",
@@ -515,6 +537,7 @@ return {
             ["domain"] = "quest",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Quest",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 12,
             ["recordIDs"] = {
                 "phrase.semantic.quest.clinic_supplies.accept.failed",
@@ -537,6 +560,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Conversation",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "phrase.semantic.conversation.acknowledged.default",
@@ -548,6 +572,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Player",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 8,
             ["recordIDs"] = {
                 "phrase.semantic.emote.player.clap",
@@ -566,6 +591,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 10,
             ["recordIDs"] = {
                 "phrase.semantic.emote.reply.clap",
@@ -586,6 +612,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ArgumentDeescalate",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "phrase.semantic.interaction.argument.deescalate",
@@ -597,6 +624,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ArgumentRetaliate",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "phrase.semantic.interaction.argument.retaliate",
@@ -608,6 +636,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/ContextClarify",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "phrase.semantic.interaction.context.clarify",
@@ -619,6 +648,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/FirstContactChallenge",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "phrase.semantic.interaction.first_contact.challenge",
@@ -630,6 +660,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/MemoryAcknowledge",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "phrase.semantic.interaction.memory.acknowledge",
@@ -641,6 +672,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/MemoryAcknowledgeFlavor",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "phrase.semantic.interaction.memory.acknowledge_flavor",
@@ -652,6 +684,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/MemoryFollowup",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "phrase.semantic.interaction.memory.followup",
@@ -663,6 +696,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/NewsAcknowledge",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "phrase.semantic.interaction.news.acknowledge",
@@ -674,6 +708,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 15,
             ["recordIDs"] = {
                 "phrase.semantic.combat.tactical_spatial.hostile.clock",
@@ -699,6 +734,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SocialConversationDirector",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.interaction.scene.post_combat_clear",
@@ -712,6 +748,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEventWarning",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "phrase.semantic.interaction.world_event.warning",
@@ -723,6 +760,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEventWarningFlavor",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "phrase.semantic.interaction.world_event.warning_flavor",
@@ -734,6 +772,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/Reactions",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 11,
             ["recordIDs"] = {
                 "phrase.semantic.social.acknowledged",
@@ -755,6 +794,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AcceptedGeneric",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.accepted_generic.1",
@@ -767,6 +807,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Admire",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.admire.1",
@@ -780,6 +821,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Apology",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.apology.1",
@@ -793,6 +835,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 8,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.ask_name.named.1",
@@ -811,6 +854,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Comfort",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.comfort.1",
@@ -824,6 +868,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Compliment",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.compliment.1",
@@ -837,6 +882,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Flirt",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.flirt.1",
@@ -850,6 +896,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Hostile",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.hostile.1",
@@ -863,6 +910,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Insult",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.insult.1",
@@ -876,6 +924,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Orientation",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.orientation.1",
@@ -888,6 +937,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Personality",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.personality.1",
@@ -900,6 +950,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Praise",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.praise.1",
@@ -913,6 +964,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Relationship",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.relationship.1",
@@ -925,6 +977,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Romantic",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.romantic.1",
@@ -938,6 +991,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Sexual",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.sexual.1",
@@ -951,6 +1005,7 @@ return {
             ["domain"] = "apology",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/SocialApology",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 4,
             ["recordIDs"] = {
                 "phrase.semantic.social.apology.default",
@@ -965,6 +1020,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Consume",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.task.consume.active",
@@ -980,6 +1036,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Drink",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.task.drink.active",
@@ -995,6 +1052,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Eat",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.task.eat.active",
@@ -1010,6 +1068,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Fetch",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.task.fetch.active",
@@ -1025,6 +1084,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Gift",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.gift.completed",
@@ -1040,6 +1100,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Give",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.task.give.active",
@@ -1055,6 +1116,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Refill",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.task.refill.active",
@@ -1070,6 +1132,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/WaitAt",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.task.wait_at.active",
@@ -1085,6 +1148,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/Cooldown",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.cooldown.1",
@@ -1097,6 +1161,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderCamp",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.order_camp.1",
@@ -1110,6 +1175,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderFollow",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.order_follow.1",
@@ -1123,6 +1189,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderGeneric",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.order_generic.1",
@@ -1136,6 +1203,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderRejected",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.order_rejected.1",
@@ -1148,6 +1216,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/OrderStay",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.order_stay.1",
@@ -1160,6 +1229,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedAdmire",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.queued_admire.1",
@@ -1172,6 +1242,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedApology",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.queued_apology.1",
@@ -1184,6 +1255,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedComfort",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.queued_comfort.1",
@@ -1196,6 +1268,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedCompliment",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.queued_compliment.1",
@@ -1208,6 +1281,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedFlirt",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.queued_flirt.1",
@@ -1220,6 +1294,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedGeneric",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.queued_generic.1",
@@ -1232,6 +1307,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedHostile",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.queued_hostile.1",
@@ -1244,6 +1320,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedInsult",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.queued_insult.1",
@@ -1256,6 +1333,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedPraise",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.queued_praise.1",
@@ -1268,6 +1346,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedRomantic",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.queued_romantic.1",
@@ -1280,6 +1359,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/QueuedSexual",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.queued_sexual.1",
@@ -1292,6 +1372,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedGame",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.rejected_game.1",
@@ -1304,6 +1385,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedGeneric",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.rejected_generic.1",
@@ -1316,6 +1398,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedHostile",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.rejected_hostile.1",
@@ -1328,6 +1411,7 @@ return {
             ["domain"] = "task",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedSexual",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "phrase.semantic.tool_reply.rejected_sexual.1",
@@ -1341,6 +1425,7 @@ return {
             ["domain"] = "wellbeing",
             ["kind"] = "Content",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/Wellbeing",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 11,
             ["recordIDs"] = {
                 "phrase.semantic.question.wellbeing.dataset.getting_by",
@@ -1362,6 +1447,7 @@ return {
             ["domain"] = "greeting",
             ["kind"] = "ContentChoices",
             ["module"] = "PNC/Semantics/Generated/Conversation/Content/PlayerChoices",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "conversation.landing:whats_up",
@@ -1373,6 +1459,7 @@ return {
             ["domain"] = "follow",
             ["kind"] = "Patterns",
             ["module"] = "PNC/Semantics/Generated/Conversation/Patterns/SemanticFlows",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "pnc.dialogue.follow.keep_close_behind_me",
@@ -1385,7 +1472,8 @@ return {
             ["bytes"] = 16499,
             ["domain"] = "greeting",
             ["kind"] = "Patterns",
-            ["module"] = "PNC/Semantics/Generated/Conversation/Patterns/Common/GreetingWhatsUp",
+            ["module"] = "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/GreetingWhatsUp",
+            ["owner"] = "PsychopatzCore",
             ["recordCount"] = 15,
             ["recordIDs"] = {
                 "pnc.dataset.greeting.glad_to_see_you_again",
@@ -1410,7 +1498,8 @@ return {
             ["bytes"] = 8836,
             ["domain"] = "question",
             ["kind"] = "Patterns",
-            ["module"] = "PNC/Semantics/Generated/Conversation/Patterns/Common/Identity",
+            ["module"] = "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/Identity",
+            ["owner"] = "PsychopatzCore",
             ["recordCount"] = 10,
             ["recordIDs"] = {
                 "pnc.dataset.question.identity.can_i_ask_your_name",
@@ -1430,7 +1519,8 @@ return {
             ["bytes"] = 10438,
             ["domain"] = "clarify",
             ["kind"] = "Patterns",
-            ["module"] = "PNC/Semantics/Generated/Conversation/Patterns/Common/WeatherNeeds",
+            ["module"] = "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/WeatherNeeds",
+            ["owner"] = "PsychopatzCore",
             ["recordCount"] = 8,
             ["recordIDs"] = {
                 "pnc.dataset.clarify.needs.what_item_do_you_mean",
@@ -1448,7 +1538,8 @@ return {
             ["bytes"] = 12418,
             ["domain"] = "question",
             ["kind"] = "Patterns",
-            ["module"] = "PNC/Semantics/Generated/Conversation/Patterns/Common/WellbeingActivity",
+            ["module"] = "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/WellbeingActivity",
+            ["owner"] = "PsychopatzCore",
             ["recordCount"] = 14,
             ["recordIDs"] = {
                 "pnc.dataset.question.activity.what_are_you_focused_on",
@@ -1473,6 +1564,7 @@ return {
             ["domain"] = "follow_up",
             ["kind"] = "Patterns",
             ["module"] = "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 7,
             ["recordIDs"] = {
                 "pnc.backstory.follow_up.do_you_miss_it",
@@ -1490,6 +1582,7 @@ return {
             ["domain"] = "flow",
             ["kind"] = "Responses",
             ["module"] = "PNC/Semantics/Generated/Conversation/Responses/Common/NeedsWeather",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "semantic.flow.weather.raining",
@@ -1503,6 +1596,7 @@ return {
             ["domain"] = "question",
             ["kind"] = "Responses",
             ["module"] = "PNC/Semantics/Generated/Conversation/Responses/Common/Questions",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 4,
             ["recordIDs"] = {
                 "semantic.question.activity",
@@ -1517,6 +1611,7 @@ return {
             ["domain"] = "accept",
             ["kind"] = "Responses",
             ["module"] = "PNC/Semantics/Generated/Conversation/Responses/Common/Social",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 6,
             ["recordIDs"] = {
                 "semantic.accept",
@@ -1533,6 +1628,7 @@ return {
             ["domain"] = "question",
             ["kind"] = "Responses",
             ["module"] = "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 13,
             ["recordIDs"] = {
                 "semantic.question.backstory.ambiguous",
@@ -1556,6 +1652,7 @@ return {
             ["domain"] = "authored",
             ["kind"] = "Responses",
             ["module"] = "PNC/Semantics/Generated/Conversation/Responses/SemanticFlows",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "semantic.authored.follow",
@@ -1568,6 +1665,7 @@ return {
             ["domain"] = "semantic",
             ["kind"] = "Flows",
             ["module"] = "PNC/Semantics/Generated/Conversation/Flows/SemanticFlows",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "pnc.dialogue.follow.flow",
@@ -1580,6 +1678,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeMemory",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.acknowledge_memory",
@@ -1591,6 +1690,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeNews",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.acknowledge_news",
@@ -1602,6 +1702,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeRepair",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.acknowledge_repair",
@@ -1613,6 +1714,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeReply",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.acknowledge_reply",
@@ -1624,6 +1726,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeThanks",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.acknowledge_thanks",
@@ -1635,6 +1738,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/AskMemoryFollowup",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.ask_memory_followup",
@@ -1646,6 +1750,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/Challenge",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.challenge",
@@ -1657,6 +1762,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/ClarifyContext",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.clarify_context",
@@ -1668,6 +1774,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/Deescalate",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.deescalate",
@@ -1679,6 +1786,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/EndConversation",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.end_conversation",
@@ -1690,6 +1798,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/Reconcile",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.reconcile",
@@ -1701,6 +1810,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/RetaliateVerbally",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.retaliate_verbally",
@@ -1712,6 +1822,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 13,
             ["recordIDs"] = {
                 "behavior.scene_excursion_acknowledge",
@@ -1735,6 +1846,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDirector",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "behavior.scene_post_combat_clear",
@@ -1748,6 +1860,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/Warn",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.warn",
@@ -1759,6 +1872,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Behaviors",
             ["module"] = "PNC/Semantics/Generated/Conversation/Behaviors/Social/WorldEventWarn",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "behavior.world_event_warn",
@@ -1770,6 +1884,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Beats",
             ["module"] = "PNC/Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "beat.argument_escalation",
@@ -1781,6 +1896,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Beats",
             ["module"] = "PNC/Semantics/Generated/Conversation/Beats/Social/Reconciliation",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "beat.reconciliation",
@@ -1792,6 +1908,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Beats",
             ["module"] = "PNC/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 1,
             ["recordIDs"] = {
                 "beat.suspicious_first_contact",
@@ -1803,6 +1920,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Realization",
             ["module"] = "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 28,
             ["recordIDs"] = {
                 "construction.en.social.acknowledge",
@@ -1841,6 +1959,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Realization",
             ["module"] = "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 28,
             ["recordIDs"] = {
                 "construction.tl.social.acknowledge",
@@ -1879,6 +1998,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Realization",
             ["module"] = "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesEn",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "construction.en.social.contextual_accept",
@@ -1892,6 +2012,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Realization",
             ["module"] = "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesTl",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "construction.tl.social.contextual_accept",
@@ -1905,6 +2026,7 @@ return {
             ["domain"] = "social",
             ["kind"] = "Realization",
             ["module"] = "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 4,
             ["recordIDs"] = {
                 "lexeme.social.agreement.yes",
@@ -1919,6 +2041,7 @@ return {
             ["domain"] = "activity",
             ["kind"] = "UI",
             ["module"] = "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 10,
             ["recordIDs"] = {
                 "question.activity",
@@ -1940,6 +2063,7 @@ return {
             ["indexKind"] = "beat",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Beat/Social",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "beat.argument_escalation",
@@ -1954,6 +2078,7 @@ return {
             ["indexKind"] = "behavior",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Behavior/Social",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 30,
             ["recordIDs"] = {
                 "behavior.acknowledge_memory",
@@ -1995,6 +2120,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Apology",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 4,
             ["recordIDs"] = {
                 "phrase.semantic.social.apology.default",
@@ -2010,6 +2136,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Combat",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.combat.player_assaulted.aggressive",
@@ -2026,6 +2153,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/CombatBanter",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 26,
             ["recordIDs"] = {
                 "phrase.semantic.combat.kill.killer.aggressive.axe_head_01",
@@ -2063,6 +2191,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/CombatHumanBanter",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 21,
             ["recordIDs"] = {
                 "phrase.semantic.combat.human_kill.aggressive.line_01",
@@ -2095,6 +2224,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Command",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 65,
             ["recordIDs"] = {
                 "phrase.semantic.combat.horde.ack.avoid_default",
@@ -2171,6 +2301,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Compatibility",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 27,
             ["recordIDs"] = {
                 "phrase.semantic.compat.bandits.hooman_hurt.colonist",
@@ -2209,6 +2340,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Conversation",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.question.whats_up.busy",
@@ -2225,6 +2357,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Event",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 104,
             ["recordIDs"] = {
                 "phrase.semantic.combat.horde.choice.avoid",
@@ -2340,6 +2473,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Greeting",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 8,
             ["recordIDs"] = {
                 "conversation.landing:whats_up",
@@ -2359,6 +2493,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Health",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 6,
             ["recordIDs"] = {
                 "phrase.semantic.question.health_state.healthy",
@@ -2376,6 +2511,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Knowledge",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 7,
             ["recordIDs"] = {
                 "phrase.semantic.gossip.unknown",
@@ -2394,6 +2530,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Navigation",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 5,
             ["recordIDs"] = {
                 "phrase.semantic.navigation.camp",
@@ -2410,6 +2547,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Needs",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 10,
             ["recordIDs"] = {
                 "phrase.semantic.question.needs.offer.fatigue",
@@ -2431,6 +2569,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Quest",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 12,
             ["recordIDs"] = {
                 "phrase.semantic.quest.clinic_supplies.accept.failed",
@@ -2454,6 +2593,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Social",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 104,
             ["recordIDs"] = {
                 "phrase.semantic.combat.tactical_spatial.hostile.clock",
@@ -2569,6 +2709,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Task",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 86,
             ["recordIDs"] = {
                 "phrase.semantic.gift.completed",
@@ -2666,6 +2807,7 @@ return {
             ["indexKind"] = "content",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Wellbeing",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 11,
             ["recordIDs"] = {
                 "phrase.semantic.question.wellbeing.dataset.getting_by",
@@ -2688,6 +2830,7 @@ return {
             ["indexKind"] = "flow",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Flow/Semantic",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "pnc.dialogue.follow.flow",
@@ -2701,6 +2844,7 @@ return {
             ["indexKind"] = "flowDefinition",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/FlowDefinition/Semantic",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "pnc.dialogue.follow",
@@ -2709,11 +2853,12 @@ return {
             ["sourceShard"] = "@index/flowDefinition/semantic",
         },
         {
-            ["bytes"] = 18113,
+            ["bytes"] = 18630,
             ["domain"] = "common",
             ["indexKind"] = "pattern",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Pattern/Common",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 47,
             ["recordIDs"] = {
                 "pnc.dataset.clarify.needs.what_item_do_you_mean",
@@ -2772,6 +2917,7 @@ return {
             ["indexKind"] = "pattern",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Pattern/GroundedPersonal",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 7,
             ["recordIDs"] = {
                 "pnc.backstory.follow_up.do_you_miss_it",
@@ -2790,6 +2936,7 @@ return {
             ["indexKind"] = "pattern",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Pattern/Semantic",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 3,
             ["recordIDs"] = {
                 "pnc.dialogue.follow.keep_close_behind_me",
@@ -2804,6 +2951,7 @@ return {
             ["indexKind"] = "realization",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Realization/Social",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 66,
             ["recordIDs"] = {
                 "construction.en.social.acknowledge",
@@ -2881,6 +3029,7 @@ return {
             ["indexKind"] = "responsePool",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/ResponsePool/Common",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 13,
             ["recordIDs"] = {
                 "semantic.accept",
@@ -2905,6 +3054,7 @@ return {
             ["indexKind"] = "responsePool",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/ResponsePool/GroundedPersonal",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 13,
             ["recordIDs"] = {
                 "semantic.question.backstory.ambiguous",
@@ -2929,6 +3079,7 @@ return {
             ["indexKind"] = "responsePool",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/ResponsePool/Semantic",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 2,
             ["recordIDs"] = {
                 "semantic.authored.follow",
@@ -2942,6 +3093,7 @@ return {
             ["indexKind"] = "ui",
             ["kind"] = "Index",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Ui/StaticSuggestions",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 10,
             ["recordIDs"] = {
                 "question.activity",
@@ -2962,11 +3114,12 @@ return {
             ["domain"] = "index",
             ["kind"] = "IndexRegistry",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Registry",
+            ["owner"] = "ProjectHoomans",
             ["recordCount"] = 29,
             ["recordIDs"] = {
             },
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "54c1b7c64f3c4154ed62c02c69a7f72a0bb548495f9f15f4c9677027020ffc4d",
+    ["wholeModelFingerprint"] = "e63463b3b3aabecf6c52b4568c79f30e9f8382e4094420a347846060a1c00a82",
 }

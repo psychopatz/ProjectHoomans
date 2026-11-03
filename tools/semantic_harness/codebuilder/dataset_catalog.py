@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from .lexicon_compiler import CompileError
+from .generation_ownership import normalize_owner
 from .dialogue_dataset import compile_dialogue_dataset
 from .semantic_definition_compiler import (
     compile_semantic_definitions,
@@ -243,7 +244,20 @@ class SemanticDatasetCatalog:
         output: list[tuple[Path, dict[str, Any]]] = []
         for path in paths:
             document = loaded[path]
-            document["source"] = source
+            existing_source = (
+                document.get("source")
+                if isinstance(document.get("source"), dict)
+                else {}
+            )
+            incoming_source = source if isinstance(source, dict) else {}
+            merged_source = {
+                **incoming_source,
+                "owner": normalize_owner(existing_source.get("owner")),
+            }
+            # Shard ownership is a physical package contract. Editing the
+            # logical mixed dataset may update shared provenance, but cannot
+            # migrate a shard between Core and Hoomans as a side effect.
+            document["source"] = merged_source or existing_source or source
             document[records_key] = buckets[path]
             output.append((self.repository / path, document))
         return output

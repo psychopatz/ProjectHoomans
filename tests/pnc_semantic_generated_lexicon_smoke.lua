@@ -15,9 +15,9 @@ local Catalog = T.load(
     "PNC/Semantics/PNC_SemanticCatalog.lua"
 )
 local GeneratedLexicon = T.load(
-    "ProjectHoomans",
-    "common_lua",
-    "PNC/Semantics/Generated/Lexicon/Catalog.lua"
+    "PsychopatzCore",
+    "common",
+    "PsychopatzCore/Semantics/Generated/Lexicon/Catalog.lua"
 )
 local Policy = T.load(
     "ProjectHoomans",

@@ -33,6 +33,12 @@ from .semantic_definition_compiler import (
     compile_semantic_definitions,
     discover_registered_capability_ids,
 )
+from .generation_ownership import (
+    HOOMANS_OWNER,
+    normalize_owner,
+    route_module_for_owner,
+    source_owner,
+)
 
 
 CONVERSATION_MANIFEST_SCHEMA = "pnc.conversation.manifest.v1"
@@ -899,6 +905,7 @@ def _add_global_id(
         "kind": kind,
         "sourceShard": path,
         "domain": shard["domain"],
+        "owner": normalize_owner(shard.get("owner")),
     }
 
 
@@ -991,11 +998,15 @@ def compile_conversation_sources(
         else:
             record_ids.extend(str(item["id"]) for item in document.get("suggestions", []))
         record_ids.sort()
+        source_meta = document.get("source") if isinstance(document, dict) else None
         report = {
             "path": entry["path"],
             "kind": entry["kind"],
             "domain": entry["domain"],
             "order": entry["order"],
+            "owner": normalize_owner(
+                source_meta.get("owner") if isinstance(source_meta, dict) else None
+            ),
             "fingerprint": _fingerprint(document),
             "recordIDs": record_ids,
         }
@@ -1016,6 +1027,13 @@ def compile_conversation_sources(
     locations: dict[str, dict[str, Any]] = {}
     for document, entry, _fingerprint_value in loaded:
         path = entry["path"]
+        source_meta = document.get("source") if isinstance(document, dict) else None
+        entry = {
+            **entry,
+            "owner": normalize_owner(
+                source_meta.get("owner") if isinstance(source_meta, dict) else None
+            ),
+        }
         if entry["kind"] == "content":
             for family in document.get("phraseFamilies", []):
                 _add_global_id(
@@ -1131,7 +1149,10 @@ def compile_conversation_sources(
                 locations,
                 pattern_id,
                 kind="pattern",
-                shard={"domain": owner["domain"]},
+                shard={
+                    "domain": owner["domain"],
+                    "owner": owner.get("owner"),
+                },
                 path=owner["sourceShard"],
             )
 
@@ -1476,11 +1497,27 @@ def render_conversation_runtime_plan(
         *realization_reports,
         *ui_reports,
     ]
+
+    # Canonical source ownership controls physical package ownership.  The
+    # combined Hoomans registry may reference Core modules, but CodeBuilder
+    # writes those modules into PsychopatzCore instead of duplicating them
+    # under the PNC package.
+    routed_modules: list[tuple[str, str]] = []
+    for (module, source), report in zip(modules, reports):
+        owner = source_owner(model, report.get("sourceShard"))
+        routed_module = route_module_for_owner(module, owner)
+        report["owner"] = owner
+        report["module"] = routed_module
+        routed_modules.append((routed_module, source))
+    modules = routed_modules
+
     index_modules, index_reports, _ = render_conversation_discovery_indexes(
         model,
         reports,
         module_prefix=prefix,
     )
+    for report in index_reports:
+        report["owner"] = HOOMANS_OWNER
     modules.extend(index_modules)
     reports.extend(index_reports)
     return modules, reports

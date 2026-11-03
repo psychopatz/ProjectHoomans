@@ -6,7 +6,7 @@ PNC.Semantics.ConversationRegistry = Registry
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "f1b0eba0b168bd724c4fd5c971a2436fd910a0eddb7639601071f6dcf1e70c97"
-Registry.WHOLE_MODEL_FINGERPRINT = "54c1b7c64f3c4154ed62c02c69a7f72a0bb548495f9f15f4c9677027020ffc4d"
+Registry.WHOLE_MODEL_FINGERPRINT = "e63463b3b3aabecf6c52b4568c79f30e9f8382e4094420a347846060a1c00a82"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -221,13 +221,13 @@ local loaded86 = require "PNC/Semantics/Generated/Conversation/Content/PlayerCho
 appendContentChoices(loaded86)
 local loaded87 = require "PNC/Semantics/Generated/Conversation/Patterns/SemanticFlows"
 appendPatterns(loaded87)
-local loaded88 = require "PNC/Semantics/Generated/Conversation/Patterns/Common/GreetingWhatsUp"
+local loaded88 = require "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/GreetingWhatsUp"
 appendPatterns(loaded88)
-local loaded89 = require "PNC/Semantics/Generated/Conversation/Patterns/Common/Identity"
+local loaded89 = require "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/Identity"
 appendPatterns(loaded89)
-local loaded90 = require "PNC/Semantics/Generated/Conversation/Patterns/Common/WeatherNeeds"
+local loaded90 = require "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/WeatherNeeds"
 appendPatterns(loaded90)
-local loaded91 = require "PNC/Semantics/Generated/Conversation/Patterns/Common/WellbeingActivity"
+local loaded91 = require "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/WellbeingActivity"
 appendPatterns(loaded91)
 local loaded92 = require "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal"
 appendPatterns(loaded92)

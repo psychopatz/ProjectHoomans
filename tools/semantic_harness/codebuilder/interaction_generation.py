@@ -13,6 +13,10 @@ from .blocks import SemanticBlockRegistry
 from .lexicon_compiler import CompileError
 from .translation_support import pretty_json
 from .semantic_definition_compiler import discover_registered_capability_ids
+from .generation_ownership import (
+    module_target,
+    resolve_core_repository,
+)
 from .conversation_compiler import (
     CONVERSATION_RUNTIME_RELATIVE,
     CONVERSATION_SOURCE_RELATIVE,
@@ -42,11 +46,13 @@ class SemanticInteractionAuthoring:
         block_registry: SemanticBlockRegistry,
         repository: Path,
         runtime_root: Path,
+        core_repository: Path,
     ) -> None:
         self.dataset_catalog = dataset_catalog
         self.block_registry = block_registry
         self.repository = repository
         self.runtime_root = runtime_root
+        self.core_repository = core_repository
 
     def _dataset_spec(self, source_id: str) -> dict[str, Any]:
         return self.dataset_catalog._dataset_spec(source_id)
@@ -205,23 +211,34 @@ class SemanticInteractionAuthoring:
             source_overrides=overrides,
         )
         rendered, reports = render_conversation_runtime_plan(model)
-        shared_root = Path(
-            "Contents/mods/ProjectHoomans/common/media/lua/shared"
-        )
-        expected_sources: dict[str, str] = {
-            str(shared_root / (module + ".lua")): source
-            for module, source in rendered
-        }
-        expected_sources[
-            str(CONVERSATION_RUNTIME_RELATIVE / "Registry.lua")
-        ] = render_conversation_registry(model, reports)
-        expected_sources[
-            str(CONVERSATION_RUNTIME_RELATIVE / "Manifest.lua")
-        ] = render_conversation_manifest_lua(model, reports)
-        expected_sources[
-            str(CONVERSATION_UI_RUNTIME_RELATIVE)
-        ] = render_conversation_ui_module(model)
+        core_repository = self.core_repository
 
+        expected_artifacts: list[tuple[Path, Path, str, str]] = []
+        for module, source in rendered:
+            owner_repository, target = module_target(
+                self.repository,
+                module,
+                core_repository=core_repository,
+                runtime_root=self.runtime_root,
+            )
+            expected_artifacts.append(
+                (
+                    owner_repository,
+                    target.relative_to(owner_repository),
+                    source,
+                    module,
+                )
+            )
+
+        hoomans_artifacts = {
+            CONVERSATION_RUNTIME_RELATIVE / "Registry.lua": render_conversation_registry(
+                model, reports
+            ),
+            CONVERSATION_RUNTIME_RELATIVE / "Manifest.lua": render_conversation_manifest_lua(
+                model, reports
+            ),
+            CONVERSATION_UI_RUNTIME_RELATIVE: render_conversation_ui_module(model),
+        }
         translation_root = Path(
             "Contents/mods/ProjectHoomans/common/media/translation"
         )
@@ -229,14 +246,24 @@ class SemanticInteractionAuthoring:
             conversation_translation_bundles(model).items()
         ):
             for domain, values in sorted(domains.items()):
-                expected_sources[
-                    str(
-                        translation_root
-                        / language
-                        / "Conversation"
-                        / f"{domain}.json"
-                    )
+                hoomans_artifacts[
+                    translation_root / language / "Conversation" / f"{domain}.json"
                 ] = pretty_json(values)
+
+        for relative, source in sorted(
+            hoomans_artifacts.items(), key=lambda item: str(item[0])
+        ):
+            expected_artifacts = [
+                row
+                for row in expected_artifacts
+                if not (
+                    row[0] == self.repository
+                    and row[1] == relative
+                )
+            ]
+            expected_artifacts.append(
+                (self.repository, relative, source, "")
+            )
 
         source_diffs = [
             authoring._artifact_diff(
@@ -246,30 +273,46 @@ class SemanticInteractionAuthoring:
             )
             for path, document in sorted(overrides.items())
         ]
-        generated_diffs = [
-            authoring._artifact_diff(self.repository, path, expected)
-            for path, expected in sorted(expected_sources.items())
-        ]
+        generated_diffs = []
+        for owner_repository, relative, expected, _module in sorted(
+            expected_artifacts,
+            key=lambda item: (str(item[0]), str(item[1])),
+        ):
+            row = authoring._artifact_diff(
+                owner_repository,
+                str(relative),
+                expected,
+            )
+            row["repository"] = str(owner_repository)
+            generated_diffs.append(row)
+
         generated_lua = [
             {
-                "module": path[
-                    len(str(shared_root)) + 1 : -4
-                ].replace("\\", "/"),
+                "module": module,
+                "repository": str(owner_repository),
+                "path": str(relative),
                 "sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
                 "source": source,
             }
-            for path, source in sorted(expected_sources.items())
-            if path.startswith(str(shared_root) + "/") and path.endswith(".lua")
+            for owner_repository, relative, source, module in expected_artifacts
+            if module
         ]
         fingerprint_payload = "\n".join(
-            f"{path}\0{expected_sources[path]}"
-            for path in sorted(expected_sources)
+            f"{owner_repository}/{relative}\0{expected}"
+            for owner_repository, relative, expected, _module in sorted(
+                expected_artifacts,
+                key=lambda item: (str(item[0]), str(item[1])),
+            )
         )
         return {
             "canonicalSourceDiff": source_diffs[0] if source_diffs else None,
             "canonicalSourceDiffs": source_diffs,
             "generatedArtifactDiffs": generated_diffs,
-            "generatedPaths": sorted(expected_sources),
+            "generatedPaths": sorted(
+                str(owner_repository / relative)
+                for owner_repository, relative, _expected, _module
+                in expected_artifacts
+            ),
             "generatedLua": generated_lua,
             "generatedSourceFingerprint": hashlib.sha256(
                 fingerprint_payload.encode("utf-8")
@@ -392,7 +435,7 @@ class SemanticInteractionAuthoring:
             self.repository,
             runtime_root=self.runtime_root,
         )
-        writes.extend(write_conversation_output(self.repository, model))
+        writes.extend(write_conversation_output(self.repository, model, core_repository=self.core_repository))
         post_write = self.preview_interaction_spec(
             spec,
             source_id=source_id,
@@ -518,7 +561,7 @@ class SemanticInteractionAuthoring:
             self.repository,
             runtime_root=self.runtime_root,
         )
-        writes.extend(write_conversation_output(self.repository, model))
+        writes.extend(write_conversation_output(self.repository, model, core_repository=self.core_repository))
         post_write = self.preview_interaction_collection(
             collection,
             source_id=source_id,
@@ -649,7 +692,7 @@ class SemanticInteractionAuthoring:
                 runtime_root=self.runtime_root,
             )
             written = [Path(path) for path in canonical.get("writes", [])]
-            written.extend(write_conversation_output(self.repository, model))
+            written.extend(write_conversation_output(self.repository, model, core_repository=self.core_repository))
             generation = {
                 **canonical,
                 "generationApproved": True,

@@ -3,6 +3,7 @@ T.addPackagePaths({
     { "ProjectHoomans", "shared" },
     { "ProjectHoomans", "server" },
     { "ProjectHoomans", "common_lua" },
+    { "PsychopatzCore", "common" },
 })
 
 local transferArgs

@@ -398,3 +398,9 @@ Headless persistence acceptance must snapshot/copy the storage representation, t
 For Project Zomboid Global ModData-backed trader records, a deep-copied persisted table fixture is sufficient developer-side evidence when native engine serialization is out of scope. The test must prove the reloaded trader record is a distinct Lua object from the pre-save record while preserving canonical policy fields.
 
 WorldKnowledge must continue to exercise its real `Save/Load` contract and evidence/fact IDs.
+
+## Generated artifact ownership
+
+CodeBuilder output follows canonical package ownership, not the repository that hosts the authoring tool. Generic semantic sources owned by `PsychopatzCore` generate into the Core mod namespace/repository. Project Hoomans sources generate into the PNC namespace/repository. The Hoomans generated Conversation registry may compose both module families, but Core-owned generated modules must not be duplicated under Hoomans.
+
+Ownership changes originate in canonical source metadata and are preserved by Semantic Lab logical-dataset edits. Generated files are downstream artifacts, never the ownership authority.

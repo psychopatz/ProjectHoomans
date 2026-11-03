@@ -156,6 +156,7 @@ class SemanticCompilerTests(unittest.TestCase):
         self.assertIn("verbFormsBySurface = {", first)
         self.assertIn('["grabbing"]', first)
         self.assertIn('["following"]', first)
+        self.assertTrue(all(line == line.rstrip() for line in first.splitlines()))
 
     def test_unknown_offset_fails_instead_of_emitting_partial_data(self) -> None:
         invalid = copy.deepcopy(self.allowlist)
@@ -167,40 +168,40 @@ class SemanticCompilerTests(unittest.TestCase):
         compiled = compile_wordnet(self.home, self.allowlist)
         rendered = render_lua_shards(
             compiled,
-            "PNC/Semantics/Generated/Lexicon/Catalog",
+            "PsychopatzCore/Semantics/Generated/Lexicon/Catalog",
         )
         modules = {module: source for module, source in rendered}
 
         self.assertIn(
-            "PNC/Semantics/Generated/Lexicon/Catalog",
+            "PsychopatzCore/Semantics/Generated/Lexicon/Catalog",
             modules,
         )
         self.assertIn(
-            "PNC/Semantics/Generated/Lexicon/Aliases",
+            "PsychopatzCore/Semantics/Generated/Lexicon/Aliases",
             modules,
         )
         self.assertIn(
-            "PNC/Semantics/Generated/Lexicon/VerbForms",
+            "PsychopatzCore/Semantics/Generated/Lexicon/VerbForms",
             modules,
         )
         self.assertIn(
-            "PNC/Semantics/Generated/Lexicon/VerbForms/Fetch",
+            "PsychopatzCore/Semantics/Generated/Lexicon/VerbForms/Fetch",
             modules,
         )
         self.assertIn(
             'local aliasesByConcept = require '
-            '"PNC/Semantics/Generated/Lexicon/Aliases"',
-            modules["PNC/Semantics/Generated/Lexicon/Catalog"],
+            '"PsychopatzCore/Semantics/Generated/Lexicon/Aliases"',
+            modules["PsychopatzCore/Semantics/Generated/Lexicon/Catalog"],
         )
         self.assertIn('["FETCH"] = {', modules[
-            "PNC/Semantics/Generated/Lexicon/Aliases"
+            "PsychopatzCore/Semantics/Generated/Lexicon/Aliases"
         ])
         self.assertIn(
-            'PNC/Semantics/Generated/Lexicon/VerbForms/Fetch',
-            modules["PNC/Semantics/Generated/Lexicon/VerbForms"],
+            'PsychopatzCore/Semantics/Generated/Lexicon/VerbForms/Fetch',
+            modules["PsychopatzCore/Semantics/Generated/Lexicon/VerbForms"],
         )
         self.assertIn('["grabbing"] = {', modules[
-            "PNC/Semantics/Generated/Lexicon/VerbForms/Fetch"
+            "PsychopatzCore/Semantics/Generated/Lexicon/VerbForms/Fetch"
         ])
 
     def test_source_hashes_are_pinned(self) -> None:

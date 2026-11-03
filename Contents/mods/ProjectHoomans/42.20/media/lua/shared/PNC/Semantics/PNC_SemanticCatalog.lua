@@ -5,7 +5,7 @@ local Semantic = require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local Registry = Semantic.Registry
 local Normalizer = Semantic.Normalizer
 local GeneratedLexicon = require
-    "PNC/Semantics/Generated/Lexicon/Catalog"
+    "PsychopatzCore/Semantics/Generated/Lexicon/Catalog"
 local ConversationRegistry = require
     "PNC/Semantics/Generated/Conversation/Registry"
 local CampSite = PNC.Semantics.CampSite

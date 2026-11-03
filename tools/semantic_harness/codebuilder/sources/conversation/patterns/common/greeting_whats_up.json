@@ -365,7 +365,8 @@
   "schema": "pnc.conversation.shard.v1",
   "source": {
     "contentLicense": "Project Hoomans authored content",
-    "name": "Project Hoomans Common Interaction Seed",
+    "name": "PsychopatzCore Common Interaction Seed",
+    "owner": "PsychopatzCore",
     "references": [
       {
         "license": "ACL Anthology terms; metadata-only reference",

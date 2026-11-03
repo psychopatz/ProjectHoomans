@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the compact Project Hoomans WordNet alias module."""
+"""Build owner-routed semantic Conversation and lexical artifacts."""
 
 from __future__ import annotations
 
@@ -25,6 +25,14 @@ if __package__ in {None, ""}:
         normalize_language,
         pretty_json,
     )
+    from tools.semantic_harness.codebuilder.generation_ownership import (
+        CORE_CONVERSATION_PREFIX,
+        CORE_OWNER,
+        HOOMANS_OWNER,
+        module_owner,
+        resolve_core_repository,
+        shared_lua_root,
+    )
     from tools.semantic_harness.codebuilder.conversation_compiler import (
         CONVERSATION_MANIFEST_RELATIVE,
         CONVERSATION_RUNTIME_RELATIVE,
@@ -46,6 +54,14 @@ else:
         render_lua_shards,
     )
     from .translation_support import normalize_language, pretty_json
+    from .generation_ownership import (
+        CORE_CONVERSATION_PREFIX,
+        CORE_OWNER,
+        HOOMANS_OWNER,
+        module_owner,
+        resolve_core_repository,
+        shared_lua_root,
+    )
     from .conversation_compiler import (
         CONVERSATION_MANIFEST_RELATIVE,
         CONVERSATION_RUNTIME_RELATIVE,
@@ -60,11 +76,17 @@ else:
     )
 
 
-DEFAULT_OUTPUT = (
-    ROOT
-    / "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Semantics/"
-    / "Generated/Lexicon/Catalog.lua"
-)
+def default_lexicon_output(core_repository: Path | None = None) -> Path:
+    core = resolve_core_repository(ROOT, explicit=core_repository)
+    return (
+        core
+        / "Contents/mods/PsychopatzCore/common/media/lua/shared/"
+        / "PsychopatzCore/Semantics/Generated/Lexicon/Catalog.lua"
+    )
+
+
+DEFAULT_CORE_REPOSITORY = resolve_core_repository(ROOT)
+DEFAULT_OUTPUT = default_lexicon_output()
 CONVERSATION_SOURCE_ROOT = (
     ROOT / "tools" / "semantic_harness" / "codebuilder" / "sources"
     / "conversation"
@@ -162,15 +184,53 @@ def _write_modules(shared_root: Path, rendered: list[tuple[str, str]]) -> list[P
     return paths
 
 
+def _write_routed_modules(
+    project_repository: Path,
+    core_repository: Path,
+    rendered: list[tuple[str, str]],
+) -> list[Path]:
+    """Write each generated module into its owning package repository."""
+    roots = {
+        HOOMANS_OWNER: shared_lua_root(project_repository, HOOMANS_OWNER),
+        CORE_OWNER: shared_lua_root(
+            project_repository,
+            CORE_OWNER,
+            core_repository=core_repository,
+        ),
+    }
+    paths: list[Path] = []
+    for module, source in rendered:
+        owner = module_owner(module)
+        path = roots[owner] / (module + ".lua")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(source, encoding="utf-8", newline="\n")
+        paths.append(path)
+    return paths
+
+
 def write_conversation_output(
     repository: Path,
     model: dict | None = None,
+    *,
+    core_repository: Path | None = None,
 ) -> list[Path]:
     """Write the manifest-backed Conversation runtime and audit artifacts."""
     repository = repository.expanduser().resolve()
+    core_repository = resolve_core_repository(
+        repository,
+        explicit=core_repository,
+    )
     model = model or compile_conversation_sources(repository)
-    shared_root = repository / "Contents/mods/ProjectHoomans/common/media/lua/shared"
+    shared_root = shared_lua_root(repository, HOOMANS_OWNER)
     runtime_dir = repository / CONVERSATION_RUNTIME_RELATIVE
+    core_runtime_dir = (
+        shared_lua_root(
+            repository,
+            CORE_OWNER,
+            core_repository=core_repository,
+        )
+        / CORE_CONVERSATION_PREFIX
+    )
 
     # Validate the complete plan before deleting or writing any generated
     # artifact. Hard context-health violations are compiler errors, not
@@ -192,7 +252,8 @@ def write_conversation_output(
 
     runtime_dir.mkdir(parents=True, exist_ok=True)
     _clean_generated_tree(runtime_dir)
-    paths = _write_modules(shared_root, rendered)
+    _clean_generated_tree(core_runtime_dir)
+    paths = _write_routed_modules(repository, core_repository, rendered)
     registry_path = runtime_dir / "Registry.lua"
     registry_path.write_text(
         render_conversation_registry(model, reports),
@@ -254,7 +315,7 @@ def main(arguments: list[str] | None = None) -> int:
         default=DEFAULT_ALLOWLIST,
         help="reviewed WordNet synset-to-Hoomans concept mapping",
     )
-    parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--output", type=Path, default=None)
     parser.add_argument(
         "--conversation-manifest",
         type=Path,
@@ -265,7 +326,13 @@ def main(arguments: list[str] | None = None) -> int:
         "--conversation-output-root",
         type=Path,
         default=ROOT,
-        help="repository root receiving generated Conversation artifacts",
+        help="Project Hoomans repository receiving adopter-owned Conversation artifacts",
+    )
+    parser.add_argument(
+        "--core-repository",
+        type=Path,
+        default=None,
+        help="PsychopatzCore repository receiving Core-owned generated artifacts",
     )
     options = parser.parse_args(arguments)
 
@@ -293,7 +360,11 @@ def main(arguments: list[str] | None = None) -> int:
         return 2
 
     if compiled_lexicon is not None:
-        output = options.output.expanduser().resolve()
+        output = (
+            options.output.expanduser().resolve()
+            if options.output is not None
+            else default_lexicon_output(options.core_repository)
+        )
         paths = write_lexicon_output(output, compiled_lexicon)
         alias_count = sum(
             len(aliases)
@@ -308,7 +379,11 @@ def main(arguments: list[str] | None = None) -> int:
 
     if compiled_conversation is not None:
         output_root = options.conversation_output_root.expanduser().resolve()
-        paths = write_conversation_output(output_root, compiled_conversation)
+        paths = write_conversation_output(
+            output_root,
+            compiled_conversation,
+            core_repository=options.core_repository,
+        )
         print(
             "wrote manifest-backed Conversation output and "
             f"{len(paths) - 1} generated files "
