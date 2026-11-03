@@ -65,6 +65,11 @@ end
 function Store.Save()
     Store.EnsureLoaded()
     if not Store.Dirty then return false, "not_dirty" end
+    local extensions = PNC.SurvivorWorldExtensions
+    if extensions and extensions.Active and extensions.Save then
+        extensions.MarkDirty("abstract_world_save")
+        return extensions.Save()
+    end
     local normalized
     normalized = Types.NormalizeRegistry(Store.Registry)
     local written = Reset.Write(Config.MODDATA_KEY, Core.DeepCopy(normalized))

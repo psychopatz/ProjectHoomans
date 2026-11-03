@@ -76,6 +76,11 @@ function Communities.Save()
     local normalized
     Communities.EnsureLoaded()
     if not Communities.Dirty then return false, "not_dirty" end
+    local extensions = PNC.SurvivorWorldExtensions
+    if extensions and extensions.Active and extensions.Save then
+        extensions.MarkDirty("communities_save")
+        return extensions.Save()
+    end
     normalized = Types.NormalizeRegistry(Communities.Registry)
     local written = Reset.Write(Constants.REGISTRY_MODDATA_KEY,
         copy(normalized))

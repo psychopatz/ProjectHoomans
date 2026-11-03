@@ -104,8 +104,13 @@ local function reconcileGroup(group, reason)
     end
     group.memberIds = surviving
     Groups.MarkCombatProfileDirty(group, reason)
-    group.revision = (tonumber(group.revision) or 0) + 1
-    Store.Touch(reason)
+    local groupManager = PNC.AbstractGroupManagerInternal
+    if groupManager and groupManager.Touch then
+        groupManager.Touch(group, reason)
+    else
+        group.revision = (tonumber(group.revision) or 0) + 1
+        Store.Touch(reason)
+    end
 end
 
 function Casualties.KillMembers(group, npcIDs, reason)

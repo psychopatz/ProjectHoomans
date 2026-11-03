@@ -102,8 +102,26 @@ function Scavenge.Apply(group, location, action)
     end
     group.diagnostics = group.diagnostics or {}
     group.diagnostics.lastScavenge = result
-    group.revision = (tonumber(group.revision) or 0) + 1
-    Store.Touch("abstract_scavenge_completed")
+
+    local adapter = PNC.CoreSurvivorWorldAdapter
+    if adapter and adapter.CommitLocation then
+        local canonical, syncReason = adapter.CommitLocation(
+            location,
+            "abstract_scavenge_location"
+        )
+        if not canonical then
+            return nil, syncReason or "core_location_sync_failed"
+        end
+    end
+
+    local groupManager = PNC.AbstractGroupManagerInternal
+    if groupManager and groupManager.Touch then
+        groupManager.Touch(group, "abstract_scavenge_completed")
+    else
+        group.revision = (tonumber(group.revision) or 0) + 1
+        Store.Touch("abstract_scavenge_completed")
+    end
+
     Store.Emit("ABSTRACT_SCAVENGE_COMPLETED", { groupId = group.id,
         locationId = location.id, result = result })
     return result, "completed"

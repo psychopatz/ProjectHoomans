@@ -74,6 +74,11 @@ function Factions.Save()
     local normalized
     Factions.EnsureLoaded()
     if not Factions.Dirty then return false, "not_dirty" end
+    local extensions = PNC.SurvivorWorldExtensions
+    if extensions and extensions.Active and extensions.Save then
+        extensions.MarkDirty("factions_save")
+        return extensions.Save()
+    end
     normalized = Types.NormalizeFactionRegistry(Factions.Registry)
     local written = Reset.Write(Constants.REGISTRY_MODDATA_KEY,
         Internal.copy(normalized))
