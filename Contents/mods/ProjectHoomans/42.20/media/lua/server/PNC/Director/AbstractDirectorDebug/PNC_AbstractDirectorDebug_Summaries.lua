@@ -85,6 +85,7 @@ function H.GroupSummary(group, selected)
         groupType = group.groupType, memberIds = H.Copy(group.memberIds),
         leaderId = group.leaderId, mission = group.mission, state = group.state,
         location = H.Copy(group.location), targetLocation = H.Copy(group.targetLocation),
+        journey = H.Copy(group.journey),
         stateStartedAt = group.stateStartedAt, stateEndsAt = group.stateEndsAt,
         missionStartedAt = group.missionStartedAt,
         action = H.Copy(group.action), previousMission = H.Copy(group.previousMission),

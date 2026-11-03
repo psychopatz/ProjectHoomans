@@ -10,6 +10,8 @@ local Encounters = PNC.AbstractEncounters
 local Actions = PNC.AbstractActions
 local ResourceNeeds = PNC.AbstractResourceNeeds
 local Config = PNC.DirectorConfig
+local CoreGroupTravel = require
+    "PNC/Core/Director/PNC_CoreGroupTraversalBridge"
 
 function Traversal.CalculateTravelHours(group, target)
     local dx, dy = target.x - group.location.x, target.y - group.location.y
@@ -34,15 +36,20 @@ function Traversal.Begin(groupOrID, targetOrID, at)
     if group.state == "TRAVELING" then return false, "already_traveling" end
     if group.location.id == target.id then return false, "already_there" end
     local hours, distance = Traversal.CalculateTravelHours(group, target)
+    local journey, journeyReason =
+        CoreGroupTravel.Begin(group, target, hours, at)
+    if not journey then
+        return false, journeyReason or "group_journey_start_failed"
+    end
     Locations.Depart(group, at)
     group.targetLocation = Locations.Ref(target)
     group.diagnostics = group.diagnostics or {}
     group.diagnostics.travel = { from = group.location.id, to = target.id,
         distance = distance, travelHours = hours }
-    Groups.SetState(group, "TRAVELING", at, at + hours)
+    Groups.SetState(group, "TRAVELING", at, journey.eta or (at + hours))
     Store.Emit("GROUP_DESTINATION_SELECTED", { groupId = group.id,
         fromLocationId = group.location.id, targetLocationId = target.id,
-        arrivalAt = at + hours })
+        arrivalAt = journey.eta or (at + hours) })
     return true, "travel_started"
 end
 
@@ -64,6 +71,9 @@ function Traversal.Arrive(groupOrID, at)
         and PNC.Core.DeepCopy(mobile.travel) or nil
     local target = Locations.Get(group.targetLocation.id)
     if not target then
+        if group.journey then
+            CoreGroupTravel.Cancel(group, "target_missing")
+        end
         group.targetLocation = nil
         Groups.SetState(group, "IDLE", at, at)
         if settlementTraveling and PNC.Factions.SetMobileGroup then
@@ -84,6 +94,11 @@ function Traversal.Arrive(groupOrID, at)
             }, "mobile_settlement_target_missing")
         end
         return false, "target_missing"
+    end
+    local completedJourney, completeReason =
+        CoreGroupTravel.Complete(group, target, at)
+    if not completedJourney then
+        return false, completeReason or "group_journey_complete_failed"
     end
     group.location = Locations.Ref(target)
     group.targetLocation = nil
@@ -158,8 +173,21 @@ function Traversal.Advance(group, at)
     local lod = Groups.RefreshLOD(group, at)
     if lod == "ACTIVE" then return false, "active_simulation" end
     if group.state == "TRAVELING" then
-        if at >= (tonumber(group.stateEndsAt) or 0) then
+        local journey, journeyReason =
+            CoreGroupTravel.Advance(group, at)
+        if not journey then
+            return false, journeyReason or "group_journey_advance_failed"
+        end
+        if journey.state == "arrived" then
             return Traversal.Arrive(group, at)
+        end
+        if journey.state == "cancelled"
+            or journey.state == "blocked"
+        then
+            group.targetLocation = nil
+            Groups.SetState(group, "IDLE", at, at)
+            return false, journey.failureReason
+                or "group_journey_terminal"
         end
         return false, "in_transit"
     end

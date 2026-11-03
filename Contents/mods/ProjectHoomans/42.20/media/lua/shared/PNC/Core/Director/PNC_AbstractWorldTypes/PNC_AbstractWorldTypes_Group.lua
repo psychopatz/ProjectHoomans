@@ -1,6 +1,8 @@
 local Types = PNC.AbstractWorldTypes
 local Internal = Types.Internal
 local Config = PNC.DirectorConfig
+local CoreGroupJourney = require
+    "PsychopatzCore/World/SurvivorWorld/Traversal/PsychopatzSurvivorWorldGroupJourney"
 
 local function normalizeActivity(source, location)
     local state = Config.STATES[source.state] and source.state or "IDLE"
@@ -41,6 +43,15 @@ function Types.NormalizeGroup(value, groupID)
         and source.groupType or "WANDERER"
     state, target, action = normalizeActivity(source, location)
     behavior, combat = normalizeProfiles(source)
+    local journey
+    if type(source.journey) == "table" then
+        journey = CoreGroupJourney.Normalize(
+            source.journey,
+            id,
+            source.journey.lastAdvancedAt
+                or source.journey.lastAdvancedWorldHour
+        )
+    end
     return {
         schemaVersion = Config.SCHEMA_VERSION,
         id = id,
@@ -54,6 +65,7 @@ function Types.NormalizeGroup(value, groupID)
         state = state,
         location = location,
         targetLocation = target,
+        journey = journey,
         stateStartedAt = math.max(
             0,
             Internal.Finite(source.stateStartedAt, 0)
