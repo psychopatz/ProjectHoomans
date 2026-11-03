@@ -8,9 +8,9 @@ No developer implementation phase remains. P0-P20 are complete; native Project Z
 
 Reverified before this documentation reconciliation:
 
-- `psychopatzCore`: `main @ c62262c`, 11 commits ahead of `origin/main`, clean.
-- `DynamicTrading`: `main @ 89cfe191`, 13 commits ahead of `origin/main`, clean.
-- `ProjectHoomans`: `main @ 29be4cfb`, 26 commits ahead of `origin/main`, clean.
+- `psychopatzCore`: `main @ 8ee7ca2`, 1 commit ahead of `origin/main`, clean.
+- `DynamicTrading`: `main @ 89cfe191`, aligned with `origin/main`, clean.
+- `ProjectHoomans`: `main @ b71e90eb`, 2 commits ahead of `origin/main`, clean.
 
 Historical Git correction: the former uncommitted `DTHoomans_Conversation.lua` semantic-hub edit was incorporated into Dynamic Trading commit `be9e8e10`; it is not an outstanding working-tree modification.
 
@@ -30,6 +30,7 @@ Verified developer outcomes:
 - settlement/community machine IDs resolve to human-facing names.
 - FAILED excursion handling is correct before departure, after departure, while visiting, while returning, and across retry.
 - reconstructed persistence uses a fresh backing table and distinct trader objects while preserving factual state and WorldKnowledge evidence.
+- CodeBuilder routes generated semantic artifacts by canonical package owner; the reviewed lexicon and generic common parser patterns are Core-owned and no longer duplicated under Hoomans.
 
 ## Final validation
 
@@ -38,6 +39,8 @@ Verified developer outcomes:
 - Project Hoomans full runner: `982/987`.
 - Changed P20 Lua: PASS under `luac5.3 -p`.
 - All three repositories: `git diff --check` PASS.
+- CodeBuilder ownership/compiler tests: PASS, including separate temporary Core/Hoomans output repositories and mixed-dataset ownership preservation.
+- Core generated semantic asset smoke: PASS.
 
 The five Hoomans failures are unchanged documented baselines:
 

@@ -23,6 +23,7 @@ Native Project Zomboid SP/MP acceptance remains user-owned and has not been clai
 - [x] Hoomans-only conversations reject DT-only grammar.
 - [x] compound turns preserve capability isolation.
 - [x] required standalone DT identity/trade/whereabouts/news/story/farewell parser coverage is complete.
+- [x] CodeBuilder-generated shared semantic assets follow canonical package ownership: Core-owned lexicon/common parser modules generate into PsychopatzCore and are not duplicated under Hoomans.
 
 ### Factual travel dialogue and presentation
 

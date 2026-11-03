@@ -36,7 +36,7 @@ The remaining acceptance is user-owned native Project Zomboid SP/MP testing. No 
 
 ## Product outcome
 
-Core owns canonical actor/player social identity, generic shared relationship state, reusable conversation/semantic mechanisms, and adopter extension envelopes.
+Core owns canonical actor/player social identity, generic shared relationship state, reusable conversation/semantic mechanisms, and adopter extension envelopes. Core also physically owns generated semantic assets whose canonical CodeBuilder sources declare `PsychopatzCore`, including the reviewed lexicon and generic common parser patterns.
 
 Dynamic Trading owns commercial/trader policy, factual trader state, and its semantic/story pack. It remains functional without Project Hoomans.
 
