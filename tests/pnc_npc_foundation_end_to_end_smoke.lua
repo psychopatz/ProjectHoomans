@@ -2,6 +2,7 @@ local T = require "tests/support/test"
 
 T.load("tests/pnc_npc_foundation_parity_baseline_smoke.lua")
 local Core = require "PsychopatzCore/Actors/PsychopatzActors"
+local ActorInventory = Core.Inventory
 local HoomansProvider = PNC.Persistence.CoreProvider
 local dtRepository = os.getenv("PZ_TEST_DT_REPOSITORY")
     or "../DynamicTrading"
@@ -36,6 +37,21 @@ local function equal(actual, expected, label)
         error((label or "equal") .. " expected=" .. tostring(expected)
             .. " actual=" .. tostring(actual))
     end
+end
+
+
+local function coreInventoryCount(payload)
+    local ledger, reason = ActorInventory.Decode(payload)
+    truthy(ledger, reason)
+    return ledger:Count()
+end
+
+local function firstCoreInventoryItemID(payload)
+    local ledger, reason = ActorInventory.Decode(payload)
+    truthy(ledger, reason)
+    local items = ledger:List()
+    truthy(items[1], "Core inventory item required")
+    return items[1].itemId
 end
 
 local registry = Core.NewRegistry()
@@ -126,7 +142,7 @@ local restocked, restockReason = Policy.Restock(record, stock, {
 })
 truthy(restocked, restockReason)
 equal(#stock.records, 1, "combined DT stock exists")
-equal(#actor.personalInventory.items, 3,
+equal(coreInventoryCount(actor.personalInventory), 3,
     "merchant stock does not enter personal inventory")
 local pricing = Policy.PriceContext(record, {
     getUsername = function() return "alice" end,
@@ -169,8 +185,8 @@ truthy(abstractProjection, projectionReason)
 actor = sync(abstract)
 equal(abstractProjection.identity.identitySeed,
     actor.identity.identitySeed, "abstract provider identity continuity")
-equal(abstractProjection.personalInventory.items[1].itemId,
-    actor.personalInventory.items[1].itemId,
+equal(firstCoreInventoryItemID(abstractProjection.personalInventory),
+    firstCoreInventoryItemID(actor.personalInventory),
     "abstract provider inventory continuity")
 
 local finalActor, finalReason = AbstractProvider.Release(abstract,

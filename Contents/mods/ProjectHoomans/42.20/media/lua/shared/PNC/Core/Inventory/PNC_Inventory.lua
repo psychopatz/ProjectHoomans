@@ -21,6 +21,7 @@ require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Mutations"
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_WaterContainers"
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Payloads"
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Persistence"
+require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_ActorBridge"
 require "PNC/Core/Inventory/PNC_InventoryItemState"
 
 Inventory.Queries.GetItemWeight = Inventory.Internal.getItemWeight

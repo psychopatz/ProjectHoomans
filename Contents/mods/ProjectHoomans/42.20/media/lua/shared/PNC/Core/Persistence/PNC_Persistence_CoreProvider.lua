@@ -8,6 +8,8 @@ PNC.Persistence = PNC.Persistence or {}
 local Persistence = PNC.Persistence
 local Adapter = Persistence.CoreProvider or {}
 Persistence.CoreProvider = Adapter
+local ActorInventoryBridge =
+    require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_ActorBridge"
 
 local function actors(core)
     return core and core.Actors
@@ -49,7 +51,13 @@ local function projectProviderLease(record, leaseID)
 end
 
 local function buildRecord(actor, baseRecord)
-    local record = type(baseRecord) == "table" and baseRecord or {}
+    local record = type(baseRecord) == "table" and baseRecord or nil
+    if not record and actor and PNC.Registry
+        and type(PNC.Registry.Get) == "function"
+    then
+        record = PNC.Registry.Get(actor.actorId)
+    end
+    record = type(record) == "table" and record or {}
     local lease = actor and actor.providerLease or {}
     local point = position(actor)
     record.id = tostring(actor.actorId)
@@ -157,6 +165,11 @@ function Adapter.Materialize(actor, core, spec)
     then
         return nil, "body_lease_active"
     end
+    local hydratedInventory, hydrateReason =
+        ActorInventoryBridge.HydrateRecord(record, projection)
+    if not hydratedInventory then
+        return nil, hydrateReason or "core_inventory_hydration_failed"
+    end
     projectProviderLease(record, projection.providerLease.leaseID)
     lifecycle = spec.lifecycle or PNC.BodyLifecycle
     factory = spec.bodyFactory or spec.spawn
@@ -177,6 +190,21 @@ function Adapter.Materialize(actor, core, spec)
         rollback = spec.cleanup or spec.destroy
         if type(rollback) == "function" then rollback(body, record, spec) end
         return nil, "body_id_required"
+    end
+    if body and type(body.getInventory) == "function"
+        and PNC.Inventory
+        and type(PNC.Inventory.MaterializeLooseInventory) == "function"
+    then
+        local inventoryOK, inventoryReason =
+            PNC.Inventory.MaterializeLooseInventory(record, body)
+        if not inventoryOK then
+            rollback = spec.cleanup or spec.destroy
+            if type(rollback) == "function" then
+                rollback(body, record, spec)
+            end
+            return nil, inventoryReason
+                or "physical_inventory_materialize_failed"
+        end
     end
     if type(spec.applyProjection) == "function" then
         local applied = spec.applyProjection(body, projection, record)
@@ -228,6 +256,8 @@ function Adapter.Dematerialize(actor, core, spec)
     local remover
     local removed
     local nextActor
+    local capturedInventory
+    local captureMode
     if not service or type(service.Project) ~= "function"
         or type(service.Dematerialize) ~= "function"
     then
@@ -236,6 +266,16 @@ function Adapter.Dematerialize(actor, core, spec)
     spec = type(spec) == "table" and spec or {}
     record, projection = Adapter.BuildRecord(actor, core, spec.record)
     if not record then return nil, projection end
+    if type(record.inventory) ~= "table" then
+        local hydratedInventory
+        local hydrateReason
+        hydratedInventory, hydrateReason =
+            ActorInventoryBridge.HydrateRecord(record, projection)
+        if not hydratedInventory then
+            return nil, hydrateReason
+                or "core_inventory_hydration_failed"
+        end
+    end
     body = spec.body
     if not body and PNC.Registry
         and type(PNC.Registry.GetLiveZombie) == "function"
@@ -251,6 +291,26 @@ function Adapter.Dematerialize(actor, core, spec)
         remover = lifecycle.RemoveLiveBody
     end
     if type(remover) ~= "function" then return nil, "body_remover_required" end
+
+    if body and type(body.getInventory) == "function"
+        and PNC.Inventory
+        and type(PNC.Inventory.CaptureLooseInventory) == "function"
+    then
+        local inventoryOK
+        inventoryOK, reason = PNC.Inventory.CaptureLooseInventory(
+            record, body)
+        if not inventoryOK then
+            return nil, reason or "physical_inventory_capture_failed"
+        end
+    end
+
+    capturedInventory, captureMode, reason =
+        ActorInventoryBridge.CaptureRecord(record, actor)
+    if not capturedInventory then
+        return nil, reason or captureMode
+            or "core_inventory_capture_failed"
+    end
+
     removed = remover(record, body, spec.reason or "core_provider_dematerialize")
     if removed == false then return nil, "body_release_failed" end
 
@@ -262,6 +322,9 @@ function Adapter.Dematerialize(actor, core, spec)
         now = spec.now,
     })
     if not nextActor then return nil, reason end
+    nextActor.personalInventory = capturedInventory
+    record.personalInventory = capturedInventory
+    record.runtime.coreInventoryCapturedMode = captureMode
     record.runtime.bodyLease = nil
     record.runtime.coreProvider = "DTHoomans"
     return {
@@ -272,6 +335,14 @@ function Adapter.Dematerialize(actor, core, spec)
         bodyID = projection.providerLease.bodyID,
         leaseID = nextActor.providerLease.leaseID,
     }
+end
+
+function Adapter.HydrateInventory(actor, record)
+    return ActorInventoryBridge.HydrateRecord(record, actor)
+end
+
+function Adapter.CaptureInventory(actor, record)
+    return ActorInventoryBridge.CaptureRecord(record, actor)
 end
 
 function Adapter.Release(actor, core, spec)

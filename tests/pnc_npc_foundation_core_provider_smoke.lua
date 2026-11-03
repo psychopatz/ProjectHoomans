@@ -2,7 +2,23 @@ local T = require "tests/support/test"
 
 T.load("tests/pnc_npc_foundation_parity_baseline_smoke.lua")
 local Core = require "PsychopatzCore/Actors/PsychopatzActors"
+local ActorInventory = Core.Inventory
 local Adapter = PNC.Persistence.CoreProvider
+
+local function firstCoreInventoryItemID(payload)
+    local ledger, reason = ActorInventory.Decode(payload)
+    T.truthy(ledger, reason)
+    local items = ledger:List()
+    T.truthy(items[1], "Core inventory item required")
+    return items[1].itemId
+end
+
+local function coreInventoryHas(payload, itemID)
+    local ledger, reason = ActorInventory.Decode(payload)
+    T.truthy(ledger, reason)
+    return ledger:Get(itemID) ~= nil
+end
+
 local registry = Core.NewRegistry()
 local actor, actorReason = registry:Create({
     actorId = "npc:p8:hoomans-provider",
@@ -56,8 +72,11 @@ local materialized, materializeReason = Adapter.Materialize(
                     == record.identity.identitySeed
                 and projection.appearance.contract.policyHash
                     == record.appearance.contract.policyHash
-                and projection.personalInventory.items[1].itemId
-                    == record.personalInventory.items[1].itemId
+                and firstCoreInventoryItemID(projection.personalInventory)
+                    == firstCoreInventoryItemID(record.personalInventory)
+                and record.inventory.items[
+                    firstCoreInventoryItemID(projection.personalInventory)
+                ] ~= nil
                 and projection.social.relationships["player:user:alice"].approval
                     == record.social.relationships["player:user:alice"].approval
             return applied
@@ -74,6 +93,22 @@ T.equal(materialized.projection.knowledge.schemaVersion, 1,
 T.truthy(stamped, "Hoomans body receives Core lease")
 T.equal(materialized.record.runtime.bodyLease,
     materialized.leaseID, "body and Core lease identity")
+
+local durableItemID = actor.actorId .. ":provider:bandage"
+local added, addReason = PNC.Inventory.AddItems(
+    materialized.record,
+    {
+        {
+            id = durableItemID,
+            type = "Base.Bandage",
+            stack = 1,
+            origin = "world",
+        },
+    },
+    "root",
+    "core_provider_inventory_fixture"
+)
+T.truthy(added, addReason)
 
 local duplicateSpawnAttempts = 0
 local duplicateBody, duplicateReason = Adapter.Materialize(
@@ -98,6 +133,7 @@ local dematerialized, dematerializeReason = Adapter.Dematerialize(
     materialized.actor, PsychopatzCore, {
         owner = "ProjectHoomans:presence",
         body = body,
+        record = materialized.record,
         removeBody = function(record, removedBody)
             removed = record.runtime.bodyLease ~= nil and removedBody == body
             return removed
@@ -111,8 +147,15 @@ T.equal(dematerialized.actor.providerLease.state, "abstract",
     "Hoomans dematerializes through Core")
 T.equal(dematerialized.actor.appearance.contract.policyHash,
     actor.appearance.contract.policyHash, "appearance parity")
-T.equal(dematerialized.actor.personalInventory.items[1].itemId,
-    actor.personalInventory.items[1].itemId, "inventory parity")
+T.truthy(coreInventoryHas(
+    dematerialized.actor.personalInventory,
+    firstCoreInventoryItemID(actor.personalInventory)
+), "baseline inventory item survives physical delta capture")
+T.equal(dematerialized.actor.personalInventory.mode, "BASELINE_DELTA",
+    "durable Hoomans inventory change returns as delta")
+T.truthy(coreInventoryHas(
+    dematerialized.actor.personalInventory, durableItemID),
+    "durable Hoomans item captured into Core actor inventory")
 T.equal(dematerialized.actor.social.relationships["player:user:alice"].respect,
     actor.social.relationships["player:user:alice"].respect, "social parity")
 
