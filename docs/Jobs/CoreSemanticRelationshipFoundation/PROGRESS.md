@@ -89,23 +89,45 @@ P20 must reconstruct a fresh storage/runtime view from a snapshot/deep copy and 
    - `git diff --check` passes cleanly.
    - Committed DT changes in `f61f0ac5`.
 
-### Next Chunk — P20B (Reconstructed trader-record persistence acceptance)
+### P20B — COMPLETE (accepted)
 
-1. Strengthen headless trader-record persistence proof.
-2. In `dt_standalone_semantic_story_smoke.lua` and `pnc_real_cross_adopter_hotplug_matrix_smoke.lua`:
-   - Establish trader state through production owners (home, current, origin, destination, route/news knowledge).
-   - Obtain real DT storage representation.
-   - Produce a persisted snapshot/deep copy representing Global ModData.
-   - Tear down/reset TalkService sessions, local trader references, runtime cache, Core WorldKnowledge in-memory state.
-   - Reconstruct fresh storage table from the persisted snapshot and reinitialize DT storage.
-   - Retrieve reloaded trader record and assert `reloadedTrader ~= originalTrader` (distinct object identity) while canonical persisted fields match.
-   - Call `WorldKnowledge.Load()` against reconstructed storage.
-   - Re-open `TalkService` and verify: destination, origin, settlement, route, news queries.
-   - Assert human names resolve, fact/evidence IDs survive, machine IDs do not leak, bounded uncertainty preserved.
-   - Cover failed/offsite state reload (does not become falsely home) and completed AT_HOME state reload (stale destination does not reappear).
+1. Strengthened headless trader-record persistence proof across both `dt_standalone_semantic_story_smoke.lua` and `pnc_real_cross_adopter_hotplug_matrix_smoke.lua`.
+2. Established trader state through production owners (`Policy.SetHomeSettlement`, `Policy.SetDestinationSettlement`, `Policy.SetOriginSettlement`, `Policy.SetCurrentSettlement`, `WorldKnowledge.Publish`/`Acquire`).
+3. Obtained actual DT storage representation and created deep-copied snapshots representing Global ModData serialization.
+4. Tore down and reset TalkService sessions, local trader references, and Core WorldKnowledge in-memory state.
+5. Reconstructed fresh storage tables from persisted snapshots and reinitialized DT storage with distinct objects.
+6. Retrieved reloaded trader records and asserted `reloadedTrader ~= originalTrader` as Lua object identity, proving true reconstruction from persisted state rather than same-object continuity.
+7. Verified canonical policy fields survived (`destinationSettlementID`, `originSettlementID`, `currentSettlementID`, `homeSettlementID`).
+8. Called `WorldKnowledge.Load()` against reconstructed storage and verified loaded facts and evidence IDs survived.
+9. Re-opened TalkService and queried:
+   - "where are you going" -> resolved human-facing name without leaking machine ID, attached canonical evidence.
+   - "where did you come from" -> resolved human-facing name without leaking machine ID, attached canonical evidence.
+   - "where is the settlement" -> resolved human-facing name without leaking machine ID, attached canonical evidence.
+   - "what route" -> grounded in active WorldKnowledge gossip fact / location.
+   - "road news" -> grounded in published WorldKnowledge fact with exact fact ID evidence.
+10. Covered failure and completion persistence:
+   - Saved and reloaded coherent failed/offsite state (`current = nil, destination = nil, s = AWAY`), proved it did NOT falsely become home after reload, and destination remained cleared with bounded uncertainty.
+   - Saved and reloaded completed `AT_HOME` state (`current = home, destination = nil, s = READY`), proved stale destination did not reappear after reload and bounded uncertainty was preserved.
+
+### P20C — COMPLETE (accepted)
+
+1. Minimal upgrade across existing test suites (`dt_m10d_resident_excursion_smoke.lua`, `dt_standalone_semantic_story_smoke.lua`, `pnc_real_cross_adopter_hotplug_matrix_smoke.lua`).
+2. Retained full accepted matrix coverage:
+   - Identity: forged PNC mirror -> Core resolves first -> forged identity remains unissued -> Hoomans validates second -> forged UUID rejected; legitimate DT-first and Hoomans-first identities stable.
+   - Relationships: DT/Hoomans interleaved writes preserve foreign extensions and memories; remove/re-add non-destructive; repeated sync idempotent.
+   - Semantics: P14 capability isolation; pack unregister/re-register residue-free; DT/Hoomans grammar boundaries preserved.
+   - Travel: normal excursion happy path; FAILED before departure; FAILED after departure with `completedAt = 0`; FAILED while visiting/returning; retry after failure without destination leak; exact-home completion.
+   - Presentation: canonical machine settlement IDs resolved to friendly display names; unresolved machine IDs suppressed without string leakage.
+   - Persistence: fresh reconstructed storage table; distinct reloaded trader object; factual policy survives; WorldKnowledge Save/Load survives; failed and completed travel states survive correctly.
+3. Test suite baselines:
+   - Dynamic Trading full runner: `43/43` PASS.
+   - Project Hoomans full runner: `982/987` PASS (identical 5 known baseline failures preserved).
+   - PsychopatzCore focused identity/social/conversation suites: ALL PASS.
+   - Changed Lua passes syntax checks (`luac5.3 -p`).
+   - All repositories pass `git diff --check`.
 
 ## Parent goal status
 
-**IN PROGRESS.**
+**READY FOR USER LIVE TEST.**
 
-Do not return to READY FOR USER LIVE TEST until P20A-P20C pass.
+All developer-implementable code, harness, lifecycle, and persistence gates are satisfied. Ready for user-owned native SP/MP testing.

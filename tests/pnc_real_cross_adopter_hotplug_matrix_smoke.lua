@@ -796,33 +796,61 @@ do
     print("PASS: Caravan story returned rich narrative: " .. replyText)
 end
 
--- 4I: Real Persistence & Reload (P19C / P19D)
+-- 4I: Real Persistence & Reload (P20B)
 do
-    -- Set known state
+    local function deepCopy(value)
+        if type(value) ~= "table" then return value end
+        local res = {}
+        for k, v in pairs(value) do
+            res[deepCopy(k)] = deepCopy(v)
+        end
+        return res
+    end
+
+    -- 1. Set known state through production policy
+    DTPolicy.SetHomeSettlement(testTraderRecord, "community_home_123")
     DTPolicy.SetDestinationSettlement(testTraderRecord, "community_dest_789")
     DTPolicy.SetOriginSettlement(testTraderRecord, "community_orig_456")
     DTPolicy.SetCurrentSettlement(testTraderRecord, "community_home_123")
 
-    -- Save trader and WorldKnowledge
+    -- 2. Save trader and WorldKnowledge to simulated persistent storage
     simulatedDTStorage.t["trader:hotplug:test"] = testTraderRecord
     local savedPayload = DTCommon.WorldKnowledge.Save()
     T.truthy(savedPayload, "WorldKnowledge successfully saved")
 
-    -- Reset in-memory sessions, CoreWK, and local reference
+    -- 3. Produce a persisted snapshot/deep copy representing Global ModData
+    local persistedSnapshot = deepCopy(simulatedDTStorage)
+
+    -- 4. Reset in-memory sessions, CoreWK, and local reference
+    local originalTrader = testTraderRecord
     DTCommon.TalkService.Sessions = {}
     PsychopatzCore.WorldKnowledge.Reset({ maxFacts = 16, maxActors = 8, maxRefs = 8 })
     testTraderRecord = nil
 
-    -- Verify reloading from storage restores state and evidence
+    -- 5. Reconstruct fresh storage table from the persisted snapshot
+    simulatedDTStorage = deepCopy(persistedSnapshot)
+    DTCommon.Storage.GetData = function() return simulatedDTStorage end
+
+    -- 6. Retrieve trader record from reconstructed storage
     local reloadedTrader = DTCommon.Storage.GetData().t["trader:hotplug:test"]
     T.truthy(reloadedTrader, "Trader record recovered from simulated persistent storage")
+
+    -- Mandatory assertion: object identity MUST be distinct!
+    T.truthy(reloadedTrader ~= originalTrader, "Reloaded trader record is a distinct reconstructed Lua object")
+    T.equal(reloadedTrader.ca.destinationSettlementID, "community_dest_789", "Reloaded destination survived")
+    T.equal(reloadedTrader.ca.originSettlementID, "community_orig_456", "Reloaded origin survived")
+    T.equal(reloadedTrader.ca.currentSettlementID, "community_home_123", "Reloaded current survived")
+    T.equal(reloadedTrader.ca.homeSettlementID, "community_home_123", "Reloaded home survived")
+
+    -- 7. Call WorldKnowledge.Load() against reconstructed storage
     local loadOk, loadErr = DTCommon.WorldKnowledge.Load()
     T.truthy(loadOk, loadErr)
 
+    -- 8. Re-open TalkService session and query
     local session, sessionReason = DTCommon.TalkService.Open(playerAlice, "trader:hotplug:test", "radio")
     T.truthy(session, sessionReason)
 
-    -- Destination
+    -- Destination query
     local turnDest, turnDestErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "where are you going", {
         mode = "radio",
         requestID = "turn-dest-reloaded",
@@ -830,8 +858,9 @@ do
     T.truthy(turnDest and turnDest.result and turnDest.result.responses[1], turnDestErr)
     T.equal(turnDest.result.responses[1].text, "We are heading toward Rosewood Outpost.", "Reloaded destination resolves display name")
     T.equal(turnDest.result.responses[1].evidence, "community_dest_789", "Reloaded destination preserves canonical evidence")
+    T.falsy(string.find(turnDest.result.responses[1].text, "community_dest_789"), "Destination machine ID is not leaked")
 
-    -- Origin
+    -- Origin query
     local turnOrig, turnOrigErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "where did you come from", {
         mode = "radio",
         requestID = "turn-orig-reloaded",
@@ -839,8 +868,9 @@ do
     T.truthy(turnOrig and turnOrig.result and turnOrig.result.responses[1], turnOrigErr)
     T.equal(turnOrig.result.responses[1].text, "We came from March Ridge Depot.", "Reloaded origin resolves display name")
     T.equal(turnOrig.result.responses[1].evidence, "community_orig_456", "Reloaded origin preserves canonical evidence")
+    T.falsy(string.find(turnOrig.result.responses[1].text, "community_orig_456"), "Origin machine ID is not leaked")
 
-    -- Settlement
+    -- Settlement query
     local turnSett, turnSettErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "where is the settlement", {
         mode = "radio",
         requestID = "turn-sett-reloaded",
@@ -848,8 +878,19 @@ do
     T.truthy(turnSett and turnSett.result and turnSett.result.responses[1], turnSettErr)
     T.equal(turnSett.result.responses[1].text, "Our primary trading settlement is Riverside Safehouse.", "Reloaded settlement resolves display name")
     T.equal(turnSett.result.responses[1].evidence, "community_home_123", "Reloaded settlement preserves canonical evidence")
+    T.falsy(string.find(turnSett.result.responses[1].text, "community_home_123"), "Settlement machine ID is not leaked")
 
-    -- Road news
+    -- Route query ("what route")
+    local turnRoute, turnRouteErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "what route", {
+        mode = "radio",
+        requestID = "turn-route-reloaded",
+    })
+    T.truthy(turnRoute and turnRoute.result and turnRoute.result.responses[1], turnRouteErr)
+    T.truthy(string.find(turnRoute.result.responses[1].text, "BANDIT RAID"), "Reloaded route grounded in WorldKnowledge fact")
+    T.equal(turnRoute.result.responses[1].evidence, "fact:report_seq4_news", "Reloaded route preserves exact fact evidence")
+    T.falsy(string.find(turnRoute.result.responses[1].text, "community_dest_789"), "Route machine ID is not leaked")
+
+    -- Road news query
     local turnNews, turnNewsErr = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", session.sessionID, "road news", {
         mode = "radio",
         requestID = "turn-news-reloaded",
@@ -858,7 +899,62 @@ do
     T.truthy(string.find(turnNews.result.responses[1].text, "BANDIT RAID"), "Reloaded road news preserves fact content")
     T.equal(turnNews.result.responses[1].evidence, "fact:report_seq4_news", "Reloaded road news preserves exact fact evidence")
 
-    print("PASS: Real persistence and reload preserves all factual state, place presentation, and evidence")
+    -- 9. Failure and Completion Persistence & Reload:
+    -- 9A. Save & reload coherent failed/offsite state
+    DTPolicy.SetCurrentSettlement(reloadedTrader, nil)
+    DTPolicy.SetDestinationSettlement(reloadedTrader, nil)
+    DTPolicy.SetOriginSettlement(reloadedTrader, "community_orig_456")
+    DTPolicy.SetAvailable(reloadedTrader, false, "resident_excursion_failed")
+    reloadedTrader.s = "AWAY"
+
+    local originalFailedTrader = reloadedTrader
+    local failedSnapshot = deepCopy(simulatedDTStorage)
+    DTCommon.TalkService.Sessions = {}
+    PsychopatzCore.WorldKnowledge.Reset({ maxFacts = 16, maxActors = 8, maxRefs = 8 })
+    simulatedDTStorage = deepCopy(failedSnapshot)
+
+    local reloadedFailedTrader = DTCommon.Storage.GetData().t["trader:hotplug:test"]
+    T.truthy(reloadedFailedTrader, "Failed trader record recovered")
+    T.truthy(reloadedFailedTrader ~= originalFailedTrader, "Reloaded failed trader is distinct object")
+    T.falsy(reloadedFailedTrader.ca.currentSettlementID, "Failed trader does NOT falsely become home after reload")
+    T.falsy(reloadedFailedTrader.ca.destinationSettlementID, "Failed trader has no stale destination after reload")
+    T.equal(reloadedFailedTrader.ca.originSettlementID, "community_orig_456", "Failed trader retains origin after reload")
+    T.equal(reloadedFailedTrader.s, "AWAY", "Failed trader availability remains away")
+
+    local failedSession, failedSessErr = DTCommon.TalkService.Open(playerAlice, "trader:hotplug:test", "radio")
+    T.truthy(failedSession, failedSessErr)
+    local turnFailedDest = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", failedSession.sessionID, "where are you going", {
+        mode = "radio", requestID = "turn-failed-dest",
+    })
+    T.equal(turnFailedDest.result.responses[1].text, "I cannot confirm where we are heading next; route orders haven't been finalized.", "Failed trader yields bounded uncertainty for destination")
+
+    -- 9B. Save & reload completed AT_HOME state
+    DTPolicy.SetCurrentSettlement(reloadedFailedTrader, "community_home_123")
+    DTPolicy.SetOriginSettlement(reloadedFailedTrader, "community_home_123")
+    DTPolicy.SetDestinationSettlement(reloadedFailedTrader, nil)
+    DTPolicy.SetAvailable(reloadedFailedTrader, true, "resident_trader_home")
+    reloadedFailedTrader.s = "READY"
+
+    local originalHomeTrader = reloadedFailedTrader
+    local homeSnapshot = deepCopy(simulatedDTStorage)
+    DTCommon.TalkService.Sessions = {}
+    simulatedDTStorage = deepCopy(homeSnapshot)
+
+    local reloadedHomeTrader = DTCommon.Storage.GetData().t["trader:hotplug:test"]
+    T.truthy(reloadedHomeTrader, "Home trader record recovered")
+    T.truthy(reloadedHomeTrader ~= originalHomeTrader, "Reloaded home trader is distinct object")
+    T.equal(reloadedHomeTrader.ca.currentSettlementID, "community_home_123", "Reloaded home trader is at home")
+    T.falsy(reloadedHomeTrader.ca.destinationSettlementID, "Stale destination does not reappear after reload")
+    T.equal(reloadedHomeTrader.s, "READY", "Reloaded home trader is ready")
+
+    local homeSession, homeSessErr = DTCommon.TalkService.Open(playerAlice, "trader:hotplug:test", "radio")
+    T.truthy(homeSession, homeSessErr)
+    local turnHomeDest = DTCommon.TalkService.Submit(playerAlice, "trader:hotplug:test", homeSession.sessionID, "where are you going", {
+        mode = "radio", requestID = "turn-home-dest",
+    })
+    T.equal(turnHomeDest.result.responses[1].text, "I cannot confirm where we are heading next; route orders haven't been finalized.", "Completed AT_HOME trader yields bounded uncertainty (stale destination did not reappear)")
+
+    print("PASS: Reconstructed persistence and reload preserves all factual state, distinct object identity, place presentation, evidence, and failure/completion states")
 end
 
 print("[P15C] Sequence 4 PASSED.")

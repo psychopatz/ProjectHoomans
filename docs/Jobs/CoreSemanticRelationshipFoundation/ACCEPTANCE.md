@@ -1,6 +1,6 @@
 # Acceptance — Core Semantic & Relationship Foundation
 
-**Current status:** IN PROGRESS. The P18-P19 closeout was reopened by a fifth production-path audit. P18 is independently accepted; P19 happy-path travel/presentation remains accepted; P20 failure-state and reconstructed-persistence gates remain mandatory.
+**Current status:** READY FOR USER LIVE TEST. P20 failure-state numeric lifecycle corrections, mandatory failure-state regressions, and reconstructed trader-record persistence proofs pass across all production handlers and matrix runners.
 
 ## A. Ownership and canonical identity
 
@@ -37,19 +37,19 @@
 - [x] production resident excursion wires PREPARING/OUTBOUND/VISITING/RETURNING_HOME/AT_HOME.
 - [x] canonical community IDs resolve to human-facing names through a bounded resolver.
 - [x] unresolved machine IDs do not leak into dialogue.
-- [ ] FAILED before departure is explicitly regression-tested and restores coherent home state.
-- [ ] FAILED after departure with numeric `completedAt = 0` does not falsely report the trader home/available.
-- [ ] FAILED while visiting/returning preserves coherent authoritative travel facts.
-- [ ] retry after FAILED does not inherit stale destination/origin incorrectly.
+- [x] FAILED before departure is explicitly regression-tested and restores coherent home state.
+- [x] FAILED after departure with numeric `completedAt = 0` does not falsely report the trader home/available.
+- [x] FAILED while visiting/returning preserves coherent authoritative travel facts.
+- [x] retry after FAILED does not inherit stale destination/origin incorrectly.
 
 ## E. Persistence
 
 - [x] WorldKnowledge real `Save/Load` path is exercised with fact IDs/evidence.
 - [x] DT storage contains canonical trader policy state.
-- [ ] headless reload reconstructs trader records from a persisted snapshot/fresh backing table.
-- [ ] the reloaded trader record is proven to be a distinct Lua object from the pre-save record.
-- [ ] reconstructed reload preserves destination/origin/current settlement and human presentation.
-- [ ] completed/failed travel cleanup remains correct after reconstructed reload.
+- [x] headless reload reconstructs trader records from a persisted snapshot/fresh backing table.
+- [x] the reloaded trader record is proven to be a distinct Lua object from the pre-save record.
+- [x] reconstructed reload preserves destination/origin/current settlement and human presentation.
+- [x] completed/failed travel cleanup remains correct after reconstructed reload.
 
 ## F. Real hot-plug/removal matrix
 
@@ -59,15 +59,15 @@
 - [x] P14 production capability isolation remains covered.
 - [x] live happy-path excursion transitions and place presentation are covered.
 - [x] pack unregister/re-register and migration idempotence remain covered.
-- [ ] FAILED/cancelled lifecycle coverage is included.
-- [ ] factual-state reload uses reconstructed persistence rather than same-object storage reuse.
+- [x] FAILED/cancelled lifecycle coverage is included.
+- [x] factual-state reload uses reconstructed persistence rather than same-object storage reuse.
 
 ## G. Performance
 
 - [x] no global per-tick semantic scan.
 - [x] no periodic full relationship reconciliation.
 - [x] identity/travel/presentation work remains bounded to explicit lifecycle/load/conversation events.
-- [ ] P20 correction preserves bounded behavior.
+- [x] P20 correction preserves bounded behavior.
 
 ## H. Developer validation
 
@@ -76,10 +76,10 @@
 - [x] Dynamic Trading full runner passes `43/43`.
 - [x] Hoomans focused P18/P19 tests pass.
 - [x] Hoomans broad runner remains `982/987` with the same five known baseline failures.
-- [x] changed P18/P19 Lua passes `luac5.3 -p`; all repos pass `git diff --check`.
-- [ ] P20 failure-state regressions pass.
-- [ ] P20 reconstructed persistence regression passes.
-- [ ] final exact revisions/worktree status are recorded accurately.
+- [x] changed P18/P19/P20 Lua passes `luac5.3 -p`; all repos pass `git diff --check`.
+- [x] P20 failure-state regressions pass.
+- [x] P20 reconstructed persistence regression passes.
+- [x] final exact revisions/worktree status are recorded accurately.
 
 ## Repository-history note
 

@@ -387,3 +387,25 @@ A fifth independent production-path audit on 2026-11-03 checked the P18-P19 comp
 3. **Documentation history was stale.** Dynamic Trading is clean at `89c349ce`; the previously preserved `DTHoomans_Conversation.lua` semantic-hub edit was incorporated into commit `be9e8e10`.
 
 These findings supersede the P18-P19 READY FOR USER LIVE TEST closeout. See ROADMAP P20 and current PROGRESS.
+
+---
+
+## Post-audit P20 resolution — Ready for user live test
+
+The P20 phase addressed and resolved both audit findings:
+
+1. **FAILED excursion lifecycle semantics fixed:**
+   - In `DTHoomans_ResidentExcursion.lua`, truthiness checks were replaced with numeric lifecycle comparisons (`departedAt > 0`, `completedAt > 0`, `visitedAt > 0`, `returnStartedAt > 0`).
+   - In `PNC_CommunityExcursionService.lua`, lifecycle timestamps are cleanly reset to 0 upon transitioning to `PREPARING`.
+   - Regressions in `dt_m10d_resident_excursion_smoke.lua` cover all 6 mandatory failure states, including explicit reproduction of `departedAt = 12, completedAt = 0` (which keeps current settlement `nil` and away, rather than fabricating home).
+2. **Reconstructed persistence verified:**
+   - In both `dt_standalone_semantic_story_smoke.lua` and `pnc_real_cross_adopter_hotplug_matrix_smoke.lua`, storage is snapshotted (deep-copied), runtime references and sessions are wiped, and storage is reloaded into a fresh table.
+   - Distinct Lua object identity is asserted (`reloadedTrader ~= originalTrader`), while canonical policy fields (`home`, `current`, `origin`, `destination`) and loaded WorldKnowledge facts/evidence survive.
+   - Failure state (`current = nil, destination = nil, s = AWAY`) and completion state (`current = home, destination = nil, s = READY`) persistence and reload are verified.
+3. **Repository status:**
+   - Dynamic Trading: `43/43` PASS.
+   - Project Hoomans: `982/987` PASS (5 baseline failures unchanged).
+   - PsychopatzCore focused suites: ALL PASS.
+   - All changed Lua passes syntax and diff checks.
+
+The job is returned to **READY FOR USER LIVE TEST**.

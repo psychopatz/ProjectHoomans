@@ -1,6 +1,6 @@
 # Roadmap — Core Semantic & Relationship Foundation
 
-**Status:** IN PROGRESS — P0-P19 implementation exists. A fifth production-path audit accepted P18 and most P19 behavior but reproduced a FAILED-after-departure lifecycle defect and found the trader-record reload proof still reuses the same backing Lua table. P20 is the mandatory final correction.
+**Status:** READY FOR USER LIVE TEST — P0-P20 complete. P20 failure-state lifecycle corrections and reconstructed persistence proofs verified across all production handlers and test suites.
 
 The parent goal completion boundary is now the complete P0-P20 outcome. Preserve accepted P0-P19 implementation; P20 repairs only the remaining failure-state and persistence-evidence gaps reproduced after the P19 closeout.
 
