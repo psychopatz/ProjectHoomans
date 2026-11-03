@@ -10,6 +10,9 @@ require "ISUI/Maps/ISWorldMap"
 require "ISUI/ISContextMenu"
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
+local SurvivorWorldClient = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldClient"
+
 PNC = PNC or {}
 PNC.MapCommands = PNC.MapCommands or {}
 
@@ -174,6 +177,14 @@ function Commands.SetSelection(raw)
     Commands.LastRegionBounds = nil
     Commands.LastResult = nil
     Commands.LastResultAt = nil
+    if SurvivorWorldClient
+        and SurvivorWorldClient.SetSelected
+    then
+        SurvivorWorldClient.SetSelected(
+            Commands.Selection[1]
+                and Commands.Selection[1].id or nil
+        )
+    end
     return #Commands.Selection
 end
 
@@ -205,6 +216,11 @@ function Commands.ClearSelection()
     Commands.RegionSelection = nil
     Commands.LastRegion = nil
     Commands.LastRegionBounds = nil
+    if SurvivorWorldClient
+        and SurvivorWorldClient.SetSelected
+    then
+        SurvivorWorldClient.SetSelected(nil)
+    end
 end
 
 function Commands.BeginRegionSelection(provider, target, map)

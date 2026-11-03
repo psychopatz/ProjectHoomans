@@ -5,6 +5,9 @@ PNC.TravelDirectory = PNC.TravelDirectory or {}
 
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
+local SurvivorWorldClient = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldClient"
+
 local Directory = PNC.TravelDirectory
 local ClientState = PNC.Network.ClientState
 local Core = PNC.Core
@@ -103,6 +106,171 @@ local function currentWorldHour()
     return gameTime and gameTime.getWorldAgeHours
         and tonumber(gameTime:getWorldAgeHours())
         or 0
+end
+
+
+local function coreVisibilitySnapshot(entry)
+    local snapshot = resolveSnapshot(entry and entry.actorID)
+    if snapshot then return snapshot end
+    if type(entry) ~= "table" then return nil end
+    return {
+        id = tostring(entry.actorID or ""),
+        alive = true,
+        x = entry.position and entry.position.x,
+        y = entry.position and entry.position.y,
+        z = entry.position and entry.position.z or 0,
+        presenceState = entry.providerState == "materialized"
+            and PNC.Const.PRESENCE_LIVE or nil,
+        worldDiscovery = {
+            populationGenerated = true,
+        },
+        affiliation = {
+            groupID = entry.groupID,
+            communityID = entry.communityID,
+            factionID = entry.factionID,
+            role = entry.role,
+        },
+    }
+end
+
+local function coreProjected(entry, atWorldHour, trackedActorID)
+    if type(entry) ~= "table"
+        or type(entry.position) ~= "table"
+        or entry.actorID == nil
+    then
+        return nil
+    end
+    local snapshot = coreVisibilitySnapshot(entry)
+    if not Directory.IsVisible(snapshot) then return nil end
+
+    local hour = tonumber(atWorldHour) or currentWorldHour()
+    local journey = type(entry.journey) == "table"
+        and entry.journey or nil
+    local total = journey
+        and math.max(0, tonumber(journey.distanceTotal) or 0)
+        or 0
+    local travelled = journey
+        and math.max(
+            0,
+            math.min(
+                total,
+                tonumber(journey.distanceTravelled) or 0
+            )
+        )
+        or 0
+    local organizationalFaction =
+        resolveOrganizationalFaction(snapshot)
+    if not organizationalFaction and entry.factionID then
+        organizationalFaction = {
+            id = entry.factionID,
+            role = entry.role,
+        }
+    end
+
+    return {
+        id = tostring(entry.actorID),
+        npcId = tostring(entry.actorID),
+        actorID = tostring(entry.actorID),
+        name = snapshot and Identity.GetName(snapshot)
+            or tostring(entry.label or entry.actorID),
+        tacticalClass = tostring(
+            snapshot and snapshot.tacticalClass or "neutral"
+        ),
+        organizationalFaction = organizationalFaction,
+        recruited = snapshot and snapshot.recruited == true or false,
+        colonyOwned = snapshot
+            and (snapshot.colonyOwned == true
+                or snapshot.recruited == true)
+            or false,
+        colonist = snapshot
+            and (snapshot.colonyOwned == true
+                or snapshot.recruited == true)
+            or false,
+        deathMarker = false,
+        alive = not snapshot or snapshot.alive ~= false,
+        infected = snapshot and snapshot.infected == true or false,
+        orderKind = snapshot and snapshot.orderKind or nil,
+        portrait = SurvivorWorldClient.GetPortraitSpec
+            and SurvivorWorldClient.GetPortraitSpec(entry)
+            or resolvePortrait(snapshot),
+        roleTag = snapshot
+            and snapshot.mapPresentation
+            and snapshot.mapPresentation.roleTag
+            or entry.role,
+        iconID = snapshot
+            and snapshot.mapPresentation
+            and snapshot.mapPresentation.iconID
+            or entry.markerID,
+        mapVisibility = snapshot
+            and snapshot.mapPresentation
+            and snapshot.mapPresentation.visibility
+            or "all",
+        presenceState = snapshot and snapshot.presenceState
+            or (entry.providerState == "materialized"
+                and PNC.Const.PRESENCE_LIVE or nil),
+        provider = entry.provider,
+        providerState = entry.providerState,
+        groupID = entry.groupID,
+        communityID = entry.communityID,
+        factionID = entry.factionID,
+        journeyId = journey and journey.journeyID or nil,
+        state = journey and journey.state
+            or entry.providerState
+            or "idle",
+        x = tonumber(entry.position.x),
+        y = tonumber(entry.position.y),
+        z = tonumber(entry.position.z) or 0,
+        percent = journey and tonumber(journey.progress) or nil,
+        distanceTotal = journey and total or nil,
+        distanceTravelled = journey and travelled or nil,
+        distanceRemaining = journey
+            and math.max(0, total - travelled) or nil,
+        etaWorldHour = journey and tonumber(journey.eta) or nil,
+        remainingWorldHours = journey
+            and tonumber(journey.eta)
+            and math.max(0, tonumber(journey.eta) - hour)
+            or nil,
+        ownerMod = journey and journey.ownerMod or nil,
+        ownerRef = journey and journey.ownerRef or nil,
+        metadata = {
+            groupID = entry.groupID,
+            communityID = entry.communityID,
+            factionID = entry.factionID,
+            role = entry.role,
+        },
+        route = journey and journey.route or nil,
+        coreActorProjection = true,
+        canonicalPosition = entry.canonicalPosition,
+        overlapIndex = entry.overlapIndex,
+        overlapCount = entry.overlapCount,
+        positionSource = entry.positionSource,
+        tracked = trackedActorID ~= nil
+            and tostring(entry.actorID)
+                == tostring(trackedActorID)
+            or false,
+    }
+end
+
+local function listCoreProjected(atWorldHour)
+    if not SurvivorWorldClient then return {} end
+    if SurvivorWorldClient.RequestActorsIfDue then
+        SurvivorWorldClient.RequestActorsIfDue(500)
+    end
+    local output = {}
+    local tracked = SurvivorWorldClient.GetTracked
+        and SurvivorWorldClient.GetTracked() or nil
+    local trackedActorID = tracked and tracked.actorID or nil
+    for _, entry in ipairs(
+        SurvivorWorldClient.ListActors(false) or {}
+    ) do
+        local projected = coreProjected(
+            entry,
+            atWorldHour,
+            trackedActorID
+        )
+        if projected then output[#output + 1] = projected end
+    end
+    return output
 end
 
 function Directory.RegisterVisibilityFilter(id, filter)
@@ -288,11 +456,23 @@ function Directory.ListProjected(atWorldHour)
     local seen = {}
     local id
     local projected
+
+    -- Canonical SurvivorWorld actors use Core as the generic map/route
+    -- authority. Hoomans metadata and command policy remain adopter-owned.
+    for _, entry in ipairs(listCoreProjected(atWorldHour)) do
+        output[#output + 1] = entry
+        seen[tostring(entry.id)] = true
+    end
+
+    -- Preserve Hoomans-only actors/death markers that are outside the
+    -- canonical SurvivorWorld projection.
     for id, _ in pairs(ClientState.snapshots or {}) do
-        projected = Directory.GetProjected(id, atWorldHour)
-        if projected then
-            output[#output + 1] = projected
-            seen[tostring(id)] = true
+        if not seen[tostring(id)] then
+            projected = Directory.GetProjected(id, atWorldHour)
+            if projected then
+                output[#output + 1] = projected
+                seen[tostring(id)] = true
+            end
         end
     end
     for _, item in ipairs(ClientState.debugRoster or {}) do

@@ -107,6 +107,12 @@ local function normalizeRegistry(raw)
 end
 
 function Discovery.Load()
+    local adapter = PNC.CoreWorldDiscoveryAdapter
+    if adapter and adapter.Active
+        and adapter.SyncFromCore
+    then
+        return adapter.SyncFromCore()
+    end
     local raw = Reset.Read(Types.MODDATA_KEY)
     local reason = Reset.Check(raw, Types.SCHEMA_VERSION, nil,
         function(value) return type(value.players) == "table" end)
@@ -128,6 +134,16 @@ end
 function Discovery.Save()
     Discovery.EnsureLoaded()
     if not Discovery.Dirty then return false, "not_dirty" end
+    local adapter = PNC.CoreWorldDiscoveryAdapter
+    if adapter and adapter.Save then
+        if adapter.Active ~= true then
+            return false, "survivor_world_discovery_cutover_inactive"
+        end
+        return adapter.Save("pnc_world_discovery_save")
+    end
+    if PNC.CoreSurvivorWorldAuthority then
+        return false, "survivor_world_discovery_cutover_unavailable"
+    end
     local written = Reset.Write(Types.MODDATA_KEY, Discovery.Registry)
     if not written then return false, "moddata_unavailable" end
     Discovery.Dirty = false

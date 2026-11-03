@@ -188,6 +188,38 @@ T.truthy(
         or overlapPositions[1].y ~= overlapPositions[2].y,
     "overlapping follower markers were not separated on the map"
 )
+
+local coreOverlapPositions =
+    PNC.MapTravelLayer.BuildMarkerScreenPositions(
+        map,
+        {
+            {
+                id = "core_follow_a",
+                x = 130,
+                y = 140,
+                coreActorProjection = true,
+                overlapIndex = 1,
+                overlapCount = 2,
+            },
+            {
+                id = "core_follow_b",
+                x = 130,
+                y = 140,
+                coreActorProjection = true,
+                overlapIndex = 2,
+                overlapCount = 2,
+            },
+        }
+    )
+T.equal(coreOverlapPositions[1].x, 130,
+    "Hoomans re-spread Core actor overlap X")
+T.equal(coreOverlapPositions[1].y, 140,
+    "Hoomans re-spread Core actor overlap Y")
+T.equal(coreOverlapPositions[2].x, 130,
+    "Hoomans re-spread second Core actor overlap X")
+T.equal(coreOverlapPositions[2].y, 140,
+    "Hoomans re-spread second Core actor overlap Y")
+
 layer.render(map)
 T.truthy(listProjectedCount == 1,
     "travel map entries were not loaded for the first frame")

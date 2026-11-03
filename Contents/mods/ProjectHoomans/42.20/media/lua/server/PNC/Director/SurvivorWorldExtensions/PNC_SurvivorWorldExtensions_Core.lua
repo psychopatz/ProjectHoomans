@@ -141,17 +141,30 @@ function Extensions.Save()
     if not Extensions.Active then
         return false, "extensions_not_active"
     end
-    if not Extensions.Dirty
-        and not (PNC.Factions and PNC.Factions.Dirty)
-        and not (PNC.Communities and PNC.Communities.Dirty)
-        and not (PNC.AbstractWorldStore
-            and PNC.AbstractWorldStore.Dirty)
-    then
+
+    local extensionDirty = Extensions.Dirty
+        or (PNC.Factions and PNC.Factions.Dirty == true)
+        or (PNC.Communities and PNC.Communities.Dirty == true)
+        or (PNC.AbstractWorldStore
+            and PNC.AbstractWorldStore.Dirty == true)
+        or false
+    local authority = PNC.CoreSurvivorWorldAuthority
+    local world = authority and authority.World
+    local store = world and world.RuntimeStore
+    local coreDirty = store and store.Dirty == true
+
+    if not extensionDirty and not coreDirty then
         return false, "not_dirty"
     end
 
     local coreOK, coreReason = Extensions.FlushCore()
     if not coreOK then return false, coreReason end
+
+    -- Core-only mutations (for example canonical discovery) do not require
+    -- rewriting the Hoomans extension root.
+    if not extensionDirty then
+        return true, coreReason or "saved"
+    end
 
     local captured, captureReason = Extensions.CaptureAll()
     if not captured then return false, captureReason end

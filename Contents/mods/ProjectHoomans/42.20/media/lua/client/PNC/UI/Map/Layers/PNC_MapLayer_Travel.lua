@@ -3,6 +3,9 @@
 require "PNC/Presentation/PNC_NPCTypePalette"
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
+local SurvivorWorldClient = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldClient"
+
 PNC = PNC or {}
 PNC.MapTravelLayer = PNC.MapTravelLayer or {}
 
@@ -104,15 +107,23 @@ function TravelLayer.BuildMarkerScreenPositions(map, entries)
                 x = map.mapAPI:worldToUIX(entry.x, entry.y),
                 y = map.mapAPI:worldToUIY(entry.x, entry.y),
             }
-            key = tostring(math.floor((tonumber(entry.x) or 0) + 0.5))
-                .. ":"
-                .. tostring(math.floor((tonumber(entry.y) or 0) + 0.5))
-            group = groups[key]
-            if not group then
-                group = {}
-                groups[key] = group
+            -- Core SurvivorWorld has already performed deterministic
+            -- provider-neutral overlap spreading for canonical actor dots.
+            -- Keep the older screen-space fallback only for Hoomans-only
+            -- records outside that projection.
+            if entry.coreActorProjection ~= true then
+                key = tostring(
+                    math.floor((tonumber(entry.x) or 0) + 0.5)
+                ) .. ":" .. tostring(
+                    math.floor((tonumber(entry.y) or 0) + 0.5)
+                )
+                group = groups[key]
+                if not group then
+                    group = {}
+                    groups[key] = group
+                end
+                group[#group + 1] = i
             end
-            group[#group + 1] = i
         end
     end
     radius = math.max(8, TravelLayer.GetDotSize(map) * 0.9)
@@ -296,8 +307,11 @@ local function drawTravelMarkers(map, entries, showLabels, dotSize,
     local positions = TravelLayer.BuildMarkerScreenPositions(map, entries)
     local color
     local selected
+    local tracked
+    local emphasized
     local markerHovered
     local half = dotSize / 2
+    TravelLayer.LastMarkerPositions = {}
     for i = 1, #entries do
         entry = entries[i]
         if entry.x and entry.y then
@@ -315,6 +329,16 @@ local function drawTravelMarkers(map, entries, showLabels, dotSize,
                     and PNC.MapCommands.IsSelected
                     and PNC.MapCommands.IsSelected(entry.id)
                     or false
+                tracked = entry.tracked == true
+                emphasized = selected or tracked
+                TravelLayer.LastMarkerPositions[
+                    tostring(entry.id)
+                ] = {
+                    entry = entry,
+                    x = sx,
+                    y = sy,
+                    radius = half + 3,
+                }
                 markerHovered = math.abs(mouseX - sx) <= half + 3
                     and math.abs(mouseY - sy) <= half + 3
                 if markerHovered then
@@ -322,7 +346,7 @@ local function drawTravelMarkers(map, entries, showLabels, dotSize,
                     hoveredX = sx
                     hoveredY = sy
                 end
-                if selected then
+                if emphasized then
                     drawSelectedRoute(map, entry)
                 end
                 if TravelLayer.DotTexture then
@@ -350,17 +374,20 @@ local function drawTravelMarkers(map, entries, showLabels, dotSize,
                     )
                 end
                 map:drawRectBorder(
-                    sx - half - (selected and 2 or 0),
-                    sy - half - (selected and 2 or 0),
-                    dotSize + (selected and 4 or 0),
-                    dotSize + (selected and 4 or 0),
+                    sx - half - (emphasized and 2 or 0),
+                    sy - half - (emphasized and 2 or 0),
+                    dotSize + (emphasized and 4 or 0),
+                    dotSize + (emphasized and 4 or 0),
                     0.9,
-                    selected and 0.2 or 0.05,
-                    selected and 1.0 or 0.05,
-                    selected and 0.2 or 0.05
+                    tracked and 0.45
+                        or selected and 0.2 or 0.05,
+                    tracked and 1.0
+                        or selected and 1.0 or 0.05,
+                    tracked and 0.55
+                        or selected and 0.2 or 0.05
                 )
                 drawMarkerIcon(map, entry, sx, sy, dotSize)
-                if (showLabels or selected) and not markerHovered then
+                if (showLabels or emphasized) and not markerHovered then
                     map:drawTextCentre(
                         displayLabel(entry),
                         sx,
@@ -381,6 +408,16 @@ local function drawTravelMarkers(map, entries, showLabels, dotSize,
 end
 
 local function drawTravelHover(map, hoveredEntry, hoveredX, hoveredY)
+    if SurvivorWorldClient
+        and SurvivorWorldClient.SetHighlighted
+    then
+        SurvivorWorldClient.SetHighlighted(
+            hoveredEntry
+                and hoveredEntry.coreActorProjection == true
+                and hoveredEntry.id
+                or nil
+        )
+    end
     if hoveredEntry then
         local portraitVisible = HoverPortrait
             and HoverPortrait.Update
@@ -447,6 +484,65 @@ Layers.Register("pnc_travel", {
         return TravelLayer.Enabled
     end,
     render = TravelLayer.Render,
+})
+
+local function markerAt(x, y)
+    local best
+    local bestDistance = math.huge
+    for _, item in pairs(
+        TravelLayer.LastMarkerPositions or {}
+    ) do
+        local entry = item.entry
+        if entry and entry.coreActorProjection == true then
+            local dx = (tonumber(x) or 0) - item.x
+            local dy = (tonumber(y) or 0) - item.y
+            local distance = math.sqrt(dx * dx + dy * dy)
+            if distance <= (item.radius or 8)
+                and distance < bestDistance
+            then
+                best = item
+                bestDistance = distance
+            end
+        end
+    end
+    return best
+end
+
+local MapHost = require
+    "PsychopatzCore/UI/Map/PsychopatzMapHost"
+MapHost.Contexts.Register("ProjectHoomans:actor_tracking", {
+    order = 70,
+    available = function(map, x, y)
+        return markerAt(x, y) ~= nil
+    end,
+    augment = function(map, context, x, y)
+        local hit = markerAt(x, y)
+        if not hit or not context or not context.addOption then
+            return false
+        end
+        local entry = hit.entry
+        local tracked = SurvivorWorldClient.GetTracked
+            and SurvivorWorldClient.GetTracked() or nil
+        local trackedID = tracked
+            and tostring(tracked.actorID or "") or ""
+        local alreadyTracked =
+            trackedID == tostring(entry.id)
+        context:addOption(
+            alreadyTracked and "Stop tracking survivor"
+                or ("Track " .. displayLabel(entry)),
+            nil,
+            function()
+                if SurvivorWorldClient.SetTracked then
+                    SurvivorWorldClient.SetTracked(
+                        alreadyTracked and nil
+                            or entry.id
+                    )
+                    TravelLayer.InvalidateEntryCache()
+                end
+            end
+        )
+        return true
+    end,
 })
 
 return TravelLayer
