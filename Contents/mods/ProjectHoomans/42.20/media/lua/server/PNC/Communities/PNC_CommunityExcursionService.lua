@@ -862,6 +862,10 @@ function Service.SetPhase(factionID, nextState, patch, at)
     )) + 1
     if nextState == Constants.EXCURSION_STATE_PREPARING then
         excursion.preparedAt = excursion.stateAt
+        excursion.departedAt = 0
+        excursion.visitedAt = 0
+        excursion.returnStartedAt = 0
+        excursion.completedAt = 0
         excursion.failure = nil
     elseif nextState == Constants.EXCURSION_STATE_OUTBOUND then
         excursion.departedAt = excursion.stateAt
