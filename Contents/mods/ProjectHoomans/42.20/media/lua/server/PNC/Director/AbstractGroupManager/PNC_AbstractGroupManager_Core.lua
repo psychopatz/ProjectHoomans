@@ -23,6 +23,27 @@ end
 
 function H.Touch(group, reason)
     group.revision = (tonumber(group.revision) or 0) + 1
+    local adapter = PNC.CoreSurvivorWorldAdapter
+    if adapter and adapter.CommitGroup then
+        local canonical, syncReason = adapter.CommitGroup(
+            group,
+            reason or "pnc_group_touched"
+        )
+        if not canonical then
+            Groups.LastCoreSyncError = tostring(
+                syncReason or "core_group_sync_failed"
+            )
+            if Core and Core.LogWarn then
+                Core.LogWarn(
+                    "Core group sync failed id="
+                    .. tostring(group.id)
+                    .. " reason=" .. Groups.LastCoreSyncError
+                )
+            end
+        else
+            Groups.LastCoreSyncError = nil
+        end
+    end
     Store.Touch(reason)
 end
 

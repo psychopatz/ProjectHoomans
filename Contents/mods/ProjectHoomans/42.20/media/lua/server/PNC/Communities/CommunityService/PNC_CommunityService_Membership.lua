@@ -78,6 +78,16 @@ function Communities.Create(spec)
         revision = 1,
     })
     if not community then return false, "invalid_spec" end
+    local adapter = PNC.CoreSurvivorWorldAdapter
+    if adapter and adapter.CommitCommunity then
+        local canonical, syncReason = adapter.CommitCommunity(
+            community,
+            "pnc_community_created"
+        )
+        if not canonical then
+            return false, syncReason or "core_community_sync_failed"
+        end
+    end
     Communities.Registry.byID[id] = community
     Communities.Registry.byFaction[faction.id] =
         Communities.Registry.byFaction[faction.id] or {}

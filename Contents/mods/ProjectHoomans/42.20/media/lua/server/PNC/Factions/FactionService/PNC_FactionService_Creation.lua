@@ -120,6 +120,16 @@ function Factions.Create(spec)
         faction.leaderNPCID = leader.id
         faction.memberIDs[leader.id] = true
     end
+    local adapter = PNC.CoreSurvivorWorldAdapter
+    if adapter and adapter.CommitFaction then
+        local canonical, syncReason = adapter.CommitFaction(
+            faction,
+            "pnc_faction_created"
+        )
+        if not canonical then
+            return false, syncReason or "core_faction_sync_failed"
+        end
+    end
     Factions.Registry.byID[id] = faction
     Factions.Registry.byArchetype[faction.archetypeID] =
         Factions.Registry.byArchetype[faction.archetypeID] or {}

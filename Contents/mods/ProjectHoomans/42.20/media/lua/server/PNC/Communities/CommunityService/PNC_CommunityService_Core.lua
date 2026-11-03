@@ -94,6 +94,27 @@ local function touchCommunity(community)
         0,
         math.floor(tonumber(community.revision) or 0)
     ) + 1
+    local adapter = PNC.CoreSurvivorWorldAdapter
+    if adapter and adapter.CommitCommunity then
+        local canonical, reason = adapter.CommitCommunity(
+            community,
+            "pnc_community_touched"
+        )
+        if not canonical then
+            Communities.LastCoreSyncError = tostring(
+                reason or "core_community_sync_failed"
+            )
+            if Core and Core.LogWarn then
+                Core.LogWarn(
+                    "Core community sync failed id="
+                    .. tostring(community.id)
+                    .. " reason=" .. Communities.LastCoreSyncError
+                )
+            end
+        else
+            Communities.LastCoreSyncError = nil
+        end
+    end
 end
 
 local function touchSite(site)

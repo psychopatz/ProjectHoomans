@@ -21,6 +21,16 @@ function Locations.Register(spec)
     if not normalized then return nil, "invalid_location" end
     local existing = Store.Registry.locationsByID[normalized.id]
     if existing then return existing, "existing" end
+    local adapter = PNC.CoreSurvivorWorldAdapter
+    if adapter and adapter.CommitLocation then
+        local canonical, syncReason = adapter.CommitLocation(
+            normalized,
+            "pnc_location_registered"
+        )
+        if not canonical then
+            return nil, syncReason or "core_location_sync_failed"
+        end
+    end
     Store.Registry.locationsByID[normalized.id] = normalized
     H.Index(normalized)
     Store.Touch("location_registered")

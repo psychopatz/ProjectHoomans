@@ -136,6 +136,16 @@ function Bridge.Advance(group, at)
     if not advanced then return nil, reason end
     group.journey = advanced
     syncCompatibility(group, advanced)
+    local adapter = PNC.CoreSurvivorWorldAdapter
+    if adapter and adapter.CommitGroup then
+        local canonical, syncReason = adapter.CommitGroup(
+            group,
+            "pnc_group_journey_advanced"
+        )
+        if not canonical then
+            return nil, syncReason or "core_group_sync_failed"
+        end
+    end
     return advanced
 end
 

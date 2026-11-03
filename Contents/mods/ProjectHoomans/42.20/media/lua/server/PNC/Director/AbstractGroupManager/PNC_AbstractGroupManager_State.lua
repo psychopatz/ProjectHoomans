@@ -92,6 +92,16 @@ function Groups.Remove(groupID, reason)
     local group = Groups.Get(groupID)
     if not group then return false, "not_found" end
     Locations.Depart(group, Store.WorldAgeHours())
+    local adapter = PNC.CoreSurvivorWorldAdapter
+    if adapter and adapter.RemoveGroup then
+        local removed, syncReason = adapter.RemoveGroup(
+            group.id,
+            reason or "pnc_group_removed"
+        )
+        if not removed then
+            return false, syncReason or "core_group_remove_failed"
+        end
+    end
     Store.Registry.groupsByID[group.id] = nil
     Store.Touch(reason or "group_removed")
     Store.Emit("GROUP_DESTROYED", { groupId = group.id,

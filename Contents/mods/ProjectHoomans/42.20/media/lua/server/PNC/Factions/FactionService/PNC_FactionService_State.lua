@@ -71,6 +71,27 @@ function Internal.touchFaction(faction)
         0,
         math.floor(tonumber(faction.revision) or 0)
     ) + 1
+    local adapter = PNC.CoreSurvivorWorldAdapter
+    if adapter and adapter.CommitFaction then
+        local canonical, reason = adapter.CommitFaction(
+            faction,
+            "pnc_faction_touched"
+        )
+        if not canonical then
+            Factions.LastCoreSyncError = tostring(
+                reason or "core_faction_sync_failed"
+            )
+            if Core and Core.LogWarn then
+                Core.LogWarn(
+                    "Core faction sync failed id="
+                    .. tostring(faction.id)
+                    .. " reason=" .. Factions.LastCoreSyncError
+                )
+            end
+        else
+            Factions.LastCoreSyncError = nil
+        end
+    end
 end
 
 function Internal.touchRegistry()
