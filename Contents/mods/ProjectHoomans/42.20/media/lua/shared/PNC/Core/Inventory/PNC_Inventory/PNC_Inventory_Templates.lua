@@ -139,6 +139,31 @@ local function addCanonicalItems(record, base)
     local index
     local entry
     local fullType
+    local created
+    local ok
+    local nativeLocation
+    local function nativeWornSlot(itemType, authoredSlot)
+        if not authoredSlot
+            or not PNC.Equipment
+            or type(PNC.Equipment.CreateItem) ~= "function"
+        then
+            return authoredSlot
+        end
+        ok, created = pcall(PNC.Equipment.CreateItem, itemType)
+        if not ok then created = nil end
+        if type(created) == "table" and created[1]
+            and type(created.getBodyLocation) ~= "function"
+        then
+            created = created[1]
+        end
+        if created and type(created.getBodyLocation) == "function" then
+            ok, nativeLocation = pcall(created.getBodyLocation, created)
+            nativeLocation = ok and Internal.normalizeString(nativeLocation)
+                or nil
+            if nativeLocation then return nativeLocation end
+        end
+        return authoredSlot
+    end
     for index = 1, #items do
         entry = type(items[index]) == "table" and items[index] or {}
         fullType = entry.fullType or entry.type
@@ -151,7 +176,7 @@ local function addCanonicalItems(record, base)
                 ammoCount = entry.ammoCount,
                 container = entry.container or "root",
                 bagContainer = entry.bagContainer,
-                wornSlot = entry.wornSlot,
+                wornSlot = nativeWornSlot(fullType, entry.wornSlot),
                 attachedSlot = entry.attachedSlot,
                 equipSlot = entry.equipSlot or entry.equippedSlot,
                 wearableSlot = entry.wearableSlot,
