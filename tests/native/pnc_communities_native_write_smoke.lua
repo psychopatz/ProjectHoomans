@@ -9,28 +9,19 @@ local COMMUNITY_NAME = "Native Harness Restart Community"
 PZHarnessNativeTest = function()
     local factions = PNC and PNC.Factions or nil
     local communities = PNC and PNC.Communities or nil
-    local factionConstants = PNC and PNC.FactionConstants or nil
-    local communityConstants = PNC and PNC.CommunityConstants or nil
     PZHarness.assertTrue(
         factions and factions.Create and factions.Get,
         "native Factions dependency was not available"
     )
     PZHarness.assertTrue(
         communities and communities.Create and communities.Get
-            and communities.Save and communities.Load,
+            and communities.Commit and communities.Load,
         "native Communities API was not available"
     )
     PZHarness.assertTrue(
         factions.Loaded == true and communities.Loaded == true,
         "native community dependencies were not loaded before the test"
     )
-    PZHarness.assertTrue(
-        factionConstants and factionConstants.REGISTRY_MODDATA_KEY
-            and communityConstants
-            and communityConstants.REGISTRY_MODDATA_KEY,
-        "native community registry keys were not available"
-    )
-
     factions.IDGenerator = function()
         return FACTION_ID
     end
@@ -176,20 +167,24 @@ PZHarnessNativeTest = function()
         "native Communities registry remained dirty after commit"
     )
 
-    local raw = ModData.get(communityConstants.REGISTRY_MODDATA_KEY)
-    local rawCommunity = raw
-        and raw.byID
-        and raw.byID[COMMUNITY_ID]
+    local coreAuthority = PNC and PNC.CoreSurvivorWorldAuthority or nil
+    local coreRegistry = coreAuthority and coreAuthority.Registry or nil
+    local coreCommunity = coreRegistry
+        and coreRegistry:GetCommunity(COMMUNITY_ID) or nil
     PZHarness.assertTrue(
-        type(rawCommunity) == "table"
-            and rawCommunity.id == COMMUNITY_ID
-            and rawCommunity.name == COMMUNITY_NAME
-            and rawCommunity.factionID == FACTION_ID
-            and rawCommunity.home
-            and rawCommunity.home.x == 4242
-            and rawCommunity.home.y == 2424,
-        "native community ModData did not contain the committed community"
+        type(coreCommunity) == "table"
+            and coreCommunity.id == COMMUNITY_ID
+            and coreCommunity.name == COMMUNITY_NAME
+            and coreCommunity.factionID == FACTION_ID,
+        "Core SurvivorWorld did not contain the committed community"
     )
+    for _, key in ipairs({ "PNC_Factions", "PNC_Communities" }) do
+        local retired = ModData.get(key)
+        PZHarness.assertTrue(
+            retired == nil or next(retired) == nil,
+            "retired generic root became active again: " .. key
+        )
+    end
 
     PZHarness.assertTrue(
         Events and Events.OnSave and Events.OnSave.Add,

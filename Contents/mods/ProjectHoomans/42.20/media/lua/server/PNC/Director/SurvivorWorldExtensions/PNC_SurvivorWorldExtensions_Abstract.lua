@@ -45,7 +45,7 @@ local function pick(source, fields)
 end
 
 function Extensions.CaptureAbstract()
-    local store = PNC.AbstractWorldStore
+    local store = PNC.HoomansWorldView
     local registry = store and store.Registry or {}
     local groups = {}
     local locations = {}

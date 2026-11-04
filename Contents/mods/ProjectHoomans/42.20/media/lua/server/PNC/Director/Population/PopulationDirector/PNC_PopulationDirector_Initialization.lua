@@ -9,7 +9,7 @@ PNC.PopulationDirector.Internal =
 local Director = PNC.PopulationDirector
 local Internal = Director.Internal
 local Config = PNC.DirectorConfig.Population
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Sectors = PNC.PopulationSectors
 local Queue = PNC.GenerationQueue
 local Scheduler = PNC.Scheduler
@@ -31,17 +31,30 @@ function Director.Initialize(force)
     Director.RateHistory = { GROUP = {}, SETTLEMENT = {} }
     local recentGenerations = {}
     local now = Store.WorldAgeHours()
-    for _, provenance in pairs(Store.Registry.population.provenance or {}) do
-        if not recentGenerations[provenance.generationId] then
-            recentGenerations[provenance.generationId] = true
-            local createdAt = tonumber(provenance.createdAt) or 0
-            if string.find(provenance.generationId, "^POP_GROUP_")
-                and createdAt > now - 1 then
-                Director.RateHistory.GROUP[#Director.RateHistory.GROUP + 1] = createdAt
-            elseif string.find(provenance.generationId, "^POP_SETTLEMENT_")
-                and createdAt > now - 24 then
+    for _, provenance in pairs(
+        Store.Registry.population.provenance or {}
+    ) do
+        local generationID = provenance.generationID
+        if generationID
+            and not recentGenerations[generationID]
+        then
+            recentGenerations[generationID] = true
+            local createdAt =
+                tonumber(provenance.createdAt) or 0
+            if string.find(generationID, "^POP_GROUP_")
+                and createdAt > now - 1
+            then
+                Director.RateHistory.GROUP[
+                    #Director.RateHistory.GROUP + 1
+                ] = createdAt
+            elseif string.find(
+                generationID,
+                "^POP_COMMUNITY_"
+            ) and createdAt > now - 24
+            then
                 Director.RateHistory.SETTLEMENT[
-                    #Director.RateHistory.SETTLEMENT + 1] = createdAt
+                    #Director.RateHistory.SETTLEMENT + 1
+                ] = createdAt
             end
         end
     end

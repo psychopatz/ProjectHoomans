@@ -78,7 +78,7 @@ T.load(SHARED .. "Director/PNC_DirectorConfig.lua")
 T.load(SHARED .. "Director/PNC_AbstractWorldTypes.lua")
 T.load(SHARED .. "Factions/PNC_FactionConstants.lua")
 T.load(SHARED .. "Scheduling/PNC_Scheduler.lua")
-T.load(SERVER .. "PNC_AbstractWorldStore.lua")
+T.load(SERVER .. "PNC_HoomansWorldView.lua")
 T.load(SERVER .. "PNC_AbstractLocationManager.lua")
 T.load(SERVER .. "PNC_AbstractGroupManager.lua")
 T.load(SERVER .. "PNC_AbstractCombatProfile.lua")
@@ -94,7 +94,7 @@ T.load(SERVER .. "PNC_AbstractEncounterResolver.lua")
 T.load(SERVER .. "PNC_AbstractEncounterDetector.lua")
 T.load(SERVER .. "PNC_AbstractTraversal.lua")
 
-PNC.AbstractWorldStore.Load()
+PNC.HoomansWorldView.Load()
 
 local function faction(id, archetype, needs)
     local value = { id = id, archetypeID = archetype, needs = needs,
@@ -380,10 +380,14 @@ local persistedActionGroup = group("agroup_action_persist", persistedActionFacti
 T.truthy(PNC.AbstractActions.Start(persistedActionGroup, "SCAVENGE", worldHour,
     { duration = 2 }))
 
--- Save/load retains completed mutations and safely normalizes optional action state.
-T.truthy(PNC.AbstractWorldStore.Save(), "phase2 registry save")
-PNC.AbstractWorldStore.Registry = {}; PNC.AbstractWorldStore.Loaded = false
-T.truthy(PNC.AbstractWorldStore.Load(), "phase2 registry reload")
+-- Compatibility snapshot normalization retains completed mutations and safely
+-- normalizes optional action state without exercising retired ModData storage.
+local phase2Snapshot = PNC.AbstractWorldTypes.NormalizeRegistry(
+    PNC.Core.DeepCopy(PNC.HoomansWorldView.Registry)
+)
+PNC.HoomansWorldView.Registry = phase2Snapshot
+PNC.HoomansWorldView.Loaded = true
+PNC.HoomansWorldView.Dirty = false
 local reloaded = T.truthy(PNC.AbstractGroups.Get(refugees.id))
 T.truthy(reloaded.combatProfileDirty, "dirty profile survives reload")
 T.truthy(reloaded.morale >= 0 and reloaded.morale <= 1, "morale survives reload")

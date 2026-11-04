@@ -3,7 +3,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 local Combat = PNC.AbstractCombatResolver
 local Profiles = PNC.AbstractCombatProfile
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Groups = PNC.AbstractGroups
 local H = Combat.Internal
 

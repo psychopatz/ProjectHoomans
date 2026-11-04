@@ -8,7 +8,7 @@ PNC.PopulationSectorInternal = PNC.PopulationSectorInternal or {}
 local Sectors = PNC.PopulationSectors
 local H = PNC.PopulationSectorInternal
 local Config = PNC.DirectorConfig.Population
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Core = PNC.Core
 
 function Sectors.Get(id)

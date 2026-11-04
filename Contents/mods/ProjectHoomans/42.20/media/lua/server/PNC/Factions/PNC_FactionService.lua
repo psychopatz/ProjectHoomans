@@ -1,4 +1,4 @@
--- Server-authoritative persistent faction identity and affiliation entry.
+-- ProjectHoomans faction gameplay view over canonical Core SurvivorWorld state.
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode()
 then
@@ -14,7 +14,7 @@ local Repository = Factions.Repository
 
 require "PNC/Factions/FactionService/PNC_FactionService_State"
 require "PNC/Factions/FactionService/PNC_FactionService_RegistryIndexes"
-require "PNC/Factions/FactionService/PNC_FactionService_RegistryPersistence"
+require "PNC/Factions/FactionService/PNC_FactionService_WorldView"
 require "PNC/Factions/FactionService/PNC_FactionService_Queries"
 require "PNC/Factions/FactionService/PNC_FactionService_Creation"
 require "PNC/Factions/FactionService/PNC_FactionService_NPCTransfers"

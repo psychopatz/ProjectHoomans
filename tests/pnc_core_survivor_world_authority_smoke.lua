@@ -44,99 +44,99 @@ end
 
 PNC = {
     Core = { DeepCopy = deepCopy },
-    Factions = {
-        Registry = {
-            byID = {
-                faction_legacy = {
-                    id = "faction_legacy",
-                    name = "Legacy Faction",
-                    archetypeID = "survivor",
-                    memberIDs = {
-                        actor_legacy = true,
-                    },
-                },
+}
+
+roots.PNC_Factions = {
+    schemaVersion = 6,
+    revision = 1,
+    byID = {
+        faction_import = {
+            id = "faction_import",
+            name = "Imported Faction",
+            archetypeID = "survivor",
+            memberIDs = {
+                actor_import = true,
             },
         },
-        EnsureLoaded = function() return true end,
     },
-    Communities = {
-        Registry = {
-            byID = {
-                community_legacy = {
-                    id = "community_legacy",
-                    factionID = "faction_legacy",
-                    name = "Legacy Camp",
-                    home = {
-                        x = 100, y = 200, z = 0, radius = 20,
-                    },
-                    memberIDs = {
-                        actor_legacy = true,
-                    },
-                },
+}
+roots.PNC_Communities = {
+    schemaVersion = 2,
+    revision = 1,
+    byID = {
+        community_import = {
+            id = "community_import",
+            factionID = "faction_import",
+            name = "Imported Camp",
+            mode = "settled",
+            status = "active",
+            home = {
+                x = 100, y = 200, z = 0, radius = 20,
+            },
+            memberIDs = {
+                actor_import = true,
             },
         },
-        EnsureLoaded = function() return true end,
     },
-    AbstractWorldStore = {
-        Registry = {
-            revision = 4,
-            locationsByID = {
-                aloc_legacy = {
-                    id = "aloc_legacy",
-                    type = "SETTLEMENT",
-                    x = 100, y = 200, z = 0,
-                },
+    sitesByID = {},
+}
+roots.PNC_AbstractWorld_v1 = {
+    schemaVersion = 1,
+    revision = 4,
+    locationsByID = {
+        aloc_import = {
+            id = "aloc_import",
+            type = "SETTLEMENT",
+            x = 100, y = 200, z = 0,
+        },
+    },
+    groupsByID = {
+        agroup_import = {
+            id = "agroup_import",
+            factionId = "faction_import",
+            homeCommunityId = "community_import",
+            groupType = "CARAVAN",
+            memberIds = { "actor_import" },
+            leaderId = "actor_import",
+            location = {
+                id = "aloc_import",
+                type = "SETTLEMENT",
+                x = 100, y = 200, z = 0,
             },
-            groupsByID = {
-                agroup_legacy = {
-                    id = "agroup_legacy",
-                    factionId = "faction_legacy",
-                    homeCommunityId = "community_legacy",
-                    groupType = "CARAVAN",
-                    memberIds = { "actor_legacy" },
-                    leaderId = "actor_legacy",
-                    location = {
-                        id = "aloc_legacy",
-                        type = "SETTLEMENT",
+        },
+    },
+    encounters = {},
+    encounterCooldowns = {},
+    population = {
+        worldSeed = 5150,
+        sectors = {},
+    },
+}
+roots.PNC_WorldDiscovery_v1 = {
+    schemaVersion = 2,
+    revision = 1,
+    players = {
+        player_import = {
+            revision = 1,
+            entities = {
+                settlement = {
+                    community_import = {
+                        phase = 3,
+                        source = "visit",
                         x = 100, y = 200, z = 0,
                     },
                 },
-            },
-            population = {
-                worldSeed = 5150,
-                sectors = {},
+                mobile_group = {},
             },
         },
-        EnsureLoaded = function() return true end,
-    },
-    WorldDiscovery = {
-        Registry = {
-            revision = 1,
-            players = {
-                player_legacy = {
-                    revision = 1,
-                    entities = {
-                        settlement = {
-                            community_legacy = {
-                                phase = 3,
-                                source = "visit",
-                                x = 100, y = 200, z = 0,
-                            },
-                        },
-                        mobile_group = {},
-                    },
-                },
-            },
-        },
-        EnsureLoaded = function() return true end,
     },
 }
 
 local before = deepCopy({
-    factions = PNC.Factions.Registry,
-    communities = PNC.Communities.Registry,
-    abstractWorld = PNC.AbstractWorldStore.Registry,
-    discovery = PNC.WorldDiscovery.Registry,
+    factions = roots.PNC_Factions,
+    communities = roots.PNC_Communities,
+    abstractWorld = roots.PNC_AbstractWorld_v1,
+    discovery = roots.PNC_WorldDiscovery_v1,
 })
 
 local Authority = T.load(
@@ -147,57 +147,58 @@ local Authority = T.load(
 
 T.truthy(Authority.Registry,
     "Hoomans must activate Core SurvivorWorld runtime")
-T.equal(next(roots), nil,
-    "activation must not allocate ModData before init")
+T.equal(roots["PsychopatzCore.SurvivorWorld"], nil,
+    "activation must not allocate Core ModData before init")
 
-local preview, source = Authority.PreviewLegacyImport()
-T.truthy(preview and source, "legacy preview must succeed")
-T.equal(preview.worldSeed, 5150, "legacy world seed")
-T.truthy(preview.factions.faction_legacy, "faction preview")
-T.truthy(preview.communities.community_legacy, "community preview")
-T.truthy(preview.groups.agroup_legacy, "group preview")
+local preview, source = Authority.PreviewImport()
+T.truthy(preview and source, "import preview must succeed")
+T.equal(preview.worldSeed, 5150, "imported world seed")
+T.truthy(preview.factions.faction_import, "faction preview")
+T.truthy(preview.communities.community_import, "community preview")
+T.truthy(preview.groups.agroup_import, "group preview")
 T.truthy(
-    preview.discovery.players.player_legacy,
+    preview.discovery.players.player_import,
     "discovery preview"
 )
 
 local status = Authority.RefreshStatus()
 T.truthy(status.coreEmpty, "Core begins empty")
-T.truthy(status.needsMigration,
-    "legacy-only world must report pending migration")
+T.truthy(status.needsImport,
+    "pre-SurvivorWorld data must report pending import")
 
 for _, callback in ipairs(initCallbacks) do callback() end
 status = Authority.RefreshStatus()
-T.truthy(status.needsMigration,
-    "init must not auto-import or dual-write legacy state")
+T.truthy(status.needsImport,
+    "init must not auto-import or dual-write source data")
 
-local registry, reason = Authority.ImportLegacy({
+local registry, reason = Authority.ImportPreSurvivorWorld({
     reason = "test_cutover",
 })
 T.truthy(registry, reason)
-T.truthy(registry:GetFaction("faction_legacy"),
+T.truthy(registry:GetFaction("faction_import"),
     "imported faction missing")
-T.truthy(registry:GetCommunity("community_legacy"),
+T.truthy(registry:GetCommunity("community_import"),
     "imported community missing")
-T.truthy(registry:GetGroup("agroup_legacy"),
+T.truthy(registry:GetGroup("agroup_import"),
     "imported group missing")
 
 local root = roots["PsychopatzCore.SurvivorWorld"]
 T.truthy(root and type(root.registry) == "string",
-    "migration must persist only the Core world root")
+    "import must persist the Core world root")
 
 T.equal(
-    PNC.Core.DeepCopy(PNC.Factions.Registry).byID.faction_legacy.name,
-    before.factions.byID.faction_legacy.name,
-    "legacy faction store must remain read-only during import"
+    roots.PNC_Factions.byID.faction_import.name,
+    before.factions.byID.faction_import.name,
+    "faction import source must remain read-only"
 )
 T.equal(
-    PNC.AbstractWorldStore.Registry.revision,
+    roots.PNC_AbstractWorld_v1.revision,
     before.abstractWorld.revision,
-    "legacy abstract store must remain read-only during import"
+    "abstract-world import source must remain read-only"
 )
 
-local duplicate, duplicateReason = Authority.ImportLegacy()
+local duplicate, duplicateReason =
+    Authority.ImportPreSurvivorWorld()
 T.falsy(duplicate,
     "non-empty Core world must reject accidental re-import")
 T.equal(
@@ -208,7 +209,7 @@ T.equal(
 
 status = Authority.RefreshStatus()
 T.falsy(status.coreEmpty, "Core should now be authoritative candidate")
-T.falsy(status.needsMigration,
-    "completed import should clear migration need")
+T.falsy(status.needsImport,
+    "completed import should clear import need")
 
 T.finish("pnc_core_survivor_world_authority_smoke")

@@ -167,7 +167,7 @@ PNC.API = {
         end,
     },
 }
-PNC.AbstractWorldStore = {
+PNC.HoomansWorldView = {
     WorldAgeHours = function() return at end,
     Emit = function(name, payload)
         events[#events + 1] = { name = name, payload = copy(payload) }

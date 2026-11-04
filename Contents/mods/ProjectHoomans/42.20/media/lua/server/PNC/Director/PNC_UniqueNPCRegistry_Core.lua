@@ -8,7 +8,7 @@ PNC.UniqueNPCRegistry = PNC.UniqueNPCRegistry or {}
 
 local Registry = PNC.UniqueNPCRegistry
 local Catalog = PNC.UniqueNPCs
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Identity = PNC.Identity
 local Config = PNC.DirectorConfig
 local Core = PNC.Core

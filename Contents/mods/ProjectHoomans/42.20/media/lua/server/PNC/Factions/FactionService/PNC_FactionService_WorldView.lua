@@ -11,24 +11,49 @@ local Archetypes = PNC.FactionArchetypes
 local EntityRef = PNC.EntityRef
 local Reset = PNC.ModDataStore
     or require "PNC/Core/Persistence/PNC_ModDataStore"
+local ImportSource = PNC.SurvivorWorldImportSource
+    or require "PNC/Director/PNC_SurvivorWorldImportSource"
+
+local function refreshCoreViews()
+    local extensions = PNC.SurvivorWorldExtensions
+    local authority = PNC.CoreSurvivorWorldAuthority
+    local registry = authority and authority.Registry
+    if not extensions or extensions.Active ~= true
+        or type(extensions.RebuildAll) ~= "function"
+        or not registry
+        or type(registry.Snapshot) ~= "function"
+    then
+        return false, "cutover_not_active"
+    end
+    return extensions.RebuildAll(registry:Snapshot())
+end
+
 function Factions.Load()
     local raw
+    local sourceRaw
     local normalized
     if not Internal.authority() then return false, "not_authority" end
     if PNC.Registry and PNC.Registry.EnsureLoaded then
         PNC.Registry.EnsureLoaded()
     end
-    raw = Reset.Read(Constants.REGISTRY_MODDATA_KEY)
-    local reason = Reset.Check(raw, Constants.REGISTRY_SCHEMA_VERSION, nil,
-        function(value) return type(value.byID) == "table" end)
-    normalized = Types.NormalizeFactionRegistry(reason == nil and raw or nil)
-    Factions.Registry = normalized
-    Factions.Loaded = true
-    Factions.Dirty = (reason ~= nil and reason ~= "empty_state")
-        or (reason == nil and not Types.AreEqual(raw, normalized))
-    if reason ~= nil and reason ~= "empty_state" then
-        Reset.Mark(Factions, raw, Constants.REGISTRY_SCHEMA_VERSION,
-            reason, "factions")
+    local refreshed = refreshCoreViews()
+    if not refreshed then
+        local reason
+        raw, reason, sourceRaw = ImportSource.Read("factions")
+        normalized = Types.NormalizeFactionRegistry(raw)
+        Factions.Registry = normalized
+        Factions.Loaded = true
+        Factions.Dirty = (reason ~= nil and reason ~= "empty_state")
+            or (reason == nil and not Types.AreEqual(raw, normalized))
+        if reason ~= nil and reason ~= "empty_state" then
+            Reset.Mark(
+                Factions,
+                sourceRaw,
+                Constants.REGISTRY_SCHEMA_VERSION,
+                reason,
+                "faction_world_view_import"
+            )
+        end
     end
     Internal.rebuildIndexes()
     if Factions.ReconcilePlayerMemberships then
@@ -69,29 +94,18 @@ function Factions.EnsureLoaded()
     return true
 end
 
-function Factions.Save()
-    local target
-    local normalized
+function Factions.Commit()
     Factions.EnsureLoaded()
     if not Factions.Dirty then return false, "not_dirty" end
     local extensions = PNC.SurvivorWorldExtensions
-    if extensions and extensions.Save then
-        if extensions.Active ~= true then
-            return false, "survivor_world_cutover_inactive"
-        end
-        extensions.MarkDirty("factions_save")
-        return extensions.Save()
-    end
-    if PNC.CoreSurvivorWorldAuthority then
+    if not extensions or type(extensions.Save) ~= "function" then
         return false, "survivor_world_cutover_unavailable"
     end
-    normalized = Types.NormalizeFactionRegistry(Factions.Registry)
-    local written = Reset.Write(Constants.REGISTRY_MODDATA_KEY,
-        Internal.copy(normalized))
-    if not written then return false, "moddata_unavailable" end
-    Factions.Registry = normalized
-    Factions.Dirty = false
-    return true, "saved"
+    if extensions.Active ~= true then
+        return false, "survivor_world_cutover_inactive"
+    end
+    extensions.MarkDirty("faction_view_commit")
+    return extensions.Save()
 end
 
 function Factions.RebuildIndexes()

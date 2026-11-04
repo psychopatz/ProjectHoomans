@@ -160,7 +160,12 @@ function Validation.ValidateRegistry()
             end
         end
     end
-    H.SafePersistent(Communities.Registry, "PNC_Communities", output, {})
+    H.SafePersistent(
+        Communities.Registry,
+        "CommunityWorldView",
+        output,
+        {}
+    )
     return output
 end
 

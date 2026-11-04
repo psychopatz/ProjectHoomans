@@ -206,7 +206,7 @@ function Staffing.EnsureTrader(factionID, at)
     return true, "trader_assigned"
 end
 
--- One bounded pass over the persistent faction registry.
+-- One bounded pass over the canonical faction gameplay view.
 function Staffing.Reconcile(at)
     local summary = {
         scanned = 0,

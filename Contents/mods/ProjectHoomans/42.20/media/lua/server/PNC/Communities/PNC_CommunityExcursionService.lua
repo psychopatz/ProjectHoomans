@@ -14,7 +14,7 @@ local Factions = PNC.Factions
 local Communities = PNC.Communities
 local Types = PNC.FactionTypes
 local Constants = PNC.FactionConstants
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Repository = Factions and Factions.Repository or {}
 local Core = PNC.Core
 

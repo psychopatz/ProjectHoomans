@@ -161,11 +161,12 @@ listing:close()
 -- Fifteen policy-free domain registrations use the same early server-role gate.
 -- The Core SurvivorWorld authority coordinator, canonical mutation
 -- adapter, the Core presentation/live-body adapter, the Core discovery
--- cutover adapter, and six modular Hoomans-extension persistence files are
--- server-only and retain the same early runtime-role guard.
+-- cutover adapter, the one-way pre-SurvivorWorld import reader, and six
+-- modular Hoomans-extension persistence files are server-only and retain the
+-- same early runtime-role guard.
 -- Two guarded public LLM require forwarders retain legacy paths after the
 -- twelve implementations move to Conversation; each new path keeps its guard.
-T.equal(#serverOnlyFiles, 1034,
+T.equal(#serverOnlyFiles, 1033,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

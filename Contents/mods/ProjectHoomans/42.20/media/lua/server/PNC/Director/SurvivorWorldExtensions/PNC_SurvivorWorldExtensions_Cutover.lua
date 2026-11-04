@@ -6,23 +6,18 @@ end
 
 local Extensions = PNC.SurvivorWorldExtensions
 local I = Extensions.Internal
+local ImportSource = PNC.SurvivorWorldImportSource
+    or require "PNC/Director/PNC_SurvivorWorldImportSource"
 
-local function legacyKeys()
-    return {
-        PNC.FactionConstants
-            and PNC.FactionConstants.REGISTRY_MODDATA_KEY,
-        PNC.CommunityConstants
-            and PNC.CommunityConstants.REGISTRY_MODDATA_KEY,
-        PNC.DirectorConfig
-            and PNC.DirectorConfig.MODDATA_KEY,
-    }
-end
+local IMPORT_KINDS = {
+    "factions",
+    "communities",
+    "abstractWorld",
+}
 
-local function hasLegacyRoots()
-    for _, key in ipairs(legacyKeys()) do
-        if key and Extensions.LegacyRootHasData(key) then
-            return true
-        end
+local function hasImportSources()
+    for _, kind in ipairs(IMPORT_KINDS) do
+        if ImportSource.HasData(kind) then return true end
     end
     return false
 end
@@ -73,7 +68,7 @@ function Extensions.RebuildAll(coreSnapshot)
     end
     if not PNC.Factions
         or not PNC.Communities
-        or not PNC.AbstractWorldStore
+        or not PNC.HoomansWorldView
     then
         return false, "pnc_world_views_unavailable"
     end
@@ -92,14 +87,14 @@ function Extensions.RebuildAll(coreSnapshot)
 
     PNC.Factions.Registry = factions
     PNC.Communities.Registry = communities
-    PNC.AbstractWorldStore.Registry = abstract
+    PNC.HoomansWorldView.Registry = abstract
 
     PNC.Factions.Loaded = true
     PNC.Factions.Dirty = false
     PNC.Communities.Loaded = true
     PNC.Communities.Dirty = false
-    PNC.AbstractWorldStore.Loaded = true
-    PNC.AbstractWorldStore.Dirty = false
+    PNC.HoomansWorldView.Loaded = true
+    PNC.HoomansWorldView.Dirty = false
 
     if PNC.AbstractLocations
         and PNC.AbstractLocations.RebuildIndex
@@ -110,11 +105,10 @@ function Extensions.RebuildAll(coreSnapshot)
     return true
 end
 
-local function retireLegacyRoots()
-    for _, key in ipairs(legacyKeys()) do
-        if key and Extensions.LegacyRootHasData(key) then
-            local retired, reason =
-                Extensions.RetireLegacyRoot(key)
+local function retireImportSources()
+    for _, kind in ipairs(IMPORT_KINDS) do
+        if ImportSource.HasData(kind) then
+            local retired, reason = ImportSource.Retire(kind)
             if not retired
                 and reason ~= "already_empty"
             then
@@ -142,12 +136,12 @@ function Extensions.ActivateCutover()
     end
 
     local loaded = Extensions.Load()
-    local legacyPresent = hasLegacyRoots()
+    local importPresent = hasImportSources()
 
     -- The first cutover captures only Hoomans-owned extension state while
-    -- legacy PNC registries still contain the complete pre-cutover view.
+    -- pre-SurvivorWorld import sources still contain the complete old view.
     -- Existing extension roots are authoritative on later loads and must not
-    -- be replaced from the now-retired legacy generic stores.
+    -- be replaced from retired import sources.
     if loaded ~= true then
         Extensions.Registry = Extensions.CaptureAll()
         Extensions.Dirty = true
@@ -155,9 +149,9 @@ function Extensions.ActivateCutover()
 
     Extensions.Active = true
 
-    -- Persist Core first, then the Hoomans-only extension root. Legacy generic
-    -- roots are retired only after both durable targets are safe.
-    if legacyPresent or Extensions.Dirty then
+    -- Persist Core first, then the Hoomans-only extension root. Import sources
+    -- are retired only after both durable targets are safe.
+    if importPresent or Extensions.Dirty then
         local saved
         saved, reason = Extensions.Save()
         if not saved and reason ~= "not_dirty" then
@@ -185,7 +179,7 @@ function Extensions.ActivateCutover()
     end
 
     local retired
-    retired, reason = retireLegacyRoots()
+    retired, reason = retireImportSources()
     if not retired then
         Extensions.Active = false
         Extensions.Activating = false
@@ -198,10 +192,10 @@ function Extensions.ActivateCutover()
         coreRevision = core:Revision(),
         extensionRevision =
             tonumber(Extensions.Registry.revision) or 0,
-        migratedLegacy = legacyPresent == true,
+        importedPreSurvivorWorld = importPresent == true,
     }
-    return true, legacyPresent
-        and "legacy_cutover_complete"
+    return true, importPresent
+        and "import_cutover_complete"
         or "cutover_active"
 end
 

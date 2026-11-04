@@ -79,7 +79,7 @@ PNC.Registry.Data.npc_2 = { id = "npc_2", alive = true,
     equipment = { primaryFullType = "Base.Axe" },
     affiliation = { role = "raider" } }
 
-T.load(SERVER .. "PNC_AbstractWorldStore.lua")
+T.load(SERVER .. "PNC_HoomansWorldView.lua")
 T.load(SERVER .. "PNC_AbstractLocationManager.lua")
 T.load(SERVER .. "PNC_AbstractGroupManager.lua")
 T.load(SERVER .. "PNC_AbstractCombatProfile.lua")
@@ -96,7 +96,7 @@ T.load(SERVER .. "PNC_AbstractEncounterDetector.lua")
 T.load(SERVER .. "PNC_AbstractTraversal.lua")
 T.load(SERVER .. "PNC_WorldDirector.lua")
 
-PNC.AbstractWorldStore.Load()
+PNC.HoomansWorldView.Load()
 local origin = T.truthy(PNC.AbstractLocations.RegisterSite(faction.mobile.site))
 local store = T.truthy(PNC.AbstractLocations.Register({ id = "aloc_store",
     type = "BUILDING", x = 120, y = 0, z = 0,
@@ -131,9 +131,9 @@ T.equal(group.location.id, store.id, "logical arrival")
 T.equal(group.state, "PERFORMING_ACTION", "arrival starts mission action")
 T.equal(PNC.Registry.Data.npc_1.x, store.x - 1,
     "abstract member moved without body")
-T.equal(#PNC.AbstractWorldStore.Registry.encounters, 1,
+T.equal(#PNC.HoomansWorldView.Registry.encounters, 1,
     "shared-location encounter detected")
-T.equal(PNC.AbstractWorldStore.Registry.encounters[1].outcome, "QUEUED",
+T.equal(PNC.HoomansWorldView.Registry.encounters[1].outcome, "QUEUED",
     "collision queues bounded resolution")
 
 PNC.SpatialIndex.QueryPlayers = function()
@@ -183,14 +183,16 @@ T.equal(PNC.Scheduler.PumpJobs(200), 1, "due job runs")
 T.equal(jobRuns, 3, "job receives work budget")
 T.equal(PNC.Scheduler.PumpJobs(200.5), 0, "interval enforced")
 
-T.truthy(PNC.AbstractWorldStore.Save())
-PNC.AbstractWorldStore.Registry = {}
-PNC.AbstractWorldStore.Loaded = false
-T.truthy(PNC.AbstractWorldStore.Load())
+local abstractSnapshot = PNC.AbstractWorldTypes.NormalizeRegistry(
+    PNC.Core.DeepCopy(PNC.HoomansWorldView.Registry)
+)
+PNC.HoomansWorldView.Registry = abstractSnapshot
+PNC.HoomansWorldView.Loaded = true
+PNC.HoomansWorldView.Dirty = false
 T.equal(PNC.AbstractGroups.Get("agroup_test").location.id, "aloc_store",
-    "group persistence round-trip")
+    "group compatibility snapshot round-trip")
 T.truthy(PNC.AbstractGroups.Get("agroup_test").combatProfile ~= nil,
-    "combat cache persistence round-trip")
+    "combat cache survives compatibility snapshot round-trip")
 T.equal(PNC.AbstractGroups.Get("agroup_test").simulation.lod, "ABSTRACT",
     "safe simulation default")
 

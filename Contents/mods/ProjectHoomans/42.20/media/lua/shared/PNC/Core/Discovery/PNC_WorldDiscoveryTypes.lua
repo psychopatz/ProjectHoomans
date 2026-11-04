@@ -6,7 +6,6 @@ PNC.WorldDiscoveryTypes = PNC.WorldDiscoveryTypes or {}
 local Types = PNC.WorldDiscoveryTypes
 
 Types.SCHEMA_VERSION = 2
-Types.MODDATA_KEY = "PNC_WorldDiscovery_v1"
 Types.KIND_SETTLEMENT = "settlement"
 Types.KIND_MOBILE_GROUP = "mobile_group"
 Types.PHASE_UNKNOWN = 0
@@ -62,6 +61,72 @@ function Types.PresenceStatus(value)
         return Types.PRESENCE_ABSENT
     end
     return Types.PRESENCE_UNKNOWN
+end
+
+function Types.NormalizeRegistry(raw)
+    raw = type(raw) == "table" and raw or {}
+    local output = {
+        schemaVersion = Types.SCHEMA_VERSION,
+        revision = math.max(0, math.floor(tonumber(raw.revision) or 0)),
+        players = {},
+    }
+    for uuid, source in pairs(type(raw.players) == "table"
+        and raw.players or {})
+    do
+        if type(uuid) == "string" and uuid ~= ""
+            and type(source) == "table"
+        then
+            local playerRecord = {
+                revision = math.max(0,
+                    math.floor(tonumber(source.revision) or 0)),
+                lastRadioScanAt = math.max(0,
+                    tonumber(source.lastRadioScanAt) or 0),
+                radioScanCount = math.max(0,
+                    math.floor(tonumber(source.radioScanCount) or 0)),
+                entities = { settlement = {}, mobile_group = {} },
+            }
+            for _, kind in ipairs({
+                Types.KIND_SETTLEMENT,
+                Types.KIND_MOBILE_GROUP,
+            }) do
+                local entries = source.entities
+                    and source.entities[kind] or {}
+                for entityID, entry in pairs(entries) do
+                    if type(entityID) == "string"
+                        and entityID ~= "" and type(entry) == "table"
+                    then
+                        playerRecord.entities[kind][entityID] = {
+                            entityID = entityID,
+                            kind = kind,
+                            phase = Types.ClampPhase(entry.phase),
+                            source = tostring(entry.source or "unknown"),
+                            discoveredAt = math.max(0,
+                                tonumber(entry.discoveredAt) or 0),
+                            updatedAt = math.max(0,
+                                tonumber(entry.updatedAt) or 0),
+                            x = tonumber(entry.x), y = tonumber(entry.y),
+                            z = tonumber(entry.z) or 0,
+                            arrivalState = Types.ArrivalState(
+                                entry.arrivalState),
+                            searchedAt = math.max(0,
+                                tonumber(entry.searchedAt) or 0),
+                            contactedAt = math.max(0,
+                                tonumber(entry.contactedAt) or 0),
+                            presenceStatus = Types.PresenceStatus(
+                                entry.presenceStatus),
+                            factionKnown = entry.factionKnown == true,
+                            factionID = entry.factionID ~= nil
+                                and tostring(entry.factionID) or nil,
+                            factionName = entry.factionName ~= nil
+                                and tostring(entry.factionName) or nil,
+                        }
+                    end
+                end
+            end
+            output.players[uuid] = playerRecord
+        end
+    end
+    return output
 end
 
 return Types

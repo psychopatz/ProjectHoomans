@@ -8,7 +8,7 @@ PNC.AbstractGroupManagerInternal =
 
 local Groups = PNC.AbstractGroups
 local H = PNC.AbstractGroupManagerInternal
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Types = PNC.AbstractWorldTypes
 local Config = PNC.DirectorConfig
 local Locations = PNC.AbstractLocations

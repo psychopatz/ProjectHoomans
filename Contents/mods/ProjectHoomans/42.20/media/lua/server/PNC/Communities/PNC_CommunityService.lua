@@ -1,4 +1,4 @@
--- Server-authoritative persistent communities entry.
+-- ProjectHoomans community gameplay view over canonical Core SurvivorWorld state.
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode()
 then
@@ -11,7 +11,7 @@ PNC.Communities.Internal = PNC.Communities.Internal or {}
 
 require "PNC/Communities/CommunityService/PNC_CommunityService_Core"
 require "PNC/Communities/CommunityService/PNC_CommunityService_Indexes"
-require "PNC/Communities/CommunityService/PNC_CommunityService_Persistence"
+require "PNC/Communities/CommunityService/PNC_CommunityService_WorldView"
 require "PNC/Communities/CommunityService/PNC_CommunityService_Queries"
 require "PNC/Communities/CommunityService/PNC_CommunityService_Sites"
 require "PNC/Communities/CommunityService/PNC_CommunityService_Affiliations"

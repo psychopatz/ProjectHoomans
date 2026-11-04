@@ -130,7 +130,7 @@ PNC = {
             faction.revision = faction.revision + 1
             return true, "renamed", faction
         end,
-        Save = function() factionSaves = factionSaves + 1 end,
+        Commit = function() factionSaves = factionSaves + 1 end,
     },
     Communities = {
         GetForFaction = function() return { community } end,
@@ -141,7 +141,7 @@ PNC = {
             community.revision = community.revision + 1
             return true, "renamed"
         end,
-        Save = function() communitySaves = communitySaves + 1 end,
+        Commit = function() communitySaves = communitySaves + 1 end,
     },
     SettlementRepository = {
         GetFacility = function(id)

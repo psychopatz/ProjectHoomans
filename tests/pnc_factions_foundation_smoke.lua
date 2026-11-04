@@ -731,15 +731,19 @@ T.equal(
     "disable telemetry result"
 )
 
--- Save/load registry remains primitive-only and copy-safe.
-T.truthy(Factions.Save(), "faction save")
-validatePersistedValue(globalData.PNC_Factions)
+-- The compatibility registry remains serialization-safe and can be rebuilt
+-- from a detached snapshot without owning a legacy ModData save path.
+local factionSnapshot = Types.NormalizeFactionRegistry(
+    PNC.Core.DeepCopy(Factions.Registry)
+)
+validatePersistedValue(factionSnapshot)
+Factions.Registry = Types.NewFactionRegistry()
 Factions.Loaded = false
-T.truthy(Factions.Load(), "faction reload")
+T.truthy(Factions.LoadRaw(factionSnapshot), "faction snapshot reload")
 T.truthy(Factions.Get(traderID) ~= nil,
-    "faction persists")
+    "faction compatibility view rebuilds")
 T.equal(Factions.GetNPCAffiliation(alice.id).factionID,
-    traderID, "membership persists")
+    traderID, "membership survives compatibility rebuild")
 T.finish("pnc_factions_foundation_smoke")
 
 T.finish("pnc_factions_foundation_smoke")

@@ -8,7 +8,7 @@ PNC.AbstractMobileAccidents = PNC.AbstractMobileAccidents or {}
 
 local Accidents = PNC.AbstractMobileAccidents
 local Groups = PNC.AbstractGroups
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Casualties = PNC.AbstractCasualtyResolver
 local Config = PNC.DirectorConfig
 

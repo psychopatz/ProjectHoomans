@@ -7,6 +7,8 @@ local Internal = Discovery.Internal
 local Types = PNC.WorldDiscoveryTypes
 local Reset = PNC.ModDataStore
     or require "PNC/Core/Persistence/PNC_ModDataStore"
+local ImportSource = PNC.SurvivorWorldImportSource
+    or require "PNC/Director/PNC_SurvivorWorldImportSource"
 
 local function copy(value, seen)
     if type(value) ~= "table" then return value end
@@ -40,72 +42,6 @@ function Internal.CharacterUUID(player)
         and PNC.PlayerCharacters.GetCharacterUUID(player) or nil
 end
 
-local function normalizeRegistry(raw)
-    raw = type(raw) == "table" and raw or {}
-    local output = {
-        schemaVersion = Types.SCHEMA_VERSION,
-        revision = math.max(0, math.floor(tonumber(raw.revision) or 0)),
-        players = {},
-    }
-    for uuid, source in pairs(type(raw.players) == "table"
-        and raw.players or {})
-    do
-        if type(uuid) == "string" and uuid ~= ""
-            and type(source) == "table"
-        then
-            local playerRecord = {
-                revision = math.max(0,
-                    math.floor(tonumber(source.revision) or 0)),
-                lastRadioScanAt = math.max(0,
-                    tonumber(source.lastRadioScanAt) or 0),
-                radioScanCount = math.max(0,
-                    math.floor(tonumber(source.radioScanCount) or 0)),
-                entities = { settlement = {}, mobile_group = {} },
-            }
-            for _, kind in ipairs({
-                Types.KIND_SETTLEMENT,
-                Types.KIND_MOBILE_GROUP,
-            }) do
-                local entries = source.entities
-                    and source.entities[kind] or {}
-                for entityID, entry in pairs(entries) do
-                    if type(entityID) == "string"
-                        and entityID ~= "" and type(entry) == "table"
-                    then
-                        playerRecord.entities[kind][entityID] = {
-                            entityID = entityID,
-                            kind = kind,
-                            phase = Types.ClampPhase(entry.phase),
-                            source = tostring(entry.source or "unknown"),
-                            discoveredAt = math.max(0,
-                                tonumber(entry.discoveredAt) or 0),
-                            updatedAt = math.max(0,
-                                tonumber(entry.updatedAt) or 0),
-                            x = tonumber(entry.x), y = tonumber(entry.y),
-                            z = tonumber(entry.z) or 0,
-                            arrivalState = Types.ArrivalState(
-                                entry.arrivalState),
-                            searchedAt = math.max(0,
-                                tonumber(entry.searchedAt) or 0),
-                            contactedAt = math.max(0,
-                                tonumber(entry.contactedAt) or 0),
-                            presenceStatus = Types.PresenceStatus(
-                                entry.presenceStatus),
-                            factionKnown = entry.factionKnown == true,
-                            factionID = entry.factionID ~= nil
-                                and tostring(entry.factionID) or nil,
-                            factionName = entry.factionName ~= nil
-                                and tostring(entry.factionName) or nil,
-                        }
-                    end
-                end
-            end
-            output.players[uuid] = playerRecord
-        end
-    end
-    return output
-end
-
 function Discovery.Load()
     local adapter = PNC.CoreWorldDiscoveryAdapter
     if adapter and adapter.Active
@@ -113,14 +49,12 @@ function Discovery.Load()
     then
         return adapter.SyncFromCore()
     end
-    local raw = Reset.Read(Types.MODDATA_KEY)
-    local reason = Reset.Check(raw, Types.SCHEMA_VERSION, nil,
-        function(value) return type(value.players) == "table" end)
-    Discovery.Registry = normalizeRegistry(reason == nil and raw or nil)
+    local raw, reason, sourceRaw = ImportSource.Read("discovery")
+    Discovery.Registry = Types.NormalizeRegistry(raw)
     Discovery.Loaded = true
     Discovery.Dirty = reason ~= nil and reason ~= "empty_state"
     if Discovery.Dirty then
-        Reset.Mark(Discovery, raw, Types.SCHEMA_VERSION, reason,
+        Reset.Mark(Discovery, sourceRaw, Types.SCHEMA_VERSION, reason,
             "world_discovery")
     end
     return true
@@ -135,19 +69,13 @@ function Discovery.Save()
     Discovery.EnsureLoaded()
     if not Discovery.Dirty then return false, "not_dirty" end
     local adapter = PNC.CoreWorldDiscoveryAdapter
-    if adapter and adapter.Save then
-        if adapter.Active ~= true then
-            return false, "survivor_world_discovery_cutover_inactive"
-        end
-        return adapter.Save("pnc_world_discovery_save")
-    end
-    if PNC.CoreSurvivorWorldAuthority then
+    if not adapter or type(adapter.Save) ~= "function" then
         return false, "survivor_world_discovery_cutover_unavailable"
     end
-    local written = Reset.Write(Types.MODDATA_KEY, Discovery.Registry)
-    if not written then return false, "moddata_unavailable" end
-    Discovery.Dirty = false
-    return true, "saved"
+    if adapter.Active ~= true then
+        return false, "survivor_world_discovery_cutover_inactive"
+    end
+    return adapter.Save("pnc_world_discovery_save")
 end
 
 function Internal.PlayerRecord(player, create)

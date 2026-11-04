@@ -425,7 +425,7 @@ local directorCalls = capture(
     ROOT .. "server/PNC/Director/PNC_Director.lua"
 )
 local expectedDirector = {
-    "PNC/Director/PNC_AbstractWorldStore",
+    "PNC/Director/PNC_HoomansWorldView",
     "PNC/Director/PNC_UniqueNPCRegistry",
     "PNC/Director/PNC_AbstractLocationManager",
     "PNC/Director/PNC_AbstractGroupManager",
@@ -445,12 +445,10 @@ local expectedDirector = {
     "PNC/Director/PNC_AbstractTraversal",
     "PNC/Director/Population/PNC_PopulationSandbox",
     "PNC/Director/Population/PNC_PopulationLog",
-    "PNC/Director/Population/PNC_PopulationIdentity",
+    "PNC/Director/Population/PNC_PopulationHoomansPolicy",
     "PNC/Director/Population/PNC_PopulationSectorManager",
     "PNC/Director/Population/PNC_PopulationBudget",
     "PNC/Director/Population/PNC_GenerationQueue",
-    "PNC/Director/Population/PNC_GroupGenerationPlan",
-    "PNC/Director/Population/PNC_SettlementGenerationPlan",
     "PNC/Director/Population/PNC_SettlementCandidateManager",
     "PNC/Director/Population/PNC_StarterPopulation",
     "PNC/Director/Population/PNC_GroupGenerator",

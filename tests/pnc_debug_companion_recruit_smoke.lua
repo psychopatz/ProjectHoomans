@@ -85,7 +85,7 @@ PNC = {
             affiliations[id] = { factionID = factionID }
             return true, "added"
         end,
-        Save = function() factionSaves = factionSaves + 1 end,
+        Commit = function() factionSaves = factionSaves + 1 end,
     },
     IndividualNeeds = {
         Ensure = function() needsCalls = needsCalls + 1 end,
@@ -117,7 +117,7 @@ PNC = {
         GetNPCCommunity = function(npcID)
             return communityByNPC[npcID]
         end,
-        Save = function() communitySaves = communitySaves + 1 end,
+        Commit = function() communitySaves = communitySaves + 1 end,
     },
     ConversationScene = {
         End = function() endedCalls = endedCalls + 1 end,

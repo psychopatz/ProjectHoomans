@@ -11,7 +11,7 @@ local H = PNC.SettlementCandidateManagerInternal
 local Config = PNC.DirectorConfig.Population
 local Sectors = PNC.PopulationSectors
 local Locations = PNC.AbstractLocations
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Core = PNC.Core
 local Log = PNC.PopulationLog
 

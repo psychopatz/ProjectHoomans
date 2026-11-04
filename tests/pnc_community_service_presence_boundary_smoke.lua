@@ -6,7 +6,7 @@ local prefix = "PNC/Communities/CommunityService/"
 local providers = {
     "PNC_CommunityService_Core",
     "PNC_CommunityService_Indexes",
-    "PNC_CommunityService_Persistence",
+    "PNC_CommunityService_WorldView",
     "PNC_CommunityService_Queries",
     "PNC_CommunityService_Sites",
     "PNC_CommunityService_Affiliations",

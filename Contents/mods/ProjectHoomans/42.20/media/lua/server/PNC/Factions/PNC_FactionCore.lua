@@ -1,4 +1,4 @@
--- Deterministic server entry for persistent faction identity and membership.
+-- Deterministic Hoomans server entry for canonical Core faction identity/membership views.
 -- Incident, behavior, toll, validation, and debug adapters remain at their
 -- later composition positions because they consume other runtime domains.
 if PsychopatzCore and PsychopatzCore.RuntimeRole

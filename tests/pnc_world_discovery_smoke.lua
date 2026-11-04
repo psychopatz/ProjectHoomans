@@ -420,7 +420,12 @@ Discovery.SetPhase(player, Types.KIND_MOBILE_GROUP, "group_one",
 Discovery.MarkFactionRevealed(player,
     Discovery.ResolveEntity(Types.KIND_MOBILE_GROUP, "group_one"),
     "Road Refugees", "radio_disclosure", true)
-Discovery.Save()
+local standaloneSaved, standaloneReason = Discovery.Save()
+T.falsy(standaloneSaved,
+    "discovery compatibility view must not own standalone persistence")
+T.equal(standaloneReason,
+    "survivor_world_discovery_cutover_unavailable",
+    "standalone discovery save fails closed without Core cutover")
 local called = Discovery.HandleAction(player, {
     action = "call_contact",
     kind = Types.KIND_MOBILE_GROUP,
@@ -486,11 +491,13 @@ T.equal(#debugAll.entities, 2,
 T.equal(debugAll.entities[1].phase, Types.PHASE_LOCATED,
     "debug discovery reveals an exact map location")
 
-Discovery.Registry = {}
-Discovery.Loaded = false
-Discovery.Load()
+local discoverySnapshot =
+    Types.NormalizeRegistry(Discovery.Registry)
+Discovery.Registry = discoverySnapshot
+Discovery.Loaded = true
+Discovery.Dirty = false
 T.equal(#Discovery.BuildSnapshot(player).entities, 2,
-    "discovery persists across reload")
+    "discovery compatibility snapshot round-trip preserves entities")
 
 local reset = Discovery.HandleAction(player, { action = "debug_reset" })
 T.equal(reset.result.ok, true,

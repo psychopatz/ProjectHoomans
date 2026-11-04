@@ -8,7 +8,7 @@ PNC.PopulationReconciler = PNC.PopulationReconciler or {}
 local Reconciler = PNC.PopulationReconciler
 local Sectors = PNC.PopulationSectors
 local Queue = PNC.GenerationQueue
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 
 Reconciler.Cursors = Reconciler.Cursors or { GROUP = 1, SETTLEMENT = 1 }
 Reconciler.Metrics = Reconciler.Metrics or { runs = 0, sectorsProcessed = 0,

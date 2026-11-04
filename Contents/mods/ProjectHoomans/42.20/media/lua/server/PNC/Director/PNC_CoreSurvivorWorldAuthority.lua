@@ -11,6 +11,8 @@ PNC.CoreSurvivorWorldAuthority =
 local Authority = PNC.CoreSurvivorWorldAuthority
 local World = require
     "PsychopatzCore/SurvivorWorld/PsychopatzSurvivorWorld"
+local ImportSource = PNC.SurvivorWorldImportSource
+    or require "PNC/Director/PNC_SurvivorWorldImportSource"
 
 local function copy(value)
     if PNC.Core and PNC.Core.DeepCopy then
@@ -32,45 +34,12 @@ local function countMap(value)
     return count
 end
 
-local function ensureLegacyLoaded()
-    if PNC.Factions and PNC.Factions.EnsureLoaded then
-        PNC.Factions.EnsureLoaded()
-    end
-    if PNC.Communities and PNC.Communities.EnsureLoaded then
-        PNC.Communities.EnsureLoaded()
-    end
-    if PNC.AbstractWorldStore
-        and PNC.AbstractWorldStore.EnsureLoaded
-    then
-        PNC.AbstractWorldStore.EnsureLoaded()
-    end
-    if PNC.WorldDiscovery and PNC.WorldDiscovery.EnsureLoaded then
-        PNC.WorldDiscovery.EnsureLoaded()
-    end
+function Authority.BuildImportSource()
+    return copy(ImportSource.Build())
 end
 
-function Authority.BuildLegacySource()
-    ensureLegacyLoaded()
-    return {
-        factions = copy(
-            PNC.Factions and PNC.Factions.Registry or {}
-        ),
-        communities = copy(
-            PNC.Communities and PNC.Communities.Registry or {}
-        ),
-        abstractWorld = copy(
-            PNC.AbstractWorldStore
-                and PNC.AbstractWorldStore.Registry or {}
-        ),
-        discovery = copy(
-            PNC.WorldDiscovery
-                and PNC.WorldDiscovery.Registry or {}
-        ),
-    }
-end
-
-function Authority.PreviewLegacyImport(options)
-    local source = Authority.BuildLegacySource()
+function Authority.PreviewImport(options)
+    local source = Authority.BuildImportSource()
     local snapshot, reason =
         World.Import.FromPNC(source, options)
     if not snapshot then return nil, reason end
@@ -117,7 +86,7 @@ function Authority.RefreshStatus()
     end
 
     local coreSnapshot = registry:Snapshot()
-    local preview, previewReason = Authority.PreviewLegacyImport()
+    local preview, previewReason = Authority.PreviewImport()
     local status = {
         active = true,
         core = snapshotCounts(coreSnapshot),
@@ -125,20 +94,20 @@ function Authority.RefreshStatus()
         previewReason = previewReason,
     }
     if preview then
-        status.legacy = snapshotCounts(preview)
-        status.legacyEmpty = isEmpty(preview)
-        status.needsMigration =
-            status.coreEmpty and not status.legacyEmpty
+        status.importSource = snapshotCounts(preview)
+        status.importSourceEmpty = isEmpty(preview)
+        status.needsImport =
+            status.coreEmpty and not status.importSourceEmpty
     else
-        status.legacy = {}
-        status.legacyEmpty = true
-        status.needsMigration = false
+        status.importSource = {}
+        status.importSourceEmpty = true
+        status.needsImport = false
     end
     Authority.LastStatus = status
     return status
 end
 
-function Authority.ImportLegacy(options)
+function Authority.ImportPreSurvivorWorld(options)
     options = type(options) == "table" and options or {}
     local registry, reason = Authority.Activate()
     if not registry then return nil, reason end
@@ -149,12 +118,12 @@ function Authority.ImportLegacy(options)
     end
 
     local snapshot
-    snapshot, reason = Authority.PreviewLegacyImport(options)
+    snapshot, reason = Authority.PreviewImport(options)
     if not snapshot then return nil, reason end
 
     registry, reason = World.RuntimeStore.Replace(
         snapshot,
-        options.reason or "project_hoomans_legacy_import"
+        options.reason or "project_hoomans_pre_survivor_world_import"
     )
     if not registry then return nil, reason end
 

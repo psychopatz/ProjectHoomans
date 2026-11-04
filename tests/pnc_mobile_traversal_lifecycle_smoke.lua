@@ -14,7 +14,7 @@ PNC = {
             return live and {} or nil
         end,
     },
-    AbstractWorldStore = {
+    HoomansWorldView = {
         Emit = function(eventName)
             emitted[#emitted + 1] = eventName
         end,

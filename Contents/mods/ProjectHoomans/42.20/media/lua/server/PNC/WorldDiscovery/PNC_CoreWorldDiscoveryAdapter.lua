@@ -11,8 +11,8 @@ PNC.CoreWorldDiscoveryAdapter =
 local Adapter = PNC.CoreWorldDiscoveryAdapter
 local Discovery = PNC.WorldDiscovery
 local Types = PNC.WorldDiscoveryTypes
-local Reset = PNC.ModDataStore
-    or require "PNC/Core/Persistence/PNC_ModDataStore"
+local ImportSource = PNC.SurvivorWorldImportSource
+    or require "PNC/Director/PNC_SurvivorWorldImportSource"
 local World = require
     "PsychopatzCore/SurvivorWorld/PsychopatzSurvivorWorld"
 
@@ -355,16 +355,13 @@ function Adapter.ActivateCutover()
     Adapter.Active = true
     Adapter.SyncFromCore()
 
-    local raw = Reset.Read(Types.MODDATA_KEY)
-    if type(raw) == "table"
-        and next(raw) ~= nil
-    then
-        local retired = Reset.Write(
-            Types.MODDATA_KEY,
-            {}
-        )
-        if not retired then
-            return false, "legacy_discovery_retire_failed"
+    if ImportSource.HasData("discovery") then
+        local retired, retireReason =
+            ImportSource.Retire("discovery")
+        if not retired
+            and retireReason ~= "already_empty"
+        then
+            return false, "discovery_import_source_retire_failed"
         end
     end
 
@@ -387,10 +384,10 @@ function Adapter.ActivateCutover()
 
     Adapter.LastCutover = {
         accepted = true,
-        importedLegacy = changed == true,
+        importedPreSurvivorWorld = changed == true,
     }
     return true, changed
-        and "legacy_cutover_complete"
+        and "import_cutover_complete"
         or "cutover_active"
 end
 

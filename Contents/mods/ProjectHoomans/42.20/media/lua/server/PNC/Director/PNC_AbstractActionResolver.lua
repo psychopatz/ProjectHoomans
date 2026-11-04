@@ -6,7 +6,7 @@ PNC = PNC or {}
 PNC.AbstractActions = PNC.AbstractActions or {}
 
 local Actions = PNC.AbstractActions
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Groups = PNC.AbstractGroups
 local Locations = PNC.AbstractLocations
 local Config = PNC.DirectorConfig

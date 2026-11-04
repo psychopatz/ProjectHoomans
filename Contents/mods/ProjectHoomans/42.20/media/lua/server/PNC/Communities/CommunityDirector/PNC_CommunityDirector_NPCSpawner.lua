@@ -44,6 +44,11 @@ function H.SpawnCommunityMembers(
     createdCommunity
 )
     local count = H.NormalizedGroupSize(spec.groupSize)
+    local plannedActorIDs = type(spec.actorIDs) == "table"
+        and spec.actorIDs or nil
+    if plannedActorIDs and #plannedActorIDs ~= count then
+        return nil, nil, nil, nil, "actor_plan_size_mismatch"
+    end
     local requestLive = presenceMode == "live"
         or presenceMode == "auto"
             and siteLoaded
@@ -73,6 +78,7 @@ function H.SpawnCommunityMembers(
     for index = 1, count do
         local point = points[index]
         local spawnDefinition = {
+            id = plannedActorIDs and plannedActorIDs[index] or nil,
             tacticalClass = "neutral",
             archetypeID = defaultArchetypeID,
             x = point.x,
@@ -105,6 +111,7 @@ function H.SpawnCommunityMembers(
         }
         if index == 1 and uniqueDefinition then
             local resolved = PNC.Core.DeepCopy(uniqueDefinition)
+            resolved.id = spawnDefinition.id
             resolved.tacticalClass = spawnDefinition.tacticalClass
             resolved.x = spawnDefinition.x
             resolved.y = spawnDefinition.y

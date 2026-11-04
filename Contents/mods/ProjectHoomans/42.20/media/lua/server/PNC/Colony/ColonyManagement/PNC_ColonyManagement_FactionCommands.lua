@@ -19,7 +19,7 @@ function Management.SetFactionEmblemForPlayer(player, args)
     end
     local ok, reason, faction = PNC.Factions.SetPlayerFactionEmblem(
         player, args.emblem)
-    if ok == true and PNC.Factions.Save then PNC.Factions.Save() end
+    if ok == true and PNC.Factions.Commit then PNC.Factions.Commit() end
     return Management.BuildSnapshot(player), {
         ok = ok == true, reason = reason,
         action = "faction_emblem",
@@ -37,7 +37,7 @@ function Management.RenameFactionForPlayer(player, args)
     local ok, reason, faction = PNC.Factions.SetPlayerFactionName(
         player, args.name
     )
-    if ok == true and PNC.Factions.Save then PNC.Factions.Save() end
+    if ok == true and PNC.Factions.Commit then PNC.Factions.Commit() end
     return Management.BuildSnapshot(player), {
         ok = ok == true,
         reason = reason,
@@ -68,8 +68,8 @@ function Management.RenameForPlayer(player, args)
         communityID,
         args.name
     )
-    if ok == true and PNC.Communities.Save then
-        PNC.Communities.Save()
+    if ok == true and PNC.Communities.Commit then
+        PNC.Communities.Commit()
         if GlobalModData and GlobalModData.save then
             GlobalModData.save()
         end

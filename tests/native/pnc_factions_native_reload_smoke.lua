@@ -7,7 +7,6 @@ local MARKER = "faction-restart"
 
 PZHarnessNativeTest = function()
     local factions = PNC and PNC.Factions or nil
-    local constants = PNC and PNC.FactionConstants or nil
     PZHarness.assertTrue(
         factions and factions.Registry and factions.Get,
         "native Factions API was not available after the JVM restart"
@@ -16,11 +15,6 @@ PZHarnessNativeTest = function()
         factions.Loaded == true,
         "native Factions registry was not loaded after the JVM restart"
     )
-    PZHarness.assertTrue(
-        constants and constants.REGISTRY_MODDATA_KEY,
-        "native FactionConstants registry key was not available"
-    )
-
     local loaded = factions.Get(FACTION_ID)
     PZHarness.assertTrue(
         type(loaded) == "table",
@@ -58,14 +52,18 @@ PZHarnessNativeTest = function()
         "native Factions archetype index did not reload the faction"
     )
 
-    local raw = ModData.get(constants.REGISTRY_MODDATA_KEY)
-    local rawFaction = raw and raw.byID and raw.byID[FACTION_ID]
+    local coreAuthority = PNC and PNC.CoreSurvivorWorldAuthority or nil
+    local coreRegistry = coreAuthority and coreAuthority.Registry or nil
+    local coreFaction = coreRegistry and coreRegistry:GetFaction(FACTION_ID) or nil
     PZHarness.assertTrue(
-        type(rawFaction) == "table"
-            and rawFaction.id == FACTION_ID
-            and rawFaction.name == FACTION_NAME
-            and rawFaction.tags
-            and rawFaction.tags.nativeHarness == MARKER,
-        "native faction ModData was not reloaded"
+        type(coreFaction) == "table"
+            and coreFaction.id == FACTION_ID
+            and coreFaction.name == FACTION_NAME,
+        "Core SurvivorWorld faction did not survive restart"
+    )
+    local retired = ModData.get("PNC_Factions")
+    PZHarness.assertTrue(
+        retired == nil or next(retired) == nil,
+        "retired PNC faction root reappeared after restart"
     )
 end

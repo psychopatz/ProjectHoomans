@@ -1,5 +1,5 @@
--- Server-authoritative bridge from persistent factions to tactical behavior.
--- Persistent faction identity remains canonical; tactical fields are derived.
+-- Server-authoritative bridge from canonical Core factions to Hoomans tactical behavior.
+-- Core faction identity is canonical; tactical fields are derived Hoomans state.
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode()
 then

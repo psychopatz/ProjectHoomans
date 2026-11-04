@@ -56,7 +56,7 @@ PNC.WorldDiscovery = {
 require "PNC/WorldDiscovery/PNC_WorldDiscovery_Storage"
 
 local Types = PNC.WorldDiscoveryTypes
-roots[Types.MODDATA_KEY] = {
+roots["PNC_WorldDiscovery_v1"] = {
     schemaVersion = Types.SCHEMA_VERSION,
     revision = 4,
     players = {
@@ -145,7 +145,7 @@ T.equal(
     "arrival timestamp changed during migration"
 )
 T.equal(
-    next(roots[Types.MODDATA_KEY]),
+    next(roots["PNC_WorldDiscovery_v1"]),
     nil,
     "legacy PNC discovery root was not retired"
 )
@@ -203,7 +203,7 @@ T.equal(
     "compatibility mutation did not update Core discovery"
 )
 T.equal(
-    next(roots[Types.MODDATA_KEY]),
+    next(roots["PNC_WorldDiscovery_v1"]),
     nil,
     "compatibility save resurrected legacy discovery root"
 )

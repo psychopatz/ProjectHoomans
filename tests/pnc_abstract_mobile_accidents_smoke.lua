@@ -18,7 +18,7 @@ PNC = {
         return kind == "REFUGEE" and 100 or 1
     end },
     AbstractScavengeResolver = { Hash = function() return 0 end },
-    AbstractWorldStore = {
+    HoomansWorldView = {
         WorldAgeHours = function() return 2 end,
         Touch = function() end,
         Emit = function() end,

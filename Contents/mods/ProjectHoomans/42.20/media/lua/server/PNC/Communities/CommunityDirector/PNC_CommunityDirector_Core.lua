@@ -132,6 +132,7 @@ function H.CreateCommunity(
     local reason
     local community
     ok, reason, community = Communities.Create({
+        id = spec.communityID,
         factionID = faction.id,
         name = name,
         mode = mode,

@@ -1,7 +1,6 @@
 local Config = PNC.DirectorConfig
 
 Config.SCHEMA_VERSION = 1
-Config.MODDATA_KEY = "PNC_AbstractWorld_v1"
 Config.LOCATION_CELL_SIZE = 100
 Config.DESTINATION_QUERY_RADIUS = 900
 Config.DESTINATION_CANDIDATE_LIMIT = 16

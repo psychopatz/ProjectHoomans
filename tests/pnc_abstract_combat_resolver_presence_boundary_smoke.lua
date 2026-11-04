@@ -27,7 +27,7 @@ for i = 1, #providers do
 end
 
 PNC = {
-    DirectorConfig = {}, AbstractWorldStore = {},
+    DirectorConfig = {}, HoomansWorldView = {},
     AbstractCombatProfile = {}, AbstractBehaviorProfile = {},
     AbstractCasualtyResolver = {}, AbstractRetreatResolver = {},
     AbstractGroups = {},

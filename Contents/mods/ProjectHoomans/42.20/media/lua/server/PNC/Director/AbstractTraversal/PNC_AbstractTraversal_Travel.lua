@@ -3,7 +3,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 local Traversal = PNC.AbstractTraversal
 local H = Traversal.Internal
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Groups = PNC.AbstractGroups
 local Locations = PNC.AbstractLocations
 local Encounters = PNC.AbstractEncounters

@@ -6,7 +6,7 @@ PNC = PNC or {}
 PNC.WorldDirector = PNC.WorldDirector or {}
 
 local Director = PNC.WorldDirector
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Groups = PNC.AbstractGroups
 local Locations = PNC.AbstractLocations
 local Traversal = PNC.AbstractTraversal

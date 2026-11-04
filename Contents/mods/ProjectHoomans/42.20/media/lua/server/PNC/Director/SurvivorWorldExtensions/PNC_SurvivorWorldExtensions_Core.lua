@@ -111,18 +111,6 @@ function Extensions.MarkDirty(reason)
     return true
 end
 
-function Extensions.LegacyRootHasData(key)
-    local raw = Reset.Read(key)
-    return type(raw) == "table" and not Reset.IsEmpty(raw)
-end
-
-function Extensions.RetireLegacyRoot(key)
-    if not Extensions.LegacyRootHasData(key) then
-        return false, "already_empty"
-    end
-    return Reset.Write(key, {})
-end
-
 function Extensions.FlushCore()
     local authority = PNC.CoreSurvivorWorldAuthority
     local world = authority and authority.World
@@ -145,8 +133,8 @@ function Extensions.Save()
     local extensionDirty = Extensions.Dirty
         or (PNC.Factions and PNC.Factions.Dirty == true)
         or (PNC.Communities and PNC.Communities.Dirty == true)
-        or (PNC.AbstractWorldStore
-            and PNC.AbstractWorldStore.Dirty == true)
+        or (PNC.HoomansWorldView
+            and PNC.HoomansWorldView.Dirty == true)
         or false
     local authority = PNC.CoreSurvivorWorldAuthority
     local world = authority and authority.World
@@ -185,8 +173,8 @@ function Extensions.Save()
     Extensions.Dirty = false
     if PNC.Factions then PNC.Factions.Dirty = false end
     if PNC.Communities then PNC.Communities.Dirty = false end
-    if PNC.AbstractWorldStore then
-        PNC.AbstractWorldStore.Dirty = false
+    if PNC.HoomansWorldView then
+        PNC.HoomansWorldView.Dirty = false
     end
     return true, "saved"
 end

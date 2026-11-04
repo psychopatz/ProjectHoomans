@@ -7,21 +7,15 @@ local MARKER = "faction-restart"
 
 PZHarnessNativeTest = function()
     local factions = PNC and PNC.Factions or nil
-    local constants = PNC and PNC.FactionConstants or nil
     PZHarness.assertTrue(
         factions and factions.Create and factions.Get
-            and factions.Save and factions.Load,
+            and factions.Commit and factions.Load,
         "native Factions API was not available"
     )
     PZHarness.assertTrue(
         factions and factions.Loaded == true,
         "native Factions registry was not loaded before the test"
     )
-    PZHarness.assertTrue(
-        constants and constants.REGISTRY_MODDATA_KEY,
-        "native FactionConstants registry key was not available"
-    )
-
     factions.IDGenerator = function()
         return FACTION_ID
     end
@@ -105,15 +99,19 @@ PZHarnessNativeTest = function()
         "native Factions registry remained dirty after commit"
     )
 
-    local raw = ModData.get(constants.REGISTRY_MODDATA_KEY)
-    local rawFaction = raw and raw.byID and raw.byID[FACTION_ID]
+    local coreAuthority = PNC and PNC.CoreSurvivorWorldAuthority or nil
+    local coreRegistry = coreAuthority and coreAuthority.Registry or nil
+    local coreFaction = coreRegistry and coreRegistry:GetFaction(FACTION_ID) or nil
     PZHarness.assertTrue(
-        type(rawFaction) == "table"
-            and rawFaction.id == FACTION_ID
-            and rawFaction.name == FACTION_NAME
-            and rawFaction.tags
-            and rawFaction.tags.nativeHarness == MARKER,
-        "native faction ModData did not contain the committed faction"
+        type(coreFaction) == "table"
+            and coreFaction.id == FACTION_ID
+            and coreFaction.name == FACTION_NAME,
+        "Core SurvivorWorld did not contain the committed faction"
+    )
+    local retired = ModData.get("PNC_Factions")
+    PZHarness.assertTrue(
+        retired == nil or next(retired) == nil,
+        "retired PNC faction root became active again"
     )
 
     PZHarness.assertTrue(

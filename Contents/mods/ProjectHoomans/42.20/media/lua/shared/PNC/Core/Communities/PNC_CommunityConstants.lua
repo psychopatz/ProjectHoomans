@@ -5,7 +5,6 @@ PNC.CommunityConstants = PNC.CommunityConstants or {}
 
 local Constants = PNC.CommunityConstants
 
-Constants.REGISTRY_MODDATA_KEY = "PNC_Communities"
 Constants.REGISTRY_SCHEMA_VERSION = 2
 Constants.RECORD_SCHEMA_VERSION = 2
 Constants.SITE_SCHEMA_VERSION = 1

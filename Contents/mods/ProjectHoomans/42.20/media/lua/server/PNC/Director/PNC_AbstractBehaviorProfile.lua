@@ -7,7 +7,7 @@ PNC.AbstractBehaviorProfile = PNC.AbstractBehaviorProfile or {}
 
 local Behavior = PNC.AbstractBehaviorProfile
 local Config = PNC.DirectorConfig
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Groups = PNC.AbstractGroups
 local ResourceNeeds = PNC.AbstractResourceNeeds
 

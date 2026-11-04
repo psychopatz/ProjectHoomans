@@ -6,8 +6,7 @@ local Config = PNC.DirectorConfig.Population
 local Sectors = PNC.PopulationSectors
 local Candidates = PNC.SettlementCandidates
 local Locations = PNC.AbstractLocations
-local Store = PNC.AbstractWorldStore
-local Identity = PNC.PopulationIdentity
+local Store = PNC.HoomansWorldView
 
 local function factionScore(faction)
     local weight = Config.SETTLEMENT_FACTION_WEIGHTS[faction.archetypeID]

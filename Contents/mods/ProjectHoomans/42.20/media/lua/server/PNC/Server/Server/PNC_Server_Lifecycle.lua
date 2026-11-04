@@ -45,8 +45,8 @@ function H.OnServerStarted()
     if PNC.LumberService and PNC.LumberService.Load then
         PNC.LumberService.Load(true)
     end
-    if PNC.AbstractWorldStore and PNC.AbstractWorldStore.Load then
-        PNC.AbstractWorldStore.Load()
+    if PNC.HoomansWorldView and PNC.HoomansWorldView.Load then
+        PNC.HoomansWorldView.Load()
     end
     if PNC.UniqueNPCRegistry and PNC.UniqueNPCRegistry.Reconcile then
         PNC.UniqueNPCRegistry.Reconcile()

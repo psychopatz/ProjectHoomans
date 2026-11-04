@@ -8,7 +8,7 @@ PNC.AbstractCombatProfile = PNC.AbstractCombatProfile or {}
 local Builder = PNC.AbstractCombatProfile
 local Groups = PNC.AbstractGroups
 local Config = PNC.DirectorConfig
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 
 local function clamp(value, minimum, maximum)
     return math.max(minimum, math.min(maximum, tonumber(value) or minimum))

@@ -8,7 +8,7 @@ PNC.PopulationDirector.Internal =
 
 local Director = PNC.PopulationDirector
 local Config = PNC.DirectorConfig.Population
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Sectors = PNC.PopulationSectors
 local Log = PNC.PopulationLog
 

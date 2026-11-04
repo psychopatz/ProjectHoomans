@@ -52,6 +52,11 @@ function Director.GenerateForFaction(factionID, spec)
     )
     if not site then return false, siteReason end
     local count = H.GroupSize(spec.groupSize)
+    local plannedActorIDs = type(spec.actorIDs) == "table"
+        and spec.actorIDs or nil
+    if plannedActorIDs and #plannedActorIDs ~= count then
+        return false, "actor_plan_size_mismatch"
+    end
     -- An optional per-group role sequence (validated against the archetype) so a
     -- caller can generate a group that is not the archetype's default roster,
     -- for example a trading caravan that roams without its faction leader.
@@ -112,6 +117,7 @@ function Director.GenerateForFaction(factionID, spec)
     for index = 1, count do
         local point = points[index]
         local spawnDefinition = {
+            id = plannedActorIDs and plannedActorIDs[index] or nil,
             tacticalClass = "neutral",
             archetypeID = defaultArchetypeID,
             x = point.x,
@@ -135,6 +141,7 @@ function Director.GenerateForFaction(factionID, spec)
         }
         if index == 1 and uniqueDefinition then
             local resolved = Core.DeepCopy(uniqueDefinition)
+            resolved.id = spawnDefinition.id
             resolved.tacticalClass = spawnDefinition.tacticalClass
             resolved.x = spawnDefinition.x
             resolved.y = spawnDefinition.y
@@ -223,7 +230,10 @@ function Director.GenerateForFaction(factionID, spec)
         Factions.SetLeader(faction.id, created[1].id, at)
     end
     if PNC.AbstractGroups and PNC.AbstractGroups.ImportMobileFaction then
-        PNC.AbstractGroups.ImportMobileFaction(Factions.Get(faction.id))
+        PNC.AbstractGroups.ImportMobileFaction(
+            Factions.Get(faction.id),
+            { groupID = spec.groupID }
+        )
     end
     local ids = {}
     for _, record in ipairs(created) do

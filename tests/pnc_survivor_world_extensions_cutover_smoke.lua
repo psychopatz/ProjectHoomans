@@ -226,7 +226,7 @@ PNC.Communities = {
     Internal = {},
 }
 
-PNC.AbstractWorldStore = {
+PNC.HoomansWorldView = {
     Registry = PNC.AbstractWorldTypes.NormalizeRegistry({
         revision = 12,
         locationsByID = {
@@ -326,17 +326,17 @@ PNC.AbstractLocations = {
     end,
 }
 
-roots[PNC.FactionConstants.REGISTRY_MODDATA_KEY] = {
+roots["PNC_Factions"] = {
     schemaVersion = PNC.FactionConstants.REGISTRY_SCHEMA_VERSION,
-    legacy = true,
+    importFixture = true,
 }
-roots[PNC.CommunityConstants.REGISTRY_MODDATA_KEY] = {
+roots["PNC_Communities"] = {
     schemaVersion = PNC.CommunityConstants.REGISTRY_SCHEMA_VERSION,
-    legacy = true,
+    importFixture = true,
 }
-roots[PNC.DirectorConfig.MODDATA_KEY] = {
+roots["PNC_AbstractWorld_v1"] = {
     schemaVersion = PNC.DirectorConfig.SCHEMA_VERSION,
-    legacy = true,
+    importFixture = true,
 }
 
 PNC.CoreSurvivorWorldAuthority = {
@@ -345,7 +345,7 @@ PNC.CoreSurvivorWorldAuthority = {
     RefreshStatus = function()
         return {
             active = true,
-            needsMigration = false,
+            needsImport = false,
         }
     end,
 }
@@ -425,22 +425,22 @@ T.truthy(locationExt.occupants,
 
 T.equal(
     next(roots[
-        PNC.FactionConstants.REGISTRY_MODDATA_KEY
+        "PNC_Factions"
     ]),
     nil,
-    "legacy faction root retired"
+    "faction import source retired"
 )
 T.equal(
     next(roots[
-        PNC.CommunityConstants.REGISTRY_MODDATA_KEY
+        "PNC_Communities"
     ]),
     nil,
-    "legacy community root retired"
+    "community import source retired"
 )
 T.equal(
-    next(roots[PNC.DirectorConfig.MODDATA_KEY]),
+    next(roots["PNC_AbstractWorld_v1"]),
     nil,
-    "legacy abstract-world root retired"
+    "abstract-world import source retired"
 )
 
 T.equal(PNC.Factions.Registry.byID.faction_ext.name,
@@ -474,7 +474,7 @@ T.equal(rebuiltCommunity.morale, -12,
     "community morale scale preserved")
 
 local rebuiltGroup =
-    PNC.AbstractWorldStore.Registry.groupsByID.agroup_ext
+    PNC.HoomansWorldView.Registry.groupsByID.agroup_ext
 T.truthy(rebuiltGroup.journey,
     "Core group journey restored to PNC view")
 T.truthy(rebuiltGroup.combatProfile,
@@ -483,7 +483,7 @@ T.truthy(rebuiltGroup.behaviorProfile,
     "group behavior extension restored")
 
 local rebuiltLocation =
-    PNC.AbstractWorldStore.Registry.locationsByID.aloc_ext
+    PNC.HoomansWorldView.Registry.locationsByID.aloc_ext
 T.equal(rebuiltLocation.x, 100,
     "generic location position restored from Core")
 T.truthy(rebuiltLocation.sourceSite,
@@ -492,22 +492,22 @@ T.truthy(rebuiltLocation.sourceSite,
 T.truthy(
     roots["PsychopatzCore.SurvivorWorld"]
         and roots["PsychopatzCore.SurvivorWorld"].registry,
-    "canonical Core world persisted before legacy retirement"
+    "canonical Core world persisted before import-source retirement"
 )
 T.falsy(PNC.Factions.Dirty, "faction view clean after cutover")
 T.falsy(PNC.Communities.Dirty,
     "community view clean after cutover")
-T.falsy(PNC.AbstractWorldStore.Dirty,
+T.falsy(PNC.HoomansWorldView.Dirty,
     "abstract view clean after cutover")
 
--- Simulate the next server load: legacy generic roots are empty, Core and the
+-- Simulate the next server load: pre-SurvivorWorld import sources are empty, Core and the
 -- bounded Hoomans extension root remain. The compatibility views must rebuild
 -- entirely from those two authorities without recapturing stale PNC state.
 PNC.Factions.Registry =
     PNC.FactionTypes.NormalizeFactionRegistry(nil)
 PNC.Communities.Registry =
     PNC.CommunityTypes.NormalizeRegistry(nil)
-PNC.AbstractWorldStore.Registry =
+PNC.HoomansWorldView.Registry =
     PNC.AbstractWorldTypes.NormalizeRegistry(nil)
 Extensions.Active = false
 Extensions.Dirty = false
@@ -534,13 +534,13 @@ T.equal(
     "reload restores community extension state"
 )
 T.truthy(
-    PNC.AbstractWorldStore.Registry.groupsByID
+    PNC.HoomansWorldView.Registry.groupsByID
         .agroup_ext.combatProfile,
     "reload restores group extension state"
 )
 T.equal(
     next(roots[
-        PNC.FactionConstants.REGISTRY_MODDATA_KEY
+        "PNC_Factions"
     ]),
     nil,
     "reload does not resurrect retired faction root"

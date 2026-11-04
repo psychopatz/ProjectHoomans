@@ -628,8 +628,10 @@ T.truthy(CommunityTypes.AreEqual(
     CommunityTypes.NormalizeRegistry(migratedRegistry)
 ), "community migration idempotent")
 
-T.truthy(PNC.Communities.Save(),
-    "community registry saves")
+local communitySnapshot = CommunityTypes.NormalizeRegistry(
+    PNC.Core.DeepCopy(PNC.Communities.Registry)
+)
+validatePersistedValue(communitySnapshot)
 local partial = newNPC("npc_partial_reference")
 partial.affiliation = FactionTypes.NormalizeAffiliation({
     factionID = refugees.id,
@@ -641,14 +643,19 @@ partial.affiliation = FactionTypes.NormalizeAffiliation({
     communityJoinedAt = 190,
 })
 local partialPresence = partial.presenceRevision
-T.truthy(PNC.Communities.Load(),
-    "community registry reloads")
-T.equal(partial.affiliation.communityID, nil,
-    "missing partial community reference clears")
+PNC.Communities.Registry = CommunityTypes.NewRegistry()
+PNC.Communities.Loaded = false
+T.truthy(PNC.Communities.LoadRaw(communitySnapshot),
+    "community snapshot reloads")
+T.equal(partial.affiliation.communityID, "community_missing",
+    "detached snapshot load does not run live-world reconciliation")
 T.equal(partial.presenceRevision, partialPresence,
-    "migration leaves presence revision")
+    "detached snapshot load leaves presence revision")
 T.equal(PNC.Communities.Get(campID).name,
-    "Highway Camp", "community registry persists on reload")
+    "Highway Camp", "community compatibility view rebuilds")
+PNC.Communities.Internal.reconcileNPCReferences()
+T.equal(partial.affiliation.communityID, nil,
+    "live-world reconciliation clears missing community reference")
 
 -- Deterministic index rebuild and invariant detection/repair.
 local campRecord = PNC.Communities.Registry.byID[campID]

@@ -65,8 +65,18 @@ function Factions.Create(spec)
     if not Archetypes.Exists(spec.archetypeID) then
         return false, "unknown_archetype"
     end
-    id = Factions.GenerateID()
-    if not id then return false, "id_generation_failed" end
+    if spec.id ~= nil then
+        id = tostring(spec.id)
+        if not Types.IsValidFactionID(id) then
+            return false, "invalid_id"
+        end
+        if Factions.Registry.byID[id] then
+            return false, "faction_exists"
+        end
+    else
+        id = Factions.GenerateID()
+        if not id then return false, "id_generation_failed" end
+    end
     createdAt = Internal.finiteTimestamp(spec.createdAt, 0)
     faction = Types.NewFaction({
         id = id,

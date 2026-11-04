@@ -44,7 +44,7 @@ PNC = {
     Registry = {
         Get = function(id) return registry[tostring(id)] end,
     },
-    AbstractWorldStore = { Registry = { encounters = {} } },
+    HoomansWorldView = { Registry = { encounters = {} } },
 }
 PNC.FactionConstants.VALID_MOBILE_TRAVEL_PURPOSES = {
     settlement_admission = true,
@@ -363,7 +363,7 @@ T.equal(registry.npc_one.affiliation.factionID, "faction_mobile",
     "sandbox join chance can disable AI admission")
 sandboxChance = 100
 
-PNC.AbstractWorldStore.Registry.encounters[1] = {
+PNC.HoomansWorldView.Registry.encounters[1] = {
     id = "report_1",
     outcome = "QUEUED",
 }
@@ -421,7 +421,7 @@ PNC.AbstractGroups = {
 }
 T.equal(Service.PumpPendingArrivals(at, 4), 0,
     "queued encounters hold the admission retry")
-PNC.AbstractWorldStore.Registry.encounters[1].outcome = "IGNORE"
+PNC.HoomansWorldView.Registry.encounters[1].outcome = "IGNORE"
 T.equal(Service.PumpPendingArrivals(at, 4), 1,
     "resolved non-hostile encounters release the admission retry")
 T.truthy(factions.faction_mobile.mobile.visit,

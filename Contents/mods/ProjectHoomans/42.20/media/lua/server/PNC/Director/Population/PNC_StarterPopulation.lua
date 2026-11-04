@@ -7,7 +7,7 @@ PNC.StarterPopulation = PNC.StarterPopulation or {}
 
 local Starter = PNC.StarterPopulation
 local Config = PNC.DirectorConfig.Population
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Sectors = PNC.PopulationSectors
 local Candidates = PNC.SettlementCandidates
 local Queue = PNC.GenerationQueue

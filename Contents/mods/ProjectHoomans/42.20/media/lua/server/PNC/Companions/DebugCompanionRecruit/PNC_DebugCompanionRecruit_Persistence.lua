@@ -36,9 +36,9 @@ end
 -- first-colony naming prompt from stale ModData.
 function H.SaveRecruitment()
     if Registry and Registry.Save then Registry.Save() end
-    if Factions and Factions.Save then Factions.Save() end
-    if PNC.Communities and PNC.Communities.Save then
-        PNC.Communities.Save()
+    if Factions and Factions.Commit then Factions.Commit() end
+    if PNC.Communities and PNC.Communities.Commit then
+        PNC.Communities.Commit()
     end
     if GlobalModData and GlobalModData.save then GlobalModData.save() end
 end

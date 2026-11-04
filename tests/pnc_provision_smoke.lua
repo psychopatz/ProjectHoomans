@@ -389,7 +389,7 @@ PNC.Factions.SetProvisionPolicy = function(id, value)
     faction.provision = deepCopy(value)
     return true, "updated"
 end
-PNC.Factions.Save = function() saved = saved + 1 return true end
+PNC.Factions.Commit = function() saved = saved + 1 return true end
 PNC.ProvisionScheduler.MarkFactionDirty = function() return 0 end
 GlobalModData = { save = function() end }
 T.load(ROOT .. "server/PNC/Provision/PNC_ProvisionPolicyService.lua")

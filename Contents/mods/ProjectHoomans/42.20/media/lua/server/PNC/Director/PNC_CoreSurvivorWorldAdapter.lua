@@ -24,9 +24,9 @@ function Adapter.EnsureCanonical()
     if not current then return nil, reason end
 
     local status = Authority.RefreshStatus()
-    if status and status.needsMigration == true then
-        current, reason = Authority.ImportLegacy({
-            reason = "project_hoomans_s6_cutover",
+    if status and status.needsImport == true then
+        current, reason = Authority.ImportPreSurvivorWorld({
+            reason = "project_hoomans_survivor_world_cutover",
         })
         if not current then return nil, reason end
     end

@@ -9,7 +9,7 @@ PNC.PopulationDirector.Internal =
 local Director = PNC.PopulationDirector
 local Internal = Director.Internal
 local Config = PNC.DirectorConfig.Population
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Sectors = PNC.PopulationSectors
 local Queue = PNC.GenerationQueue
 local Log = PNC.PopulationLog
@@ -50,12 +50,12 @@ local function processRequest(kind, now, remainingNPCs)
         or plan.memberCount
     if needed > remainingNPCs then
         if kind == "SETTLEMENT" then
-            PNC.SettlementCandidates.Release(plan.locationId, plan.generationId)
+            PNC.SettlementCandidates.Release(plan.locationID, plan.generationID)
         end
         Queue.Retry(request, now)
         Sectors.SetSuppression(request.sectorId, kind, "NPC_CREATION_RATE_LIMIT")
         Log.Info("GENERATION_DEFERRED", { kind = kind,
-            sectorId = request.sectorId, generationId = plan.generationId,
+            sectorId = request.sectorId, generationID = plan.generationID,
             reason = "NPC_CREATION_RATE_LIMIT", needed = needed,
             remaining = remainingNPCs })
         return 1, remainingNPCs
@@ -72,9 +72,9 @@ local function processRequest(kind, now, remainingNPCs)
             Starter.MarkCommitted(result.community, now)
         end
         Log.Info(kind .. "_GENERATION_COMMITTED", { sectorId = request.sectorId,
-            generationId = plan.generationId, seed = plan.seed,
-            archetype = plan.archetype or plan.factionArchetypeId,
-            entityId = result.group and result.group.id
+            generationID = plan.generationID, seed = plan.seed,
+            archetype = plan.groupType or plan.factionArchetypeID,
+            entityID = result.group and result.group.id
                 or result.community and result.community.id,
             createdNPCs = created, liveNPCs = result.liveNPCs or 0,
             abstractNPCs = result.abstractNPCs or 0,
@@ -83,13 +83,13 @@ local function processRequest(kind, now, remainingNPCs)
     end
     Sectors.SetSuppression(request.sectorId, kind, result.reason)
     Sectors.AddHistory(kind .. "_GENERATION_FAILED", {
-        sectorId = request.sectorId, generationId = plan.generationId,
+        sectorId = request.sectorId, generationID = plan.generationID,
         reason = result.reason, seed = plan.seed }, now)
     Director.Metrics.queueFailures = Director.Metrics.queueFailures + 1
     Store.Emit(kind .. "_GENERATION_FAILED", { sectorId = request.sectorId,
-        generationId = plan.generationId, reason = result.reason })
+        generationID = plan.generationID, reason = result.reason })
     Log.Warn("GENERATION_COMMIT_FAILED", { kind = kind,
-        sectorId = request.sectorId, generationId = plan.generationId,
+        sectorId = request.sectorId, generationID = plan.generationID,
         seed = plan.seed, reason = result.reason })
     return 1, remainingNPCs
 end

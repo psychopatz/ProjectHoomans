@@ -8,25 +8,21 @@ PNC.PopulationSectorInternal = PNC.PopulationSectorInternal or {}
 local Sectors = PNC.PopulationSectors
 local H = PNC.PopulationSectorInternal
 local Config = PNC.DirectorConfig.Population
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Core = PNC.Core
+local Generation = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldGeneration"
 
 function Sectors.NextGenerationID(kind)
     local data = H.Persistent()
     local serial = data.nextGenerationSerial
     data.nextGenerationSerial = serial + 1
     Store.Touch("population_generation_sequence")
-    return "POP_" .. tostring(kind or "ENTITY") .. "_"
-        .. string.format("%07d", serial), serial
+    return Generation.GenerationID(kind, serial), serial
 end
 
 function Sectors.Seed(text)
-    local value = 5381
-    text = tostring(text or "")
-    for index = 1, #text do
-        value = (value * 33 + string.byte(text, index)) % 2147483647
-    end
-    return value
+    return Generation.SeedText(text)
 end
 
 function H.EngineSeedString()
@@ -60,29 +56,17 @@ end
 
 function Sectors.GenerationSeed(kind, sectorID, serial, qualifier)
     local worldSeed = Sectors.WorldSeed()
-    return Sectors.Seed(table.concat({ tostring(worldSeed),
-        tostring(kind or "ENTITY"), tostring(sectorID or ""),
-        tostring(serial or 0), tostring(qualifier or "") }, ":"))
+    return Generation.GenerationSeed(
+        worldSeed,
+        kind,
+        sectorID,
+        serial,
+        qualifier
+    )
 end
 
 function Sectors.WeightedChoice(weights, seed)
-    local keys, total = {}, 0
-    for key, value in pairs(type(weights) == "table" and weights or {}) do
-        value = math.max(0, tonumber(value) or 0)
-        if value > 0 then
-            keys[#keys + 1] = tostring(key)
-            total = total + value
-        end
-    end
-    if total <= 0 then return nil end
-    table.sort(keys)
-    local roll = (Sectors.Seed(tostring(seed) .. ":WEIGHTED_ROLL")
-        % 1000000) / 1000000 * total
-    for _, key in ipairs(keys) do
-        roll = roll - math.max(0, tonumber(weights[key]) or 0)
-        if roll <= 0 then return key end
-    end
-    return keys[#keys]
+    return Generation.WeightedChoice(weights, seed)
 end
 
 function Sectors.IsCommitted(generationID)

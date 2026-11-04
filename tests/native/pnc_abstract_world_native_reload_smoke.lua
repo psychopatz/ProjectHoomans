@@ -4,10 +4,10 @@
 local DEFINITION_ID = "pzharness:abstract-world-restart"
 
 PZHarnessNativeTest = function()
-    local store = PNC and PNC.AbstractWorldStore or nil
+    local store = PNC and PNC.HoomansWorldView or nil
     PZHarness.assertTrue(
         store and store.Registry and store.Loaded == true,
-        "native AbstractWorldStore was not loaded after the JVM restart"
+        "native HoomansWorldView was not loaded after the JVM restart"
     )
 
     local loaded = store
@@ -15,7 +15,7 @@ PZHarnessNativeTest = function()
         and store.Registry.uniqueNPCsByID[DEFINITION_ID]
     PZHarness.assertTrue(
         type(loaded) == "table",
-        "native AbstractWorldStore entry was not reloaded"
+        "native HoomansWorldView entry was not reloaded"
     )
     PZHarness.assertEqual(
         loaded and loaded.definitionId,
@@ -37,15 +37,22 @@ PZHarnessNativeTest = function()
         "native abstract-world revision did not survive the JVM restart"
     )
 
-    local raw = ModData.get(PNC.DirectorConfig.MODDATA_KEY)
-    local rawEntry = raw
-        and raw.uniqueNPCsByID
-        and raw.uniqueNPCsByID[DEFINITION_ID]
+    local extensionKey = PNC.SurvivorWorldExtensions
+        and PNC.SurvivorWorldExtensions.STORAGE_KEY
+    local raw = extensionKey and ModData.get(extensionKey) or nil
+    local rawEntry = raw and raw.abstract
+        and raw.abstract.uniqueNPCsByID
+        and raw.abstract.uniqueNPCsByID[DEFINITION_ID]
     PZHarness.assertTrue(
         type(rawEntry) == "table"
             and rawEntry.definitionId == DEFINITION_ID
             and rawEntry.status == "reserved"
             and rawEntry.identitySeed == 6262,
-        "native abstract-world ModData entry was not reloaded"
+        "Hoomans extension entry was not reloaded"
+    )
+    local retired = ModData.get("PNC_AbstractWorld_v1")
+    PZHarness.assertTrue(
+        retired == nil or next(retired) == nil,
+        "retired abstract-world root reappeared after restart"
     )
 end

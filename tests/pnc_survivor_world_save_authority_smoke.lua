@@ -1,7 +1,7 @@
 local T = require "tests/support/test"
 
 PsychopatzCore = nil
-local legacyWrites = {}
+local retiredRootWrites = {}
 local extensionSaves = 0
 local dirtyReasons = {}
 
@@ -23,12 +23,12 @@ local reset = {
     Check = function() return "empty_state" end,
     Mark = function() end,
     Write = function(key)
-        legacyWrites[#legacyWrites + 1] = key
+        retiredRootWrites[#retiredRootWrites + 1] = key
         return true, "written"
     end,
 }
 
--- Faction public Save must delegate once cutover is active.
+-- Faction view commit must delegate once cutover is active.
 PNC = {
     Core = {},
     Factions = {
@@ -57,12 +57,12 @@ PNC = {
     SurvivorWorldExtensions = extensions(),
 }
 T.load("ProjectHoomans", "server",
-    "PNC/Factions/FactionService/PNC_FactionService_RegistryPersistence.lua")
-local saved, reason = PNC.Factions.Save()
+    "PNC/Factions/FactionService/PNC_FactionService_WorldView.lua")
+local saved, reason = PNC.Factions.Commit()
 T.truthy(saved, reason)
 T.equal(reason, "extension_saved", "faction save redirect")
 
--- Community public Save must delegate too.
+-- Community view commit must delegate too.
 PNC = {
     Core = {},
     Communities = {
@@ -96,54 +96,22 @@ PNC = {
     SurvivorWorldExtensions = extensions(),
 }
 T.load("ProjectHoomans", "server",
-    "PNC/Communities/CommunityService/PNC_CommunityService_Persistence.lua")
-saved, reason = PNC.Communities.Save()
+    "PNC/Communities/CommunityService/PNC_CommunityService_WorldView.lua")
+saved, reason = PNC.Communities.Commit()
 T.truthy(saved, reason)
 T.equal(reason, "extension_saved", "community save redirect")
 
--- Abstract-world public Save follows the same boundary.
-PNC = {
-    Core = {
-        IsAuthority = function() return true end,
-        DeepCopy = function(value) return value end,
-    },
-    AbstractWorldTypes = {
-        NewRegistry = function()
-            return {
-                revision = 0,
-                groupsByID = {},
-                locationsByID = {},
-                encounters = {},
-            }
-        end,
-        NormalizeRegistry = function(value) return value end,
-    },
-    DirectorConfig = {
-        MODDATA_KEY = "PNC_AbstractWorld_v1",
-        SCHEMA_VERSION = 1,
-    },
-    ModDataStore = reset,
-    SurvivorWorldExtensions = extensions(),
-}
-T.load("ProjectHoomans", "server",
-    "PNC/Director/PNC_AbstractWorldStore.lua")
-PNC.AbstractWorldStore.Loaded = true
-PNC.AbstractWorldStore.Dirty = true
-saved, reason = PNC.AbstractWorldStore.Save()
-T.truthy(saved, reason)
-T.equal(reason, "extension_saved", "abstract save redirect")
-
-T.equal(extensionSaves, 3,
-    "all three public legacy saves must delegate")
-T.equal(#legacyWrites, 0,
+T.equal(extensionSaves, 2,
+    "faction and community view commits must delegate")
+T.equal(#retiredRootWrites, 0,
     "active cutover must never rewrite old generic roots")
-T.equal(dirtyReasons[1], "factions_save", "faction dirty reason")
-T.equal(dirtyReasons[2], "communities_save", "community dirty reason")
-T.equal(dirtyReasons[3], "abstract_world_save",
-    "abstract dirty reason")
+T.equal(dirtyReasons[1], "faction_view_commit",
+    "faction view commit reason")
+T.equal(dirtyReasons[2], "community_view_commit",
+    "community view commit reason")
 
--- Once Core authority is composed, a missing/inactive cutover must fail
--- closed instead of resurrecting a legacy generic ModData writer.
+-- A missing cutover must fail closed even in a detached/partial runtime; there
+-- is no supported standalone generic-world writer anymore.
 PNC = {
     Core = {},
     Factions = {
@@ -169,16 +137,15 @@ PNC = {
     FactionArchetypes = {},
     EntityRef = {},
     ModDataStore = reset,
-    CoreSurvivorWorldAuthority = {},
 }
 T.load("ProjectHoomans", "server",
-    "PNC/Factions/FactionService/PNC_FactionService_RegistryPersistence.lua")
-saved, reason = PNC.Factions.Save()
+    "PNC/Factions/FactionService/PNC_FactionService_WorldView.lua")
+saved, reason = PNC.Factions.Commit()
 T.falsy(saved,
-    "Core-composed runtime must not fall back to legacy faction writes")
+    "partial runtime must not fall back to retired faction writes")
 T.equal(reason, "survivor_world_cutover_unavailable",
     "missing cutover fails closed")
-T.equal(#legacyWrites, 0,
-    "fail-closed save still writes no legacy generic root")
+T.equal(#retiredRootWrites, 0,
+    "fail-closed save still writes no retired generic root")
 
-T.finish("pnc_survivor_world_legacy_save_redirect_smoke")
+T.finish("pnc_survivor_world_save_authority_smoke")

@@ -1,5 +1,5 @@
 -- Target-owned native abstract-world restart fixture, phase one.
--- Exercise the production AbstractWorldStore through the commit coordinator.
+-- Exercise the Hoomans runtime world view through the commit coordinator.
 
 local DEFINITION_ID = "pzharness:abstract-world-restart"
 
@@ -16,14 +16,14 @@ local function entry()
 end
 
 PZHarnessNativeTest = function()
-    local store = PNC and PNC.AbstractWorldStore or nil
+    local store = PNC and PNC.HoomansWorldView or nil
     PZHarness.assertTrue(
         store and store.Registry and store.Touch,
-        "native AbstractWorldStore API was not available"
+        "native HoomansWorldView API was not available"
     )
     PZHarness.assertTrue(
         store and store.Loaded == true,
-        "native AbstractWorldStore was not loaded before the test"
+        "native HoomansWorldView was not loaded before the test"
     )
 
     local beforeRevision = store and tonumber(store.Registry.revision) or 0
@@ -31,11 +31,11 @@ PZHarnessNativeTest = function()
     store.Touch("native_harness_abstract_world_restart")
     PZHarness.assertTrue(
         (tonumber(store.Registry.revision) or 0) > beforeRevision,
-        "native AbstractWorldStore.Touch did not advance the revision"
+        "native HoomansWorldView.Touch did not advance the revision"
     )
     PZHarness.assertTrue(
         store.Dirty == true,
-        "native AbstractWorldStore did not retain its dirty state"
+        "native HoomansWorldView did not retain its dirty state"
     )
 
     local stored = store.Registry.uniqueNPCsByID[DEFINITION_ID]
@@ -44,7 +44,7 @@ PZHarnessNativeTest = function()
             and stored.definitionId == DEFINITION_ID
             and stored.status == "reserved"
             and stored.identitySeed == 6262,
-        "native AbstractWorldStore did not retain the written entry"
+        "native HoomansWorldView did not retain the written entry"
     )
 
     PZHarness.assertTrue(
@@ -66,22 +66,29 @@ PZHarnessNativeTest = function()
         and commitDetails.results.abstractWorld
     PZHarness.assertTrue(
         abstractResult and abstractResult.changed == true,
-        "native persistence coordinator did not save AbstractWorldStore"
+        "native persistence coordinator did not commit HoomansWorldView extensions"
     )
     PZHarness.assertTrue(
         store.Dirty == false,
-        "native AbstractWorldStore remained dirty after commit"
+        "native HoomansWorldView remained dirty after commit"
     )
 
-    local raw = ModData.get(PNC.DirectorConfig.MODDATA_KEY)
-    local rawEntry = raw
-        and raw.uniqueNPCsByID
-        and raw.uniqueNPCsByID[DEFINITION_ID]
+    local extensionKey = PNC.SurvivorWorldExtensions
+        and PNC.SurvivorWorldExtensions.STORAGE_KEY
+    local raw = extensionKey and ModData.get(extensionKey) or nil
+    local rawEntry = raw and raw.abstract
+        and raw.abstract.uniqueNPCsByID
+        and raw.abstract.uniqueNPCsByID[DEFINITION_ID]
     PZHarness.assertTrue(
         type(rawEntry) == "table"
             and rawEntry.definitionId == DEFINITION_ID
             and rawEntry.identitySeed == 6262,
-        "native abstract-world ModData did not contain the committed entry"
+        "Hoomans extension ModData did not contain the committed entry"
+    )
+    local retired = ModData.get("PNC_AbstractWorld_v1")
+    PZHarness.assertTrue(
+        retired == nil or next(retired) == nil,
+        "retired abstract-world root became active again"
     )
 
     PZHarness.assertTrue(

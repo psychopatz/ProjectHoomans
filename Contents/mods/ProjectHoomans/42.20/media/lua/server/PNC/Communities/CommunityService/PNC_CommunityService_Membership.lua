@@ -45,8 +45,18 @@ function Communities.Create(spec)
     if faction.status ~= "active" then
         return false, "faction_not_active"
     end
-    id = Communities.GenerateID()
-    if not id then return false, "id_generation_failed" end
+    if spec.id ~= nil then
+        id = tostring(spec.id)
+        if not Types.IsValidCommunityID(id) then
+            return false, "invalid_id"
+        end
+        if Communities.Registry.byID[id] then
+            return false, "community_exists"
+        end
+    else
+        id = Communities.GenerateID()
+        if not id then return false, "id_generation_failed" end
+    end
     defaults = Types.BuildCreationDefaults(
         spec.mode,
         faction.archetypeID

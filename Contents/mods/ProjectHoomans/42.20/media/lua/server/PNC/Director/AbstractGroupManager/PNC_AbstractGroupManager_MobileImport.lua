@@ -8,7 +8,7 @@ PNC.AbstractGroupManagerInternal =
 
 local Groups = PNC.AbstractGroups
 local H = PNC.AbstractGroupManagerInternal
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Types = PNC.AbstractWorldTypes
 local Config = PNC.DirectorConfig
 local Locations = PNC.AbstractLocations
@@ -19,8 +19,9 @@ local MOBILE_TRAVELING = FactionConstants
     .MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
     or "traveling_to_settlement"
 
-function Groups.ImportMobileFaction(factionOrID)
+function Groups.ImportMobileFaction(factionOrID, options)
     if not H.Authority() then return nil, "not_authority" end
+    options = type(options) == "table" and options or {}
     local faction = type(factionOrID) == "table" and factionOrID
         or PNC.Factions and PNC.Factions.Get(factionOrID) or nil
     if not faction or not PNC.Factions.IsMobileGroup(faction) then
@@ -71,7 +72,8 @@ function Groups.ImportMobileFaction(factionOrID)
     end
     local ids = H.MemberIDs(faction)
     local group, createReason = Groups.Create({
-        id = "agroup_" .. tostring(faction.id),
+        id = options.groupID
+            or ("agroup_" .. tostring(faction.id)),
         factionId = faction.id,
         homeCommunityId = nil,
         groupType = H.GroupTypeForFaction(faction),

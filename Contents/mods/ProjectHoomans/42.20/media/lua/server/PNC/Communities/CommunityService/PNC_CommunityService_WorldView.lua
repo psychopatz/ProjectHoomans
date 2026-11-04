@@ -20,9 +20,26 @@ local reconcileLeaders = Internal.reconcileLeaders
 local reconcileNPCReferences = Internal.reconcileNPCReferences
 local Reset = PNC.ModDataStore
     or require "PNC/Core/Persistence/PNC_ModDataStore"
+local ImportSource = PNC.SurvivorWorldImportSource
+    or require "PNC/Director/PNC_SurvivorWorldImportSource"
+
+local function refreshCoreViews()
+    local extensions = PNC.SurvivorWorldExtensions
+    local coreAuthority = PNC.CoreSurvivorWorldAuthority
+    local registry = coreAuthority and coreAuthority.Registry
+    if not extensions or extensions.Active ~= true
+        or type(extensions.RebuildAll) ~= "function"
+        or not registry
+        or type(registry.Snapshot) ~= "function"
+    then
+        return false, "cutover_not_active"
+    end
+    return extensions.RebuildAll(registry:Snapshot())
+end
 
 function Communities.Load()
     local raw
+    local sourceRaw
     local normalized
     if not authority() then return false, "not_authority" end
     if PNC.Registry and PNC.Registry.EnsureLoaded then
@@ -31,20 +48,24 @@ function Communities.Load()
     if PNC.Factions and PNC.Factions.EnsureLoaded then
         PNC.Factions.EnsureLoaded()
     end
-    raw = Reset.Read(Constants.REGISTRY_MODDATA_KEY)
-    local reason = Reset.Check(raw, Constants.REGISTRY_SCHEMA_VERSION, nil,
-        function(value)
-            return type(value.byID) == "table"
-                and type(value.sitesByID) == "table"
-        end)
-    normalized = Types.NormalizeRegistry(reason == nil and raw or nil)
-    Communities.Registry = normalized
-    Communities.Loaded = true
-    Communities.Dirty = (reason ~= nil and reason ~= "empty_state")
-        or (reason == nil and not Types.AreEqual(raw, normalized))
-    if reason ~= nil and reason ~= "empty_state" then
-        Reset.Mark(Communities, raw, Constants.REGISTRY_SCHEMA_VERSION,
-            reason, "communities")
+    local refreshed = refreshCoreViews()
+    if not refreshed then
+        local reason
+        raw, reason, sourceRaw = ImportSource.Read("communities")
+        normalized = Types.NormalizeRegistry(raw)
+        Communities.Registry = normalized
+        Communities.Loaded = true
+        Communities.Dirty = (reason ~= nil and reason ~= "empty_state")
+            or (reason == nil and not Types.AreEqual(raw, normalized))
+        if reason ~= nil and reason ~= "empty_state" then
+            Reset.Mark(
+                Communities,
+                sourceRaw,
+                Constants.REGISTRY_SCHEMA_VERSION,
+                reason,
+                "community_world_view_import"
+            )
+        end
     end
     reconcileNPCReferences()
     rebuildDerivedIndexes()
@@ -71,29 +92,18 @@ function Communities.EnsureLoaded()
     return true
 end
 
-function Communities.Save()
-    local target
-    local normalized
+function Communities.Commit()
     Communities.EnsureLoaded()
     if not Communities.Dirty then return false, "not_dirty" end
     local extensions = PNC.SurvivorWorldExtensions
-    if extensions and extensions.Save then
-        if extensions.Active ~= true then
-            return false, "survivor_world_cutover_inactive"
-        end
-        extensions.MarkDirty("communities_save")
-        return extensions.Save()
-    end
-    if PNC.CoreSurvivorWorldAuthority then
+    if not extensions or type(extensions.Save) ~= "function" then
         return false, "survivor_world_cutover_unavailable"
     end
-    normalized = Types.NormalizeRegistry(Communities.Registry)
-    local written = Reset.Write(Constants.REGISTRY_MODDATA_KEY,
-        copy(normalized))
-    if not written then return false, "moddata_unavailable" end
-    Communities.Registry = normalized
-    Communities.Dirty = false
-    return true, "saved"
+    if extensions.Active ~= true then
+        return false, "survivor_world_cutover_inactive"
+    end
+    extensions.MarkDirty("community_view_commit")
+    return extensions.Save()
 end
 
 function Communities.GenerateID()

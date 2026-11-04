@@ -14,7 +14,7 @@ local Constants = PNC.FactionConstants
 local Config = PNC.DirectorConfig
 local Factions = PNC.Factions
 local Communities = PNC.Communities
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Core = PNC.Core
 local MAX_ARRIVAL_LISTENER_DIAGNOSTICS = 32
 

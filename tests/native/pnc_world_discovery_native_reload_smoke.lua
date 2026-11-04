@@ -37,15 +37,10 @@ PZHarnessNativeTest = function()
         "native WorldDiscovery was not loaded after the JVM restart"
     )
     PZHarness.assertTrue(
-        types and types.MODDATA_KEY and types.KIND_SETTLEMENT
+        types and types.KIND_SETTLEMENT
             and types.PHASE_LOCATED and types.PRESENCE_PRESENT
             and types.ARRIVAL_SEARCHED,
         "native WorldDiscovery types were not available after restart"
-    )
-    PZHarness.assertEqual(
-        types.MODDATA_KEY,
-        "PNC_WorldDiscovery_v1",
-        "native WorldDiscovery ModData key was not stable"
     )
 
     local characterUUID, identityReason =
@@ -79,21 +74,22 @@ PZHarnessNativeTest = function()
         "native WorldDiscovery was unexpectedly dirty after reload"
     )
 
-    local raw = ModData.get(types.MODDATA_KEY)
-    local rawPlayer = raw and raw.players and raw.players[UUID]
-    local rawEntity = rawPlayer and rawPlayer.entities
-        and rawPlayer.entities[types.KIND_SETTLEMENT]
-        and rawPlayer.entities[types.KIND_SETTLEMENT][ENTITY_ID]
+    local coreAuthority = PNC and PNC.CoreSurvivorWorldAuthority or nil
+    local coreRegistry = coreAuthority and coreAuthority.Registry or nil
+    local coreDiscovery = coreRegistry and coreRegistry:GetDiscovery() or nil
+    local corePlayer = coreDiscovery and coreDiscovery.players
+        and coreDiscovery.players[UUID]
+    local coreEntity = corePlayer and corePlayer.entities
+        and corePlayer.entities.community
+        and corePlayer.entities.community[ENTITY_ID]
     PZHarness.assertTrue(
-        type(raw) == "table"
-            and raw.schemaVersion == types.SCHEMA_VERSION
-            and type(rawPlayer) == "table"
-            and type(rawEntity) == "table"
-            and rawEntity.entityID == ENTITY_ID
-            and rawEntity.phase == types.PHASE_LOCATED
-            and rawEntity.source == SOURCE
-            and rawEntity.arrivalState == types.ARRIVAL_SEARCHED
-            and rawEntity.presenceStatus == types.PRESENCE_PRESENT,
-        "native WorldDiscovery ModData was not reloaded"
+        type(coreEntity) == "table"
+            and coreEntity.source == SOURCE,
+        "Core SurvivorWorld discovery did not survive restart"
+    )
+    local retired = ModData.get("PNC_WorldDiscovery_v1")
+    PZHarness.assertTrue(
+        retired == nil or next(retired) == nil,
+        "retired discovery root reappeared after restart"
     )
 end

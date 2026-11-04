@@ -74,7 +74,8 @@ PNC.Factions = {}
 function PNC.Factions.EnsureLoaded() return true end
 function PNC.Factions.Create(spec)
     factionSerial = factionSerial + 1
-    local id = "faction_population_" .. factionSerial
+    local id = spec.id
+        or ("faction_population_" .. factionSerial)
     factions[id] = { id = id, name = spec.name, archetypeID = spec.archetypeID,
         status = "active", memberIDs = {}, tags = spec.tags or {} }
     return true, "created", PNC.Core.DeepCopy(factions[id])
@@ -135,17 +136,15 @@ T.load(SHARED .. "Director/PNC_DirectorConfig.lua")
 T.load(SHARED .. "Director/PNC_AbstractWorldTypes.lua")
 T.load(SHARED .. "Scheduling/PNC_Scheduler.lua")
 T.load(SHARED .. "Base/PNC_Sandbox.lua")
-T.load(DIRECTOR .. "PNC_AbstractWorldStore.lua")
+T.load(DIRECTOR .. "PNC_HoomansWorldView.lua")
 T.load(DIRECTOR .. "PNC_AbstractLocationManager.lua")
 T.load(DIRECTOR .. "PNC_AbstractGroupManager.lua")
 T.load(POP .. "PNC_PopulationSandbox.lua")
 T.load(POP .. "PNC_PopulationLog.lua")
-T.load(POP .. "PNC_PopulationIdentity.lua")
+T.load(POP .. "PNC_PopulationHoomansPolicy.lua")
 T.load(POP .. "PNC_PopulationSectorManager.lua")
 T.load(POP .. "PNC_PopulationBudget.lua")
 T.load(POP .. "PNC_GenerationQueue.lua")
-T.load(POP .. "PNC_GroupGenerationPlan.lua")
-T.load(POP .. "PNC_SettlementGenerationPlan.lua")
 T.load(POP .. "PNC_SettlementCandidateManager.lua")
 T.load(POP .. "PNC_StarterPopulation.lua")
 
@@ -156,7 +155,8 @@ function PNC.MobileGroupDirector.GenerateForFaction(factionID, spec)
     faction.mobile = { active = true, site = PNC.Core.DeepCopy(spec.siteSpec) }
     for index = 1, spec.groupSize do
         npcSerial = npcSerial + 1
-        local id = "npc_population_" .. npcSerial
+        local id = spec.actorIDs and spec.actorIDs[index]
+            or ("npc_population_" .. npcSerial)
         PNC.Registry.Data[id] = { id = id, alive = true,
             presenceState = "abstract", x = spec.siteSpec.home.x,
             y = spec.siteSpec.home.y, z = spec.siteSpec.home.z,
@@ -173,11 +173,13 @@ PNC.CommunityDirector = {}
 function PNC.CommunityDirector.GenerateForFaction(factionID, spec)
     lastCommunitySpec = PNC.Core.DeepCopy(spec)
     communitySerial = communitySerial + 1
-    local id = "community_population_" .. communitySerial
+    local id = spec.communityID
+        or ("community_population_" .. communitySerial)
     local members = {}
-    for _ = 1, spec.groupSize do
+    for index = 1, spec.groupSize do
         npcSerial = npcSerial + 1
-        local npcID = "npc_population_" .. npcSerial
+        local npcID = spec.actorIDs and spec.actorIDs[index]
+            or ("npc_population_" .. npcSerial)
         PNC.Registry.Data[npcID] = { id = npcID, alive = true,
             presenceState = "abstract", generation = PNC.Core.DeepCopy(spec.generation) }
         factions[factionID].memberIDs[npcID] = true
@@ -198,7 +200,7 @@ T.load(POP .. "PNC_CommunityGroupFormation.lua")
 T.load(POP .. "PNC_PopulationReconciler.lua")
 T.load(POP .. "PNC_PopulationDirector.lua")
 
-PNC.AbstractWorldStore.Load()
+PNC.HoomansWorldView.Load()
 players = { { getX = function() return 0 end, getY = function() return 0 end,
     getZ = function() return 0 end } }
 PNC.PopulationSectors.RefreshPlayers()
@@ -292,8 +294,8 @@ local fallbackGroupPlan, fallbackGroupReason = PNC.GroupGenerator.BuildPlan({
 T.truthy(fallbackGroupPlan ~= nil,
     "roaming group uses bounded meta fallback: " .. tostring(fallbackGroupReason))
 T.equal(PNC.PopulationSectors.IDForPosition(
-    PNC.AbstractLocations.Get(fallbackGroupPlan.locationId).x,
-    PNC.AbstractLocations.Get(fallbackGroupPlan.locationId).y),
+    PNC.AbstractLocations.Get(fallbackGroupPlan.locationID).x,
+    PNC.AbstractLocations.Get(fallbackGroupPlan.locationID).y),
     groupFallbackSector, "fallback group site belongs to sector")
 T.equal(PNC.SettlementCandidates.LastMetaDiscovery[groupFallbackSector].purpose,
     "GROUP_FALLBACK", "group fallback discovery is diagnosed")
@@ -321,9 +323,9 @@ T.truthy(PNC.StarterPopulation.GetDebugSnapshot().completed,
 -- Return to a clean world for the remaining focused transaction tests.
 factions, communities = {}, {}
 PNC.Registry.Data = {}
-PNC.AbstractWorldStore.Registry = PNC.AbstractWorldTypes.NewRegistry()
-PNC.AbstractWorldStore.Loaded = true
-PNC.AbstractWorldStore.Dirty = false
+PNC.HoomansWorldView.Registry = PNC.AbstractWorldTypes.NewRegistry()
+PNC.HoomansWorldView.Loaded = true
+PNC.HoomansWorldView.Dirty = false
 PNC.AbstractLocations.Cells, PNC.AbstractLocations.Membership = {}, {}
 PNC.AbstractLocations.IndexedRevision = -1
 PNC.AbstractLocations.RebuildIndex()
@@ -365,27 +367,27 @@ T.truthy(settlementTypeCount > 1, "world seeds vary settlement archetypes")
 
 for index = 1, normal.groups.lowerThreshold do
     local id = "agroup_hysteresis_" .. index
-    PNC.AbstractWorldStore.Registry.groupsByID[id] =
+    PNC.HoomansWorldView.Registry.groupsByID[id] =
         PNC.AbstractWorldTypes.NormalizeGroup({ id = id, groupType = "SCAVENGER",
             memberIds = {}, state = "IDLE", mission = "SCAVENGE",
             location = PNC.AbstractLocations.Ref({ id = "aloc_hysteresis",
                 type = "TEMPORARY", x = 10, y = 10, z = 0 }) }, id)
     -- Normalization requires the location record only as a stable reference;
     -- the population index remains the tested source of counts here.
-    PNC.PopulationSectors.RegisterGroup(PNC.AbstractWorldStore.Registry.groupsByID[id])
+    PNC.PopulationSectors.RegisterGroup(PNC.HoomansWorldView.Registry.groupsByID[id])
 end
 local healthyBand = PNC.PopulationBudget.Calculate(
     PNC.PopulationSectors.Get(sectorID), onePlayer)
 T.equal(healthyBand.groups.deficit, 0, "healthy lower band suppresses generation")
 local removedHysteresis = "agroup_hysteresis_" .. normal.groups.lowerThreshold
-PNC.AbstractWorldStore.Registry.groupsByID[removedHysteresis] = nil
+PNC.HoomansWorldView.Registry.groupsByID[removedHysteresis] = nil
 PNC.PopulationSectors.UnregisterGroup(removedHysteresis)
 local belowBand = PNC.PopulationBudget.Calculate(
     PNC.PopulationSectors.Get(sectorID), onePlayer)
 T.truthy(belowBand.groups.deficit > 0, "below healthy band generates pressure")
 for index = 1, normal.groups.lowerThreshold - 1 do
     local id = "agroup_hysteresis_" .. index
-    PNC.AbstractWorldStore.Registry.groupsByID[id] = nil
+    PNC.HoomansWorldView.Registry.groupsByID[id] = nil
     PNC.PopulationSectors.UnregisterGroup(id)
 end
 
@@ -469,15 +471,15 @@ T.falsy(string.find(PNC.Factions.Get(groupResult.group.factionId).name,
 T.truthy(PNC.AbstractGroups.Get(groupResult.group.id) ~= nil,
     "canonical abstract group registered")
 T.equal(#groupResult.group.memberIds, groupPlan.memberCount, "canonical NPC membership")
-T.equal(groupResult.group.generation.generationId, groupPlan.generationId,
+T.equal(groupResult.group.generation.generationID, groupPlan.generationID,
     "group provenance")
 local duplicateCommit = PNC.GroupGenerator.Commit(groupPlan, onePlayer)
 T.falsy(duplicateCommit.ok, "generation idempotency")
 T.equal(duplicateCommit.reason, "GENERATION_ID_DUPLICATE", "idempotency reason")
 
 local nearPlan = PNC.Core.DeepCopy(groupPlan)
-nearPlan.generationId = "POP_GROUP_9999999"
-nearPlan.locationId = location.id
+nearPlan.generationID = "POP_GROUP_9999999"
+nearPlan.locationID = location.id
 PNC.PopulationSectors.Ensure(sectorID).groupGenerationCooldownUntil = 0
 players = { { getX = function() return 700 end, getY = function() return 100 end,
     getZ = function() return 0 end } }
@@ -503,13 +505,13 @@ local commercialScore = PNC.SettlementCandidates.Evaluate(
     commercialLocation, "settler", resolved, worldHour)
 T.truthy(candidate.score > commercialScore.score,
     "faction-preferred rural location scores higher")
-PNC.AbstractWorldStore.Registry.population.siteHistory[location.id] = {
+PNC.HoomansWorldView.Registry.population.siteHistory[location.id] = {
     formerSettlement = true, destroyedAt = worldHour,
     regenerationBlockedUntil = worldHour + 24 }
 local blocked = PNC.SettlementCandidates.Evaluate(location, "settler", resolved, worldHour)
 T.falsy(blocked.eligible, "destroyed site blocked")
 T.equal(blocked.reason, "DESTROYED_SITE_COOLDOWN", "site cooldown reason")
-PNC.AbstractWorldStore.Registry.population.siteHistory[location.id] = nil
+PNC.HoomansWorldView.Registry.population.siteHistory[location.id] = nil
 
 local racePlan = T.truthy(PNC.SettlementGenerator.BuildPlan(
     { sectorId = sectorID }, onePlayer))
@@ -523,7 +525,7 @@ T.equal(raceResult.reason, "PLAYER_TOO_CLOSE", "settlement race reason")
 T.equal(#PNC.Communities.List(), communitiesBeforeRace,
     "failed settlement creates no community")
 T.falsy(PNC.SettlementCandidates.HasReservation(
-    racePlan.locationId, racePlan.generationId, worldHour),
+    racePlan.locationID, racePlan.generationID, worldHour),
     "failed settlement releases reservation")
 players = { { getX = function() return 0 end, getY = function() return 0 end,
     getZ = function() return 0 end } }
@@ -544,7 +546,7 @@ T.falsy(string.find(PNC.Factions.Get(settlementResult.community.factionID).name,
     "director settlement faction uses canonical generated naming")
 T.truthy(PNC.Communities.Get(settlementResult.community.id) ~= nil,
     "canonical community registered")
-local settlementLocation = PNC.AbstractLocations.Get(settlementPlan.locationId)
+local settlementLocation = PNC.AbstractLocations.Get(settlementPlan.locationID)
 T.equal(settlementResult.community.siteID, settlementLocation.sourceSite.id,
     "canonical site reserved")
 T.equal(PNC.PopulationSectors.CountSettlements(sectorID), 1,
@@ -569,7 +571,7 @@ T.equal(historyProbe[1].event, "RETENTION_TEST_2",
 PNC.PopulationSectors.History = oldHistory
 populationConfig.GENERATION_HISTORY_LIMIT = oldHistoryLimit
 
-local populationData = PNC.AbstractWorldStore.Registry.population
+local populationData = PNC.HoomansWorldView.Registry.population
 local oldCommittedLimit = populationConfig.COMMITTED_GENERATION_HISTORY_LIMIT
 local oldCommittedIDs = populationData.committedGenerationIds
 local oldCommittedOrder = populationData.committedOrder
@@ -626,7 +628,7 @@ PNC.PopulationDirector.OnSettlementDestroyed(
 T.truthy(PNC.PopulationSectors.Ensure(sectorID)
     .settlementGenerationCooldownUntil > worldHour,
     "settlement regeneration cooldown")
-T.truthy(PNC.AbstractWorldStore.Registry.population.siteHistory[settlementLocation.id]
+T.truthy(PNC.HoomansWorldView.Registry.population.siteHistory[settlementLocation.id]
     .regenerationBlockedUntil > worldHour, "destroyed site history")
 
 local existingGroups = #PNC.AbstractGroups.List()
@@ -638,17 +640,19 @@ T.equal(lowered.groups.deficit, 0, "lowered population suppresses generation")
 T.equal(#PNC.AbstractGroups.List(), existingGroups, "lowered population deletes nothing")
 SandboxVars.ProjectHoomans.NPCPopulation = 4
 
-T.truthy(PNC.AbstractWorldStore.Save(), "population state saves")
-PNC.AbstractWorldStore.Registry = {}
-PNC.AbstractWorldStore.Loaded = false
-T.truthy(PNC.AbstractWorldStore.Load(), "population state reloads")
-T.truthy(PNC.AbstractWorldStore.Registry.population.committedGenerationIds[
-    groupPlan.generationId] == true, "committed id persisted")
-T.equal(PNC.AbstractWorldStore.Registry.population.worldSeedString,
+local populationSnapshot = PNC.AbstractWorldTypes.NormalizeRegistry(
+    PNC.Core.DeepCopy(PNC.HoomansWorldView.Registry)
+)
+PNC.HoomansWorldView.Registry = populationSnapshot
+PNC.HoomansWorldView.Loaded = true
+PNC.HoomansWorldView.Dirty = false
+T.truthy(PNC.HoomansWorldView.Registry.population.committedGenerationIds[
+    groupPlan.generationID] == true, "committed id survives compatibility snapshot")
+T.equal(PNC.HoomansWorldView.Registry.population.worldSeedString,
     "PNC-TEST-WORLD-SEED", "engine world seed string persists")
-T.equal(PNC.AbstractWorldStore.Registry.population.worldSeed, populationSeed,
+T.equal(PNC.HoomansWorldView.Registry.population.worldSeed, populationSeed,
     "hashed population seed persists")
-T.truthy((PNC.AbstractWorldStore.Registry.population.starterAttempts or 0) > 0,
+T.truthy((PNC.HoomansWorldView.Registry.population.starterAttempts or 0) > 0,
     "starter attempt diagnostics persist")
 
 players = { { getX = function() return 0 end, getY = function() return 0 end,
@@ -696,7 +700,7 @@ for sectorIndex = 1, 40 do
             memberIds = {}, state = "IDLE", mission = "SCAVENGE",
             location = { id = "aloc_stress_" .. sectorIndex .. "_" .. groupIndex,
                 type = "TEMPORARY", x = x, y = y, z = 0 } }, id)
-        PNC.AbstractWorldStore.Registry.groupsByID[id] = group
+        PNC.HoomansWorldView.Registry.groupsByID[id] = group
         PNC.PopulationSectors.RegisterGroup(group)
     end
 end

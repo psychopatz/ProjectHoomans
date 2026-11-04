@@ -115,12 +115,12 @@ T.equal(fallback.displayName,
     }),
     "deterministic name fallback")
 
-PNC.AbstractWorldStore = {
+PNC.HoomansWorldView = {
     Registry = { uniqueNPCsByID = {} },
     EnsureLoaded = function() return true end,
     WorldAgeHours = function() return 12 end,
     Touch = function(_, reasonValue)
-        PNC.AbstractWorldStore.lastTouch = reasonValue
+        PNC.HoomansWorldView.lastTouch = reasonValue
     end,
 }
 PNC.DirectorConfig = {

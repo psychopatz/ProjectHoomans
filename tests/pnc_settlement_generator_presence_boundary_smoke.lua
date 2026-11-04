@@ -29,7 +29,7 @@ end
 PNC = {
     DirectorConfig = { Population = {} }, PopulationSectors = {},
     SettlementCandidates = {}, AbstractLocations = {},
-    AbstractWorldStore = {}, PopulationIdentity = {},
+    HoomansWorldView = {}, PopulationHoomansPolicy = {},
 }
 local Generator = T.load("ProjectHoomans", "server", path)
 

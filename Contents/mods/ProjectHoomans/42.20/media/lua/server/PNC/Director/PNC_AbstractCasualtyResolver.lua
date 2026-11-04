@@ -7,7 +7,7 @@ PNC.AbstractCasualtyResolver = PNC.AbstractCasualtyResolver or {}
 
 local Casualties = PNC.AbstractCasualtyResolver
 local Config = PNC.DirectorConfig
-local Store = PNC.AbstractWorldStore
+local Store = PNC.HoomansWorldView
 local Groups = PNC.AbstractGroups
 
 local function condition(record)

@@ -5,7 +5,7 @@ local prefix = "PNC/Factions/FactionService/"
 local providers = {
     "PNC_FactionService_State",
     "PNC_FactionService_RegistryIndexes",
-    "PNC_FactionService_RegistryPersistence",
+    "PNC_FactionService_WorldView",
     "PNC_FactionService_Queries",
     "PNC_FactionService_Creation",
     "PNC_FactionService_NPCTransfers",

@@ -3,7 +3,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode()
 then return end
 
-require "PNC/Director/PNC_AbstractWorldStore"
+require "PNC/Director/PNC_HoomansWorldView"
 require "PNC/Director/PNC_UniqueNPCRegistry"
 require "PNC/Director/PNC_AbstractLocationManager"
 require "PNC/Director/PNC_AbstractGroupManager"
@@ -27,12 +27,10 @@ require "PNC/Director/PNC_AbstractEncounterDetector"
 require "PNC/Director/PNC_AbstractTraversal"
 require "PNC/Director/Population/PNC_PopulationSandbox"
 require "PNC/Director/Population/PNC_PopulationLog"
-require "PNC/Director/Population/PNC_PopulationIdentity"
+require "PNC/Director/Population/PNC_PopulationHoomansPolicy"
 require "PNC/Director/Population/PNC_PopulationSectorManager"
 require "PNC/Director/Population/PNC_PopulationBudget"
 require "PNC/Director/Population/PNC_GenerationQueue"
-require "PNC/Director/Population/PNC_GroupGenerationPlan"
-require "PNC/Director/Population/PNC_SettlementGenerationPlan"
 require "PNC/Director/Population/PNC_SettlementCandidateManager"
 require "PNC/Director/Population/PNC_StarterPopulation"
 require "PNC/Director/Population/PNC_GroupGenerator"

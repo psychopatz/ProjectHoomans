@@ -54,7 +54,7 @@ PNC.PlayerCharacters.Registry = { byUUID = {}, uuidAliases = {} }
 PNC.NPCKnowledge = service("NPCKnowledge")
 PNC.Factions = service("Factions")
 PNC.Communities = service("Communities")
-PNC.AbstractWorldStore = service("AbstractWorldStore")
+PNC.HoomansWorldView = service("HoomansWorldView")
 PNC.SurvivorWorldExtensions = service("SurvivorWorldExtensions")
 PNC.SurvivorWorldExtensions.Save = function(flushGlobal)
     T.equal(flushGlobal, false,
@@ -64,7 +64,7 @@ PNC.SurvivorWorldExtensions.Save = function(flushGlobal)
     PNC.SurvivorWorldExtensions.Dirty = false
     PNC.Factions.Dirty = false
     PNC.Communities.Dirty = false
-    PNC.AbstractWorldStore.Dirty = false
+    PNC.HoomansWorldView.Dirty = false
     return true, "saved"
 end
 PNC.WorldDiscovery = service("WorldDiscovery")
@@ -88,7 +88,7 @@ T.equal(calls.Factions, nil,
     "factions no longer own an active persistence write")
 T.equal(calls.Communities, nil,
     "communities no longer own an active persistence write")
-T.equal(calls.AbstractWorldStore, nil,
+T.equal(calls.HoomansWorldView, nil,
     "abstract world no longer owns an active persistence write")
 T.equal(globalSaves, 1, "all services share one GlobalModData flush")
 T.finish("pnc_world_save_coordinator_smoke")

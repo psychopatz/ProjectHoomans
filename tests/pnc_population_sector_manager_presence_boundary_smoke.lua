@@ -33,7 +33,7 @@ end
 
 PNC = {
     DirectorConfig = { Population = {} },
-    AbstractWorldStore = {},
+    HoomansWorldView = {},
     Core = {},
 }
 T.load("ProjectHoomans", "server",

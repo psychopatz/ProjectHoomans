@@ -9,8 +9,6 @@ local COMMUNITY_NAME = "Native Harness Restart Community"
 PZHarnessNativeTest = function()
     local factions = PNC and PNC.Factions or nil
     local communities = PNC and PNC.Communities or nil
-    local factionConstants = PNC and PNC.FactionConstants or nil
-    local communityConstants = PNC and PNC.CommunityConstants or nil
     PZHarness.assertTrue(
         factions and factions.Get and factions.Registry
             and communities and communities.Get and communities.Registry,
@@ -20,13 +18,6 @@ PZHarnessNativeTest = function()
         factions.Loaded == true and communities.Loaded == true,
         "native community registries were not loaded after the JVM restart"
     )
-    PZHarness.assertTrue(
-        factionConstants and factionConstants.REGISTRY_MODDATA_KEY
-            and communityConstants
-            and communityConstants.REGISTRY_MODDATA_KEY,
-        "native community registry keys were not available after restart"
-    )
-
     local faction = factions.Get(FACTION_ID)
     PZHarness.assertTrue(
         type(faction) == "table",
@@ -112,18 +103,22 @@ PZHarnessNativeTest = function()
         "native Communities faction index did not reload the community"
     )
 
-    local raw = ModData.get(communityConstants.REGISTRY_MODDATA_KEY)
-    local rawCommunity = raw
-        and raw.byID
-        and raw.byID[COMMUNITY_ID]
+    local coreAuthority = PNC and PNC.CoreSurvivorWorldAuthority or nil
+    local coreRegistry = coreAuthority and coreAuthority.Registry or nil
+    local coreCommunity = coreRegistry
+        and coreRegistry:GetCommunity(COMMUNITY_ID) or nil
     PZHarness.assertTrue(
-        type(rawCommunity) == "table"
-            and rawCommunity.id == COMMUNITY_ID
-            and rawCommunity.name == COMMUNITY_NAME
-            and rawCommunity.factionID == FACTION_ID
-            and rawCommunity.home
-            and rawCommunity.home.x == 4242
-            and rawCommunity.home.y == 2424,
-        "native community ModData was not reloaded"
+        type(coreCommunity) == "table"
+            and coreCommunity.id == COMMUNITY_ID
+            and coreCommunity.name == COMMUNITY_NAME
+            and coreCommunity.factionID == FACTION_ID,
+        "Core SurvivorWorld community did not survive restart"
     )
+    for _, key in ipairs({ "PNC_Factions", "PNC_Communities" }) do
+        local retired = ModData.get(key)
+        PZHarness.assertTrue(
+            retired == nil or next(retired) == nil,
+            "retired generic root reappeared after restart: " .. key
+        )
+    end
 end

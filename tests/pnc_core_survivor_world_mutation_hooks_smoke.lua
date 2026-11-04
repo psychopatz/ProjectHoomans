@@ -96,7 +96,7 @@ PNC = {
     Const = {},
     AbstractGroups = {},
     AbstractGroupManagerInternal = {},
-    AbstractWorldStore = {
+    HoomansWorldView = {
         Touch = function(reason)
             calls[#calls + 1] = { "legacy_group_touch", reason }
         end,
@@ -129,7 +129,7 @@ PNC = {
         Index = function() end,
         SiteLocationID = function() return nil end,
     },
-    AbstractWorldStore = {
+    HoomansWorldView = {
         Registry = { locationsByID = {} },
         EnsureLoaded = function() return true end,
         Touch = function() end,
@@ -157,7 +157,7 @@ local location, reason = PNC.AbstractLocations.Register({
 T.truthy(location, reason)
 T.equal(calls[#calls][1], "location", "location hook domain")
 T.equal(calls[#calls][2], "aloc_hook", "location hook id")
-T.truthy(PNC.AbstractWorldStore.Registry.locationsByID.aloc_hook,
+T.truthy(PNC.HoomansWorldView.Registry.locationsByID.aloc_hook,
     "PNC compatibility view receives accepted Core location")
 
 T.finish("pnc_core_survivor_world_mutation_hooks_smoke")
