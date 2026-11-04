@@ -52,7 +52,10 @@ PZHarnessNativeTest = function()
     )
     local retired = ModData.get("PNC_AbstractWorld_v1")
     PZHarness.assertTrue(
-        retired == nil or next(retired) == nil,
+        retired == nil
+            or (PNC.ModDataStore
+                and PNC.ModDataStore.IsEmpty
+                and PNC.ModDataStore.IsEmpty(retired)),
         "retired abstract-world root reappeared after restart"
     )
 end

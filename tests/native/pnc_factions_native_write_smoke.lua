@@ -110,7 +110,10 @@ PZHarnessNativeTest = function()
     )
     local retired = ModData.get("PNC_Factions")
     PZHarness.assertTrue(
-        retired == nil or next(retired) == nil,
+        retired == nil
+            or (PNC.ModDataStore
+                and PNC.ModDataStore.IsEmpty
+                and PNC.ModDataStore.IsEmpty(retired)),
         "retired PNC faction root became active again"
     )
 

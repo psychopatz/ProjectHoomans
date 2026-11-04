@@ -117,7 +117,10 @@ PZHarnessNativeTest = function()
     for _, key in ipairs({ "PNC_Factions", "PNC_Communities" }) do
         local retired = ModData.get(key)
         PZHarness.assertTrue(
-            retired == nil or next(retired) == nil,
+            retired == nil
+            or (PNC.ModDataStore
+                and PNC.ModDataStore.IsEmpty
+                and PNC.ModDataStore.IsEmpty(retired)),
             "retired generic root reappeared after restart: " .. key
         )
     end
