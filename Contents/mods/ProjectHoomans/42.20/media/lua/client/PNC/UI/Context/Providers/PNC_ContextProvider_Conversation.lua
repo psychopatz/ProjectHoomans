@@ -4,6 +4,9 @@ PNC.ContextHub = PNC.ContextHub or {}
 local DialogueRuntime = PNC.Semantics
     and PNC.Semantics.SemanticDialogueRuntime
     or require "PNC/Semantics/PNC_SemanticDialogueRuntime"
+local Openers = PNC.Conversation
+    and PNC.Conversation.Openers
+    or require "PNC/Conversation/PNC_ConversationOpeners"
 
 local Provider = {
     id = "conversation",
@@ -48,6 +51,17 @@ function Provider.addOptions(menu, entry, player)
                     playerName = player and type(player.getDisplayName)
                         == "function" and player:getDisplayName() or nil,
                 })
+                local handled, result, reason = Openers.Try(
+                    entry, player)
+                if handled then
+                    auditTalk("native.talk.external_result", {
+                        entryID = entry and entry.id,
+                        handled = true,
+                        result = result,
+                        reason = reason,
+                    })
+                    return result, reason
+                end
                 local view = PNC.Conversation.Open(entry, player)
                 auditTalk("native.talk.context_result", {
                     entryID = entry and entry.id,

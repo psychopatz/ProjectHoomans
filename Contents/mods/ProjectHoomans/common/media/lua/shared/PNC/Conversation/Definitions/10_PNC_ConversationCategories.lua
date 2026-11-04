@@ -2,10 +2,6 @@ local H = PNC.Conversation.DefinitionHelpers
 local Registry = PNC.Conversation.Registry
 local categorySource = H.Source("system", "shared", "categories")
 
--- The optional sixth column carries extra registration fields. `trade` talks
--- about exchanging goods, but the actual trade window belongs to the Dynamic
--- Trading integration, so without that mod the entry stays visible and disabled
--- with the reason instead of silently doing nothing.
 local categories = {
     { "greetings", "category.greetings", -100, true },
     { "wellbeing", "category.wellbeing", 200 },
@@ -13,10 +9,6 @@ local categories = {
     { "ask_about", "category.ask_about", 400 },
     { "needs", "category.needs", 500 },
     { "work_orders", "category.work_orders", 600 },
-    { "trade", "category.trade", 700, false, nil, {
-        requiresModID = "DTHoomans",
-        unavailableTextKey = "category.trade.requires_dynamic_trading",
-    } },
     { "personal", "category.personal", 800 },
     { "relationship", "category.relationship", 900 },
     { "set_territory", "category.set_territory", 950 },

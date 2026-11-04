@@ -17,7 +17,6 @@ Catalog.AUTHORED_CATEGORY_TOPICS = Catalog.AUTHORED_CATEGORY_TOPICS or {
     ["projecthoomans:ask_about"] = "ask_about",
     ["projecthoomans:needs"] = "needs",
     ["projecthoomans:work_orders"] = "work_orders",
-    ["projecthoomans:trade"] = "trade",
     ["projecthoomans:personal"] = "personal",
     ["projecthoomans:relationship"] = "relationship",
     ["projecthoomans:set_territory"] = "set_territory",

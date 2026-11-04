@@ -91,11 +91,11 @@ local Rules = PNC.Conversation.Rules
 local Selector = PNC.Conversation.Selector
 local Loader = PNC.Conversation.TextLoader
 
-T.equal(#Registry.ListCategories(), 11, "built-in category count")
-T.equal(#Registry.ListBlocks(), 41, "expanded built-in block count")
+T.equal(#Registry.ListCategories(), 10, "built-in category count")
+T.equal(#Registry.ListBlocks(), 38, "expanded built-in block count")
 T.equal(Registry.GetFingerprint(), Registry.GetFingerprint(),
     "registry fingerprint stable")
-T.equal(#Registry.ListBlocks({ includeInvalid = true }), 41,
+T.equal(#Registry.ListBlocks({ includeInvalid = true }), 38,
     "built-ins all validate")
 
 local legacyWhatsUpID = "projecthoomans:" .. "whats_up"

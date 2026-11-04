@@ -5,7 +5,6 @@
     "category.ask_about": "Ask about...",
     "category.needs": "Need anything?",
     "category.work_orders": "Work / Orders",
-    "category.trade": "Trade",
     "category.personal": "Personal",
     "category.relationship": "Relationship",
     "category.set_territory": "Set Territory",
@@ -68,6 +67,5 @@
     "semantic.gift.preference.like": "I like that.",
     "semantic.gift.preference.dislike": "I don't like that.",
     "semantic.gift.preference.neutral": "I don't have a strong preference.",
-    "semantic.gift.preference.unknown": "I'm not sure which item you mean.",
-    "category.trade.requires_dynamic_trading": "Requires Dynamic Trading mod"
+    "semantic.gift.preference.unknown": "I'm not sure which item you mean."
 }

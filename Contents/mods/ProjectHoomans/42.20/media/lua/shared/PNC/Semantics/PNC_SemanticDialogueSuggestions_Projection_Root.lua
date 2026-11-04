@@ -28,7 +28,6 @@ local function appendConversationRootChoices(
                 choiceID == "show_debug_text"
                 or choiceID == "view_dossier"
                 or semantic.categoryID == "projecthoomans:set_territory"
-                or semantic.categoryID == "projecthoomans:trade"
             )
             and #output < Suggestions.MAX_CANDIDATES
         then
