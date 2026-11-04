@@ -111,6 +111,65 @@ local function bodyID(body, spec)
     return nil
 end
 
+-- Core-owned actors enter Project Hoomans through this adapter instead of the
+-- normal Presence.Materialize path. Keep that provider handoff on the same
+-- presentation contract as every other live NPC: the body factory only
+-- creates a managed shell; animation, human visuals, inventory, equipment,
+-- and the lifecycle token still have to be applied before registration.
+local function configureMaterializedBody(record, body, lifecycle)
+    local inventoryOK
+    local inventoryReason
+    local token
+    local tokenReason
+    if not record or not body then
+        return nil, "materialized_body_configuration_input_required"
+    end
+    if body.DoZombieStats then body:DoZombieStats() end
+    record.runtime = record.runtime or {}
+    record.runtime.target = nil
+
+    if PNC.Animation and PNC.Animation.ApplyLiveSetup then
+        PNC.Animation.ApplyLiveSetup(body, record)
+    end
+    if PNC.Visuals and PNC.Visuals.ApplyHumanVisuals then
+        PNC.Visuals.ApplyHumanVisuals(body, record)
+    end
+
+    if type(body.getInventory) == "function"
+        and PNC.Inventory
+        and type(PNC.Inventory.MaterializeLooseInventory) == "function"
+    then
+        inventoryOK, inventoryReason =
+            PNC.Inventory.MaterializeLooseInventory(record, body)
+        if not inventoryOK then
+            return nil, inventoryReason
+                or "physical_inventory_materialize_failed"
+        end
+    end
+
+    if PNC.Equipment and PNC.Equipment.Apply then
+        PNC.Equipment.Apply(body, record)
+    end
+    if lifecycle and lifecycle.EnsureLiveShellIdentityToken then
+        token, _, tokenReason = lifecycle.EnsureLiveShellIdentityToken(
+            record, body)
+        if not token
+            and tokenReason ~= "not_authority"
+            and Core and Core.LogWarn
+        then
+            Core.LogWarn("PNC live shell token unavailable npc="
+                .. tostring(record.id)
+                .. " reason=" .. tostring(tokenReason or "unknown"))
+        end
+    end
+    if PNC.LiveBodyControl
+        and PNC.LiveBodyControl.SetManagedBodyUseless
+    then
+        PNC.LiveBodyControl.SetManagedBodyUseless(body, true)
+    end
+    return true
+end
+
 function Adapter.BuildRecord(actor, core, baseRecord)
     local service = provider(core)
     if not service or type(service.Project) ~= "function" then
@@ -191,20 +250,14 @@ function Adapter.Materialize(actor, core, spec)
         if type(rollback) == "function" then rollback(body, record, spec) end
         return nil, "body_id_required"
     end
-    if body and type(body.getInventory) == "function"
-        and PNC.Inventory
-        and type(PNC.Inventory.MaterializeLooseInventory) == "function"
-    then
-        local inventoryOK, inventoryReason =
-            PNC.Inventory.MaterializeLooseInventory(record, body)
-        if not inventoryOK then
-            rollback = spec.cleanup or spec.destroy
-            if type(rollback) == "function" then
-                rollback(body, record, spec)
-            end
-            return nil, inventoryReason
-                or "physical_inventory_materialize_failed"
+    local configured, configurationReason = configureMaterializedBody(
+        record, body, lifecycle)
+    if not configured then
+        rollback = spec.cleanup or spec.destroy
+        if type(rollback) == "function" then
+            rollback(body, record, spec)
         end
+        return nil, configurationReason
     end
     if type(spec.applyProjection) == "function" then
         local applied = spec.applyProjection(body, projection, record)
