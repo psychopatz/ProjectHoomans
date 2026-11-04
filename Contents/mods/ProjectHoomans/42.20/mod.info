@@ -6,5 +6,6 @@ category=framework
 version=0.1.0
 versionMin=42.20
 require=PsychopatzCore,MarketSense
+incompatible=\DTAbstract
 poster=poster.png
 icon=icon.png

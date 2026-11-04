@@ -661,6 +661,139 @@ T.equal(sentClientCommand.command, Scene.CMD_END,
     "MP snapshot-only lifecycle sends authoritative end")
 sendClientCommand = nil
 isClient = function() return false end
-T.finish("pnc_conversation_safety_smoke")
+
+-- A canonical Core actor can participate in the exact same Hoomans
+-- conversation authority while remaining permanently abstract. No live
+-- zombie, distance check, threat scan or animation scene is required.
+local abstractRecord = {
+    id = "actor:abstract:conversation",
+    coreActorID = "actor:abstract:conversation",
+    alive = true,
+    available = true,
+    persist = false,
+    runtimeView = true,
+    abstractOnly = true,
+    presenceState = "abstract",
+    tacticalClass = "neutral",
+    hostility = { attackPlayers = false },
+    social = {},
+    runtime = {},
+}
+local originalGet = PNC.Registry.Get
+local originalGetLiveZombie = PNC.Registry.GetLiveZombie
+PNC.Registry.Get = function(id)
+    if id == abstractRecord.id then return abstractRecord end
+    return originalGet(id)
+end
+PNC.Registry.GetLiveZombie = function(id)
+    if id == abstractRecord.id then return nil end
+    return originalGetLiveZombie(id)
+end
+local abstractSpec = {
+    npcID = abstractRecord.id,
+    character = nil,
+    context = {
+        player = player,
+        abstractConversation = true,
+        entry = {
+            id = abstractRecord.id,
+            abstractOnly = true,
+            record = abstractRecord,
+            snapshot = {
+                id = abstractRecord.id,
+                alive = true,
+                abstractOnly = true,
+                presenceState = "abstract",
+            },
+        },
+    },
+}
+T.equal(Safety.Check(abstractSpec), nil,
+    "abstract Core actor is conversation-available without a body")
+local abstractAuthorized = false
+PNC.CoreActorRuntimeView = {
+    ConsumeConversationAccess = function(targetRecord, targetPlayer)
+        T.equal(targetRecord, abstractRecord,
+            "abstract access record")
+        T.equal(targetPlayer, player,
+            "abstract access player")
+        if not abstractAuthorized then
+            return false, "abstract_access_denied"
+        end
+        abstractAuthorized = false
+        return true, "debug"
+    end,
+}
+local heldBeforeAbstract = held
+local deniedAbstract, deniedAbstractReason = Scene.Begin(
+    abstractRecord,
+    nil,
+    player,
+    "lease-abstract-denied",
+    {
+        maximumDistance = 5.5,
+        dangerRadius = 8,
+        enforceDistance = true,
+        guardThreats = true,
+    }
+)
+T.falsy(deniedAbstract,
+    "abstract Core actor must require remote authorization")
+T.equal(deniedAbstractReason, "abstract_access_denied",
+    "abstract authorization denial reason")
+abstractAuthorized = true
+local abstractStarted, abstractLease = Scene.Begin(
+    abstractRecord,
+    nil,
+    player,
+    "lease-abstract",
+    {
+        maximumDistance = 5.5,
+        dangerRadius = 8,
+        enforceDistance = true,
+        guardThreats = true,
+    }
+)
+T.equal(abstractStarted, true,
+    "authorized abstract actor begins normal Hoomans conversation lease")
+T.truthy(abstractLease and abstractLease.abstractOnly,
+    "abstract lease records bodyless presence")
+T.equal(abstractLease.guardThreats, false,
+    "abstract lease skips body-dependent threat guard")
+T.equal(held, heldBeforeAbstract,
+    "abstract lease does not request a physical animation scene")
+local abstractReserved = Scene.ReserveLLMRequest(
+    abstractRecord,
+    nil,
+    player,
+    "lease-abstract",
+    "request-abstract"
+)
+T.equal(abstractReserved, true,
+    "abstract conversation reserves normal Hoomans semantic request")
+local abstractValid = Scene.ValidateLLMRequest(
+    abstractRecord,
+    nil,
+    player,
+    "lease-abstract",
+    "request-abstract"
+)
+T.equal(abstractValid, true,
+    "abstract conversation validates normal Hoomans semantic request")
+T.equal(Scene.Pump(abstractRecord, nil, now), false,
+    "abstract conversation heartbeat remains active without a body")
+T.truthy(abstractRecord.runtime.conversationLease,
+    "abstract conversation lease remains active")
+Scene.ClearLLMRequest(abstractRecord, "test_cleanup")
+Scene.End(
+    abstractRecord,
+    nil,
+    "lease-abstract",
+    "test_cleanup"
+)
+T.equal(abstractRecord.runtime.conversationLease, nil,
+    "abstract conversation closes through normal lease cleanup")
+PNC.Registry.Get = originalGet
+PNC.Registry.GetLiveZombie = originalGetLiveZombie
 
 T.finish("pnc_conversation_safety_smoke")

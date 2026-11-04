@@ -39,6 +39,18 @@ local function isNetworkClient()
     return isClient and isClient() == true
 end
 
+local function isAbstractConversation(spec, record)
+    local context = spec and spec.context or {}
+    local entry = context.entry or {}
+    record = record or entry.record
+    return context.abstractConversation == true
+        or entry.abstractOnly == true
+        or type(record) == "table"
+            and (record.abstractOnly == true
+                or record.runtimeView == true
+                    and tostring(record.presenceState or "") == "abstract")
+end
+
 local function isTravelConversation(spec)
     local context = spec and spec.context or {}
     local state = context.conversationLifecycleState
@@ -68,6 +80,7 @@ local function enforceConversationDistance(spec)
     -- interaction resolver. Their active lease must not be cancelled when
     -- FollowOwner carries the NPC away from the player.
     if context.nameplateConversation == true then return false end
+    if isAbstractConversation(spec, record) then return false end
     if record and record.runtime and record.runtime.conversationLease then
         return false
     end
@@ -81,6 +94,7 @@ end
 function Safety.GuardsThreats(spec)
     local context = spec and spec.context or {}
     if context.nameplateConversation == true then return false end
+    if isAbstractConversation(spec) then return false end
     return context.guardThreats ~= false
 end
 
@@ -368,7 +382,8 @@ function Safety.Check(spec)
     local player, zombie, record, npcID = Safety.ResolveActors(spec)
     local snapshot = snapshotFor(spec)
     local snapshotConversation = allowsSnapshotConversation(spec, zombie)
-    if not alive(zombie) and not snapshotConversation then
+    local abstract = isAbstractConversation(spec, record)
+    if not abstract and not alive(zombie) and not snapshotConversation then
         return "npc_unavailable"
     end
     if enforceConversationDistance(spec) then

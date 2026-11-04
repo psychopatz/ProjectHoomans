@@ -56,7 +56,11 @@ local CoreClient = {
             identitySeed = entry.actorID,
             isFemale = false,
             appearance = { hairModel = "Short" },
-            equipment = { worn = {} },
+            equipment = {
+                worn = {
+                    Torso_Upper = "Base.Tshirt",
+                },
+            },
         }
     end,
 }
@@ -80,6 +84,7 @@ end
 PNC = {
     Const = {
         PRESENCE_LIVE = "live",
+        PRESENCE_ABSTRACT = "abstract",
         PRESENCE_CORPSE = "corpse",
     },
     Core = {
@@ -163,5 +168,37 @@ T.equal(entry.coreActorProjection, true,
     "entry did not mark Core map authority")
 T.equal(entry.positionSource, "ProjectHoomans.LiveBody",
     "live-body provider source missing")
+T.falsy(entry.abstractOnly,
+    "materialized Hoomans Core actor was incorrectly made abstract")
+T.equal(entry.record.presenceState, "live",
+    "materialized Hoomans Core actor lost live presence")
+
+local abstract = Directory.ProjectCoreActor({
+    actorID = "actor:core:abstract-trader",
+    label = "Abstract Trader",
+    provider = "DTAbstract",
+    providerState = "abstract",
+    position = { x = 500, y = 600, z = 0 },
+    groupID = "group:abstract:trader",
+    communityID = "community:abstract:trader",
+    factionID = "faction:abstract:trader",
+    role = "trader",
+})
+T.truthy(abstract,
+    "abstract Core trader did not project through Hoomans directory")
+T.truthy(abstract.abstractOnly,
+    "DTAbstract Core actor was not marked permanently abstract")
+T.equal(abstract.presenceState, "abstract",
+    "DTAbstract Core actor presence mismatch")
+T.equal(abstract.record.role, "trader",
+    "abstract trader role was not promoted into Hoomans record")
+T.truthy(abstract.record.roles
+    and abstract.record.roles.trader,
+    "abstract trader semantic role was not available on first render")
+T.equal(
+    abstract.record.equipment.worn.Torso_Upper,
+    "Base.Tshirt",
+    "abstract trader clothing did not survive Core->Hoomans projection"
+)
 
 T.finish("pnc_core_survivor_world_travel_directory_smoke")

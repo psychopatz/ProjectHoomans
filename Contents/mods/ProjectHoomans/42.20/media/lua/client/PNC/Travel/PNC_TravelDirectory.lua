@@ -109,18 +109,40 @@ local function currentWorldHour()
 end
 
 
+local function isAbstractCoreProjection(entry)
+    if type(entry) ~= "table" then return false end
+    return tostring(entry.providerState or "") ~= "materialized"
+end
+
 local function coreVisibilitySnapshot(entry)
     local snapshot = resolveSnapshot(entry and entry.actorID)
     if snapshot then return snapshot end
     if type(entry) ~= "table" then return nil end
+    local abstract = isAbstractCoreProjection(entry)
+    local presenceState = abstract
+        and (PNC.Const.PRESENCE_ABSTRACT or "abstract")
+        or (PNC.Const.PRESENCE_LIVE or "live")
+    local portrait = SurvivorWorldClient.GetPortraitSpec
+        and SurvivorWorldClient.GetPortraitSpec(entry) or nil
     return {
         id = tostring(entry.actorID or ""),
+        coreActorID = tostring(entry.actorID or ""),
         alive = true,
+        available = true,
+        persist = false,
+        runtimeView = true,
+        abstractOnly = abstract,
+        presenceMode = abstract and "abstract" or "live",
+        name = tostring(entry.label or entry.actorID or ""),
+        displayName = tostring(entry.label or entry.actorID or ""),
+        identitySeed = tostring(entry.actorID or ""),
+        portrait = portrait,
+        appearance = portrait and portrait.appearance or nil,
+        equipmentSummary = portrait and portrait.equipment or nil,
         x = entry.position and entry.position.x,
         y = entry.position and entry.position.y,
         z = entry.position and entry.position.z or 0,
-        presenceState = entry.providerState == "materialized"
-            and PNC.Const.PRESENCE_LIVE or nil,
+        presenceState = presenceState,
         worldDiscovery = {
             populationGenerated = true,
         },
@@ -167,6 +189,58 @@ local function coreProjected(entry, atWorldHour, trackedActorID)
         }
     end
 
+    local abstract = isAbstractCoreProjection(entry)
+    local presenceState = abstract
+        and (PNC.Const.PRESENCE_ABSTRACT or "abstract")
+        or (PNC.Const.PRESENCE_LIVE or "live")
+    local portrait = SurvivorWorldClient.GetPortraitSpec
+        and SurvivorWorldClient.GetPortraitSpec(entry)
+        or resolvePortrait(snapshot)
+    local runtimeRecord = {
+        id = tostring(entry.actorID),
+        coreActorID = tostring(entry.actorID),
+        persist = false,
+        runtimeView = true,
+        abstractOnly = abstract,
+        presenceMode = abstract and "abstract" or "live",
+        presenceState = presenceState,
+        provider = entry.provider,
+        providerState = entry.providerState,
+        alive = not snapshot or snapshot.alive ~= false,
+        available = true,
+        identitySeed = snapshot and snapshot.identitySeed
+            or tostring(entry.actorID),
+        name = snapshot and (
+            snapshot.name or snapshot.displayName
+        ) or tostring(entry.label or entry.actorID),
+        displayName = snapshot and (
+            snapshot.displayName or snapshot.name
+        ) or tostring(entry.label or entry.actorID),
+        tacticalClass = tostring(
+            snapshot and snapshot.tacticalClass or "neutral"
+        ),
+        appearance = portrait and portrait.appearance or nil,
+        equipment = portrait and portrait.equipment or { worn = {} },
+        equipmentSummary = portrait and portrait.equipment or { worn = {} },
+        portrait = portrait,
+        role = snapshot and snapshot.role
+            or entry.role,
+        roles = {
+            trader = tostring(
+                snapshot and snapshot.role or entry.role or ""
+            ) == "trader",
+        },
+        affiliation = snapshot and snapshot.affiliation or {
+            groupID = entry.groupID,
+            communityID = entry.communityID,
+            factionID = entry.factionID,
+            role = entry.role,
+        },
+        x = tonumber(entry.position.x),
+        y = tonumber(entry.position.y),
+        z = tonumber(entry.position.z) or 0,
+    }
+
     return {
         id = tostring(entry.actorID),
         npcId = tostring(entry.actorID),
@@ -190,9 +264,10 @@ local function coreProjected(entry, atWorldHour, trackedActorID)
         alive = not snapshot or snapshot.alive ~= false,
         infected = snapshot and snapshot.infected == true or false,
         orderKind = snapshot and snapshot.orderKind or nil,
-        portrait = SurvivorWorldClient.GetPortraitSpec
-            and SurvivorWorldClient.GetPortraitSpec(entry)
-            or resolvePortrait(snapshot),
+        portrait = portrait,
+        snapshot = runtimeRecord,
+        record = runtimeRecord,
+        abstractOnly = abstract,
         roleTag = snapshot
             and snapshot.mapPresentation
             and snapshot.mapPresentation.roleTag
@@ -205,9 +280,7 @@ local function coreProjected(entry, atWorldHour, trackedActorID)
             and snapshot.mapPresentation
             and snapshot.mapPresentation.visibility
             or "all",
-        presenceState = snapshot and snapshot.presenceState
-            or (entry.providerState == "materialized"
-                and PNC.Const.PRESENCE_LIVE or nil),
+        presenceState = presenceState,
         provider = entry.provider,
         providerState = entry.providerState,
         groupID = entry.groupID,
@@ -250,6 +323,11 @@ local function coreProjected(entry, atWorldHour, trackedActorID)
             or false,
     }
 end
+
+-- Public adapter for any client integration that already has a canonical Core
+-- SurvivorWorld actor projection and needs the same Hoomans presentation /
+-- conversation entry used by the travel directory.
+Directory.ProjectCoreActor = coreProjected
 
 local function listCoreProjected(atWorldHour)
     if not SurvivorWorldClient then return {} end

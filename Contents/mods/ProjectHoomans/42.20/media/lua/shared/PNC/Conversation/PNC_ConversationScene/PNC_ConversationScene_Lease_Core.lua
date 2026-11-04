@@ -35,6 +35,13 @@ local function sceneOptions(options)
     )
 end
 
+local function isAbstractRecord(record)
+    return type(record) == "table"
+        and (record.abstractOnly == true
+            or record.runtimeView == true
+                and tostring(record.presenceState or "") == "abstract")
+end
+
 local function isTravelJourney(record)
     local order = record and record.orderSpec or nil
     local journey = record and record.travel or nil
@@ -71,8 +78,12 @@ local function renewLease(record, token, currentTime)
     local current = record.runtime.conversationLease
     if not current
         or tostring(current.token or "") ~= token
-        or not record.runtime.animationScene
-        or record.runtime.animationScene.id ~= Scene.ID
+    then
+        return nil
+    end
+    if not isAbstractRecord(record)
+        and (not record.runtime.animationScene
+            or record.runtime.animationScene.id ~= Scene.ID)
     then
         return nil
     end
@@ -99,6 +110,9 @@ local function ownedByAnotherPlayer(current, player, currentTime)
 end
 
 local function requestScene(record, zombie, currentTime)
+    if isAbstractRecord(record) then
+        return true, "abstract_no_body_scene"
+    end
     return PNC.AnimationScenes.Request(record, zombie, Scene.ID, {
         reason = "conversation",
         repeatMode = "loop",
@@ -152,6 +166,7 @@ end
 
 Internal.LeaseLog = log
 Internal.SceneOptions = sceneOptions
+Internal.IsAbstractRecord = isAbstractRecord
 Internal.IsTravelJourney = isTravelJourney
 Internal.IsTravelConversation = isTravelConversation
 Internal.PlayerOwnsLease = playerOwnsLease

@@ -11,6 +11,11 @@ local Reset = Persistence.Reset
     or require "PNC/Core/Persistence/PNC_ModDataStore"
 
 Registry.Data = Registry.Data or {}
+-- Non-persistent logical views of canonical Core actors. These entries are
+-- addressable by runtime services (conversation/social/etc.) but are never
+-- enumerated as Hoomans-owned NPCs and never enter ModData/scheduler/spatial
+-- persistence.
+Registry.RuntimeViews = Registry.RuntimeViews or {}
 Registry.LiveByID = Registry.LiveByID or {}
 Registry.DirtyByID = Registry.DirtyByID or {}
 Registry.DirtyDomains = Registry.DirtyDomains or {}

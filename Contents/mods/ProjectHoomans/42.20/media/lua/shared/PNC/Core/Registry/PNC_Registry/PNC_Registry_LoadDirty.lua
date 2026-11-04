@@ -35,9 +35,21 @@ function Registry.MarkDirty(recordOrID, domain)
         return false
     end
     id = tostring(id)
-    record = Registry.Data[id] or type(recordOrID) == "table" and recordOrID or nil
+    record = Registry.Data[id]
+        or Registry.RuntimeViews and Registry.RuntimeViews[id]
+        or type(recordOrID) == "table" and recordOrID or nil
     if not record then
         return false
+    end
+    -- Runtime Core-actor views are intentionally non-persistent. Services may
+    -- mutate their projected social/context state, but durable changes are
+    -- synchronized back to Core by the owning adapters rather than written as
+    -- a second Hoomans NPC record.
+    if record.persist == false
+        and record.runtimeView == true
+        and not Registry.Data[id]
+    then
+        return true
     end
     if not Registry.DirtyByID[id] then
         record.recordRevision = math.max(0, math.floor(tonumber(record.recordRevision) or 0)) + 1
@@ -58,6 +70,7 @@ function Registry.Load()
         return
     end
     Registry.Data = {}
+    Registry.RuntimeViews = {}
     Registry.LiveByID = {}
     Registry.DirtyByID = {}
     Registry.DirtyDomains = {}

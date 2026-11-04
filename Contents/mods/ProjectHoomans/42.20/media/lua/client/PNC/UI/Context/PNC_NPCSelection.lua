@@ -56,6 +56,22 @@ local function buildEntry(zombie, record, snapshot, referenceX, referenceY)
     }
 end
 
+function Selection.BuildEntry(
+    zombie,
+    record,
+    snapshot,
+    referenceX,
+    referenceY
+)
+    return buildEntry(
+        zombie,
+        record,
+        snapshot,
+        referenceX,
+        referenceY
+    )
+end
+
 function Selection.GetWorldSquare(worldObjects)
     return getWorldSquare(worldObjects)
 end

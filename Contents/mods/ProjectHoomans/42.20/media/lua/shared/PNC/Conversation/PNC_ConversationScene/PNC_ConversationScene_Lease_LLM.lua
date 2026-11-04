@@ -7,6 +7,7 @@ PNC.ConversationScene.Internal = PNC.ConversationScene.Internal or {}
 local Scene = PNC.ConversationScene
 local Internal = Scene.Internal
 local playerOwnsLease = Internal.PlayerOwnsLease
+local isAbstractRecord = Internal.IsAbstractRecord
 local log = Internal.LeaseLog
 
 function Scene.ReserveLLMRequest(record, zombie, player, token, requestID)
@@ -39,10 +40,11 @@ function Scene.ReserveLLMRequest(record, zombie, player, token, requestID)
         end
         Scene.ClearLLMRequest(record, "request_timeout")
     end
-    if not Internal.IsAlive(zombie) then
+    local abstract = isAbstractRecord(record)
+    if not abstract and not Internal.IsAlive(zombie) then
         return false, "npc_unavailable"
     end
-    if lease.guardThreats ~= false and Scene.HasThreat(
+    if not abstract and lease.guardThreats ~= false and Scene.HasThreat(
         record,
         zombie,
         player,
@@ -148,10 +150,11 @@ function Scene.ValidateLLMRequest(record, zombie, player, token, requestID)
     if not playerOwnsLease(player, pending) then
         return false, "conversation_player_mismatch"
     end
-    if not Internal.IsAlive(zombie) then
+    local abstract = isAbstractRecord(record)
+    if not abstract and not Internal.IsAlive(zombie) then
         return false, "npc_unavailable"
     end
-    if pending.guardThreats ~= false and Scene.HasThreat(
+    if not abstract and pending.guardThreats ~= false and Scene.HasThreat(
         record,
         zombie,
         player,

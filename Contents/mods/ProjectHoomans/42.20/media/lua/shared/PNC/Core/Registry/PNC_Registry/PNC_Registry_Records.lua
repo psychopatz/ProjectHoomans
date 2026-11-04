@@ -80,9 +80,40 @@ function Registry.RemoveRecord(id)
     Registry.DirectoryDirty = true
 end
 
+function Registry.SetRuntimeView(record)
+    Registry.EnsureLoaded()
+    if type(record) ~= "table" or record.id == nil then
+        return nil, "runtime_view_id_required"
+    end
+    local id = tostring(record.id)
+    if Registry.Data[id] then
+        return Registry.Data[id], "persistent_record_exists"
+    end
+    record.id = id
+    record.persist = false
+    record.runtimeView = true
+    Registry.RuntimeViews[id] = record
+    return record, "runtime_view_set"
+end
+
+function Registry.RemoveRuntimeView(id)
+    Registry.EnsureLoaded()
+    id = id ~= nil and tostring(id) or nil
+    if not id or not Registry.RuntimeViews[id] then return false end
+    Registry.RuntimeViews[id] = nil
+    return true
+end
+
+function Registry.GetRuntimeView(id)
+    Registry.EnsureLoaded()
+    return id ~= nil and Registry.RuntimeViews[tostring(id)] or nil
+end
+
 function Registry.Get(id)
     Registry.EnsureLoaded()
-    return id ~= nil and Registry.Data[tostring(id)] or nil
+    if id == nil then return nil end
+    id = tostring(id)
+    return Registry.Data[id] or Registry.RuntimeViews[id]
 end
 
 function Registry.GetLiveZombie(id)

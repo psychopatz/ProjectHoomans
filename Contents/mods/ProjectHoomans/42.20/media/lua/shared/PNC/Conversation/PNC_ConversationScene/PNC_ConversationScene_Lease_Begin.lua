@@ -16,6 +16,7 @@ local ownedByAnotherPlayer = Internal.OwnedByAnotherPlayer
 local requestScene = Internal.RequestScene
 local createLease = Internal.CreateLease
 local establishParley = Internal.EstablishParley
+local isAbstractRecord = Internal.IsAbstractRecord
 
 function Scene.Begin(record, zombie, player, token, options)
     local maximumDistance
@@ -35,10 +36,11 @@ function Scene.Begin(record, zombie, player, token, options)
     local previousProcessedRequests
     local activeTravelHeartbeat
     options, maximumDistance, dangerRadius = sceneOptions(options)
-    guardThreats = options.guardThreats ~= false
-    enforceDistance = options.enforceDistance ~= false
+    local abstract = isAbstractRecord(record)
+    guardThreats = not abstract and options.guardThreats ~= false
+    enforceDistance = not abstract and options.enforceDistance ~= false
     if not record or record.alive == false
-        or not Internal.IsAlive(zombie)
+        or (not abstract and not Internal.IsAlive(zombie))
     then
         return false, "npc_unavailable"
     end
@@ -46,6 +48,31 @@ function Scene.Begin(record, zombie, player, token, options)
     currentTime = Internal.Now()
     token = tostring(token or "")
     current = record.runtime.conversationLease
+    if abstract and not (
+        current
+        and tostring(current.token or "") == token
+        and playerOwnsLease(player, current)
+        and (tonumber(current.expiresAt) or 0) > currentTime
+    ) then
+        local adapter = PNC.CoreActorRuntimeView
+        local authorized
+        local accessReason
+        if adapter
+            and type(adapter.ConsumeConversationAccess)
+                == "function"
+        then
+            authorized, accessReason =
+                adapter.ConsumeConversationAccess(
+                    record,
+                    player,
+                    currentTime
+                )
+        end
+        if authorized ~= true then
+            return false, accessReason
+                or "abstract_access_denied"
+        end
+    end
     activeTravelHeartbeat = current
         and tostring(current.token or "") == token
         and playerOwnsLease(player, current)
@@ -106,6 +133,7 @@ function Scene.Begin(record, zombie, player, token, options)
         hostileParley,
         isTravelJourney(record)
     )
+    lease.abstractOnly = abstract == true
     if hostileParley
         and not establishParley(
             record, zombie, player, token, currentTime

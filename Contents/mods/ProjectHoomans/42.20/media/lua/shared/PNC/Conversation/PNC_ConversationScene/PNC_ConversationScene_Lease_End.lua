@@ -8,6 +8,7 @@ local Scene = PNC.ConversationScene
 local Internal = Scene.Internal
 local isTravelConversation = Internal.IsTravelConversation
 local playerOwnsLease = Internal.PlayerOwnsLease
+local isAbstractRecord = Internal.IsAbstractRecord
 local log = Internal.LeaseLog
 local recordConversationTopics = Internal.RecordConversationTopics
 local InteractionPersistence = PNC.Conversation
@@ -119,19 +120,22 @@ function Scene.Pump(record, zombie, currentTime)
     local lease = runtime and runtime.conversationLease or nil
     local pending = runtime and runtime.llmRequestLease or nil
     local player
+    local abstract = isAbstractRecord(record)
     currentTime = tonumber(currentTime) or Internal.Now()
     if pending then
         player = resolveLeasePlayer(pending)
         if currentTime >= (tonumber(pending.expiresAt) or 0) then
             Scene.ClearLLMRequest(record, "request_timeout")
-        elseif not player or not Internal.IsAlive(zombie)
-            or (pending.guardThreats ~= false and Scene.HasThreat(
-                record,
-                zombie,
-                player,
-                tonumber(pending.dangerRadius) or Scene.DANGER_RADIUS,
-                { ignoreTalkingNPC = pending.hostileParley == true }
-            ))
+        elseif not player
+            or (not abstract and not Internal.IsAlive(zombie))
+            or (not abstract and pending.guardThreats ~= false
+                and Scene.HasThreat(
+                    record,
+                    zombie,
+                    player,
+                    tonumber(pending.dangerRadius) or Scene.DANGER_RADIUS,
+                    { ignoreTalkingNPC = pending.hostileParley == true }
+                ))
         then
             Scene.ClearLLMRequest(record, "request_safety_failed")
         end
@@ -143,12 +147,12 @@ function Scene.Pump(record, zombie, currentTime)
             record, zombie, lease.token, "conversation_timeout"
         )
     end
-    if not player or not Internal.IsAlive(zombie) then
+    if not player or (not abstract and not Internal.IsAlive(zombie)) then
         return Scene.End(
             record, zombie, lease.token, "conversation_unavailable"
         )
     end
-    if lease.guardThreats ~= false and Scene.HasThreat(
+    if not abstract and lease.guardThreats ~= false and Scene.HasThreat(
         record,
         zombie,
         player,
