@@ -5,6 +5,8 @@ require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
 local SurvivorWorldClient = require
     "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldClient"
+local CoreActorMap = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldActorMap"
 
 PNC = PNC or {}
 PNC.MapTravelLayer = PNC.MapTravelLayer or {}
@@ -50,6 +52,16 @@ function TravelLayer.GetProjectedEntries()
     return listProjectedEntries()
 end
 
+local function listLegacyProjectedEntries()
+    local output = {}
+    for _, entry in ipairs(listProjectedEntries()) do
+        if entry.coreActorProjection ~= true then
+            output[#output + 1] = entry
+        end
+    end
+    return output
+end
+
 function TravelLayer.GetDotSize(map)
     local zoom = map and map.mapAPI
         and tonumber(map.mapAPI:getZoomF()) or 0
@@ -63,7 +75,7 @@ function TravelLayer.FindMarkerAt(map, x, y, padding)
     if not TravelLayer.Enabled or not map or not map.mapAPI then
         return nil
     end
-    local entries = listProjectedEntries()
+    local entries = listLegacyProjectedEntries()
     local positions = TravelLayer.BuildMarkerScreenPositions(map, entries)
     local half = TravelLayer.GetDotSize(map) / 2
         + (tonumber(padding) or 3)
@@ -466,7 +478,7 @@ function TravelLayer.Render(map)
         end
         return
     end
-    local entries = listProjectedEntries()
+    local entries = listLegacyProjectedEntries()
     local showLabels = Display and Display.AreNamesVisible
         and Display.AreNamesVisible() or false
     local dotSize = TravelLayer.GetDotSize(map)
@@ -486,62 +498,35 @@ Layers.Register("pnc_travel", {
     render = TravelLayer.Render,
 })
 
-local function markerAt(x, y)
-    local best
-    local bestDistance = math.huge
-    for _, item in pairs(
-        TravelLayer.LastMarkerPositions or {}
-    ) do
-        local entry = item.entry
-        if entry and entry.coreActorProjection == true then
-            local dx = (tonumber(x) or 0) - item.x
-            local dy = (tonumber(y) or 0) - item.y
-            local distance = math.sqrt(dx * dx + dy * dy)
-            if distance <= (item.radius or 8)
-                and distance < bestDistance
-            then
-                best = item
-                bestDistance = distance
+local function corePresentationFor(actorID)
+    actorID = tostring(actorID or "")
+    local entries = listProjectedEntries()
+    if TravelLayer.CorePresentationIndexSource ~= entries then
+        local index = {}
+        for _, entry in ipairs(entries) do
+            if entry.coreActorProjection == true then
+                index[tostring(entry.id or "")] = entry
             end
         end
+        TravelLayer.CorePresentationIndex = index
+        TravelLayer.CorePresentationIndexSource = entries
     end
-    return best
+    return TravelLayer.CorePresentationIndex
+        and TravelLayer.CorePresentationIndex[actorID] or nil
 end
 
-local MapHost = require
-    "PsychopatzCore/UI/Map/PsychopatzMapHost"
-MapHost.Contexts.Register("ProjectHoomans:actor_tracking", {
-    order = 70,
-    available = function(map, x, y)
-        return markerAt(x, y) ~= nil
-    end,
-    augment = function(map, context, x, y)
-        local hit = markerAt(x, y)
-        if not hit or not context or not context.addOption then
-            return false
+CoreActorMap.RegisterDecorator("ProjectHoomans", {
+    priority = 200,
+    decorate = function(entry, style)
+        local projected = corePresentationFor(entry.actorID)
+        if not projected then
+            style.visible = false
+            return style
         end
-        local entry = hit.entry
-        local tracked = SurvivorWorldClient.GetTracked
-            and SurvivorWorldClient.GetTracked() or nil
-        local trackedID = tracked
-            and tostring(tracked.actorID or "") or ""
-        local alreadyTracked =
-            trackedID == tostring(entry.id)
-        context:addOption(
-            alreadyTracked and "Stop tracking survivor"
-                or ("Track " .. displayLabel(entry)),
-            nil,
-            function()
-                if SurvivorWorldClient.SetTracked then
-                    SurvivorWorldClient.SetTracked(
-                        alreadyTracked and nil
-                            or entry.id
-                    )
-                    TravelLayer.InvalidateEntryCache()
-                end
-            end
-        )
-        return true
+        style.color = colorFor(projected)
+        style.label = displayLabel(projected)
+        style.size = 9
+        return style
     end,
 })
 
