@@ -61,6 +61,12 @@ function Types.NormalizeDefinition(definition)
         ),
         startingItems = type(def.startingItems) == "table"
             and PNC.Core.DeepCopy(def.startingItems) or nil,
+        inventoryAuthority = Internal.NormalizeString(
+            def.inventoryAuthority
+        ),
+        personalInventory = type(def.personalInventory) == "table"
+            and PNC.Core.DeepCopy(def.personalInventory) or nil,
+        coreActorID = Internal.NormalizeString(def.coreActorID),
         skillBaseLevels = Types.NormalizeSkillLevels(
             def.skillBaseLevels or def.skillLevels
         ),

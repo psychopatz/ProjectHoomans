@@ -87,6 +87,24 @@ local function finalizeNewRecord(record, definition)
     if Inventory then
         if definition.inventory and Inventory.Deserialize then
             Inventory.Deserialize(record, definition.inventory)
+        elseif definition.inventoryAuthority == "canonical"
+            and definition.personalInventory
+            and Inventory.ActorInventoryBridge
+            and Inventory.ActorInventoryBridge.HydrateRecord
+        then
+            local hydrated, hydrateReason =
+                Inventory.ActorInventoryBridge.HydrateRecord(
+                    record,
+                    { personalInventory = definition.personalInventory }
+                )
+            if not hydrated then
+                Core.LogWarn(
+                    "PNC canonical inventory hydration failed id="
+                        .. tostring(record.id) .. " reason="
+                        .. tostring(hydrateReason)
+                )
+                return nil
+            end
         elseif hasExplicitEquipment(definition.equipment) and Inventory.SyncFromEquipment then
             Inventory.SyncFromEquipment(record, "spawn_definition_equipment")
         elseif Inventory.EnsureRecordInventory then

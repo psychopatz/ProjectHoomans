@@ -134,8 +134,48 @@ local function addStartingWeapons(record, base, template)
     end
 end
 
+local function addCanonicalItems(record, base)
+    local items = record and record.startingItems or {}
+    local index
+    local entry
+    local fullType
+    for index = 1, #items do
+        entry = type(items[index]) == "table" and items[index] or {}
+        fullType = entry.fullType or entry.type
+        if fullType then
+            Internal.createItem(record, base, {
+                type = fullType,
+                stack = entry.stack or entry.quantity,
+                uses = entry.uses,
+                cond = entry.cond,
+                ammoCount = entry.ammoCount,
+                container = entry.container or "root",
+                bagContainer = entry.bagContainer,
+                wornSlot = entry.wornSlot,
+                attachedSlot = entry.attachedSlot,
+                equipSlot = entry.equipSlot or entry.equippedSlot,
+                wearableSlot = entry.wearableSlot,
+                maxWeight = entry.maxWeight,
+                weightReduction = entry.weightReduction,
+                itemState = entry.itemState,
+                templateKey = "dt:canonical:" .. tostring(index),
+            })
+        end
+    end
+end
+
 function Internal.buildTemplateSnapshot(record, options)
     local base = Internal.createBaseInventory(record, options)
+    if record and record.inventoryAuthority == "canonical" then
+        addCanonicalItems(record, base)
+        base.template.equipmentPoolID = record.equipmentPoolID
+            or "DynamicTrading"
+        base.template.weaponMode = record.weaponMode or "melee"
+        base.template.templateRef = record.inventoryTemplateRef
+            or "dynamictrading.canonical"
+        Internal.calculateWeights(base)
+        return base
+    end
     local template = buildIdentityTemplate(record)
     local bagContainerID
 

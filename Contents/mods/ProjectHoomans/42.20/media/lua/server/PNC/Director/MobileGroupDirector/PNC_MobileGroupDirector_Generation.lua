@@ -14,6 +14,29 @@ local Resolver = PNC.CommunitySiteResolver
 local Core = PNC.Core
 local Const = PNC.Const
 
+local function applyMemberSpec(spawnDefinition, memberSpec)
+    if type(memberSpec) ~= "table" then return spawnDefinition end
+    local fields = {
+        "displayName", "name", "identitySeed", "identity", "isFemale",
+        "archetypeID", "appearance", "appearanceAuthored",
+        "appearanceProvenance", "visualProfile", "startingItems",
+        "inventoryAuthority", "personalInventory", "coreActorID",
+        "inventoryTemplateRef", "equipment", "weaponMode",
+    }
+    for _, key in ipairs(fields) do
+        if memberSpec[key] ~= nil then
+            spawnDefinition[key] = Core.DeepCopy(memberSpec[key])
+        end
+    end
+    if memberSpec.actorID ~= nil then
+        spawnDefinition.id = tostring(memberSpec.actorID)
+    end
+    if memberSpec.inventoryAuthority == "canonical" then
+        spawnDefinition.equipmentSpawnMode = nil
+    end
+    return spawnDefinition
+end
+
 function Director.GenerateForFaction(factionID, spec)
     if not H.Authority() then return false, "not_authority" end
     spec = type(spec) == "table" and spec or {}
@@ -160,6 +183,10 @@ function Director.GenerateForFaction(factionID, spec)
             resolved.generation = spawnDefinition.generation
             spawnDefinition = resolved
         end
+        spawnDefinition = applyMemberSpec(
+            spawnDefinition,
+            spec.memberSpecs and spec.memberSpecs[index] or nil
+        )
         local record = PNC.API.Spawn(spawnDefinition)
         if not record then
             rollbackCreated("npc_spawn_failed")
@@ -253,5 +280,7 @@ function Director.GenerateForFaction(factionID, spec)
         liveCount = liveCount,
         abstractCount = abstractCount,
         npcIDs = ids,
+        memberSpecs = type(spec.memberSpecs) == "table"
+            and Core.DeepCopy(spec.memberSpecs) or nil,
     }
 end

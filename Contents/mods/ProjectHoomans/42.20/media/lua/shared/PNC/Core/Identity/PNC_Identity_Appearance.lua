@@ -59,6 +59,11 @@ end
 
 function Appearance.Normalize(source, legacyOutfit)
     local input = type(source) == "table" and source or {}
+    local authoredPolicy = type(input.policy) == "table"
+        and input.policy or nil
+    if authoredPolicy then
+        input = authoredPolicy
+    end
     local output = {
         schemaVersion = Appearance.SCHEMA_VERSION,
         outfit = { mode = "random" },
