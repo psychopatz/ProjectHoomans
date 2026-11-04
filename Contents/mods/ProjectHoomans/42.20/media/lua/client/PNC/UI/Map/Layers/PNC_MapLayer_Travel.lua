@@ -516,11 +516,17 @@ local function corePresentationFor(actorID)
 end
 
 CoreActorMap.RegisterDecorator("ProjectHoomans", {
-    priority = 200,
+    -- Keep generic Hoomans actor styling below the shared Dynamic Trading
+    -- decorator so trader identity/icon/faction presentation remains common.
+    priority = 50,
     decorate = function(entry, style)
         local projected = corePresentationFor(entry.actorID)
         if not projected then
-            style.visible = false
+            return style
+        end
+        if style.hoverMetadata
+            and style.hoverMetadata.traderID
+        then
             return style
         end
         style.color = colorFor(projected)
