@@ -22,6 +22,7 @@ end
 
 local actualZombie = body("real-zed", false)
 local managedNPCBody = body("managed-npc", true)
+local registryManagedBody = body("registry-managed-npc", false)
 
 PNC = {
     Const = {
@@ -54,17 +55,20 @@ PNC = {
     },
     SpatialIndex = {
         QueryZombies = function()
-            return { actualZombie, managedNPCBody }
+            return { actualZombie, managedNPCBody, registryManagedBody }
         end,
         FindZombieByID = function(id)
             if id == actualZombie.id then return actualZombie end
             if id == managedNPCBody.id then return managedNPCBody end
+            if id == registryManagedBody.id then return registryManagedBody end
             return nil
         end,
     },
     Registry = {
         FindRecordByZombie = function(bodyValue)
-            if bodyValue == managedNPCBody then
+            if bodyValue == managedNPCBody
+                or bodyValue == registryManagedBody
+            then
                 return { id = "managed-npc" }
             end
             return nil
@@ -107,6 +111,10 @@ T.falsy(
     PNC.Perception.IsActualZombieBody(managedNPCBody),
     "repurposed managed IsoZombie is not an actual zombie target"
 )
+T.falsy(
+    PNC.Perception.IsActualZombieBody(registryManagedBody),
+    "registry-managed IsoZombie is not an actual zombie target"
+)
 
 local record = {
     id = "observer",
@@ -128,6 +136,12 @@ T.falsy(
         record, managedNPCBody, 4, "clear"
     ),
     "managed NPC body cannot enter the zombie target path"
+)
+T.falsy(
+    PNC.Perception.Internal.BuildZombieTarget(
+        record, registryManagedBody, 4, "clear"
+    ),
+    "registry-managed NPC body cannot enter the zombie target path"
 )
 T.equal(
     #PNC.Perception.GetVisibleZombieEntries(record, 12),
@@ -162,6 +176,13 @@ record.runtime.recentThreat.id = managedNPCBody.id
 T.falsy(
     PNC.Perception.ResolveRecentAttacker(record, now),
     "managed NPC body cannot masquerade as a zombie recent attacker"
+)
+T.falsy(
+    PNC.Perception.IsTargetThreatening(record, {
+        kind = "zombie",
+        zombieId = managedNPCBody.id,
+    }),
+    "managed NPC body cannot masquerade as a threatening zombie target"
 )
 
 record.runtime.recentThreat = nil

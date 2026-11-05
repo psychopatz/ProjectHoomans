@@ -8,6 +8,16 @@ local Perception = PNC.Perception
 local Core = PNC.Core
 local Const = PNC.Const
 
+local function isActualZombieBody(zombie)
+    if type(Perception.IsActualZombieBody) == "function" then
+        return Perception.IsActualZombieBody(zombie) == true
+    end
+    -- Keep this module safe when a focused harness loads it without the
+    -- ordered PNC_Perception composition. The production path always uses
+    -- the registry-aware classifier above.
+    return not Core.IsManagedNPCBody(zombie)
+end
+
 local function frameRadius(requested)
     return math.max(
         tonumber(requested) or 0,
@@ -53,7 +63,7 @@ local function buildFrame(record, radius, now)
         zombie = candidates[i]
         if zombie
             and not zombie:isDead()
-            and not Core.IsManagedNPCBody(zombie)
+            and isActualZombieBody(zombie)
             and math.abs(zombie:getZ() - record.z) < 1
         then
             distSq = Core.DistanceSq(

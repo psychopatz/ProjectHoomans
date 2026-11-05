@@ -266,6 +266,11 @@ function Perception.IsTargetThreatening(record, target)
     local observerBody
     local engineTarget
     if not record or not target then return false end
+    if target.kind == "zombie"
+        and not Perception.IsActualZombieTarget(target)
+    then
+        return false
+    end
     recent = record.runtime and record.runtime.recentThreat or nil
     if recent and Core.Now() <= (tonumber(recent.expiresAt) or 0)
         and sameTarget(
@@ -288,9 +293,6 @@ function Perception.IsTargetThreatening(record, target)
     if target.kind == "zombie" then
         targetBody = target.zombie
             or (Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId))
-        if not Perception.IsActualZombieBody(targetBody) then
-            return false
-        end
         observerBody = Registry and Registry.GetLiveZombie
             and Registry.GetLiveZombie(record.id)
             or nil

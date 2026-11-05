@@ -28,6 +28,9 @@ PNC = {
 }
 
 T.load(ROOT .. "Perception/PNC_Perception.lua")
+PNC.Perception.IsActualZombieTarget = function(value)
+    return value and value.kind == "zombie"
+end
 
 local player = { kind = "player", onlineID = 1, x = 1, y = 0, distSq = 1, visible = true }
 local attacker = { kind = "npc", id = "attacker", x = 4, y = 0, distSq = 16, visible = true, threatening = true }
