@@ -1,195 +1,110 @@
 local T = require "tests/support/test"
+T.addPackagePaths()
 
-package.preload["PNC/UI/Map/PNC_MapHoverPortraitCard"] =
-    function() return true end
-package.preload["PNC/Knowledge/PNC_KnowledgeInterest"] =
-    function() return true end
-
-local portraitCreateCount = 0
-local portraitTargetCount = 0
-local portraitOptions
-local portraitTarget
-local portraitContext
-local portraitDebugPresence
-local clock = 1000
-local debugEnabled = false
+local providers = {}
+local requests = 0
+local knownName
 
 PNC = {
-    Core = {
-        Now = function() return clock end,
+    Network = {
+        ClientState = {
+            npcKnowledge = {},
+            npcPresentations = {
+                ["npc:map:one"] = {
+                    state = "unknown",
+                    knowledgePending = false,
+                },
+            },
+        },
     },
-    MapHoverPortraitCard = {
-        FaceZoom = 18,
-        FaceYOffset = -0.85,
-        DebugBackground = false,
-        new = function(card, x, y, size, options)
-            portraitCreateCount = portraitCreateCount + 1
-            portraitOptions = options
-            local panel = {
-                x = x,
-                y = y,
-                width = size,
-                height = size + options.nameHeight,
-                portraitZoom = card.FaceZoom,
-                portraitYOffset = card.FaceYOffset,
-                debugBackground = card.DebugBackground,
+    Client = {
+        RequestNPCKnowledge = function(actorID)
+            requests = requests + 1
+            return true, actorID
+        end,
+    },
+    NPCIdentityPresentation = {
+        GetKnownName = function()
+            return knownName
+        end,
+        GetFaction = function()
+            return {
+                id = "faction:map",
+                name = "Map Faction",
+                role = "trader",
             }
-            function panel:initialise() end
-            function panel:instantiate() end
-            function panel:setVisible(value) self.visible = value end
-            function panel:setContext(entry, showPresence)
-                portraitContext = entry
-                portraitDebugPresence = showPresence
-            end
-            function panel:setTarget(spec)
-                portraitTargetCount = portraitTargetCount + 1
-                portraitTarget = spec
-                return true
-            end
-            function panel:setCardPosition(px, py)
-                self.x = px
-                self.y = py
-            end
-            return panel
+        end,
+        GetFactionName = function()
+            return "Map Faction"
         end,
     },
 }
-PNC.Client = {
-    CanUseDebug = function() return debugEnabled end,
-}
 
-T.load("ProjectHoomans", "client", "PNC/UI/Map/PNC_MapHoverPortrait.lua")
+package.preload[
+    "PNC/Knowledge/PNC_NPCIdentityPresentation"
+] = function()
+    return PNC.NPCIdentityPresentation
+end
+package.preload[
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldClient"
+] = function()
+    return {
+        RegisterActorKnowledgeProvider = function(id, adapter)
+            providers[id] = adapter
+            return true, id
+        end,
+    }
+end
+package.preload[
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldMapHover"
+] = function()
+    return {
+        RegisterProvider = function(id, adapter)
+            providers["hover:" .. id] = adapter
+            return true, id
+        end,
+    }
+end
 
-local map = {
-    width = 500,
-    height = 500,
-    children = {},
-    addChild = function(self, child)
-        self.children[#self.children + 1] = child
-    end,
-}
-local portraitEntry = {
-    id = "npc_portrait",
-    recruited = true,
+local Adapter = T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/UI/Map/PNC_MapCoreActorKnowledge.lua"
+)
+T.truthy(Adapter and providers.ProjectHoomans,
+    "Project Hoomans did not register the Core knowledge adapter")
+T.truthy(providers.DTHoomans,
+    "DTHoomans did not reuse the Project Hoomans knowledge adapter")
+T.truthy(providers["hover:ProjectHoomans"],
+    "Project Hoomans did not register the shared Core hover adapter")
+
+local entry = {
+    id = "npc:map:one",
     portrait = {
         identitySeed = 7,
-        revision = 1,
         isFemale = true,
         appearance = { hairModel = "Long" },
         equipment = { worn = { Hat = "Base.Hat_HardHat" } },
     },
 }
+local unknown = providers.ProjectHoomans.get(entry)
+T.falsy(unknown.nameKnown,
+    "Project Hoomans exposed an unknown actor as known to Core")
+T.truthy(providers.ProjectHoomans.request(entry.id),
+    "Project Hoomans knowledge request did not reach its client transport")
+T.equal(requests, 1,
+    "Project Hoomans knowledge request was not issued exactly once")
 
-T.truthy(PNC.MapHoverPortrait.Update(map, portraitEntry, 100, 100)
-    == false, "portrait ignored hover stabilization delay")
-clock = 1090
-T.truthy(PNC.MapHoverPortrait.Update(map, portraitEntry, 100, 100),
-    "portrait was not shown after hover delay")
-T.truthy(portraitCreateCount == 1,
-    "hover portrait did not lazily create exactly one renderer")
-T.truthy(map.pncHoverPortrait.width == 128
-    and map.pncHoverPortrait.height == 152
-    and portraitOptions.portraitZoom == nil
-    and portraitOptions.portraitYOffset == nil
-    and portraitOptions.debugBackground == nil
-    and map.pncHoverPortrait.pncLayoutVersion == 8,
-    "hover portrait card did not use the enlarged full-box layout")
-T.truthy(portraitTarget.id == portraitEntry.id
-    and portraitTarget.preferDescriptor == true
-    and portraitTarget.faceOnly == true
-    and portraitTarget.includeCurrentClothing == true
-    and portraitTarget.equipment.worn.Hat == "Base.Hat_HardHat",
-    "hover portrait did not use descriptor rendering")
-T.truthy(portraitContext == portraitEntry,
-    "hover portrait card did not receive NPC badge/name context")
-T.falsy(portraitDebugPresence,
-    "map hover exposed debug presence without debug access")
-debugEnabled = true
-clock = 1100
-T.truthy(PNC.MapHoverPortrait.Update(map, portraitEntry, 100, 100),
-    "debug-enabled map hover did not remain visible")
-T.truthy(portraitDebugPresence == true,
-    "map hover did not pass debug presence visibility to the card")
-debugEnabled = false
-clock = 1200
-T.truthy(PNC.MapHoverPortrait.Update(map, portraitEntry, 120, 120),
-    "same portrait did not remain reusable")
-T.truthy(portraitCreateCount == 1,
-    "same hover allocated another portrait renderer")
-T.truthy(portraitTargetCount == 1,
-    "stable hover rebound the same portrait descriptor")
-portraitEntry.portrait.revision = 2
-clock = 1210
-T.truthy(PNC.MapHoverPortrait.Update(map, portraitEntry, 120, 120),
-    "updated portrait metadata was not displayed")
-T.truthy(portraitTargetCount == 2,
-    "updated portrait metadata did not rebind the descriptor")
-
-local secondEntry = {
-    id = "npc_portrait_2",
-    recruited = true,
-    portrait = {
-        identitySeed = 8,
-        revision = 1,
-        appearance = { hairModel = "Messy" },
-        equipment = { worn = {} },
-    },
-}
-clock = 1300
-T.truthy(PNC.MapHoverPortrait.Update(map, secondEntry, 130, 130)
-    == false, "new portrait bypassed hover stabilization")
-clock = 1390
-T.truthy(PNC.MapHoverPortrait.Update(map, secondEntry, 130, 130),
-    "second portrait did not appear after stabilization")
-T.truthy(portraitCreateCount == 1,
-    "switching NPCs allocated another portrait renderer")
-T.truthy(portraitTarget.id == secondEntry.id,
-    "reused portrait renderer did not switch descriptor")
-T.truthy(portraitTargetCount == 3,
-    "portrait descriptor was rebound more than once per NPC")
-T.truthy(map.pncHoverPortrait.x == 66,
-    "portrait card was not horizontally centered over the map marker")
-T.truthy(map.pncHoverPortrait.y == -30,
-    "portrait card was not kept directly above the map marker")
-
-PNC.MapHoverPortraitCard.FaceZoom = 17
-clock = 1400
-T.truthy(PNC.MapHoverPortrait.Update(map, secondEntry, 130, 130),
-    "camera tuning did not rebuild the visible portrait card")
-T.truthy(portraitCreateCount == 2
-    and map.pncHoverPortrait.portraitZoom == 17,
-    "camera tuning remained stuck on the previous portrait card")
-T.truthy(portraitTargetCount == 4
-    and portraitTarget.id == secondEntry.id,
-    "rebuilt portrait card did not restore its NPC descriptor")
-
-PNC.MapHoverPortrait.Hide(map)
-T.truthy(map.pncHoverPortrait.visible == false,
-    "hover portrait remained visible after hover ended")
-
-PNC.Network = {
-    ClientState = { npcKnowledge = {} },
-}
-local unknownMap = {
-    width = 500,
-    height = 500,
-    children = {},
-    addChild = function(self, child)
-        self.children[#self.children + 1] = child
-    end,
-}
-local unknownEntry = {
-    id = "npc_unknown_portrait",
-    portrait = {
-        identitySeed = 9,
-        revision = 1,
-        appearance = { hairModel = "Short" },
-    },
-}
-clock = 1500
-T.equal(PNC.MapHoverPortrait.Update(unknownMap, unknownEntry, 200, 200), false,
-    "unknown survivor map hover did not remain hidden")
-T.equal(unknownMap.pncHoverPortrait, nil,
-    "unknown survivor created a 3D face renderer")
+knownName = "Mara Voss"
+local known = providers.ProjectHoomans.get(entry)
+T.truthy(known.nameKnown and known.knownName == knownName,
+    "Core adapter did not consume the learned Hoomans identity")
+T.equal(known.state, "known",
+    "learned Hoomans identity did not override stale unknown presentation")
+local portrait = providers.ProjectHoomans.getPortraitSpec(entry)
+T.truthy(portrait and portrait.preferDescriptor
+    and portrait.includeCurrentClothing
+    and portrait.equipment.worn.Hat == "Base.Hat_HardHat",
+    "Core hover adapter lost the Hoomans portrait/equipment projection")
 
 T.finish("pnc_map_hover_portrait_smoke")

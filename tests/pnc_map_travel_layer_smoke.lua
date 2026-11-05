@@ -109,15 +109,6 @@ PNC = {
         AreNamesVisible = function() return namesVisible end,
         EnsureButton = function() end,
     },
-    MapHoverPortrait = {
-        Update = function(_, entry)
-            hoveredPortrait = entry
-            return entry and entry.portrait ~= nil
-        end,
-        Hide = function()
-            portraitHidden = portraitHidden + 1
-        end,
-    },
     MapMarkerIcons = {
         Resolve = function(iconID)
             if iconID == "dead_icon" then
@@ -134,11 +125,45 @@ PNC = {
         GetName = function(entry)
             return entry and entry.name or "Unknown"
         end,
+        GetKnownName = function(entry)
+            return entry and entry.id ~= "unknown" and entry.name or nil
+        end,
+        IsNameKnown = function(entry)
+            return entry and entry.id ~= "unknown"
+        end,
     },
     Client = {
         CanUseDebug = function() return debugEnabled end,
     },
 }
+
+package.preload[
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldClient"
+] = function()
+    return {
+        SetHighlighted = function() return true end,
+    }
+end
+package.preload[
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldActorMap"
+] = function()
+    return {
+        RegisterDecorator = function() return true end,
+    }
+end
+package.preload[
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldMapHover"
+] = function()
+    return {
+        Update = function(_, entry)
+            hoveredPortrait = entry
+            return entry and entry.portrait ~= nil
+        end,
+        Hide = function()
+            portraitHidden = portraitHidden + 1
+        end,
+    }
+end
 
 T.load(PALETTE)
 package.preload["PNC/Presentation/PNC_NPCTypePalette"] =
@@ -280,6 +305,25 @@ clock = 1500
 layer.render(map)
 T.truthy(listProjectedCount == 2,
     "travel map did not refresh projected NPC entries after its throttle")
+
+PNC.TravelDirectory.ListProjected = function()
+    return {
+        {
+            id = "unknown",
+            name = "Leaked Unknown Name",
+            state = "live",
+            x = 110,
+            y = 120,
+        },
+    }
+end
+clock = 2500
+mouseX = 110
+mouseY = 120
+labels = {}
+layer.render(map)
+T.equal(labels[1], nil,
+    "unknown Hoomans actor leaked a name through the map hover fallback")
 T.finish("pnc_map_travel_layer_smoke")
 
 T.finish("pnc_map_travel_layer_smoke")

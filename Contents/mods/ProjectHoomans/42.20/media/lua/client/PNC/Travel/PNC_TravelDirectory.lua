@@ -413,6 +413,8 @@ function Directory.GetProjected(npcId, atWorldHour)
         return {
             id = tostring(snapshot.id),
             npcId = tostring(snapshot.id),
+            provider = "ProjectHoomans",
+            knowledgeProvider = "ProjectHoomans",
             name = Identity.GetName(snapshot),
             tacticalClass = tostring(snapshot.tacticalClass or "neutral"),
             organizationalFaction =
@@ -481,6 +483,8 @@ function Directory.GetProjected(npcId, atWorldHour)
     return {
         id = tostring(snapshot.id),
         npcId = tostring(snapshot.id),
+        provider = "ProjectHoomans",
+        knowledgeProvider = "ProjectHoomans",
         name = Identity.GetName(snapshot),
         tacticalClass = tostring(snapshot.tacticalClass or "neutral"),
         organizationalFaction =

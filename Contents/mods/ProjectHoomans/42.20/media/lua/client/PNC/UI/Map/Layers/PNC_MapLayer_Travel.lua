@@ -16,7 +16,8 @@ local Directory = PNC.TravelDirectory
 local Layers = PNC.MapLayers
 local Display = PNC.MapDisplay
 local Icons = PNC.MapMarkerIcons
-local HoverPortrait = PNC.MapHoverPortrait
+local HoverPortrait = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldMapHover"
 local Palette = PNC.NPCTypePalette
 local Identity = PNC.NPCIdentityPresentation
 
@@ -168,7 +169,17 @@ local function etaText(entry)
 end
 
 local function displayLabel(entry)
-    local name = Identity.GetName(entry)
+    local known = true
+    if Identity and type(Identity.IsNameKnown) == "function" then
+        known = Identity.IsNameKnown(entry) == true
+    end
+    if not known then return "" end
+    local name
+    if Identity and type(Identity.GetKnownName) == "function" then
+        name = Identity.GetKnownName(entry)
+    end
+    name = name or Identity.GetName(entry)
+    if type(name) ~= "string" or name == "" then return "" end
     local roleTag = entry and entry.roleTag
     if roleTag ~= nil and tostring(roleTag) ~= "" then
         return name .. " [" .. tostring(roleTag) .. "]"
@@ -259,7 +270,8 @@ local function isOverControls(map, x, y)
         or isInsideVisibleChild(map.buttonPanel, x, y)
         or isInsideVisibleChild(map.pncHoomansButton, x, y)
         or isInsideVisibleChild(map.pncTrackButton, x, y)
-        or isInsideVisibleChild(map.pncHoverPortrait, x, y)
+        or isInsideVisibleChild(
+            map.psychopatzSurvivorWorldHover, x, y)
 end
 
 local function drawSelectedRoute(map, entry)
@@ -440,8 +452,8 @@ local function drawTravelHover(map, hoveredEntry, hoveredX, hoveredY)
                 hoveredY
             )
             or false
-        if not portraitVisible then
-            local label = displayLabel(hoveredEntry)
+        local label = displayLabel(hoveredEntry)
+        if not portraitVisible and label ~= "" then
             local presence = debugPresenceLabel(hoveredEntry)
             local eta = etaText(hoveredEntry)
             if presence then label = label .. " [" .. presence .. "]" end
