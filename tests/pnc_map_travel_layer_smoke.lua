@@ -19,6 +19,8 @@ local portraitHidden = 0
 local clock = 1000
 local listProjectedCount = 0
 local debugEnabled = false
+local isNameKnownCalls = 0
+local getKnownNameCalls = 0
 
 getTexture = function() return nil end
 getTimestampMs = function() return clock end
@@ -126,9 +128,11 @@ PNC = {
             return entry and entry.name or "Unknown"
         end,
         GetKnownName = function(entry)
+            getKnownNameCalls = getKnownNameCalls + 1
             return entry and entry.id ~= "unknown" and entry.name or nil
         end,
         IsNameKnown = function(entry)
+            isNameKnownCalls = isNameKnownCalls + 1
             return entry and entry.id ~= "unknown"
         end,
     },
@@ -301,6 +305,14 @@ T.truthy(labels[1] == "Idle NPC"
     and labels[4] == "Dead NPC"
     and labels[5] == "Dead Colonist",
     "NPC name toggle did not reveal ordinary labels")
+local knownCallsAfterFirstLabelFrame = isNameKnownCalls
+local resolvedCallsAfterFirstLabelFrame = getKnownNameCalls
+labels = {}
+layer.render(map)
+T.equal(isNameKnownCalls, knownCallsAfterFirstLabelFrame,
+    "map label rendering re-ran knowledge lookup inside its refresh window")
+T.equal(getKnownNameCalls, resolvedCallsAfterFirstLabelFrame,
+    "map label rendering re-ran known-name lookup inside its refresh window")
 clock = 1500
 layer.render(map)
 T.truthy(listProjectedCount == 2,

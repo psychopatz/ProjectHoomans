@@ -25,6 +25,7 @@ TravelLayer.Enabled = TravelLayer.Enabled ~= false
 TravelLayer.DotTexture = TravelLayer.DotTexture
     or getTexture("media/ui/circle.png")
 TravelLayer.RefreshMs = 500
+TravelLayer.LabelCache = TravelLayer.LabelCache or {}
 
 local function listProjectedEntries()
     local now = getTimestampMs and tonumber(getTimestampMs()) or 0
@@ -42,10 +43,11 @@ local function listProjectedEntries()
         return cached
     end
     cached = Directory.ListProjected()
-    if now > 0 then
-        TravelLayer.EntryCache = cached
-        TravelLayer.EntryCacheAt = now
+    if TravelLayer.EntryCache ~= cached then
+        TravelLayer.LabelCache = {}
     end
+    TravelLayer.EntryCache = cached
+    TravelLayer.EntryCacheAt = now
     return cached
 end
 
@@ -169,22 +171,33 @@ local function etaText(entry)
 end
 
 local function displayLabel(entry)
+    local cacheKey = tostring(entry and entry.id or "")
+    local cached = TravelLayer.LabelCache[cacheKey]
+    if cached then return cached end
     local known = true
     if Identity and type(Identity.IsNameKnown) == "function" then
         known = Identity.IsNameKnown(entry) == true
     end
-    if not known then return "" end
+    if not known then
+        TravelLayer.LabelCache[cacheKey] = ""
+        return ""
+    end
     local name
     if Identity and type(Identity.GetKnownName) == "function" then
         name = Identity.GetKnownName(entry)
     end
     name = name or Identity.GetName(entry)
-    if type(name) ~= "string" or name == "" then return "" end
-    local roleTag = entry and entry.roleTag
-    if roleTag ~= nil and tostring(roleTag) ~= "" then
-        return name .. " [" .. tostring(roleTag) .. "]"
+    if type(name) ~= "string" or name == "" then
+        TravelLayer.LabelCache[cacheKey] = ""
+        return ""
     end
-    return name
+    local roleTag = entry and entry.roleTag
+    local label = name
+    if roleTag ~= nil and tostring(roleTag) ~= "" then
+        label = name .. " [" .. tostring(roleTag) .. "]"
+    end
+    TravelLayer.LabelCache[cacheKey] = label
+    return label
 end
 
 local function debugPresenceEnabled()
@@ -318,6 +331,7 @@ end
 function TravelLayer.InvalidateEntryCache()
     TravelLayer.EntryCache = nil
     TravelLayer.EntryCacheAt = nil
+    TravelLayer.LabelCache = {}
 end
 
 local function drawTravelMarkers(map, entries, showLabels, dotSize,
