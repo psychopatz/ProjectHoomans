@@ -1,5 +1,11 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({
+    { "ProjectHoomans", "client" },
+    { "PsychopatzCore", "client" },
+    { "PsychopatzCore", "common" },
+})
+
 local ROOT = T.path("ProjectHoomans", "root", "")
 local MENU = T.path("ProjectHoomans", "client", "PNC/UI/Map/")
     .. "PNC_MapHoomansMenu.lua"
@@ -54,9 +60,14 @@ ISWorldMap = {
         return "vanilla"
     end,
 }
+ISContextMenu = {}
+function ISContextMenu.get()
+    return { addOption = function() end }
+end
 package.preload["ISUI/Maps/ISWorldMap"] = function() return ISWorldMap end
 package.preload["ISUI/ISPanel"] = function() return ISPanel end
 package.preload["ISUI/ISButton"] = function() return ISButton end
+package.preload["ISUI/ISContextMenu"] = function() return ISContextMenu end
 
 local requests = {}
 PNC = {
@@ -78,7 +89,7 @@ getCore = function()
 end
 
 T.load(MENU)
-T.load(ROOT .. "client/PNC/UI/Map/PNC_WorldDiscoveryDebugMap.lua")
+T.load(ROOT .. "client/PNC/UI/Map/PNC_MapRawEntityDebug.lua")
 local map = { children = {}, addChild = ISPanel.addChild }
 setmetatable(map, { __index = ISWorldMap })
 map:createChildren()
@@ -86,29 +97,16 @@ map:createChildren()
 T.equal(map:onRightMouseUp(10, 20), "vanilla",
     "PNC discovery debug leaves the vanilla teleport menu untouched")
 T.equal(originalCalls, 1, "vanilla right-click handler runs exactly once")
-T.truthy(map.pncHoomansButton, "authorized map did not receive Hoomans settings")
-map.pncHoomansButton.onclick()
+T.truthy(map.psychopatzMapToolsButton,
+    "authorized map did not receive Core map tools")
+map.psychopatzMapToolsButton.onclick()
 local menu = PNC.MapHoomansMenu.instance
-T.truthy(menu and menu.entryButtons.npc_debug,
-    "Hoomans menu did not receive the debug entry")
-menu:onButton(menu.entryButtons.npc_debug)
-local modal = PNC.WorldDiscoveryDebugMap.instance
-T.truthy(modal and modal.allButton and modal.resetButton,
-    "Hoomans debug entry did not open the scalable settings modal")
-modal:onButton(modal.allButton)
-T.equal(requests[#requests].action, "debug_discover_all",
-    "modal discover-all uses the authoritative action")
-T.equal(requests[#requests].args.scope, "all",
-    "modal discover-all sends an explicit scope")
-modal:onButton(modal.resetButton)
-T.equal(requests[#requests].action, "debug_reset",
-    "modal exposes recovery from an accidental discover-all")
-
-T.equal(PNC.WorldDiscoveryDebugMap.ShowRawEntities, false,
+T.truthy(menu and menu.entryButtons["ProjectHoomans:raw_entities"],
+    "shared map menu did not receive the raw-overlay entry")
+local rawButton = menu.entryButtons["ProjectHoomans:raw_entities"]
+T.equal(PNC.MapRawEntityDebug.ShowRawEntities, false,
     "undiscovered debug overlays start hidden")
-modal:onButton(modal.rawButton)
-T.equal(PNC.WorldDiscoveryDebugMap.ShowRawEntities, true,
-    "raw overlays require an explicit modal toggle")
-T.finish("pnc_world_discovery_debug_map_smoke")
-
+menu:onButton(rawButton)
+T.equal(PNC.MapRawEntityDebug.ShowRawEntities, true,
+    "raw overlays require an explicit shared-menu toggle")
 T.finish("pnc_world_discovery_debug_map_smoke")

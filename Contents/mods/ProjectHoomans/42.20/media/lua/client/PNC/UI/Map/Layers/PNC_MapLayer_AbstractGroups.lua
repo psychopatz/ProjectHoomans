@@ -38,8 +38,8 @@ local MOBILE_COLORS = {
 local function isVisible()
     return PNC.MapDisplay and PNC.MapDisplay.AreBasesVisible
         and PNC.MapDisplay.AreBasesVisible()
-        and PNC.WorldDiscoveryDebugMap
-        and PNC.WorldDiscoveryDebugMap.ShowRawEntities == true
+        and PNC.MapRawEntityDebug
+        and PNC.MapRawEntityDebug.ShowRawEntities == true
         and PNC.Client and PNC.Client.CanUseDebug
         and PNC.Client.CanUseDebug()
 end

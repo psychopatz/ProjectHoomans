@@ -1,5 +1,11 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({
+    { "ProjectHoomans", "client" },
+    { "PsychopatzCore", "client" },
+    { "PsychopatzCore", "common" },
+})
+
 local FILE = T.path("ProjectHoomans", "client", "PNC/UI/Map/")
     .. "PNC_MapHoomansMenu.lua"
 
@@ -59,9 +65,14 @@ ISWorldMap = {
     prerender = function() end,
     close = function(self) self.closed = true return "vanilla" end,
 }
+ISContextMenu = {}
+function ISContextMenu.get()
+    return { addOption = function() end }
+end
 package.preload["ISUI/Maps/ISWorldMap"] = function() return ISWorldMap end
 package.preload["ISUI/ISPanel"] = function() return ISPanel end
 package.preload["ISUI/ISButton"] = function() return ISButton end
+package.preload["ISUI/ISContextMenu"] = function() return ISContextMenu end
 
 getTexture = function(path) return path end
 getText = function(key) return key end
@@ -88,21 +99,23 @@ T.truthy(Menu.Register("future_tool", {
 local map = { children = {}, addChild = ISPanel.addChild }
 setmetatable(map, { __index = ISWorldMap })
 map:createChildren()
-T.truthy(map.pncHoomansButton, "Hoomans settings button was not attached")
-T.equal(map.pncHoomansButton.title, "Hoomans",
-    "Hoomans settings button has a readable label")
-T.equal(map.pncHoomansButton.iconTexture,
+T.truthy(map.psychopatzMapToolsButton, "Core map tools button was not attached")
+T.equal(map.psychopatzMapToolsButton.title, "Map Tools",
+    "Core map tools button has a readable label")
+T.equal(map.psychopatzMapToolsButton.iconTexture,
     "media/ui/inventoryPanes/Button_Settings.png",
-    "Hoomans reuses the vanilla settings cog")
-T.equal(map.pncHoomansButton.tooltip, "Open Hoomans map settings",
-    "Hoomans tooltip does not expose a raw translation key")
-T.equal(map.pncHoomansButton.x, 188,
-    "Hoomans button is laid out left of the vanilla map controls")
+    "Core map tools reuses the vanilla settings cog")
+T.equal(map.psychopatzMapToolsButton.tooltip,
+    "Open shared map controls and debug tools.",
+    "Core map tools tooltip does not expose a raw translation key")
+T.equal(map.psychopatzMapToolsButton.x, 188,
+    "Core map tools button is laid out left of the vanilla map controls")
 T.falsy(map.pncNamesButton, "NPC names still owns a map button")
 T.falsy(map.pncBasesButton, "NPC world still owns a map button")
-T.falsy(map.pncTrackButton, "Track is not registered in the settings menu")
+T.falsy(map.pncHoomansButton,
+    "Project Hoomans still owns a second map button")
 
-map.pncHoomansButton.onclick()
+map.psychopatzMapToolsButton.onclick()
 local modal = Menu.instance
 T.truthy(modal and modal.entryButtons.future_tool,
     "registered tool did not appear in the Hoomans menu")

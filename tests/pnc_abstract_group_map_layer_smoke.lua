@@ -12,7 +12,7 @@ local receivedAt = 2000
 -- Marker coordinates the layer asked the map to project.
 local positions = {}
 PNC = {
-    WorldDiscoveryDebugMap = { ShowRawEntities = false },
+    MapRawEntityDebug = { ShowRawEntities = false },
     Core = { Now = function() return receivedAt end },
     MapDisplay = {
         AreBasesVisible = function() return true end,
@@ -53,7 +53,7 @@ T.truthy(registered.definition.order > 90,
     "group markers should render above community geometry")
 T.truthy(registered.definition.isVisible() == false,
     "raw group overlay must be hidden by default")
-PNC.WorldDiscoveryDebugMap.ShowRawEntities = true
+PNC.MapRawEntityDebug.ShowRawEntities = true
 
 local rectangles, labels, hover = {}, {}, {}
 local map = {
@@ -185,7 +185,7 @@ receivedAt = receivedAt + 1
 ClientState.lastDirectorDebugReceiveAt = receivedAt
 registered.definition.render(map)
 T.truthy(layer.TrackCount == 1, "track should be rebuilt")
-PNC.WorldDiscoveryDebugMap.ShowRawEntities = false
+PNC.MapRawEntityDebug.ShowRawEntities = false
 registered.definition.render(map)
 T.truthy(layer.TrackCount == 0,
     "hiding the overlay must release interpolation state")

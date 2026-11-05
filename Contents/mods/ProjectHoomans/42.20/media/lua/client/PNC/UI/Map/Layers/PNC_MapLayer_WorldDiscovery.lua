@@ -63,8 +63,8 @@ local function populationNPCVisible(snapshot)
     if snapshot.recruited == true or snapshot.colonyOwned == true then
         return true
     end
-    if PNC.WorldDiscoveryDebugMap
-        and PNC.WorldDiscoveryDebugMap.ShowRawEntities == true
+    if PNC.MapRawEntityDebug
+        and PNC.MapRawEntityDebug.ShowRawEntities == true
     then
         return true
     end

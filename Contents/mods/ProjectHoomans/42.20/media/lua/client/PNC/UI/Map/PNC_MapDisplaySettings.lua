@@ -6,7 +6,7 @@ PNC = PNC or {}
 PNC.MapDisplay = PNC.MapDisplay or {}
 
 local Display = PNC.MapDisplay
-local Menu = PNC.MapHoomansMenu
+local Menu = require "PsychopatzCore/UI/Map/PsychopatzMapToolsMenu"
 
 Display.NamesVisible = Display.NamesVisible == true
 if Display.BasesVisible == nil then Display.BasesVisible = true end
@@ -98,13 +98,13 @@ function Display.ToggleNames()
 end
 
 if Menu and Menu.Register then
-    Menu.Register("npc_names", {
+    Menu.Register("ProjectHoomans:npc_names", {
         order = 20,
         title = function() return Display.GetNamesTitle() end,
         tooltip = function() return Display.GetNamesTooltip() end,
         onActivate = function() return Display.ToggleNames() end,
     })
-    Menu.Register("npc_world", {
+    Menu.Register("ProjectHoomans:npc_world", {
         order = 30,
         title = function() return Display.GetBasesTitle() end,
         tooltip = function() return Display.GetBasesTooltip() end,

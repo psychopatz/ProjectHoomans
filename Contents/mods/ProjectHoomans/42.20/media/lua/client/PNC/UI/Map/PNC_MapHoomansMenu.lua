@@ -1,29 +1,10 @@
--- Central map menu for Hoomans controls and future map tools.
+-- Project Hoomans registration facade over Core's shared map-tools menu.
+-- Core owns the singleton registry, window, toolbar button, and lifecycle;
+-- Hoomans contributes only provider-specific entries.
 
-local Menu = require "PNC/UI/Map/PNC_MapHoomansMenu_Registry"
+local Menu = require "PsychopatzCore/UI/Map/PsychopatzMapToolsMenu"
 
-require "PNC/UI/Map/PNC_MapHoomansMenu_UI"
-local Toolbar = require "PNC/UI/Map/PNC_MapToolbar"
-
-Toolbar.Register("hoomans", {
-    order = 20,
-    field = "pncHoomansButton",
-    width = 112,
-    title = function()
-        local value = getText and PNC.Translation.GetKey("UI_PNC_MapHoomans_Button")
-        return value and value ~= ""
-            and value ~= "UI_PNC_MapHoomans_Button" and value or "Hoomans"
-    end,
-    tooltip = function()
-        local value = getText and PNC.Translation.GetKey("UI_PNC_MapHoomans_ButtonHelp")
-        return value and value ~= ""
-            and value ~= "UI_PNC_MapHoomans_ButtonHelp"
-            and value or "Open Hoomans map settings"
-    end,
-    icon = "media/ui/inventoryPanes/Button_Settings.png",
-    iconSize = 22,
-    onActivate = function(map) return Menu.Open(map) ~= nil end,
-    onMapClose = Menu.Close,
-})
+PNC = PNC or {}
+PNC.MapHoomansMenu = Menu
 
 return Menu

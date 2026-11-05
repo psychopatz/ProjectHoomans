@@ -1,5 +1,11 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({
+    { "ProjectHoomans", "client" },
+    { "PsychopatzCore", "client" },
+    { "PsychopatzCore", "common" },
+})
+
 local FILE = T.path("ProjectHoomans", "client", "PNC/UI/Map/")
     .. "PNC_MapDisplaySettings.lua"
 local MENU = T.path("ProjectHoomans", "client", "PNC/UI/Map/")
@@ -47,6 +53,10 @@ ISWorldMap = {
     end,
     prerender = function() end,
 }
+ISContextMenu = {}
+function ISContextMenu.get()
+    return { addOption = function() end }
+end
 
 ISButton = {}
 function ISButton:new(x, y, width, height, title, target, onclick)
@@ -74,6 +84,7 @@ function ISButton:new(x, y, width, height, title, target, onclick)
     end
     return button
 end
+package.preload["ISUI/ISContextMenu"] = function() return ISContextMenu end
 
 PNC = {}
 T.load(MENU)
@@ -90,17 +101,18 @@ local map = {
 setmetatable(map, { __index = ISWorldMap })
 map:createChildren()
 
-T.truthy(map.pncHoomansButton ~= nil, "Hoomans button was not attached")
+T.truthy(map.psychopatzMapToolsButton ~= nil,
+    "Core map tools button was not attached")
 T.falsy(map.pncNamesButton, "NPC names retained a standalone button")
 T.falsy(map.pncBasesButton, "NPC world retained a standalone button")
-map.pncHoomansButton.onclick()
+map.psychopatzMapToolsButton.onclick()
 local menu = PNC.MapHoomansMenu.instance
-T.truthy(menu and menu.entryButtons.npc_names,
-    "Hoomans menu did not register NPC names")
-T.truthy(menu.entryButtons.npc_world,
-    "Hoomans menu did not register NPC world")
-local namesButton = menu.entryButtons.npc_names
-local basesButton = menu.entryButtons.npc_world
+T.truthy(menu and menu.entryButtons["ProjectHoomans:npc_names"],
+    "shared menu did not register NPC names")
+T.truthy(menu.entryButtons["ProjectHoomans:npc_world"],
+    "shared menu did not register NPC world")
+local namesButton = menu.entryButtons["ProjectHoomans:npc_names"]
+local basesButton = menu.entryButtons["ProjectHoomans:npc_world"]
 T.truthy(namesButton.title == "NPC NAMES: OFF",
     "NPC names default was not off")
 T.truthy(basesButton.title == "NPC WORLD: ON",

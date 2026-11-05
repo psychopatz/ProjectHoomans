@@ -6,8 +6,7 @@ require "ISUI/ISButton"
 PNC = PNC or {}
 local Tracking = PNC.MapTracking
     or require "PNC/UI/Map/PNC_MapTracking"
-local Toolbar = PNC.MapToolbar
-    or require "PNC/UI/Map/PNC_MapToolbar"
+local Menu = require "PsychopatzCore/UI/Map/PsychopatzMapToolsMenu"
 
 local function text(key, fallback)
     local value = getText and PNC.Translation.GetKey(key) or nil
@@ -152,25 +151,28 @@ function Tracking.Close()
     if Tracking.instance then Tracking.instance:close() end
 end
 
-if Toolbar and Toolbar.Register then
-    Toolbar.Register("track", {
-        order = 10,
-        field = "pncTrackButton",
-        width = 92,
+if Menu and Menu.Register then
+    Menu.Register("ProjectHoomans:track_base", {
+        order = 30,
         title = function()
-            local value = getText and PNC.Translation.GetKey("UI_PNC_MapTrack_Button")
+            local value = getText and PNC.Translation.GetKey(
+                "UI_PNC_MapTrack_Button")
             return value and value ~= ""
-                and value ~= "UI_PNC_MapTrack_Button" and value or "Track"
+                and value ~= "UI_PNC_MapTrack_Button" and value or "Track base"
         end,
         tooltip = function()
-            local value = getText and PNC.Translation.GetKey("UI_PNC_MapTrack_ButtonHelp")
+            local value = getText and PNC.Translation.GetKey(
+                "UI_PNC_MapTrack_ButtonHelp")
             return value and value ~= ""
                 and value ~= "UI_PNC_MapTrack_ButtonHelp"
-                and value or "Open Hoomans tracking options."
+                and value or "Open Hoomans base tracking options."
         end,
         icon = "media/ui/MP/mp_ui_internet.png",
         iconSize = 22,
-        onActivate = function() return Tracking.Open() ~= nil end,
+        onActivate = function()
+            Menu.Close()
+            return Tracking.Open() ~= nil
+        end,
         onMapClose = Tracking.Close,
     })
 end

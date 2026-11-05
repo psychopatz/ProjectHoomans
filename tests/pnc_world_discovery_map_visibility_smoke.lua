@@ -52,7 +52,7 @@ T.truthy(visibilityFilter({ id = "hand-authored" }) == true,
     "discovery filter hid a non-population NPC")
 
 PNC.Network.ClientState.worldDiscovery.entities = {}
-PNC.WorldDiscoveryDebugMap = { ShowRawEntities = true }
+PNC.MapRawEntityDebug = { ShowRawEntities = true }
 T.truthy(visibilityFilter(generated) == true,
     "explicit raw debug overlay did not reveal generated NPC markers")
 

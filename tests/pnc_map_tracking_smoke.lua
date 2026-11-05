@@ -193,6 +193,7 @@ T.load(MENU)
 T.load(SERVICE)
 T.load(UI)
 local Tracking = PNC.MapTracking
+local Menu = PNC.MapHoomansMenu
 
 local map = {
     children = {},
@@ -201,14 +202,23 @@ local map = {
 setmetatable(map, { __index = ISWorldMap })
 map:createChildren()
 
-T.truthy(map.pncHoomansButton, "map did not receive Hoomans settings")
-T.truthy(map.pncTrackButton, "map did not receive standalone Track")
-T.equal(map.pncTrackButton.title, "Track", "Track translation")
-T.equal(map.pncTrackButton.iconTexture, "media/ui/MP/mp_ui_internet.png",
+T.truthy(map.psychopatzMapToolsButton,
+    "map did not receive the Core map tools button")
+T.falsy(map.pncHoomansButton,
+    "Project Hoomans still owns a second map button")
+T.falsy(map.pncTrackButton,
+    "Project Hoomans still owns a standalone Track button")
+map.psychopatzMapToolsButton.onclick()
+local mapMenu = Menu.instance
+local trackButton = mapMenu
+    and mapMenu.entryButtons["ProjectHoomans:track_base"]
+T.truthy(trackButton, "shared map menu did not expose base tracking")
+T.equal(trackButton.title, "Track", "Track translation")
+T.equal(trackButton.iconTexture, "media/ui/MP/mp_ui_internet.png",
     "Track uses the multiplayer internet icon")
-T.equal(map.pncTrackButton.tooltip, "Open Hoomans tracking options.",
+T.equal(trackButton.tooltip, "Open Hoomans tracking options.",
     "Track tooltip does not expose a raw translation key")
-map.pncTrackButton.onclick()
+mapMenu:onButton(trackButton)
 local modal = Tracking.instance
 T.truthy(modal and modal.baseButton, "Track button did not open its modal")
 T.truthy(modal.baseButton.enabled, "Base button disabled despite valid base geometry")
@@ -276,7 +286,10 @@ T.falsy(modal.baseButton.enabled, "Base button stayed enabled without a base")
 T.falsy(modal:onButton(modal.baseButton),
     "disabled Base button still toggled tracking")
 
-map.pncTrackButton.onclick()
+map.psychopatzMapToolsButton.onclick()
+Menu.instance:onButton(
+    Menu.instance.entryButtons["ProjectHoomans:track_base"]
+)
 T.truthy(Tracking.instance, "Track modal could not be reopened")
 map:close()
 T.falsy(Tracking.instance, "closing the map did not close Track modal")
