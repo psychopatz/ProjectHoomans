@@ -224,6 +224,31 @@ T.truthy(joining.orderSpec.kind == "follow",
 T.truthy(joining.orderSpec.ownerUsername == "alice",
     "initial Follow order did not bind the faction owner")
 
+local released = copy(waiting)
+released.id = "released"
+released.affiliation = { membershipStatus = "unaffiliated" }
+released.recruited = true
+released.ownerUsername = "alice"
+released.ownerOnlineID = 7
+released.ownerCharacterUUID = "character_alice"
+released.orderSpec = {
+    kind = "follow",
+    ownerUsername = "alice",
+    ownerCharacterUUID = "character_alice",
+}
+released.runtime = {}
+records.released = released
+
+PNC.FactionBehavior.ApplyUnaffiliated(released, "faction_removed")
+T.falsy(released.recruited,
+    "faction removal did not release recruited state")
+T.equal(released.ownerUsername, nil,
+    "faction removal did not clear the owner username")
+T.equal(released.ownerOnlineID, nil,
+    "faction removal did not clear the owner online id")
+T.equal(released.ownerCharacterUUID, nil,
+    "faction removal left a stale character owner identity")
+
 -- Mobile-faction planning must not outrank an explicit player-owned order.
 -- Before this boundary was moved ahead of the mobile branch, reconciliation
 -- changed this record back to area roaming whenever the site was active.

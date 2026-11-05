@@ -341,6 +341,7 @@ T.equal(startingRestored.generation.playerCharacterUUID,
 
 local ownedFollower = deepCopy(record)
 ownedFollower.id = "npc_owned_follower"
+ownedFollower.recruited = true
 ownedFollower.ownerUsername = "Psychopatz"
 ownedFollower.ownerCharacterUUID = "char_owner_uuid"
 ownedFollower.orderSpec = {
@@ -350,6 +351,8 @@ ownedFollower.orderSpec = {
     ownerCharacterUUID = "char_owner_uuid",
 }
 local ownedFollowerPayload = PNC.Persistence.SerializeRecord(ownedFollower)
+T.equal(ownedFollowerPayload.progression.recruited, true,
+    "recruited ownership was not persisted in progression")
 T.equal(ownedFollowerPayload.ownerCharacterUUID, "char_owner_uuid",
     "companion character ownership was not serialized")
 T.equal(ownedFollowerPayload.orderSpec.ownerCharacterUUID, "char_owner_uuid",
@@ -362,6 +365,8 @@ local ownedFollowerRestored = PNC.Persistence.DeserializeRecord(
 )
 T.equal(ownedFollowerRestored.ownerCharacterUUID, "char_owner_uuid",
     "companion character ownership did not survive reload")
+T.equal(ownedFollowerRestored.recruited, true,
+    "recruited ownership did not survive reload")
 T.equal(ownedFollowerRestored.orderSpec.ownerCharacterUUID, "char_owner_uuid",
     "follow order character ownership did not survive reload")
 

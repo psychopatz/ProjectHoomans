@@ -64,12 +64,14 @@ local function apply(record, mode, owner, reason, faction)
         changed = assign(record, "recruited", false) or changed
         changed = assign(record, "ownerUsername", nil) or changed
         changed = assign(record, "ownerOnlineID", nil) or changed
+        changed = assign(record, "ownerCharacterUUID", nil) or changed
     else
         tacticalClass = Const.TACTICAL_CLASS_NEUTRAL
         hostility = Types.DefaultHostility(tacticalClass)
         changed = assign(record, "recruited", false) or changed
         changed = assign(record, "ownerUsername", nil) or changed
         changed = assign(record, "ownerOnlineID", nil) or changed
+        changed = assign(record, "ownerCharacterUUID", nil) or changed
     end
     changed = assign(record, "tacticalClass", tacticalClass) or changed
     if not same(record.hostility, hostility) then

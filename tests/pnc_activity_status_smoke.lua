@@ -249,8 +249,12 @@ local combat = Status.Build({
     activeJob = "GuardAnchor",
     runtime = { target = { kind = "zombie" } },
 })
-T.equal(combat.activityId, "combat",
-    "combat overrides a stale generic job")
+T.equal(combat.activityId, "engaging",
+    "target acquisition is not presented as an active attack")
+T.equal(combat.fallback, "Engaging",
+    "target acquisition has a truthful non-attack label")
+T.equal(combat.labelKey, nil,
+    "target acquisition does not reuse the Fighting localization key")
 
 local reacquiring = Status.Build({
     alive = true,
@@ -260,8 +264,37 @@ local reacquiring = Status.Build({
         phase = "reacquiring",
     } },
 })
-T.equal(reacquiring.activityId, "combat",
-    "reacquiring threat guard remains visible as a combat activity")
+T.falsy(reacquiring.activityId == "combat",
+    "threat-guard reacquisition does not claim that an attack is running")
+T.falsy(reacquiring.labelKey == "UI_PNC_Activity_Fighting",
+    "threat-guard reacquisition does not reuse the Fighting label")
+
+local combatLeaseOnly = Status.Build({
+    alive = true,
+    runtime = { inCombatUntil = now + 2500 },
+})
+T.equal(combatLeaseOnly, nil,
+    "a recent combat lease does not claim that an attack is running")
+
+local activeAttack = Status.Build({
+    alive = true,
+    runtime = {
+        attackAction = { finishAt = now + 500 },
+    },
+})
+T.equal(activeAttack.activityId, "combat",
+    "an active attack action is presented as Fighting")
+T.equal(activeAttack.fallback, "Fighting",
+    "an active attack action retains the Fighting label")
+
+local expiredAttack = Status.Build({
+    alive = true,
+    runtime = {
+        attackAction = { finishAt = now - 1 },
+    },
+})
+T.equal(expiredAttack, nil,
+    "an expired attack action does not remain presented as Fighting")
 
 PNC.BehaviorTreatment = {
     BuildSnapshot = function(record)

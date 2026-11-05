@@ -261,7 +261,7 @@ end)
 Status.Register("combat", 90, function(record)
     local runtime = record.runtime or {}
     local treatment = runtime.selfTreatment
-    local threatGuard = runtime.threatGuard
+    local target = runtime.target
     if treatment and treatment.phase == "bandaging" then
         -- Bandaging is an active tactical owner. The combat lease can be a
         -- stale presentation hold from the attack that preceded treatment.
@@ -269,11 +269,19 @@ Status.Register("combat", 90, function(record)
     end
     local attackActive = runtime.attackAction ~= nil
         and Core.Now() < (tonumber(runtime.attackAction.finishAt) or 0)
-    local combatActive = runtime.target ~= nil or attackActive
-        or Core.Now() < (tonumber(runtime.inCombatUntil) or 0)
-        or threatGuard and threatGuard.active == true
-    if combatActive then
+    if attackActive then
         return activity("combat", "UI_PNC_Activity_Fighting", "Fighting")
+    end
+    -- A selected target, a recent damage lease, or a threat-guard scan is
+    -- not proof that an attack has started. Keep the target visible as an
+    -- engagement state so the nameplate cannot claim Fighting while the
+    -- combat pump is still approaching, blocked, or has no valid action.
+    if type(target) == "table"
+        and tostring(target.kind or "") ~= ""
+    then
+        return activity("engaging", nil, "Engaging", {
+            targetKind = tostring(target.kind),
+        })
     end
 end)
 
