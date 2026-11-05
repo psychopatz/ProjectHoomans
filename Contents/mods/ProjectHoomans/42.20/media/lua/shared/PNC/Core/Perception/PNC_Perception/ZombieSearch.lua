@@ -12,7 +12,7 @@ function Perception.FindNearestEnemyZombie(record, radius)
     local entry
     local candidate
 
-    if not record or record.hostility and record.hostility.attackZombies == false then
+    if not record then
         return nil
     end
 

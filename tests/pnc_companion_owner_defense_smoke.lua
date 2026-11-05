@@ -11,6 +11,7 @@ local owner = {
 }
 
 local passiveZombie = {
+    isZombie = function() return true end,
     isDead = function() return false end,
     getX = function() return 1 end,
     getY = function() return 0 end,
@@ -22,6 +23,7 @@ local passiveZombie = {
 }
 
 local attackingZombie = {
+    isZombie = function() return true end,
     isDead = function() return false end,
     getX = function() return 2 end,
     getY = function() return 0 end,

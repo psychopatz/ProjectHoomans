@@ -36,6 +36,7 @@ local function publishGroupAlert(record, zombie, now, radius)
     local recipients = 0
     if not isAuthority() or not Spatial or not Spatial.QueryNPCs
         or not record or not zombie
+        or not Perception.IsActualZombieBody(zombie)
     then
         return false
     end
@@ -137,6 +138,12 @@ function Perception.PublishZombieGroupAlert(record, zombie, now, radius)
 end
 
 local function buildAlertOnlyTarget(alert)
+    local zombie = Perception.FindZombieByID
+        and Perception.FindZombieByID(alert.zombieId)
+        or nil
+    if zombie and not Perception.IsActualZombieBody(zombie) then
+        return nil
+    end
     return {
         kind = "zombie",
         zombieId = alert.zombieId,
@@ -172,8 +179,6 @@ function Perception.FindProximityZombieAlert(record, radius)
     local nextAlertCheckAt
     local nextProximityScanAt
     if not record
-        or record.hostility
-            and record.hostility.attackZombies == false
         or not Perception.GetVisibleZombieEntries
     then
         return nil
@@ -268,7 +273,6 @@ function Perception.FindImmediateEnemyZombie(record, radius)
         or 4
     local limitSq = limit * limit
     if not record
-        or record.hostility and record.hostility.attackZombies == false
         or not Perception.GetZombieFrame
     then
         return nil

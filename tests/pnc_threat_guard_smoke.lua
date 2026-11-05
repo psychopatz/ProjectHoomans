@@ -48,6 +48,11 @@ PNC = {
             }
         end,
     },
+    Perception = {
+        IsActualZombieTarget = function(value)
+            return value and value.kind == "zombie"
+        end,
+    },
     BehaviorTargeting = {
         UpdateTargetFromWorld = function(_, current)
             return threatActive and current or nil

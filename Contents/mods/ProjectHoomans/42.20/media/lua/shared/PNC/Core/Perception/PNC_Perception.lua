@@ -17,6 +17,50 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 Perception.CandidateCache = Perception.CandidateCache or {}
 Perception.CandidateCacheKeys = Perception.CandidateCacheKeys or {}
 
+local function isIsoZombieBody(body)
+    if not body then return false end
+    if type(instanceof) == "function" then
+        return instanceof(body, "IsoZombie")
+    end
+    return type(body.isZombie) == "function"
+        and body:isZombie() == true
+end
+
+-- The engine represents a materialized Hoomans NPC with an IsoZombie shell.
+-- Target kind must therefore be decided by ownership/registry state, not by
+-- the Java class alone. This is the shared boundary for perception, recent
+-- threat recovery, and combat authorization.
+function Perception.IsActualZombieBody(body)
+    local registry
+    if not isIsoZombieBody(body) then return false end
+    if Core and type(Core.IsManagedNPCBody) == "function"
+        and Core.IsManagedNPCBody(body) == true
+    then
+        return false
+    end
+    registry = PNC.Registry
+    if registry and type(registry.FindRecordByZombie) == "function"
+        and registry.FindRecordByZombie(body) ~= nil
+    then
+        return false
+    end
+    return true
+end
+
+function Perception.IsActualZombieTarget(target)
+    local body
+    if type(target) ~= "table" or target.kind ~= "zombie" then
+        return false
+    end
+    body = target.zombie or target.worldObject
+    if not body and target.zombieId
+        and type(Perception.FindZombieByID) == "function"
+    then
+        body = Perception.FindZombieByID(target.zombieId)
+    end
+    return Perception.IsActualZombieBody(body)
+end
+
 local function candidateNow(value)
     if value ~= nil then return tonumber(value) or 0 end
     if Core and type(Core.Now) == "function" then

@@ -117,11 +117,9 @@ function OrderSystem.SetHostility(record, modeSpec)
     else
         record.hostility.attackNPCs = record.hostility.attackNPCs == true
     end
-    if modeSpec and modeSpec.attackZombies ~= nil then
-        record.hostility.attackZombies = modeSpec.attackZombies == true
-    else
-        record.hostility.attackZombies = record.hostility.attackZombies == true
-    end
+    -- Real zombies are a universal NPC threat. Preserve the field for the
+    -- saved/debug contract, but never allow an order to disable self-defense.
+    record.hostility.attackZombies = true
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "hostility")
     end

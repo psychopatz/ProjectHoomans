@@ -75,7 +75,7 @@ local function findThreat(record, radius)
     if hostility.attackNPCs ~= false and Perception and Perception.FindNearestEnemyNPC then
         threat = nearest(threat, Perception.FindNearestEnemyNPC(record, radius))
     end
-    if hostility.attackZombies ~= false and Perception and Perception.FindNearestEnemyZombie then
+    if Perception and Perception.FindNearestEnemyZombie then
         threat = nearest(threat, Perception.FindNearestEnemyZombie(record, radius))
     end
     if (record.tacticalClass == Const.TACTICAL_CLASS_HOSTILE or hostility.attackPlayers == true)

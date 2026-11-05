@@ -36,6 +36,9 @@ PNC = {
         end,
     },
     Perception = {
+        IsActualZombieTarget = function(value)
+            return value and value.kind == "zombie"
+        end,
         FindImmediateZombieThreat = function(_, radius)
             T.equal(radius, expectedRadius,
                 "seated threat search uses the stay engagement radius")

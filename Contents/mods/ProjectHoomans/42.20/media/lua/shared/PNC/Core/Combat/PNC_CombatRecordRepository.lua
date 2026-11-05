@@ -10,7 +10,9 @@ function Repository.NormalizeHostility(rawHostility, faction)
     return { mode = tostring(source.mode or (hostile and "hostile_any_player" or "defend_owner")),
         attackPlayers = source.attackPlayers == nil and hostile or source.attackPlayers == true,
         attackNPCs = source.attackNPCs == nil and true or source.attackNPCs == true,
-        attackZombies = source.attackZombies == nil and true or source.attackZombies == true }
+        -- Real zombies are universally attackable; this fallback must match
+        -- the canonical normalized hostility contract when Types is absent.
+        attackZombies = true }
 end
 
 function Repository.NormalizeAttackType(attackType, weaponMode)

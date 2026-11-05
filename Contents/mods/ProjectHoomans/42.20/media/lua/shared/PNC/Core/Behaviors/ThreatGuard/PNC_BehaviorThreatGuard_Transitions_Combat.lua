@@ -5,6 +5,7 @@ local Companion = PNC.BehaviorCompanion
 local Common = PNC.BehaviorCommon
 local Scenes = PNC.AnimationScenes
 local Tactics = PNC.CombatTactics
+local Perception = PNC.Perception
 local preserveTravelConversationScene =
     Internal.PreserveTravelConversationScene
 local releaseCombatScene = Internal.ReleaseCombatScene
@@ -18,10 +19,10 @@ function Internal.CanAttackTarget(record, target)
     then
         return false
     end
-    if target.kind == "zombie" and record.hostility
-        and record.hostility.attackZombies == false
-    then
-        return false
+    if target.kind == "zombie" then
+        return Perception
+            and type(Perception.IsActualZombieTarget) == "function"
+            and Perception.IsActualZombieTarget(target) == true
     end
     return true
 end

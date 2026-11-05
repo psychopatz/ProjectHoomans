@@ -24,7 +24,7 @@ function Perception.FindBestEnemyZombie(record, radius)
     local crowdRadiusSq = (tonumber(Const.COMBAT_TARGET_CROWD_RADIUS) or 2.2) ^ 2
     local crowdPenalty = 1.6
 
-    if not record or record.hostility and record.hostility.attackZombies == false then
+    if not record then
         return nil
     end
 
@@ -64,7 +64,7 @@ function Perception.CountEnemyZombies(record, radius)
     local i
     local entry
 
-    if not record or record.hostility and record.hostility.attackZombies == false then
+    if not record then
         return 0
     end
 

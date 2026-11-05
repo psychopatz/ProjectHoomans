@@ -80,6 +80,9 @@ function Internal.BuildZombieTarget(
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
     local zombieId = knownZombieId
         or (modData and modData.PNC_ZombieID or nil)
+    if not Perception.IsActualZombieBody(zombie) then
+        return nil
+    end
     if not zombieId and Spatial and Spatial.GetZombieID then
         zombieId = Spatial.GetZombieID(zombie)
     end

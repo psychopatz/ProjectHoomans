@@ -27,6 +27,7 @@ local function resolveObservedAttacker(record, now, limit)
     if not observedZombie
         or observedZombie:isDead()
         or math.abs(observedZombie:getZ() - record.z) >= 1
+        or not Perception.IsActualZombieBody(observedZombie)
     then
         return nil
     end
@@ -87,9 +88,9 @@ local function findThreatInFrame(record, limit)
     return best
 end
 
--- A no-initiation policy does not make a zombie harmless. This query is
--- deliberately independent of attackZombies and only returns a visible
--- zombie whose engine target is this NPC (or one remembered from damage).
+-- Zombie defense is universal for managed NPCs. This query still only
+-- returns a visible actual zombie whose engine target is this NPC (or one
+-- remembered from damage); proximity alone is not attack authorization.
 function Perception.FindImmediateZombieThreat(record, radius)
     local now
     local recent

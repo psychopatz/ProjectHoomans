@@ -95,8 +95,7 @@ function Internal.AssessFollowHazards(record, zombie, now)
     cached.expiresAt = now
         + (tonumber(Const.FOLLOW_HORDE_SCAN_MS) or 150)
     candidates = getSharedCandidates(record, x, y, z, radius, now)
-    hostileZombies = not record.hostility
-        or record.hostility.attackZombies ~= false
+    hostileZombies = true
     for i = 1, #candidates do
         candidate = candidates[i]
         if type(candidate) == "table" and candidate.zombie then

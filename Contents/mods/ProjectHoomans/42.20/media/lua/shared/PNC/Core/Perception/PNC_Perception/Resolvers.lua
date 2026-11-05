@@ -60,7 +60,7 @@ function Perception.ResolveCompanionTarget(record)
     if immediateZombie then
         return immediateZombie
     end
-    if owner and (not record.hostility or record.hostility.attackZombies ~= false) then
+    if owner then
         ownerThreatZombie = Internal.FindZombieTargetingOwner(
             record,
             owner,
@@ -81,9 +81,7 @@ function Perception.ResolveCompanionTarget(record)
     if not record.hostility or record.hostility.attackNPCs ~= false then
         npcTarget = Perception.FindNearestEnemyNPC(record, defenseRadius)
     end
-    if not record.hostility or record.hostility.attackZombies ~= false then
-        zombieTarget = Perception.FindBestEnemyZombie(record, defenseRadius)
-    end
+    zombieTarget = Perception.FindBestEnemyZombie(record, defenseRadius)
     if npcTarget or zombieTarget then
         return Internal.PickNearest(npcTarget, zombieTarget)
     end
@@ -97,7 +95,7 @@ function Perception.ResolveCompanionTarget(record)
             z = owner:getZ(),
             hostility = record.hostility,
         }, defenseRadius)
-        hostileToOwnerZombie = (not record.hostility or record.hostility.attackZombies ~= false) and Perception.FindBestEnemyZombie({
+        hostileToOwnerZombie = Perception.FindBestEnemyZombie({
             id = record.id,
             tacticalClass = record.tacticalClass,
             x = owner:getX(),
@@ -111,9 +109,9 @@ function Perception.ResolveCompanionTarget(record)
     return nil
 end
 
--- Companion orders are protective, not an invitation to hunt everything in
--- perception range. Direct attackers always win; otherwise companions defend
--- the owner, and only broaden target selection while the owner is fighting.
+-- NPC/player targets remain protective and relationship-scoped. Actual
+-- zombies are always valid combat targets; direct attackers still win and
+-- owner-defense remains the first companion target selection stage.
 function Perception.ResolveCompanionProtectionTarget(record, ownerEngaged)
     local now = Core.Now and Core.Now() or 0
     local immediate = Perception.ResolveRecentAttacker(record, now)
@@ -131,9 +129,7 @@ function Perception.ResolveCompanionProtectionTarget(record, ownerEngaged)
     end
     owner = Core.ResolvePlayerByOnlineID(record.ownerOnlineID)
         or Core.ResolvePlayerByUsername(record.ownerUsername)
-    if owner and (not record.hostility
-        or record.hostility.attackZombies ~= false)
-    then
+    if owner then
         ownerThreat = Internal.FindZombieTargetingOwner(
             record,
             owner,
@@ -186,9 +182,7 @@ function Perception.ResolveHostileTarget(record)
     then
         playerTarget = Perception.FindNearestEnemyPlayer(record, 12)
     end
-    if hostileConfig.attackZombies ~= false then
-        zombieTarget = Perception.FindBestEnemyZombie(record, Const.ZOMBIE_TARGET_RADIUS)
-    end
+    zombieTarget = Perception.FindBestEnemyZombie(record, Const.ZOMBIE_TARGET_RADIUS)
 
     local selectedTarget = Internal.PickNearest(
         Internal.PickNearest(npcTarget, playerTarget),
@@ -224,9 +218,7 @@ function Perception.ResolveRoamingTarget(record, radius)
     then
         playerTarget = Perception.FindNearestEnemyPlayer(record, searchRadius)
     end
-    if hostility.attackZombies ~= false then
-        zombieTarget = Perception.FindBestEnemyZombie(record, searchRadius)
-    end
+    zombieTarget = Perception.FindBestEnemyZombie(record, searchRadius)
 
     return Internal.PickNearest(Internal.PickNearest(npcTarget, playerTarget), zombieTarget)
 end

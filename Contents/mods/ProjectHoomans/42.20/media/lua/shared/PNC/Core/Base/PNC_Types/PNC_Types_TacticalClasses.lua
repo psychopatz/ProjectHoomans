@@ -56,7 +56,7 @@ function Types.DefaultHostility(tacticalClass)
     end
     if tacticalClass == "neutral" then
         return { mode = "neutral", attackPlayers = false,
-            attackNPCs = true, attackZombies = false }
+            attackNPCs = true, attackZombies = true }
     end
     return { mode = "defend_owner", attackPlayers = false,
         attackNPCs = true, attackZombies = true }
@@ -71,8 +71,10 @@ function Types.NormalizeHostility(tacticalClass, value)
             and defaults.attackPlayers or source.attackPlayers == true,
         attackNPCs = source.attackNPCs == nil
             and defaults.attackNPCs or source.attackNPCs == true,
-        attackZombies = source.attackZombies == nil
-            and defaults.attackZombies or source.attackZombies == true,
+        -- Every live NPC defends itself against a real zombie. Keep the
+        -- field in the persisted contract for diagnostics/compatibility, but
+        -- do not let an old false value disable universal zombie defense.
+        attackZombies = true,
     }
     if Types.NormalizeTacticalClass(tacticalClass) == "neutral" then
         normalized.attackNPCs = true

@@ -55,10 +55,8 @@ function Internal.CountVisibleZombies(record, radius)
         and Perception.CountEnemyZombies(record, radius) or 0
 end
 
--- Threat is a survival concern even when the NPC is configured not to
--- initiate attacks against zombies. Count the physical frame entries here,
--- rather than Perception.CountEnemyZombies, whose contract intentionally
--- returns zero for attackZombies=false records.
+-- Count the physical frame entries here so threat pressure remains grounded
+-- in actual unmanaged zombies rather than the saved presentation policy.
 function Internal.CountWorldZombies(record, radius)
     if Perception and Perception.CountZombiesInFrame then
         return Perception.CountZombiesInFrame(record, radius)

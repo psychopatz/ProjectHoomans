@@ -21,7 +21,8 @@ Perception.OwnerThreatCache = Perception.OwnerThreatCache or {}
 
 function Internal.IsImmediateThreat(target)
     local radius = tonumber(Const.TARGET_IMMEDIATE_THREAT_RADIUS) or 6
-    return target and target.threatening == true
+    if not target then return false end
+    return target.threatening == true
         and (tonumber(target.distSq) or math.huge) <= (radius * radius)
 end
 
@@ -204,6 +205,9 @@ function Perception.ResolveRecentAttacker(record, now)
         if not worldObject or (worldObject.isDead and worldObject:isDead()) then
             return nil
         end
+        if not Perception.IsActualZombieBody(worldObject) then
+            return nil
+        end
         x = worldObject:getX()
         y = worldObject:getY()
         z = worldObject:getZ()
@@ -284,6 +288,9 @@ function Perception.IsTargetThreatening(record, target)
     if target.kind == "zombie" then
         targetBody = target.zombie
             or (Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId))
+        if not Perception.IsActualZombieBody(targetBody) then
+            return false
+        end
         observerBody = Registry and Registry.GetLiveZombie
             and Registry.GetLiveZombie(record.id)
             or nil

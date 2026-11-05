@@ -8,6 +8,7 @@ local enemy = true
 
 local function body(x, y)
     return {
+        isZombie = function() return true end,
         getX = function() return x end,
         getY = function() return y end,
         getZ = function() return 0 end,

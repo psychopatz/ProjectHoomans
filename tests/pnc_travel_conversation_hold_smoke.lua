@@ -120,6 +120,11 @@ PNC = {
             return threatActive and enemy or nil
         end,
     },
+    Perception = {
+        IsActualZombieTarget = function(value)
+            return value and value.kind == "zombie"
+        end,
+    },
     BehaviorCompanion = {
         Internal = {
             ResolveThreatTarget = function()
