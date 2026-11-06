@@ -13,9 +13,23 @@ Every maintained test must justify itself with at least one unique current value
 
 Similarity of file names or inputs is not enough to classify tests as duplicates.
 
-## Classification contract
+## Review-state contract
 
-Each maintained test/family is classified as one of:
+Inventory and review are separate operations.
+
+### `UNREVIEWED`
+
+The test/family is known to exist but has not yet received a real production-subject, boundary, overlap, and cost review.
+
+- This is the default for executable tests after inventory.
+- It is not a keep decision.
+- It is not deletion evidence.
+- Any `pending_family_review` entry from the first pass is treated as `UNREVIEWED` unless later evidence proves a real review.
+- Final acceptance requires **zero `UNREVIEWED` maintained families**.
+
+### Reviewed classifications
+
+After actual inspection, classify as one of:
 
 - `KEEP_CANONICAL` — unique current contract/regression;
 - `KEEP_BOUNDARY_SPECIFIC` — similar behavior, distinct execution/authority boundary;
@@ -25,7 +39,15 @@ Each maintained test/family is classified as one of:
 - `DELETE_DUPLICATE` — equal-or-stronger current coverage proven elsewhere;
 - `DELETE_SUPERSEDED` — only protects removed behavior/compatibility/migration path;
 - `REPAIR` — intended current contract is valuable but the test is stale/broken;
-- `UNKNOWN_KEEP` — purpose cannot yet be proven; deletion forbidden.
+- `UNKNOWN_KEEP` — the family was genuinely reviewed, but evidence remains insufficient to modify safely.
+
+`UNKNOWN_KEEP` is not a fallback for skipped analysis. It requires specific evidence describing:
+- production subjects inspected;
+- execution/authority boundary;
+- overlap candidates checked;
+- why merge/delete/move is unsafe or unproven.
+
+A generic sentence such as “no deletion proof found” does not satisfy review.
 
 ## Deletion gate
 
@@ -40,14 +62,12 @@ Age, `smoke` naming, test count, or apparent similarity are never sufficient evi
 
 ## Desired topology
 
-The suite should converge, where practical, toward:
-
 ```text
 FAST DEFAULT
   unit + cheap contract + essential regressions
 
 FOCUSED
-  subsystem-specific suites
+  subsystem/domain suites
 
 INTEGRATION
   cross-domain / worker / process / network-boundary tests
@@ -60,6 +80,18 @@ NATIVE
 ```
 
 A test's tier is separate from its usefulness. Moving a slow test out of default execution can be a successful optimization without deleting it.
+
+## Domain-review model
+
+The root Lua estate must be reviewed domain-by-domain, not merely by a global generated scan. Typical domains include semantic, NPC, conversation, inventory, faction/community, MP/network, facility/building, colony, abstract world/traversal, combat/zombies, presence/body, map, companion/tasking/work, fishing/scavenge, persistence, animation, compatibility, and remaining small families.
+
+For each domain:
+1. group tests by production subject/authority rather than filename alone;
+2. inspect loaded modules/callers and assertion intent;
+3. identify overlap, legacy paths, repeated mocks/setup, and one-contract-per-file fragmentation;
+4. disposition each family with specific evidence;
+5. consolidate/remove only after focused parity;
+6. rerun the domain slice and broader regression as appropriate.
 
 ## Consolidation principles
 
@@ -84,12 +116,12 @@ Preserve:
 
 ## Production boundary
 
-This job optimizes tests and test infrastructure. Do not change production behavior simply to make obsolete tests green. If current production is actually defective, record the defect separately and only fix it when required to preserve an approved current contract.
+This job optimizes tests and test infrastructure. Do not change production behavior simply to make obsolete tests green. If a test reveals an actual current production defect, record the defect and fix it only when needed to preserve an approved current contract. Production changes discovered during test work must be separately justified; test cleanup is not blanket authorization for unrelated refactoring.
 
 ## Manifest
 
-P0 must create a machine-readable or generated audit manifest outside watched `media/` (format chosen from existing tooling where possible) containing enough information to prove every maintained test family was reviewed:
+The audit manifest is a generated working artifact, not completion evidence by itself. It must contain enough information to prove actual review:
 
-`path/family -> runner -> subject -> boundary -> classification -> overlap -> action -> evidence -> final disposition`.
+`path/family -> runner -> subject -> boundary -> review state -> classification -> overlap checked -> action -> specific evidence -> final disposition`.
 
-Do not turn the manifest into another manually maintained permanent database if it can be regenerated from repository truth.
+Do not turn it into a manually maintained permanent database if it can be regenerated from repository truth.

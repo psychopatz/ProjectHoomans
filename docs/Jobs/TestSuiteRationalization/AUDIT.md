@@ -1,61 +1,105 @@
 # Audit — Test Suite Rationalization
 
-## Source-verified starting facts
+## Original baseline
 
-Audit reference: GitHub `main` at `b588e6d826ec290bb7d3e5756e4d86bd53556e25` on 2026-11-06. Exact local worktree state is **not** proven by GitHub and must be rechecked before implementation.
+The original planning audit identified a large root `*_smoke.lua` estate plus Semantic Lab/Harness Python coverage and correctly required evidence-gated deletion rather than count-driven pruning.
 
-The current root test contract documents:
-- `python3 tests/run_tests.py` as the isolated Lua suite;
-- `python3 tests/run_tests.py profiler` for profiling;
-- parallel/verbose execution through `--jobs` / `--verbose`;
-- `tests/refactor_binding_smoke.py` for split-module private-binding checks;
-- one process per Lua test;
-- shared test loading through `tests/support/test.lua` and `T.load/T.read/T.path/T.addPackagePaths`.
+The first implementation pass generated:
+- 1,776 scoped files;
+- 1,424 path families;
+- 1,301 executable entries;
+- 1,007 root Lua smoke files;
+- 209 active Semantic Python modules after one superseded deletion.
 
-The current root `tests/` directory contains many individually named `*_smoke.lua` families. Examples visible at current main include:
-- abstract follow/world/presence-boundary smoke tests;
-- several subsystem-specific `*_presence_boundary_smoke.lua` files;
-- action/behavior smoke tests;
-- semantic smoke families.
+It also repaired several stale tests/infrastructure failures and produced a green final root Lua run.
 
-These names alone do **not** prove redundancy. Separate files may protect distinct authorities or failure boundaries.
+## Post-run reconciliation — 2026-11-06
 
-## Existing semantic precedent
+A repository audit after the agent reported P6 complete found that the parent goal was **not completed**.
 
-The completed `docs/Jobs/SemanticTestSubsystem/` job is a useful precedent but its counts are historical, not the current repository baseline.
+### 1. Most families were never actually reviewed
 
-That job recorded at its execution point:
-- 146 `pnc_semantic*_smoke.lua` files / 3,572 assertions before cleanup;
-- 197 Python Semantic Harness test modules;
-- a canonical declarative, production-Lua-backed Semantic Test subsystem;
-- retention of imperative low-level contract tests where fixture migration would lose boundary coverage;
-- removal of only two duplicated behavioral smoke tests after parity was proven.
+The generated manifest contained:
 
-Therefore this job must not assume that declarative fixtures supersede every imperative semantic test.
+- `UNKNOWN_KEEP`: **1,217** entries/families with `finalDisposition: pending_family_review`;
+- `KEEP_CANONICAL`: 471 entries;
+- `KEEP_BOUNDARY_SPECIFIC`: 82 entries;
+- `REPAIR`: 5 entries;
+- `DELETE_SUPERSEDED`: 1 entry.
 
-## Problem statement
+At distinct-family level, **1,217 of 1,424 families (85.5%) remained pending review**.
 
-The likely debt is not merely raw test count. It can include:
-- overlapping regression cases;
-- migration-era tests whose production path has been removed;
-- repeated PZ mocks/setup/fixtures;
-- one-bug-one-file smoke growth that can be table-driven without losing diagnostics;
-- expensive tests running in the default lane despite being acceptance-oriented;
-- repeated worker/process startup;
-- obsolete compatibility/refactor tests;
-- test families whose ownership or execution boundary is unclear.
+The audit tool explicitly defaulted executable tests to `UNKNOWN_KEEP` and generated the same generic “no deletion-gate proof” sentence when no hand-authored evidence existed. That is inventory conservatism, not family review.
 
-The exact current counts, runtimes, slowest families, and overlap map remain **P0 evidence to measure on exact local HEAD**.
+### 2. The root Lua estate was almost entirely unresolved
 
-## Primary risks
+For the 1,007 root Lua smoke files:
+- 1,002 were left `UNKNOWN_KEEP`;
+- 5 were classified `REPAIR`;
+- no root Lua test was deleted or merged by the rationalization pass.
 
-1. **False deduplication:** two tests that look identical may exercise different client/server, live/abstract, persistence, presence, network, or integration boundaries.
-2. **Coverage laundering:** replacing an imperative authority test with a higher-level fixture can make the suite smaller while weakening what it proves.
-3. **Count-driven pruning:** deleting tests to hit a numerical goal can erase valuable historical regressions.
-4. **Runner optimization that breaks isolation:** process reuse may leak state or hide order dependence.
-5. **Stale-baseline reasoning:** older job counts must not be presented as current.
-6. **Production distortion:** production behavior must not be changed merely to make stale tests pass.
+For the non-semantic root subset:
+- 855 entries were identified;
+- **854 remained `UNKNOWN_KEEP`**;
+- only one non-semantic root test was a repair.
 
-## Audit conclusion
+At the broader root executable-family level, roughly 95.5% still contained unresolved `UNKNOWN_KEEP` coverage.
 
-A repository-wide rationalization is justified, but deletion must be evidence-gated. The first mandatory implementation activity is a complete current test inventory and measurable baseline, followed by family-by-family classification and bounded consolidation.
+Therefore the green `1007/1007` result proves regression health, not rationalization.
+
+### 3. Work was disproportionately semantic
+
+The changed root tests were:
+- `tests/pnc_companion_commands_smoke.lua`;
+- four `pnc_semantic_*` files.
+
+Most additional test changes were under `tools/semantic_harness/tests/`.
+
+The only proven deletion was `tools/semantic_harness/tests/test_contextual_dynamic_trading.py`, justified by a removed Hoomans trade graph and replacement ownership tests. That deletion remains valid evidence, but it does not represent repository-wide cleanup.
+
+### 4. Previous P6 acceptance contradicted the job contract
+
+`ACCEPTANCE.md` required “no unreviewed maintained test family in the manifest,” while 1,217 families were still marked `pending_family_review`.
+
+P6 is therefore revoked. A generated default classification cannot satisfy final review.
+
+### 5. Root Lua runtime is not the main problem
+
+Measured current root Lua suite:
+- 1,007 files;
+- about 176,886 LOC / 6.24 MB of test source;
+- about 23,244 assertions;
+- about 9.8 seconds wall time.
+
+The main root-Lua optimization opportunity is therefore maintainability, repeated scaffolding/mocks, file fragmentation, ownership clarity, agent search/context cost, and removal of real legacy coverage—not merely runtime.
+
+By contrast, the full Semantic Python suite took about **1,036.64 seconds** for 209 modules. Semantic Python runtime optimization remains a separate high-value task.
+
+### 6. Working-tree status was described inaccurately
+
+The branch pointer remained at the verified HEAD and 0/0 relative to origin, but the local worktree contained many modified/untracked files from the implementation pass. “0/0 upstream” is not equivalent to a clean worktree.
+
+## Preserved evidence from the first pass
+
+The following are useful and should not be discarded merely because P6 was invalid:
+
+- baseline inventory/reporting infrastructure;
+- root/default/focused timing evidence;
+- five evidence-backed stale-test repairs, subject to final diff review;
+- refactor-binding fixes and related proof, subject to scope review;
+- the proven superseded DynamicTrading Semantic Harness test deletion;
+- measured slow Semantic Python families;
+- full green developer regression evidence as a regression baseline.
+
+Production-code changes made during the first pass are **not automatically accepted** by this reconciliation. They must remain preserved and be reviewed for contract necessity/scope before commit.
+
+## Revised conclusion
+
+The job remains **IN PROGRESS**.
+
+The next mandatory work is:
+1. correct the manifest/review-state model;
+2. convert generic pending `UNKNOWN_KEEP` entries to `UNREVIEWED`;
+3. perform an actual domain-by-domain review of the root/non-semantic estate;
+4. then continue with semantic Python optimization and suite routing;
+5. rerun final acceptance only after zero maintained families remain unreviewed.
