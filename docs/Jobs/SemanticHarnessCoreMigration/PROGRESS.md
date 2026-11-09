@@ -33,10 +33,17 @@
 - `UNVERIFIED`: native Project Zomboid SP/MP acceptance for the future unified
   worker is not claimed.
 
+## P1-A result
+
+The move matrix is recorded in `P1A_MOVE_MATRIX.md`. Python process/protocol/
+worker-session paths are already Core-backed compatibility façades. The first
+safe Lua extraction is `RuntimeState.lua` plus `Values.lua`; ScenarioSession,
+Conversation, OutputProjection, CommandRouter, and RuntimeEnvironment remain
+mixed until typed provider callbacks exist. No source or test file was deleted.
+
 ## Next Chunk
 
-**P1-A — classify the Hoomans harness into Core-kernel, provider-policy, and
-adopter-acceptance modules.** Use Codebase Memory plus exact source reads to
-produce a bounded move list for transport/session/scenario/projection/runtime
-modules, their callers, and their tests. Do not move production policy or
-delete files in this chunk.
+**P1-B — move the bounded Lua runtime kernel.** Add Core `RuntimeState` and
+`Values` modules with extension buckets, redirect the Hoomans worker to those
+modules, add Core and Hoomans boundary tests, and prove the Hoomans worker
+behavior is unchanged before considering the next family.
