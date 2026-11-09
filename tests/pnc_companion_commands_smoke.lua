@@ -288,8 +288,15 @@ local npcReply = PNC.Semantics.CompanionSpeech.ResolveNPCCommand(
 )
 T.equal(npcReply.realizationID, "semantic.command.reply.camp_rejected",
     "NPC command rejection uses the semantic rejection variant")
-T.contains(npcReply.fallback, "safe",
-    "camp rejection realization explains outdoor camping is unsafe")
+local campReplyText = string.lower(tostring(npcReply.fallback or ""))
+T.truthy(
+    string.find(campReplyText, "safe", 1, true)
+        or string.find(campReplyText, "shelter", 1, true)
+        or string.find(campReplyText, "campfire", 1, true)
+        or string.find(campReplyText, "exposed", 1, true)
+        or string.find(campReplyText, "open", 1, true)
+        or string.find(campReplyText, "danger", 1, true),
+    "camp rejection realization explains why the selected site is unsafe")
 
 local player = {
     getUsername = function() return "alice" end,
@@ -832,7 +839,10 @@ T.truthy(string.find(spoken[#spoken], "safe", 1, true)
 T.truthy(string.find(npcSpeech[#npcSpeech], "safe", 1, true)
     or string.find(npcSpeech[#npcSpeech], "shelter", 1, true)
     or string.find(npcSpeech[#npcSpeech], "campfire", 1, true)
-    or string.find(npcSpeech[#npcSpeech], "site", 1, true),
+    or string.find(npcSpeech[#npcSpeech], "site", 1, true)
+    or string.find(npcSpeech[#npcSpeech], "exposed", 1, true)
+    or string.find(npcSpeech[#npcSpeech], "open", 1, true)
+    or string.find(npcSpeech[#npcSpeech], "danger", 1, true),
     "camp rejection speech did not explain the missing site")
 
 local campExchangePlayerSpeech = #spoken

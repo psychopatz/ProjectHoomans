@@ -55,7 +55,7 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
 
         self.assertEqual(_labels(app.trace_tabs), [
             "Inspect", "Graph", "Interactions",
-            "Compare / Regression", "World", "Debug",
+            "Compare / Regression", "Quality Sweep", "World", "Debug",
         ])
         self.assertEqual(_labels(app.inspect_tabs), [
             "Understanding", "Authority / effects", "Predicates", "Provenance",
@@ -77,7 +77,7 @@ class SurfaceConsolidationTkTests(SemanticLabGuiTestCase):
         root = tk.Tk()
         app = self.make_gui_app(root)
         root.update()
-        app.main_tabs.select(1)
+        app.main_tabs.select(app.studio_tab)
         app.developer_tools_host.grid_remove()
         root.update_idletasks()
         self.assertFalse(app.developer_tools_host.winfo_ismapped())

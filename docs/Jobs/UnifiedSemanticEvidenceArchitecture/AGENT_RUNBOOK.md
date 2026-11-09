@@ -2,15 +2,9 @@
 
 ## Read order
 
-Read root AGENTS.md, then:
+Use progressive disclosure. Read root `AGENTS.md`, then `PROGRESS.md`, then `HANDOFF.md` last among bootstrap-state docs and verify its checkpoint before trusting it. Read this runbook for durable procedure. Open only the ROADMAP/ARCHITECTURE section implicated by a live regression.
 
-1. README.md;
-2. ARCHITECTURE.md;
-3. this runbook;
-4. ROADMAP.md;
-5. PROGRESS.md last.
-
-Open AUDIT.md for revision-specific baseline evidence. Open HARNESS_ACCEPTANCE.md when implementing or verifying a gate. Do not recursively read older semantic jobs unless a concrete ownership question requires them.
+Open `AUDIT.md` only for revision-specific baseline evidence and `HARNESS_ACCEPTANCE.md` only when implementing or re-verifying a gate. Use Codebase Memory for retrievable structure. Do not recursively read older semantic jobs unless a concrete ownership question requires them.
 
 ## Ownership
 

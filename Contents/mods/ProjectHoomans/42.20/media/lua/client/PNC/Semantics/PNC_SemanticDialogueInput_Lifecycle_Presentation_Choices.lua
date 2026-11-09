@@ -75,6 +75,7 @@ local function buildCoreChoices(view, projection, authoredChoices)
                 end or nil,
             source = semanticSource,
             action = function()
+                if not rowEnabled then return false, "conversation_choice_disabled" end
                 local input = PNC.Semantics
                     and PNC.Semantics.DialogueInput or nil
                 if not input or type(input.SubmitSemanticFrame)

@@ -65,7 +65,6 @@ function H.BuildIdentityProjection(record, state)
         hostility = Core.DeepCopy(record.hostility or {}),
         organizationalFaction = buildOrganizationalFactionSummary(record),
         worldDiscovery = Parts.BuildWorldDiscoverySummary(record),
-        visualProfile = record.visualProfile,
         isFemale = identity.isFemale,
         identity = {
             isFemale = identity.isFemale,

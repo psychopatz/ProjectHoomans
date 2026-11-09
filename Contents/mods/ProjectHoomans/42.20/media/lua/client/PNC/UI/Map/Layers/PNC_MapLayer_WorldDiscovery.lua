@@ -64,7 +64,8 @@ local function populationNPCVisible(snapshot)
         return true
     end
     if PNC.MapRawEntityDebug
-        and PNC.MapRawEntityDebug.ShowRawEntities == true
+        and (PNC.MapRawEntityDebug.IsEnabled and PNC.MapRawEntityDebug.IsEnabled()
+            or not PNC.MapRawEntityDebug.IsEnabled and PNC.MapRawEntityDebug.ShowRawEntities == true)
     then
         return true
     end

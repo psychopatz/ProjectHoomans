@@ -27,6 +27,7 @@ SAVE = Path(
 class InventoryGiftWorkbenchTests(SemanticLabGuiTestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_real_save_gift_uses_production_route_and_resets_working_world(self) -> None:
+        self.require_supported_save()
         root = tk.Tk()
         app = self.make_gui_app(root)
         root.geometry("1080x700")

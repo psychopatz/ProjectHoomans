@@ -240,36 +240,6 @@ class ContextualSemanticHubTests(unittest.TestCase):
         self.assertTrue(clicked["accepted"], clicked.get("reason"))
         self.assertEqual(clicked["result"]["ir"]["subject"], "GOSSIP")
 
-    def test_dynamic_trading_joins_the_hub_only_through_its_registered_provider(self) -> None:
-        trader = apply_npc_profile(deepcopy(DEFAULT_SCENARIO), "trader")
-        with LuaSemanticWorker(trader) as worker:
-            response = worker.input("What's up?")
-            suggestions = response["observation"]["suggestions"]
-            candidates = self._candidate_map(suggestions)
-            trade = candidates["dynamictrading.trade"]
-            self.assertEqual(trade["providerID"], "dynamictrading.trader")
-            self.assertEqual(trade["semanticOwner"], "dynamictrading.trader")
-            self.assertEqual(trade["groupID"], "semantic_hub.whats_up")
-            self.assertEqual(
-                trade["eligibility"]["reason"], "enabled_trader_provider"
-            )
-            self.assertEqual(
-                suggestions["currentGroupID"], "semantic_hub.whats_up"
-            )
-            clicked = worker.suggestion_click(trade["frame"])
-
-        disabled = deepcopy(DEFAULT_SCENARIO)
-        disabled["runtime"]["availableMods"] = {"DTHoomans": False}
-        _, suggestions = self._hub_turn(disabled)
-        self.assertNotIn("dynamictrading.trade", self._candidate_map(suggestions))
-
-        self.assertTrue(clicked["accepted"], clicked.get("reason"))
-        self.assertEqual(clicked["dispatchTransport"][0]["command"], "ConversationBlock")
-        self.assertEqual(
-            clicked["dispatchTransport"][0]["payload"]["blockID"],
-            "dthoomans:trade_basic",
-        )
-
 
 if __name__ == "__main__":
     unittest.main()

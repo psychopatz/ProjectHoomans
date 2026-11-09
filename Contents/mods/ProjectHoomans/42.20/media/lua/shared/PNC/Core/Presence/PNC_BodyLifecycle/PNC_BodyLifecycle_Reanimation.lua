@@ -146,8 +146,9 @@ function Lifecycle.SpawnReanimatedZombie(record, corpse)
         x = corpse.getX and corpse:getX() or tonumber(record.x) or 0
         y = corpse.getY and corpse:getY() or tonumber(record.y) or 0
         z = corpse.getZ and corpse:getZ() or tonumber(record.z) or 0
-        outfit = PNC.VisualProfiles and PNC.VisualProfiles.ResolveSpawnOutfit
-            and PNC.VisualProfiles.ResolveSpawnOutfit(record) or nil
+        local appearance = PNC.Identity and PNC.Identity.RollAppearance
+            and PNC.Identity.RollAppearance(record) or nil
+        outfit = appearance and appearance.outfit or nil
         femaleChance = record.isFemale == true and 100 or 0
         -- This body is ours even though it is created by the same engine call
         -- the population manager uses for husks. Keep it inside the spawn

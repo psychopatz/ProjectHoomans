@@ -36,7 +36,8 @@ local snapshot = {
         moving = false,
     },
 }
-local body = {}
+local bodyData = { PNC_UUID = record.id, PNC_NPC = true }
+local body = { getModData = function() return bodyData end }
 
 PNC = {
     Const = {

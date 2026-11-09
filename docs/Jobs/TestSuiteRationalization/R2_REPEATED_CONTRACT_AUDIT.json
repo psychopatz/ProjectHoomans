@@ -1,0 +1,3910 @@
+{
+  "schemaVersion": 1,
+  "phase": "R2",
+  "scope": "root tests/*_smoke.lua repeated contract families",
+  "runner": "tests/run_tests.py (existing runner)",
+  "validation": {
+    "command": "python3 tests/run_tests.py --jobs 4 --timeout 30",
+    "returncode": 0,
+    "result": "PASS 1007/1007 in 12.14s (4 workers)"
+  },
+  "groups": [
+    {
+      "name": "presence-boundary",
+      "fileCount": 107,
+      "loc": 6190,
+      "bytes": 205553,
+      "assertionCalls": 727,
+      "distinctFinishIDs": 85,
+      "distinctSubjectSets": 2,
+      "repeatedSetupFingerprints": {},
+      "records": [
+        {
+          "path": "tests/pnc_abstract_combat_resolver_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_abstract_combat_resolver_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "cc3843b4ff11a13e",
+          "metrics": {
+            "loc": 51,
+            "bytes": 1717,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_abstract_director_debug_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "3a5949cffa6280c8",
+          "metrics": {
+            "loc": 27,
+            "bytes": 1004,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_abstract_encounter_resolver_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_abstract_encounter_resolver_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "1ab3e748a537b5c2",
+          "metrics": {
+            "loc": 51,
+            "bytes": 1661,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_abstract_group_manager_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_abstract_group_manager_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "f76415cb6b517111",
+          "metrics": {
+            "loc": 50,
+            "bytes": 1566,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_abstract_location_manager_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_abstract_location_manager_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "32249dced8bd25de",
+          "metrics": {
+            "loc": 56,
+            "bytes": 1905,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_abstract_traversal_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "c36ce3082f9cdc6a",
+          "metrics": {
+            "loc": 25,
+            "bytes": 1069,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_abstract_world_types_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_abstract_world_types_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "3621b07b29ef7113",
+          "metrics": {
+            "loc": 73,
+            "bytes": 1931,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_animation_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_animation_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "961d4f9d92c5fdc5",
+          "metrics": {
+            "loc": 29,
+            "bytes": 800,
+            "assertionCalls": 3
+          }
+        },
+        {
+          "path": "tests/pnc_animation_scenes_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_animation_scenes_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "f2ae4d9f2f045262",
+          "metrics": {
+            "loc": 67,
+            "bytes": 1508,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_animation_trace_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_animation_trace_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "f9ff5445f94a1463",
+          "metrics": {
+            "loc": 44,
+            "bytes": 1352,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_api_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_api_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "cda84e544ac83ba2",
+          "metrics": {
+            "loc": 45,
+            "bytes": 1975,
+            "assertionCalls": 12
+          }
+        },
+        {
+          "path": "tests/pnc_base_validation_service_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "e901189899def00a",
+          "metrics": {
+            "loc": 30,
+            "bytes": 1212,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_body_lifecycle_startup_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_body_lifecycle_startup_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "31e2dc702f1a93d8",
+          "metrics": {
+            "loc": 67,
+            "bytes": 1792,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_building_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_building_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "37b547a2fea79edc",
+          "metrics": {
+            "loc": 72,
+            "bytes": 2571,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_colony_management_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_colony_management_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "e73b807a197c7d9c",
+          "metrics": {
+            "loc": 58,
+            "bytes": 1931,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_colony_storage_deposits_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_colony_storage_deposits_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "1222d2c11b630ac9",
+          "metrics": {
+            "loc": 50,
+            "bytes": 1550,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_colony_storage_internal_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "3a8ecd4c7184ec5f",
+          "metrics": {
+            "loc": 24,
+            "bytes": 1080,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_colony_storage_production_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_colony_storage_production_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "9c618a427b9f31ec",
+          "metrics": {
+            "loc": 68,
+            "bytes": 2350,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_colony_storage_source_adapters_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_colony_storage_source_adapters_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "b38629bd9e0702ef",
+          "metrics": {
+            "loc": 68,
+            "bytes": 2330,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_combat_defense_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_combat_defense_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "2e3266c5dc927d06",
+          "metrics": {
+            "loc": 60,
+            "bytes": 1428,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_combat_firearms_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_combat_firearms_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "8fde1a627b14bf81",
+          "metrics": {
+            "loc": 58,
+            "bytes": 1355,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_combat_zombie_reaction_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_combat_zombie_reaction_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "2f977781794732e4",
+          "metrics": {
+            "loc": 53,
+            "bytes": 1374,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_community_debug_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_community_debug_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "79a082a8bd0fd177",
+          "metrics": {
+            "loc": 50,
+            "bytes": 1517,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_community_director_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "bdcd748754d6446f",
+          "metrics": {
+            "loc": 34,
+            "bytes": 1444,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_community_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_community_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "107fcb1850e64e41",
+          "metrics": {
+            "loc": 78,
+            "bytes": 2640,
+            "assertionCalls": 9
+          }
+        },
+        {
+          "path": "tests/pnc_community_site_resolver_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_community_site_resolver_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "1c8612f4bfc49132",
+          "metrics": {
+            "loc": 48,
+            "bytes": 1505,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_community_validation_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "f12ede3776c0cc50",
+          "metrics": {
+            "loc": 20,
+            "bytes": 936,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_companion_vehicle_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_companion_vehicle_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "77a2764ee6dcafa6",
+          "metrics": {
+            "loc": 58,
+            "bytes": 1408,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_conduct_service_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "fd3b5b05e00b33f2",
+          "metrics": {
+            "loc": 26,
+            "bytes": 1282,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_constants_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_constants_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "b68d7bad4bfbf637",
+          "metrics": {
+            "loc": 76,
+            "bytes": 3298,
+            "assertionCalls": 26
+          }
+        },
+        {
+          "path": "tests/pnc_construction_lifecycle_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_construction_lifecycle_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "55413490739ae794",
+          "metrics": {
+            "loc": 81,
+            "bytes": 2693,
+            "assertionCalls": 10
+          }
+        },
+        {
+          "path": "tests/pnc_construction_queueing_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "79ad7e903874022d",
+          "metrics": {
+            "loc": 14,
+            "bytes": 933,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_conversation_authority_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_conversation_authority_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "7d542f231683894a",
+          "metrics": {
+            "loc": 84,
+            "bytes": 3137,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_conversation_registry_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_conversation_registry_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "b4be1f16469928fe",
+          "metrics": {
+            "loc": 67,
+            "bytes": 1793,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_conversation_rules_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_conversation_rules_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "e39c7a7c4ac6915f",
+          "metrics": {
+            "loc": 58,
+            "bytes": 1544,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_conversation_scene_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_conversation_scene_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "b1d16800288c8512",
+          "metrics": {
+            "loc": 65,
+            "bytes": 1645,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_crafting_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_crafting_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "a4cc101ad722e3f0",
+          "metrics": {
+            "loc": 64,
+            "bytes": 2198,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_debug_companion_recruit_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_debug_companion_recruit_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "f12acb908f380d89",
+          "metrics": {
+            "loc": 52,
+            "bytes": 1691,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_director_config_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_director_config_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "754bdb939de33f50",
+          "metrics": {
+            "loc": 70,
+            "bytes": 1605,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_equipment_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "6a348351906f3999",
+          "metrics": {
+            "loc": 28,
+            "bytes": 792,
+            "assertionCalls": 3
+          }
+        },
+        {
+          "path": "tests/pnc_equipment_slots_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_equipment_slots_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "792c1467b1cfb683",
+          "metrics": {
+            "loc": 45,
+            "bytes": 1627,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_facility_definitions_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_facility_definitions_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "e07cba461342c8d4",
+          "metrics": {
+            "loc": 103,
+            "bytes": 3305,
+            "assertionCalls": 16
+          }
+        },
+        {
+          "path": "tests/pnc_facility_jobs_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_facility_jobs_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "8aeb931dd9f2e579",
+          "metrics": {
+            "loc": 72,
+            "bytes": 2437,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_facility_reservations_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "a1d552b2713d027b",
+          "metrics": {
+            "loc": 25,
+            "bytes": 1025,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_facility_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_facility_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "cec846c2040cc3c5",
+          "metrics": {
+            "loc": 72,
+            "bytes": 2355,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_facility_validation_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_facility_validation_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "a40ff8d724035455",
+          "metrics": {
+            "loc": 53,
+            "bytes": 1845,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_faction_behavior_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_faction_behavior_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "ca542e4b07816eee",
+          "metrics": {
+            "loc": 53,
+            "bytes": 1775,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_faction_debug_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_faction_debug_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "9eae225260c39aaf",
+          "metrics": {
+            "loc": 55,
+            "bytes": 1699,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_faction_incident_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_faction_incident_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "2aca40715c8b8814",
+          "metrics": {
+            "loc": 53,
+            "bytes": 1853,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_faction_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_faction_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "48cebdbe25b126e5",
+          "metrics": {
+            "loc": 82,
+            "bytes": 2890,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_faction_toll_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_faction_toll_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "8bd03755c568933d",
+          "metrics": {
+            "loc": 54,
+            "bytes": 1749,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_faction_types_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_faction_types_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "b1f618a2e6f6bfa4",
+          "metrics": {
+            "loc": 50,
+            "bytes": 1841,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_faction_validation_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_faction_validation_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "09c6bfff10f841cf",
+          "metrics": {
+            "loc": 51,
+            "bytes": 1616,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_farming_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_farming_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "8ab6b4bd97edbd09",
+          "metrics": {
+            "loc": 55,
+            "bytes": 1807,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_group_generator_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "1254aa86f0666188",
+          "metrics": {
+            "loc": 33,
+            "bytes": 1246,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_group_needs_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "62d304e787e47aed",
+          "metrics": {
+            "loc": 23,
+            "bytes": 1041,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_health_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_health_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "643a9d1b56030ec2",
+          "metrics": {
+            "loc": 67,
+            "bytes": 1422,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_home_duty_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_home_duty_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "e95ed05f4273ccae",
+          "metrics": {
+            "loc": 53,
+            "bytes": 1768,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_individual_needs_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_individual_needs_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "4e09520eb3bced73",
+          "metrics": {
+            "loc": 75,
+            "bytes": 2539,
+            "assertionCalls": 9
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_items_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_items_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "b9eed73488146497",
+          "metrics": {
+            "loc": 100,
+            "bytes": 2988,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_mutations_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_mutations_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "482372af0e3aa695",
+          "metrics": {
+            "loc": 51,
+            "bytes": 1514,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_item_utility_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "de19827251748e67",
+          "metrics": {
+            "loc": 20,
+            "bytes": 932,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_mobile_group_director_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_mobile_group_director_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "82536774520e448a",
+          "metrics": {
+            "loc": 55,
+            "bytes": 1822,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_nearby_resource_locator_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "bc44e8759e61f214",
+          "metrics": {
+            "loc": 23,
+            "bytes": 1056,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_nearby_water_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_nearby_water_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "b022d01048c60dc3",
+          "metrics": {
+            "loc": 56,
+            "bytes": 1850,
+            "assertionCalls": 9
+          }
+        },
+        {
+          "path": "tests/pnc_needs_debug_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "9f34d3e52a3ee9f3",
+          "metrics": {
+            "loc": 27,
+            "bytes": 1043,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_network_server_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_network_server_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "6cf0fca52df18a6d",
+          "metrics": {
+            "loc": 190,
+            "bytes": 5883,
+            "assertionCalls": 17
+          }
+        },
+        {
+          "path": "tests/pnc_npc_knowledge_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_knowledge_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "09fd6d1dfeb93f6f",
+          "metrics": {
+            "loc": 58,
+            "bytes": 2047,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_npc_supply_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_supply_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "955c24f91e8aa4d8",
+          "metrics": {
+            "loc": 66,
+            "bytes": 2154,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_npc_wounds_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_wounds_presence_boundary_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "0764ad3e3de5112e",
+          "metrics": {
+            "loc": 43,
+            "bytes": 1331,
+            "assertionCalls": 3
+          }
+        },
+        {
+          "path": "tests/pnc_pathing_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_pathing_presence_boundary_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "9c6891eb1a69070e",
+          "metrics": {
+            "loc": 380,
+            "bytes": 14343,
+            "assertionCalls": 40
+          }
+        },
+        {
+          "path": "tests/pnc_perception_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_perception_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "8ec7809bc246a405",
+          "metrics": {
+            "loc": 57,
+            "bytes": 1664,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_persistence_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_persistence_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "2ed346b07fe033a8",
+          "metrics": {
+            "loc": 34,
+            "bytes": 1315,
+            "assertionCalls": 3
+          }
+        },
+        {
+          "path": "tests/pnc_player_character_lifecycle_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "6b45d57df4ce2a52",
+          "metrics": {
+            "loc": 25,
+            "bytes": 1194,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_player_character_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_player_character_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "3b5bce2fe195c812",
+          "metrics": {
+            "loc": 77,
+            "bytes": 2639,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_player_identity_migration_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_player_identity_migration_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "ef930a0b05b9f92d",
+          "metrics": {
+            "loc": 14,
+            "bytes": 581,
+            "assertionCalls": 3
+          }
+        },
+        {
+          "path": "tests/pnc_player_knowledge_commands_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "3d360825de4ac08e",
+          "metrics": {
+            "loc": 27,
+            "bytes": 1236,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_player_needs_model_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_player_needs_model_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "bdbf6055b9b67f17",
+          "metrics": {
+            "loc": 54,
+            "bytes": 1875,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_population_director_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_population_director_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "9d6b273916f2145d",
+          "metrics": {
+            "loc": 56,
+            "bytes": 1883,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_population_sector_manager_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_population_sector_manager_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "54d803600b35fa3f",
+          "metrics": {
+            "loc": 59,
+            "bytes": 1898,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_presence_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_presence_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "65cb58724f7c1550",
+          "metrics": {
+            "loc": 68,
+            "bytes": 1512,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_provision_evaluator_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "748232528fcb9286",
+          "metrics": {
+            "loc": 31,
+            "bytes": 1191,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_provision_scheduler_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "181b40a3302e6486",
+          "metrics": {
+            "loc": 26,
+            "bytes": 1117,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_psychopatz_profiler_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_psychopatz_profiler_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "89dedc5be3da9a28",
+          "metrics": {
+            "loc": 60,
+            "bytes": 1818,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_pz_farming_adapter_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_pz_farming_adapter_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "0ce042aa01618f3f",
+          "metrics": {
+            "loc": 51,
+            "bytes": 1628,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_registry_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_registry_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "5311dcb4f32873ec",
+          "metrics": {
+            "loc": 81,
+            "bytes": 1778,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_relationship_debug_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_relationship_debug_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "df62b87007436550",
+          "metrics": {
+            "loc": 53,
+            "bytes": 1723,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_relationship_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_relationship_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "dee6ef7b70c7be9f",
+          "metrics": {
+            "loc": 94,
+            "bytes": 3081,
+            "assertionCalls": 11
+          }
+        },
+        {
+          "path": "tests/pnc_research_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_research_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "9c5777a36e99667a",
+          "metrics": {
+            "loc": 67,
+            "bytes": 2206,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_server_debug_command_handler_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_server_debug_command_handler_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "0ab7bf1b64ec7881",
+          "metrics": {
+            "loc": 39,
+            "bytes": 1490,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_server_inventory_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_server_inventory_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "07c705a3bae823dd",
+          "metrics": {
+            "loc": 63,
+            "bytes": 1997,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_server_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "960c1052526cdf59",
+          "metrics": {
+            "loc": 36,
+            "bytes": 1404,
+            "assertionCalls": 10
+          }
+        },
+        {
+          "path": "tests/pnc_settlement_candidate_manager_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_settlement_candidate_manager_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "acd8ff1d5108be75",
+          "metrics": {
+            "loc": 55,
+            "bytes": 1959,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_settlement_generator_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_settlement_generator_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "a3f800445ac04424",
+          "metrics": {
+            "loc": 50,
+            "bytes": 1713,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_social_encounter_tracker_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_social_encounter_tracker_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "b2628d7e9274a3c6",
+          "metrics": {
+            "loc": 52,
+            "bytes": 1764,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_social_event_hooks_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_social_event_hooks_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "40e4aaf9ca3dac9b",
+          "metrics": {
+            "loc": 82,
+            "bytes": 2618,
+            "assertionCalls": 10
+          }
+        },
+        {
+          "path": "tests/pnc_social_event_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_social_event_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "589881005bffc7c7",
+          "metrics": {
+            "loc": 50,
+            "bytes": 1571,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_social_profile_service_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "9745d7e8073ab36e",
+          "metrics": {
+            "loc": 23,
+            "bytes": 1172,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_starting_companion_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_starting_companion_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "2981e6e0e3bdbca9",
+          "metrics": {
+            "loc": 54,
+            "bytes": 1805,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_supply_inventory_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_supply_inventory_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "60ef8c7acf795301",
+          "metrics": {
+            "loc": 73,
+            "bytes": 2554,
+            "assertionCalls": 9
+          }
+        },
+        {
+          "path": "tests/pnc_tasking_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_tasking_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "632c1b41f9d0bbbd",
+          "metrics": {
+            "loc": 82,
+            "bytes": 3014,
+            "assertionCalls": 11
+          }
+        },
+        {
+          "path": "tests/pnc_travel_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_travel_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "9046e05166f079ee",
+          "metrics": {
+            "loc": 71,
+            "bytes": 1560,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_types_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_types_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "dc6751bb557e0922",
+          "metrics": {
+            "loc": 44,
+            "bytes": 1423,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_work_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_work_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "e898b61cde3dabcb",
+          "metrics": {
+            "loc": 106,
+            "bytes": 3851,
+            "assertionCalls": 14
+          }
+        },
+        {
+          "path": "tests/pnc_world_discovery_entities_presence_boundary_smoke.lua",
+          "finishIDs": [],
+          "literalSubjects": [],
+          "setupFingerprint": "51518c0ac78af2e9",
+          "metrics": {
+            "loc": 24,
+            "bytes": 1037,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_zombie_aggro_bite_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_zombie_aggro_bite_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "1b0563b892337b65",
+          "metrics": {
+            "loc": 68,
+            "bytes": 1600,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_zombie_kill_audit_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_zombie_kill_audit_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "db80fe36e6d4e3c4",
+          "metrics": {
+            "loc": 42,
+            "bytes": 2357,
+            "assertionCalls": 13
+          }
+        }
+      ],
+      "disposition": "KEEP_BOUNDARY_SPECIFIC",
+      "evidence": [
+        "85 files expose distinct explicit finish IDs; the other 22 are still isolated and identified by their runner path. Every file inspects a concrete entry/provider ownership, load order, public facade, or internal-boundary contract.",
+        "The repeated loop shape is a diagnostic aid, not equivalent coverage: provider ownership, public functions, auto-load behavior, and role-specific seams differ by production entry point.",
+        "No safe merge preserves per-file module ownership and failure identity without creating an opaque boundary mega-test; no deletion gate is met."
+      ]
+    },
+    {
+      "name": "inventory",
+      "fileCount": 30,
+      "loc": 5881,
+      "bytes": 210225,
+      "assertionCalls": 743,
+      "distinctFinishIDs": 30,
+      "distinctSubjectSets": 5,
+      "repeatedSetupFingerprints": {},
+      "records": [
+        {
+          "path": "tests/pnc_actor_inventory_bridge_smoke.lua",
+          "finishIDs": [
+            "pnc_actor_inventory_bridge_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "f56c08f14e07a373",
+          "metrics": {
+            "loc": 117,
+            "bytes": 3920,
+            "assertionCalls": 23
+          }
+        },
+        {
+          "path": "tests/pnc_context_inventory_access_smoke.lua",
+          "finishIDs": [
+            "pnc_context_inventory_access_smoke",
+            "pnc_context_inventory_access_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "dfa3edb10175e91c",
+          "metrics": {
+            "loc": 113,
+            "bytes": 3536,
+            "assertionCalls": 13
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_backpack_patch_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_backpack_patch_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "064c59a92736b946",
+          "metrics": {
+            "loc": 68,
+            "bytes": 2320,
+            "assertionCalls": 10
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_equipment_sync_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_equipment_sync_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "f34cda80dc50856d",
+          "metrics": {
+            "loc": 204,
+            "bytes": 8216,
+            "assertionCalls": 29
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_faction_dogtag_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_faction_dogtag_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "c28b281ef3b53516",
+          "metrics": {
+            "loc": 212,
+            "bytes": 7896,
+            "assertionCalls": 28
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_fluid_seed_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_fluid_seed_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "c7b0dfe39fed8049",
+          "metrics": {
+            "loc": 131,
+            "bytes": 4954,
+            "assertionCalls": 15
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_food_lifecycle_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_food_lifecycle_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "a5565b2c770aac18",
+          "metrics": {
+            "loc": 174,
+            "bytes": 6349,
+            "assertionCalls": 26
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_hydration_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_hydration_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "f2cf32e508c6349a",
+          "metrics": {
+            "loc": 209,
+            "bytes": 8205,
+            "assertionCalls": 29
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_identity_ui_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_identity_ui_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "6e6153adadc8d485",
+          "metrics": {
+            "loc": 71,
+            "bytes": 2034,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_items_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_items_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "b9eed73488146497",
+          "metrics": {
+            "loc": 100,
+            "bytes": 2988,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_mutations_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_mutations_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "482372af0e3aa695",
+          "metrics": {
+            "loc": 51,
+            "bytes": 1514,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_open_perf_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_open_perf_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "e9cc347ea20c2cff",
+          "metrics": {
+            "loc": 272,
+            "bytes": 9316,
+            "assertionCalls": 26
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_persisted_repair_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_persisted_repair_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "8555be9a80bfc431",
+          "metrics": {
+            "loc": 161,
+            "bytes": 4766,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_replication_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_replication_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "118c0f8603b224e3",
+          "metrics": {
+            "loc": 48,
+            "bytes": 1543,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_server_audit_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_server_audit_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "cd76bd852fd5756c",
+          "metrics": {
+            "loc": 204,
+            "bytes": 7618,
+            "assertionCalls": 37
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_state_roundtrip_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_state_roundtrip_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "a533e7c12015a551",
+          "metrics": {
+            "loc": 173,
+            "bytes": 6593,
+            "assertionCalls": 29
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_summary_cache_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_summary_cache_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "1fe4d982c08c056f",
+          "metrics": {
+            "loc": 100,
+            "bytes": 2841,
+            "assertionCalls": 9
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_sync_recovery_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_sync_recovery_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "a9f7408adba1c376",
+          "metrics": {
+            "loc": 188,
+            "bytes": 6405,
+            "assertionCalls": 16
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_tooltip_capability_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_tooltip_capability_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "3a740864b478db2e",
+          "metrics": {
+            "loc": 148,
+            "bytes": 5171,
+            "assertionCalls": 21
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_trade_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_trade_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "82be3fe38c0e2e46",
+          "metrics": {
+            "loc": 342,
+            "bytes": 12031,
+            "assertionCalls": 39
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_transactions_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_transactions_smoke",
+            "pnc_inventory_transactions_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "a7abeb7cfd204e82",
+          "metrics": {
+            "loc": 379,
+            "bytes": 12366,
+            "assertionCalls": 53
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_transfer_rollback_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_transfer_rollback_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "451a03763ac89e8f",
+          "metrics": {
+            "loc": 202,
+            "bytes": 7093,
+            "assertionCalls": 21
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_ui_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_ui_smoke",
+            "pnc_inventory_ui_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "cf07e4c6c20979ef",
+          "metrics": {
+            "loc": 887,
+            "bytes": 33676,
+            "assertionCalls": 120
+          }
+        },
+        {
+          "path": "tests/pnc_semantic_inventory_dialogue_smoke.lua",
+          "finishIDs": [
+            "pnc_semantic_inventory_dialogue_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans",
+            "PsychopatzCore"
+          ],
+          "setupFingerprint": "f568c5917c178937",
+          "metrics": {
+            "loc": 358,
+            "bytes": 12525,
+            "assertionCalls": 37
+          }
+        },
+        {
+          "path": "tests/pnc_semantic_inventory_query_smoke.lua",
+          "finishIDs": [
+            "pnc_semantic_inventory_query_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans",
+            "PsychopatzCore"
+          ],
+          "setupFingerprint": "561a1eec0d47cf67",
+          "metrics": {
+            "loc": 118,
+            "bytes": 4815,
+            "assertionCalls": 34
+          }
+        },
+        {
+          "path": "tests/pnc_semantic_inventory_service_smoke.lua",
+          "finishIDs": [
+            "pnc_semantic_inventory_service_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "e19f64e02fb52052",
+          "metrics": {
+            "loc": 363,
+            "bytes": 13386,
+            "assertionCalls": 41
+          }
+        },
+        {
+          "path": "tests/pnc_server_inventory_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_server_inventory_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "07c705a3bae823dd",
+          "metrics": {
+            "loc": 63,
+            "bytes": 1997,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_server_inventory_semantic_smoke.lua",
+          "finishIDs": [
+            "pnc_server_inventory_semantic_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "7ae6d16905cc8ddb",
+          "metrics": {
+            "loc": 111,
+            "bytes": 3811,
+            "assertionCalls": 17
+          }
+        },
+        {
+          "path": "tests/pnc_supply_inventory_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_supply_inventory_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "60ef8c7acf795301",
+          "metrics": {
+            "loc": 73,
+            "bytes": 2554,
+            "assertionCalls": 9
+          }
+        },
+        {
+          "path": "tests/psychopatz_inventory_fluid_roundtrip_smoke.lua",
+          "finishIDs": [
+            "psychopatz_inventory_fluid_roundtrip_smoke"
+          ],
+          "literalSubjects": [
+            "PsychopatzCore"
+          ],
+          "setupFingerprint": "9cde97364a0ccbba",
+          "metrics": {
+            "loc": 241,
+            "bytes": 9786,
+            "assertionCalls": 24
+          }
+        }
+      ],
+      "disposition": "KEEP_CANONICAL or KEEP_BOUNDARY_SPECIFIC per R1 path record",
+      "evidence": [
+        "Inventory files cover separate item state, equipment, UI, transfer, rollback, replication, persistence, and ownership outcomes.",
+        "Shared item-shaped fixtures do not prove the same client/server/Core authority or lifecycle contract; per-case diagnostics remain valuable.",
+        "The high-density family has no proven parity-equivalent deletion or table-driven replacement in the current runner."
+      ]
+    },
+    {
+      "name": "mp-network",
+      "fileCount": 92,
+      "loc": 17562,
+      "bytes": 597486,
+      "assertionCalls": 2237,
+      "distinctFinishIDs": 92,
+      "distinctSubjectSets": 6,
+      "repeatedSetupFingerprints": {},
+      "records": [
+        {
+          "path": "tests/pnc_building_completion_smoke.lua",
+          "finishIDs": [
+            "pnc_building_completion_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "d434694914c82885",
+          "metrics": {
+            "loc": 146,
+            "bytes": 4975,
+            "assertionCalls": 15
+          }
+        },
+        {
+          "path": "tests/pnc_bump_action_lease_smoke.lua",
+          "finishIDs": [
+            "pnc_bump_action_lease_smoke",
+            "pnc_bump_action_lease_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "29f07fedc7227f7f",
+          "metrics": {
+            "loc": 436,
+            "bytes": 11129,
+            "assertionCalls": 61
+          }
+        },
+        {
+          "path": "tests/pnc_camp_foundation_smoke.lua",
+          "finishIDs": [
+            "pnc_camp_foundation_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "bcac01abc587ae5a",
+          "metrics": {
+            "loc": 113,
+            "bytes": 3664,
+            "assertionCalls": 17
+          }
+        },
+        {
+          "path": "tests/pnc_camp_movement_coordinator_smoke.lua",
+          "finishIDs": [
+            "pnc_camp_movement_coordinator_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "e9fc1c60a8e9416f",
+          "metrics": {
+            "loc": 217,
+            "bytes": 7599,
+            "assertionCalls": 30
+          }
+        },
+        {
+          "path": "tests/pnc_camp_native_failure_smoke.lua",
+          "finishIDs": [
+            "pnc_camp_native_failure_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "cafe932ac67f6292",
+          "metrics": {
+            "loc": 95,
+            "bytes": 2497,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_camp_overlay_smoke.lua",
+          "finishIDs": [
+            "pnc_camp_overlay_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "48df0f01058c66cf",
+          "metrics": {
+            "loc": 98,
+            "bytes": 3914,
+            "assertionCalls": 20
+          }
+        },
+        {
+          "path": "tests/pnc_camp_resource_service_modules_smoke.lua",
+          "finishIDs": [
+            "pnc_camp_resource_service_modules_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "98a3db93299690a2",
+          "metrics": {
+            "loc": 76,
+            "bytes": 2952,
+            "assertionCalls": 17
+          }
+        },
+        {
+          "path": "tests/pnc_camp_sleep_smoke.lua",
+          "finishIDs": [
+            "pnc_camp_sleep_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "f1e4721998d393b4",
+          "metrics": {
+            "loc": 396,
+            "bytes": 14886,
+            "assertionCalls": 43
+          }
+        },
+        {
+          "path": "tests/pnc_camp_work_exclusion_smoke.lua",
+          "finishIDs": [
+            "pnc_camp_work_exclusion_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "91d991e38a6edd88",
+          "metrics": {
+            "loc": 87,
+            "bytes": 3099,
+            "assertionCalls": 11
+          }
+        },
+        {
+          "path": "tests/pnc_camp_work_release_smoke.lua",
+          "finishIDs": [
+            "pnc_camp_work_release_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "08e112a7fe314846",
+          "metrics": {
+            "loc": 117,
+            "bytes": 4011,
+            "assertionCalls": 16
+          }
+        },
+        {
+          "path": "tests/pnc_camp_zone_service_smoke.lua",
+          "finishIDs": [
+            "pnc_camp_zone_service_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "a3ded71589a707a8",
+          "metrics": {
+            "loc": 283,
+            "bytes": 9015,
+            "assertionCalls": 15
+          }
+        },
+        {
+          "path": "tests/pnc_client_companion_authority_smoke.lua",
+          "finishIDs": [
+            "pnc_client_companion_authority_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "b789ec2b33c917fc",
+          "metrics": {
+            "loc": 206,
+            "bytes": 8411,
+            "assertionCalls": 24
+          }
+        },
+        {
+          "path": "tests/pnc_client_companion_camp_feedback_smoke.lua",
+          "finishIDs": [
+            "pnc_client_companion_camp_feedback_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "3ae30efeb1caf805",
+          "metrics": {
+            "loc": 261,
+            "bytes": 7827,
+            "assertionCalls": 24
+          }
+        },
+        {
+          "path": "tests/pnc_client_zombie_reaction_replica_smoke.lua",
+          "finishIDs": [
+            "pnc_client_zombie_reaction_replica_smoke",
+            "pnc_client_zombie_reaction_replica_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "09528a59e27c650c",
+          "metrics": {
+            "loc": 80,
+            "bytes": 2249,
+            "assertionCalls": 10
+          }
+        },
+        {
+          "path": "tests/pnc_colony_management_mp_identity_smoke.lua",
+          "finishIDs": [
+            "pnc_colony_management_mp_identity_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "9701d16938292e05",
+          "metrics": {
+            "loc": 154,
+            "bytes": 5457,
+            "assertionCalls": 14
+          }
+        },
+        {
+          "path": "tests/pnc_colony_name_prompt_smoke.lua",
+          "finishIDs": [
+            "pnc_colony_name_prompt_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "c9d578b339a071dd",
+          "metrics": {
+            "loc": 152,
+            "bytes": 5081,
+            "assertionCalls": 20
+          }
+        },
+        {
+          "path": "tests/pnc_companion_attack_type_smoke.lua",
+          "finishIDs": [
+            "pnc_companion_attack_type_smoke",
+            "pnc_companion_attack_type_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "da86e209437e7512",
+          "metrics": {
+            "loc": 160,
+            "bytes": 4652,
+            "assertionCalls": 14
+          }
+        },
+        {
+          "path": "tests/pnc_companion_camp_site_hint_smoke.lua",
+          "finishIDs": [
+            "pnc_companion_camp_site_hint_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "eb2674c4028594a6",
+          "metrics": {
+            "loc": 243,
+            "bytes": 7609,
+            "assertionCalls": 22
+          }
+        },
+        {
+          "path": "tests/pnc_companion_character_ownership_smoke.lua",
+          "finishIDs": [
+            "pnc_companion_character_ownership_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "3ad718ff9e92b142",
+          "metrics": {
+            "loc": 153,
+            "bytes": 4832,
+            "assertionCalls": 13
+          }
+        },
+        {
+          "path": "tests/pnc_companion_command_interaction_smoke.lua",
+          "finishIDs": [
+            "pnc_companion_command_interaction_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "291aaba644f6244c",
+          "metrics": {
+            "loc": 123,
+            "bytes": 4178,
+            "assertionCalls": 17
+          }
+        },
+        {
+          "path": "tests/pnc_companion_commands_smoke.lua",
+          "finishIDs": [
+            "pnc_companion_commands_smoke",
+            "pnc_companion_commands_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "c097e873b87f1dc7",
+          "metrics": {
+            "loc": 1289,
+            "bytes": 45878,
+            "assertionCalls": 205
+          }
+        },
+        {
+          "path": "tests/pnc_companion_dogs_compatibility_smoke.lua",
+          "finishIDs": [
+            "pnc_companion_dogs_compatibility_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "30b7beec1aacebd1",
+          "metrics": {
+            "loc": 286,
+            "bytes": 9593,
+            "assertionCalls": 39
+          }
+        },
+        {
+          "path": "tests/pnc_companion_owner_defense_smoke.lua",
+          "finishIDs": [
+            "pnc_companion_owner_defense_smoke",
+            "pnc_companion_owner_defense_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "dee3b6f8ffd18b6c",
+          "metrics": {
+            "loc": 115,
+            "bytes": 3186,
+            "assertionCalls": 9
+          }
+        },
+        {
+          "path": "tests/pnc_companion_target_scope_smoke.lua",
+          "finishIDs": [
+            "pnc_companion_target_scope_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "169aa160f1057061",
+          "metrics": {
+            "loc": 195,
+            "bytes": 5462,
+            "assertionCalls": 16
+          }
+        },
+        {
+          "path": "tests/pnc_companion_vehicle_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_companion_vehicle_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "77a2764ee6dcafa6",
+          "metrics": {
+            "loc": 58,
+            "bytes": 1408,
+            "assertionCalls": 4
+          }
+        },
+        {
+          "path": "tests/pnc_companion_vehicle_smoke.lua",
+          "finishIDs": [
+            "pnc_companion_vehicle_smoke",
+            "pnc_companion_vehicle_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "1158136375910973",
+          "metrics": {
+            "loc": 320,
+            "bytes": 11652,
+            "assertionCalls": 49
+          }
+        },
+        {
+          "path": "tests/pnc_compatibility_adapter_smoke.lua",
+          "finishIDs": [
+            "pnc_compatibility_adapter_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "3b0bf349baccace2",
+          "metrics": {
+            "loc": 203,
+            "bytes": 5926,
+            "assertionCalls": 21
+          }
+        },
+        {
+          "path": "tests/pnc_compatibility_damage_context_smoke.lua",
+          "finishIDs": [
+            "pnc_compatibility_damage_context_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "595d3096382fb883",
+          "metrics": {
+            "loc": 54,
+            "bytes": 1635,
+            "assertionCalls": 10
+          }
+        },
+        {
+          "path": "tests/pnc_compatibility_incoming_damage_smoke.lua",
+          "finishIDs": [
+            "pnc_compatibility_incoming_damage_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "84f290dfddbbbb64",
+          "metrics": {
+            "loc": 116,
+            "bytes": 3269,
+            "assertionCalls": 13
+          }
+        },
+        {
+          "path": "tests/pnc_compatibility_necroa_damage_command_smoke.lua",
+          "finishIDs": [
+            "pnc_compatibility_necroa_damage_command_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "6a27df1804407ccc",
+          "metrics": {
+            "loc": 91,
+            "bytes": 2232,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_compatibility_necroa_mask_smoke.lua",
+          "finishIDs": [
+            "pnc_compatibility_necroa_mask_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "7e4729f02e090853",
+          "metrics": {
+            "loc": 93,
+            "bytes": 2769,
+            "assertionCalls": 10
+          }
+        },
+        {
+          "path": "tests/pnc_compatibility_necroa_smoke.lua",
+          "finishIDs": [
+            "pnc_compatibility_necroa_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "91200b5e4cfb0441",
+          "metrics": {
+            "loc": 75,
+            "bytes": 2181,
+            "assertionCalls": 12
+          }
+        },
+        {
+          "path": "tests/pnc_compatibility_shape_smoke.lua",
+          "finishIDs": [
+            "pnc_compatibility_shape_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "3d86a1aff7217c70",
+          "metrics": {
+            "loc": 145,
+            "bytes": 5180,
+            "assertionCalls": 14
+          }
+        },
+        {
+          "path": "tests/pnc_composition_bootstrap_smoke.lua",
+          "finishIDs": [
+            "pnc_composition_bootstrap_smoke",
+            "pnc_composition_bootstrap_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "2d3f9b8d0884d990",
+          "metrics": {
+            "loc": 490,
+            "bytes": 18982,
+            "assertionCalls": 61
+          }
+        },
+        {
+          "path": "tests/pnc_corpse_reaction_templates_smoke.lua",
+          "finishIDs": [
+            "pnc_corpse_reaction_templates_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "25885cfe3ba296c1",
+          "metrics": {
+            "loc": 56,
+            "bytes": 1764,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_debug_companion_recruit_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_debug_companion_recruit_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "f12acb908f380d89",
+          "metrics": {
+            "loc": 52,
+            "bytes": 1691,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_debug_companion_recruit_smoke.lua",
+          "finishIDs": [
+            "pnc_debug_companion_recruit_smoke",
+            "pnc_debug_companion_recruit_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "30a276cdb8a6497c",
+          "metrics": {
+            "loc": 263,
+            "bytes": 10582,
+            "assertionCalls": 56
+          }
+        },
+        {
+          "path": "tests/pnc_facility_component_rows_smoke.lua",
+          "finishIDs": [
+            "pnc_facility_component_rows_smoke",
+            "pnc_facility_component_rows_smoke"
+          ],
+          "literalSubjects": [
+            "PNC/UI/SettlementManagement/"
+          ],
+          "setupFingerprint": "aec327e8b7ad570c",
+          "metrics": {
+            "loc": 161,
+            "bytes": 5874,
+            "assertionCalls": 23
+          }
+        },
+        {
+          "path": "tests/pnc_faction_companion_order_smoke.lua",
+          "finishIDs": [
+            "pnc_faction_companion_order_smoke",
+            "pnc_faction_companion_order_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "e288ad7818f57179",
+          "metrics": {
+            "loc": 274,
+            "bytes": 9327,
+            "assertionCalls": 21
+          }
+        },
+        {
+          "path": "tests/pnc_follow_need_preemption_smoke.lua",
+          "finishIDs": [
+            "pnc_follow_need_preemption_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "96739d6e81d391fa",
+          "metrics": {
+            "loc": 97,
+            "bytes": 3552,
+            "assertionCalls": 9
+          }
+        },
+        {
+          "path": "tests/pnc_group_camp_coordinator_integration_smoke.lua",
+          "finishIDs": [
+            "pnc_group_camp_coordinator_integration_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "4ffe37efad452672",
+          "metrics": {
+            "loc": 185,
+            "bytes": 5625,
+            "assertionCalls": 12
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_replication_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_replication_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "118c0f8603b224e3",
+          "metrics": {
+            "loc": 48,
+            "bytes": 1543,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_mp_binding_targeted_recovery_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_binding_targeted_recovery_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "38ed676bb385169b",
+          "metrics": {
+            "loc": 125,
+            "bytes": 3882,
+            "assertionCalls": 18
+          }
+        },
+        {
+          "path": "tests/pnc_mp_body_audit_streaming_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_body_audit_streaming_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "25e45518e8e847b3",
+          "metrics": {
+            "loc": 149,
+            "bytes": 4663,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_mp_body_binding_bounds_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_body_binding_bounds_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "edc1a6c00f570c60",
+          "metrics": {
+            "loc": 43,
+            "bytes": 2261,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_mp_body_binding_client_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_body_binding_client_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "444b51d04a4374be",
+          "metrics": {
+            "loc": 66,
+            "bytes": 3248,
+            "assertionCalls": 29
+          }
+        },
+        {
+          "path": "tests/pnc_mp_body_binding_death_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_body_binding_death_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "b778de84cfca6b05",
+          "metrics": {
+            "loc": 46,
+            "bytes": 2228,
+            "assertionCalls": 13
+          }
+        },
+        {
+          "path": "tests/pnc_mp_body_binding_multiclient_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_body_binding_multiclient_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "07732b70aca4e830",
+          "metrics": {
+            "loc": 58,
+            "bytes": 2838,
+            "assertionCalls": 11
+          }
+        },
+        {
+          "path": "tests/pnc_mp_body_binding_server_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_body_binding_server_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "b9268d2622e3f4bf",
+          "metrics": {
+            "loc": 76,
+            "bytes": 2948,
+            "assertionCalls": 27
+          }
+        },
+        {
+          "path": "tests/pnc_mp_body_incarnation_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_body_incarnation_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "46dbfcfd13a80e12",
+          "metrics": {
+            "loc": 77,
+            "bytes": 3881,
+            "assertionCalls": 21
+          }
+        },
+        {
+          "path": "tests/pnc_mp_body_replication_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_body_replication_boundary_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "4f7daca59b924042",
+          "metrics": {
+            "loc": 36,
+            "bytes": 1522,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_mp_follow_stability_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_follow_stability_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "43d65f9ec7ef5b7d",
+          "metrics": {
+            "loc": 134,
+            "bytes": 4287,
+            "assertionCalls": 12
+          }
+        },
+        {
+          "path": "tests/pnc_mp_human_visual_repair_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_human_visual_repair_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "70f5a60cc1cc7a7e",
+          "metrics": {
+            "loc": 169,
+            "bytes": 4945,
+            "assertionCalls": 21
+          }
+        },
+        {
+          "path": "tests/pnc_mp_late_stream_rehydrate_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_late_stream_rehydrate_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "8612286fd3d4127b",
+          "metrics": {
+            "loc": 263,
+            "bytes": 8154,
+            "assertionCalls": 26
+          }
+        },
+        {
+          "path": "tests/pnc_mp_presence_authority_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_presence_authority_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "a80d9d2ef937bd12",
+          "metrics": {
+            "loc": 107,
+            "bytes": 2753,
+            "assertionCalls": 11
+          }
+        },
+        {
+          "path": "tests/pnc_mp_replica_transport_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_replica_transport_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "e06c481677ea7cb1",
+          "metrics": {
+            "loc": 686,
+            "bytes": 19902,
+            "assertionCalls": 51
+          }
+        },
+        {
+          "path": "tests/pnc_mp_replica_visual_ownership_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_replica_visual_ownership_smoke",
+            "pnc_mp_replica_visual_ownership_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "47dae6f6ecfae4ae",
+          "metrics": {
+            "loc": 333,
+            "bytes": 9161,
+            "assertionCalls": 25
+          }
+        },
+        {
+          "path": "tests/pnc_mp_restart_carrier_claim_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_restart_carrier_claim_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "045dd5993c995774",
+          "metrics": {
+            "loc": 137,
+            "bytes": 3433,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_mp_scale_guardrails_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_scale_guardrails_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "8f17547744fcc247",
+          "metrics": {
+            "loc": 196,
+            "bytes": 6649,
+            "assertionCalls": 23
+          }
+        },
+        {
+          "path": "tests/pnc_mp_server_file_guard_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_server_file_guard_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "ed4dce6482b25fa5",
+          "metrics": {
+            "loc": 223,
+            "bytes": 11390,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_mp_snapshot_budget_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_snapshot_budget_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "e6299194319a38f3",
+          "metrics": {
+            "loc": 189,
+            "bytes": 6203,
+            "assertionCalls": 27
+          }
+        },
+        {
+          "path": "tests/pnc_mp_zombie_aggro_controller_smoke.lua",
+          "finishIDs": [
+            "pnc_mp_zombie_aggro_controller_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "86bb91db54901dc8",
+          "metrics": {
+            "loc": 415,
+            "bytes": 12256,
+            "assertionCalls": 39
+          }
+        },
+        {
+          "path": "tests/pnc_native_bump_recovery_smoke.lua",
+          "finishIDs": [
+            "pnc_native_bump_recovery_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "2f351184255f4832",
+          "metrics": {
+            "loc": 154,
+            "bytes": 5342,
+            "assertionCalls": 24
+          }
+        },
+        {
+          "path": "tests/pnc_native_handoff_audit_sampling_smoke.lua",
+          "finishIDs": [
+            "pnc_native_handoff_audit_sampling_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "a3e74a4fc664d4c4",
+          "metrics": {
+            "loc": 77,
+            "bytes": 2404,
+            "assertionCalls": 13
+          }
+        },
+        {
+          "path": "tests/pnc_native_invalidate_idempotence_smoke.lua",
+          "finishIDs": [
+            "pnc_native_invalidate_idempotence_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "6fb2e76386d82474",
+          "metrics": {
+            "loc": 51,
+            "bytes": 1318,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_network_payload_budget_smoke.lua",
+          "finishIDs": [
+            "pnc_network_payload_budget_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "814577bfc9954c7c",
+          "metrics": {
+            "loc": 362,
+            "bytes": 14753,
+            "assertionCalls": 78
+          }
+        },
+        {
+          "path": "tests/pnc_network_scale_smoke.lua",
+          "finishIDs": [
+            "pnc_network_scale_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "ddf0ed7fe66da8ca",
+          "metrics": {
+            "loc": 969,
+            "bytes": 32399,
+            "assertionCalls": 153
+          }
+        },
+        {
+          "path": "tests/pnc_network_server_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_network_server_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "6cf0fca52df18a6d",
+          "metrics": {
+            "loc": 190,
+            "bytes": 5883,
+            "assertionCalls": 17
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_import_plan_codec_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_import_plan_codec_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "bbb76be8e9d59382",
+          "metrics": {
+            "loc": 54,
+            "bytes": 1800,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_import_plan_continuity_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_import_plan_continuity_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans",
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "0f6de752c06728b7",
+          "metrics": {
+            "loc": 146,
+            "bytes": 6419,
+            "assertionCalls": 28
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_import_plan_generator_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_import_plan_generator_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "c314c7625e83eda1",
+          "metrics": {
+            "loc": 129,
+            "bytes": 5517,
+            "assertionCalls": 21
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_import_plan_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_import_plan_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "e88c329171eb464a",
+          "metrics": {
+            "loc": 222,
+            "bytes": 10715,
+            "assertionCalls": 62
+          }
+        },
+        {
+          "path": "tests/pnc_pathing_bump_classification_smoke.lua",
+          "finishIDs": [
+            "pnc_pathing_bump_classification_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "7d0f9def3ca35aba",
+          "metrics": {
+            "loc": 54,
+            "bytes": 1279,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_perception_debug_camp_diagnostics_smoke.lua",
+          "finishIDs": [
+            "pnc_perception_debug_camp_diagnostics_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "1e357cbae80bb3fb",
+          "metrics": {
+            "loc": 147,
+            "bytes": 4903,
+            "assertionCalls": 19
+          }
+        },
+        {
+          "path": "tests/pnc_projectalife_compat_policy_smoke.lua",
+          "finishIDs": [
+            "pnc_projectalife_compat_policy_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "cb89efaac6f1ea53",
+          "metrics": {
+            "loc": 319,
+            "bytes": 11792,
+            "assertionCalls": 34
+          }
+        },
+        {
+          "path": "tests/pnc_puppet_opera_noncombat_bump_smoke.lua",
+          "finishIDs": [
+            "pnc_puppet_opera_noncombat_bump_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "4558a08d124dc69d",
+          "metrics": {
+            "loc": 71,
+            "bytes": 2060,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_semantic_camp_client_request_smoke.lua",
+          "finishIDs": [
+            "pnc_semantic_camp_client_request_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "3e86579e5dfeca73",
+          "metrics": {
+            "loc": 66,
+            "bytes": 1987,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_semantic_camp_site_hint_client_smoke.lua",
+          "finishIDs": [
+            "pnc_semantic_camp_site_hint_client_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "26c72ebcd31759bc",
+          "metrics": {
+            "loc": 260,
+            "bytes": 8587,
+            "assertionCalls": 37
+          }
+        },
+        {
+          "path": "tests/pnc_semantic_camp_site_smoke.lua",
+          "finishIDs": [
+            "pnc_semantic_camp_site_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "c7029a2f84ae0263",
+          "metrics": {
+            "loc": 322,
+            "bytes": 12626,
+            "assertionCalls": 42
+          }
+        },
+        {
+          "path": "tests/pnc_semantic_camp_task_smoke.lua",
+          "finishIDs": [
+            "pnc_semantic_camp_task_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "945dbe1fd9908d15",
+          "metrics": {
+            "loc": 181,
+            "bytes": 5928,
+            "assertionCalls": 18
+          }
+        },
+        {
+          "path": "tests/pnc_semantic_consumption_task_smoke.lua",
+          "finishIDs": [
+            "pnc_semantic_consumption_task_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans",
+            "PsychopatzCore"
+          ],
+          "setupFingerprint": "c1da44f4ff9a2b74",
+          "metrics": {
+            "loc": 338,
+            "bytes": 10017,
+            "assertionCalls": 23
+          }
+        },
+        {
+          "path": "tests/pnc_semantic_gift_idempotency_smoke.lua",
+          "finishIDs": [
+            "pnc_semantic_gift_idempotency_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "ec6590c83bc25b52",
+          "metrics": {
+            "loc": 105,
+            "bytes": 3538,
+            "assertionCalls": 13
+          }
+        },
+        {
+          "path": "tests/pnc_semantic_horde_tactical_prompt_smoke.lua",
+          "finishIDs": [
+            "pnc_semantic_horde_tactical_prompt_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "1f4077d65a9fbc0f",
+          "metrics": {
+            "loc": 161,
+            "bytes": 5553,
+            "assertionCalls": 20
+          }
+        },
+        {
+          "path": "tests/pnc_semantic_marketsense_consumption_smoke.lua",
+          "finishIDs": [
+            "pnc_semantic_marketsense_consumption_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans",
+            "PsychopatzCore"
+          ],
+          "setupFingerprint": "8a1f5c17250b2126",
+          "metrics": {
+            "loc": 189,
+            "bytes": 6435,
+            "assertionCalls": 32
+          }
+        },
+        {
+          "path": "tests/pnc_server_character_replication_command_handler_smoke.lua",
+          "finishIDs": [
+            "pnc_server_character_replication_command_handler_smoke",
+            "pnc_server_character_replication_command_handler_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "b5f2964c18824200",
+          "metrics": {
+            "loc": 98,
+            "bytes": 3377,
+            "assertionCalls": 17
+          }
+        },
+        {
+          "path": "tests/pnc_sink_companion_context_smoke.lua",
+          "finishIDs": [
+            "pnc_sink_companion_context_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "c7bd3fff8ad4f247",
+          "metrics": {
+            "loc": 80,
+            "bytes": 2623,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_starting_companion_relationship_key_continuity_smoke.lua",
+          "finishIDs": [
+            "pnc_starting_companion_relationship_key_continuity_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "fd3499b225efb5b5",
+          "metrics": {
+            "loc": 142,
+            "bytes": 4994,
+            "assertionCalls": 14
+          }
+        },
+        {
+          "path": "tests/pnc_starting_companion_service_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_starting_companion_service_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "2981e6e0e3bdbca9",
+          "metrics": {
+            "loc": 54,
+            "bytes": 1805,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_starting_companion_smoke.lua",
+          "finishIDs": [
+            "pnc_starting_companion_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "779387b34e31be19",
+          "metrics": {
+            "loc": 339,
+            "bytes": 13052,
+            "assertionCalls": 45
+          }
+        },
+        {
+          "path": "tests/pnc_starting_companion_state_normalization_smoke.lua",
+          "finishIDs": [
+            "pnc_starting_companion_state_normalization_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "027c4d24cf6148f7",
+          "metrics": {
+            "loc": 35,
+            "bytes": 1009,
+            "assertionCalls": 2
+          }
+        },
+        {
+          "path": "tests/pnc_unified_authority_compatibility_smoke.lua",
+          "finishIDs": [
+            "pnc_unified_authority_compatibility_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "a1a9d086588265ea",
+          "metrics": {
+            "loc": 251,
+            "bytes": 8835,
+            "assertionCalls": 29
+          }
+        },
+        {
+          "path": "tests/pnc_zombie_pursuit_compatibility_smoke.lua",
+          "finishIDs": [
+            "pnc_zombie_pursuit_compatibility_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "a592b316a99b11e4",
+          "metrics": {
+            "loc": 206,
+            "bytes": 6584,
+            "assertionCalls": 37
+          }
+        }
+      ],
+      "disposition": "KEEP_BOUNDARY_SPECIFIC per R1 path record",
+      "evidence": [
+        "MP/network candidates cross distinct client, server, replica, reconnect, death, snapshot, cleanup, and authority boundaries.",
+        "Imperative authority tests are retained because fixture-level shape checks cannot prove role admission or mutation ownership.",
+        "No merge is accepted when it would share mutable role state or hide a per-boundary failure identity."
+      ]
+    },
+    {
+      "name": "persistence-and-migration",
+      "fileCount": 23,
+      "loc": 3546,
+      "bytes": 128892,
+      "assertionCalls": 504,
+      "distinctFinishIDs": 23,
+      "distinctSubjectSets": 6,
+      "repeatedSetupFingerprints": {},
+      "records": [
+        {
+          "path": "tests/pnc_backstory_persistence_stability_smoke.lua",
+          "finishIDs": [
+            "pnc_backstory_persistence_stability_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans",
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "c680db7cb10cea8f",
+          "metrics": {
+            "loc": 187,
+            "bytes": 7377,
+            "assertionCalls": 29
+          }
+        },
+        {
+          "path": "tests/pnc_core_group_journey_persistence_smoke.lua",
+          "finishIDs": [
+            "pnc_core_group_journey_persistence_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "860374eb5564b99b",
+          "metrics": {
+            "loc": 80,
+            "bytes": 2537,
+            "assertionCalls": 10
+          }
+        },
+        {
+          "path": "tests/pnc_follower_abandonment_persistence_smoke.lua",
+          "finishIDs": [
+            "pnc_follower_abandonment_persistence_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "c1c1b9561930bac5",
+          "metrics": {
+            "loc": 35,
+            "bytes": 1163,
+            "assertionCalls": 7
+          }
+        },
+        {
+          "path": "tests/pnc_identity_v4_migration_smoke.lua",
+          "finishIDs": [
+            "pnc_identity_v4_migration_smoke",
+            "pnc_identity_v4_migration_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "6c632bc7a7de1d44",
+          "metrics": {
+            "loc": 180,
+            "bytes": 6182,
+            "assertionCalls": 8
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_persisted_repair_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_persisted_repair_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "8555be9a80bfc431",
+          "metrics": {
+            "loc": 161,
+            "bytes": 4766,
+            "assertionCalls": 5
+          }
+        },
+        {
+          "path": "tests/pnc_inventory_state_roundtrip_smoke.lua",
+          "finishIDs": [
+            "pnc_inventory_state_roundtrip_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "a533e7c12015a551",
+          "metrics": {
+            "loc": 173,
+            "bytes": 6593,
+            "assertionCalls": 29
+          }
+        },
+        {
+          "path": "tests/pnc_kahlua_persistence_smoke.lua",
+          "finishIDs": [
+            "pnc_kahlua_persistence_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "a4cc3c6762117d25",
+          "metrics": {
+            "loc": 375,
+            "bytes": 15062,
+            "assertionCalls": 63
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_core_migration_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_core_migration_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans",
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "c760b3fd504c939b",
+          "metrics": {
+            "loc": 103,
+            "bytes": 4189,
+            "assertionCalls": 25
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_normal_persistence_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_normal_persistence_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "ce0b0bacd02ce022",
+          "metrics": {
+            "loc": 149,
+            "bytes": 6154,
+            "assertionCalls": 33
+          }
+        },
+        {
+          "path": "tests/pnc_owned_needs_nutrition_persistence_smoke.lua",
+          "finishIDs": [
+            "pnc_owned_needs_nutrition_persistence_smoke",
+            "pnc_owned_needs_nutrition_persistence_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "18fb423ab97f9327",
+          "metrics": {
+            "loc": 218,
+            "bytes": 10576,
+            "assertionCalls": 55
+          }
+        },
+        {
+          "path": "tests/pnc_persisted_shell_cleanup_smoke.lua",
+          "finishIDs": [
+            "pnc_persisted_shell_cleanup_smoke",
+            "pnc_persisted_shell_cleanup_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "bd6784ee9694075f",
+          "metrics": {
+            "loc": 276,
+            "bytes": 7623,
+            "assertionCalls": 17
+          }
+        },
+        {
+          "path": "tests/pnc_persistence_follow_travel_smoke.lua",
+          "finishIDs": [
+            "pnc_persistence_follow_travel_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "55a4dec4d8cce5c5",
+          "metrics": {
+            "loc": 127,
+            "bytes": 3413,
+            "assertionCalls": 9
+          }
+        },
+        {
+          "path": "tests/pnc_persistence_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_persistence_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "2ed346b07fe033a8",
+          "metrics": {
+            "loc": 34,
+            "bytes": 1315,
+            "assertionCalls": 3
+          }
+        },
+        {
+          "path": "tests/pnc_persistence_repairs_smoke.lua",
+          "finishIDs": [
+            "pnc_persistence_repairs_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "c141c565811112da",
+          "metrics": {
+            "loc": 112,
+            "bytes": 4366,
+            "assertionCalls": 36
+          }
+        },
+        {
+          "path": "tests/pnc_persistence_reset_smoke.lua",
+          "finishIDs": [
+            "pnc_persistence_reset_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "90f9e49338743417",
+          "metrics": {
+            "loc": 69,
+            "bytes": 2704,
+            "assertionCalls": 19
+          }
+        },
+        {
+          "path": "tests/pnc_persistence_scale_smoke.lua",
+          "finishIDs": [
+            "pnc_persistence_scale_smoke",
+            "pnc_persistence_scale_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_seed_delta_smoke.lua"
+          ],
+          "setupFingerprint": "b2396ef154aee58a",
+          "metrics": {
+            "loc": 332,
+            "bytes": 12452,
+            "assertionCalls": 40
+          }
+        },
+        {
+          "path": "tests/pnc_persistence_v5_smoke.lua",
+          "finishIDs": [
+            "pnc_persistence_v5_smoke",
+            "pnc_persistence_v5_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "e5fd5344fc33f6c7",
+          "metrics": {
+            "loc": 193,
+            "bytes": 6765,
+            "assertionCalls": 33
+          }
+        },
+        {
+          "path": "tests/pnc_player_identity_migration_presence_boundary_smoke.lua",
+          "finishIDs": [
+            "pnc_player_identity_migration_presence_boundary_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "ef930a0b05b9f92d",
+          "metrics": {
+            "loc": 14,
+            "bytes": 581,
+            "assertionCalls": 3
+          }
+        },
+        {
+          "path": "tests/pnc_semantic_interaction_persistence_smoke.lua",
+          "finishIDs": [
+            "pnc_semantic_interaction_persistence_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "7fd32c84971dc674",
+          "metrics": {
+            "loc": 124,
+            "bytes": 3983,
+            "assertionCalls": 18
+          }
+        },
+        {
+          "path": "tests/pnc_survivor_world_save_authority_smoke.lua",
+          "finishIDs": [
+            "pnc_survivor_world_save_authority_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "6a7bfb8da0d7aa34",
+          "metrics": {
+            "loc": 152,
+            "bytes": 4732,
+            "assertionCalls": 12
+          }
+        },
+        {
+          "path": "tests/pnc_world_save_body_retirement_smoke.lua",
+          "finishIDs": [
+            "pnc_world_save_body_retirement_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans"
+          ],
+          "setupFingerprint": "af66f3e37fa9b007",
+          "metrics": {
+            "loc": 114,
+            "bytes": 3512,
+            "assertionCalls": 15
+          }
+        },
+        {
+          "path": "tests/pnc_world_save_coordinator_smoke.lua",
+          "finishIDs": [
+            "pnc_world_save_coordinator_smoke",
+            "pnc_world_save_coordinator_smoke"
+          ],
+          "literalSubjects": [],
+          "setupFingerprint": "a28e2c6b9ed69dd0",
+          "metrics": {
+            "loc": 97,
+            "bytes": 3061,
+            "assertionCalls": 11
+          }
+        },
+        {
+          "path": "tests/psychopatz_inventory_fluid_roundtrip_smoke.lua",
+          "finishIDs": [
+            "psychopatz_inventory_fluid_roundtrip_smoke"
+          ],
+          "literalSubjects": [
+            "PsychopatzCore"
+          ],
+          "setupFingerprint": "9cde97364a0ccbba",
+          "metrics": {
+            "loc": 241,
+            "bytes": 9786,
+            "assertionCalls": 24
+          }
+        }
+      ],
+      "disposition": "KEEP_BOUNDARY_SPECIFIC or KEEP_CANONICAL per R1 path record",
+      "evidence": [
+        "Persistence candidates cover roundtrip, repair, supported migration, import, reset, scale, identity, relationship, inventory, and travel contracts.",
+        "Still-supported schema/migration paths are explicitly retained; similarity of serialized fields is not deletion proof.",
+        "No merge or deletion passed all four deletion gates; the current process isolation is required for clean global state."
+      ]
+    },
+    {
+      "name": "npc-foundation-and-adopter",
+      "fileCount": 13,
+      "loc": 2002,
+      "bytes": 79160,
+      "assertionCalls": 338,
+      "distinctFinishIDs": 13,
+      "distinctSubjectSets": 3,
+      "repeatedSetupFingerprints": {},
+      "records": [
+        {
+          "path": "tests/pnc_npc_foundation_core_knowledge_adapter_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_core_knowledge_adapter_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "c6106c1d7a6c6e3c",
+          "metrics": {
+            "loc": 169,
+            "bytes": 6269,
+            "assertionCalls": 26
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_core_migration_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_core_migration_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans",
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "c760b3fd504c939b",
+          "metrics": {
+            "loc": 103,
+            "bytes": 4189,
+            "assertionCalls": 25
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_core_presentation_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_core_presentation_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "8331daca9fd35048",
+          "metrics": {
+            "loc": 45,
+            "bytes": 1658,
+            "assertionCalls": 12
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_core_provider_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_core_provider_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "a678c52281a3cd7d",
+          "metrics": {
+            "loc": 171,
+            "bytes": 6256,
+            "assertionCalls": 30
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_end_to_end_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_end_to_end_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "53201d01c54e1512",
+          "metrics": {
+            "loc": 213,
+            "bytes": 7021,
+            "assertionCalls": 1
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_gap_characterization_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_gap_characterization_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "93f5ee884edc40c5",
+          "metrics": {
+            "loc": 150,
+            "bytes": 6345,
+            "assertionCalls": 35
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_import_plan_codec_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_import_plan_codec_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "bbb76be8e9d59382",
+          "metrics": {
+            "loc": 54,
+            "bytes": 1800,
+            "assertionCalls": 6
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_import_plan_continuity_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_import_plan_continuity_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans",
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "0f6de752c06728b7",
+          "metrics": {
+            "loc": 146,
+            "bytes": 6419,
+            "assertionCalls": 28
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_import_plan_generator_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_import_plan_generator_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "c314c7625e83eda1",
+          "metrics": {
+            "loc": 129,
+            "bytes": 5517,
+            "assertionCalls": 21
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_import_plan_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_import_plan_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "e88c329171eb464a",
+          "metrics": {
+            "loc": 222,
+            "bytes": 10715,
+            "assertionCalls": 62
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_normal_persistence_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_normal_persistence_smoke"
+          ],
+          "literalSubjects": [
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "ce0b0bacd02ce022",
+          "metrics": {
+            "loc": 149,
+            "bytes": 6154,
+            "assertionCalls": 33
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_parity_baseline_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_parity_baseline_smoke"
+          ],
+          "literalSubjects": [
+            "PsychopatzCore"
+          ],
+          "setupFingerprint": "43e9685b91cc04e4",
+          "metrics": {
+            "loc": 383,
+            "bytes": 14015,
+            "assertionCalls": 42
+          }
+        },
+        {
+          "path": "tests/pnc_npc_foundation_social_adapter_smoke.lua",
+          "finishIDs": [
+            "pnc_npc_foundation_social_adapter_smoke"
+          ],
+          "literalSubjects": [
+            "ProjectHoomans",
+            "tests/pnc_npc_foundation_parity_baseline_smoke.lua"
+          ],
+          "setupFingerprint": "0f234abcee3b0029",
+          "metrics": {
+            "loc": 68,
+            "bytes": 2802,
+            "assertionCalls": 17
+          }
+        }
+      ],
+      "disposition": "KEEP_CANONICAL; fixture extraction deferred",
+      "evidence": [
+        "The shared parity baseline is loaded by multiple focused tests, but those tests intentionally assert different identity, inventory, knowledge, migration, presentation, provider, and cross-adopter contracts.",
+        "The baseline file is itself an executable regression with assertions; extracting it into a support fixture would require moving its assertions and re-proving every dependent process boundary.",
+        "The current T.load baseline reuse is explicit and searchable; no test file is deleted or silently converted into an opaque mega-test without parity evidence."
+      ]
+    }
+  ],
+  "actions": {
+    "merges": 0,
+    "deletions": 0,
+    "tierMoves": 0,
+    "fixtureConsolidations": 0,
+    "reason": "R2 review found repeated syntactic shapes but no evidence-proven redundant coverage. Preserve authority-boundary and isolation guarantees; continue with R3 legacy cross-reference and R4 Semantic Python tier review."
+  }
+}

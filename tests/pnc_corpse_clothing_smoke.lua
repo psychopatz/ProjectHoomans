@@ -173,7 +173,7 @@ PNC = {
             error("unexpected corpse item type " .. tostring(fullType))
         end,
     },
-    VisualProfiles = {
+    Identity = {
         RollAppearance = function()
             return { outfitItems = { "Base.Shirt_FormalWhite" } }
         end,

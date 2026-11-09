@@ -21,6 +21,8 @@ function Client.SubmitSemanticIdentity(npcID, options)
         npcID = npcID,
         kind = kind,
         claimedName = options.claimedName,
+        claimMode = options.claimMode,
+        responseStyle = options.responseStyle,
         conversationToken = options.conversationToken or options.token,
         origin = options.origin or "semantic_dialogue",
     }

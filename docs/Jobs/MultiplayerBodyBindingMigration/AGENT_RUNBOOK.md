@@ -2,15 +2,9 @@
 
 ## Read order
 
-Read root AGENTS.md, then:
-1. this job README.md;
-2. AUDIT.md;
-3. ARCHITECTURE.md;
-4. ROADMAP.md;
-5. HARNESS_ACCEPTANCE.md;
-6. PROGRESS.md last.
+Use progressive disclosure. Read root `AGENTS.md`, then `PROGRESS.md`, then `HANDOFF.md` last among bootstrap-state docs and verify its checkpoint before trusting it. Read this runbook for durable procedure. Open only the ROADMAP/ARCHITECTURE/AUDIT/HARNESS sections needed for the current responsibility.
 
-Use current code/tests/runtime evidence as source of truth over historical agent prose.
+Use Codebase Memory for retrievable structure and current code/tests/runtime evidence as source of truth over historical agent prose.
 
 ## Parent objective
 

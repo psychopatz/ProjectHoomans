@@ -173,8 +173,6 @@ local function buildDefinitionDiagnostic(definition, entry, errors)
         authored = definition and {
             identity = copy(definition.identity or {}),
             tacticalClass = definition.tacticalClass,
-            visualProfile = definition.visualProfile,
-            outfit = definition.outfit,
             hpMax = definition.hpMax,
             combatProfile = copy(definition.combatProfile or {}),
             equipment = copy(definition.equipment or {}),

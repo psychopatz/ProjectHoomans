@@ -8,7 +8,7 @@ PNC = {
         IsAuthority = function() return authority end,
         Now = function() return now end,
     },
-    VisualProfiles = {
+    Identity = {
         RollAppearance = function()
             return {
                 skinTexture = "MaleBody01",

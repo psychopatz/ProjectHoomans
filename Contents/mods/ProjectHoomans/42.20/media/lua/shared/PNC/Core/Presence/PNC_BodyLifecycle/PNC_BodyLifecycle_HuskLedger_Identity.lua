@@ -24,6 +24,22 @@ local function validEngineIdentity(value)
     return numeric == nil or numeric ~= 0
 end
 
+-- PersistentOutfits stores NO_HAT_BIT (32768) in the low word. It is
+-- mutable appearance, not identity. Arithmetic keeps this Lua 5.1 compatible
+-- and preserves the signed female bit, outfit index and random seed.
+function Lifecycle.NormalizeShellOutfitID(value)
+    local id = tonumber(value)
+    if not id or id ~= math.floor(id) or id < -2147483648
+        or id > 2147483647 or id == 0
+    then
+        return value ~= nil and tostring(value) or nil
+    end
+    if id % 65536 >= 32768 then
+        id = id - 32768
+    end
+    return tostring(id)
+end
+
 --[[
     PNC shell outfit identity.
 
@@ -77,7 +93,7 @@ function Lifecycle.NoteShellCarrierID(outfitID)
         return false
     end
     ledger = ensureLoaded()
-    key = tostring(outfitID)
+    key = Lifecycle.NormalizeShellOutfitID(outfitID)
     if key == "" or ledger.shellCarrierIds[key] == true then
         return false
     end
@@ -86,8 +102,7 @@ function Lifecycle.NoteShellCarrierID(outfitID)
     -- old save permanently prevents the new durable PNCShellCarrier path.
     if Lifecycle.ShellCarrierCount()
         >= (tonumber(Const.HUSK_LEDGER_MAX_SHELL_CARRIERS)
-            or tonumber(Const.HUSK_LEDGER_MAX_SHELL_OUTFITS)
-            or 32)
+            or 2048)
     then
         return false
     end
@@ -122,7 +137,14 @@ function Lifecycle.IsShellCarrierID(outfitID)
         return false
     end
     ledger = ensureLoaded()
-    return ledger.shellCarrierIds[tostring(outfitID)] == true
+    local key = Lifecycle.NormalizeShellOutfitID(outfitID)
+    if ledger.shellCarrierIds[key] == true then
+        return true
+    end
+    -- Read old saves that learned the id while the hat was already fallen.
+    local id = tonumber(key)
+    return id ~= nil and id ~= 0
+        and ledger.shellCarrierIds[tostring(id + 32768)] == true
 end
 
 function Lifecycle.ShellOutfitCount()

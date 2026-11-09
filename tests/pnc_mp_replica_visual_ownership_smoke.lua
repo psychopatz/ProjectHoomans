@@ -26,7 +26,7 @@ ItemVisual = {
     end,
 }
 PNC = {
-    VisualProfiles = {},
+    Identity = {},
 }
 T.load(VISUALS)
 

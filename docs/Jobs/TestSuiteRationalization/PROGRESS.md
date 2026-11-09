@@ -1,72 +1,67 @@
 # Test Suite Rationalization — current progress
 
-**Status:** IN PROGRESS — previous P6 completion REVOKED after repository audit.
-**Current continuation phase:** R0 — Correct review-state model and preserve evidence.
-**Repository branch:** `main`.
-**Baseline HEAD used by first pass:** `2d882b952ea41c855b8bcf3658c7b75b36945632`.
-**Current worktree:** intentionally dirty with prior rationalization changes and evidence artifacts; branch synchronization must not be described as worktree cleanliness.
+**Status:** DEVELOPER-SIDE ACCEPTANCE PASSED. Native SP/MP acceptance remains user-owned.
 
-## Accepted evidence from the first pass
+**Current phase:** R0–R6 complete. The previous generic P6 completion claim was revoked and superseded by the evidence below.
 
-The following remains useful evidence, subject to final diff/scope review:
+**Repository:** branch `main`, HEAD `9572b548f19b6229a7c5e7887047baa9cc783993`, synchronized with `origin/main` (`0/0` ahead/behind). The worktree is intentionally dirty; synchronization is not being represented as cleanliness.
 
-- P0 inventory established 1,776 scoped files, 1,424 path families and 1,301 executable entries.
-- Root Lua baseline/final evidence: 1,007 smoke files; final regression `PASS 1007/1007` in about 9.82s.
-- Root Lua source footprint measured after audit: about 176,886 LOC / 6.24 MB / ~23,244 assertions.
-- Semantic Python final regression: 198 PASS, 11 SKIP, 0 FAIL across 209 active modules in about 1,036.64s.
-- Five manifest-tracked stale-test repairs have specific historical/current-contract evidence.
-- Refactor-binding, worker/doctor and related repairs produced passing focused evidence, but production changes still require scope review before final acceptance.
-- `tools/semantic_harness/tests/test_contextual_dynamic_trading.py` has specific `DELETE_SUPERSEDED` evidence tied to the retired Hoomans trade graph and replacement DynamicTrading ownership tests.
+## R0 — review-state model and worktree triage
 
-## Invalidated completion claims
+- `tools/test_estate_audit.py` now starts inventoried executable tests as `UNREVIEWED`; it no longer synthesizes reviewed-looking generic `UNKNOWN_KEEP` evidence.
+- `AUDIT_MANIFEST.json` records entry and family review states, domain accounting, active/deleted counts, tier counts, classifications, and test-cost metrics.
+- `R0_DIFF_REVIEW.json` separates pre-existing unrelated edits, concurrent work preserved outside rationalization, evidence-backed production contract/ownership repairs, worker infrastructure changes, and the accepted test/evidence changes. No scope-drift production change was accepted as rationalization.
+- The proven deletion of `tools/semantic_harness/tests/test_contextual_dynamic_trading.py` remains recorded as `DELETE_SUPERSEDED`.
 
-The previous P2/P6 completion claim is not accepted.
+## R1 — complete root Lua estate review
 
-Post-run audit found:
-- 1,217 of 1,424 families remained `UNKNOWN_KEEP` with `finalDisposition: pending_family_review` — **85.5% unresolved**.
-- The audit generator defaulted executable coverage to `UNKNOWN_KEEP` and generated generic “no deletion proof” evidence; this was inventory conservatism, not review.
-- Root Lua: 1,002 of 1,007 files remained generic `UNKNOWN_KEEP`; only five were repairs.
-- Non-semantic root subset: 854 of 855 entries remained generic `UNKNOWN_KEEP`.
-- At distinct root executable-family level, roughly 95.5% still contained unresolved `UNKNOWN_KEEP` coverage.
-- No root Lua test was deleted/merged by the first pass.
-- Most implementation/test edits centered on semantic/Harness work.
-- The only proven deletion was one Semantic Harness Python module.
-- The worktree was not clean despite 0/0 branch synchronization.
+- `R1_ROOT_DOMAIN_REVIEW.json` contains path-specific review for all 1,007 root Lua smoke files across 19 production-ownership domains.
+- Each family records production subjects and callers/owners, runtime/authority boundary, assertion intent, overlap candidates, legacy/history review, cost, focused validation, and disposition.
+- All 19 focused domain slices passed: `1,007/1,007`.
+- No filename-similarity deletion or merge was inferred. Root dispositions are canonical, boundary-specific, or one of the five separately evidenced repairs.
 
-These facts directly violate final acceptance's requirement for no unreviewed maintained family.
+## R2 — repeated-contract review
 
-## Revised review-state interpretation
+- `R2_REPEATED_CONTRACT_AUDIT.json` reviewed presence-boundary (107 files), inventory (30), MP/network (92), persistence/migration (23), and NPC foundation/adopter (13) high-density groups.
+- Similar setup was not proof of parity: authority boundaries, production subjects, state ownership, migration stages, and diagnostics differed.
+- Result: zero unsupported merges, deletions, tier moves, or fixture extractions. Existing isolation and per-case diagnostics remain intact.
 
-Until R0 rewrites/regenerates the manifest:
+## R3 — legacy and migration review
 
-- all generic `UNKNOWN_KEEP` entries whose final disposition is `pending_family_review` are treated as **`UNREVIEWED`**;
-- only entries with specific evidence-backed dispositions count as reviewed;
-- final acceptance requires zero `UNREVIEWED`.
+- `R3_LEGACY_FAMILY_AUDIT.json` cross-referenced 1,505 legacy-looking marker lines across 308 files against current production paths, callers, and history.
+- Eight representative removal/migration/authority families were reviewed path-specifically and retained because they protect supported behavior or authority boundaries.
+- Only the DynamicTrading test deletion passed all deletion gates; no additional legacy/debris deletion was proven.
 
-## Current phase — R0
+## R4 — Semantic Python slow-family review
 
-### Immediate Next Chunk
+- `R4_SEMANTIC_SLOW_REVIEW.json` reviews the 12 measured slowest families, including response observatory, sweep acceptance, fixture parity, harness, contextual talk, behavior, social reactions, speech behavior, and related parity families.
+- Baseline: `PASS 198 / SKIP 11 / FAIL 0`, 209 active modules, `1,036.639s`.
+- Final routed run: `PASS 198 / SKIP 11 / FAIL 0`, 209 active modules, `1,005.234s`.
+- Ten resource-sensitive modules were routed through the existing exclusive lane after a contention-only parallel failure; the isolated rerun passed `10/10`. No production authority assertion was weakened and no opaque replacement framework was added.
 
-1. Recheck current local branch/HEAD/status/worktrees without discarding the existing dirty rationalization work.
-2. Review the current diff and separate:
-   - valid evidence artifacts and test-only repairs;
-   - production changes required by proven current contracts;
-   - any scope-drift production changes needing separate treatment.
-3. Update `tools/test_estate_audit.py` so executable tests default to `UNREVIEWED`, not `UNKNOWN_KEEP`.
-4. Remove the generic evidence path that converts an unreviewed entry into a reviewed-looking keep decision.
-5. Regenerate the manifest and add review-state/domain-summary fields so remaining work is measurable.
-6. Preserve the proven DynamicTrading deletion and specific repair evidence.
-7. Establish the first non-semantic root domain batch for R1, prioritizing high-density/repeated-contract families rather than returning to semantic-only work.
-8. Update PROGRESS with exact R0 evidence and continue automatically into R1.
+## R5 — suite topology
 
-## Remaining mandatory gap
+- `R5_SUITE_TOPOLOGY.json` defines FAST, DEFAULT, FOCUSED, INTEGRATION, ACCEPTANCE, and NATIVE using the existing runners.
+- `tests/run_tests.py --domain <reviewed-domain>` selects reviewed root-domain paths without introducing a competing generic framework.
+- The Python runner labels slow acceptance modules and routes resource-sensitive modules through its existing exclusive scheduling path while retaining the ACCEPTANCE tier.
+- Native fixtures are reviewed and inventoried but were not executed; native SP/MP acceptance remains the user-owned handoff.
 
-R1-R6 remain mandatory. In particular:
-- actually review the non-semantic root Lua estate;
-- consolidate repeated contract families where parity permits;
-- remove real legacy/migration/refactor debris;
-- rationalize the 17-minute Semantic Python estate;
-- establish useful suite/domain routing;
-- reach zero unreviewed families before final acceptance.
+## R6 — final developer-side acceptance
 
-Do not mark this goal complete because all current tests pass or because the raw count stays above/below 1,000.
+Final `AUDIT_MANIFEST.json` state:
+
+- 1,776 tracked-scope files; 1,775 active after one accepted superseded deletion.
+- 1,424 families; 1,423 active families; 1,300 active executable entries.
+- `REVIEWED=1,776` entries and `REVIEWED=1,424` families.
+- `UNREVIEWED=0`, `pending_family_review=0`, and `UNKNOWN_KEEP=0`.
+- Classifications: `KEEP_CANONICAL=1,275`, `KEEP_BOUNDARY_SPECIFIC=495`, `REPAIR=5`, `DELETE_SUPERSEDED=1`.
+
+Developer validation recorded in `R6_FINAL_EVIDENCE.json`:
+
+- Root default: before `FAIL 5/1,007` in `9.63s`; after `PASS 1,007/1,007` in `9.60s`.
+- Semantic Lua: before `FAIL 4/144` in `3.22s`; after `PASS 144/144` in `3.28s`.
+- Focused root slices: persistence `11/11`, presence `101/101`, inventory `41/41`, MP/network `80/80`.
+- Root Python `22/22`, unique-NPC `6/6`, refactor checks `3,340` passing, doctor checks passing, and PZ verification `3,316` checks with zero errors.
+- No unsupported merge was made. One superseded test family was deleted. Semantic execution routing was optimized without changing the declared acceptance tier.
+
+The final worktree contains 67 status entries (45 modified, 1 deleted, 21 untracked), including preserved concurrent work and evidence artifacts. No reset, stash, discard, branch creation, native Project Zomboid launch, or Workshop publication was performed.

@@ -11,11 +11,24 @@ local function install(ScenarioSession)
     local Internal = ScenarioSession.Internal
 
     function ScenarioSession.configureRuntime(context)
+        local Runtime = context.Runtime
         InventoryFixtures.restoreProduction(context)
         RuntimeEnvironment.configure(context)
         local rehydrated, reason = ProductionRehydration.configure(context)
         if not rehydrated then
             error("production_rehydration_failed:" .. tostring(reason))
+        end
+        if context.RuntimeEnvironment
+            and type(context.RuntimeEnvironment.ensureCoreActor) == "function"
+            and PsychopatzCore and type(PsychopatzCore.Actors) == "table"
+        then
+            local record = context.Runtime.hydratedNpcRecord
+                or context.Runtime.scenario.npc
+            local actorReady, actorReason =
+                context.RuntimeEnvironment.ensureCoreActor(context, record)
+            if not actorReady then
+                error("core_actor_fixture_failed:" .. tostring(actorReason))
+            end
         end
         SemanticAdapters.configure(context)
         InventoryFixtures.configure(context)

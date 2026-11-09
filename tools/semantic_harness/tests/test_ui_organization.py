@@ -11,6 +11,7 @@ import unittest
 
 from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import require_supported_save
 
 
 class SemanticLabUIOrganizationTests(unittest.TestCase):
@@ -23,6 +24,7 @@ class SemanticLabUIOrganizationTests(unittest.TestCase):
         self._assert_save_backed_layout("1280x800")
 
     def _assert_save_backed_layout(self, geometry: str) -> None:
+        require_supported_save(self)
         state_dir = tempfile.TemporaryDirectory(prefix="projecthoomans-ui-org-")
         state_path = Path(state_dir.name) / "ui-state.json"
         root = tk.Tk()

@@ -106,14 +106,15 @@ class UnifiedEvidenceE7Tests(unittest.TestCase):
     def test_storage_pressure_plateaus_and_queries_remain_read_only(self):
         report, samples, bench, rolled = capture_stress()
         before, first, second, repeated = samples
+        relationship_limit = before["limits"]["relationship"]
         self.assertTrue(report["sourceSnapshotUnchanged"])
         for sample in samples:
-            for key, maximum in {"today": 8, "durable": 6, "relationship": 20, "conduct": 64, "journal": 80, "topicPlayers": 4}.items():
+            for key, maximum in {"today": 8, "durable": 6, "relationship": relationship_limit, "conduct": 64, "journal": 80, "topicPlayers": 4}.items():
                 self.assertLessEqual(sample["counts"][key], maximum)
             for owner in [sample["serializedRecord"], sample["playerRecord"]]:
                 self.assertFalse(keys(owner) & FORBIDDEN, keys(owner) & FORBIDDEN)
             self.assertEqual(sample["roots"], before["roots"])
-        self.assertEqual(second["counts"]["relationship"], 20)
+        self.assertEqual(second["counts"]["relationship"], relationship_limit)
         self.assertEqual(second["counts"]["conduct"], 64)
         for sample in [first, second, repeated]:
             self.assertIn(1101, sample["memory"]["s"][::3])

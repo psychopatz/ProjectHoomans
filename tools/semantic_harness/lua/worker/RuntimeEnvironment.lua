@@ -13,4 +13,8 @@ function RuntimeEnvironment.configure(context)
     Core.configure(context)
 end
 
+function RuntimeEnvironment.ensureCoreActor(context, record)
+    return Core.ensureActor(context, record)
+end
+
 return RuntimeEnvironment

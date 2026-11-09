@@ -1,6 +1,6 @@
 # Agent runbook — Test Suite Rationalization
 
-1. Work in `/home/psychopatz/Zomboid/Workshop/ProjectHoomans` on existing **main** only. Read root `AGENTS.md`, then this job's README, ARCHITECTURE, AUDIT, ACCEPTANCE, ROADMAP, AGENT_RUNBOOK, and **PROGRESS last**.
+1. Work in `/home/psychopatz/Zomboid/Workshop/ProjectHoomans` on existing **main** only. Treat that repository as the product target even when the shell starts in the shared `Zomboid-devSkills` workspace. Use progressive disclosure: read root `AGENTS.md`, then this runbook, `PROGRESS.md`, and `HANDOFF.md` last among bootstrap docs. Verify the handoff checkpoint before trusting it. Read only the ROADMAP/ARCHITECTURE/AUDIT/ACCEPTANCE sections needed for the current responsibility; use Codebase Memory for retrievable code structure instead of loading those documents wholesale.
 2. Before edits verify local branch/HEAD/status, origin/main, worktrees and concurrent user/agent changes. The current worktree already contains prior rationalization changes; preserve them and do not reset/stash/discard them merely to obtain cleanliness.
 3. Treat the first pass as **partial evidence**, not completed work. P0 inventory/baseline and proven repairs/deletion may be retained; previous P2/P6 completion claims are revoked.
 4. Start R0 by correcting the audit model: executable tests default to `UNREVIEWED`. A generic generated sentence cannot convert an entry to `UNKNOWN_KEEP` or any other reviewed classification.

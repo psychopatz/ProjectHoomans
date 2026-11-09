@@ -4,14 +4,14 @@ Use this runbook for the active combat-banter/tactical-intent job only.
 
 ## Read order
 
-Read root `AGENTS.md`, then this job's `AUDIT.md`, `ARCHITECTURE.md`, `ROADMAP.md`, `HARNESS_ACCEPTANCE.md`, and `PROGRESS.md` last.
+Use progressive disclosure. Read root `AGENTS.md`, then this job's `PROGRESS.md`, then `HANDOFF.md` last among bootstrap-state docs and verify its checkpoint before trusting it. Read this runbook for durable procedure. Open only the ROADMAP/ARCHITECTURE/AUDIT/HARNESS sections needed for a reproduced live issue.
 
-Also read the accepted foundation only when needed:
+Consult accepted predecessor docs only for a concrete inherited contract:
 - `docs/Jobs/OpenEndedSemanticCombatAwareness/PROGRESS.md`;
 - `docs/Jobs/PragmaticDialogueBeatDirector/ARCHITECTURE.md`;
 - `docs/Jobs/UnifiedSemanticDialogueAuthority/ARCHITECTURE.md`.
 
-Do not reload completed-job history wholesale.
+Use Codebase Memory for retrievable structure. Do not reload completed-job history wholesale.
 
 ## Parent objective
 

@@ -33,7 +33,7 @@ local function applyIdentityVoice(zombie, record, appearance)
             math.max(-100, math.min(100, tonumber(survivor.voicePitch) or 0)))
     end
 end
-local Profiles = PNC.VisualProfiles
+local Identity = PNC.Identity
 local Core = PNC.Core
 
 local function isReplicaRuntime()
@@ -358,7 +358,7 @@ function Visuals.ApplyHumanVisuals(zombie, record)
     if not zombie or not record then
         return
     end
-    appearance = Profiles.RollAppearance(record)
+    appearance = Identity.RollAppearance(record)
     if isReplicaRuntime() then
         Visuals.ApplyReplicaAppearance(
             zombie,

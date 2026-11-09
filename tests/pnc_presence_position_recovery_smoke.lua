@@ -111,9 +111,6 @@ PNC = {
     Inventory = {
         EnsureRecordInventory = function() end,
     },
-    VisualProfiles = {
-        ResolveSpawnOutfit = function() return "PNCCompanionMale" end,
-    },
     SimulationClock = {
         Wake = function(_, key, dueAt)
             if key == "presence" then

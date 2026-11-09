@@ -57,7 +57,6 @@ local function buildVisualKey(snapshot)
         tostring(snapshot and snapshot.liveBodyInstanceID or ""),
         tostring(snapshot and snapshot.liveBodyLease or ""),
         tostring(snapshot and snapshot.liveBodyOnlineID or ""),
-        tostring(snapshot and snapshot.visualProfile or ""),
         tostring(snapshot and snapshot.isFemale == true),
         tostring(appearance.outfit or ""),
         tostring(appearance.skinTexture or ""),

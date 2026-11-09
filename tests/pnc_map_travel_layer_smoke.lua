@@ -16,6 +16,8 @@ local mouseX = -100
 local mouseY = -100
 local hoveredPortrait
 local portraitHidden = 0
+local lastHoverOwner
+local lastHideOwner
 local clock = 1000
 local listProjectedCount = 0
 local debugEnabled = false
@@ -159,12 +161,14 @@ package.preload[
     "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldMapHover"
 ] = function()
     return {
-        Update = function(_, entry)
+        Update = function(_, entry, _, _, _, owner)
             hoveredPortrait = entry
+            lastHoverOwner = owner
             return entry and entry.portrait ~= nil
         end,
-        Hide = function()
+        Hide = function(_, _, owner)
             portraitHidden = portraitHidden + 1
+            lastHideOwner = owner
         end,
     }
 end
@@ -252,6 +256,8 @@ T.equal(coreOverlapPositions[2].y, 140,
 layer.render(map)
 T.truthy(listProjectedCount == 1,
     "travel map entries were not loaded for the first frame")
+T.equal(lastHideOwner, "ProjectHoomans:pnc_travel",
+    "travel layer did not scope shared hover cleanup to its owner")
 T.truthy(dots == 5, "live and deceased NPC dots were not all rendered")
 T.truthy(colors[1].r == 0.95 and colors[1].g == 0.75,
     "neutral NPC marker was not yellow")
@@ -278,6 +284,8 @@ T.truthy(labels[1] == "Moving Follower [trader]" and labels[2] == nil,
     "map layer duplicated the name owned by the visible portrait card")
 T.truthy(hoveredPortrait and hoveredPortrait.id == "idle",
     "hovered map marker was not sent to the portrait presenter")
+T.equal(lastHoverOwner, "ProjectHoomans:pnc_travel",
+    "travel layer did not claim shared hover ownership")
 
 labels = {}
 mouseX = 30

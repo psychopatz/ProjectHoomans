@@ -6,7 +6,7 @@ Deliver the **entire** approved Observatory-first system in the existing Semanti
 
 ## Safe checkout and document order
 
-1. Work only in /home/psychopatz/Zomboid/Workshop/ProjectHoomans on **existing main**; read root AGENTS.md, this runbook, ARCHITECTURE.md, SURFACE_CONSOLIDATION.md, DIALOGUE_CONTENT_REGISTRY.md, TEST_RUNTIME_PERFORMANCE.md, HARNESS_ACCEPTANCE.md, ROADMAP.md, AUDIT.md, related job authority docs; **read PROGRESS.md last**.
+1. Work only in /home/psychopatz/Zomboid/Workshop/ProjectHoomans on **existing main**. Use progressive disclosure: read root AGENTS.md, then PROGRESS.md, then HANDOFF.md last among bootstrap-state docs and verify its checkpoint; read this runbook for durable procedure; open only the ARCHITECTURE/ROADMAP/surface/content/performance/acceptance/audit sections required by the current issue. Use Codebase Memory for retrievable structure instead of preloading related job authority docs.
 2. Inspect local git branch/status/HEAD, worktrees, origin/main remote and concurrent edits before writing. Prefer explicit fetch and verified fast-forward-only sync where needed. No new branches, blind pull, automatic stash, checkout/reset/rebase, force push, overwrite of user/agent files or unrelated doc churn.
 3. Inspect the current production code instead of assuming the P0 audit SHA still applies. Protect PsychopatzCore and DynamicTrading as separate owners; don't alter sibling repositories without an approved, verified cross-repo requirement and safe Git ownership.
 4. Changes only to this job's docs for execution/progress. Do not append goal status to root AGENTS.md or rewrite old goals. Do not check in GOAL_PROMPT.md; /goal stays in ChatGPT.

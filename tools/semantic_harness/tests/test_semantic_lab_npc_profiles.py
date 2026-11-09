@@ -43,20 +43,22 @@ class SemanticLabNpcProfileTests(unittest.TestCase):
                     if item.get("action")
                     and item.get("status") != "requires_destination"
                 )
-                trade = next(
-                    item
-                    for item in worker.snapshot()["context"]["categoryDiagnostics"]
-                    if item.get("id") == "projecthoomans:trade"
-                )
+                snapshot = worker.snapshot()
+                diagnostics = snapshot["context"]["categoryDiagnostics"]
+                category_ids = {item.get("id") for item in diagnostics}
+                dynamic_load = snapshot["dynamicTradingLoad"]
                 self.assertEqual(
                     suggestions.get("activeHub"),
                     {"id": "whats_up", "route": "semantic_hub"},
                 )
                 self.assertNotIn("semantic_hub.whats_up", ids)
                 self.assertEqual("FOLLOW" in action_ids, profile == "companion")
-                self.assertEqual(trade["visible"], profile == "trader")
+                self.assertEqual(dynamic_load["loaded"], profile == "trader")
+                self.assertEqual(dynamic_load["requested"], profile == "trader")
+                self.assertNotIn("projecthoomans:trade", category_ids)
                 self.assertEqual(
-                    trade["reason"], "visible" if profile == "trader" else "integration_unavailable"
+                    "dthoomans:caravan_referral" in category_ids,
+                    profile == "trader",
                 )
             finally:
                 worker.close()

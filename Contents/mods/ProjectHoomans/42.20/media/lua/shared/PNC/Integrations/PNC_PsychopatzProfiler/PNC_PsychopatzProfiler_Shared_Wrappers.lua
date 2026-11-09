@@ -45,7 +45,7 @@ function Internal.InstallSharedPerformanceWrappers()
         "ProjectHoomans.Network.Snapshot.Inventory")
     Internal.Wrap(PNC.Skills, "BuildSnapshot",
         "ProjectHoomans.Network.Snapshot.Skills")
-    Internal.Wrap(PNC.VisualProfiles, "RollAppearance",
+    Internal.Wrap(PNC.Identity, "RollAppearance",
         "ProjectHoomans.Network.Snapshot.Appearance")
     Internal.Wrap(PNC.NPCWounds, "BuildSnapshot",
         "ProjectHoomans.Network.Snapshot.Wounds")

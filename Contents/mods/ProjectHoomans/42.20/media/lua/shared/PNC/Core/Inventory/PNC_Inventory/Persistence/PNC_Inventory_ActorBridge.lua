@@ -27,6 +27,14 @@ local function copy(value)
     return Util.copy(value)
 end
 
+local function hasEntries(value)
+    if type(value) ~= "table" then return false end
+    for _ in pairs(value) do
+        return true
+    end
+    return false
+end
+
 local function encodedEqual(left, right)
     return Json.Encode(left) == Json.Encode(right)
 end
@@ -77,7 +85,7 @@ local function durablePNCMetadata(item)
         data.bagContainer = tostring(item.bagContainer)
     end
 
-    if next(data) == nil then return {} end
+    if not hasEntries(data) then return {} end
     return { pnc = data }
 end
 

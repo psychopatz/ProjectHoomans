@@ -1,6 +1,6 @@
 --[[
     PNC Inventory
-    Stable public entry point for the split inventory subsystem.
+    Stable public entry point for the canonical inventory subsystem.
 ]]
 
 PNC = PNC or {}

@@ -2,14 +2,9 @@
 
 ## Read order
 
-Read root `AGENTS.md`, then:
-1. `README.md`;
-2. `ARCHITECTURE.md`;
-3. `AGENT_RUNBOOK.md`;
-4. `ROADMAP.md`;
-5. `PROGRESS.md` last.
+Use progressive disclosure. Read root `AGENTS.md`, then `PROGRESS.md`, then `HANDOFF.md` last among bootstrap-state docs and verify its checkpoint before trusting it. Read this runbook for durable procedure. Open only the relevant ROADMAP/ARCHITECTURE section for the implicated scene-runtime layer.
 
-Read `AUDIT.md` while establishing revision-specific evidence and `HARNESS_ACCEPTANCE.md` while implementing/accepting gates.
+Read `AUDIT.md` only for revision-specific evidence and `HARNESS_ACCEPTANCE.md` only when implementing or re-accepting a gate. Use Codebase Memory for retrievable structure.
 
 Use predecessor docs only for a specific inherited contract:
 - `SemanticCombatBanterTacticalIntent`;

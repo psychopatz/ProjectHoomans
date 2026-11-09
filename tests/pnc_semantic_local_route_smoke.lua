@@ -103,6 +103,8 @@ T.load(
     "PNC/Semantics/PNC_SemanticDialogueInput_Actions.lua"
 )
 
+T.load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticDialogueSuggestions.lua")
+
 -- The production widget dependencies are UI-only. Keep the routing test
 -- headless while preserving the real Core parser, Hoomans catalog, policy,
 -- router, and input spokes.
@@ -316,7 +318,8 @@ T.equal(view.session.semanticDialogueState.currentTopic, "weather",
 
 local activityAccepted = Input.Submit(view, "what are you doing")
 T.equal(activityAccepted, true, "activity question is accepted locally")
-T.equal(queued[6].payload.fallback, "I'm trying to catch something.",
+T.equal(queued[6].payload.fallback,
+    "Fishing is a solid way to secure fresh food.",
     "activity question uses the NPC's current behavior projection")
 T.equal(view.session.semanticDialogueState.currentTopic, "activity",
     "activity question updates the current topic")
@@ -337,6 +340,7 @@ local weatherFallbacks = {
     ["Hey there. Wet one today."] = true,
     ["Rain's not letting up."] = true,
     ["Keep dry if you can."] = true,
+    ["Watch your footing in this mud."] = true,
 }
 T.truthy(weatherFallbacks[queued[8].payload.fallback],
     "provider-disabled greeting still uses the bounded local response pool")
@@ -489,6 +493,14 @@ local identityView = {
     session = identitySession,
     isConversationInteractive = function() return true end,
 }
+-- The native ask-name callback enters the same real parser/response queue.
+local IdentityChoice = T.load("ProjectHoomans", "client",
+    "PNC/Conversation/Blocks/PNC_ConversationIdentityChoice.lua")
+PsychopatzCore.Conversation.instance = identityView
+local nameChoice = IdentityChoice.Build("npc-identity", { canAskName = true })
+nameChoice.action()
+T.equal(#identityQueue, 1, "native name choice queues the semantic name prompt")
+identityQueue = {}
 T.equal(Input.Submit(identityView, "what is your name"), true,
     "identity question starts the authoritative exchange")
 T.equal(#identityQueue, 1,
@@ -499,6 +511,26 @@ T.equal(#identityQueue, 1,
     "identity claim does not queue a contradictory provisional response")
 T.equal(identityEvents[1].kind, "identity_claim",
     "identity claim uses the authoritative identity transport")
+
+-- The landing What's up shortcut uses its semantic frame, without an LLM.
+local smallTalkQueue = {}
+local smallTalkView = {
+    spec = { npcID = "npc-small-talk", context = { identityState = "unknown" } },
+    session = {
+        conversationID = "small-talk-native",
+        append = function() return { messageID = "small-talk" } end,
+        queueMessage = function(_, _, payload) smallTalkQueue[#smallTalkQueue + 1] = payload end,
+    },
+    isConversationInteractive = function() return true end,
+}
+local shortcut = PNC.Semantics.DialogueSuggestions.BuildShortcutFrame({
+    candidateID = "conversation.landing:whats_up", topic = "whats_up",
+    utterance = "What's up?", labelFallback = "What's up?",
+    extensions = { route = "semantic_hub", hubID = "whats_up", canonicalConcept = "WHATS_UP" },
+}, 0)
+local shortcutAccepted, shortcutReason = Input.SubmitSemanticFrame(smallTalkView, shortcut)
+T.truthy(shortcutAccepted, "native What's up shortcut is accepted: " .. tostring(shortcutReason))
+T.truthy(#smallTalkQueue > 0, "native What's up shortcut queues a local NPC reply")
 
 local cognitionDispatch
 PNC.Client.RequestSemanticCognition = function(npcID, request)

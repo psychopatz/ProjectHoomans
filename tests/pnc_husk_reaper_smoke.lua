@@ -4,6 +4,9 @@ T.addPackagePaths()
 local SHARED = T.path("ProjectHoomans", "shared", "")
 local BODY_ROOT = SHARED .. "PNC/Core/Presence/PNC_BodyLifecycle/"
 
+local updateHandler
+Events = { OnZombieUpdate = { Add = function(handler) updateHandler = handler end } }
+
 local authority = true
 -- The orphan rule is only active in worlds that cannot spawn vanilla zombies,
 -- so the ledger-path sections below run with it off.
@@ -112,6 +115,7 @@ T.load(BODY_ROOT .. "PNC_BodyLifecycle_HuskReaper.lua")
 local Lifecycle = PNC.BodyLifecycle
 local Reaper = Lifecycle.HuskReaper
 local Internal = Lifecycle.Internal
+T.equal(updateHandler, Lifecycle.OnHuskZombieUpdate, "husk update hook not registered")
 
 -- 1. A husk handed back by the population manager is matched, queued and then
 -- removed on the next pump.
@@ -360,5 +364,52 @@ T.equal(Lifecycle.FindHuskEntry(makeHusk(2400.4, 2500.6, 0, 46)),
 T.equal(Lifecycle.FindHuskEntry(makeHusk(2401.4, 2501.6, 0, 47)),
     secondHistory,
     "new carrier row was not retained")
+
+-- Late outfit initialization / missed creation must be caught before the
+-- census sweep. Both normal and saturated queues suppress combat.
+Reaper.pending = {}
+censusBodies = {}
+local carrier = 100 * 65536 + 7
+local lateEntry = armLoss("late_hat", 10, 10, 0, carrier)
+local late = makeHusk(10, 10, 0, carrier + 32768)
+late.setTarget = function(self, target) self.target = target end
+late.setUseless = function(self, value) self.useless = value end
+late.target = "player"
+Lifecycle.OnHuskZombieUpdate(late)
+T.equal(late.target, nil, "late restored shell retained player target")
+T.truthy(late.useless, "late restored shell retained zombie AI")
+T.equal(Reaper.pending[1].entry, lateEntry, "hat change lost ledger association")
+late.target = "player"
+late.useless = false
+Lifecycle.OnHuskZombieUpdate(late)
+T.equal(#Reaper.pending, 1, "update duplicated pending entry")
+T.truthy(late.useless, "pending shell was not neutralized again")
+PNC.Const.HUSK_REAP_PENDING_MAX = 1
+local overflow = makeHusk(12, 12, 0, carrier)
+overflow.setUseless = function(self, value) self.useless = value end
+Lifecycle.OnHuskZombieUpdate(overflow)
+T.truthy(overflow.useless, "full queue left proven husk dangerous")
+T.equal(#Reaper.pending, 1, "queue exceeded bound")
+Lifecycle.PumpHuskReaper(40000, true)
+T.truthy(late.removedFromWorld, "late restored husk not removed")
+Lifecycle.OnHuskZombieUpdate(overflow)
+Lifecycle.PumpHuskReaper(41000, true)
+T.truthy(overflow.removedFromWorld, "overflow husk did not retry")
+local client = makeHusk(12, 12, 0, carrier)
+authority = false
+Lifecycle.OnHuskZombieUpdate(client)
+T.equal(#Reaper.pending, 0, "MP client queued authoritative removal")
+authority = true
+local ordinary = makeHusk(12, 12, 0, carrier + 1)
+Lifecycle.OnHuskZombieUpdate(ordinary)
+T.equal(#Reaper.pending, 0, "ordinary zombie queued as husk")
+local protected = makeHusk(12, 12, 0, carrier)
+managed[protected] = true
+Lifecycle.OnHuskZombieUpdate(protected)
+T.equal(#Reaper.pending, 0, "active NPC queued as husk")
+foreignOwned[protected] = true
+managed[protected] = nil
+Lifecycle.OnHuskZombieUpdate(protected)
+T.equal(#Reaper.pending, 0, "foreign NPC queued as husk")
 
 return T.finish("pnc_husk_reaper_smoke")

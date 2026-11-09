@@ -111,7 +111,8 @@ Const.HUSK_DEBUG_MAX_OUTFITS = 8
 -- The engine picks a shell outfit id per call, so the learned set accumulates
 -- across sessions. Bound it so the persisted diagnostics cannot grow forever.
 Const.HUSK_LEDGER_MAX_SHELL_OUTFITS = 32
-Const.HUSK_LEDGER_MAX_SHELL_CARRIERS = 256
+-- 500 seeds per sex, plus legacy fallen-hat keys retained from old saves.
+Const.HUSK_LEDGER_MAX_SHELL_CARRIERS = 2048
 -- IsoWorld.getZombiesDisabled() is a Java call on the hot zombie-spawn path;
 -- cache it for this long.
 Const.ZOMBIE_SPAWN_DISABLED_CACHE_MS = 1000

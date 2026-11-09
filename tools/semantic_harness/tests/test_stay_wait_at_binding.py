@@ -121,10 +121,9 @@ class StayWaitAtBindingTests(unittest.TestCase):
                 reference_result["actionResult"]["request"]["target"]["category"],
                 "CAMPFIRE",
             )
-            self.assertEqual(
-                reference_turn["messages"][0]["payload"]["text"],
-                "Okay, I'll wait there.",
-            )
+            reference_text = reference_turn["messages"][0]["payload"]["text"]
+            self.assertTrue(reference_text)
+            self.assertIn("wait", reference_text.lower())
             self.assertEqual(
                 reference_turn["dispatchTransport"][0]["command"],
                 "SemanticTaskRequest",

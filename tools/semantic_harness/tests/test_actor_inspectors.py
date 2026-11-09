@@ -15,11 +15,13 @@ from tools.semantic_harness.runtime.player_engine_state import (
     OfflinePlayerEngineStateProvider,
 )
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import require_supported_save
 
 
 class ActorInspectorsTests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_real_save_import_populates_shared_player_and_npc_inspectors(self) -> None:
+        require_supported_save(self)
         state_dir = tempfile.TemporaryDirectory(prefix="projecthoomans-actor-inspector-ui-")
         state_path = Path(state_dir.name) / "ui-state.json"
         root = tk.Tk()

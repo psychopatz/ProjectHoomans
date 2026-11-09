@@ -27,20 +27,7 @@ local voiceTriggers = PNC.NPCVoice
     and PNC.NPCVoice.Triggers or nil
 local combatAudio = PNC.NPCCombatAudio
 
-local function resolveSnapshotBodyFromIndexes(snapshot)
-    local id
-    if type(snapshot) ~= "table" or snapshot.id == nil then
-        return nil
-    end
-    id = tostring(snapshot.id)
-    return Sync.BodyByLease[
-        id .. ":" .. tostring(snapshot.liveBodyLease or "")
-    ] or Sync.BodyByInstanceID[
-        tostring(snapshot.liveBodyInstanceID or "")
-    ] or Sync.BodyByID[id] or Sync.BodyByOnlineID[
-        tostring(snapshot.liveBodyOnlineID or "")
-    ]
-end
+local BodyRegistry = require "PNC/PresenceSync/PNC_ClientPresenceBodies_Registry"
 
 local function hasIncapacitatedSnapshots()
     local snapshot
@@ -83,9 +70,13 @@ local function applySnapshots(
             if remoteReplica then
                 body = resolveSnapshotBody and resolveSnapshotBody(snapshot) or nil
             else
-                body = resolveSnapshotBody
-                    and resolveSnapshotBody(snapshot)
-                    or resolveSnapshotBodyFromIndexes(snapshot)
+                -- A rejected canonical lookup must remain rejected. The old
+                -- `and/or` fallback resurrected stale/recycled census bodies.
+                if resolveSnapshotBody then
+                    body = resolveSnapshotBody(snapshot)
+                else
+                    body = BodyRegistry.ResolveSnapshotBody(Sync, snapshot)
+                end
             end
             if body then
                 if applyLocalVisuals

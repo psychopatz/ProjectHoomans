@@ -12,11 +12,13 @@ import unittest
 
 from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.tests.gui_test_support import require_supported_save
 
 
 class OperationalWorldBrowserTests(unittest.TestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_real_save_player_hierarchy_import_and_talk_at_supported_geometries(self) -> None:
+        require_supported_save(self)
         for geometry in ("1080x700", "1280x800"):
             with self.subTest(geometry=geometry):
                 with tempfile.TemporaryDirectory() as directory:

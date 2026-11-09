@@ -1,0 +1,42 @@
+{
+  "job": "TestSuiteRationalization",
+  "phase": "P1",
+  "date": "2026-11-06",
+  "classification": "DELETE_SUPERSEDED",
+  "deleted": [
+    {
+      "path": "tools/semantic_harness/tests/test_contextual_dynamic_trading.py",
+      "family": "semantic_lab_dynamic_trading_handover",
+      "reason": "All four cases required the retired projecthoomans:trade provider/category and asserted behavior now owned by the shared DTCommon trader opener; none exercised a remaining ProjectHoomans boundary.",
+      "production_history": [
+        "ProjectHoomans commit 8f4ca4a4 routes trader Talk through the shared opener and removes the Hoomans trade category/topic/block/localized graph.",
+        "DynamicTrading commit 246df5b5 moves the shared trader conversation to DTCommon, removes DTCommon_HoomansConversation, and leaves DTHoomans with only caravan referral content."
+      ],
+      "replacement_evidence": [
+        "tests/pnc_trader_conversation_ownership_smoke.lua",
+        "tests/pnc_core_semantic_adopter_smoke.lua",
+        "DynamicTrading tests/dt_core_trader_conversation_smoke.lua",
+        "DynamicTrading tests/dt_trader_semantic_service_smoke.lua",
+        "DynamicTrading tests/dt_hoomans_conversation_parity_smoke.lua"
+      ],
+      "focused_result": {
+        "report": "/tmp/hoomans-python-dynamic-superseded.json",
+        "passed": 5,
+        "failed": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "retained_repairs": [
+    {
+      "path": "tools/semantic_harness/tests/test_semantic_lab_npc_profiles.py",
+      "classification": "REPAIR",
+      "change": "Profile coverage now checks the current optional Dynamic Trading load and DTHoomans caravan-referral registration while asserting the retired projecthoomans:trade category remains absent."
+    },
+    {
+      "path": "tools/semantic_harness/tests/test_contextual_talk_parity.py",
+      "classification": "KEEP_BOUNDARY_SPECIFIC",
+      "change": "Retains native Talk trader overlay/load coverage; removes only the obsolete Hoomans semanticHubChoices trade assertion."
+    }
+  ]
+}

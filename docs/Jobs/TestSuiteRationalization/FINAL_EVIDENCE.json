@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "job": "TestSuiteRationalization",
+  "status": "superseded_historical_prior_pass",
+  "supersededBy": "docs/Jobs/TestSuiteRationalization/R6_FINAL_EVIDENCE.json",
+  "supersessionReason": "The reopened R0-R6 job invalidated the prior P6 completion because generic UNKNOWN_KEEP/pending_family_review entries had not been investigated.",
+  "capturedDate": "2026-11-06",
+  "repository": {
+    "branch": "main",
+    "headAtBaseline": "2d882b952ea41c855b8bcf3658c7b75b36945632",
+    "upstream": "origin/main",
+    "ahead": 0,
+    "behind": 0,
+    "coreHead": "4592477f11d53faaf80837a7b8c1d0a08733a02d",
+    "preExistingDirtyFilesPreserved": 3,
+    "nativeProjectZomboidLaunched": false,
+    "workshopPublished": false
+  },
+  "inventory": {
+    "manifest": "docs/Jobs/TestSuiteRationalization/AUDIT_MANIFEST.json",
+    "scopedFiles": 1776,
+    "pathFamilies": 1424,
+    "executableEntries": 1301,
+    "activeScopedFiles": 1775,
+    "activePathFamilies": 1423,
+    "activeExecutableEntries": 1300,
+    "rootLuaSmokeFiles": 1007,
+    "nativeLuaFixtures": 81,
+    "semanticPythonModulesAfterSupersededRemoval": 209,
+    "semanticLuaWorkers": 99,
+    "semanticFixtures": 26,
+    "semanticScenarios": 5,
+    "semanticInfrastructure": 24,
+    "rootPythonTests": 22,
+    "uniqueNpcTests": 6
+  },
+  "baseline": {
+    "rootLuaDefault": "FAIL 5/1007; 9.63s",
+    "semanticLua": "FAIL 4/144; 3.22s",
+    "semanticPython": "timeout at 300s; no passing total claimed",
+    "rootPython": "PASS 22/22; 0.09s",
+    "uniqueNpc": "PASS 6/6; 0.09s",
+    "refactorBindingAll": "FAIL; 6 cross-file private-helper findings across 3340 Lua files",
+    "doctor": "FAIL; worker_syntax false"
+  },
+  "finalRuns": {
+    "rootLuaDefault": {
+      "command": "python3 tests/run_tests.py --jobs 4 --timeout 30",
+      "result": "PASS 1007/1007",
+      "wallSeconds": 9.82
+    },
+    "semanticLua": {
+      "command": "python3 tests/run_tests.py --jobs 4 --timeout 30 pnc_semantic",
+      "result": "PASS 144/144",
+      "wallSeconds": 3.25
+    },
+    "semanticPythonFull": {
+      "command": "python3 -m tools.semantic_harness.testing.python_runner --jobs 4 --timeout 300 --keep-display --report /tmp/hoomans-python-final-full-exclusive.json --quiet",
+      "result": "PASS 198, SKIP 11, FAIL 0, TOTAL 209",
+      "wallSeconds": 1036.64,
+      "maxActiveProcesses": 4,
+      "exclusiveModules": 6
+    },
+    "protectedLuaSlices": {
+      "pnc_persistence": "PASS 6/6; 2.63s",
+      "presence_boundary": "PASS 107/107; 0.30s",
+      "pnc_inventory": "PASS 21/21; 0.20s",
+      "pnc_mp": "PASS 20/20; 0.22s",
+      "profiler": "PASS 9/9; 0.04s",
+      "pnc_body": "PASS 6/6; 0.12s"
+    },
+    "rootPython": "PASS 22/22",
+    "uniqueNpc": "PASS 6/6",
+    "refactorBindingAll": "PASS; scanned 3340 Lua files; zero findings",
+    "doctor": "PASS; worker_syntax and worker_boot true",
+    "evidenceBoundary": "PASS 3/3 for unified evidence E0/E3/E7; 47.47s",
+    "surfaceConsolidation": "PASS 5/5; 32.12s",
+    "dynamicTradingReplacementFamily": "PASS 5/5 focused modules",
+    "h3PersonalityBoundary": "PASS 1/1 focused test",
+    "guiSaveBackedFamilies": "PASS 0 failures; 7 tests skipped because no compatible local offline save exists"
+  },
+  "slowestSemanticModules": [
+    ["test_response_observatory_matrix", 212.069],
+    ["test_sweep_acceptance", 127.423],
+    ["test_observatory_fixture_parity", 123.602],
+    ["test_harness", 106.339],
+    ["test_contextual_talk_parity", 95.718],
+    ["test_behavior_fixture_parity", 85.666],
+    ["test_contextual_social_reactions", 81.034],
+    ["test_contextual_speech_behavior", 78.350]
+  ],
+  "dispositions": {
+    "auditManifestCounts": {
+      "UNKNOWN_KEEP": 1217,
+      "KEEP_CANONICAL": 471,
+      "KEEP_BOUNDARY_SPECIFIC": 82,
+      "REPAIR": 5,
+      "DELETE_SUPERSEDED": 1
+    },
+    "unknownKeepRule": "No uncertain executable family was deleted; static similarity and age were never used as deletion proof.",
+    "deletedSuperseded": "tools/semantic_harness/tests/test_contextual_dynamic_trading.py; proof in P1_SUPERSEDED_EVIDENCE.json",
+    "deletionGate": "The deleted family had a removed production path, replacement ownership tests, focused PASS evidence, and no remaining ProjectHoomans boundary assertion.",
+    "noUnprovenMergeOrMove": true
+  },
+  "repairsAndOptimizations": [
+    "Repaired five stale semantic protocol/content expectation families after production-history proof.",
+    "Removed six stale cross-file private-helper exports and restored canonical module ownership; full binding scan is clean.",
+    "Bounded the cyclic semantic composer projection and preserved live semantic-context mutation methods across Core recursive copying.",
+    "Added isolated Core actor fixtures and loaded the real Core actor registry in the existing worker, preserving authority boundaries.",
+    "Seeded an empty Core personality only on first sync; non-empty Core personality remains authoritative.",
+    "Extended semantic evidence queries to the Core-owned 64-entry ledger while retaining the Hoomans 20-entry mutation projection contract.",
+    "Moved the scheduler-sensitive read-only latency benchmark into the existing exclusive runner lane without weakening its 0.25-second assertion.",
+    "Added save-availability gating for GUI tests so missing compatible local saves are explicit skips rather than false failures.",
+    "Aligned surface-consolidation assertions with the current tab ownership and retained all structural coverage."
+  ],
+  "architectureAudit": {
+    "command": "architecture_audit.py scan . --include-tests --framework project_zomboid",
+    "files": 5246,
+    "testsIndexed": 1313,
+    "productionCoveragePercent": 77.2,
+    "confidencePercent": 65.1,
+    "productionHealth": 52.8,
+    "interpretation": "Static signals only; not used as deletion proof."
+  },
+  "pzVerify": {
+    "command": "pz_verify.py --mod-dir Contents/mods/ProjectHoomans/42.20 --kahlua --severity ERROR --no-snippets",
+    "filesScanned": 3316,
+    "filesFlagged": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "nativeHandoff": "Native Project Zomboid SP/MP acceptance remains user-owned. Developer-side inventory, repairs, consolidation, runner routing, refactor checks, and validation are complete; no native game or Workshop publication was performed."
+}

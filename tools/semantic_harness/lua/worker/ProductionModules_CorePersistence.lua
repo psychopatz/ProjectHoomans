@@ -5,6 +5,13 @@ local function loadCorePersistence(load)
         "PsychopatzCore", "common",
         "PsychopatzCore/Semantics/PsychopatzSemantic.lua", "semantic"
     )
+    -- CoreSocial is a canonical adopter bridge. Load the real Core actor
+    -- registry before Hoomans persistence modules so worker mutations can
+    -- exercise SyncToCore against the same registry owner as native runtime.
+    load(
+        "PsychopatzCore", "common",
+        "PsychopatzCore/Actors/PsychopatzActors.lua", "actor_registry"
+    )
     load("PsychopatzCore", "common", "PsychopatzCore/Translation/PsychopatzCustomTranslationManager.lua", "translation")
     load("PsychopatzCore", "common", "PsychopatzCore/Translation/PsychopatzCoreTranslation.lua", "translation")
     load("ProjectHoomans", "shared", "PNC/Core/Base/PNC_Constants.lua", "network")

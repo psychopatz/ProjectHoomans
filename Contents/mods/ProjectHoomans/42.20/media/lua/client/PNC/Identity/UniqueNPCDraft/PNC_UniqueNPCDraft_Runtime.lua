@@ -185,7 +185,7 @@ function Model.ApplyDraftToRuntime(draft)
     authoredFields = draft.authoredFields or {}
     for _, key in ipairs({
         "displayName", "name", "isFemale", "archetypeID", "archetypeLabel",
-        "tacticalClass", "visualProfile", "weaponMode", "attackType",
+        "tacticalClass", "weaponMode", "attackType",
         "equipmentSpawnMode", "equipmentPoolID", "chanceWeight", "spawnChance",
         "skillLevels", "vanillaTraits", "dynamicTraits", "npcTraits",
         "factionID", "membershipStatus", "factionRole", "factionRank",

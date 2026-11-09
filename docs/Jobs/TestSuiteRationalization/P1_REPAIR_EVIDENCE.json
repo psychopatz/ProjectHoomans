@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "phase": "P1",
+  "batch": "stale semantic protocol/content assertions after intentional contract expansion",
+  "classification": "REPAIR",
+  "deletion": {
+    "filesDeleted": 0,
+    "assertionsDeleted": 0,
+    "reason": "all five families retain meaningful boundary and semantic coverage; no deletion-gate condition was met"
+  },
+  "productionEvidence": [
+    {
+      "commit": "9c6e90c7",
+      "subject": "dialogue-variation P5",
+      "proof": "aligned Lua and Python worker message limits intentionally changed from 512 KiB to 1 MiB; comments explain expanded phrase-family and registered-flow metadata"
+    },
+    {
+      "commit": "6fa916ba",
+      "subject": "dialogue-variation P4",
+      "proof": "command acknowledgement and rejection phrase families were intentionally replaced/expanded"
+    },
+    {
+      "commit": "f544e901",
+      "subject": "dialogue-variation P6",
+      "proof": "knowledge and navigation generated phrase families were intentionally expanded, including activity/fishing wording"
+    },
+    {
+      "commit": "c768e07f",
+      "subject": "dialogue-variation P2",
+      "proof": "core greeting phrase families were intentionally expanded, including rainy-weather variants"
+    }
+  ],
+  "families": [
+    {
+      "path": "tests/pnc_semantic_harness_worker_modules_smoke.lua",
+      "subject": "Lua worker Protocol.VERSION/MAX_MESSAGE_BYTES and RuntimeState reset",
+      "boundary": "Lua protocol boundary and worker state reset",
+      "change": "512 * 1024 -> 1024 * 1024 expectation",
+      "retained": "version, aligned message bound, JSON round trip, and all runtime reset containers/counters",
+      "focusedResult": "PASS 1/1",
+      "pythonParity": "PASS 2/2 tools.semantic_harness.tests.test_protocol"
+    },
+    {
+      "path": "tests/pnc_semantic_horde_command_ack_smoke.lua",
+      "subject": "CompanionSpeech.ResolveNPCCommand",
+      "boundary": "semantic response-pool selection, reaction-style routing, invalid-command rejection",
+      "change": "updated two stale authored wording expectations",
+      "retained": "eager/hesitant/avoid/hold IDs, rejected generic response, ordinary follow response",
+      "focusedResult": "PASS"
+    },
+    {
+      "path": "tests/pnc_semantic_horde_tactical_prompt_smoke.lua",
+      "subject": "SocialReaction.Resolve, ResponseCatalog offers, InteractionLifecycle, Suggestions.FrameToIR",
+      "boundary": "semantic authority, encounter identity, typed combat action, click-frame to IR",
+      "change": "updated stale profanity-only expectation to current authored shaken prompt",
+      "retained": "TACTICAL_PROMPT, three typed offers, eventRef, lifecycle availability, target binding, episode guard, parser provenance",
+      "focusedResult": "PASS"
+    },
+    {
+      "path": "tests/pnc_semantic_local_route_smoke.lua",
+      "subject": "headless real local semantic route",
+      "boundary": "deterministic local route, provider suppression, state/provenance",
+      "change": "updated current fishing phrase and accepted current rainy greeting variant",
+      "retained": "no LLM calls, topics, live clock/climate, typo diagnostics, hostile branch, provider-disabled route, translation provenance",
+      "focusedResult": "PASS"
+    },
+    {
+      "path": "tests/pnc_companion_commands_smoke.lua",
+      "subject": "CompanionCommands and CompanionCommandPresentation",
+      "boundary": "companion command rejection, live speech presentation, ownership/authority",
+      "change": "current authored rejection vocabulary accepts safe/shelter/campfire/exposure/open/danger meaning set",
+      "retained": "semantic rejection ID, live presentation, player and NPC speech, missing-site explanation, command side effects",
+      "focusedResult": "PASS"
+    }
+  ],
+  "regressions": [
+    {
+      "command": "python3 tests/run_tests.py pnc_semantic_harness_worker_modules_smoke pnc_semantic_horde_command_ack_smoke pnc_semantic_horde_tactical_prompt_smoke pnc_semantic_local_route_smoke pnc_companion_commands_smoke --verbose",
+      "result": "PASS 5/5",
+      "wallSeconds": 0.62
+    },
+    {
+      "command": "python3 tests/run_tests.py pnc_semantic --harness-report <report>",
+      "result": "PASS 144/144",
+      "wallSeconds": 3.31,
+      "cpuSeconds": 10.05,
+      "maxRssKb": 33164
+    },
+    {
+      "command": "python3 tests/run_tests.py --harness-report <report>",
+      "result": "PASS 1007/1007",
+      "wallSeconds": 9.72,
+      "cpuSeconds": 25.74,
+      "maxRssKb": 78628
+    }
+  ],
+  "manifestClassifications": {
+    "REPAIR": 5,
+    "UNKNOWN_KEEP": 1219,
+    "KEEP_BOUNDARY_SPECIFIC": 81,
+    "KEEP_CANONICAL": 471
+  },
+  "next": "Continue P1 family review; do not infer duplicate coverage from names or from the newly green default run."
+}

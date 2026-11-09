@@ -21,8 +21,10 @@ local ActorConversationContext = PNC.Semantics.ActorConversationContext
     or require "PNC/Semantics/PNC_ActorConversationContext"
 local ChoiceRanking = PNC.Semantics.DialogueChoiceRanking
     or require "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_Ranking"
+-- Identity publishes its API on PNC and has no module return value.
+-- Reading require's sentinel here breaks cold-loaded conversation navigation.
+require "PNC/Core/Identity/PNC_Identity"
 local Identity = PNC.Identity
-    or require "PNC/Core/Identity/PNC_Identity"
 local CampSite = PNC.Semantics.CampSite
     or require "PNC/Semantics/PNC_SemanticCampSite"
 
@@ -248,9 +250,6 @@ Internal.resolvedText = resolvedText
 Internal.normalizeCandidate = normalizeCandidate
 Internal.revisionFor = revisionFor
 Internal.privateResult = privateResult
-Internal.sourceRecord = sourceRecord
-Internal.isActiveHubDefinition = isActiveHubDefinition
-Internal.isActiveHubCandidate = isActiveHubCandidate
 
 return Suggestions
 

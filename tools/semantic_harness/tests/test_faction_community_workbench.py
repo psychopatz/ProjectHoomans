@@ -17,6 +17,7 @@ from tools.semantic_harness.tests.gui_test_support import SemanticLabGuiTestCase
 class FactionCommunityWorkbenchTests(SemanticLabGuiTestCase):
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_saved_groups_show_persisted_context_and_load_member_target(self) -> None:
+        self.require_supported_save()
         root = tk.Tk()
         app = self.make_gui_app(root)
         root.geometry("1080x700")

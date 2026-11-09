@@ -60,8 +60,9 @@ T.equal(resolved.responsePlanID, "semantic.combat.horde.prompt",
     "tactical horde uses dedicated prompt pool")
 T.equal(resolved.realizationID, "semantic.combat.horde.prompt.shaken",
     "shaken follower gets hesitant prompt wording")
-T.truthy(string.find(resolved.fallback, "Fuck", 1, true),
-    "hesitant high-pressure prompt may use authored profanity")
+T.equal(resolved.fallback,
+    "God... that's a lot. Are we really fighting all of them?",
+    "hesitant high-pressure prompt uses the current authored horde wording")
 T.equal(#(resolved.offerIDs or {}), 3, "prompt exposes exactly three team choices")
 
 local offers = Catalog.OffersForSelection(

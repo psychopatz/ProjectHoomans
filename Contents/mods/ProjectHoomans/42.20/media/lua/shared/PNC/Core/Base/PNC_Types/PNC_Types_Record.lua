@@ -33,8 +33,6 @@ function Types.NewRecord(definition)
         archetypeID = def.archetypeID,
         archetypeLabel = nil,
         tacticalClass = def.tacticalClass,
-        outfit = def.outfit,
-        visualProfile = def.visualProfile,
         isFemale = def.isFemale,
         x = def.x, y = def.y, z = def.z,
         spawnX = def.x, spawnY = def.y, spawnZ = def.z,

@@ -270,11 +270,6 @@ local function appendAuthoredRows(rows, authored)
     add(rows, 'authored_tactical',
         'UI_PNC_UniqueNPCDebug_AuthoredTactical', 'Authored tactical class',
         authored.tacticalClass)
-    add(rows, 'authored_visual',
-        'UI_PNC_UniqueNPCDebug_AuthoredVisual', 'Authored visual profile',
-        authored.visualProfile)
-    add(rows, 'authored_outfit', 'UI_PNC_UniqueNPCDebug_AuthoredOutfit',
-        'Authored outfit', authored.outfit)
     add(rows, 'authored_hp', 'UI_PNC_UniqueNPCDebug_AuthoredHP',
         'Authored maximum health', authored.hpMax)
     add(rows, 'authored_combat',

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "phase": "P1",
+  "batch": "semantic worker context boundary and doctor diagnostic repair",
+  "classification": "REPAIR",
+  "deletion": {
+    "filesDeleted": 0,
+    "testsDeleted": 0,
+    "reason": "worker-backed actor-service coverage is current integration protection; the failure was a real cyclic projection defect, not obsolete coverage"
+  },
+  "defect": {
+    "projection": "PNC_SemanticDialogueInput_ContextProjection.Build shallow-copied the authored composer context into the semantic service context",
+    "cycle": "conversationBlockContext.conversationMenuOptions.presentationContext.conversationBlockContext",
+    "consumer": "PsychopatzCore ActorService:Preview/ProcessIR -> actorContext -> recursive copy",
+    "observedBefore": "direct worker hello timed out with stack overflow in sibling PsychopatzCore Conversation/PsychopatzActorConversationService.lua copy/actorContext; the full Python semantic runner did not complete",
+    "authorityImpact": "the failure occurred before semantic routing and prevented the existing Hoomans/Core actor-service boundary from exercising its current parser, router, and context policy"
+  },
+  "repair": {
+    "productionFilesChanged": [
+      "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueInput_ContextProjection.lua"
+    ],
+    "change": "the semantic projection excludes only private cyclic conversationBlockContext and conversationMenuOptions; actorAuthority/npcState are still promoted and bounded conversationBlock/conversationRoot projections remain",
+    "preserved": [
+      "authored composer context remains on the live view for presentation and authority callbacks",
+      "semantic actor context, identity, relationship, lifecycle, and suggestion projections",
+      "Core actor-service attach/Preview/ProcessIR integration boundary",
+      "no sibling PsychopatzCore files changed"
+    ],
+    "infrastructureFilesChanged": [
+      "tools/semantic_harness/testing/doctor.py"
+    ],
+    "doctorChange": "Lua syntax checking now loads worker.lua through a task-specific environment path without passing worker.lua as the interpreter script, so the worker's runtime-environment guard is not executed during a syntax-only check"
+  },
+  "validation": [
+    {
+      "command": "python3 -m unittest tools.semantic_harness.tests.test_shared_actor_conversation_service -q",
+      "result": "PASS; 2 tests"
+    },
+    {
+      "command": "python3 -m unittest tools.semantic_harness.tests.test_contextual_actor_context -q",
+      "result": "PASS; 3 tests"
+    },
+    {
+      "command": "bash tools/semantic_harness/run_harness.sh --doctor --doctor-json",
+      "result": "PASS; worker_syntax and worker_boot true"
+    }
+  ],
+  "next": "complete the broader Python runner and focused semantic-family regressions, then record final timing and any remaining genuine blockers"
+}

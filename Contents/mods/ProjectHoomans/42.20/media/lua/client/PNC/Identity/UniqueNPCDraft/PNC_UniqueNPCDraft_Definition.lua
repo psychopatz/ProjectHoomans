@@ -69,7 +69,7 @@ function Model.BuildDefinition(draft)
     local appearance
     local voice
     local fields = {
-        "archetypeID", "archetypeLabel", "tacticalClass", "visualProfile",
+        "archetypeID", "archetypeLabel", "tacticalClass",
         "weaponMode", "attackType", "equipmentSpawnMode",
         "equipmentPoolID", "chanceWeight", "spawnChance", "skillLevels",
         "vanillaTraits", "dynamicTraits", "npcTraits", "factionID",
@@ -108,7 +108,7 @@ function Model.BuildDefinition(draft)
         end
     end
     appearance = Appearance and Appearance.Normalize
-        and Appearance.Normalize(draft.appearance, draft.outfit) or nil
+        and Appearance.Normalize(draft.appearance) or nil
     if appearance then captureAppearanceItems(draft, appearance) end
     voice = appearance and appearance.voice or nil
     if voice and voice.mode == "item" then

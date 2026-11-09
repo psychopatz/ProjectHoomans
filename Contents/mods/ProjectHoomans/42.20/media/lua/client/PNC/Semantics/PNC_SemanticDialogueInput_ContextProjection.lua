@@ -74,6 +74,68 @@ local function boundedPlayerTraits(player)
     return output
 end
 
+local function boundedComposerContext(context)
+    if type(context) ~= "table" then return nil end
+    local output = {}
+    for key, value in pairs(context) do
+        -- BuildContext owns the authored menu graph. Its menu points at the
+        -- presentation context, which points back at this block context. The
+        -- semantic projection keeps the bounded block facts but never
+        -- carries that private presentation cycle into Core's recursive
+        -- actor-context copy.
+        if key ~= "conversationMenuOptions"
+            and key ~= "conversationBlockContext"
+        then
+            output[key] = value
+        end
+    end
+    return output
+end
+
+local LIVE_CONTEXT_METHODS = {
+    "CompletePendingFollowUp",
+    "DirectorSnapshot",
+    "FlowSnapshot",
+    "GetDirectorState",
+    "GetFocus",
+    "GetFlowSession",
+    "GetMentions",
+    "GetPendingFollowUp",
+    "RecentTurns",
+    "RecordNPCResponse",
+    "RecordTurn",
+    "RemoveFlowSession",
+    "Reset",
+    "SetPendingFollowUp",
+    "StoreDirectorState",
+    "StoreFlowSession",
+    "ToContext",
+}
+
+local function boundContextMethod(state, name)
+    local method = state[name]
+    if type(method) ~= "function" then return nil end
+    return function(_, ...)
+        return method(state, ...)
+    end
+end
+
+local function semanticContextProxy(state)
+    if type(state) ~= "table" then return nil end
+    local snapshot = type(state.ToContext) == "function"
+        and state:ToContext() or {}
+    local output = type(snapshot) == "table" and snapshot or {}
+    -- Core recursively copies context tables. Keep bounded scalar/snapshot
+    -- fields for readers while binding only the live methods that must mutate
+    -- this conversation's state; metatable methods cannot survive that copy.
+    for index = 1, #LIVE_CONTEXT_METHODS do
+        local name = LIVE_CONTEXT_METHODS[index]
+        local method = boundContextMethod(state, name)
+        if method then output[name] = method end
+    end
+    return output
+end
+
 function Projection.LLMEnabled()
     local integration = PNC.PBrainZ
     if integration
@@ -105,13 +167,30 @@ function Projection.Build(view, getProviderStatus)
     local output = {}
     local key
     local value
-    for key, value in pairs(source) do output[key] = value end
+    for key, value in pairs(source) do
+        -- The authored composer context is retained on the live view for
+        -- presentation and authority callbacks.  It is not a semantic
+        -- projection: conversationMenuOptions points through
+        -- presentationContext back to conversationBlockContext, which is a
+        -- deliberate private cycle.  The portable Core actor service copies
+        -- semantic contexts recursively, so carrying that graph across this
+        -- boundary turns an otherwise bounded projection into a stack
+        -- overflow.  Promote the bounded authority fields below instead.
+        if key ~= "conversationBlockContext"
+            and key ~= "conversationMenuOptions"
+        then
+            output[key] = value
+        end
+    end
     -- Older/native definition callers keep the semantic authority snapshot
     -- inside the authored composer context.  Promote the bounded projection
     -- at this boundary so capability eligibility does not depend on the
     -- authored menu's private nesting shape.
     local composerContext = type(source.conversationBlockContext) == "table"
         and source.conversationBlockContext or nil
+    if composerContext then
+        output.conversationBlockContext = boundedComposerContext(composerContext)
+    end
     if output.actorAuthority == nil and composerContext then
         output.actorAuthority = composerContext.actorAuthority
     end
@@ -227,9 +306,13 @@ function Projection.Build(view, getProviderStatus)
     if session and session.semanticDialogueContext
         and type(session.semanticDialogueContext.ToContext) == "function"
     then
-        -- Keep the live object private to the local resolver. The serialized
-        -- projection is safe for diagnostics and future LLM context payloads.
-        output.semanticContextState = session.semanticDialogueContext
+        -- Core's actor service recursively copies context tables, which would
+        -- strip metatable methods from the live dialogue state. Preserve the
+        -- bounded snapshot for readers and bind only its live mutation/query
+        -- methods so flow/director authority remains conversation-owned.
+        output.semanticContextState = semanticContextProxy(
+            session.semanticDialogueContext
+        )
         output.semanticDialogueContext =
             session.semanticDialogueContext:ToContext()
         output.currentTopic = session.semanticDialogueContext.currentTopic

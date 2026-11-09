@@ -24,8 +24,10 @@ PNC = {
         BroadcastRemoval = function(id) broadcastId = id end,
     },
     BodyLifecycle = { Internal = {} },
-    VisualProfiles = {
-        ResolveSpawnOutfit = function() return "Survivalist" end,
+    Identity = {
+        RollAppearance = function()
+            return { outfit = "Survivalist" }
+        end,
     },
 }
 

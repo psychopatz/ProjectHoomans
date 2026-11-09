@@ -25,6 +25,8 @@ local function buildIdentityTemplate(record)
     local appearance = Identity and Identity.RollAppearance and Identity.RollAppearance(record) or {}
     local archetype = Archetypes.Get(record and record.archetypeID or nil)
     local loadout = archetype.loadout or {}
+    local corePlan = Identity and Identity.GetCoreArchetypePlan
+        and Identity.GetCoreArchetypePlan(record) or nil
     local seed = Identity.NormalizeSeed(record and record.identitySeed or nil, record and record.id or "npc")
     local uniqueItems = record and record.startingItems or nil
     local uniqueTemplate = record and record.inventoryTemplateRef
@@ -37,10 +39,15 @@ local function buildIdentityTemplate(record)
     return {
         archetypeID = archetype.id,
         appearance = appearance,
-        bagType = choose(loadout.bagChoices, seed, "inv:bag:" .. tostring(archetype.id)),
+        bagType = corePlan and corePlan.bagType
+            or choose(loadout.bagChoices, seed, "inv:bag:" .. tostring(archetype.id)),
         startingEquipment = startingEquipment,
-        attached = Core.DeepCopy(loadout.attached or {}),
-        supplies = Internal.shallowArrayCopy(loadout.supplies),
+        attached = Core.DeepCopy(
+            corePlan and corePlan.inventory.attached or loadout.attached or {}
+        ),
+        supplies = Internal.shallowArrayCopy(
+            corePlan and corePlan.inventory.items or loadout.supplies
+        ),
         uniqueItems = Internal.shallowArrayCopy(uniqueItems),
         templateRef = record and record.inventoryTemplateRef or nil,
     }
@@ -142,6 +149,9 @@ local function addCanonicalItems(record, base)
     local created
     local ok
     local nativeLocation
+    local authoredTemplateKey
+    local templateKey
+    local legacyTemplateKey
     local function nativeWornSlot(itemType, authoredSlot)
         if not authoredSlot
             or not PNC.Equipment
@@ -168,6 +178,18 @@ local function addCanonicalItems(record, base)
         entry = type(items[index]) == "table" and items[index] or {}
         fullType = entry.fullType or entry.type
         if fullType then
+            authoredTemplateKey = Internal.normalizeString(
+                entry.key or entry.templateKey
+            )
+            templateKey = SupplyBuilder.ResolveTemplateKey(
+                entry,
+                "dt:canonical:",
+                tostring(index),
+                nil,
+                record and record.archetypeID
+            )
+            legacyTemplateKey = authoredTemplateKey
+                and "dt:canonical:" .. tostring(index) or nil
             Internal.createItem(record, base, {
                 type = fullType,
                 stack = entry.stack or entry.quantity,
@@ -183,7 +205,8 @@ local function addCanonicalItems(record, base)
                 maxWeight = entry.maxWeight,
                 weightReduction = entry.weightReduction,
                 itemState = entry.itemState,
-                templateKey = "dt:canonical:" .. tostring(index),
+                templateKey = templateKey,
+                legacyTemplateKey = legacyTemplateKey,
             })
         end
     end

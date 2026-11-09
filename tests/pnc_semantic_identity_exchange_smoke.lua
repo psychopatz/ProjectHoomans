@@ -288,4 +288,44 @@ T.equal(evasionPayload.trustLabel, "untrustworthy",
 T.truthy(effects[3].respect < 0 and effects[3].approval < 0,
     "identity evasion causes reputation loss")
 
+-- Exercise the actual client wire builder and SP/MP dispatch, not a
+-- hand-authored server payload: canonical menu choices omit claimedName.
+PNC.Network.ClientState = {}
+PNC.Const.MODULE = "ProjectHoomans"
+PNC.Const.CMD_SEMANTIC_IDENTITY_REQUEST = "SemanticIdentityRequest"
+PNC.Core.Now = function() return 100 end
+local multiplayer = false
+PNC.Core.IsClientOnly = function() return multiplayer end
+getSpecificPlayer = function() return {} end
+T.load("ProjectHoomans", "client",
+    "PNC/Networking/ClientRequests/PNC_ClientRequests_Internal.lua")
+T.load("ProjectHoomans", "client",
+    "PNC/Networking/ClientRequests/PNC_ClientRequests_Identity.lua")
+local Requests = T.load("ProjectHoomans", "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Requests.lua")
+local wire
+sendClientCommand = function(_, _, _, args) wire = args end
+for _, remote in ipairs({ false, true }) do
+    multiplayer = remote
+    local before = disclosures
+    local accepted = Requests.DispatchIdentityRequest({
+        npcID = "npc_mara", kind = "identity_claim", claimMode = "canonical",
+        conversationToken = "lease",
+    })
+    T.truthy(accepted, "canonical choice is accepted by transport")
+    if remote then
+        T.truthy(Commands.HandleSemanticIdentity({}, wire),
+            "MP canonical payload passes server admission")
+    end
+    T.equal(disclosures, before + 1,
+        "canonical name choice reaches authoritative disclosure in SP and MP")
+end
+multiplayer = false
+local rejected = Requests.DispatchIdentityRequest({
+    npcID = "npc_mara", kind = "identity_claim", claimMode = "canonical",
+    conversationToken = "expired",
+})
+T.falsy(rejected, "SP must report server rejection to the dialogue caller")
+T.equal(PNC.Network.ClientState.pendingSemanticIdentity.npc_mara, nil,
+    "SP rejection must release pending identity state")
 T.finish("pnc_semantic_identity_exchange_smoke")

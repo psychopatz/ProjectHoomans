@@ -14,7 +14,7 @@ local Core = H.Core
 local Equipment = H.Equipment
 local Inventory = H.Inventory
 local Stamina = H.Stamina
-local Profiles = H.Profiles
+local Identity = H.Identity
 local Wounds = H.Wounds
 local Firearms = H.Firearms
 local Settings = H.Settings
@@ -56,8 +56,8 @@ function H.BuildSnapshotState(record, inventorySummaryOverride)
     end
     state.combat = H.buildCombatSummary(record, state.equipmentInfo)
     state.visualState = H.buildVisualState(record)
-    state.appearance = Profiles and Profiles.RollAppearance
-        and Profiles.RollAppearance(record) or nil
+    state.appearance = Identity and Identity.RollAppearance
+        and Identity.RollAppearance(record) or nil
     state.bodyHealth = Wounds and Wounds.BuildSnapshot
         and Wounds.BuildSnapshot(record) or nil
     state.needsSummary = buildNeedsSummary(record)

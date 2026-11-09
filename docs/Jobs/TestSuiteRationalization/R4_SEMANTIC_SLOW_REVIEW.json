@@ -1,0 +1,1341 @@
+{
+  "schemaVersion": 1,
+  "phase": "R4",
+  "sourceReport": "/tmp/hoomans-r6-python-final2.json",
+  "baseline": {
+    "report": "/tmp/hoomans-python-final-full-exclusive.json",
+    "modules": {
+      "PASS": 198,
+      "FAIL": 0,
+      "SKIP": 11,
+      "total": 209
+    },
+    "elapsedSeconds": 1036.6393050449988,
+    "jobs": 4,
+    "maxActiveProcesses": 4,
+    "exclusiveModules": [
+      "test_codebuilder_consolidation",
+      "test_contextual_scale_isolation",
+      "test_conversational_competence_c7g",
+      "test_interaction_spec",
+      "test_semantic_authoring_compiler",
+      "test_v1_visual_authoring"
+    ]
+  },
+  "final": {
+    "report": "/tmp/hoomans-r6-python-final2.json",
+    "modules": {
+      "PASS": 198,
+      "FAIL": 0,
+      "SKIP": 11,
+      "total": 209
+    },
+    "elapsedSeconds": 1005.233746099,
+    "jobs": 4,
+    "maxActiveProcesses": 4,
+    "exclusiveModules": [
+      "test_c7f_dataset_precision",
+      "test_codebuilder_consolidation",
+      "test_coherent_conversation_c8",
+      "test_contextual_acceptance_c6b",
+      "test_contextual_conversation_c4a",
+      "test_contextual_conversation_c4b",
+      "test_contextual_conversation_c4c",
+      "test_contextual_conversation_c4d",
+      "test_contextual_provider_parity_c6c",
+      "test_contextual_scale_isolation",
+      "test_contextual_speech_behavior",
+      "test_contextual_suggestions_whats_up",
+      "test_conversational_competence_c7g",
+      "test_interaction_spec",
+      "test_semantic_authoring_compiler",
+      "test_v1_visual_authoring"
+    ],
+    "slowAcceptanceModules": [
+      "test_automatic_flow_generation",
+      "test_behavior_fixture_parity",
+      "test_contextual_bonds",
+      "test_contextual_social_reactions",
+      "test_contextual_speech_behavior",
+      "test_contextual_suggestions_s4",
+      "test_contextual_talk_parity",
+      "test_harness",
+      "test_observatory_fixture_parity",
+      "test_pilot_parity",
+      "test_response_observatory_matrix",
+      "test_sweep_acceptance"
+    ]
+  },
+  "reviewedSlowModules": [
+    {
+      "module": "test_response_observatory_matrix",
+      "classificationBefore": "parallel",
+      "classificationAfter": "acceptance_slow",
+      "status": "PASS",
+      "elapsedSeconds": 181.14466059699998,
+      "testCount": 20,
+      "subjectsInspected": "response_observatory quality matrices, production Lua response/command presentation, negative permission and transport cases",
+      "authorityBoundary": "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review",
+      "workerIsolation": {
+        "workerConstructorsInSource": 9,
+        "fixtureExecutorsInSource": 0,
+        "fixtureLoadersInSource": 0,
+        "setUpClass": false,
+        "decision": "retain per-test worker/process isolation where constructors occur; do not share mutable Lua workers across test methods"
+      },
+      "overlapReview": "Compared with observatory_fixture_parity and contextual_talk_parity: it checks ad hoc matrix expectations and authority rejection/transport counts, not fixture catalog parity or full presentation adapter parity.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "tierDecision": "KEEP_CANONICAL in ACCEPTANCE; label acceptance_slow while retaining bounded parallel execution",
+      "action": "retain; do not merge or delete; record slow acceptance routing and continue measuring",
+      "sourceDetails": {
+        "path": "tools/semantic_harness/tests/test_response_observatory_matrix.py",
+        "testMethods": [
+          "test_greeting_and_companion_actions_en_tl",
+          "test_goodbye_root_closes_while_typed_goodbye_does_not",
+          "test_observation_is_not_falsely_accepted",
+          "test_negative_expectation_is_reported_as_failure",
+          "test_command_rejections_are_server_declared_not_accepted_effects",
+          "test_matrix_rejects_unknown_unsupported_or_unbounded_assertions",
+          "test_safe_proposal_preflight_never_changes_loaded_pool",
+          "test_isolated_candidate_changes_real_lua_in_en_tl_not_gameplay",
+          "test_checked_in_greeting_promotion_changes_text_only",
+          "test_rejects_generated_owner_as_edit_source",
+          "test_manifest_translation_keys_are_unique_after_follow_wait_fix",
+          "test_en_tl_follow_wait_use_production_catalog_not_english_fallback",
+          "test_bundled_real_lua_context_matrices",
+          "test_comparison_flags_regressions_and_missing_cases",
+          "test_comparison_accepts_equivalent_complete_reports",
+          "test_cli_reports_bounded_error_with_nonzero_exit",
+          "test_invalid_language_and_large_case_are_rejected",
+          "test_cli_catalog_and_explain_use_real_lua",
+          "test_explore_is_static_and_selection_belongs_to_simulation",
+          "test_review_widget_previews_isolated_real_lua_candidate"
+        ],
+        "workerConstructors": 9,
+        "fixtureExecutors": 0,
+        "fixtureLoaders": 0,
+        "setUpClass": false,
+        "productionLuaBoundary": true,
+        "history": "9ed916e9 refactor(semantics): remove milestone and legacy naming"
+      }
+    },
+    {
+      "module": "test_sweep_acceptance",
+      "classificationBefore": "parallel",
+      "classificationAfter": "acceptance_slow",
+      "status": "PASS",
+      "elapsedSeconds": 109.09838372600007,
+      "testCount": 3,
+      "subjectsInspected": "DialogueQualitySweepService, dimension inventory, reachability/planning, evidence extraction, and 13 acceptance scenarios through LuaSemanticWorker",
+      "authorityBoundary": "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review",
+      "workerIsolation": {
+        "workerConstructorsInSource": 13,
+        "fixtureExecutorsInSource": 0,
+        "fixtureLoadersInSource": 0,
+        "setUpClass": true,
+        "decision": "retain per-test worker/process isolation where constructors occur; do not share mutable Lua workers across test methods"
+      },
+      "overlapReview": "Compared with response_observatory_matrix: sweep planner/reachability/performance coverage is a bounded acceptance system, not duplicate per-response matrix cases.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "tierDecision": "KEEP_CANONICAL in ACCEPTANCE; label acceptance_slow while retaining bounded parallel execution",
+      "action": "retain; do not merge or delete; record slow acceptance routing and continue measuring",
+      "sourceDetails": {
+        "path": "tools/semantic_harness/tests/test_sweep_acceptance.py",
+        "testMethods": [
+          "test_performance_characterization",
+          "test_13_required_demonstration_scenarios",
+          "test_frontier_expansion_discovers_unique_variant"
+        ],
+        "workerConstructors": 13,
+        "fixtureExecutors": 0,
+        "fixtureLoaders": 0,
+        "setUpClass": true,
+        "productionLuaBoundary": true,
+        "history": "9ed916e9 refactor(semantics): remove milestone and legacy naming"
+      }
+    },
+    {
+      "module": "test_observatory_fixture_parity",
+      "classificationBefore": "parallel",
+      "classificationAfter": "acceptance_slow",
+      "status": "PASS",
+      "elapsedSeconds": 104.08038733600006,
+      "testCount": 7,
+      "subjectsInspected": "fixtures/v1 c0a and observatory JSON catalogs plus testing.executor/loaders",
+      "authorityBoundary": "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review",
+      "workerIsolation": {
+        "workerConstructorsInSource": 0,
+        "fixtureExecutorsInSource": 7,
+        "fixtureLoadersInSource": 7,
+        "setUpClass": false,
+        "decision": "retain per-test worker/process isolation where constructors occur; do not share mutable Lua workers across test methods"
+      },
+      "overlapReview": "Compared with behavior_fixture_parity: fixture families and schemas differ; preserving both catches migration/parity loss at separate catalog boundaries.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "tierDecision": "KEEP_CANONICAL in ACCEPTANCE; label acceptance_slow while retaining bounded parallel execution",
+      "action": "retain; do not merge or delete; record slow acceptance routing and continue measuring",
+      "sourceDetails": {
+        "path": "tools/semantic_harness/tests/test_observatory_fixture_parity.py",
+        "testMethods": [
+          "test_c0a_multi_turn_fixtures",
+          "test_c0a_suggestions_fixtures",
+          "test_c0a_reply_realization_fixtures",
+          "test_observatory_lifecycle_fixtures",
+          "test_observatory_health_authority_fixtures",
+          "test_observatory_permission_rejections_fixtures",
+          "test_observatory_core_fixtures"
+        ],
+        "workerConstructors": 0,
+        "fixtureExecutors": 7,
+        "fixtureLoaders": 7,
+        "setUpClass": false,
+        "productionLuaBoundary": false,
+        "history": "9ed916e9 refactor(semantics): remove milestone and legacy naming"
+      }
+    },
+    {
+      "module": "test_harness",
+      "classificationBefore": "parallel",
+      "classificationAfter": "acceptance_slow",
+      "status": "PASS",
+      "elapsedSeconds": 93.41526889999977,
+      "testCount": 24,
+      "subjectsInspected": "LuaSemanticWorker, LuaProcess, HarnessConfig, scenario save/load, transport and lifecycle",
+      "authorityBoundary": "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review",
+      "workerIsolation": {
+        "workerConstructorsInSource": 23,
+        "fixtureExecutorsInSource": 0,
+        "fixtureLoadersInSource": 0,
+        "setUpClass": false,
+        "decision": "retain per-test worker/process isolation where constructors occur; do not share mutable Lua workers across test methods"
+      },
+      "overlapReview": "Compared with all contextual tests: this validates worker boot/process/transport/session contracts; contextual modules consume that worker and cannot replace its lifecycle checks.",
+      "legacyMigration": {
+        "historyTip": "6fa471de Refactor semantic harness tests and UI components",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "tierDecision": "KEEP_CANONICAL in ACCEPTANCE; label acceptance_slow while retaining bounded parallel execution",
+      "action": "retain; do not merge or delete; record slow acceptance routing and continue measuring",
+      "sourceDetails": {
+        "path": "tools/semantic_harness/tests/test_harness.py",
+        "testMethods": [
+          "test_worker_loads_production_modules_and_parses_greeting",
+          "test_scenario_save_round_trip_preserves_editable_runtime_state",
+          "test_semantic_inventory_query_uses_editable_npc_inventory",
+          "test_news_questions_use_gossip_semantics_not_inventory",
+          "test_gift_uses_editable_player_inventory_and_mutates_npc_projection",
+          "test_worker_can_restart_and_restore_the_current_scenario",
+          "test_actual_player_name_uses_authoritative_identity_exchange",
+          "test_natural_identity_phrases_use_the_actual_character_name",
+          "test_profile_forename_phrase_is_authoritative_not_display_name",
+          "test_false_name_does_not_disclose_npc_name",
+          "test_topic_change_after_name_question_preserves_pending_exchange",
+          "test_self_reflection_is_not_an_insult_and_directed_insult_is",
+          "test_self_blame_stays_self_directed",
+          "test_self_reflection_response_uses_trait_style",
+          "test_first_person_state_is_not_identity_claim",
+          "test_real_tagalog_tool_catalog_and_live_language_switch",
+          "test_tagalog_identity_exchange_uses_canonical_npc_translation",
+          "test_tagalog_semantic_identity_and_self_reflection_use_catalogs",
+          "test_action_boundary_uses_configurable_mock_and_reports_tools",
+          "test_worker_reports_grounded_module_manifest_and_translation_state",
+          "test_process_correlates_requests_and_serializes_concurrent_callers",
+          "test_process_timeout_fails_fast_and_terminates_the_worker",
+          "test_case_runner_returns_turns_and_ignores_transport_mirrors",
+          "test_conflict_ledger_detects_duplicate_authoritative_events"
+        ],
+        "workerConstructors": 23,
+        "fixtureExecutors": 0,
+        "fixtureLoaders": 0,
+        "setUpClass": false,
+        "productionLuaBoundary": true,
+        "history": "6fa471de Refactor semantic harness tests and UI components"
+      }
+    },
+    {
+      "module": "test_contextual_talk_parity",
+      "classificationBefore": "parallel",
+      "classificationAfter": "acceptance_slow",
+      "status": "PASS",
+      "elapsedSeconds": 81.17225785399978,
+      "testCount": 22,
+      "subjectsInspected": "production native Talk presentation projection and Semantic Lab Tk adapter projection",
+      "authorityBoundary": "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review",
+      "workerIsolation": {
+        "workerConstructorsInSource": 23,
+        "fixtureExecutorsInSource": 0,
+        "fixtureLoadersInSource": 0,
+        "setUpClass": false,
+        "decision": "retain per-test worker/process isolation where constructors occur; do not share mutable Lua workers across test methods"
+      },
+      "overlapReview": "Compared with response observatory and UI tests: this is the explicit production-Lua-to-adapter parity boundary and retains per-row identity/order checks.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "tierDecision": "KEEP_CANONICAL in ACCEPTANCE; label acceptance_slow while retaining bounded parallel execution",
+      "action": "retain; do not merge or delete; record slow acceptance routing and continue measuring",
+      "sourceDetails": {
+        "path": "tools/semantic_harness/tests/test_contextual_talk_parity.py",
+        "testMethods": [
+          "test_production_native_conversation_parity_record",
+          "test_catalog_is_production_owned_and_truthful",
+          "test_matrix_uses_native_target_facts_and_restores_base_scenario",
+          "test_native_and_harness_enter_the_shared_talk_start_projection",
+          "test_production_projection_exposes_exact_presented_session_rows",
+          "test_open_returns_bounded_projection_for_large_saved_world",
+          "test_primary_renderer_adapter_preserves_production_row_order_and_frames",
+          "test_primary_click_uses_exact_production_frame_and_reprojects",
+          "test_production_frame_rejection_is_stale_or_replayed_without_mutation",
+          "test_unpresented_production_frame_is_rejected_without_mutation",
+          "test_close_and_explicit_reopen_follow_the_same_production_session",
+          "test_typed_emote_suspend_resume_share_the_production_semantic_state",
+          "test_landing_projection_keeps_shortcut_and_back_target_after_hub_turn",
+          "test_owned_companion_uses_known_identity_policy",
+          "test_talk_something_else_returns_to_landing_with_navigation_reply",
+          "test_cli_exposes_the_same_talk_operations",
+          "test_unavailable_current_target_reports_reason_and_restores_scenario",
+          "test_trader_capability_is_an_overlay_on_the_talk_target",
+          "test_en_tl_keep_talk_routes_and_semantic_choices_identical",
+          "test_recruitment_shortcut_and_typed_input_use_production_result_path",
+          "test_recruitment_authority_reads_staged_relationship_and_assigns_member",
+          "test_tk_talk_parity_surface_runs_the_real_worker"
+        ],
+        "workerConstructors": 23,
+        "fixtureExecutors": 0,
+        "fixtureLoaders": 0,
+        "setUpClass": false,
+        "productionLuaBoundary": true,
+        "history": "9ed916e9 refactor(semantics): remove milestone and legacy naming"
+      }
+    },
+    {
+      "module": "test_behavior_fixture_parity",
+      "classificationBefore": "parallel",
+      "classificationAfter": "acceptance_slow",
+      "status": "PASS",
+      "elapsedSeconds": 70.162674273,
+      "testCount": 4,
+      "subjectsInspected": "fixtures/v1/behavior command/question/social/inventory catalogs and executor",
+      "authorityBoundary": "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review",
+      "workerIsolation": {
+        "workerConstructorsInSource": 0,
+        "fixtureExecutorsInSource": 4,
+        "fixtureLoadersInSource": 4,
+        "setUpClass": false,
+        "decision": "retain per-test worker/process isolation where constructors occur; do not share mutable Lua workers across test methods"
+      },
+      "overlapReview": "Compared with observatory fixtures: the behavior migration catalog has separate case ownership and broad command/question coverage; no equal assertion matrix was proven.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "tierDecision": "KEEP_CANONICAL in ACCEPTANCE; label acceptance_slow while retaining bounded parallel execution",
+      "action": "retain; do not merge or delete; record slow acceptance routing and continue measuring",
+      "sourceDetails": {
+        "path": "tools/semantic_harness/tests/test_behavior_fixture_parity.py",
+        "testMethods": [
+          "test_commands_fixtures",
+          "test_questions_fixtures",
+          "test_social_dialogue_fixtures",
+          "test_inventory_dialogue_fixtures"
+        ],
+        "workerConstructors": 0,
+        "fixtureExecutors": 4,
+        "fixtureLoaders": 4,
+        "setUpClass": false,
+        "productionLuaBoundary": false,
+        "history": "9ed916e9 refactor(semantics): remove milestone and legacy naming"
+      }
+    },
+    {
+      "module": "test_contextual_social_reactions",
+      "classificationBefore": "parallel",
+      "classificationAfter": "acceptance_slow",
+      "status": "PASS",
+      "elapsedSeconds": 69.72585569600005,
+      "testCount": 12,
+      "subjectsInspected": "production worker social reaction routing, relationship state, authority, transport/tool-call suppression",
+      "authorityBoundary": "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review",
+      "workerIsolation": {
+        "workerConstructorsInSource": 14,
+        "fixtureExecutorsInSource": 0,
+        "fixtureLoadersInSource": 0,
+        "setUpClass": false,
+        "decision": "retain per-test worker/process isolation where constructors occur; do not share mutable Lua workers across test methods"
+      },
+      "overlapReview": "Compared with contextual_speech_behavior: social reaction decision/authority cases and speech-family realization variants are different contracts.",
+      "legacyMigration": {
+        "historyTip": "c5972ce8 refactor(arch): complete P5-P8 domain context architecture refactor",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "tierDecision": "KEEP_CANONICAL in ACCEPTANCE; label acceptance_slow while retaining bounded parallel execution",
+      "action": "retain; do not merge or delete; record slow acceptance routing and continue measuring",
+      "sourceDetails": {
+        "path": "tools/semantic_harness/tests/test_contextual_social_reactions.py",
+        "testMethods": [
+          "test_apology_uses_relationship_emotion_and_explicit_precedence",
+          "test_existing_social_reactions_remain_local_and_contextual",
+          "test_insults_use_the_authoritative_social_boundary_and_visible_response",
+          "test_typoed_hostility_keeps_recognized_social_route",
+          "test_rejected_and_unavailable_insults_are_truthful_and_social_specific",
+          "test_self_directed_insult_does_not_dispatch_social_authority",
+          "test_social_rejection_translation_is_available_in_tl",
+          "test_threat_uses_guarded_emotion_relationship_and_precedence",
+          "test_offer_uses_emotion_hunger_and_social_context",
+          "test_dispute_uses_guarded_context_and_preserves_pending_authority",
+          "test_apology_preview_is_idempotent_without_relationship_effect",
+          "test_insult_preview_is_pure_and_does_not_emit_social_effects"
+        ],
+        "workerConstructors": 14,
+        "fixtureExecutors": 0,
+        "fixtureLoaders": 0,
+        "setUpClass": false,
+        "productionLuaBoundary": true,
+        "history": "c5972ce8 refactor(arch): complete P5-P8 domain context architecture refactor"
+      }
+    },
+    {
+      "module": "test_contextual_speech_behavior",
+      "classificationBefore": "parallel",
+      "classificationAfter": "exclusive",
+      "status": "PASS",
+      "elapsedSeconds": 53.203550691000146,
+      "testCount": 5,
+      "subjectsInspected": "production worker speech-family realization across personality, relationship, bond, and language variants",
+      "authorityBoundary": "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review",
+      "workerIsolation": {
+        "workerConstructorsInSource": 3,
+        "fixtureExecutorsInSource": 0,
+        "fixtureLoadersInSource": 0,
+        "setUpClass": false,
+        "decision": "retain per-test worker/process isolation where constructors occur; do not share mutable Lua workers across test methods"
+      },
+      "overlapReview": "Compared with contextual_social_reactions: wording-family realization remains distinct from social-reaction decision and transport assertions.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "tierDecision": "KEEP_CANONICAL in ACCEPTANCE; route through the existing exclusive resource lane after isolated rerun proved scheduler-sensitive failures",
+      "action": "retain; do not merge or delete; record slow acceptance routing and continue measuring",
+      "sourceDetails": {
+        "path": "tools/semantic_harness/tests/test_contextual_speech_behavior.py",
+        "testMethods": [
+          "test_non_greeting_production_families_have_visible_variants",
+          "test_refusal_reuse_does_not_turn_authoritative_no_into_acknowledgement",
+          "test_bond_terms_are_whole_phrase_arguments_and_standing_independent",
+          "test_tl_keeps_semantic_identity_and_localizes_bond_term",
+          "test_production_catalog_exposes_machine_readable_realization_coverage"
+        ],
+        "workerConstructors": 3,
+        "fixtureExecutors": 0,
+        "fixtureLoaders": 0,
+        "setUpClass": false,
+        "productionLuaBoundary": true,
+        "history": "9ed916e9 refactor(semantics): remove milestone and legacy naming"
+      }
+    },
+    {
+      "module": "test_automatic_flow_generation",
+      "classificationBefore": "parallel",
+      "classificationAfter": "acceptance_slow",
+      "status": "PASS",
+      "elapsedSeconds": 57.43724299700011,
+      "testCount": 11,
+      "subjectsInspected": "measured slow acceptance module; source inspected directly",
+      "authorityBoundary": "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review",
+      "workerIsolation": {
+        "workerConstructorsInSource": 20,
+        "fixtureExecutorsInSource": 0,
+        "fixtureLoadersInSource": 0,
+        "setUpClass": false,
+        "decision": "retain per-test worker/process isolation where constructors occur; do not share mutable Lua workers across test methods"
+      },
+      "overlapReview": "Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven.",
+      "legacyMigration": {
+        "historyTip": "0a4c401e test: align semantic fixtures with current public meaning contracts",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "tierDecision": "KEEP_CANONICAL in ACCEPTANCE; label acceptance_slow while retaining bounded parallel execution",
+      "action": "retain; do not merge or delete; record slow acceptance routing and continue measuring",
+      "sourceDetails": {
+        "path": "tools/semantic_harness/tests/test_automatic_flow_generation.py",
+        "testMethods": [
+          "test_live_coverage_generates_follow_and_stay_from_one_template",
+          "test_parameterized_task_template_generates_wait_at_and_fetch",
+          "test_all_dispatchable_registered_capabilities_use_existing_handlers",
+          "test_parameterized_task_result_branches_and_gate_are_truthful",
+          "test_real_worker_records_result_nodes_and_one_dispatch",
+          "test_generated_simple_command_uses_relationship_and_personality_context",
+          "test_generated_simple_command_uses_bounded_previous_action_memory",
+          "test_denied_failed_and_context_gate_are_truthful",
+          "test_preview_is_pure_and_generation_survives_restart",
+          "test_authoritative_gossip_memory_reaches_response_selection_in_en_and_tl",
+          "test_authoritative_gossip_is_target_scoped_across_repeated_renamed_and_unavailable_targets"
+        ],
+        "workerConstructors": 20,
+        "fixtureExecutors": 0,
+        "fixtureLoaders": 0,
+        "setUpClass": false,
+        "productionLuaBoundary": true,
+        "history": "0a4c401e test: align semantic fixtures with current public meaning contracts"
+      }
+    },
+    {
+      "module": "test_pilot_parity",
+      "classificationBefore": "parallel",
+      "classificationAfter": "acceptance_slow",
+      "status": "PASS",
+      "elapsedSeconds": 60.07827630200018,
+      "testCount": 5,
+      "subjectsInspected": "measured slow acceptance module; source inspected directly",
+      "authorityBoundary": "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review",
+      "workerIsolation": {
+        "workerConstructorsInSource": 0,
+        "fixtureExecutorsInSource": 5,
+        "fixtureLoadersInSource": 5,
+        "setUpClass": false,
+        "decision": "retain per-test worker/process isolation where constructors occur; do not share mutable Lua workers across test methods"
+      },
+      "overlapReview": "Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven.",
+      "legacyMigration": {
+        "historyTip": "8b251fe7 feat(semantic-test): migrate pilot behavioral fixtures with verified legacy parity (P2)",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "tierDecision": "KEEP_CANONICAL in ACCEPTANCE; label acceptance_slow while retaining bounded parallel execution",
+      "action": "retain; do not merge or delete; record slow acceptance routing and continue measuring",
+      "sourceDetails": {
+        "path": "tools/semantic_harness/tests/test_pilot_parity.py",
+        "testMethods": [
+          "test_whats_up_pilot_fixture_passes_with_full_parity",
+          "test_wellbeing_pilot_fixture_passes_with_full_parity",
+          "test_identity_collision_pilot_fixture_passes_with_full_parity",
+          "test_language_variants_pilot_fixture_passes_with_full_parity",
+          "test_negative_controls_pilot_fixture_passes_with_full_parity"
+        ],
+        "workerConstructors": 0,
+        "fixtureExecutors": 5,
+        "fixtureLoaders": 5,
+        "setUpClass": false,
+        "productionLuaBoundary": false,
+        "history": "8b251fe7 feat(semantic-test): migrate pilot behavioral fixtures with verified legacy parity (P2)"
+      }
+    },
+    {
+      "module": "test_contextual_suggestions_s4",
+      "classificationBefore": "parallel",
+      "classificationAfter": "acceptance_slow",
+      "status": "PASS",
+      "elapsedSeconds": 54.089751665999756,
+      "testCount": 7,
+      "subjectsInspected": "measured slow acceptance module; source inspected directly",
+      "authorityBoundary": "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review",
+      "workerIsolation": {
+        "workerConstructorsInSource": 0,
+        "fixtureExecutorsInSource": 0,
+        "fixtureLoadersInSource": 0,
+        "setUpClass": false,
+        "decision": "retain per-test worker/process isolation where constructors occur; do not share mutable Lua workers across test methods"
+      },
+      "overlapReview": "Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "tierDecision": "KEEP_CANONICAL in ACCEPTANCE; label acceptance_slow while retaining bounded parallel execution",
+      "action": "retain; do not merge or delete; record slow acceptance routing and continue measuring",
+      "sourceDetails": {
+        "path": "tools/semantic_harness/tests/test_contextual_suggestions_s4.py",
+        "testMethods": [
+          "test_topic_combobox_uses_the_worker_group_click_contract",
+          "test_existing_lab_renders_inspects_and_clicks_production_suggestions",
+          "test_identity_lie_choice_stays_in_inspect_until_native_session",
+          "test_whats_up_gui_activates_hub_without_a_conversation_graph",
+          "test_npc_profile_selection_is_staged_until_workbench_apply",
+          "test_simulation_layout_at_minimum_size_keeps_runtime_controls_visible",
+          "test_simulation_layout_at_normal_desktop_size"
+        ],
+        "workerConstructors": 0,
+        "fixtureExecutors": 0,
+        "fixtureLoaders": 0,
+        "setUpClass": false,
+        "productionLuaBoundary": true,
+        "history": "9ed916e9 refactor(semantics): remove milestone and legacy naming"
+      }
+    },
+    {
+      "module": "test_contextual_bonds",
+      "classificationBefore": "parallel",
+      "classificationAfter": "acceptance_slow",
+      "status": "PASS",
+      "elapsedSeconds": 48.10222296899997,
+      "testCount": 6,
+      "subjectsInspected": "measured slow acceptance module; source inspected directly",
+      "authorityBoundary": "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review",
+      "workerIsolation": {
+        "workerConstructorsInSource": 4,
+        "fixtureExecutorsInSource": 0,
+        "fixtureLoadersInSource": 0,
+        "setUpClass": false,
+        "decision": "retain per-test worker/process isolation where constructors occur; do not share mutable Lua workers across test methods"
+      },
+      "overlapReview": "Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "tierDecision": "KEEP_CANONICAL in ACCEPTANCE; label acceptance_slow while retaining bounded parallel execution",
+      "action": "retain; do not merge or delete; record slow acceptance routing and continue measuring",
+      "sourceDetails": {
+        "path": "tools/semantic_harness/tests/test_contextual_bonds.py",
+        "testMethods": [
+          "test_required_kinds_map_to_coarse_classes_without_losing_detail",
+          "test_bond_is_independent_of_directed_relationship_standing",
+          "test_relationship_state_is_derived_by_production_thresholds",
+          "test_normal_lab_settings_do_not_edit_or_persist_derived_state_or_class",
+          "test_relationship_terms_are_language_localized_without_changing_kind_or_keys",
+          "test_future_family_subtype_uses_registry_and_family_projection"
+        ],
+        "workerConstructors": 4,
+        "fixtureExecutors": 0,
+        "fixtureLoaders": 0,
+        "setUpClass": false,
+        "productionLuaBoundary": true,
+        "history": "9ed916e9 refactor(semantics): remove milestone and legacy naming"
+      }
+    }
+  ],
+  "pathReviews": {
+    "tools/semantic_harness/tests/test_response_observatory_matrix.py": {
+      "classification": "KEEP_CANONICAL",
+      "finalDisposition": "retained_acceptance_slow_reviewed",
+      "productionSubjectsInspected": [
+        "response_observatory quality matrices, production Lua response/command presentation, negative permission and transport cases"
+      ],
+      "callersInspected": [
+        "tools/semantic_harness/testing/python_runner.py",
+        "the imported production-Lua worker/fixture/UI subjects recorded in the module review"
+      ],
+      "authorityBoundary": [
+        "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review"
+      ],
+      "assertionPurpose": {
+        "testMethods": [
+          "test_greeting_and_companion_actions_en_tl",
+          "test_goodbye_root_closes_while_typed_goodbye_does_not",
+          "test_observation_is_not_falsely_accepted",
+          "test_negative_expectation_is_reported_as_failure",
+          "test_command_rejections_are_server_declared_not_accepted_effects",
+          "test_matrix_rejects_unknown_unsupported_or_unbounded_assertions",
+          "test_safe_proposal_preflight_never_changes_loaded_pool",
+          "test_isolated_candidate_changes_real_lua_in_en_tl_not_gameplay",
+          "test_checked_in_greeting_promotion_changes_text_only",
+          "test_rejects_generated_owner_as_edit_source",
+          "test_manifest_translation_keys_are_unique_after_follow_wait_fix",
+          "test_en_tl_follow_wait_use_production_catalog_not_english_fallback",
+          "test_bundled_real_lua_context_matrices",
+          "test_comparison_flags_regressions_and_missing_cases",
+          "test_comparison_accepts_equivalent_complete_reports",
+          "test_cli_reports_bounded_error_with_nonzero_exit",
+          "test_invalid_language_and_large_case_are_rejected",
+          "test_cli_catalog_and_explain_use_real_lua",
+          "test_explore_is_static_and_selection_belongs_to_simulation",
+          "test_review_widget_previews_isolated_real_lua_candidate"
+        ],
+        "workerConstructors": 9,
+        "fixtureExecutors": 0
+      },
+      "overlapCandidates": [
+        "test_sweep_acceptance",
+        "test_observatory_fixture_parity",
+        "test_harness",
+        "test_contextual_talk_parity",
+        "test_behavior_fixture_parity",
+        "test_contextual_social_reactions"
+      ],
+      "overlapReview": "Compared with observatory_fixture_parity and contextual_talk_parity: it checks ad hoc matrix expectations and authority rejection/transport counts, not fixture catalog parity or full presentation adapter parity.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "cost": {
+        "elapsedSeconds": 181.14466059699998,
+        "testCount": 20,
+        "baselineClassification": "parallel",
+        "afterClassification": "acceptance_slow"
+      },
+      "evidence": [
+        "Final developer acceptance report /tmp/hoomans-r6-python-final2.json recorded PASS in 181.14466059699998 seconds for 20 test methods.",
+        "Inspected production/fixture subjects: response_observatory quality matrices, production Lua response/command presentation, negative permission and transport cases.",
+        "Compared overlap: Compared with observatory_fixture_parity and contextual_talk_parity: it checks ad hoc matrix expectations and authority rejection/transport counts, not fixture catalog parity or full presentation adapter parity.",
+        "Worker/fixture isolation counts: {'path': 'tools/semantic_harness/tests/test_response_observatory_matrix.py', 'testMethods': ['test_greeting_and_companion_actions_en_tl', 'test_goodbye_root_closes_while_typed_goodbye_does_not', 'test_observation_is_not_falsely_accepted', 'test_negative_expectation_is_reported_as_failure', 'test_command_rejections_are_server_declared_not_accepted_effects', 'test_matrix_rejects_unknown_unsupported_or_unbounded_assertions', 'test_safe_proposal_preflight_never_changes_loaded_pool', 'test_isolated_candidate_changes_real_lua_in_en_tl_not_gameplay', 'test_checked_in_greeting_promotion_changes_text_only', 'test_rejects_generated_owner_as_edit_source', 'test_manifest_translation_keys_are_unique_after_follow_wait_fix', 'test_en_tl_follow_wait_use_production_catalog_not_english_fallback', 'test_bundled_real_lua_context_matrices', 'test_comparison_flags_regressions_and_missing_cases', 'test_comparison_accepts_equivalent_complete_reports', 'test_cli_reports_bounded_error_with_nonzero_exit', 'test_invalid_language_and_large_case_are_rejected', 'test_cli_catalog_and_explain_use_real_lua', 'test_explore_is_static_and_selection_belongs_to_simulation', 'test_review_widget_previews_isolated_real_lua_candidate'], 'workerConstructors': 9, 'fixtureExecutors': 0, 'fixtureLoaders': 0, 'setUpClass': False, 'productionLuaBoundary': True, 'history': '9ed916e9 refactor(semantics): remove milestone and legacy naming'}; no mutable worker reuse was introduced.",
+        "The existing runner labels this module acceptance_slow while preserving the acceptance tier and bounded parallel execution."
+      ],
+      "action": "retain canonical acceptance coverage; route visibly through acceptance_slow label",
+      "overlap": "Compared with observatory_fixture_parity and contextual_talk_parity: it checks ad hoc matrix expectations and authority rejection/transport counts, not fixture catalog parity or full presentation adapter parity."
+    },
+    "tools/semantic_harness/tests/test_sweep_acceptance.py": {
+      "classification": "KEEP_CANONICAL",
+      "finalDisposition": "retained_acceptance_slow_reviewed",
+      "productionSubjectsInspected": [
+        "DialogueQualitySweepService, dimension inventory, reachability/planning, evidence extraction, and 13 acceptance scenarios through LuaSemanticWorker"
+      ],
+      "callersInspected": [
+        "tools/semantic_harness/testing/python_runner.py",
+        "the imported production-Lua worker/fixture/UI subjects recorded in the module review"
+      ],
+      "authorityBoundary": [
+        "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review"
+      ],
+      "assertionPurpose": {
+        "testMethods": [
+          "test_performance_characterization",
+          "test_13_required_demonstration_scenarios",
+          "test_frontier_expansion_discovers_unique_variant"
+        ],
+        "workerConstructors": 13,
+        "fixtureExecutors": 0
+      },
+      "overlapCandidates": [
+        "test_response_observatory_matrix",
+        "test_observatory_fixture_parity",
+        "test_harness",
+        "test_contextual_talk_parity",
+        "test_behavior_fixture_parity",
+        "test_contextual_social_reactions"
+      ],
+      "overlapReview": "Compared with response_observatory_matrix: sweep planner/reachability/performance coverage is a bounded acceptance system, not duplicate per-response matrix cases.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "cost": {
+        "elapsedSeconds": 109.09838372600007,
+        "testCount": 3,
+        "baselineClassification": "parallel",
+        "afterClassification": "acceptance_slow"
+      },
+      "evidence": [
+        "Final developer acceptance report /tmp/hoomans-r6-python-final2.json recorded PASS in 109.09838372600007 seconds for 3 test methods.",
+        "Inspected production/fixture subjects: DialogueQualitySweepService, dimension inventory, reachability/planning, evidence extraction, and 13 acceptance scenarios through LuaSemanticWorker.",
+        "Compared overlap: Compared with response_observatory_matrix: sweep planner/reachability/performance coverage is a bounded acceptance system, not duplicate per-response matrix cases.",
+        "Worker/fixture isolation counts: {'path': 'tools/semantic_harness/tests/test_sweep_acceptance.py', 'testMethods': ['test_performance_characterization', 'test_13_required_demonstration_scenarios', 'test_frontier_expansion_discovers_unique_variant'], 'workerConstructors': 13, 'fixtureExecutors': 0, 'fixtureLoaders': 0, 'setUpClass': True, 'productionLuaBoundary': True, 'history': '9ed916e9 refactor(semantics): remove milestone and legacy naming'}; no mutable worker reuse was introduced.",
+        "The existing runner labels this module acceptance_slow while preserving the acceptance tier and bounded parallel execution."
+      ],
+      "action": "retain canonical acceptance coverage; route visibly through acceptance_slow label",
+      "overlap": "Compared with response_observatory_matrix: sweep planner/reachability/performance coverage is a bounded acceptance system, not duplicate per-response matrix cases."
+    },
+    "tools/semantic_harness/tests/test_observatory_fixture_parity.py": {
+      "classification": "KEEP_CANONICAL",
+      "finalDisposition": "retained_acceptance_slow_reviewed",
+      "productionSubjectsInspected": [
+        "fixtures/v1 c0a and observatory JSON catalogs plus testing.executor/loaders"
+      ],
+      "callersInspected": [
+        "tools/semantic_harness/testing/python_runner.py",
+        "the imported production-Lua worker/fixture/UI subjects recorded in the module review"
+      ],
+      "authorityBoundary": [
+        "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review"
+      ],
+      "assertionPurpose": {
+        "testMethods": [
+          "test_c0a_multi_turn_fixtures",
+          "test_c0a_suggestions_fixtures",
+          "test_c0a_reply_realization_fixtures",
+          "test_observatory_lifecycle_fixtures",
+          "test_observatory_health_authority_fixtures",
+          "test_observatory_permission_rejections_fixtures",
+          "test_observatory_core_fixtures"
+        ],
+        "workerConstructors": 0,
+        "fixtureExecutors": 7
+      },
+      "overlapCandidates": [
+        "test_response_observatory_matrix",
+        "test_sweep_acceptance",
+        "test_harness",
+        "test_contextual_talk_parity",
+        "test_behavior_fixture_parity",
+        "test_contextual_social_reactions"
+      ],
+      "overlapReview": "Compared with behavior_fixture_parity: fixture families and schemas differ; preserving both catches migration/parity loss at separate catalog boundaries.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "cost": {
+        "elapsedSeconds": 104.08038733600006,
+        "testCount": 7,
+        "baselineClassification": "parallel",
+        "afterClassification": "acceptance_slow"
+      },
+      "evidence": [
+        "Final developer acceptance report /tmp/hoomans-r6-python-final2.json recorded PASS in 104.08038733600006 seconds for 7 test methods.",
+        "Inspected production/fixture subjects: fixtures/v1 c0a and observatory JSON catalogs plus testing.executor/loaders.",
+        "Compared overlap: Compared with behavior_fixture_parity: fixture families and schemas differ; preserving both catches migration/parity loss at separate catalog boundaries.",
+        "Worker/fixture isolation counts: {'path': 'tools/semantic_harness/tests/test_observatory_fixture_parity.py', 'testMethods': ['test_c0a_multi_turn_fixtures', 'test_c0a_suggestions_fixtures', 'test_c0a_reply_realization_fixtures', 'test_observatory_lifecycle_fixtures', 'test_observatory_health_authority_fixtures', 'test_observatory_permission_rejections_fixtures', 'test_observatory_core_fixtures'], 'workerConstructors': 0, 'fixtureExecutors': 7, 'fixtureLoaders': 7, 'setUpClass': False, 'productionLuaBoundary': False, 'history': '9ed916e9 refactor(semantics): remove milestone and legacy naming'}; no mutable worker reuse was introduced.",
+        "The existing runner labels this module acceptance_slow while preserving the acceptance tier and bounded parallel execution."
+      ],
+      "action": "retain canonical acceptance coverage; route visibly through acceptance_slow label",
+      "overlap": "Compared with behavior_fixture_parity: fixture families and schemas differ; preserving both catches migration/parity loss at separate catalog boundaries."
+    },
+    "tools/semantic_harness/tests/test_harness.py": {
+      "classification": "KEEP_CANONICAL",
+      "finalDisposition": "retained_acceptance_slow_reviewed",
+      "productionSubjectsInspected": [
+        "LuaSemanticWorker, LuaProcess, HarnessConfig, scenario save/load, transport and lifecycle"
+      ],
+      "callersInspected": [
+        "tools/semantic_harness/testing/python_runner.py",
+        "the imported production-Lua worker/fixture/UI subjects recorded in the module review"
+      ],
+      "authorityBoundary": [
+        "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review"
+      ],
+      "assertionPurpose": {
+        "testMethods": [
+          "test_worker_loads_production_modules_and_parses_greeting",
+          "test_scenario_save_round_trip_preserves_editable_runtime_state",
+          "test_semantic_inventory_query_uses_editable_npc_inventory",
+          "test_news_questions_use_gossip_semantics_not_inventory",
+          "test_gift_uses_editable_player_inventory_and_mutates_npc_projection",
+          "test_worker_can_restart_and_restore_the_current_scenario",
+          "test_actual_player_name_uses_authoritative_identity_exchange",
+          "test_natural_identity_phrases_use_the_actual_character_name",
+          "test_profile_forename_phrase_is_authoritative_not_display_name",
+          "test_false_name_does_not_disclose_npc_name",
+          "test_topic_change_after_name_question_preserves_pending_exchange",
+          "test_self_reflection_is_not_an_insult_and_directed_insult_is",
+          "test_self_blame_stays_self_directed",
+          "test_self_reflection_response_uses_trait_style",
+          "test_first_person_state_is_not_identity_claim",
+          "test_real_tagalog_tool_catalog_and_live_language_switch",
+          "test_tagalog_identity_exchange_uses_canonical_npc_translation",
+          "test_tagalog_semantic_identity_and_self_reflection_use_catalogs",
+          "test_action_boundary_uses_configurable_mock_and_reports_tools",
+          "test_worker_reports_grounded_module_manifest_and_translation_state",
+          "test_process_correlates_requests_and_serializes_concurrent_callers",
+          "test_process_timeout_fails_fast_and_terminates_the_worker",
+          "test_case_runner_returns_turns_and_ignores_transport_mirrors",
+          "test_conflict_ledger_detects_duplicate_authoritative_events"
+        ],
+        "workerConstructors": 23,
+        "fixtureExecutors": 0
+      },
+      "overlapCandidates": [
+        "test_response_observatory_matrix",
+        "test_sweep_acceptance",
+        "test_observatory_fixture_parity",
+        "test_contextual_talk_parity",
+        "test_behavior_fixture_parity",
+        "test_contextual_social_reactions"
+      ],
+      "overlapReview": "Compared with all contextual tests: this validates worker boot/process/transport/session contracts; contextual modules consume that worker and cannot replace its lifecycle checks.",
+      "legacyMigration": {
+        "historyTip": "6fa471de Refactor semantic harness tests and UI components",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "cost": {
+        "elapsedSeconds": 93.41526889999977,
+        "testCount": 24,
+        "baselineClassification": "parallel",
+        "afterClassification": "acceptance_slow"
+      },
+      "evidence": [
+        "Final developer acceptance report /tmp/hoomans-r6-python-final2.json recorded PASS in 93.41526889999977 seconds for 24 test methods.",
+        "Inspected production/fixture subjects: LuaSemanticWorker, LuaProcess, HarnessConfig, scenario save/load, transport and lifecycle.",
+        "Compared overlap: Compared with all contextual tests: this validates worker boot/process/transport/session contracts; contextual modules consume that worker and cannot replace its lifecycle checks.",
+        "Worker/fixture isolation counts: {'path': 'tools/semantic_harness/tests/test_harness.py', 'testMethods': ['test_worker_loads_production_modules_and_parses_greeting', 'test_scenario_save_round_trip_preserves_editable_runtime_state', 'test_semantic_inventory_query_uses_editable_npc_inventory', 'test_news_questions_use_gossip_semantics_not_inventory', 'test_gift_uses_editable_player_inventory_and_mutates_npc_projection', 'test_worker_can_restart_and_restore_the_current_scenario', 'test_actual_player_name_uses_authoritative_identity_exchange', 'test_natural_identity_phrases_use_the_actual_character_name', 'test_profile_forename_phrase_is_authoritative_not_display_name', 'test_false_name_does_not_disclose_npc_name', 'test_topic_change_after_name_question_preserves_pending_exchange', 'test_self_reflection_is_not_an_insult_and_directed_insult_is', 'test_self_blame_stays_self_directed', 'test_self_reflection_response_uses_trait_style', 'test_first_person_state_is_not_identity_claim', 'test_real_tagalog_tool_catalog_and_live_language_switch', 'test_tagalog_identity_exchange_uses_canonical_npc_translation', 'test_tagalog_semantic_identity_and_self_reflection_use_catalogs', 'test_action_boundary_uses_configurable_mock_and_reports_tools', 'test_worker_reports_grounded_module_manifest_and_translation_state', 'test_process_correlates_requests_and_serializes_concurrent_callers', 'test_process_timeout_fails_fast_and_terminates_the_worker', 'test_case_runner_returns_turns_and_ignores_transport_mirrors', 'test_conflict_ledger_detects_duplicate_authoritative_events'], 'workerConstructors': 23, 'fixtureExecutors': 0, 'fixtureLoaders': 0, 'setUpClass': False, 'productionLuaBoundary': True, 'history': '6fa471de Refactor semantic harness tests and UI components'}; no mutable worker reuse was introduced.",
+        "The existing runner labels this module acceptance_slow while preserving the acceptance tier and bounded parallel execution."
+      ],
+      "action": "retain canonical acceptance coverage; route visibly through acceptance_slow label",
+      "overlap": "Compared with all contextual tests: this validates worker boot/process/transport/session contracts; contextual modules consume that worker and cannot replace its lifecycle checks."
+    },
+    "tools/semantic_harness/tests/test_contextual_talk_parity.py": {
+      "classification": "KEEP_CANONICAL",
+      "finalDisposition": "retained_acceptance_slow_reviewed",
+      "productionSubjectsInspected": [
+        "production native Talk presentation projection and Semantic Lab Tk adapter projection"
+      ],
+      "callersInspected": [
+        "tools/semantic_harness/testing/python_runner.py",
+        "the imported production-Lua worker/fixture/UI subjects recorded in the module review"
+      ],
+      "authorityBoundary": [
+        "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review"
+      ],
+      "assertionPurpose": {
+        "testMethods": [
+          "test_production_native_conversation_parity_record",
+          "test_catalog_is_production_owned_and_truthful",
+          "test_matrix_uses_native_target_facts_and_restores_base_scenario",
+          "test_native_and_harness_enter_the_shared_talk_start_projection",
+          "test_production_projection_exposes_exact_presented_session_rows",
+          "test_open_returns_bounded_projection_for_large_saved_world",
+          "test_primary_renderer_adapter_preserves_production_row_order_and_frames",
+          "test_primary_click_uses_exact_production_frame_and_reprojects",
+          "test_production_frame_rejection_is_stale_or_replayed_without_mutation",
+          "test_unpresented_production_frame_is_rejected_without_mutation",
+          "test_close_and_explicit_reopen_follow_the_same_production_session",
+          "test_typed_emote_suspend_resume_share_the_production_semantic_state",
+          "test_landing_projection_keeps_shortcut_and_back_target_after_hub_turn",
+          "test_owned_companion_uses_known_identity_policy",
+          "test_talk_something_else_returns_to_landing_with_navigation_reply",
+          "test_cli_exposes_the_same_talk_operations",
+          "test_unavailable_current_target_reports_reason_and_restores_scenario",
+          "test_trader_capability_is_an_overlay_on_the_talk_target",
+          "test_en_tl_keep_talk_routes_and_semantic_choices_identical",
+          "test_recruitment_shortcut_and_typed_input_use_production_result_path",
+          "test_recruitment_authority_reads_staged_relationship_and_assigns_member",
+          "test_tk_talk_parity_surface_runs_the_real_worker"
+        ],
+        "workerConstructors": 23,
+        "fixtureExecutors": 0
+      },
+      "overlapCandidates": [
+        "test_response_observatory_matrix",
+        "test_sweep_acceptance",
+        "test_observatory_fixture_parity",
+        "test_harness",
+        "test_behavior_fixture_parity",
+        "test_contextual_social_reactions"
+      ],
+      "overlapReview": "Compared with response observatory and UI tests: this is the explicit production-Lua-to-adapter parity boundary and retains per-row identity/order checks.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "cost": {
+        "elapsedSeconds": 81.17225785399978,
+        "testCount": 22,
+        "baselineClassification": "parallel",
+        "afterClassification": "acceptance_slow"
+      },
+      "evidence": [
+        "Final developer acceptance report /tmp/hoomans-r6-python-final2.json recorded PASS in 81.17225785399978 seconds for 22 test methods.",
+        "Inspected production/fixture subjects: production native Talk presentation projection and Semantic Lab Tk adapter projection.",
+        "Compared overlap: Compared with response observatory and UI tests: this is the explicit production-Lua-to-adapter parity boundary and retains per-row identity/order checks.",
+        "Worker/fixture isolation counts: {'path': 'tools/semantic_harness/tests/test_contextual_talk_parity.py', 'testMethods': ['test_production_native_conversation_parity_record', 'test_catalog_is_production_owned_and_truthful', 'test_matrix_uses_native_target_facts_and_restores_base_scenario', 'test_native_and_harness_enter_the_shared_talk_start_projection', 'test_production_projection_exposes_exact_presented_session_rows', 'test_open_returns_bounded_projection_for_large_saved_world', 'test_primary_renderer_adapter_preserves_production_row_order_and_frames', 'test_primary_click_uses_exact_production_frame_and_reprojects', 'test_production_frame_rejection_is_stale_or_replayed_without_mutation', 'test_unpresented_production_frame_is_rejected_without_mutation', 'test_close_and_explicit_reopen_follow_the_same_production_session', 'test_typed_emote_suspend_resume_share_the_production_semantic_state', 'test_landing_projection_keeps_shortcut_and_back_target_after_hub_turn', 'test_owned_companion_uses_known_identity_policy', 'test_talk_something_else_returns_to_landing_with_navigation_reply', 'test_cli_exposes_the_same_talk_operations', 'test_unavailable_current_target_reports_reason_and_restores_scenario', 'test_trader_capability_is_an_overlay_on_the_talk_target', 'test_en_tl_keep_talk_routes_and_semantic_choices_identical', 'test_recruitment_shortcut_and_typed_input_use_production_result_path', 'test_recruitment_authority_reads_staged_relationship_and_assigns_member', 'test_tk_talk_parity_surface_runs_the_real_worker'], 'workerConstructors': 23, 'fixtureExecutors': 0, 'fixtureLoaders': 0, 'setUpClass': False, 'productionLuaBoundary': True, 'history': '9ed916e9 refactor(semantics): remove milestone and legacy naming'}; no mutable worker reuse was introduced.",
+        "The existing runner labels this module acceptance_slow while preserving the acceptance tier and bounded parallel execution."
+      ],
+      "action": "retain canonical acceptance coverage; route visibly through acceptance_slow label",
+      "overlap": "Compared with response observatory and UI tests: this is the explicit production-Lua-to-adapter parity boundary and retains per-row identity/order checks."
+    },
+    "tools/semantic_harness/tests/test_behavior_fixture_parity.py": {
+      "classification": "KEEP_CANONICAL",
+      "finalDisposition": "retained_acceptance_slow_reviewed",
+      "productionSubjectsInspected": [
+        "fixtures/v1/behavior command/question/social/inventory catalogs and executor"
+      ],
+      "callersInspected": [
+        "tools/semantic_harness/testing/python_runner.py",
+        "the imported production-Lua worker/fixture/UI subjects recorded in the module review"
+      ],
+      "authorityBoundary": [
+        "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review"
+      ],
+      "assertionPurpose": {
+        "testMethods": [
+          "test_commands_fixtures",
+          "test_questions_fixtures",
+          "test_social_dialogue_fixtures",
+          "test_inventory_dialogue_fixtures"
+        ],
+        "workerConstructors": 0,
+        "fixtureExecutors": 4
+      },
+      "overlapCandidates": [
+        "test_response_observatory_matrix",
+        "test_sweep_acceptance",
+        "test_observatory_fixture_parity",
+        "test_harness",
+        "test_contextual_talk_parity",
+        "test_contextual_social_reactions"
+      ],
+      "overlapReview": "Compared with observatory fixtures: the behavior migration catalog has separate case ownership and broad command/question coverage; no equal assertion matrix was proven.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "cost": {
+        "elapsedSeconds": 70.162674273,
+        "testCount": 4,
+        "baselineClassification": "parallel",
+        "afterClassification": "acceptance_slow"
+      },
+      "evidence": [
+        "Final developer acceptance report /tmp/hoomans-r6-python-final2.json recorded PASS in 70.162674273 seconds for 4 test methods.",
+        "Inspected production/fixture subjects: fixtures/v1/behavior command/question/social/inventory catalogs and executor.",
+        "Compared overlap: Compared with observatory fixtures: the behavior migration catalog has separate case ownership and broad command/question coverage; no equal assertion matrix was proven.",
+        "Worker/fixture isolation counts: {'path': 'tools/semantic_harness/tests/test_behavior_fixture_parity.py', 'testMethods': ['test_commands_fixtures', 'test_questions_fixtures', 'test_social_dialogue_fixtures', 'test_inventory_dialogue_fixtures'], 'workerConstructors': 0, 'fixtureExecutors': 4, 'fixtureLoaders': 4, 'setUpClass': False, 'productionLuaBoundary': False, 'history': '9ed916e9 refactor(semantics): remove milestone and legacy naming'}; no mutable worker reuse was introduced.",
+        "The existing runner labels this module acceptance_slow while preserving the acceptance tier and bounded parallel execution."
+      ],
+      "action": "retain canonical acceptance coverage; route visibly through acceptance_slow label",
+      "overlap": "Compared with observatory fixtures: the behavior migration catalog has separate case ownership and broad command/question coverage; no equal assertion matrix was proven."
+    },
+    "tools/semantic_harness/tests/test_contextual_social_reactions.py": {
+      "classification": "KEEP_CANONICAL",
+      "finalDisposition": "retained_acceptance_slow_reviewed",
+      "productionSubjectsInspected": [
+        "production worker social reaction routing, relationship state, authority, transport/tool-call suppression"
+      ],
+      "callersInspected": [
+        "tools/semantic_harness/testing/python_runner.py",
+        "the imported production-Lua worker/fixture/UI subjects recorded in the module review"
+      ],
+      "authorityBoundary": [
+        "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review"
+      ],
+      "assertionPurpose": {
+        "testMethods": [
+          "test_apology_uses_relationship_emotion_and_explicit_precedence",
+          "test_existing_social_reactions_remain_local_and_contextual",
+          "test_insults_use_the_authoritative_social_boundary_and_visible_response",
+          "test_typoed_hostility_keeps_recognized_social_route",
+          "test_rejected_and_unavailable_insults_are_truthful_and_social_specific",
+          "test_self_directed_insult_does_not_dispatch_social_authority",
+          "test_social_rejection_translation_is_available_in_tl",
+          "test_threat_uses_guarded_emotion_relationship_and_precedence",
+          "test_offer_uses_emotion_hunger_and_social_context",
+          "test_dispute_uses_guarded_context_and_preserves_pending_authority",
+          "test_apology_preview_is_idempotent_without_relationship_effect",
+          "test_insult_preview_is_pure_and_does_not_emit_social_effects"
+        ],
+        "workerConstructors": 14,
+        "fixtureExecutors": 0
+      },
+      "overlapCandidates": [
+        "test_response_observatory_matrix",
+        "test_sweep_acceptance",
+        "test_observatory_fixture_parity",
+        "test_harness",
+        "test_contextual_talk_parity",
+        "test_behavior_fixture_parity"
+      ],
+      "overlapReview": "Compared with contextual_speech_behavior: social reaction decision/authority cases and speech-family realization variants are different contracts.",
+      "legacyMigration": {
+        "historyTip": "c5972ce8 refactor(arch): complete P5-P8 domain context architecture refactor",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "cost": {
+        "elapsedSeconds": 69.72585569600005,
+        "testCount": 12,
+        "baselineClassification": "parallel",
+        "afterClassification": "acceptance_slow"
+      },
+      "evidence": [
+        "Final developer acceptance report /tmp/hoomans-r6-python-final2.json recorded PASS in 69.72585569600005 seconds for 12 test methods.",
+        "Inspected production/fixture subjects: production worker social reaction routing, relationship state, authority, transport/tool-call suppression.",
+        "Compared overlap: Compared with contextual_speech_behavior: social reaction decision/authority cases and speech-family realization variants are different contracts.",
+        "Worker/fixture isolation counts: {'path': 'tools/semantic_harness/tests/test_contextual_social_reactions.py', 'testMethods': ['test_apology_uses_relationship_emotion_and_explicit_precedence', 'test_existing_social_reactions_remain_local_and_contextual', 'test_insults_use_the_authoritative_social_boundary_and_visible_response', 'test_typoed_hostility_keeps_recognized_social_route', 'test_rejected_and_unavailable_insults_are_truthful_and_social_specific', 'test_self_directed_insult_does_not_dispatch_social_authority', 'test_social_rejection_translation_is_available_in_tl', 'test_threat_uses_guarded_emotion_relationship_and_precedence', 'test_offer_uses_emotion_hunger_and_social_context', 'test_dispute_uses_guarded_context_and_preserves_pending_authority', 'test_apology_preview_is_idempotent_without_relationship_effect', 'test_insult_preview_is_pure_and_does_not_emit_social_effects'], 'workerConstructors': 14, 'fixtureExecutors': 0, 'fixtureLoaders': 0, 'setUpClass': False, 'productionLuaBoundary': True, 'history': 'c5972ce8 refactor(arch): complete P5-P8 domain context architecture refactor'}; no mutable worker reuse was introduced.",
+        "The existing runner labels this module acceptance_slow while preserving the acceptance tier and bounded parallel execution."
+      ],
+      "action": "retain canonical acceptance coverage; route visibly through acceptance_slow label",
+      "overlap": "Compared with contextual_speech_behavior: social reaction decision/authority cases and speech-family realization variants are different contracts."
+    },
+    "tools/semantic_harness/tests/test_contextual_speech_behavior.py": {
+      "classification": "KEEP_CANONICAL",
+      "finalDisposition": "retained_acceptance_slow_reviewed",
+      "productionSubjectsInspected": [
+        "production worker speech-family realization across personality, relationship, bond, and language variants"
+      ],
+      "callersInspected": [
+        "tools/semantic_harness/testing/python_runner.py",
+        "the imported production-Lua worker/fixture/UI subjects recorded in the module review"
+      ],
+      "authorityBoundary": [
+        "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review"
+      ],
+      "assertionPurpose": {
+        "testMethods": [
+          "test_non_greeting_production_families_have_visible_variants",
+          "test_refusal_reuse_does_not_turn_authoritative_no_into_acknowledgement",
+          "test_bond_terms_are_whole_phrase_arguments_and_standing_independent",
+          "test_tl_keeps_semantic_identity_and_localizes_bond_term",
+          "test_production_catalog_exposes_machine_readable_realization_coverage"
+        ],
+        "workerConstructors": 3,
+        "fixtureExecutors": 0
+      },
+      "overlapCandidates": [
+        "test_response_observatory_matrix",
+        "test_sweep_acceptance",
+        "test_observatory_fixture_parity",
+        "test_harness",
+        "test_contextual_talk_parity",
+        "test_behavior_fixture_parity"
+      ],
+      "overlapReview": "Compared with contextual_social_reactions: wording-family realization remains distinct from social-reaction decision and transport assertions.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "cost": {
+        "elapsedSeconds": 53.203550691000146,
+        "testCount": 5,
+        "baselineClassification": "parallel",
+        "afterClassification": "exclusive"
+      },
+      "evidence": [
+        "Final developer acceptance report /tmp/hoomans-r6-python-final2.json recorded PASS in 53.203550691000146 seconds for 5 test methods.",
+        "Inspected production/fixture subjects: production worker speech-family realization across personality, relationship, bond, and language variants.",
+        "Compared overlap: Compared with contextual_social_reactions: wording-family realization remains distinct from social-reaction decision and transport assertions.",
+        "Worker/fixture isolation counts: {'path': 'tools/semantic_harness/tests/test_contextual_speech_behavior.py', 'testMethods': ['test_non_greeting_production_families_have_visible_variants', 'test_refusal_reuse_does_not_turn_authoritative_no_into_acknowledgement', 'test_bond_terms_are_whole_phrase_arguments_and_standing_independent', 'test_tl_keeps_semantic_identity_and_localizes_bond_term', 'test_production_catalog_exposes_machine_readable_realization_coverage'], 'workerConstructors': 3, 'fixtureExecutors': 0, 'fixtureLoaders': 0, 'setUpClass': False, 'productionLuaBoundary': True, 'history': '9ed916e9 refactor(semantics): remove milestone and legacy naming'}; no mutable worker reuse was introduced.",
+        "The existing runner routes this module through the exclusive acceptance resource lane after the isolated rerun proved scheduler-sensitive parallel failures."
+      ],
+      "action": "retain canonical acceptance coverage; route visibly through acceptance_slow label",
+      "overlap": "Compared with contextual_social_reactions: wording-family realization remains distinct from social-reaction decision and transport assertions."
+    },
+    "tools/semantic_harness/tests/test_automatic_flow_generation.py": {
+      "classification": "KEEP_CANONICAL",
+      "finalDisposition": "retained_acceptance_slow_reviewed",
+      "productionSubjectsInspected": [
+        "measured slow acceptance module; source inspected directly"
+      ],
+      "callersInspected": [
+        "tools/semantic_harness/testing/python_runner.py",
+        "the imported production-Lua worker/fixture/UI subjects recorded in the module review"
+      ],
+      "authorityBoundary": [
+        "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review"
+      ],
+      "assertionPurpose": {
+        "testMethods": [
+          "test_live_coverage_generates_follow_and_stay_from_one_template",
+          "test_parameterized_task_template_generates_wait_at_and_fetch",
+          "test_all_dispatchable_registered_capabilities_use_existing_handlers",
+          "test_parameterized_task_result_branches_and_gate_are_truthful",
+          "test_real_worker_records_result_nodes_and_one_dispatch",
+          "test_generated_simple_command_uses_relationship_and_personality_context",
+          "test_generated_simple_command_uses_bounded_previous_action_memory",
+          "test_denied_failed_and_context_gate_are_truthful",
+          "test_preview_is_pure_and_generation_survives_restart",
+          "test_authoritative_gossip_memory_reaches_response_selection_in_en_and_tl",
+          "test_authoritative_gossip_is_target_scoped_across_repeated_renamed_and_unavailable_targets"
+        ],
+        "workerConstructors": 20,
+        "fixtureExecutors": 0
+      },
+      "overlapCandidates": [
+        "test_response_observatory_matrix",
+        "test_sweep_acceptance",
+        "test_observatory_fixture_parity",
+        "test_harness",
+        "test_contextual_talk_parity",
+        "test_behavior_fixture_parity"
+      ],
+      "overlapReview": "Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven.",
+      "legacyMigration": {
+        "historyTip": "0a4c401e test: align semantic fixtures with current public meaning contracts",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "cost": {
+        "elapsedSeconds": 57.43724299700011,
+        "testCount": 11,
+        "baselineClassification": "parallel",
+        "afterClassification": "acceptance_slow"
+      },
+      "evidence": [
+        "Final developer acceptance report /tmp/hoomans-r6-python-final2.json recorded PASS in 57.43724299700011 seconds for 11 test methods.",
+        "Inspected production/fixture subjects: measured slow acceptance module; source inspected directly.",
+        "Compared overlap: Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven.",
+        "Worker/fixture isolation counts: {'path': 'tools/semantic_harness/tests/test_automatic_flow_generation.py', 'testMethods': ['test_live_coverage_generates_follow_and_stay_from_one_template', 'test_parameterized_task_template_generates_wait_at_and_fetch', 'test_all_dispatchable_registered_capabilities_use_existing_handlers', 'test_parameterized_task_result_branches_and_gate_are_truthful', 'test_real_worker_records_result_nodes_and_one_dispatch', 'test_generated_simple_command_uses_relationship_and_personality_context', 'test_generated_simple_command_uses_bounded_previous_action_memory', 'test_denied_failed_and_context_gate_are_truthful', 'test_preview_is_pure_and_generation_survives_restart', 'test_authoritative_gossip_memory_reaches_response_selection_in_en_and_tl', 'test_authoritative_gossip_is_target_scoped_across_repeated_renamed_and_unavailable_targets'], 'workerConstructors': 20, 'fixtureExecutors': 0, 'fixtureLoaders': 0, 'setUpClass': False, 'productionLuaBoundary': True, 'history': '0a4c401e test: align semantic fixtures with current public meaning contracts'}; no mutable worker reuse was introduced.",
+        "The existing runner labels this module acceptance_slow while preserving the acceptance tier and bounded parallel execution."
+      ],
+      "action": "retain canonical acceptance coverage; route visibly through acceptance_slow label",
+      "overlap": "Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven."
+    },
+    "tools/semantic_harness/tests/test_pilot_parity.py": {
+      "classification": "KEEP_CANONICAL",
+      "finalDisposition": "retained_acceptance_slow_reviewed",
+      "productionSubjectsInspected": [
+        "measured slow acceptance module; source inspected directly"
+      ],
+      "callersInspected": [
+        "tools/semantic_harness/testing/python_runner.py",
+        "the imported production-Lua worker/fixture/UI subjects recorded in the module review"
+      ],
+      "authorityBoundary": [
+        "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review"
+      ],
+      "assertionPurpose": {
+        "testMethods": [
+          "test_whats_up_pilot_fixture_passes_with_full_parity",
+          "test_wellbeing_pilot_fixture_passes_with_full_parity",
+          "test_identity_collision_pilot_fixture_passes_with_full_parity",
+          "test_language_variants_pilot_fixture_passes_with_full_parity",
+          "test_negative_controls_pilot_fixture_passes_with_full_parity"
+        ],
+        "workerConstructors": 0,
+        "fixtureExecutors": 5
+      },
+      "overlapCandidates": [
+        "test_response_observatory_matrix",
+        "test_sweep_acceptance",
+        "test_observatory_fixture_parity",
+        "test_harness",
+        "test_contextual_talk_parity",
+        "test_behavior_fixture_parity"
+      ],
+      "overlapReview": "Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven.",
+      "legacyMigration": {
+        "historyTip": "8b251fe7 feat(semantic-test): migrate pilot behavioral fixtures with verified legacy parity (P2)",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "cost": {
+        "elapsedSeconds": 60.07827630200018,
+        "testCount": 5,
+        "baselineClassification": "parallel",
+        "afterClassification": "acceptance_slow"
+      },
+      "evidence": [
+        "Final developer acceptance report /tmp/hoomans-r6-python-final2.json recorded PASS in 60.07827630200018 seconds for 5 test methods.",
+        "Inspected production/fixture subjects: measured slow acceptance module; source inspected directly.",
+        "Compared overlap: Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven.",
+        "Worker/fixture isolation counts: {'path': 'tools/semantic_harness/tests/test_pilot_parity.py', 'testMethods': ['test_whats_up_pilot_fixture_passes_with_full_parity', 'test_wellbeing_pilot_fixture_passes_with_full_parity', 'test_identity_collision_pilot_fixture_passes_with_full_parity', 'test_language_variants_pilot_fixture_passes_with_full_parity', 'test_negative_controls_pilot_fixture_passes_with_full_parity'], 'workerConstructors': 0, 'fixtureExecutors': 5, 'fixtureLoaders': 5, 'setUpClass': False, 'productionLuaBoundary': False, 'history': '8b251fe7 feat(semantic-test): migrate pilot behavioral fixtures with verified legacy parity (P2)'}; no mutable worker reuse was introduced.",
+        "The existing runner labels this module acceptance_slow while preserving the acceptance tier and bounded parallel execution."
+      ],
+      "action": "retain canonical acceptance coverage; route visibly through acceptance_slow label",
+      "overlap": "Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven."
+    },
+    "tools/semantic_harness/tests/test_contextual_suggestions_s4.py": {
+      "classification": "KEEP_CANONICAL",
+      "finalDisposition": "retained_acceptance_slow_reviewed",
+      "productionSubjectsInspected": [
+        "measured slow acceptance module; source inspected directly"
+      ],
+      "callersInspected": [
+        "tools/semantic_harness/testing/python_runner.py",
+        "the imported production-Lua worker/fixture/UI subjects recorded in the module review"
+      ],
+      "authorityBoundary": [
+        "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review"
+      ],
+      "assertionPurpose": {
+        "testMethods": [
+          "test_topic_combobox_uses_the_worker_group_click_contract",
+          "test_existing_lab_renders_inspects_and_clicks_production_suggestions",
+          "test_identity_lie_choice_stays_in_inspect_until_native_session",
+          "test_whats_up_gui_activates_hub_without_a_conversation_graph",
+          "test_npc_profile_selection_is_staged_until_workbench_apply",
+          "test_simulation_layout_at_minimum_size_keeps_runtime_controls_visible",
+          "test_simulation_layout_at_normal_desktop_size"
+        ],
+        "workerConstructors": 0,
+        "fixtureExecutors": 0
+      },
+      "overlapCandidates": [
+        "test_response_observatory_matrix",
+        "test_sweep_acceptance",
+        "test_observatory_fixture_parity",
+        "test_harness",
+        "test_contextual_talk_parity",
+        "test_behavior_fixture_parity"
+      ],
+      "overlapReview": "Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "cost": {
+        "elapsedSeconds": 54.089751665999756,
+        "testCount": 7,
+        "baselineClassification": "parallel",
+        "afterClassification": "acceptance_slow"
+      },
+      "evidence": [
+        "Final developer acceptance report /tmp/hoomans-r6-python-final2.json recorded PASS in 54.089751665999756 seconds for 7 test methods.",
+        "Inspected production/fixture subjects: measured slow acceptance module; source inspected directly.",
+        "Compared overlap: Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven.",
+        "Worker/fixture isolation counts: {'path': 'tools/semantic_harness/tests/test_contextual_suggestions_s4.py', 'testMethods': ['test_topic_combobox_uses_the_worker_group_click_contract', 'test_existing_lab_renders_inspects_and_clicks_production_suggestions', 'test_identity_lie_choice_stays_in_inspect_until_native_session', 'test_whats_up_gui_activates_hub_without_a_conversation_graph', 'test_npc_profile_selection_is_staged_until_workbench_apply', 'test_simulation_layout_at_minimum_size_keeps_runtime_controls_visible', 'test_simulation_layout_at_normal_desktop_size'], 'workerConstructors': 0, 'fixtureExecutors': 0, 'fixtureLoaders': 0, 'setUpClass': False, 'productionLuaBoundary': True, 'history': '9ed916e9 refactor(semantics): remove milestone and legacy naming'}; no mutable worker reuse was introduced.",
+        "The existing runner labels this module acceptance_slow while preserving the acceptance tier and bounded parallel execution."
+      ],
+      "action": "retain canonical acceptance coverage; route visibly through acceptance_slow label",
+      "overlap": "Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven."
+    },
+    "tools/semantic_harness/tests/test_contextual_bonds.py": {
+      "classification": "KEEP_CANONICAL",
+      "finalDisposition": "retained_acceptance_slow_reviewed",
+      "productionSubjectsInspected": [
+        "measured slow acceptance module; source inspected directly"
+      ],
+      "callersInspected": [
+        "tools/semantic_harness/testing/python_runner.py",
+        "the imported production-Lua worker/fixture/UI subjects recorded in the module review"
+      ],
+      "authorityBoundary": [
+        "production-Lua worker, fixture executor, presentation adapter, or acceptance subsystem as named by the subject review"
+      ],
+      "assertionPurpose": {
+        "testMethods": [
+          "test_required_kinds_map_to_coarse_classes_without_losing_detail",
+          "test_bond_is_independent_of_directed_relationship_standing",
+          "test_relationship_state_is_derived_by_production_thresholds",
+          "test_normal_lab_settings_do_not_edit_or_persist_derived_state_or_class",
+          "test_relationship_terms_are_language_localized_without_changing_kind_or_keys",
+          "test_future_family_subtype_uses_registry_and_family_projection"
+        ],
+        "workerConstructors": 4,
+        "fixtureExecutors": 0
+      },
+      "overlapCandidates": [
+        "test_response_observatory_matrix",
+        "test_sweep_acceptance",
+        "test_observatory_fixture_parity",
+        "test_harness",
+        "test_contextual_talk_parity",
+        "test_behavior_fixture_parity"
+      ],
+      "overlapReview": "Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven.",
+      "legacyMigration": {
+        "historyTip": "9ed916e9 refactor(semantics): remove milestone and legacy naming",
+        "review": "current acceptance/fixture/worker subject inspected; no retired-only path identified"
+      },
+      "cost": {
+        "elapsedSeconds": 48.10222296899997,
+        "testCount": 6,
+        "baselineClassification": "parallel",
+        "afterClassification": "acceptance_slow"
+      },
+      "evidence": [
+        "Final developer acceptance report /tmp/hoomans-r6-python-final2.json recorded PASS in 48.10222296899997 seconds for 6 test methods.",
+        "Inspected production/fixture subjects: measured slow acceptance module; source inspected directly.",
+        "Compared overlap: Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven.",
+        "Worker/fixture isolation counts: {'path': 'tools/semantic_harness/tests/test_contextual_bonds.py', 'testMethods': ['test_required_kinds_map_to_coarse_classes_without_losing_detail', 'test_bond_is_independent_of_directed_relationship_standing', 'test_relationship_state_is_derived_by_production_thresholds', 'test_normal_lab_settings_do_not_edit_or_persist_derived_state_or_class', 'test_relationship_terms_are_language_localized_without_changing_kind_or_keys', 'test_future_family_subtype_uses_registry_and_family_projection'], 'workerConstructors': 4, 'fixtureExecutors': 0, 'fixtureLoaders': 0, 'setUpClass': False, 'productionLuaBoundary': True, 'history': '9ed916e9 refactor(semantics): remove milestone and legacy naming'}; no mutable worker reuse was introduced.",
+        "The existing runner labels this module acceptance_slow while preserving the acceptance tier and bounded parallel execution."
+      ],
+      "action": "retain canonical acceptance coverage; route visibly through acceptance_slow label",
+      "overlap": "Compared adjacent acceptance modules by subject and test method; no parity-equivalent replacement was proven."
+    }
+  },
+  "actions": {
+    "merges": 0,
+    "deletions": 0,
+    "workerReuse": 0,
+    "tierMoves": 0,
+    "topologyChange": "Added explicit acceptance_slow labels and routed the ten modules that failed only under parallel contention through the existing exclusive lane; worker isolation remains intact.",
+    "resourceSensitiveModules": [
+      "test_c7f_dataset_precision",
+      "test_coherent_conversation_c8",
+      "test_contextual_acceptance_c6b",
+      "test_contextual_conversation_c4a",
+      "test_contextual_conversation_c4b",
+      "test_contextual_conversation_c4c",
+      "test_contextual_conversation_c4d",
+      "test_contextual_provider_parity_c6c",
+      "test_contextual_speech_behavior",
+      "test_contextual_suggestions_whats_up"
+    ],
+    "reason": "Measured cost is real production-Lua/fixture execution, not redundant assertion repetition. Ten modules passed serial focused rerun after scheduler-sensitive parallel failures; the final full lane passed with the existing exclusive runner mechanism."
+  }
+}

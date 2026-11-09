@@ -72,19 +72,37 @@ local function bodyConflictsWithSnapshot(body, snapshot, id)
     if not body then
         return true
     end
+    -- A census index is only a hint: PZ can detach and recycle the same Java
+    -- object between scans. Presentation must never recreate identity on an
+    -- anonymous recycled zombie from a stale cached pointer.
+    if (body.isDead and body:isDead())
+        or (body.getCurrentSquare and body:getCurrentSquare() == nil)
+    then
+        return true
+    end
     modData = body.getModData and body:getModData() or nil
     bodyID = modData and modData.PNC_UUID or nil
-    if modData and modData.PNC_NPC == true
-        and bodyID ~= nil
-        and tostring(bodyID) ~= tostring(id)
+    if not modData or modData.PNC_NPC ~= true
+        or bodyID == nil or tostring(bodyID) ~= tostring(id)
+        or modData.PNC_BodyKind == "corpse"
+        or modData.PNC_DeathMarkerID ~= nil
+    then
+        return true
+    end
+    -- This registry serves local authority presentation; MP admission uses
+    -- MultiplayerBodyBinding. A superseded live object must not win over the
+    -- authority's current body merely because an older snapshot still fits.
+    local authorityRegistry = PNC and PNC.Registry
+    if authorityRegistry and authorityRegistry.GetLiveZombie
+        and authorityRegistry.GetLiveZombie(id) ~= body
     then
         return true
     end
     expectedLease = snapshot and snapshot.liveBodyLease or nil
     bodyLease = modData and modData.PNC_BodyLease or nil
     return expectedLease ~= nil
-        and bodyLease ~= nil
-        and tostring(expectedLease) ~= tostring(bodyLease)
+        and (bodyLease == nil
+            or tostring(expectedLease) ~= tostring(bodyLease))
 end
 
 local function resolveIndexedBody(index, key, snapshot, id)

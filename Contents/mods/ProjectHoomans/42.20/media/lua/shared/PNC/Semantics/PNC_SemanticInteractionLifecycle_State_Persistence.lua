@@ -82,10 +82,4 @@ function Lifecycle.Import(store, payload)
     return true
 end
 
-Lifecycle.Internal = Lifecycle.Internal or {}
-Lifecycle.Internal.PairKey = pairKey
-Lifecycle.Internal.HasDurableMeaning = hasDurableMeaning
-Lifecycle.Internal.ApproximateSize = approximateSize
-
-
 return Lifecycle

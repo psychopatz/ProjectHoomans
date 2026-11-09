@@ -24,6 +24,14 @@ local GENERIC_RELATION_FIELDS = {
     schemaVersion = true,
 }
 
+local function hasEntries(value)
+    if type(value) ~= "table" then return false end
+    for _ in pairs(value) do
+        return true
+    end
+    return false
+end
+
 local function relationDetails(relation)
     local output = {}
     for key, value in pairs(
@@ -43,7 +51,7 @@ local function factionExtension(faction)
             and faction.relations or {}
     ) do
         local extra = relationDetails(relation)
-        if next(extra) ~= nil then details[targetID] = extra end
+        if hasEntries(extra) then details[targetID] = extra end
     end
     return {
         ownerPlayerKey = faction.ownerPlayerKey,

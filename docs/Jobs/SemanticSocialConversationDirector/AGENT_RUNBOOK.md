@@ -2,15 +2,9 @@
 
 ## Read order
 
-Read root `AGENTS.md`, then:
-1. `README.md`;
-2. `ARCHITECTURE.md`;
-3. this `AGENT_RUNBOOK.md`;
-4. `ROADMAP.md`;
-5. `HARNESS_ACCEPTANCE.md` while implementing/testing;
-6. `PROGRESS.md` last.
+Use progressive disclosure. Read root `AGENTS.md`, then `PROGRESS.md`, then `HANDOFF.md` last among bootstrap-state docs and verify its checkpoint before trusting it. Read this runbook for durable procedure. Open only the ROADMAP/ARCHITECTURE section for the implicated Social Director layer.
 
-Use `AUDIT.md` for revision-specific starting evidence.
+Use `HARNESS_ACCEPTANCE.md` only when implementing/re-accepting a gate and `AUDIT.md` only for revision-specific evidence. Use Codebase Memory for retrievable structure.
 
 Consult predecessor job docs only for an inherited/disputed contract. Do not reread completed histories wholesale.
 

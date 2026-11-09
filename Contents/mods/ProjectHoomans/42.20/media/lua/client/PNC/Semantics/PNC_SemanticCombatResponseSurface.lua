@@ -26,7 +26,13 @@ local function now()
     if type(getTimestampMs) == "function" then
         return tonumber(getTimestampMs()) or 0
     end
-    return math.floor((os.clock and os.clock() or 0) * 1000)
+    local gameTime = getGameTime and getGameTime() or nil
+    if gameTime and type(gameTime.getWorldAgeHours) == "function" then
+        return math.floor(
+            (tonumber(gameTime:getWorldAgeHours()) or 0) * 3600000
+        )
+    end
+    return 0
 end
 
 local function boundedList(value, limit)

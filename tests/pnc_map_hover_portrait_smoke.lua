@@ -49,6 +49,9 @@ package.preload[
     "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldClient"
 ] = function()
     return {
+        GetPortraitSpec = function(entry)
+            return { isFemale = entry.portrait.gender == "female", canonical = true }
+        end,
         RegisterActorKnowledgeProvider = function(id, adapter)
             providers[id] = adapter
             return true, id
@@ -95,16 +98,23 @@ T.truthy(providers.ProjectHoomans.request(entry.id),
 T.equal(requests, 1,
     "Project Hoomans knowledge request was not issued exactly once")
 
+PNC.Network.ClientState.npcPresentations[entry.id].knowledgePending = true
 knownName = "Mara Voss"
 local known = providers.ProjectHoomans.get(entry)
 T.truthy(known.nameKnown and known.knownName == knownName,
     "Core adapter did not consume the learned Hoomans identity")
 T.equal(known.state, "known",
     "learned Hoomans identity did not override stale unknown presentation")
+T.falsy(known.pending, "stale loading state must not hide a learned name")
 local portrait = providers.ProjectHoomans.getPortraitSpec(entry)
 T.truthy(portrait and portrait.preferDescriptor
     and portrait.includeCurrentClothing
     and portrait.equipment.worn.Hat == "Base.Hat_HardHat",
     "Core hover adapter lost the Hoomans portrait/equipment projection")
 
+local canonical = Adapter.getPortraitSpec({ actorID = "abstract:npc", portrait = {
+    gender = "female", face = { hairModel = "Long" },
+} })
+T.truthy(canonical.canonical and canonical.isFemale,
+    "canonical non-colonist portrait was interpreted as legacy male appearance")
 T.finish("pnc_map_hover_portrait_smoke")

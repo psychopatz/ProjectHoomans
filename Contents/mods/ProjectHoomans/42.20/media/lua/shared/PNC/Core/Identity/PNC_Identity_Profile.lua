@@ -37,6 +37,26 @@ local function choose(list, seed, salt)
     return list[Identity.Index(seed, salt, #list)]
 end
 
+function Identity.GetCoreArchetypePlan(record)
+    local actors = PsychopatzCore and PsychopatzCore.Actors or nil
+    local registry
+    local ok
+    if not actors then
+        ok, actors = pcall(require,
+            "PsychopatzCore/Actors/PsychopatzActors")
+        if not ok then actors = nil end
+    end
+    registry = actors and actors.Archetypes or nil
+    if not registry or type(registry.ResolvePlan) ~= "function" then
+        return nil
+    end
+    return registry:ResolvePlan(record and record.archetypeID or nil, {
+        actorId = record and record.id or nil,
+        identitySeed = record and record.identitySeed or nil,
+        identity = record and record.identity or nil,
+    })
+end
+
 local function preserveGeneratedLookState(record, look)
     local inventory = record and record.inventory
     local byType = {}
@@ -45,6 +65,7 @@ local function preserveGeneratedLookState(record, look)
     local item
     local key
     local fullType
+    local valueType
     if type(look) ~= "table" or type(inventory) ~= "table"
         or type(inventory.items) ~= "table"
     then
@@ -61,7 +82,10 @@ local function preserveGeneratedLookState(record, look)
         end
     end
     for index, value in ipairs(look) do
-        fullType = tostring(value or "")
+        valueType = type(value) == "table" and value or nil
+        fullType = tostring(
+            valueType and (valueType.fullType or valueType.type) or value or ""
+        )
         local candidates = byType[fullType]
         local selected
         if candidates then
@@ -74,11 +98,19 @@ local function preserveGeneratedLookState(record, look)
                 end
             end
         end
-        output[index] = selected and {
-            type = fullType,
-            wornSlot = selected.wornSlot,
-            itemState = copy(selected.itemState),
-        } or fullType
+        if selected then
+            output[index] = {
+                type = fullType,
+                wornSlot = selected.wornSlot,
+                itemState = copy(selected.itemState),
+            }
+        elseif valueType then
+            output[index] = copy(valueType)
+            output[index].type = fullType
+            output[index].fullType = fullType
+        else
+            output[index] = fullType
+        end
     end
     return output
 end
@@ -151,8 +183,6 @@ function Identity.ApplyRecordIdentity(record, source)
     record.archetypeLabel = resolvedIdentity.archetypeLabel
     record.isFemale = resolvedIdentity.isFemale == true
     record.name = resolvedIdentity.displayName
-    record.visualProfile = normalizeString(source and source.visualProfile or record.visualProfile) or archetype.visualProfile
-    record.outfit = normalizeString(source and source.outfit or record.outfit) or nil
     -- Defaults belong only at record creation. Applying identity during a
     -- snapshot/load/reconciliation pass must preserve player-edited work
     -- policy, otherwise a UI refresh silently restores archetype values.
@@ -163,10 +193,7 @@ function Identity.ApplyRecordIdentity(record, source)
 end
 
 function Identity.RollAppearance(record)
-    local archetype
-    local genderKey
     local seed
-    local lookPool
     local look
     local survivor
     local spawnOutfit
@@ -177,24 +204,33 @@ function Identity.RollAppearance(record)
     local appearanceResult
     local appearancePolicy
     local resolvedOutfit
+    local corePlan
+    local appearanceRecord
     if not record then
         return nil
     end
     Identity.ApplyRecordIdentity(record, record)
     seed = Identity.NormalizeSeed(record.identitySeed, record.id)
-    archetype = Archetypes.Get(record.archetypeID)
-    genderKey = record.isFemale and "female" or "male"
-    lookPool = archetype.looks and archetype.looks[genderKey] or nil
-    look = choose(lookPool, seed, "look:" .. tostring(archetype.id))
-    look = preserveGeneratedLookState(record, look)
+    corePlan = Identity.GetCoreArchetypePlan(record)
+    if not corePlan then
+        return nil
+    end
+    look = preserveGeneratedLookState(record, corePlan.appearanceItems or {})
+    -- Appearance.Resolve only needs the canonical policy. Never copy the live
+    -- record: runtime navigation and other controllers intentionally point
+    -- back to it and therefore form cyclic graphs.
+    appearanceRecord = {
+        appearance = type(record.appearance) == "table"
+            and record.appearance or corePlan.appearance,
+    }
     appearanceResult = Appearance and Appearance.Resolve
-        and Appearance.Resolve(record, look) or {
+        and Appearance.Resolve(appearanceRecord, look) or {
             itemSpecs = {}, items = type(look) == "table"
                 and PNC.Core.DeepCopy(look) or {},
         }
     appearancePolicy = appearanceResult.policy or {}
     survivor = record.identity and record.identity.survivor or {}
-    spawnOutfit = archetype.looks and archetype.looks.spawnOutfit or {}
+    spawnOutfit = corePlan.spawnOutfit or {}
     if Appearance and Appearance.HasExplicitSlots
         and Appearance.HasExplicitSlots(appearancePolicy)
     then
@@ -213,8 +249,7 @@ function Identity.RollAppearance(record)
     then
         resolvedOutfit = tostring(appearancePolicy.outfit.id)
     else
-        resolvedOutfit = record.outfit
-            or (record.isFemale and spawnOutfit.female or spawnOutfit.male)
+        resolvedOutfit = record.isFemale and spawnOutfit.female or spawnOutfit.male
     end
     hairColor = survivor.hairColor or {}
     skinColor = survivor.skinColor or {}
@@ -222,9 +257,8 @@ function Identity.RollAppearance(record)
     record.runtime = runtime
     cacheKey = table.concat({
         tostring(seed),
-        tostring(archetype.id),
+        tostring(corePlan.archetypeID),
         tostring(record.isFemale == true),
-        tostring(record.outfit or ""),
         tostring(survivor.skinTexture or ""),
         tostring(survivor.hairModel or ""),
         tostring(survivor.beardModel or ""),
@@ -238,7 +272,7 @@ function Identity.RollAppearance(record)
         tostring(survivor.voiceType or ""),
         tostring(survivor.voicePitch or ""),
         Appearance and Appearance.Signature
-            and Appearance.Signature(record.appearance) or "",
+            and Appearance.Signature(appearanceRecord.appearance) or "",
     }, "|")
     if runtime.appearanceCacheKey == cacheKey and runtime.appearanceCache then
         if not runtime.generatedAppearance then
@@ -269,6 +303,11 @@ function Identity.RollAppearance(record)
     end
     runtime.appearanceCacheKey = cacheKey
     return runtime.appearanceCache
+end
+
+function Identity.ResolveSpawnOutfit(record)
+    local appearance = Identity.RollAppearance(record)
+    return appearance and appearance.outfit or nil
 end
 
 function Identity.GetCharacterSummary(record)

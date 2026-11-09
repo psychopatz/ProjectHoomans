@@ -19,7 +19,7 @@ local function applyMemberSpec(spawnDefinition, memberSpec)
     local fields = {
         "displayName", "name", "identitySeed", "identity", "isFemale",
         "archetypeID", "appearance", "appearanceAuthored",
-        "appearanceProvenance", "visualProfile", "startingItems",
+        "appearanceProvenance", "startingItems",
         "inventoryAuthority", "personalInventory", "coreActorID",
         "inventoryTemplateRef", "equipment", "weaponMode",
     }

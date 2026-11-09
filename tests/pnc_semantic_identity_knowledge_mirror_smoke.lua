@@ -282,4 +282,37 @@ T.equal(Identity.GetName(npcID), identityName,
 T.equal(ClientState.identityDisclosurePending[npcID], nil,
     "knowledge mirror clears the pending disclosure marker")
 
+-- The authoritative fact must reach the shared map gate for a non-colonist,
+-- even while the marker and presentation cache still carry old unknown flags.
+local adapter
+local client = {
+    RegisterActorKnowledgeProvider = function(_, provider) adapter = provider end,
+    GetActorKnowledge = function(id) return adapter.get(id) end,
+    GetPortraitSpec = function() return {} end,
+    IsDebugPresentationEnabled = function() return true end,
+}
+package.loaded["PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldClient"] = client
+package.loaded["PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldMapHoverCard"] = {
+    new = function() return {
+        initialise = function() end, instantiate = function() end,
+        setTarget = function() return true end,
+        setContext = function(self, _, _, context) self.context = context end,
+        setCardPosition = function() end,
+        setVisible = function(self, visible) self.visible = visible end,
+    } end,
+}
+local Hover = require "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldMapHover"
+T.load("ProjectHoomans", "client", "PNC/UI/Map/PNC_MapCoreActorKnowledge.lua")
+Hover.DELAY_MS = 0
+local map = { width = 800, addChild = function(self, panel) self.card = panel end }
+local entry = { actorID = npcID, provider = "ProjectHoomans", nameKnown = false,
+    identityKnown = false, displayName = "Unknown survivor", portrait = { face = {} } }
+ClientState.npcPresentations[npcID].state = "unknown"
+ClientState.npcPresentations[npcID].knowledgePending = true
+T.truthy(Hover.Update(map, entry, 100, 100, {}),
+    "delivered identity fact enables known non-colonist hover despite stale flags")
+T.equal(map.card.context.name, identityName, "hover reads learned name by canonical actorID")
+ClientState.npcKnowledge[npcID] = nil
+T.falsy(Hover.Update(map, entry, 100, 100, {}),
+    "unknown non-colonist cannot hover even with debug enabled")
 T.finish("pnc_semantic_identity_knowledge_mirror_smoke")

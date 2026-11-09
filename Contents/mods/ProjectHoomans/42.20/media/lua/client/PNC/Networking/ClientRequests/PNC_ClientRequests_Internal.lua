@@ -38,7 +38,12 @@ function Internal.DispatchIdentity(player, command, args, localHandler)
     then
         return false, "identity_command_handler_unavailable"
     end
-    local result = PNC.PlayerKnowledgeCommands[localHandler](player, args)
+    local result, details = PNC.PlayerKnowledgeCommands[localHandler](player, args)
+    if result == false then
+        local reason = type(details) == "table" and details.reason
+            or type(details) == "string" and details or "identity_request_failed"
+        return false, reason, details
+    end
     if type(result) == "table"
         and (result.success == false or result.state == "error")
     then

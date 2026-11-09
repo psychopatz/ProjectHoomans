@@ -25,7 +25,7 @@ end
 -- Authored policy is now part of the normal versioned persistence contract.
 local authoredPolicy = {
     schemaVersion = 2,
-    outfit = "none",
+    outfit = { mode = "none" },
     slots = {
         Torso_Upper = {
             mode = "item",

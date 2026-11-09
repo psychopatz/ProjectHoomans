@@ -81,4 +81,17 @@ T.truthy(string.find(string.lower(identity.decision.response.fallback or ""),
     "mara", 1, true),
     "known identity response uses authorized conversation context")
 
+for _, phrase in ipairs({ "what's your name?", "whats your name", "what is your name" }) do
+    local result = router:Preview(phrase)
+    T.equal(result.ir.subject, "IDENTITY", "name question stays deterministic: " .. phrase)
+    T.truthy(result.decision.response and result.decision.response.fallback ~= "",
+        "name question has a local response")
+end
+for _, phrase in ipairs({ "what's up?", "whats up", "whatsup" }) do
+    local result = router:Preview(phrase)
+    T.equal(result.ir.subject, "CONVERSATION_TOPIC", "small talk stays deterministic: " .. phrase)
+    T.equal(result.ir.extensions.hubID, "whats_up", "small talk opens the semantic hub")
+    T.truthy(result.decision.response and result.decision.response.fallback ~= "",
+        "small talk has a local response")
+end
 T.finish("pnc_semantic_state_response_smoke")

@@ -18,6 +18,15 @@ local prepareSocial = Internal.prepareSocial
 local finiteNumber = Internal.finiteNumber
 local commit = Internal.commit
 
+local function memoryLimit()
+    local coreSocial = PsychopatzCore and PsychopatzCore.Actors
+        and PsychopatzCore.Actors.Social or nil
+    return math.max(1, math.floor(
+        tonumber(coreSocial and coreSocial.MAX_MEMORIES)
+            or tonumber(Constants.MEMORY_LIMIT) or 1
+    ))
+end
+
 function Relationships.Get(observerNPCID, targetKey)
     local record
     local reason
@@ -55,7 +64,9 @@ function Relationships.QuerySemanticEvidence(observerNPCID, targetKey, actorID, 
         and PNC.Conversation.Memory.Events
     if not Events then return {} end
     local rows = {}
-    for index = math.min(#memories, Constants.MEMORY_LIMIT), 1, -1 do
+    local maximum = memoryLimit()
+    local first = math.max(1, #memories - maximum + 1)
+    for index = #memories, first, -1 do
         local memory = memories[index]
         local entry = Events.GetType(memory.type)
         local metadata = entry and entry.semantic

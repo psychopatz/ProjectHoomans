@@ -51,9 +51,10 @@ local function advanceActionContext()
     end
 end
 
+local bodyData = { PNC_UUID = "npc_1", PNC_NPC = true }
 local zombie = {
     getActionStateName = function() return actionState end,
-    getModData = function() return {} end,
+    getModData = function() return bodyData end,
     changeState = function(_, state)
         T.equal(state, "idle_state", "downed idle transition state")
         -- This is the legacy AI state machine, not animation ActionContext.
@@ -195,7 +196,6 @@ local visualKeySnapshot = {
     liveBodyOnlineID = 77,
     presenceRevision = 4,
     attackMode = false,
-    visualProfile = "profile",
     isFemale = false,
     appearance = { outfit = "Naked" },
     equipmentSummary = {

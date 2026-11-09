@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "phase": "R0",
+  "repository": "ProjectHoomans",
+  "branch": "main",
+  "head": "9572b548f19b6229a7c5e7887047baa9cc783993",
+  "upstream": "origin/main",
+  "aheadBehind": [
+    0,
+    0
+  ],
+  "worktreeState": "dirty; pre-existing user/agent work preserved",
+  "categories": {
+    "preExistingUnrelated": {
+      "disposition": "preserve; outside this rationalization change set",
+      "files": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCombatResponseSurface.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/SurvivorWorldExtensions/PNC_SurvivorWorldExtensions_Factions.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_ActorBridge.lua"
+      ],
+      "reason": "These changes were present before the reopened rationalization pass and concern runtime clock/Kahlua-compatible table-entry behavior. They were not reverted, rewritten, or claimed as suite-rationalization production work."
+    },
+    "concurrentWorkPreservedOutsideRationalization": {
+      "disposition": "preserve; do not claim as rationalization work or modify",
+      "files": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_Identity_Appearance.lua",
+        "tests/pnc_map_travel_layer_smoke.lua",
+        "tests/pnc_unique_npc_appearance_smoke.lua"
+      ],
+      "reason": "These edits appeared in the shared dirty worktree during the rationalization run and address map-hover ownership and native appearance/body-location typing. They are preserved as concurrent user/agent work, separately reviewed only for scope classification, and excluded from the rationalization production-change claim."
+    },
+    "productionContractRepairs": {
+      "disposition": "preserve; validate against current contracts and focused regressions",
+      "files": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueInput_ContextProjection.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Social/RelationshipService/PNC_RelationshipService_Queries.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence_CoreSocial.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionLifecycle_State_Projections.lua"
+      ],
+      "evidence": [
+        "The context projection repair bounds a cyclic authored composer graph while preserving live semantic-context methods; semantic worker, contextual, and full Python regressions passed.",
+        "The relationship query repair derives the active memory limit from the current Core social owner and preserves newest-memory ordering; relationship evidence and full Python regressions passed.",
+        "The Core social repair seeds an empty Core personality from an existing Hoomans record without replacing non-empty Core-owned state; the persistence/identity regression set passed.",
+        "The lifecycle projection repair keeps the public size helper at the supported projection boundary after private helper exports were removed; refactor and semantic regressions passed."
+      ]
+    },
+    "productionOwnershipRepairs": {
+      "disposition": "preserve; current-contract ownership cleanup validated by refactor checks",
+      "files": [
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueSuggestions_Core.lua",
+        "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionLifecycle_State_Persistence.lua"
+      ],
+      "evidence": [
+        "Stale internal helper exports were removed from the Core module after their callers moved to the owning private modules.",
+        "The refactor binding scan (--all) reported zero helper-leak findings across the maintained 42.20 Lua estate, and affected semantic suites passed."
+      ]
+    },
+    "workerInfrastructure": {
+      "disposition": "preserve; shared test-infrastructure changes, not production behavior",
+      "files": [
+        "tools/semantic_harness/lua/worker/EvidenceStressFixture.lua",
+        "tools/semantic_harness/lua/worker/ProductionModules.lua",
+        "tools/semantic_harness/lua/worker/ProductionModules_CorePersistence.lua",
+        "tools/semantic_harness/lua/worker/RuntimeEnvironment.lua",
+        "tools/semantic_harness/lua/worker/RuntimeEnvironment_Core.lua",
+        "tools/semantic_harness/lua/worker/ScenarioSession_Lifecycle.lua",
+        "tools/semantic_harness/testing/doctor.py",
+        "tools/semantic_harness/testing/python_runner.py",
+        "tools/semantic_harness/tests/gui_test_support.py"
+      ],
+      "evidence": [
+        "Changes isolate worker-owned production loading, repair stale boot/syntax diagnostics, bound process/resource-sensitive modules, and keep the existing runner topology.",
+        "Doctor worker_syntax/boot passed; the full developer Python lane passed 198/198 runnable modules with 11 intentional skips; the root Lua lane passed 1007/1007."
+      ]
+    },
+    "testRepairsAndRationalization": {
+      "disposition": "preserve; each is test-only repair, evidence artifact, or the accepted superseded deletion",
+      "files": [
+        "tests/pnc_companion_commands_smoke.lua",
+        "tests/pnc_semantic_harness_worker_modules_smoke.lua",
+        "tests/pnc_semantic_horde_command_ack_smoke.lua",
+        "tests/pnc_semantic_horde_tactical_prompt_smoke.lua",
+        "tests/pnc_semantic_local_route_smoke.lua",
+        "tools/semantic_harness/tests/test_contextual_dynamic_trading.py",
+        "tools/semantic_harness/tests/test_actor_inspectors.py",
+        "tools/semantic_harness/tests/test_cli_parity.py",
+        "tools/semantic_harness/tests/test_contextual_choice_provider.py",
+        "tools/semantic_harness/tests/test_contextual_runtime_graph.py",
+        "tools/semantic_harness/tests/test_contextual_semantic_hub.py",
+        "tools/semantic_harness/tests/test_contextual_talk_parity.py",
+        "tools/semantic_harness/tests/test_faction_community_workbench.py",
+        "tools/semantic_harness/tests/test_interaction_spec.py",
+        "tools/semantic_harness/tests/test_inventory_gift_workbench.py",
+        "tools/semantic_harness/tests/test_operational_world_browser.py",
+        "tools/semantic_harness/tests/test_semantic_lab_npc_profiles.py",
+        "tools/semantic_harness/tests/test_stay_wait_at_binding.py",
+        "tools/semantic_harness/tests/test_surface_consolidation.py",
+        "tools/semantic_harness/tests/test_ui_organization.py",
+        "tools/semantic_harness/tests/test_unified_evidence_e7.py"
+      ],
+      "evidence": [
+        "The five root repairs adapt stale expectations to current authored contracts without removing semantic IDs, authority, rejection, or lifecycle assertions.",
+        "The DynamicTrading contextual module remains the proven deletion from the prior pass: its retired ProjectHoomans trade provider/category has replacement ownership and 5/5 focused parity coverage.",
+        "The other Python modifications repair fixture parity, GUI/save handling, CLI/surface assertions, or worker isolation and remain covered by focused/full reports."
+      ]
+    },
+    "scopeDrift": {
+      "disposition": "none accepted; unresolved unrelated changes remain explicitly outside the rationalization claim",
+      "files": [],
+      "reason": "No production change was accepted solely because a stale test became green. The three pre-existing production edits are isolated above; rationalization production edits have current-contract evidence and regression evidence."
+    }
+  },
+  "preservedDeletion": "tools/semantic_harness/tests/test_contextual_dynamic_trading.py",
+  "preservedRepairs": true
+}

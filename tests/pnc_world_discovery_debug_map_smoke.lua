@@ -82,6 +82,7 @@ PNC = {
     },
     MapTravelLayer = { InvalidateEntryCache = function() end },
 }
+isDebugEnabled = function() return true end
 getText = function(key) return key end
 getCore = function()
     return { getScreenWidth = function() return 1280 end,

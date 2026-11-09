@@ -9,7 +9,7 @@ local factionDogtagKey = Internal.FactionDogtagKey
 
 function Internal.prepareCorpseItems(record, zombie)
     local equipment = PNC.Equipment
-    local profiles = PNC.VisualProfiles
+    local Identity = PNC.Identity
     local container = zombie and zombie.getInventory and zombie:getInventory() or nil
     local pool = {}
     local allItems = {}
@@ -19,7 +19,8 @@ function Internal.prepareCorpseItems(record, zombie)
     local wornItems = zombie and zombie.getWornItems and zombie:getWornItems() or nil
     local itemVisuals = zombie and zombie.getItemVisuals and zombie:getItemVisuals() or nil
     local inventoryItems = container and container.getItems and container:getItems() or nil
-    local appearance = profiles and profiles.RollAppearance and profiles.RollAppearance(record) or nil
+    local appearance = Identity and Identity.RollAppearance
+        and Identity.RollAppearance(record) or nil
     local abstractInventory = PNC.Inventory and PNC.Inventory.EnsureRecordInventory
         and PNC.Inventory.EnsureRecordInventory(record) or record.inventory
     local i

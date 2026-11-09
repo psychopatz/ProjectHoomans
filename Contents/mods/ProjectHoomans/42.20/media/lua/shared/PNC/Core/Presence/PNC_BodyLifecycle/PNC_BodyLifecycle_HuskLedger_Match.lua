@@ -360,7 +360,8 @@ local function matchesEntry(entry, zombie, radiusSq, includeAbandoned)
     if isUnmarkedBody(zombie)
         and validEngineIdentity(entry.outfitId)
         and outfitId ~= nil
-        and tostring(entry.outfitId) == tostring(outfitId)
+        and Lifecycle.NormalizeShellOutfitID(entry.outfitId)
+            == Lifecycle.NormalizeShellOutfitID(outfitId)
         and Lifecycle.IsShellCarrierID
         and Lifecycle.IsShellCarrierID(outfitId) == true
     then

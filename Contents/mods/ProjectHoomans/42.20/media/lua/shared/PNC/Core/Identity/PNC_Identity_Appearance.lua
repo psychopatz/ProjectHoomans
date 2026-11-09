@@ -57,7 +57,7 @@ local function normalizeSlot(source)
     }
 end
 
-function Appearance.Normalize(source, legacyOutfit)
+function Appearance.Normalize(source)
     local input = type(source) == "table" and source or {}
     local authoredPolicy = type(input.policy) == "table"
         and input.policy or nil
@@ -75,9 +75,7 @@ function Appearance.Normalize(source, legacyOutfit)
     local slot
     local key
 
-    if type(outfit) == "string" and outfit ~= "" then
-        output.outfit = { mode = "item", id = outfit }
-    elseif type(outfit) == "table" then
+    if type(outfit) == "table" then
         output.outfit = {
             mode = modeValue(outfit.mode, "random"),
             id = stringValue(outfit.id or outfit.name or outfit.type),
@@ -85,10 +83,6 @@ function Appearance.Normalize(source, legacyOutfit)
         if output.outfit.mode == "item" and not output.outfit.id then
             output.outfit.mode = "random"
         end
-    elseif stringValue(legacyOutfit) then
-        -- Legacy outfit values were only labels used by the old runtime. Keep
-        -- them as an explicit preset marker without changing old behavior.
-        output.outfit = { mode = "item", id = stringValue(legacyOutfit) }
     end
 
     if type(input.slots) == "table" then
@@ -156,15 +150,21 @@ local function nativeBodyLocation(value)
     local resource
     local ok
     local resolved
+    local hasNativeResolver = ItemBodyLocation
+        and ItemBodyLocation.get
+        and ResourceLocation
+        and ResourceLocation.of
     if value == nil or tostring(value) == "" then return nil end
-    if ItemBodyLocation and ItemBodyLocation.get
-        and ResourceLocation and ResourceLocation.of
-    then
+    if hasNativeResolver then
         ok, resource = pcall(ResourceLocation.of, tostring(value))
         if ok and resource then
             ok, resolved = pcall(ItemBodyLocation.get, resource)
             if ok and resolved then return resolved end
         end
+        -- Build 42's WornItems APIs require ItemBodyLocation values. An
+        -- unresolved authored alias must not cross that typed boundary as a
+        -- Lua string; callers can safely skip native-only validation.
+        return nil
     end
     return value
 end
@@ -209,11 +209,17 @@ function Appearance.Validate(source)
     local selected = {}
     local left
     local right
+    local location
     for slot, value in pairs(policy.slots or {}) do
         if value.mode == "item" and value.type then
+            -- The item definition is authoritative for native body
+            -- placement. Keep authored slot aliases as a compatibility
+            -- fallback for records whose item metadata is unavailable.
+            location = Appearance.ResolveBodyLocation(value.type)
+                or tostring(value.wornSlot or slot)
             selected[#selected + 1] = {
                 slot = tostring(slot),
-                location = tostring(value.wornSlot or slot),
+                location = location,
             }
         end
     end
@@ -251,7 +257,7 @@ end
 
 function Appearance.Resolve(record, baseItems)
     local source = record and record.appearance
-    local policy = Appearance.Normalize(source, record and record.outfit)
+    local policy = Appearance.Normalize(source)
     local output = {}
     local base = {}
     local input

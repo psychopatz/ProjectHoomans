@@ -96,6 +96,7 @@ PNC = {
                 equipment = { worn = { Hat = "Base.Hat_HardHat" } },
             }
         end,
+    RollAppearance = function() return {} end,
     },
     Equipment = {
         Describe = function()
@@ -156,7 +157,6 @@ PNC = {
             return debugVisibleZombieEntries
         end,
     },
-    VisualProfiles = { RollAppearance = function() return {} end },
     MotionHints = {},
     Health = { CanRevive = function() return false end },
     NPCWounds = {

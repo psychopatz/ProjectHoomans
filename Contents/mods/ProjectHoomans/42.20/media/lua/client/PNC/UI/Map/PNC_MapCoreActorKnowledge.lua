@@ -22,6 +22,9 @@ end
 local function portraitSpec(entry)
     local portrait = entry and entry.portrait or nil
     if type(portrait) ~= "table" then return nil end
+    if type(portrait.face) == "table" then
+        return SurvivorWorldClient.GetPortraitSpec(entry)
+    end
     return {
         id = actorIDFor(entry),
         identitySeed = portrait.identitySeed or 1,
@@ -42,13 +45,13 @@ local function knowledge(entryOrID)
         and state.npcPresentations[actorID] or nil
     local knownName = Identity
         and type(Identity.GetKnownName) == "function"
-        and Identity.GetKnownName(entryOrID) or nil
+        and Identity.GetKnownName(actorID) or nil
     local faction = Identity
         and type(Identity.GetFaction) == "function"
-        and Identity.GetFaction(entryOrID) or nil
+        and Identity.GetFaction(actorID) or nil
     local factionName = Identity
         and type(Identity.GetFactionName) == "function"
-        and Identity.GetFactionName(entryOrID) or nil
+        and Identity.GetFactionName(actorID) or nil
     local nameKnown = knownName ~= nil and knownName ~= ""
     return {
         -- The learned identity API is the authority. A stale presentation
@@ -56,7 +59,7 @@ local function knowledge(entryOrID)
         -- Do not make Core wait for another unrelated presentation refresh.
         state = nameKnown and "known"
             or presentation and presentation.state or "unknown",
-        pending = presentation
+        pending = not nameKnown and presentation
             and presentation.knowledgePending == true or false,
         nameKnown = nameKnown,
         knownName = knownName,
@@ -84,7 +87,7 @@ local function context(entry)
         or nil
     local knownName = Identity
         and type(Identity.GetKnownName) == "function"
-        and Identity.GetKnownName(entry) or nil
+        and Identity.GetKnownName(actorIDFor(entry)) or nil
     return {
         name = knownName or entry and (entry.name or entry.displayName),
         factionID = presentation and presentation.factionID

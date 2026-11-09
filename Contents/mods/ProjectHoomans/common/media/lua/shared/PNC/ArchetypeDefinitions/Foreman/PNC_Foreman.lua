@@ -11,7 +11,6 @@ local bundle = {
         label = "Foreman",
         type = "survivor",
         tags = { "civilian", "builder" },
-        visualProfile = "colonist",
         defaultForFaction = "colonist",
         allowedJobs = {
             FollowOwner = true,
@@ -22,22 +21,27 @@ local bundle = {
             Constructor = true,
         },
     },
-    looks = {
+    appearance = {
+        schemaVersion = 2,
+        mode = "authored",
+        authority = "authored",
         spawnOutfit = {
             male = "PNCCompanionMale",
             female = "PNCCompanionFemale",
         },
-        male = {
+        variants = {
+            male = {
             { "Base.Hat_HardHat", "Base.Vest_Foreman", "Base.Shirt_Workman", "Base.Trousers_JeanBaggy", "Base.Shoes_WorkBoots" },
             { "Base.Hat_HardHat", "Base.Vest_HighViz", "Base.Tshirt_White", "Base.Trousers_Denim", "Base.Shoes_WorkBoots" },
             { "Base.Hat_HardHat_Miner", "Base.Boilersuit", "Base.Shoes_WorkBoots" },
             { "Base.Hat_EarMuff_Protectors", "Base.Shirt_Denim", "Base.Trousers_Padded", "Base.Shoes_WorkBoots" },
-        },
-        female = {
+            },
+            female = {
             { "Base.Hat_HardHat", "Base.Vest_Foreman", "Base.Shirt_Workman", "Base.Trousers_JeanBaggy", "Base.Shoes_WorkBoots" },
             { "Base.Hat_HardHat", "Base.Vest_HighViz", "Base.Tshirt_White", "Base.Trousers_Denim", "Base.Shoes_WorkBoots" },
             { "Base.Hat_HardHat_Miner", "Base.Boilersuit", "Base.Shoes_WorkBoots" },
             { "Base.Hat_EarMuff_Protectors", "Base.Shirt_Denim", "Base.Trousers_Padded", "Base.Shoes_WorkBoots" },
+            },
         },
     },
     skills = {

@@ -33,7 +33,7 @@ local eager = T.truthy(Speech.ResolveNPCCommand(
 ), "eager combat acknowledgement resolves")
 T.equal(eager.realizationID, "semantic.combat.horde.ack.engage_eager",
     "brave/aggressive engage uses eager acknowledgement")
-T.equal(eager.fallback, "Fuck yeah. Let's go.",
+T.equal(eager.fallback, "Ready to strike! Let's take them down.",
     "eager engage has active combat wording")
 
 local hesitant = T.truthy(Speech.ResolveNPCCommand(
@@ -44,8 +44,8 @@ local hesitant = T.truthy(Speech.ResolveNPCCommand(
 T.equal(hesitant.realizationID,
     "semantic.combat.horde.ack.engage_hesitant",
     "shaken engage uses hesitant acknowledgement")
-T.equal(hesitant.fallback, "Fuck... alright. I'm with you.",
-    "hesitant engage uses reluctant profanity rather than enthusiasm")
+T.equal(hesitant.fallback, "Watch my back... here we go.",
+    "hesitant engage uses guarded wording rather than enthusiasm")
 
 local avoid = T.truthy(Speech.ResolveNPCCommand(
     "combat_avoid",

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "phase": "R5",
+  "repository": "ProjectHoomans",
+  "branch": "main",
+  "tiers": {
+    "FAST": {
+      "runner": "python -m unittest discover -s tests",
+      "scope": "root Python architecture/configuration checks and static refactor checks",
+      "selection": "unittest module/path selection",
+      "evidence": "root architecture tests and refactor_binding_smoke.py --all were retained as boundary-specific checks"
+    },
+    "DEFAULT": {
+      "runner": "python3 tests/run_tests.py",
+      "scope": "1,007 isolated root Lua smoke files",
+      "selection": "existing name filters plus the new --domain selector backed by R1_ROOT_DOMAIN_REVIEW.json",
+      "evidence": [
+        "python3 tests/run_tests.py --domain root_lua:inventory --jobs 4 --timeout 30 -> PASS 41/41 in 0.13s",
+        "python3 tests/run_tests.py --domain root_lua:mp_network --jobs 4 --timeout 30 -> PASS 80/80 in 0.33s",
+        "full root baseline report -> PASS 1007/1007; no test was removed for runtime count"
+      ]
+    },
+    "FOCUSED": {
+      "runner": "existing root runner filters and refactor_binding_smoke.py",
+      "scope": "reviewed domain slices, protected persistence/presence/inventory/MP/body/profiler slices, and static ownership checks",
+      "selection": "--domain, existing name filters, and existing focused commands",
+      "evidence": "R1 domain ledger records all 19 focused domain runs; every domain passed"
+    },
+    "INTEGRATION": {
+      "runner": "existing root/Python semantic harness integration commands",
+      "scope": "cross-adopter, worker, GUI/save, evidence, and shared integration paths",
+      "selection": "existing module filters and focused evidence commands",
+      "evidence": "prior evidence records root Python 22/22, unique-NPC 6/6, worker/doctor, and evidence-focused passes"
+    },
+    "ACCEPTANCE": {
+      "runner": "python3 -m tools.semantic_harness.testing.python_runner",
+      "scope": "209 Semantic Python modules, including production-Lua authority and fixture parity",
+      "selection": "existing module filters; --list now exposes 12 acceptance_slow modules while preserving bounded parallelism and explicit exclusive modules",
+      "evidence": [
+        "baseline report PASS 198, SKIP 11, FAIL 0, TOTAL 209 in 1036.639s",
+        "final routed report PASS 198, SKIP 11, FAIL 0, TOTAL 209 in 1005.234s with max-active=4",
+        "R4 records every measured slow family and the ten contextual modules routed to the existing exclusive resource lane after isolated reruns passed"
+      ]
+    },
+    "NATIVE": {
+      "runner": "PZ native harness / user-owned",
+      "scope": "81 native SP/MP/save/reload fixtures",
+      "selection": "native fixture names through the existing harness",
+      "evidence": "fixture purpose, subject, authority boundary, overlap, and native ownership reviewed; execution remains explicitly user-owned and was not claimed as developer PASS"
+    }
+  },
+  "topologyDecision": "Use the existing runners with explicit tier/domain routing. Root Lua remains a fast valuable suite; semantic acceptance remains separate and expensive; native remains user-owned. No competing generic test framework was added.",
+  "changes": [
+    "Added --domain to tests/run_tests.py using the R1 path ledger.",
+    "Documented FAST/DEFAULT/FOCUSED/INTEGRATION/ACCEPTANCE/NATIVE commands in tests/README.md.",
+    "Added acceptance_slow classification/reporting and explicit resource-sensitive exclusive routing to the existing Python acceptance runner without worker reuse or isolation weakening."
+  ]
+}

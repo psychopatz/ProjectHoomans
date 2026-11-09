@@ -386,8 +386,11 @@ class InteractionSpecTests(unittest.TestCase):
                 path.endswith("TL/Conversation/Patterns.json")
                 for path in generated["writes"]
             ))
+            # Generation is owner-aware: some artifacts are intentionally
+            # written to the sibling Core repository.  Compare canonical
+            # absolute paths so idempotence covers that ownership boundary.
             first_bytes = {
-                Path(path).relative_to(repository): Path(path).read_bytes()
+                Path(path).resolve(): Path(path).read_bytes()
                 for path in generated["writes"]
             }
             second = service.generate_interaction_spec(
@@ -396,7 +399,7 @@ class InteractionSpecTests(unittest.TestCase):
             self.assertTrue(second["ok"], second)
             self.assertEqual(
                 first_bytes,
-                {Path(path).relative_to(repository): Path(path).read_bytes()
+                {Path(path).resolve(): Path(path).read_bytes()
                  for path in second["writes"]},
             )
 

@@ -11,7 +11,6 @@ local bundle = {
         label = "Doctor",
         type = "survivor",
         tags = { "civilian", "medical" },
-        visualProfile = "colonist",
         defaultForFaction = "colonist",
         allowedJobs = {
             FollowOwner = true,
@@ -21,22 +20,27 @@ local bundle = {
             MedicalCare = true,
         },
     },
-    looks = {
+    appearance = {
+        schemaVersion = 2,
+        mode = "authored",
+        authority = "authored",
         spawnOutfit = {
             male = "PNCCompanionMale",
             female = "PNCCompanionFemale",
         },
-        male = {
+        variants = {
+            male = {
             { "Base.Hat_SurgicalMask", "Base.JacketLong_Doctor", "Base.Shirt_FormalWhite", "Base.Trousers_Suit", "Base.Shoes_Black" },
             { "Base.Hat_SurgicalCap", "Base.Shirt_Scrubs", "Base.Trousers_Scrubs", "Base.Shoes_BlueTrainers" },
             { "Base.Hat_HeadMirrorUP", "Base.JacketLong_Doctor", "Base.Shirt_FormalBlue", "Base.Trousers_Black", "Base.Shoes_Black" },
             { "Base.Glasses_Reading", "Base.Tshirt_Scrubs", "Base.Trousers_Scrubs", "Base.Shoes_BlueTrainers" },
-        },
-        female = {
+            },
+            female = {
             { "Base.Hat_SurgicalMask", "Base.JacketLong_Doctor", "Base.Shirt_FormalWhite", "Base.Skirt_Knees", "Base.Shoes_Black" },
             { "Base.Hat_SurgicalCap", "Base.Shirt_Scrubs", "Base.Trousers_Scrubs", "Base.Shoes_BlueTrainers" },
             { "Base.Hat_HeadMirrorUP", "Base.JacketLong_Doctor", "Base.Shirt_FormalBlue", "Base.Trousers_Black", "Base.Shoes_Black" },
             { "Base.Glasses_Reading", "Base.Tshirt_Scrubs", "Base.Trousers_Scrubs", "Base.Shoes_BlueTrainers" },
+            },
         },
     },
     skills = {

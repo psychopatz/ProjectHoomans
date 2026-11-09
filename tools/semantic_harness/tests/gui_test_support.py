@@ -11,7 +11,17 @@ import unittest
 from typing import Any, Callable, Iterable
 
 from tools.semantic_harness.cli import _parser
+from tools.semantic_harness.runtime.save_catalog import SaveCatalog
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
+
+
+def require_supported_save(test_case: unittest.TestCase) -> dict[str, Any]:
+    """Skip save-backed GUI coverage when no verified local save is present."""
+
+    catalog = SaveCatalog().discover()
+    if not catalog.get("saves"):
+        test_case.skipTest("no compatible offline save is available")
+    return catalog
 
 
 class SemanticLabGuiTestCase(unittest.TestCase):
@@ -21,6 +31,9 @@ class SemanticLabGuiTestCase(unittest.TestCase):
         directory = tempfile.TemporaryDirectory(prefix=prefix)
         self.addCleanup(directory.cleanup)
         return Path(directory.name) / "ui-state.json"
+
+    def require_supported_save(self) -> dict[str, Any]:
+        return require_supported_save(self)
 
     def gui_arguments(
         self,
@@ -136,4 +149,4 @@ class SemanticLabGuiTestCase(unittest.TestCase):
         )
 
 
-__all__ = ["SemanticLabGuiTestCase"]
+__all__ = ["SemanticLabGuiTestCase", "require_supported_save"]

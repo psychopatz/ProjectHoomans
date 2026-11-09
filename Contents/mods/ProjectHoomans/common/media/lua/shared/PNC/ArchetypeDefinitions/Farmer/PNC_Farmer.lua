@@ -11,7 +11,6 @@ local bundle = {
         label = "Farmer",
         type = "survivor",
         tags = { "civilian", "agriculture" },
-        visualProfile = "colonist",
         defaultForFaction = "colonist",
         allowedJobs = {
             FollowOwner = true,
@@ -19,22 +18,27 @@ local bundle = {
             PatrolRoute = true,
         },
     },
-    looks = {
+    appearance = {
+        schemaVersion = 2,
+        mode = "authored",
+        authority = "authored",
         spawnOutfit = {
             male = "PNCCompanionMale",
             female = "PNCCompanionFemale",
         },
-        male = {
+        variants = {
+            male = {
             { "Base.Hat_StrawHat", "Base.Dungarees", "Base.Shirt_Lumberjack", "Base.Shoes_Wellies" },
             { "Base.Hat_Cowboy", "Base.Shirt_Denim", "Base.Trousers_Denim", "Base.Shoes_WorkBoots" },
             { "Base.Hat_BaseballCap", "Base.Tshirt_WhiteTINT", "Base.Dungarees", "Base.Shoes_Wellies" },
             { "Base.Hat_StrawHat", "Base.Shirt_Lumberjack_Green", "Base.Trousers_JeanBaggy", "Base.Shoes_HikingBoots" },
-        },
-        female = {
+            },
+            female = {
             { "Base.Hat_StrawHat", "Base.Dungarees", "Base.Shirt_Lumberjack", "Base.Shoes_Wellies" },
             { "Base.Hat_Cowboy", "Base.Shirt_Denim", "Base.Trousers_Denim", "Base.Shoes_WorkBoots" },
             { "Base.Hat_BandanaTied", "Base.Tshirt_WhiteTINT", "Base.Dungarees", "Base.Shoes_Wellies" },
             { "Base.Hat_Cowboy_Brown", "Base.Shirt_CropTopTINT", "Base.Shorts_ShortDenim", "Base.Shoes_WorkBoots" },
+            },
         },
     },
     skills = {

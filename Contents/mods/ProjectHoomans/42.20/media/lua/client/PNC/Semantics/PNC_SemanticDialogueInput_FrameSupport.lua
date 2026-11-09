@@ -74,7 +74,11 @@ local function beginDirectFrame(view, frame, options)
     local coreAuthoredChoice = type(options) == "table"
         and options.coreAuthoredChoice == true
     if requiresPresentedChoice and not coreAuthoredChoice then
-        local presentedChoice
+        -- Core clears session.choices before invoking the native row action.
+        -- That adapter scopes the exact frame for this synchronous dispatch;
+        -- other callers still need a currently presented, enabled row.
+        local presentedChoice = view.semanticCoreChoiceFrame == frame
+            and { enabled = true } or nil
         for _, choice in ipairs(view.session.choices or {}) do
             local source = type(choice) == "table"
                 and type(choice.source) == "table" and choice.source or nil

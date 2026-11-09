@@ -17,8 +17,6 @@ function Repository.RestoreRecord(record, raw, identity)
         identity = identity,
         displayName = raw.displayName or raw.name,
         name = raw.displayName or raw.name,
-        visualProfile = raw.visualProfile,
-        outfit = raw.outfit,
         isFemale = raw.isFemale == true
             or (identity and identity.isFemale == true),
     })

@@ -30,8 +30,6 @@ function Types.NormalizeDefinition(definition)
         displayName = explicitName,
         archetypeID = Internal.NormalizeString(def.archetypeID),
         tacticalClass = tacticalClass,
-        outfit = def.outfit and tostring(def.outfit) or nil,
-        visualProfile = Internal.NormalizeString(def.visualProfile),
         isFemale = def.isFemale == nil and nil or def.isFemale == true,
         x = x,
         y = y,

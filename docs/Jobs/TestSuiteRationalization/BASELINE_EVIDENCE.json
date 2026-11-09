@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "capturedDate": "2026-11-06",
+  "purpose": "P0 exact-local baseline evidence; counts and timings are informational evidence, not deletion proof",
+  "repository": {
+    "branch": "main",
+    "head": "2d882b952ea41c855b8bcf3658c7b75b36945632",
+    "upstream": "origin/main",
+    "ahead": 0,
+    "behind": 0,
+    "preExistingDirtyFiles": [
+      "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticCombatResponseSurface.lua",
+      "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/SurvivorWorldExtensions/PNC_SurvivorWorldExtensions_Factions.lua",
+      "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_ActorBridge.lua"
+    ],
+    "worktreesObserved": 3,
+    "psychopatzCoreHead": "4592477f11d53faaf80837a7b8c1d0a08733a02d"
+  },
+  "inventory": {
+    "rootLuaSmokeFiles": 1007,
+    "nativeLuaFiles": 81,
+    "rootPythonFiles": 5,
+    "rootSupportFiles": 3,
+    "semanticPythonTestModules": 210,
+    "semanticPythonTestTrackedFiles": 212,
+    "semanticFixtures": 26,
+    "semanticScenarios": 5,
+    "semanticLuaWorkers": 99,
+    "semanticTestingInfrastructure": 24,
+    "uniqueNpcTrackedTestFiles": 2,
+    "auditManifestScopeFiles": 1776,
+    "auditManifestFamilies": 1424
+  },
+  "runs": [
+    {
+      "name": "root Lua default",
+      "command": "python3 tests/run_tests.py --harness-report <report>",
+      "result": "FAIL 5/1007",
+      "wallSeconds": 9.63,
+      "cpuSeconds": 25.74,
+      "maxRssKb": 78484,
+      "failures": [
+        "pnc_companion_commands_smoke.lua: outdoor camping rejection realization missing safe",
+        "pnc_semantic_harness_worker_modules_smoke.lua: protocol message bound expected 524288, actual 1048576",
+        "pnc_semantic_horde_command_ack_smoke.lua: authored acknowledgement mismatch",
+        "pnc_semantic_horde_tactical_prompt_smoke.lua: authored high-pressure prompt expectation failed",
+        "pnc_semantic_local_route_smoke.lua: local-route realization expectation mismatch"
+      ]
+    },
+    {
+      "name": "semantic Lua slice",
+      "command": "python3 tests/run_tests.py pnc_semantic --harness-report <report> --verbose",
+      "result": "FAIL 4/144",
+      "wallSeconds": 3.22,
+      "cpuSeconds": 9.67,
+      "maxRssKb": 28440,
+      "failures": [
+        "pnc_semantic_harness_worker_modules_smoke.lua",
+        "pnc_semantic_horde_command_ack_smoke.lua",
+        "pnc_semantic_horde_tactical_prompt_smoke.lua",
+        "pnc_semantic_local_route_smoke.lua"
+      ]
+    },
+    {
+      "name": "protected focused Lua slices",
+      "result": "PASS",
+      "slices": {
+        "pnc_persistence": {"cases": "6/6", "wallSeconds": 2.47},
+        "presence_boundary": {"cases": "107/107", "wallSeconds": 0.28},
+        "pnc_inventory": {"cases": "21/21", "wallSeconds": 0.21},
+        "pnc_mp": {"cases": "20/20", "wallSeconds": 0.24},
+        "profiler": {"cases": "9/9", "wallSeconds": 0.12},
+        "pnc_body": {"cases": "6/6", "wallSeconds": 0.17}
+      }
+    },
+    {
+      "name": "root Python tests",
+      "command": "python3 -m unittest discover -s tests -p 'test_*.py' -q",
+      "result": "PASS 22/22",
+      "wallSeconds": 0.09,
+      "cpuSeconds": 0.07,
+      "maxRssKb": 21052
+    },
+    {
+      "name": "unique NPC manager tests",
+      "command": "python3 -m unittest discover -s tools/unique_npc_manager/tests -p 'test_*.py' -q",
+      "result": "PASS 6/6",
+      "wallSeconds": 0.09,
+      "cpuSeconds": 0.06,
+      "maxRssKb": 16112
+    },
+    {
+      "name": "refactor binding smoke (changed files)",
+      "command": "python3 tests/refactor_binding_smoke.py",
+      "result": "PASS; scanned 3 changed Lua files",
+      "wallSeconds": 0.37,
+      "cpuSeconds": 0.29,
+      "maxRssKb": 29216
+    },
+    {
+      "name": "refactor binding smoke (all)",
+      "command": "python3 tests/refactor_binding_smoke.py --all",
+      "result": "FAIL; scanned 3340 Lua files; 6 cross-file private-helper references",
+      "failures": [
+        "PNC_SemanticDialogueSuggestions_Core.lua references sourceRecord/isActiveHubDefinition/isActiveHubCandidate from sibling capabilities module",
+        "PNC_SemanticInteractionLifecycle_State_Persistence.lua references pairKey/hasDurableMeaning from sibling storage and approximateSize from sibling projections"
+      ]
+    },
+    {
+      "name": "semantic Python full suite",
+      "command": "python3 -m tools.semantic_harness.testing.python_runner --quiet-modules --report <report>",
+      "result": "TIMEOUT after 300s; child process groups were terminated after ownership was verified",
+      "observed": "worker-backed modules did not complete; no passing total is claimed"
+    },
+    {
+      "name": "semantic Python focused worker-backed probes",
+      "command": "python3 -m tools.semantic_harness.testing.python_runner <filter> --jobs 1 --timeout 20 --quiet-modules",
+      "result": "FAIL by timeout in each selected module",
+      "observed": "direct worker probe reaches a current PsychopatzCore actorContext copy recursion and Lua stack overflow; this is recorded as a production/harness boundary defect, not as deletion or weakened assertions"
+    },
+    {
+      "name": "semantic harness doctor",
+      "command": "tools/semantic_harness/run_harness.sh --doctor --doctor-json",
+      "result": "FAIL; worker_syntax false",
+      "observed": "doctor does not inject the runtime environment required by the current worker bootstrap"
+    },
+    {
+      "name": "architecture static scan",
+      "command": "python3 .../architecture_audit.py scan . --include-tests --framework project_zomboid",
+      "result": "static signal only: 5246 files, 1313 tests indexed; production coverage 77.2%; confidence 65.1%",
+      "observed": "findings identify candidates, not deletion decisions"
+    }
+  ],
+  "assertionCounts": {
+    "rootLuaRegexInventory": {
+      "T.contains": 828,
+      "T.equal": 14922,
+      "T.falsy": 1591,
+      "T.finish": 1136,
+      "T.near": 312,
+      "T.truthy": 5451
+    },
+    "semanticPythonTestMethods": 881,
+    "semanticPythonAssertionCalls": 6612
+  },
+  "firstRationalizationBatch": {
+    "status": "pending evidence review",
+    "candidate": "pnc_semantic_harness_worker_modules_smoke.lua protocol bound assertion",
+    "classificationBeforeProof": "UNKNOWN_KEEP",
+    "requiredNextEvidence": [
+      "inspect the test assertion and current Lua/Python protocol constants",
+      "inspect callers and compatibility history",
+      "determine whether the test is stale or production behavior is defective",
+      "repair only the proven contract and rerun focused plus broader semantic suites"
+    ],
+    "deletion": "none"
+  },
+  "manifest": "docs/Jobs/TestSuiteRationalization/AUDIT_MANIFEST.json",
+  "nativeAcceptance": "not run; SP/MP native acceptance remains user-owned"
+}

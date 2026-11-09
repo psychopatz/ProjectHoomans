@@ -20,7 +20,8 @@ local localRecord = {
     },
 }
 
-local body = {}
+local bodyData = { PNC_UUID = localRecord.id, PNC_NPC = true }
+local body = { getModData = function() return bodyData end }
 
 local function buildSnapshot(record)
     fullBuilds = fullBuilds + 1

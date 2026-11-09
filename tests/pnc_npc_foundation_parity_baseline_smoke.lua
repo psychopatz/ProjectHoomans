@@ -141,11 +141,15 @@ T.load(CORE_ROOT .. "Base/PNC_Constants.lua")
 local archetype = {
     id = "parity_merchant",
     label = "Parity Merchant",
-    visualProfile = "civilian",
     skillBias = {},
-    looks = {
-        male = { { "Base.Shirt" } },
-        female = { { "Base.Dress" } },
+    appearance = {
+        schemaVersion = 2,
+        mode = "authored",
+        authority = "authored",
+        variants = {
+            male = { { "Base.Shirt" } },
+            female = { { "Base.Dress" } },
+        },
         spawnOutfit = { male = "Survivor", female = "Survivor" },
     },
     loadout = {
@@ -211,6 +215,21 @@ T.load(CORE_ROOT .. "Identity/PNC_Identity_Names.lua")
 T.load(CORE_ROOT .. "Identity/PNC_Identity_Appearance.lua")
 T.load(CORE_ROOT .. "Identity/PNC_Identity_Factory.lua")
 T.load(CORE_ROOT .. "Identity/PNC_Identity_Profile.lua")
+
+PNC.Identity.GetCoreArchetypePlan = function(record)
+    local female = record and record.isFemale == true
+    return {
+        archetypeID = archetype.id,
+        appearance = archetype.appearance,
+        appearanceItems = female
+            and { "Base.Dress" } or { "Base.Shirt" },
+        spawnOutfit = archetype.appearance.spawnOutfit,
+        inventory = {
+            attached = archetype.loadout.attached,
+            items = archetype.loadout.supplies,
+        },
+    }
+end
 
 -- Use the production relationship normalizer so directed targets and memory
 -- records are tested through the same schema used by the live service.

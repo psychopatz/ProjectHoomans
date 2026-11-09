@@ -39,7 +39,8 @@ local function isVisible()
     return PNC.MapDisplay and PNC.MapDisplay.AreBasesVisible
         and PNC.MapDisplay.AreBasesVisible()
         and PNC.MapRawEntityDebug
-        and PNC.MapRawEntityDebug.ShowRawEntities == true
+        and (PNC.MapRawEntityDebug.IsEnabled and PNC.MapRawEntityDebug.IsEnabled()
+            or not PNC.MapRawEntityDebug.IsEnabled and PNC.MapRawEntityDebug.ShowRawEntities == true)
         and PNC.Client and PNC.Client.CanUseDebug
         and PNC.Client.CanUseDebug()
 end

@@ -57,6 +57,42 @@ CANONICAL_SOURCE_MODULES = frozenset({
 # serial resource lane as canonical-source tests; this is not worker reuse.
 RESOURCE_SENSITIVE_MODULES = frozenset({
     "test_conversational_competence_c7g",
+    "test_contextual_scale_isolation",
+    # These real-worker contextual modules passed in an isolated serial
+    # rerun but produced scheduler-sensitive precision/context failures when
+    # competing with other worker-heavy modules.  Keep the tests unchanged;
+    # route only the resource-sensitive processes through the existing
+    # exclusive lane.
+    "test_c7f_dataset_precision",
+    "test_coherent_conversation_c8",
+    "test_contextual_acceptance_c6b",
+    "test_contextual_conversation_c4a",
+    "test_contextual_conversation_c4b",
+    "test_contextual_conversation_c4c",
+    "test_contextual_conversation_c4d",
+    "test_contextual_provider_parity_c6c",
+    "test_contextual_speech_behavior",
+    "test_contextual_suggestions_whats_up",
+})
+
+# These modules are still safe to run in the bounded parallel lane, but their
+# measured wall time is dominated by real production-Lua worker/fixture work.
+# Keep the topology visible in --list and reports so a fast/default run is not
+# confused with the deliberately expensive acceptance estate.  This label does
+# not share workers or weaken per-module isolation.
+SLOW_ACCEPTANCE_MODULES = frozenset({
+    "test_response_observatory_matrix",
+    "test_sweep_acceptance",
+    "test_observatory_fixture_parity",
+    "test_harness",
+    "test_contextual_talk_parity",
+    "test_behavior_fixture_parity",
+    "test_contextual_social_reactions",
+    "test_contextual_speech_behavior",
+    "test_automatic_flow_generation",
+    "test_pilot_parity",
+    "test_contextual_suggestions_s4",
+    "test_contextual_bonds",
 })
 
 EXCLUSIVE_MODULES = CANONICAL_SOURCE_MODULES | RESOURCE_SENSITIVE_MODULES
@@ -183,7 +219,9 @@ class PythonAcceptanceRunner:
     def classify(self, module: str) -> PythonModule:
         short_name = module.rsplit(".", 1)[-1]
         classification = (
-            "exclusive" if short_name in self.exclusive_modules else "parallel"
+            "exclusive" if short_name in self.exclusive_modules
+            else "acceptance_slow" if short_name in SLOW_ACCEPTANCE_MODULES
+            else "parallel"
         )
         return PythonModule(name=module, classification=classification)
 
@@ -444,6 +482,7 @@ class PythonAcceptanceRunner:
             "timeout": self.timeout,
             "headless": self.headless,
             "exclusiveModules": sorted(self.exclusive_modules),
+            "slowAcceptanceModules": sorted(SLOW_ACCEPTANCE_MODULES),
             "modules": [result.as_dict() for result in ordered],
             "slowest": [result.as_dict() for result in slowest[:DEFAULT_SLOWEST_COUNT]],
             "events": self.events,

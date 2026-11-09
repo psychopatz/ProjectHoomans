@@ -184,10 +184,8 @@ PNC.Archetypes = {
         return {
             id = id or "General",
             label = id or "General",
-            visualProfile = "colonist",
             tags = {},
             allowedJobs = {},
-            looks = {},
             skillBias = {},
             loadout = {},
         }

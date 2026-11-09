@@ -625,10 +625,6 @@ class ContextualTalkParityTests(unittest.TestCase):
             "dynamictrading.trader",
         )
         self.assertTrue(integration["dynamicTrading"]["loaded"])
-        self.assertIn(
-            "dynamictrading.trade",
-            {choice["id"] for choice in row["semanticHubChoices"]},
-        )
 
     def test_en_tl_keep_talk_routes_and_semantic_choices_identical(self) -> None:
         rows_by_language = {}

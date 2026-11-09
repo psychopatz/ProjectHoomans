@@ -110,4 +110,28 @@ T.truthy(PNC.BodyLifecycle.NoteShellCarrierID(779),
 T.truthy(PNC.BodyLifecycle.IsShellCarrierID(779),
     "new carrier id was not retained in its separate namespace")
 
+-- Engine-realistic ids: outfit index 100, variant 7, mutable hat bit.
+local male = 100 * 65536 + 7
+local female = male - 2147483648
+PNC.BodyLifecycle.NoteShellCarrierID(male)
+PNC.BodyLifecycle.NoteShellCarrierID(female + 32768)
+T.truthy(PNC.BodyLifecycle.IsShellCarrierID(male + 32768), "fallen hat lost male carrier")
+T.truthy(PNC.BodyLifecycle.IsShellCarrierID(female), "fallen hat lost female carrier")
+T.falsy(PNC.BodyLifecycle.IsShellCarrierID(male + 1), "different seed became owned")
+T.falsy(PNC.BodyLifecycle.IsShellCarrierID(male + 65536), "ordinary outfit became owned")
+-- Simulate a pre-fix saved ledger containing only the hat-on-ground form.
+store.shellCarrierIds[tostring(male)] = nil
+store.shellCarrierIds[tostring(male + 32768)] = true
+T.truthy(PNC.BodyLifecycle.IsShellCarrierID(male), "legacy hat key was not recognized")
+-- Production capacity must hold all 500 variants for both sexes across restarts.
+T.load("ProjectHoomans", "shared", "PNC/Core/Base/PNC_Constants/ReplicationBodies.lua")
+for variant = 1, 500 do
+    PNC.BodyLifecycle.NoteShellCarrierID(100 * 65536 + variant)
+    PNC.BodyLifecycle.NoteShellCarrierID(100 * 65536 + variant - 2147483648)
+end
+T.truthy(PNC.BodyLifecycle.IsShellCarrierID(100 * 65536 + 500), "male carrier capacity exhausted")
+T.truthy(PNC.BodyLifecycle.IsShellCarrierID(100 * 65536 + 500 - 2147483648), "female carrier capacity exhausted")
+PNC.BodyLifecycle.HuskLedger.loaded = false
+T.truthy(PNC.BodyLifecycle.IsShellCarrierID(male + 32768), "reloaded carrier lost hat normalization")
+
 T.finish("pnc_shell_carrier_smoke")

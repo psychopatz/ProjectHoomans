@@ -40,8 +40,6 @@ local function buildDefinition(
         name = raw.displayName or raw.name
             or (identity and identity.displayName) or nil,
         tacticalClass = raw.tacticalClass,
-        visualProfile = raw.visualProfile,
-        outfit = raw.outfit,
         isFemale = raw.isFemale == true
             or (identity and identity.isFemale == true),
         x = Codec.normalizeNumber(position.x, raw.x or 0),

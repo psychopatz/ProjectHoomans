@@ -48,9 +48,13 @@ local function buildSnapshot(record)
     }
 end
 
+local function makeBody(id)
+    local md = { PNC_UUID = id, PNC_NPC = true }
+    return { getModData = function() return md end }
+end
 local bodyByID = {
-    [attacker.id] = {},
-    [idle.id] = {},
+    [attacker.id] = makeBody(attacker.id),
+    [idle.id] = makeBody(idle.id),
 }
 
 PNC = {

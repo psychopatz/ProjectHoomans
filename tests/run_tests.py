@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import subprocess
 import sys
@@ -59,8 +60,39 @@ def test_environment(verbose: bool) -> dict[str, str]:
     return environment
 
 
-def discover(filters: list[str]) -> list[Path]:
+def discover(filters: list[str], domain: str | None = None) -> list[Path]:
     tests = sorted(TESTS.glob("*_smoke.lua"))
+    if domain:
+        ledger_path = ROOT / "docs/Jobs/TestSuiteRationalization/R1_ROOT_DOMAIN_REVIEW.json"
+        try:
+            ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            raise RuntimeError(
+                "root domain ledger unavailable; run the R1 audit first"
+            ) from error
+        reviewed = ledger.get("pathReviews", {})
+        selected = {
+            ROOT / path for path, review in reviewed.items()
+            if isinstance(review, dict)
+            and review.get("domain") == domain
+        }
+        # R1 records domain on the ledger key's domainReviews, not every path;
+        # infer it from the root filename groups when the path record is used.
+        if not selected:
+            domain_reviews = ledger.get("domainReviews", {})
+            if domain not in domain_reviews:
+                raise RuntimeError(f"unknown root Lua domain: {domain}")
+            # The review ledger is intentionally the selection manifest.  Its
+            # path records carry the domain in their evidence prefix.
+            selected = {
+                ROOT / path for path, review in reviewed.items()
+                if isinstance(review, dict)
+                and any(
+                    str(item).startswith(f"R1 {domain}:")
+                    for item in review.get("evidence", [])
+                )
+            }
+        tests = [path for path in tests if path in selected]
     if filters:
         lowered = [value.casefold() for value in filters]
         tests = [path for path in tests
@@ -105,6 +137,10 @@ def bounded_output(output: str, maximum_lines: int) -> str:
 def parse_args(arguments: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("filters", nargs="*", help="case-insensitive test-name filters")
+    parser.add_argument(
+        "--domain",
+        help="run one reviewed root-Lua domain from R1_ROOT_DOMAIN_REVIEW.json",
+    )
     parser.add_argument("--jobs", type=int, default=min(4, os.cpu_count() or 1))
     parser.add_argument("--timeout", type=float, default=30.0, help="seconds per test")
     parser.add_argument("--max-output-lines", type=int, default=80)
@@ -133,7 +169,11 @@ def parse_args(arguments: list[str]) -> argparse.Namespace:
 def main(arguments: list[str] | None = None) -> int:
     install_suite_shutdown_handler()
     options = parse_args(arguments or sys.argv[1:])
-    tests = discover(options.filters)
+    try:
+        tests = discover(options.filters, options.domain)
+    except RuntimeError as error:
+        print(f"Test selection error: {error}", file=sys.stderr)
+        return 2
     if options.list:
         for path in tests:
             print(path.relative_to(ROOT))

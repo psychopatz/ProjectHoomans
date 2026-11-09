@@ -4,6 +4,8 @@
 PNC = PNC or {}
 PNC.MapRawEntityDebug = PNC.MapRawEntityDebug or {}
 
+local CoreMap = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldClient"
 local DebugMap = PNC.MapRawEntityDebug
 local Menu = require "PsychopatzCore/UI/Map/PsychopatzMapToolsMenu"
 
@@ -23,9 +25,21 @@ local function canDebug()
         and PNC.Client.CanUseDebug() == true
 end
 
+function DebugMap.IsEnabled()
+    if CoreMap.IsDebugPresentationEnabled then
+        return CoreMap.IsDebugPresentationEnabled()
+    end
+    return DebugMap.ShowRawEntities == true and canDebug()
+end
+
 function DebugMap.ToggleRawEntities()
     if not canDebug() then return false, "not_authorized" end
-    DebugMap.ShowRawEntities = not DebugMap.ShowRawEntities
+    local enabled = not DebugMap.IsEnabled()
+    if CoreMap.SetDebugPresentationEnabled then
+        local accepted, reason = CoreMap.SetDebugPresentationEnabled(enabled)
+        if not accepted then return false, reason end
+    end
+    DebugMap.ShowRawEntities = enabled
     if DebugMap.ShowRawEntities and PNC.Client then
         if type(PNC.Client.RequestCommunityDebug) == "function" then
             PNC.Client.RequestCommunityDebug()
@@ -47,13 +61,16 @@ end
 if Menu and type(Menu.Register) == "function" then
     Menu.Register("ProjectHoomans:raw_entities", {
         order = 40,
-        visible = canDebug,
+        visible = function()
+            return canDebug() and not (Menu.EntriesByID
+                and Menu.EntriesByID["PsychopatzCore:actor_debug_presentation"])
+        end,
         title = function()
             return text(
-                DebugMap.ShowRawEntities
+                DebugMap.IsEnabled()
                     and "UI_PNC_DebugDiscoveryHideRaw"
                     or "UI_PNC_DebugDiscoveryShowRaw",
-                DebugMap.ShowRawEntities
+                DebugMap.IsEnabled()
                     and "Hide raw Hoomans overlays"
                     or "Show raw Hoomans overlays"
             )

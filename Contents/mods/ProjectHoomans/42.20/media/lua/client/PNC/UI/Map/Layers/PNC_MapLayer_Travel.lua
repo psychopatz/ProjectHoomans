@@ -19,6 +19,7 @@ local Icons = PNC.MapMarkerIcons
 local HoverPortrait = require
     "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldMapHover"
 local Palette = PNC.NPCTypePalette
+local HOVER_OWNER = "ProjectHoomans:pnc_travel"
 local Identity = PNC.NPCIdentityPresentation
 
 TravelLayer.Enabled = TravelLayer.Enabled ~= false
@@ -462,7 +463,9 @@ local function drawTravelHover(map, hoveredEntry, hoveredX, hoveredY)
                 map,
                 hoveredEntry,
                 hoveredX,
-                hoveredY
+                hoveredY,
+                nil,
+                HOVER_OWNER
             )
             or false
         local label = displayLabel(hoveredEntry)
@@ -492,14 +495,14 @@ local function drawTravelHover(map, hoveredEntry, hoveredX, hoveredY)
             )
         end
     elseif HoverPortrait and HoverPortrait.Hide then
-        HoverPortrait.Hide(map)
+        HoverPortrait.Hide(map, true, HOVER_OWNER)
     end
 end
 
 function TravelLayer.Render(map)
     if not TravelLayer.Enabled or not map or not map.mapAPI then
         if HoverPortrait and HoverPortrait.Hide then
-            HoverPortrait.Hide(map)
+            HoverPortrait.Hide(map, true, HOVER_OWNER)
         end
         return
     end

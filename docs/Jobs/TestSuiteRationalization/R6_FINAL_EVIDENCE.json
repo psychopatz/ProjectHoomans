@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "phase": "R6",
+  "status": "developer_side_validated_native_handoff",
+  "capturedDate": "2026-11-06",
+  "repository": {
+    "branch": "main",
+    "head": "9572b548f19b6229a7c5e7887047baa9cc783993",
+    "upstream": "origin/main",
+    "ahead": 0,
+    "behind": 0,
+    "worktree": "dirty; 67 status entries (45 modified, 1 deleted, 21 untracked, including this R6 evidence artifact); no reset, stash, discard, branch, native PZ launch, or Workshop publish",
+    "worktreeInterpretation": "branch synchronization is clean (0/0); worktree cleanliness is not claimed",
+    "preservedConcurrentFiles": [
+      "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/Layers/PNC_MapLayer_Travel.lua",
+      "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Identity/PNC_Identity_Appearance.lua",
+      "tests/pnc_map_travel_layer_smoke.lua",
+      "tests/pnc_unique_npc_appearance_smoke.lua"
+    ],
+    "preExistingUnrelatedProductionFiles": 3
+  },
+  "inventoryBefore": {
+    "baselineCommit": "2d882b952ea41c855b8bcf3658c7b75b36945632",
+    "scopedFiles": 1776,
+    "pathFamilies": 1424,
+    "executableEntries": 1301,
+    "rootLuaSmokeFiles": 1007,
+    "nativeLuaFixtures": 81,
+    "semanticPythonModules": 210,
+    "semanticLuaWorkers": 99,
+    "semanticFixtures": 26,
+    "semanticScenarios": 5
+  },
+  "inventoryAfter": {
+    "activeScopedFiles": 1775,
+    "activePathFamilies": 1423,
+    "activeExecutableEntries": 1300,
+    "rootLuaSmokeFiles": 1007,
+    "nativeLuaFixtures": 81,
+    "semanticPythonModules": 209,
+    "semanticLuaWorkers": 99,
+    "semanticFixtures": 26,
+    "semanticScenarios": 5
+  },
+  "manifestReviewState": {
+    "trackedScopeFiles": 1776,
+    "families": 1424,
+    "activeFamilies": 1423,
+    "activeExecutableEntries": 1300,
+    "UNREVIEWED": 0,
+    "pending_family_review": 0,
+    "UNKNOWN_KEEP": 0,
+    "reviewedEntries": 1776,
+    "reviewedFamilies": 1423,
+    "classifications": {
+      "KEEP_CANONICAL": 1275,
+      "KEEP_BOUNDARY_SPECIFIC": 495,
+      "REPAIR": 5,
+      "DELETE_SUPERSEDED": 1
+    }
+  },
+  "footprintMethod": "lines are newline count plus one per active manifest file; bytes are UTF-8 source bytes; assertionCalls use the audit tool's Lua T/assert and Python assert-family scanners",
+  "footprintBefore": {
+    "allScopedFiles": {
+      "files": 1776,
+      "loc": 691256,
+      "bytes": 38836037,
+      "assertionCalls": 30957
+    },
+    "rootLua": {
+      "files": 1007,
+      "loc": 177878,
+      "bytes": 6244177,
+      "assertionCalls": 24380
+    }
+  },
+  "footprintAfter": {
+    "activeManifestFiles": {
+      "files": 1775,
+      "loc": 691402,
+      "bytes": 38841162,
+      "assertionCalls": 30926
+    },
+    "rootLuaIncludingPreservedConcurrentWork": {
+      "files": 1007,
+      "loc": 177980,
+      "bytes": 6247625,
+      "assertionCalls": 24388
+    },
+    "rootLuaRationalizationAdjustedExcludingConcurrentFourFileDelta": {
+      "loc": 177876,
+      "bytes": 6244107,
+      "assertionCalls": 24380,
+      "note": "This adjusted view is informational only; the authoritative worktree metric above includes preserved concurrent work."
+    }
+  },
+  "runs": {
+    "rootDefaultBefore": "FAIL 5/1007 in 9.63s",
+    "rootDefaultAfter": "PASS 1007/1007 in 9.60s (4 workers)",
+    "semanticLuaBefore": "FAIL 4/144 in 3.22s",
+    "semanticLuaAfter": "PASS 144/144 in 3.28s (4 workers)",
+    "rootPythonAfter": "PASS 22/22",
+    "uniqueNpcAfter": "PASS 6/6",
+    "refactorBindingAfter": "PASS; scanned 3340 Lua files; no cross-file private helper leaks",
+    "doctorAfter": "PASS; worker_syntax and worker_boot",
+    "rootFocusedDomainsAfter": [
+      "persistence PASS 11/11 in 2.74s",
+      "presence_body PASS 101/101 in 0.42s",
+      "inventory PASS 41/41 in 0.20s",
+      "mp_network PASS 80/80 in 0.46s"
+    ],
+    "semanticPythonBefore": "PASS 198, SKIP 11, FAIL 0, TOTAL 209 in 1036.639s; prior parallel topology",
+    "semanticPythonAfter": "PASS 198, SKIP 11, FAIL 0, TOTAL 209 in 1005.234s; max-active=4; final routed report ok=true",
+    "semanticPythonFailureRecovery": "The first final attempt had 10 parallel-contention failures; all 10 passed in a serial focused run. Routing them through the existing exclusive lane made the final full run pass.",
+    "pzVerifyAfter": "PASS; 3316 files scanned, 0 ERROR findings",
+    "native": "not executed; native SP/MP acceptance remains user-owned"
+  },
+  "slowSemanticModulesAfter": [
+    ["test_response_observatory_matrix", 181.145],
+    ["test_sweep_acceptance", 109.098],
+    ["test_observatory_fixture_parity", 104.080],
+    ["test_harness", 93.415],
+    ["test_contextual_talk_parity", 81.172],
+    ["test_behavior_fixture_parity", 70.163],
+    ["test_contextual_social_reactions", 69.726],
+    ["test_pilot_parity", 60.078],
+    ["test_automatic_flow_generation", 57.437],
+    ["test_contextual_suggestions_s4", 54.090],
+    ["test_contextual_speech_behavior", 53.204],
+    ["test_contextual_bonds", 48.102]
+  ],
+  "rationalizationActions": {
+    "rootDomainFamiliesReviewed": 1007,
+    "rootDomainsReviewed": 19,
+    "repeatedContractMerges": 0,
+    "additionalDeletions": 0,
+    "acceptedSupersededDeletions": 1,
+    "executionTierMoves": 0,
+    "acceptanceSlowLabels": 12,
+    "resourceSensitiveExclusiveRoutes": 10,
+    "reason": "No other deletion or merge passed the evidence gate; valuable authority-boundary, migration, native, and isolation coverage was retained."
+  },
+  "evidenceArtifacts": [
+    "AUDIT_MANIFEST.json",
+    "R0_DIFF_REVIEW.json",
+    "R1_ROOT_DOMAIN_REVIEW.json",
+    "R2_REPEATED_CONTRACT_AUDIT.json",
+    "R3_LEGACY_FAMILY_AUDIT.json",
+    "R4_SEMANTIC_SLOW_REVIEW.json",
+    "R5_SUITE_TOPOLOGY.json",
+    "ESTATE_REVIEW.json"
+  ],
+  "nativeHandoff": "Developer-side review, tooling, consolidation analysis, routing, and validation are complete. User-owned native Project Zomboid SP/MP/save/reload acceptance remains outstanding and was not claimed as PASS."
+}

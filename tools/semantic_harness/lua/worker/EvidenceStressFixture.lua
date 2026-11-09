@@ -3,6 +3,15 @@ local Fixture = {}
 local ContextProjection = require "worker/Conversation_Context"
 local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
 
+local function relationshipLimit()
+    local coreSocial = PsychopatzCore and PsychopatzCore.Actors
+        and PsychopatzCore.Actors.Social or nil
+    return math.max(1, math.floor(
+        tonumber(coreSocial and coreSocial.MAX_MEMORIES)
+            or tonumber(PNC.RelationshipConstants.MEMORY_LIMIT) or 1
+    ))
+end
+
 function Fixture.Run(context, payload)
     payload = type(payload) == "table" and payload or {}
     local Runtime = context.Runtime
@@ -57,6 +66,7 @@ function Fixture.Run(context, payload)
             durable = #(record.memory and record.memory.l or {}) / 4,
             topicPlayers = #(record.memory and record.memory.t or {}) / 2 },
         evidence = evidence, queryIterations = iterations, roots = roots,
-        limits = { topicPlayers = Events.TOPIC_PLAYER_LIMIT, topicMask = Events.TOPIC_MASK_LIMIT } }
+        limits = { relationship = relationshipLimit(),
+            topicPlayers = Events.TOPIC_PLAYER_LIMIT, topicMask = Events.TOPIC_MASK_LIMIT } }
 end
 return Fixture

@@ -20,6 +20,12 @@ local function clone(val)
     return res
 end
 
+local function hasEntries(value)
+    if type(value) ~= "table" then return false end
+    for _ in pairs(value) do return true end
+    return false
+end
+
 function Adapter.ToCoreSocial(recordSocial, core)
     local Social = service(core or PsychopatzCore)
     if not Social or type(Social.NewState) ~= "function" then
@@ -214,6 +220,16 @@ function Adapter.SyncToCore(record, core)
     -- Non-destructive Core-first mutation: operate on existing Core social state
     local currentSocial = actor.social and clone(actor.social) or Social.NewState()
 
+    -- A newly registered Core actor may legitimately have an empty social
+    -- personality while the existing Hoomans record already carries the
+    -- authored/generated profile. Seed that empty Core slot once; never let a
+    -- stale Hoomans projection replace a non-empty Core-owned personality.
+    if not hasEntries(currentSocial.personality)
+        and hasEntries(record.social.personality)
+    then
+        currentSocial.personality = clone(record.social.personality)
+    end
+
     -- 1. Preserve foreign top-level extensions, update ProjectHoomans top-level
     currentSocial.extensions = currentSocial.extensions or {}
     currentSocial.extensions.ProjectHoomans = {
@@ -307,9 +323,16 @@ function Adapter.SyncToCore(record, core)
 
     currentSocial.revision = (tonumber(currentSocial.revision) or 0) + 1
 
-    local committed, commitReason = core.Actors.DefaultRegistry:Commit(actorID, {
-        social = currentSocial,
-    })
+    local authority = core.Actors.SocialAuthority
+    if not authority or type(authority.CommitSocial) ~= "function" then
+        return false, "core_social_authority_unavailable"
+    end
+    local committed, commitReason = authority.CommitSocial(
+        actorID,
+        currentSocial,
+        core,
+        actor.revision
+    )
     if not committed then
         return false, commitReason
     end

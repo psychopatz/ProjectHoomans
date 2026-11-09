@@ -11,7 +11,6 @@ local bundle = {
         label = "Scavenger",
         type = "raider",
         tags = { "hostile", "scavenger" },
-        visualProfile = "hostile",
         defaultForFaction = "hostile",
         allowedJobs = {
             RoamArea = true,
@@ -19,22 +18,27 @@ local bundle = {
             EngageTarget = true,
         },
     },
-    looks = {
+    appearance = {
+        schemaVersion = 2,
+        mode = "authored",
+        authority = "authored",
         spawnOutfit = {
             male = "PNCHostileMale",
             female = "PNCHostileFemale",
         },
-        male = {
+        variants = {
+            male = {
             { "Base.Hat_Beany", "Base.PonchoGarbageBag", "Base.Trousers_JeanBaggy", "Base.Shoes_Slippers" },
             { "Base.Hat_GasMask", "Base.HoodieDOWN_WhiteTINT", "Base.Trousers_Crafted_Burlap", "Base.Shoes_Random" },
             { "Base.Hat_BalaclavaFace", "Base.Jacket_PaddedDOWN", "Base.Trousers_Padded", "Base.Shoes_BlackBoots" },
             { "Base.Hat_HeadSack_Burlap", "Base.Shirt_Crafted_DenimRandom", "Base.Trousers_Crafted_DenimRandom", "Base.Shoes_TrainerTINT" },
-        },
-        female = {
+            },
+            female = {
             { "Base.Hat_Beany", "Base.PonchoGarbageBag", "Base.Trousers_JeanBaggy", "Base.Shoes_Slippers" },
             { "Base.Hat_GasMask", "Base.HoodieDOWN_WhiteTINT", "Base.Skirt_Long_Crafted_Burlap", "Base.Shoes_Random" },
             { "Base.Hat_BalaclavaFace", "Base.Jacket_PaddedDOWN", "Base.Trousers_Padded", "Base.Shoes_BlackBoots" },
             { "Base.Hat_HeadSack_Burlap", "Base.Dress_Knees_Crafted_DenimRandom", "Base.Shoes_TrainerTINT" },
+            },
         },
     },
     skills = {

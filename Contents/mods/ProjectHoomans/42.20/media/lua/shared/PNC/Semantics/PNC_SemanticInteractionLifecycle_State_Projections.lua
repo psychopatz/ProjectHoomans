@@ -108,5 +108,6 @@ function Lifecycle.ResponseWindow(store, playerUUID, npcID)
     }
 end
 
+Internal.ApproximateSize = approximateSize
 
 return Lifecycle

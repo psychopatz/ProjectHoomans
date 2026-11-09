@@ -4,16 +4,9 @@ Use this only when actively implementing the current P11 roadmap.
 
 ## Read order
 
-Read root `AGENTS.md`, then:
+Use progressive disclosure. Read root `AGENTS.md`, then `PROGRESS.md`, then `HANDOFF.md` last among bootstrap-state docs and verify its checkpoint before trusting it. Read this runbook for durable procedure. Open only the current P11 ROADMAP phase and the ARCHITECTURE contract needed for that domain.
 
-1. `README.md`;
-2. `ARCHITECTURE.md`;
-3. this runbook;
-4. `ROADMAP.md`;
-5. `PROGRESS.md` last.
-
-Completed phase/characterization history is not part of the normal bootstrap.
-Use Git history only when investigating a specific regression.
+Use Codebase Memory for retrievable structure. Completed phase/characterization history is not part of the normal bootstrap. Use Git history only when investigating a specific regression.
 
 ## Source and generation discipline
 

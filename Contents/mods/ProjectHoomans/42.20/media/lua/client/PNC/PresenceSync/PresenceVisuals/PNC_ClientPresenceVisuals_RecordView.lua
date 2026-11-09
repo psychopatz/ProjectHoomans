@@ -30,7 +30,6 @@ local function buildRecordView(snapshot)
         },
         presenceState = snapshot and snapshot.presenceState or Const.PRESENCE_ABSTRACT,
         weaponMode = snapshot and snapshot.weaponMode or "melee",
-        visualProfile = snapshot and snapshot.visualProfile or nil,
         isFemale = snapshot and snapshot.isFemale == true or false,
         identitySeed = snapshot and snapshot.identitySeed or 1,
         archetypeID = snapshot and snapshot.archetypeID or nil,

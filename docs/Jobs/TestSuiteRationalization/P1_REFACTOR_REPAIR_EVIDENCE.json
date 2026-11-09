@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "phase": "P1",
+  "batch": "cross-file private-helper ownership repair",
+  "classification": "REPAIR",
+  "deletion": {
+    "filesDeleted": 0,
+    "testsDeleted": 0,
+    "reason": "the refactor smoke is canonical boundary coverage and all six findings mapped to an actual split ownership defect"
+  },
+  "findingsBefore": [
+    {
+      "owner": "PNC_SemanticDialogueSuggestions_Core.lua",
+      "references": ["sourceRecord", "isActiveHubDefinition", "isActiveHubCandidate"],
+      "cause": "helpers moved to Capabilities_Core.lua but stale nil global reads remained in the old core export tail",
+      "repair": "removed stale exports; Capabilities_Core remains the sole owner and ordered public composition loads it before branch/build consumers"
+    },
+    {
+      "owner": "PNC_SemanticInteractionLifecycle_State_Persistence.lua",
+      "references": ["pairKey", "hasDurableMeaning", "approximateSize"],
+      "cause": "the split persistence module exported helpers it neither declared nor owned; ordered loading could reset valid Storage exports to nil",
+      "repair": "removed stale persistence exports and exported the local approximateSize from State_Projections, its actual owner"
+    }
+  ],
+  "productionFilesChanged": [
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueSuggestions_Core.lua",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionLifecycle_State_Persistence.lua",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticInteractionLifecycle_State_Projections.lua"
+  ],
+  "preservedContracts": [
+    "public DialogueSuggestions composition and ordered capability/branch/build loading",
+    "InteractionLifecycle Storage PairKey and HasDurableMeaning ownership",
+    "InteractionLifecycle Export/Import behavior and Metrics pairCapsuleBytes calculation",
+    "existing persistence, lifecycle, suggestions, and authority tests"
+  ],
+  "validation": [
+    {
+      "command": "python3 tests/refactor_binding_smoke.py --all",
+      "result": "PASS; scanned 3340 Lua files; zero cross-file private-helper findings"
+    },
+    {
+      "command": "python3 tests/refactor_binding_smoke.py",
+      "result": "PASS; scanned 6 changed Lua files"
+    },
+    {
+      "command": "python3 tests/run_tests.py pnc_semantic_dialogue_suggestions pnc_semantic_interaction_lifecycle pnc_semantic_suggestion --verbose",
+      "result": "PASS 4/4; 0.07 seconds"
+    }
+  ],
+  "next": "Investigate the Semantic Python worker stack-overflow boundary without weakening worker-backed tests or changing sibling Core outside the target repository scope."
+}

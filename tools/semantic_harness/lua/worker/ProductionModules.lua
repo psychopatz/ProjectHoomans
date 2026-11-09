@@ -320,6 +320,17 @@ function ProductionModules.loadOptional(context)
     if not ok then
         error("optional Dynamic Trading load failed: " .. tostring(reason))
     end
+    -- Optional semantic packs register capabilities after the worker's
+    -- startup catalog pass. Re-run the existing catalog owner so the newly
+    -- loaded Dynamic Trading action is discoverable through the normal
+    -- provider lane; do not synthesize a worker-side candidate.
+    local capabilityCatalog = PNC and PNC.Semantics
+        and PNC.Semantics.CapabilityCatalog or nil
+    if capabilityCatalog
+        and type(capabilityCatalog.EnsureAutomaticGeneration) == "function"
+    then
+        capabilityCatalog.EnsureAutomaticGeneration()
+    end
     -- The worker scenario describes the external actor fixture; materialize
     -- that fixture through Dynamic Trading's own registry so role lookup,
     -- category revalidation, and later trade ownership use the dependency's

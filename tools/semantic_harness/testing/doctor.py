@@ -98,8 +98,17 @@ def run_doctor(
     syntax_ok = False
     if resolved_lua is not None and worker_script.is_file():
         try:
+            syntax_environment = os.environ.copy()
+            syntax_environment["PNC_DOCTOR_WORKER_SCRIPT"] = str(
+                worker_script
+            )
             syntax = subprocess.run(
-                [str(resolved_lua), "-e", "assert(loadfile(arg[1]))", str(worker_script)],
+                [
+                    str(resolved_lua),
+                    "-e",
+                    "assert(loadfile(os.getenv('PNC_DOCTOR_WORKER_SCRIPT')))",
+                ],
+                env=syntax_environment,
                 capture_output=True,
                 text=True,
                 timeout=2.0,

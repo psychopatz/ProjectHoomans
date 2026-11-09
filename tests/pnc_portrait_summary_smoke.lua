@@ -14,6 +14,20 @@ local function deepCopy(value)
     return output
 end
 
+local coreAppearance = {
+    schemaVersion = 2,
+    mode = "authored",
+    authority = "authored",
+    variants = {
+        male = { { "Base.Shirt_FormalWhite", "Base.Trousers" } },
+        female = { { "Base.Shirt_FormalWhite", "Base.Trousers" } },
+    },
+    spawnOutfit = {
+        male = "PNCCompanionMale",
+        female = "PNCCompanionFemale",
+    },
+}
+
 PNC = {
     Core = {
         DeepCopy = deepCopy,
@@ -23,20 +37,8 @@ PNC = {
             return {
                 id = "General",
                 label = "General",
-                visualProfile = "colonist",
                 allowedJobs = {},
-                looks = {
-                    male = {
-                        { "Base.Shirt_FormalWhite", "Base.Trousers" },
-                    },
-                    female = {
-                        { "Base.Shirt_FormalWhite", "Base.Trousers" },
-                    },
-                    spawnOutfit = {
-                        male = "PNCCompanionMale",
-                        female = "PNCCompanionFemale",
-                    },
-                },
+                appearance = coreAppearance,
             }
         end,
         GetColonistDefaults = function() return { "General" } end,
@@ -49,6 +51,14 @@ PNC = {
 
 T.load(ROOT .. "Identity/PNC_Identity.lua")
 T.load(ROOT .. "Identity/PNC_Identity_Profile.lua")
+PNC.Identity.GetCoreArchetypePlan = function(record)
+    return {
+        archetypeID = "General",
+        appearance = coreAppearance,
+        appearanceItems = { "Base.Shirt_FormalWhite", "Base.Trousers" },
+        spawnOutfit = coreAppearance.spawnOutfit,
+    }
+end
 T.load(ROOT .. "Identity/PNC_Identity_Portrait.lua")
 
 local record = {

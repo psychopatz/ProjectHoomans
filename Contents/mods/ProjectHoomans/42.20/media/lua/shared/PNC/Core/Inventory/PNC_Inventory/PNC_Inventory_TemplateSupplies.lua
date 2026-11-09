@@ -7,22 +7,59 @@ local Internal = Inventory.Internal
 local Core = PNC.Core
 local Builder = {}
 
+local function resolveTemplateKey(source, prefix, fallbackKey, counts, archetypeID)
+    source = type(source) == "table" and source or {}
+    local explicitKey = Internal.normalizeString(
+        source.key or source.templateKey
+    )
+    local repaired = false
+    local sourceType
+    local baseKey
+    local fullKey
+
+    if explicitKey then
+        baseKey = explicitKey
+    else
+        repaired = true
+        if fallbackKey ~= nil then
+            baseKey = tostring(fallbackKey)
+        else
+            sourceType = Internal.normalizeString(
+                source.type or source.fullType
+            ) or "unknown"
+            counts = counts or {}
+            counts[sourceType] = (counts[sourceType] or 0) + 1
+            baseKey = sourceType .. ":" .. tostring(counts[sourceType])
+        end
+    end
+
+    fullKey = tostring(prefix or "") .. tostring(baseKey)
+    if repaired and Core and Core.LogDebug then
+        Core.LogDebug("PNC template supply stable key repaired archetype="
+            .. tostring(archetypeID) .. " source=" .. tostring(prefix)
+            .. " type=" .. tostring(source.type or source.fullType)
+            .. " key=" .. fullKey)
+    end
+    return fullKey
+end
+
+-- One template-key contract is shared by archetype supplies and canonical
+-- starting items. Runtime/world items may remain keyless; only deterministic
+-- template construction comes through this resolver.
+function Builder.ResolveTemplateKey(source, prefix, fallbackKey, counts, archetypeID)
+    return resolveTemplateKey(source, prefix, fallbackKey, counts, archetypeID)
+end
+
 local function createSupplyItems(record, base, supplies, prefix, bagContainerID, archetypeID)
     local counts = {}
     local supply
     local templateKey
     local i
     for i = 1, #(supplies or {}) do
-        supply = supplies[i]
-        templateKey = Internal.normalizeString(supply.key or supply.templateKey)
-        if not templateKey then
-            counts[tostring(supply.type)] = (counts[tostring(supply.type)] or 0) + 1
-            templateKey = tostring(supply.type) .. ":" .. tostring(counts[tostring(supply.type)])
-            if Core.LogWarn then
-                Core.LogWarn("PNC spawn supply missing stable key archetype="
-                    .. tostring(archetypeID) .. " type=" .. tostring(supply.type))
-            end
-        end
+        supply = type(supplies[i]) == "table" and supplies[i] or {}
+        templateKey = Builder.ResolveTemplateKey(
+            supply, prefix, nil, counts, archetypeID
+        )
         local created = Internal.createItem(record, base, {
             type = supply.type,
             stack = supply.stack,
@@ -42,7 +79,7 @@ local function createSupplyItems(record, base, supplies, prefix, bagContainerID,
                 and bagContainerID
                 or "root",
             preferredContainer = supply.preferredContainer,
-            templateKey = tostring(prefix) .. tostring(templateKey),
+            templateKey = templateKey,
             legacyTemplateKey = prefix == "tmpl:supply:"
                 and "tmpl:supply:" .. tostring(i)
                 or nil,

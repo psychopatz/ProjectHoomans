@@ -25,7 +25,9 @@ PNC = {
             for key, item in pairs(value) do output[key] = PNC.Core.DeepCopy(item) end
             return output
         end,
-        LogWarn = function() end,
+        LogWarn = function()
+            PNC.KeyWarningCount = (PNC.KeyWarningCount or 0) + 1
+        end,
     },
     Sandbox = {
         NPCMeleeWeaponSpawnChance = function() return 0 end,
@@ -69,6 +71,7 @@ PNC = {
                 version = 1,
                 items = {
                     { templateKey = "money", type = "Base.Money", stack = 1000 },
+                    { type = "Base.Crowbar", stack = 1 },
                 },
             }
         end,
@@ -264,10 +267,47 @@ T.truthy(PNC.UniqueTemplateMoney, "unique inventory template item missing")
 T.equal(PNC.UniqueTemplateMoney.stack, 1000, "unique inventory template stack")
 T.equal(PNC.UniqueTemplateMoney.templateKey, "tmpl:unique:money",
     "unique inventory template key")
+PNC.UniqueLegacyBandage = nil
+for _, item in pairs(PNC.UniqueTemplateInventory.items) do
+    if item.type == "Base.Crowbar" then PNC.UniqueLegacyBandage = item end
+end
+T.truthy(PNC.UniqueLegacyBandage, "legacy unique inventory item missing")
+T.equal(PNC.UniqueLegacyBandage.templateKey, "tmpl:unique:Base.Crowbar:1",
+    "legacy unique inventory item receives one deterministic key")
+T.equal(PNC.KeyWarningCount or 0, 0,
+    "legacy template key repair does not emit a warning")
 PNC.UniqueTemplateSaved = PNC.Inventory.Serialize(PNC.UniqueTemplateRecord)
 T.equal(PNC.UniqueTemplateSaved[2], "SEED_ONLY", "unique unchanged baseline mode")
 T.equal(PNC.UniqueTemplateSaved[4].templateRef, "unique:test:v1",
     "unique inventory template reference persisted")
+
+PNC.CanonicalTemplateRecord = {
+    id = "npc_canonical_template",
+    identitySeed = 88,
+    archetypeID = "Test",
+    inventoryAuthority = "canonical",
+    startingItems = {
+        { key = "authored_pistol", type = "Base.Pistol", stack = 1 },
+        { type = "Base.Bandage", stack = 1 },
+    },
+    equipment = { worn = {}, attached = {} },
+    runtime = {},
+}
+PNC.CanonicalTemplateInventory = PNC.Inventory.CreateFromTemplate(
+    PNC.CanonicalTemplateRecord
+)
+PNC.CanonicalAuthoredItem = nil
+PNC.CanonicalLegacyItem = nil
+for _, item in pairs(PNC.CanonicalTemplateInventory.items) do
+    if item.type == "Base.Pistol" then PNC.CanonicalAuthoredItem = item end
+    if item.type == "Base.Bandage" then PNC.CanonicalLegacyItem = item end
+end
+T.equal(PNC.CanonicalAuthoredItem.templateKey, "dt:canonical:authored_pistol",
+    "canonical authored key uses the shared template resolver")
+T.equal(PNC.CanonicalAuthoredItem.legacyTemplateKey, "dt:canonical:1",
+    "canonical authored key keeps its index compatibility alias")
+T.equal(PNC.CanonicalLegacyItem.templateKey, "dt:canonical:2",
+    "canonical legacy item keeps its deterministic index key")
 
 loadout.supplies[#loadout.supplies + 1] = {
     key = "new_template_item",

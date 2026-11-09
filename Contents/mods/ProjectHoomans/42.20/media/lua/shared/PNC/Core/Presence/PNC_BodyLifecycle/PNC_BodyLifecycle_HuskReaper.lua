@@ -327,13 +327,10 @@ local function queueHuskReap(zombie, entry, reason)
     local reaper = Lifecycle.HuskReaper
     local pending = reaper.pending
     local identity
-    if not zombie or pendingContains(zombie) then
+    if not zombie then
         return false
     end
     if not entry and not matchesOrphanedShell(zombie) then
-        return false
-    end
-    if #pending >= (tonumber(Const.HUSK_REAP_PENDING_MAX) or 32) then
         return false
     end
     -- Positive identity proof is already established here. Neutralize the
@@ -344,6 +341,13 @@ local function queueHuskReap(zombie, entry, reason)
     end
     if Internal.clearBodyCombat then
         pcall(Internal.clearBodyCombat, zombie)
+    end
+    -- Queue pressure must never leave an identified shell able to bite.
+    -- Existing pending bodies are neutralized again if the engine reset AI.
+    if pendingContains(zombie)
+        or #pending >= (tonumber(Const.HUSK_REAP_PENDING_MAX) or 32)
+    then
+        return false
     end
     if not entry then
         reaper.orphanReaps = (tonumber(reaper.orphanReaps) or 0) + 1
@@ -731,4 +735,25 @@ if Events and Events.OnZombieCreate and Events.OnZombieCreate.Add then
         pcall(Events.OnZombieCreate.Remove, Lifecycle.OnZombieCreate)
     end
     Events.OnZombieCreate.Add(Lifecycle.OnZombieCreate)
+end
+
+-- Save/chunk loads can miss OnZombieCreate, and creation can precede outfit
+-- initialization. Recognize durable carriers at the update boundary too;
+-- removal still waits for the existing authority-owned, revalidated pump.
+function Lifecycle.OnHuskZombieUpdate(zombie)
+    if Internal.SpawnInProgress == true or not isAuthority()
+        or not zombie or isMarkedBody(zombie) or isDeadBody(zombie)
+    then
+        return
+    end
+    if matchesOrphanedShell(zombie) then
+        Lifecycle.OnZombieCreate(zombie)
+    end
+end
+
+if Events and Events.OnZombieUpdate and Events.OnZombieUpdate.Add then
+    if Events.OnZombieUpdate.Remove then
+        Events.OnZombieUpdate.Remove(Lifecycle.OnHuskZombieUpdate)
+    end
+    Events.OnZombieUpdate.Add(Lifecycle.OnHuskZombieUpdate)
 end

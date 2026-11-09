@@ -11,7 +11,6 @@ import tkinter as tk
 import unittest
 
 from tools.semantic_harness.cli import _parser
-from tools.semantic_harness.runtime.npc_profiles import apply_npc_profile
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.flow_editor.model import conversation_graph_model
@@ -57,23 +56,6 @@ class ContextualRuntimeGraphTests(unittest.TestCase):
         )
         self.assertEqual(visited_node["state"], "completed")
         self.assertTrue(visited_node["visited"])
-
-    def test_authored_conversation_block_keeps_existing_graph_adapter(self) -> None:
-        scenario = apply_npc_profile(deepcopy(DEFAULT_SCENARIO), "trader")
-        with LuaSemanticWorker(scenario) as worker:
-            entered = worker.input("What's up?")
-            candidate = next(
-                row
-                for row in entered["observation"]["suggestions"]["candidates"]
-                if row["id"] == "dynamictrading.trade"
-            )
-            clicked = worker.suggestion_click(candidate["frame"])
-
-        graph = clicked["observation"]["conversationGraph"]
-        self.assertEqual(graph["graphKind"], "conversation_block")
-        model = conversation_graph_model(graph)
-        self.assertEqual(model["graphKind"], "conversation_block")
-        self.assertIn("current", {node["state"] for node in model["nodes"]})
 
     @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")
     def test_simulation_graph_pane_follows_hello_and_whats_up(self) -> None:

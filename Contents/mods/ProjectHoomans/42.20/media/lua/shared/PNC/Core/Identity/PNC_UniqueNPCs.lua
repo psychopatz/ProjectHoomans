@@ -102,10 +102,8 @@ function Unique.NormalizeDefinition(definition)
         archetypeID = stringValue(source.archetypeID),
         archetypeLabel = stringValue(source.archetypeLabel),
         tacticalClass = stringValue(source.tacticalClass),
-        visualProfile = stringValue(source.visualProfile),
-        outfit = stringValue(source.outfit),
         appearance = Appearance and Appearance.Normalize
-            and Appearance.Normalize(source.appearance, source.outfit)
+            and Appearance.Normalize(source.appearance)
             or nil,
         chanceWeight = math.max(0, tonumber(source.chanceWeight) or 1),
         spawnChance = spawnChance,
