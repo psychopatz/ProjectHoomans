@@ -11,8 +11,11 @@ import time
 from pathlib import Path
 import unittest
 
-from tools.semantic_harness.runtime.config import HarnessConfig
-from tools.semantic_harness.runtime.process import HarnessError, LuaProcess
+from semantic_harness.process import HarnessError, LuaProcess
+from tools.semantic_harness.runtime.config import (
+    HarnessConfig,
+    build_worker_launch_spec,
+)
 from tools.semantic_harness.testing.runner import HarnessCase, detect_conflicts, run_case
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, load_scenario, merge, save_scenario
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
@@ -733,7 +736,7 @@ class SemanticHarnessTests(unittest.TestCase):
     def test_process_correlates_requests_and_serializes_concurrent_callers(self) -> None:
         temporary, config = self.fake_worker()
         self.addCleanup(temporary.cleanup)
-        runtime = LuaProcess(config)
+        runtime = LuaProcess(build_worker_launch_spec(config))
         self.addCleanup(runtime.close)
         hello = runtime.start()
         self.assertEqual(hello["type"], "hello")
@@ -770,7 +773,7 @@ class SemanticHarnessTests(unittest.TestCase):
             request_timeout=0.05,
             shutdown_timeout=0.1,
         )
-        runtime = LuaProcess(config)
+        runtime = LuaProcess(build_worker_launch_spec(config))
         self.addCleanup(runtime.close)
         runtime.start()
         started = time.monotonic()

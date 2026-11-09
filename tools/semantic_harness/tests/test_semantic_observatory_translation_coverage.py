@@ -35,7 +35,7 @@ class TranslationManifestTests(unittest.TestCase):
         self.assertIn("not a runtime translation", " ".join(report["limitations"]))
 
     def test_unknown_pool_remains_error(self):
-        from tools.semantic_harness.runtime.process import HarnessError
+        from semantic_harness.process import HarnessError
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             with self.assertRaises(HarnessError):
                 translation_coverage(worker, "not.a.real.registered.pool")

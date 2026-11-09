@@ -12,7 +12,7 @@ import tempfile
 import unittest
 
 from tools.semantic_harness.runtime.activity import ActivityLog
-from tools.semantic_harness.runtime.process import HarnessError
+from semantic_harness.process import HarnessError
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 

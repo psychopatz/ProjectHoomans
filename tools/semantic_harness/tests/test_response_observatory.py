@@ -3,7 +3,7 @@ import unittest
 
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
-from tools.semantic_harness.runtime.process import HarnessError
+from semantic_harness.process import HarnessError
 
 
 class ResponseObservatoryTests(unittest.TestCase):

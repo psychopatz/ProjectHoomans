@@ -9,6 +9,7 @@ import unittest
 from tools.semantic_harness.runtime.config import (
     ConfigurationError,
     HarnessConfig,
+    build_worker_launch_spec,
     discover_newest_runtime,
     discover_dynamic_trading_runtime,
 )
@@ -62,6 +63,24 @@ class RuntimeConfigTests(unittest.TestCase):
                 CORE_REPOSITORY
                 / "tools/semantic_harness/lua/worker.lua"
             ).resolve(),
+        )
+
+    def test_hoomans_profile_uses_core_launch_metadata(self) -> None:
+        config = HarnessConfig.discover(
+            repository=REPOSITORY,
+            core_repository=CORE_REPOSITORY,
+            lua_bin="lua",
+            profile="hoomans",
+        )
+        spec = build_worker_launch_spec(config)
+        self.assertEqual(
+            spec.provider_ids,
+            ("PsychopatzCore", "ProjectHoomans"),
+        )
+        self.assertEqual(spec.materialization_mode, "physical")
+        self.assertEqual(
+            spec.neutral_environment()["SEMANTIC_HARNESS_MATERIALIZATION_MODE"],
+            "physical",
         )
 
 

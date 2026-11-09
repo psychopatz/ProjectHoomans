@@ -12,13 +12,13 @@ if __package__ in {None, ""}:
     from tools.semantic_harness.cli import AUTHORING_OPERATIONS, CLI_OPERATIONS, _parser, cli
     from tools.semantic_harness.testing.doctor import run_doctor
     from tools.semantic_harness.ui.shell import SemanticHarnessApp, run_gui
-    from tools.semantic_harness.runtime.process import install_shutdown_handler
+    from semantic_harness.process import install_shutdown_handler
     from tools.semantic_harness.inspection.rendering import pretty, print_result as _print_result
 else:
     from .cli import AUTHORING_OPERATIONS, CLI_OPERATIONS, _parser, cli
     from .testing.doctor import run_doctor
     from .ui.shell import SemanticHarnessApp, run_gui
-    from .runtime.process import install_shutdown_handler
+    from semantic_harness.process import install_shutdown_handler
     from .inspection.rendering import pretty, print_result as _print_result
 
 

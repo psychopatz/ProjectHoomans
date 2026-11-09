@@ -11,7 +11,7 @@ from ..inspection.transcript import TranscriptBuffer
 from ..runtime.scenario import load_scenario
 from ..runtime.activity import ActivityLog, default_activity_path
 from ..runtime.worker import LuaSemanticWorker
-from ..runtime.worker_session import WorkerSession
+from semantic_harness.worker_session import WorkerSession
 from .dialogs.catalog_control import CatalogControlField
 from .state import load as load_ui_state
 from .state import state_path as ui_state_path

@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-import importlib
 import re
 from typing import Any
 
 from .lexicon_compiler import CompileError
 from .translation_support import normalize_translations
-from ..runtime.process import _load_core_process
+from semantic_harness.codebuilder.rule_contract import (
+    validate_scalar_conditions,
+    validate_typed_arguments,
+)
 from .dialogue_contract import (
     DIALOGUE_ID,
     DIALOGUE_TEMPLATE_ID,
@@ -27,12 +29,6 @@ from .dialogue_contract import (
 )
 
 
-_load_core_process()
-_CORE_RULES = importlib.import_module(
-    "semantic_harness.codebuilder.rule_contract"
-)
-
-
 def _variant_translations(
     variant: dict[str, Any],
     fallback: str,
@@ -45,7 +41,7 @@ def _variant_translations(
     return normalize_translations(raw, f"{label}.translations")
 
 def _validate_response_condition(value: Any, pool_id: str, variant_id: str) -> dict[str, Any]:
-    return _CORE_RULES.validate_scalar_conditions(
+    return validate_scalar_conditions(
         value,
         f"{pool_id}:{variant_id}",
         DIALOGUE_RESPONSE_CONDITIONS,
@@ -54,7 +50,7 @@ def _validate_response_condition(value: Any, pool_id: str, variant_id: str) -> d
 
 def _validate_translation_args(value: Any, label: str) -> dict[str, str]:
     """Validate typed argument declarations without evaluating them."""
-    return _CORE_RULES.validate_typed_arguments(
+    return validate_typed_arguments(
         value,
         label,
         DIALOGUE_TRANSLATION_ARG_TYPES,

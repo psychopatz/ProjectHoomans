@@ -7,7 +7,7 @@ from typing import Any, Callable
 
 from ..runtime.config import ConfigurationError
 from ..runtime.worker import HarnessError, LuaSemanticWorker
-from ..runtime.worker_session import WorkerResult
+from semantic_harness.worker_session import WorkerResult
 
 
 def poll_future(

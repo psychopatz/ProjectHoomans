@@ -12,7 +12,8 @@ _CORE_TOOLS = Path(__file__).resolve().parents[3].parent / "psychopatzCore" / "t
 if str(_CORE_TOOLS) not in sys.path:
     sys.path.insert(0, str(_CORE_TOOLS))
 
-from .protocol import DEFAULT_MAX_MESSAGE_BYTES
+from semantic_harness.process import WorkerLaunchSpec
+from semantic_harness.protocol import DEFAULT_MAX_MESSAGE_BYTES
 
 
 from semantic_harness.runtime_discovery import (
@@ -128,6 +129,8 @@ class HarnessConfig:
     lua_bin: Path
     worker_script: Path
     profile: str = "hoomans"
+    provider_ids: tuple[str, ...] = ("PsychopatzCore", "ProjectHoomans")
+    materialization_mode: str = "physical"
     hoomans_runtime: str | None = None
     core_runtime: str | None = None
     dynamic_trading_repository: Path | None = None
@@ -194,12 +197,20 @@ class HarnessConfig:
                 dynamic_trading_runtime = discover_dynamic_trading_runtime(
                     dynamic_trading_repository
                 )
+        if profile == "core":
+            provider_ids = ("PsychopatzCore",)
+            materialization_mode = "none"
+        else:
+            provider_ids = ("PsychopatzCore", "ProjectHoomans")
+            materialization_mode = "physical"
         return cls(
             repository=repo,
             core_repository=core,
             lua_bin=lua,
             worker_script=worker,
             profile=profile,
+            provider_ids=provider_ids,
+            materialization_mode=materialization_mode,
             hoomans_runtime=hoomans_runtime,
             core_runtime=core_runtime,
             dynamic_trading_repository=dynamic_trading_repository,
@@ -208,3 +219,60 @@ class HarnessConfig:
             request_timeout=float(request_timeout),
             shutdown_timeout=float(shutdown_timeout),
         )
+
+
+def build_worker_launch_spec(config: HarnessConfig) -> WorkerLaunchSpec:
+    """Build the generic Core client spec from Hoomans adapter policy.
+
+    Repository-specific environment aliases and worker argument selection are
+    intentionally kept here.  Process lifecycle and neutral provider metadata
+    are owned by PsychopatzCore's ``WorkerLaunchSpec``/``LuaProcess``.
+    """
+
+    profile = str(config.profile or "hoomans").strip().lower()
+    environment = {
+        "PNC_HARNESS_REPOSITORY": str(config.repository),
+        "PNC_HARNESS_CORE_REPOSITORY": str(config.core_repository),
+        "PZ_TEST_REPOSITORY": str(config.repository),
+        "PZ_TEST_CORE_REPOSITORY": str(config.core_repository),
+    }
+    if config.candidate_overlay_root is not None:
+        environment["PNC_HARNESS_CANDIDATE_OVERLAY_ROOT"] = str(
+            config.candidate_overlay_root
+        )
+        environment["PNC_HARNESS_CANDIDATE_OVERLAY_MODULE"] = (
+            config.candidate_overlay_module or ""
+        )
+    if config.hoomans_runtime is not None:
+        environment["PZ_TEST_HOOMANS_RUNTIME"] = config.hoomans_runtime
+    if config.core_runtime is not None:
+        environment["PZ_TEST_CORE_RUNTIME"] = config.core_runtime
+    if config.dynamic_trading_repository is not None:
+        environment["PNC_HARNESS_DYNAMIC_TRADING_REPOSITORY"] = str(
+            config.dynamic_trading_repository
+        )
+    if config.dynamic_trading_runtime is not None:
+        environment["PZ_TEST_DYNAMIC_TRADING_RUNTIME"] = (
+            config.dynamic_trading_runtime
+        )
+
+    worker_arguments = (
+        (str(config.core_repository),)
+        if profile == "core"
+        else (str(config.repository), str(config.core_repository))
+    )
+    return WorkerLaunchSpec(
+        lua_bin=config.lua_bin,
+        worker_script=config.worker_script,
+        core_repository=config.core_repository,
+        working_directory=config.repository,
+        profile=profile,
+        provider_ids=config.provider_ids,
+        materialization_mode=config.materialization_mode,
+        worker_arguments=worker_arguments,
+        environment=environment,
+        startup_timeout=config.startup_timeout,
+        request_timeout=config.request_timeout,
+        shutdown_timeout=config.shutdown_timeout,
+        max_message_bytes=config.max_message_bytes,
+    )

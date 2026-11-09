@@ -207,3 +207,23 @@ Core imports. Core and Hoomans configuration/profile/runtime-package tests pass.
 Hoomans worker selection and scenario policy local, but move generic launch
 configuration and adapter metadata into Core before deleting any remaining
 facades.
+
+## P3-C result
+
+Core `WorkerLaunchSpec` now accepts validated profile selections and exposes a
+neutral worker environment. Hoomans keeps repository/runtime/worker-argument
+selection in `build_worker_launch_spec()` while using Core's process client
+directly. Production and test callers no longer import Hoomans process,
+protocol, or worker-session facades; those three duplicate files were deleted.
+Core (36 tests), the Hoomans migration/regression slice, and DynamicTrading's
+provider adapter gates pass. The remaining Hoomans activity/scenario/config
+surfaces are intentionally provider policy or compatibility boundaries and
+are not deleted in this chunk.
+
+## Next Chunk
+
+**P3-D — migrate remaining projection facades and cross-provider worker
+metadata.** Audit activity/state/scenario compatibility paths and the Hoomans
+worker handshake for direct Core imports, then add a Core-only matrix that
+proves optional DTAbstract and DTHoomans metadata can be enabled independently
+without importing provider-owned gameplay policy.

@@ -2,21 +2,19 @@
 
 from __future__ import annotations
 
-import importlib
 import re
 from pathlib import Path
 from typing import Any
 
 from .lexicon_compiler import CompileError
-from ..runtime.process import _load_core_process
-
-
-_load_core_process()
-_CORE_DATASET = importlib.import_module(
-    "semantic_harness.codebuilder.dataset_contract"
+from semantic_harness.codebuilder.dataset_contract import (
+    load_dataset_document,
+    normalize_utterance,
+    validate_source_metadata,
 )
-_CORE_RULES = importlib.import_module(
-    "semantic_harness.codebuilder.rule_contract"
+from semantic_harness.codebuilder.rule_contract import (
+    validate_predicate,
+    validate_source_refs,
 )
 
 DIALOGUE_ID = re.compile(r"^[a-z][a-z0-9_.-]{0,95}$")
@@ -87,11 +85,11 @@ DIALOGUE_BRANCH_FRAME_FIELDS = frozenset({
 })
 
 def load_dialogue_dataset(path: Path) -> dict[str, Any]:
-    return _CORE_DATASET.load_dataset_document(path, label="dialogue dataset")
+    return load_dataset_document(path, label="dialogue dataset")
 
 
 def _normalize_dialogue_utterance(value: Any) -> tuple[str, tuple[str, ...]]:
-    return _CORE_DATASET.normalize_utterance(
+    return normalize_utterance(
         value,
         max_tokens=DIALOGUE_MAX_PATTERN_TOKENS,
         label="dialogue pattern utterance",
@@ -100,7 +98,7 @@ def _normalize_dialogue_utterance(value: Any) -> tuple[str, tuple[str, ...]]:
 
 
 def _validate_dialogue_source(value: Any) -> dict[str, Any]:
-    return _CORE_DATASET.validate_source_metadata(
+    return validate_source_metadata(
         value,
         label="dialogue dataset",
         source_label="dialogue source",
@@ -112,12 +110,12 @@ def _validate_source_refs(
     available: set[str],
     label: str,
 ) -> list[str]:
-    return _CORE_RULES.validate_source_refs(value, available, label)
+    return validate_source_refs(value, available, label)
 
 
 def _validate_branch_constraint(value: Any, label: str, depth: int = 0) -> Any:
     """Validate the bounded all/any/not predicate AST used by branch offers."""
-    return _CORE_RULES.validate_predicate(value, label, depth)
+    return validate_predicate(value, label, depth)
 
 
 def validate_branch_offers(

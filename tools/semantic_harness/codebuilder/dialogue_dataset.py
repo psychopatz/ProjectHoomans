@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-import importlib
 from typing import Any
 
-from ..runtime.process import _load_core_process
+from semantic_harness.codebuilder.dataset_compiler import compile_typed_dataset
 from .dialogue_contract import (
     DIALOGUE_MAX_PATTERNS,
     DIALOGUE_MAX_POOLS,
@@ -15,15 +14,9 @@ from .dialogue_patterns import _compile_dialogue_pattern
 from .dialogue_responses import _compile_dialogue_response_pool
 
 
-_load_core_process()
-_CORE_COMPILER = importlib.import_module(
-    "semantic_harness.codebuilder.dataset_compiler"
-)
-
-
 def compile_dialogue_dataset(document: dict[str, Any]) -> dict[str, Any]:
     """Compile Hoomans patterns and response pools through Core mechanics."""
-    return _CORE_COMPILER.compile_typed_dataset(
+    return compile_typed_dataset(
         document,
         pattern_compiler=_compile_dialogue_pattern,
         response_compiler=_compile_dialogue_response_pool,

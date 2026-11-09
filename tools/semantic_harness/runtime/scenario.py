@@ -2,23 +2,20 @@
 
 from __future__ import annotations
 
-import importlib
 from pathlib import Path
 from typing import Any
 
 from .health import normalize_scenario, validate_npc_health
-from .process import _load_core_process
-
-
-_load_core_process()
-_CORE_SCENARIO = importlib.import_module("semantic_harness.scenario")
+from semantic_harness.scenario import (
+    derive_actor_identifier,
+    derive_display_name,
+    deep_merge,
+    load_json_document,
+    save_json_document,
+)
 
 # These mechanics are Core-owned. The aliases preserve the established Hoomans
 # import path for the authoring app, CLI, worker, and existing fixtures.
-derive_display_name = _CORE_SCENARIO.derive_display_name
-derive_actor_identifier = _CORE_SCENARIO.derive_actor_identifier
-
-
 DEFAULT_SCENARIO: dict[str, Any] = {
     "player": {
         "characterUUID": "char_patrick",
@@ -225,7 +222,7 @@ DEFAULT_SCENARIO: dict[str, Any] = {
 def merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
     """Recursively merge an authored scenario over the safe defaults."""
 
-    return _CORE_SCENARIO.deep_merge(
+    return deep_merge(
         base,
         override,
         replace_empty_objects=("needs", "conditionStats", "personality", "identity"),
@@ -235,7 +232,7 @@ def merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
 def load_scenario(path: Path | None = None) -> dict[str, Any]:
     if path is None:
         return normalize_scenario(merge({}, DEFAULT_SCENARIO))
-    authored = _CORE_SCENARIO.load_json_document(path)
+    authored = load_json_document(path)
     return normalize_scenario(merge(DEFAULT_SCENARIO, authored))
 
 
@@ -244,7 +241,7 @@ def save_scenario(path: Path, scenario: dict[str, Any]) -> Path:
 
     normalized = normalize_scenario(scenario)
     validate_scenario(normalized)
-    return _CORE_SCENARIO.save_json_document(path, normalized)
+    return save_json_document(path, normalized)
 
 
 def validate_scenario(scenario: dict[str, Any]) -> None:

@@ -7,10 +7,11 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
-from .config import HarnessConfig
+from semantic_harness.process import HarnessError, LuaProcess
+
+from .config import HarnessConfig, build_worker_launch_spec
 from .fixture_provider import OfflineEngineFixtureProvider
 from .item_catalog import search_item_catalog
-from .process import HarnessError, LuaProcess
 from .scenario import load_scenario, normalize_scenario, validate_scenario
 from .state import HarnessWorkingWorld, ImportedSourceSnapshot, Provenance
 from .activity import ActivityLog, default_activity_path
@@ -81,7 +82,10 @@ class LuaSemanticWorker:
             path=default_activity_path(self.config.repository),
             client="api",
         )
-        self.runtime = LuaProcess(self.config, activity_log=self.activity_log)
+        self.runtime = LuaProcess(
+            build_worker_launch_spec(self.config),
+            activity_log=self.activity_log,
+        )
         self._authoring = WorkerAuthoringOperations(self)
         self._conversation = WorkerConversationOperations(self)
         self._knowledge = WorkerKnowledgeOperations(self)

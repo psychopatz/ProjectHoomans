@@ -8,7 +8,6 @@ turn statements into executable commands.
 from __future__ import annotations
 
 import hashlib
-import importlib
 import json
 import math
 import re
@@ -16,11 +15,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from ..runtime.process import _load_core_process
-
-
-_load_core_process()
-_CORE_ERRORS = importlib.import_module("semantic_harness.codebuilder.errors")
+from semantic_harness.codebuilder.errors import CompileError
 
 CANONICAL_SOURCE_ROOT = (
     Path(__file__).resolve().parents[3]
@@ -34,9 +29,6 @@ REQUIRED_FILES = ("index.verb", "data.verb", "verb.exc")
 VOWELS = frozenset("aeiou")
 CONCEPT_ID = re.compile(r"^[A-Z][A-Z0-9_]*$")
 WORDNET_OFFSET = re.compile(r"^\d{8}$")
-
-CompileError = _CORE_ERRORS.CompileError
-
 
 @dataclass(frozen=True)
 class Synset:

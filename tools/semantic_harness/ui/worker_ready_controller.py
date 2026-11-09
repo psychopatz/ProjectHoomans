@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from ..inspection.rendering import pretty
-from ..runtime.worker_session import WorkerReady
+from semantic_harness.worker_session import WorkerReady
 from .ui_state_persistence import remember_active_source
 
 
