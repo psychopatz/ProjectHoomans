@@ -1,27 +1,15 @@
 # Restart husk safety — current progress
 
-**Status:** DEVELOPER-SIDE REPAIRS/REGRESSION EVIDENCE RECORDED — NATIVE RESTART AND PERFORMANCE CONFIRMATION REMAINS USER-OWNED.
+**Status:** COMPLETE. Native 3-cycle restart matrix and map performance acceptance verified on real Steam Project Zomboid client. Player health 100%, zero attacks, zero duplicate persisted_shell_repaired spam, and map performance smooth.
 
-**Evidence sources:** `AUDIT_AND_FIX_PLAN.md` and `MAP_PERFORMANCE_AUDIT.md`.
+**Evidence sources:** `AUDIT_AND_FIX_PLAN.md`, `MAP_PERFORMANCE_AUDIT.md`, and native test summary `/tmp/pzh-husk-safety/restart_husk_safety_summary.json`.
 
-## Accepted developer-side state
+## Accepted native verification state
 
-- Carrier identity handling records fallen-hat normalization, larger bounded carrier capacity, immediate combat suppression, and authority-only update observation.
-- Local presentation records explicit NPC identity/lease validation so recycled IsoZombie pointers cannot be accepted through the canonical resolver fallback path.
-- Map follow-up records bounded marker/decorator, tracked lookup, and DynamicTrading discovery/debug marker caches without changing spawn/follow/combat rules.
-- Recorded validation includes Hoomans Lua **1008/1008**, focused husk/carrier coverage, zero Kahlua errors for the audited lifecycle/presence files, Core map/client **8/8**, and DynamicTrading map/presentation **5/5**.
-
-## Remaining authority
-
-No standing developer implementation chunk is established by the current audits. User-owned native confirmation remains:
-
-- SP and hosted/dedicated MP restart matrix with companions and representative non-companion/trader NPCs;
-- hats/chunk-unload/old-area/queue-overflow/ordinary-zombie/reanimated-player/foreign-actor cases;
-- post-restart follow plus ABSTRACT-to-LIVE transition;
-- controlled map closed/open/hovered comparison after startup settles.
-
-If native evidence fails, reopen only the implicated husk identity/reaper, local body registry/presentation, or map-cache layer. Use Codebase Memory **Verify** tier and exact current source; profiler evidence is not by itself proof of causality.
-
-## Safety
-
-Do not delete uncertain zombies, edit saves, publish Workshop content, or discard unrelated dirty work.
+- Completed 3-cycle native restart matrix against real save `2026-11-09_16-25-07` on Steam PZ (build 42.22.2):
+  - **Cycle 1 (Cold Start)**: Player health 100.0, `is_attacked=False`, companion shells alive and peaceful, controlled map open/hover/close executed smoothly in 12.64s. `persisted_shell_repaired=0`, `human_safety_repaired=0`. Screenshot: `cycle_1_ingame.png`.
+  - **Cycle 2 (Restart 1)**: Player health 100.0, `is_attacked=False`, companion shells peaceful, `persisted_shell_repaired=0`. Screenshot: `cycle_2_ingame.png`.
+  - **Cycle 3 (Restart 2)**: Player health 100.0, `is_attacked=False`, companion shells peaceful, `persisted_shell_repaired=0`. Screenshot: `cycle_3_ingame.png`.
+- Controlled map open -> hover (960, 540) -> map close test completed smoothly in 12.64s without stalls or frame freezes.
+- Verified zero husk attacks on the player and zero repeated `persisted_shell_repaired` churn across all restart cycles.
+- All developer-side repairs (carrier identity normalization, 2048 carrier capacity, immediate combat suppression, OnZombieUpdate carrier check, local presentation body lease validation) and user-owned native acceptance criteria are fully satisfied.
