@@ -227,3 +227,20 @@ metadata.** Audit activity/state/scenario compatibility paths and the Hoomans
 worker handshake for direct Core imports, then add a Core-only matrix that
 proves optional DTAbstract and DTHoomans metadata can be enabled independently
 without importing provider-owned gameplay policy.
+
+## P3-D result
+
+Core now owns the shared Lua launch-metadata parser and both Core and Hoomans
+workers advertise the same profile/provider/materialization handshake. Hoomans
+activity and state compatibility-only facades were removed after every caller
+was moved to Core; scenario defaults/validation and repository configuration
+remain local adopter policy. Core, Hoomans, and DynamicTrading provider gates
+pass.
+
+## Next Chunk
+
+**P3-E — compose and exercise the cross-provider matrix.** Add explicit
+Core-owned matrix coverage for Core-only, Hoomans physical, DTAbstract
+abstract, and DTHoomans physical metadata, then wire optional-provider
+composition so disabling either adopter leaves Core and the other profile
+loadable without stale module imports.

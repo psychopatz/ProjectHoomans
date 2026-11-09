@@ -10,7 +10,7 @@ import unittest
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.runtime.save_catalog import SaveCatalog
 from tools.semantic_harness.runtime.save_import import SaveBackedImporter
-from tools.semantic_harness.runtime.state import Provenance
+from semantic_harness.state import Provenance
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 

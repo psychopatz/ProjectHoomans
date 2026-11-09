@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..runtime.activity import format_activity_event
+from semantic_harness.activity import format_activity_event
 
 
 def schedule_activity_poll(app: Any) -> None:

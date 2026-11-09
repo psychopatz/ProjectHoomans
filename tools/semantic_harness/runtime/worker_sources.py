@@ -11,7 +11,7 @@ from .live_profiler_provider import LiveProfilerProvider
 from .save_browser import SavedWorldBrowser
 from .save_catalog import SaveCatalog
 from .save_import import SaveBackedImporter
-from .state import ImportedSourceSnapshot, Provenance
+from semantic_harness.state import ImportedSourceSnapshot, Provenance
 
 
 class _WorkerSourceHost(Protocol):

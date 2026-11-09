@@ -4,19 +4,20 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P3-C"
-phase_commit_message: "phase(P3-C): phase(P3-C): migrate Hoomans worker client to Core"
+phase_commit_phase: "P3-D"
+phase_commit_message: "phase(P3-D): remove Hoomans projection facades and share handshake"
 phase_commit_vector: "project-hoomans=self"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-09T23:52:37.285104Z"
+updated_at: "2026-11-09T23:59:24.408142Z"
 state: "CLEAN_CHECKPOINT"
 parent_status: "IN_PROGRESS"
 phase: "P3"
 chunk: "P3-C"
 retrieval_tier: "verify"
 ---
+
 
 
 # Handoff — Semantic Harness Core Migration

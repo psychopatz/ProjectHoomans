@@ -6,7 +6,7 @@ from copy import deepcopy
 import unittest
 
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.semantic_harness.runtime.state import (
+from semantic_harness.state import (
     HarnessWorkingWorld,
     ImportedSourceSnapshot,
     Provenance,

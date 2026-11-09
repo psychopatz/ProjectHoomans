@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.semantic_harness.runtime.activity import ActivityLog
+from semantic_harness.activity import ActivityLog
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 

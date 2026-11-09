@@ -79,8 +79,17 @@ local SessionEnvelope = require "worker/SessionEnvelope"
 local WorkingWorld = require "worker/WorkingWorld"
 local WorkerLoop = require "worker/WorkerLoop"
 local SemanticExecution = require "worker/SemanticExecution"
+local LaunchMetadata = require "worker/LaunchMetadata"
 
 local Runtime = RuntimeState.new()
+local launch = LaunchMetadata.read({
+    profile = "hoomans",
+    providers = { "PsychopatzCore", "ProjectHoomans" },
+    materializationMode = "physical",
+})
+Runtime.launchProfile = launch.profile
+Runtime.launchProviders = launch.providers
+Runtime.launchMaterializationMode = launch.materializationMode
 local Context = {
     repository = repository,
     coreRepository = coreRepository,
@@ -113,7 +122,7 @@ local Context = {
 
 local semanticExecution, semanticExecutionReason = SemanticExecution.new({
     providerID = "ProjectHoomans",
-    materializationMode = "physical",
+    materializationMode = launch.materializationMode,
     capabilities = {
         "semantic.conversation",
         "semantic.identity",
