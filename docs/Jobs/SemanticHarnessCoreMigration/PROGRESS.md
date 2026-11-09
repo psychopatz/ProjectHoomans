@@ -14,8 +14,8 @@
   surface, and provider-specific test estate.
 - Current tracked Hoomans scope includes 95 Lua worker modules, 404 harness
   Python files, and 212 harness tests.
-- Core currently contains the generic foundation, 7 Lua harness files, 16
-  harness Python files, and 9 harness tests.
+- Core currently contains the generic foundation, 8 Lua harness files, 16
+  harness Python files, and 10 harness tests.
 - Hoomans `runtime/config.py` still selects the Hoomans worker for the default
   `hoomans` profile; Core has a separate minimal `core` worker.
 - DynamicTrading has no standalone `tools/semantic_harness` tree yet. Its
@@ -84,9 +84,17 @@ module while retaining provider rehydration, actor setup, and gameplay reset
 policy. Numeric-key patch handling is covered by the Core implementation, and
 Hoomans compatibility tests verify patch shape and source provenance.
 
+## P1-H result
+
+Core now owns the provider-neutral ordered worker-router loop. Hoomans keeps
+its existing handler composition, session command policy, transport evidence
+configuration, and provider-specific catalogs while delegating dispatch and
+unknown-command behavior to Core. Core router smoke coverage and Hoomans boot
+smokes pass. The exact split is recorded in `P1H_ROUTER_BOUNDARY.md`.
+
 ## Next Chunk
 
-**P1-H — audit the remaining worker session/router boundary.** Separate generic
-request lifecycle, snapshot/mutation response routing, and provider-specific
-command policy. Move only the generic orchestration into Core after the
-Hoomans compatibility and optional-provider gates are explicit.
+**P1-I — audit Core worker lifecycle ownership.** Compare the minimal Core
+worker loop with the Hoomans JSON-lines process loop and identify the smallest
+provider-neutral lifecycle/process seam that can be shared without importing
+Hoomans modules into Core.
