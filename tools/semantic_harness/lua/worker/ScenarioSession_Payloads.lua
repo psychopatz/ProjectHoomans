@@ -8,12 +8,15 @@ local function install(ScenarioSession)
     local function basePayload(context, responseType)
         local Runtime = context.Runtime
         local Values = context.Values
+        local sessionEnvelope = Internal.SessionEnvelopeProjection(context)
         return {
             ok = true,
             type = responseType,
             scenario = Values.copy(Runtime.scenario),
-            sourceSnapshot = Internal.SourceSnapshotProjection(context),
-            sessionEnvelope = Internal.SessionEnvelopeProjection(context),
+            sourceSnapshot = Internal.SourceSnapshotProjection(
+                context, sessionEnvelope
+            ),
+            sessionEnvelope = sessionEnvelope,
             productionRehydration = Values.copy(Runtime.productionRehydration),
             productionFactionRehydration = Values.copy(
                 Runtime.productionFactionRehydration
@@ -30,7 +33,9 @@ local function install(ScenarioSession)
             productionFactionContext = Values.copy(
                 Runtime.productionFactionContext
             ),
-            workingWorld = Internal.WorkingWorldProjection(context),
+            workingWorld = Internal.WorkingWorldProjection(
+                context, sessionEnvelope
+            ),
         }
     end
 

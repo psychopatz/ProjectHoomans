@@ -4,17 +4,17 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P1-E"
-phase_commit_message: "phase(P1-E): refactor(hoomans): adopt Core session envelope"
+phase_commit_phase: "P1-F"
+phase_commit_message: "phase(P1-F): refactor(hoomans): source projections from Core envelope"
 phase_commit_vector: "project-hoomans=self"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-09T22:26:36.853259Z"
+updated_at: "2026-11-09T22:30:40.931438Z"
 state: "CLEAN_CHECKPOINT"
 parent_status: "IN_PROGRESS"
 phase: "P1"
-chunk: "P1-F"
+chunk: "P1-G"
 retrieval_tier: "verify"
 ---
 
@@ -23,54 +23,51 @@ retrieval_tier: "verify"
 
 ## What became true
 
-P1-E adds the provider-neutral Core `SessionEnvelope`. It projects immutable
-source state, effective working state, revision metadata, opaque namespaced
-provider payloads, and extensions without interpreting provider policy.
-
-Hoomans now exposes the envelope beside its existing compatibility payload
-fields. Explicit snapshots retain raw source/provider data for inspection;
-mutation responses compact those fields. Hoomans still owns rehydration, PNC
-relationship/knowledge state, synthetic defaults, and legacy response fields.
+P1-F makes the Core `SessionEnvelope` the internal source for Hoomans
+`sourceSnapshot` and `workingWorld` compatibility projections. Hoomans still
+returns the existing schemas and fields, including patch records, provenance
+overrides, and transport compaction. Provider rehydration, PNC relationship and
+knowledge state, synthetic defaults, and legacy response policy remain in the
+adopter.
 
 ## Remaining
 
-Implement P1-F: use the Core envelope internally in Hoomans `ScenarioSession`
-where duplicate source/working projection mechanics can be removed without
-changing compatibility responses. Keep provider policy in Hoomans until its
-own boundary is classified.
+Implement P1-G: classify the remaining generic `ScenarioSession` mechanics.
+Audit the bounded patch-diff projection and reset/revision orchestration as
+separate seams. Move only provider-neutral mechanics into Core with focused
+compatibility tests.
 
 ## Resume
 
-1. Verify the three repository HEADs and clean-state fingerprints.
-2. Trace Hoomans `ScenarioSession` source/working projections against the Core
-   envelope and identify behavior-preserving substitutions.
-3. Add focused projection tests before deleting any duplicate mechanics.
-4. Preserve the inspector-versus-mutation response boundary.
+1. Verify the three repository HEADs and worktree fingerprints.
+2. Read `P1F_ENVELOPE_INTERNAL.md` and trace patch/reset callers.
+3. Decide whether each candidate belongs in Core or remains a Hoomans policy
+   adapter; record the boundary before moving code.
+4. Add tests before removing any duplicate implementation.
 
 ## Evidence
 
-- `CODE_VERIFIED`: Core `SessionEnvelope` schema, projection, and compacting
-  implementation are committed in the participant repository.
-- `TEST_VERIFIED`: Core Lua envelope smoke, Core Python harness suite (26),
-  Hoomans envelope contract, worker-module smoke, and grounded-dialogue smoke
-  pass.
-- `STATIC_ONLY`: full provider-neutral harness migration is not complete; most
-  worker modules, Python harness modules, and tests remain Hoomans-owned.
+- `CODE_VERIFIED`: compatibility source and working projections consume one
+  Core envelope per response.
+- `TEST_VERIFIED`: Hoomans envelope contract, worker-module smoke, grounded
+  dialogue smoke, Core Python suite (26), and Kahlua checks pass.
+- `STATIC_ONLY`: most provider-neutral harness modules and tests remain
+  Hoomans-owned; DTAbstract and DTHoomans are not yet full Core adopters.
 - `UNVERIFIED`: native Project Zomboid SP/MP behavior remains user-owned.
 
 ## Residual findings
 
-The broader Hoomans `test_harness` suite reproduces three unrelated
+The broader Hoomans `test_harness` suite still reproduces three unrelated
 translation/identity failures: false-name response disclosure, Tagalog
 identity translation, and Tagalog identity/self-reflection catalog use. The
-P1-E focused contract passes and the changed files do not own those catalogs;
-these failures remain a follow-up regression, not a reason to broaden this
-phase.
+P1-F changed files do not own those catalogs; keep them as a follow-up
+regression rather than widening this migration phase.
 
-## Acceptance for P1-E
+## Acceptance for P1-F
 
-- Core owns the neutral session-envelope contract.
-- Hoomans consumes it without deleting provider policy or compatibility fields.
-- Inspector and mutation response boundaries are tested.
-- Core participant commit precedes the Hoomans primary commit.
+- Core envelope is the canonical internal source for the two Hoomans
+  compatibility projections.
+- Existing compatibility response shapes remain stable under focused tests.
+- No provider policy or production rehydration moved into Core.
+- Core participant commits precede the Hoomans primary commit.
 - No native runtime or Workshop publication claim is made.

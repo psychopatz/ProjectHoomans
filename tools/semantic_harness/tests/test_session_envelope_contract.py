@@ -10,13 +10,34 @@ from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 class SessionEnvelopeContractTests(unittest.TestCase):
     def test_inspector_and_mutation_envelope_boundaries(self) -> None:
         with LuaSemanticWorker(deepcopy(DEFAULT_SCENARIO)) as worker:
-            snapshot = worker.snapshot()["sessionEnvelope"]
+            response = worker.snapshot()
+            snapshot = response["sessionEnvelope"]
             self.assertEqual(
                 snapshot["schema"],
                 "semantic.harness_session_envelope.v1",
             )
             self.assertIsNotNone(snapshot["source"].get("data"))
             self.assertIn("working", snapshot)
+            self.assertEqual(
+                response["sourceSnapshot"]["data"],
+                snapshot["source"]["data"],
+            )
+            self.assertEqual(
+                response["sourceSnapshot"]["providerPayloads"],
+                snapshot["providerPayloads"],
+            )
+            self.assertEqual(
+                response["workingWorld"]["effective"],
+                snapshot["working"]["effective"],
+            )
+            self.assertEqual(
+                response["workingWorld"]["sourceSnapshotID"],
+                snapshot["working"]["sourceID"],
+            )
+            self.assertEqual(
+                response["workingWorld"]["revision"],
+                snapshot["working"]["revision"],
+            )
 
             compact = worker.configure(deepcopy(DEFAULT_SCENARIO))[
                 "sessionEnvelope"

@@ -65,10 +65,19 @@ legacy response policy in the adopter. Explicit snapshots remain an inspector
 boundary with raw source/provider data; mutation responses compact those
 fields. Core and Hoomans focused envelope tests pass.
 
+## P1-F result
+
+Hoomans `ScenarioSession` now creates one Core session envelope per response
+and feeds the legacy `sourceSnapshot` and `workingWorld` compatibility
+projections from it. The old wire shapes, patch list, provenance overrides,
+and compacting behavior remain intact; duplicate source/working selection is
+no longer the canonical path. Provider rehydration, PNC relationship/knowledge
+state, synthetic defaults, and legacy fields remain Hoomans-owned. The boundary
+and focused contract are recorded in `P1F_ENVELOPE_INTERNAL.md`.
+
 ## Next Chunk
 
-**P1-F — use the Core envelope internally in Hoomans ScenarioSession.** Replace
-duplicate source/working projection mechanics only where the existing
-compatibility fields can remain stable. Keep Hoomans rehydration, PNC
-relationships/knowledge, synthetic defaults, and production records in the
-adopter until their policy seams are separately classified.
+**P1-G — classify the remaining generic ScenarioSession mechanics.** Audit the
+bounded patch-diff projection and reset/revision orchestration separately.
+Move only provider-neutral mechanics into Core with focused compatibility
+tests; keep production rehydration and PNC policy in Hoomans.

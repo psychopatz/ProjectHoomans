@@ -66,9 +66,10 @@ local function install(ScenarioSession)
         return patches
     end
 
-    local function sourceSnapshotProjection(context)
-        local Runtime = context.Runtime
+    local function sourceSnapshotProjection(context, envelope)
         local Values = context.Values
+        envelope = envelope or Internal.SessionEnvelopeProjection(context)
+        local source = envelope and envelope.source or {}
         return {
             schema = "semantic.imported_source_snapshot.v1",
             schemaVersion = 1,
@@ -76,37 +77,34 @@ local function install(ScenarioSession)
             -- Source state is an imported record, not a bounded diagnostic
             -- projection. Keep the production deep-copy seam here so the
             -- original values survive transport and later resets.
-            data = Values.productionCopy(Runtime.sourceSnapshot),
-            metadata = Values.productionCopy(Runtime.sourceMetadata),
-            provenance = Values.productionCopy(Runtime.sourceProvenance),
+            data = Values.productionCopy(source.data),
+            metadata = Values.productionCopy(source.metadata),
+            provenance = Values.productionCopy(source.provenance),
             providerPayloads = Values.productionCopy(
-                Runtime.sourceProviderPayloads
+                envelope and envelope.providerPayloads or {}
             ),
         }
     end
 
-    local function workingWorldProjection(context)
-        local Runtime = context.Runtime
+    local function workingWorldProjection(context, envelope)
         local Values = context.Values
+        envelope = envelope or Internal.SessionEnvelopeProjection(context)
+        local working = envelope and envelope.working or {}
         local patches = patchProjection(context)
         return {
             schema = "semantic.harness_working_world.v1",
             schemaVersion = 1,
-            sourceSnapshotID = Runtime.sourceMetadata
-                and Runtime.sourceMetadata.sourceID or nil,
-            effective = Values.productionCopy(Runtime.scenario),
-            baseline = Values.productionCopy(
-                Runtime.sourceWorkingBaseline or Runtime.sourceSnapshot
-            ),
+            sourceSnapshotID = working.sourceID,
+            effective = Values.productionCopy(working.effective),
+            baseline = Values.productionCopy(working.baseline),
             patches = patches,
             provenance = {
                 schema = "semantic.provenance.v1",
-                defaultSource = Runtime.sourceMetadata
-                    and Runtime.sourceMetadata.sourceKind or "MISSING",
+                defaultSource = working.sourceKind or "MISSING",
                 overrides = Values.copy(patches),
             },
-            resetCount = Runtime.workingResetCount or 0,
-            revision = Runtime.workingWorldRevision or 0,
+            resetCount = working.resetCount or 0,
+            revision = working.revision or 0,
         }
     end
 
