@@ -24,6 +24,7 @@ local function path(root, relative)
 end
 
 local packagePaths = {
+    path(coreRepository, "tools/semantic_harness/lua/?.lua"),
     path(repository, "tools/semantic_harness/lua/?.lua"),
     path(repository, "Contents/mods/ProjectHoomans/" .. hoomansRuntime .. "/media/lua/shared/?.lua"),
     path(repository, "Contents/mods/ProjectHoomans/" .. hoomansRuntime .. "/media/lua/server/?.lua"),
@@ -57,7 +58,7 @@ if dynamicTradingRuntime then
 end
 package.path = table.concat(packagePaths, ";")
 
-local Protocol = require "worker/Protocol"
+local Protocol = require "Protocol"
 local RuntimeState = require "worker/RuntimeState"
 local Values = require "worker/Values"
 local Translations = require "worker/Translations"

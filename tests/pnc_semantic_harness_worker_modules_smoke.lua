@@ -1,9 +1,14 @@
 local T = require "tests/support/test"
 
+local coreRepository = os.getenv("PZ_TEST_CORE_REPOSITORY")
+    or "../psychopatzCore"
+package.path = coreRepository .. "/Contents/mods/PsychopatzCore/common/media/lua/shared/?.lua;"
+    .. coreRepository .. "/tools/semantic_harness/lua/?.lua;"
+    .. package.path
 package.path = "./tools/semantic_harness/lua/?.lua;"
     .. package.path
 
-local Protocol = require "worker/Protocol"
+local Protocol = require "Protocol"
 local RuntimeState = require "worker/RuntimeState"
 
 T.equal(Protocol.VERSION, 1, "harness protocol version changed unexpectedly")
@@ -13,11 +18,14 @@ T.equal(Protocol.MAX_MESSAGE_BYTES, 1024 * 1024,
 local encoded = Protocol.encode({
     greeting = "Mara",
     nested = { true, 4 },
+    explicitNull = Protocol.NULL,
 })
 local decoded = Protocol.decode(encoded)
 T.equal(decoded.greeting, "Mara", "protocol JSON round trip lost a string")
 T.equal(decoded.nested[1], true, "protocol JSON round trip lost a boolean")
 T.equal(decoded.nested[2], 4, "protocol JSON round trip lost a number")
+T.truthy(string.find(encoded, '"explicitNull":null', 1, true),
+    "protocol JSON round trip lost the Core null marker")
 
 local runtime = RuntimeState.new()
 runtime.queued = { "old" }

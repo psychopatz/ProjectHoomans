@@ -4,8 +4,12 @@
 local T = require "tests/support/test"
 
 T.addPackagePaths()
+local coreRepository = os.getenv("PZ_TEST_CORE_REPOSITORY")
+    or "../psychopatzCore"
+package.path = coreRepository .. "/tools/semantic_harness/lua/?.lua;"
+    .. package.path
 package.path = "./tools/semantic_harness/lua/?.lua;" .. package.path
-local Protocol = require "worker/Protocol"
+local Protocol = require "Protocol"
 
 T.load("tests/pnc_npc_foundation_parity_baseline_smoke.lua")
 T.load(
