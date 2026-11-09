@@ -162,3 +162,19 @@ deleted.
 Core profile-loader/worker bootstrap seam that can consume the optional DT
 manifest without importing Hoomans or creating a DT worker. Keep the current
 Hoomans worker as a compatibility path until P3/P4 gates pass.
+
+## P2-D result
+
+Core now owns `profile_loader.py`, which composes optional adopter registrars
+and returns validated profile selections with neutral worker launch metadata.
+`WorkerLaunchSpec` forwards provider IDs and materialization mode through the
+same environment contract, and the Core worker advertises that selected
+metadata without importing an adopter. DynamicTrading resolves `dtabstract`
+through this loader. This is bootstrap metadata only; merchant callback
+execution and physical materialization remain the P3 boundary.
+
+## Next Chunk
+
+**P3-A — connect provider callbacks to Core execution.** Add the first
+provider-backed execution bootstrap for DTCommon while keeping DTAbstract
+abstract and DTHoomans physical behavior behind their existing adapters.
