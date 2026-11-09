@@ -119,9 +119,19 @@ Hoomans-only defaults, health normalization, NPC validation, available-mod
 policy, and save/import normalization remain provider/domain policy and were
 not moved into Core. The boundary is recorded in `P1K_SCENARIO_BOUNDARY.md`.
 
+## P2-A audit result
+
+Core already owns the semantic parser/IR, actor conversation service, identity,
+social, knowledge, journey, and conversation-landing primitives. Hoomans'
+worker conversation files are mixed PNC adapters: they combine generic turn
+bookkeeping with provider health/faction/knowledge projections, authority,
+translation, and interaction-lifecycle policy. No mixed file was moved
+wholesale. The typed execution boundary and extraction sequence are recorded
+in `P2A_SEMANTIC_EXECUTION_BOUNDARY.md`.
+
 ## Next Chunk
 
-**P2-A — audit semantic execution seams.** Compare Hoomans semantic adapters,
-conversation orchestration, output projection, and interaction lifecycle code
-with Core semantic services. Move generic contracts/orchestration only; keep
-provider callbacks and provider data in adopters.
+**P2-B — add the typed Core semantic-execution contract.** Define the callback
+surface for context, text/frame submission, snapshots, bounded turn results,
+interaction operations, and materialization metadata; wire Hoomans to it before
+moving any mixed conversation module.
