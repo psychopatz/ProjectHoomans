@@ -178,3 +178,18 @@ execution and physical materialization remain the P3 boundary.
 **P3-A — connect provider callbacks to Core execution.** Add the first
 provider-backed execution bootstrap for DTCommon while keeping DTAbstract
 abstract and DTHoomans physical behavior behind their existing adapters.
+
+## P3-A result
+
+Core now owns the provider-neutral bounded activity stream in
+`semantic_harness/activity.py`. Hoomans `runtime/activity.py` is a
+compatibility facade exporting the Core implementation; no duplicate activity
+engine remains. Core activity tests and Hoomans activity/app/profile/runtime-
+package checks pass.
+
+## Next Chunk
+
+**P3-B — move the remaining provider-neutral Python client seams.** Audit the
+Hoomans runtime package for generic configuration, worker-session, worker
+client, and projection helpers; move one cohesive boundary at a time and keep
+facades only until all callers and tests import Core directly.
