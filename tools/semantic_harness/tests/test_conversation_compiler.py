@@ -17,6 +17,7 @@ from tools.semantic_harness.codebuilder.conversation_compiler import (
     render_conversation_runtime_plan,
 )
 from tools.semantic_harness.codebuilder.build import _write_conversation_translation_manifest
+from tools.semantic_harness.codebuilder.lexicon_compiler import CompileError
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 
 
@@ -24,6 +25,40 @@ REPOSITORY = Path(__file__).resolve().parents[3]
 
 
 class ConversationCompilerTests(unittest.TestCase):
+    def test_manifest_requires_valid_default_and_registry_owners(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory)
+            shutil.copytree(
+                REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
+                repository / CONVERSATION_SOURCE_RELATIVE,
+            )
+            manifest_path = repository / CONVERSATION_SOURCE_RELATIVE / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+            manifest.pop("defaultOwner")
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaises(CompileError):
+                compile_conversation_sources(repository)
+
+            manifest["defaultOwner"] = "ProjectHoomans"
+            manifest["registryOwner"] = "not-a-package"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaises(CompileError):
+                compile_conversation_sources(repository)
+
+            manifest["registryOwner"] = "ProjectHoomans"
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            shard_path = (
+                repository
+                / CONVERSATION_SOURCE_RELATIVE
+                / "content/greeting.json"
+            )
+            shard = json.loads(shard_path.read_text(encoding="utf-8"))
+            shard["source"] = {"owner": "not-a-package"}
+            shard_path.write_text(json.dumps(shard), encoding="utf-8")
+            with self.assertRaises(CompileError):
+                compile_conversation_sources(repository)
+
     def test_manifest_merge_and_fingerprints_are_bounded(self) -> None:
         model = compile_conversation_sources(REPOSITORY)
         source_documents = model["_source_documents"]

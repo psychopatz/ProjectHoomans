@@ -26,20 +26,23 @@ if __package__ in {None, ""}:
         pretty_json,
     )
     from tools.semantic_harness.codebuilder.generation_ownership import (
-        CORE_CONVERSATION_PREFIX,
         CORE_OWNER,
+        DT_COMMON_OWNER,
         HOOMANS_OWNER,
+        generated_conversation_root,
         module_owner,
+        module_target,
+        normalize_owner,
+        package_descriptor,
         resolve_core_repository,
-        shared_lua_root,
+        translation_root,
     )
     from tools.semantic_harness.codebuilder.conversation_compiler import (
         CONVERSATION_MANIFEST_RELATIVE,
-        CONVERSATION_RUNTIME_RELATIVE,
         CONVERSATION_UI_RUNTIME_RELATIVE,
         compile_conversation_sources,
         conversation_context_health,
-        conversation_translation_bundles,
+        conversation_translation_bundles_by_owner,
         render_conversation_registry,
         render_conversation_manifest_lua,
         render_conversation_runtime_plan,
@@ -55,20 +58,23 @@ else:
     )
     from .translation_support import normalize_language, pretty_json
     from .generation_ownership import (
-        CORE_CONVERSATION_PREFIX,
         CORE_OWNER,
+        DT_COMMON_OWNER,
         HOOMANS_OWNER,
+        generated_conversation_root,
         module_owner,
+        module_target,
+        normalize_owner,
+        package_descriptor,
         resolve_core_repository,
-        shared_lua_root,
+        translation_root,
     )
     from .conversation_compiler import (
         CONVERSATION_MANIFEST_RELATIVE,
-        CONVERSATION_RUNTIME_RELATIVE,
         CONVERSATION_UI_RUNTIME_RELATIVE,
         compile_conversation_sources,
         conversation_context_health,
-        conversation_translation_bundles,
+        conversation_translation_bundles_by_owner,
         render_conversation_registry,
         render_conversation_manifest_lua,
         render_conversation_runtime_plan,
@@ -128,19 +134,33 @@ def _conversation_locale_directories(translation_root: Path) -> list[tuple[str, 
     return sorted(discovered, key=lambda item: item[0])
 
 
-def _write_conversation_translation_manifest(translation_root: Path) -> Path:
-    """Generate Conversation.json from real locale files instead of mutating it."""
-    languages: dict[str, list[str]] = {}
-    for language, directory in _conversation_locale_directories(translation_root):
-        entries: list[str] = []
-        for path in sorted((directory / "Conversation").rglob("*.json")):
-            relative_from_language = path.relative_to(directory).as_posix()
-            if relative_from_language in _CONVERSATION_SOURCE_ONLY_TRANSLATIONS:
-                continue
-            entries.append(path.relative_to(translation_root).as_posix())
-        if entries:
-            languages[language] = entries
-    manifest_path = translation_root / "manifests/Conversation.json"
+def _write_conversation_translation_manifest(
+    translation_root: Path,
+    manifest_relative: Path = Path("manifests/Conversation.json"),
+    bundles: dict[str, dict[str, dict[str, str]]] | None = None,
+) -> Path:
+    """Generate a package manifest from canonical bundles or locale files."""
+    if bundles is None:
+        languages: dict[str, list[str]] = {}
+        for language, directory in _conversation_locale_directories(translation_root):
+            entries: list[str] = []
+            for path in sorted((directory / "Conversation").rglob("*.json")):
+                relative_from_language = path.relative_to(directory).as_posix()
+                if relative_from_language in _CONVERSATION_SOURCE_ONLY_TRANSLATIONS:
+                    continue
+                entries.append(path.relative_to(translation_root).as_posix())
+            if entries:
+                languages[language] = entries
+    else:
+        languages = {
+            language: [
+                f"{language}/Conversation/{domain}.json"
+                for domain in sorted(domains)
+            ]
+            for language, domains in sorted(bundles.items())
+            if domains
+        }
+    manifest_path = translation_root / manifest_relative
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(
         pretty_json({"version": 1, "languages": languages}),
@@ -186,22 +206,20 @@ def _write_modules(shared_root: Path, rendered: list[tuple[str, str]]) -> list[P
 
 def _write_routed_modules(
     project_repository: Path,
-    core_repository: Path,
+    core_repository: Path | None,
+    dynamic_trading_repository: Path | None,
     rendered: list[tuple[str, str]],
 ) -> list[Path]:
     """Write each generated module into its owning package repository."""
-    roots = {
-        HOOMANS_OWNER: shared_lua_root(project_repository, HOOMANS_OWNER),
-        CORE_OWNER: shared_lua_root(
-            project_repository,
-            CORE_OWNER,
-            core_repository=core_repository,
-        ),
-    }
     paths: list[Path] = []
     for module, source in rendered:
-        owner = module_owner(module)
-        path = roots[owner] / (module + ".lua")
+        _owner_repository, path = module_target(
+            project_repository,
+            module,
+            core_repository=core_repository,
+            dynamic_trading_repository=dynamic_trading_repository,
+            runtime_root=project_repository,
+        )
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(source, encoding="utf-8", newline="\n")
         paths.append(path)
@@ -213,6 +231,7 @@ def write_conversation_output(
     model: dict | None = None,
     *,
     core_repository: Path | None = None,
+    dynamic_trading_repository: Path | None = None,
 ) -> list[Path]:
     """Write the manifest-backed Conversation runtime and audit artifacts."""
     repository = repository.expanduser().resolve()
@@ -220,16 +239,28 @@ def write_conversation_output(
         repository,
         explicit=core_repository,
     )
-    model = model or compile_conversation_sources(repository)
-    shared_root = shared_lua_root(repository, HOOMANS_OWNER)
-    runtime_dir = repository / CONVERSATION_RUNTIME_RELATIVE
-    core_runtime_dir = (
-        shared_lua_root(
-            repository,
-            CORE_OWNER,
-            core_repository=core_repository,
+    package_repositories = {
+        HOOMANS_OWNER: repository,
+        CORE_OWNER: core_repository,
+    }
+    if dynamic_trading_repository is not None:
+        package_repositories[DT_COMMON_OWNER] = (
+            dynamic_trading_repository.expanduser().resolve()
         )
-        / CORE_CONVERSATION_PREFIX
+    model = model or compile_conversation_sources(
+        repository,
+        package_repositories=package_repositories,
+    )
+    manifest = model.get("manifest") if isinstance(model, dict) else None
+    registry_owner = normalize_owner(
+        manifest.get("registryOwner") if isinstance(manifest, dict) else None,
+    )
+    registry_root = generated_conversation_root(
+        repository,
+        registry_owner,
+        core_repository=core_repository,
+        dynamic_trading_repository=dynamic_trading_repository,
+        runtime_root=repository,
     )
 
     # Validate the complete plan before deleting or writing any generated
@@ -250,18 +281,35 @@ def write_conversation_output(
             + (": " + summary if summary else "")
         )
 
-    runtime_dir.mkdir(parents=True, exist_ok=True)
-    _clean_generated_tree(runtime_dir)
-    _clean_generated_tree(core_runtime_dir)
-    paths = _write_routed_modules(repository, core_repository, rendered)
-    registry_path = runtime_dir / "Registry.lua"
+    owners_to_clean = {registry_owner}
+    for module, _source in rendered:
+        owners_to_clean.add(module_owner(module))
+    for owner in sorted(owners_to_clean):
+        _clean_generated_tree(
+            generated_conversation_root(
+                repository,
+                owner,
+                core_repository=core_repository,
+                dynamic_trading_repository=dynamic_trading_repository,
+                runtime_root=repository,
+            )
+        )
+
+    registry_root.mkdir(parents=True, exist_ok=True)
+    paths = _write_routed_modules(
+        repository,
+        core_repository,
+        dynamic_trading_repository,
+        rendered,
+    )
+    registry_path = registry_root / "Registry.lua"
     registry_path.write_text(
         render_conversation_registry(model, reports),
         encoding="utf-8",
         newline="\n",
     )
     paths.append(registry_path)
-    manifest_path = runtime_dir / "Manifest.lua"
+    manifest_path = registry_root / "Manifest.lua"
     manifest_path.write_text(
         render_conversation_manifest_lua(model, reports),
         encoding="utf-8",
@@ -278,25 +326,36 @@ def write_conversation_output(
     )
     paths.append(ui_runtime_path)
 
-    translation_root = repository / "Contents/mods/ProjectHoomans/common/media/translation"
-    bundles = conversation_translation_bundles(model)
-    for language in sorted(bundles):
-        for domain, values in sorted(bundles[language].items()):
-            relative = f"{language}/Conversation/{domain}.json"
-            path = translation_root / relative
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(
-                pretty_json(values),
-                encoding="utf-8",
-                newline="\n",
-            )
-            paths.append(path)
-
-
-    translation_manifest_path = _write_conversation_translation_manifest(
-        translation_root
+    bundles_by_owner = conversation_translation_bundles_by_owner(
+        model,
+        package_repositories=package_repositories,
     )
-    paths.append(translation_manifest_path)
+    for owner, bundles in sorted(bundles_by_owner.items()):
+        package_translation_root = translation_root(
+            repository,
+            owner,
+            core_repository=core_repository,
+            dynamic_trading_repository=dynamic_trading_repository,
+            runtime_root=repository,
+        )
+        for language in sorted(bundles):
+            for domain, values in sorted(bundles[language].items()):
+                relative = f"{language}/Conversation/{domain}.json"
+                path = package_translation_root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(
+                    pretty_json(values),
+                    encoding="utf-8",
+                    newline="\n",
+                )
+                paths.append(path)
+        paths.append(
+            _write_conversation_translation_manifest(
+                package_translation_root,
+                package_descriptor(owner).translation_manifest_relative,
+                bundles,
+            )
+        )
 
     return paths
 
@@ -334,6 +393,12 @@ def main(arguments: list[str] | None = None) -> int:
         default=None,
         help="PsychopatzCore repository receiving Core-owned generated artifacts",
     )
+    parser.add_argument(
+        "--dynamic-trading-repository",
+        type=Path,
+        default=None,
+        help="DynamicTrading repository receiving DTCommon-owned generated artifacts",
+    )
     options = parser.parse_args(arguments)
 
     if options.wordnet_home is None and options.conversation_manifest is None:
@@ -354,6 +419,21 @@ def main(arguments: list[str] | None = None) -> int:
                 output_root,
                 manifest_path=manifest_path,
                 runtime_root=output_root,
+                package_repositories={
+                    HOOMANS_OWNER: output_root,
+                    CORE_OWNER: resolve_core_repository(
+                        output_root,
+                        explicit=options.core_repository,
+                        runtime_root=output_root,
+                    ),
+                    **(
+                        {
+                            DT_COMMON_OWNER: options.dynamic_trading_repository
+                        }
+                        if options.dynamic_trading_repository is not None
+                        else {}
+                    ),
+                },
             )
     except CompileError as error:
         print(f"semantic compiler error: {error}", file=sys.stderr)
@@ -383,6 +463,7 @@ def main(arguments: list[str] | None = None) -> int:
             output_root,
             compiled_conversation,
             core_repository=options.core_repository,
+            dynamic_trading_repository=options.dynamic_trading_repository,
         )
         print(
             "wrote manifest-backed Conversation output and "

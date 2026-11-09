@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 from .lexicon_compiler import CompileError
-from .generation_ownership import normalize_owner
+from .generation_ownership import HOOMANS_OWNER, normalize_owner
 from .dialogue_dataset import compile_dialogue_dataset
 from .semantic_definition_compiler import (
     compile_semantic_definitions,
@@ -99,9 +99,15 @@ def _read_json(path: Path, label: str) -> dict[str, Any]:
 class SemanticDatasetCatalog:
     """Own canonical dataset discovery, validation, and explicit shard writes."""
 
-    def __init__(self, repository: Path, runtime_root: Path) -> None:
+    def __init__(
+        self,
+        repository: Path,
+        runtime_root: Path,
+        package_repositories: Mapping[str, Path] | None = None,
+    ) -> None:
         self.repository = repository
         self.runtime_root = runtime_root
+        self.package_repositories = dict(package_repositories or {})
 
     def _spec_paths(self, spec: dict[str, Any]) -> list[Path]:
         if spec["kind"] == "dialogue":
@@ -252,7 +258,10 @@ class SemanticDatasetCatalog:
             incoming_source = source if isinstance(source, dict) else {}
             merged_source = {
                 **incoming_source,
-                "owner": normalize_owner(existing_source.get("owner")),
+            "owner": normalize_owner(
+                existing_source.get("owner"),
+                default=HOOMANS_OWNER,
+            ),
             }
             # Shard ownership is a physical package contract. Editing the
             # logical mixed dataset may update shared provenance, but cannot
@@ -394,7 +403,8 @@ class SemanticDatasetCatalog:
                 compiled = compile_semantic_definitions(
                     document,
                     discover_registered_capability_ids(
-                        self.runtime_root
+                        self.runtime_root,
+                        package_repositories=self.package_repositories,
                     ),
                 )
                 summary = {

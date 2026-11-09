@@ -12,7 +12,7 @@ def behavior(continuation: dict | None) -> dict:
     record = {
         "id": "behavior.test.continuation",
         "version": 1,
-        "owner": "Test",
+        "owner": "ProjectHoomans",
         "act": "ASK_FOLLOWUP",
         "mode": "one_shot",
         "stimuli": ["NPC_SEMANTIC_ACT"],
@@ -46,6 +46,7 @@ class InteractionContinuationCompilerTests(unittest.TestCase):
                 }
             ),
             "test.json",
+            default_owner="ProjectHoomans",
         )
         continuation = compiled["records"][0]["continuation"]
         self.assertEqual(continuation["mode"], "emit")
@@ -60,6 +61,7 @@ class InteractionContinuationCompilerTests(unittest.TestCase):
         compiled = _validate_behavior_shard(
             behavior({"mode": "terminate"}),
             "test.json",
+            default_owner="ProjectHoomans",
         )
         continuation = compiled["records"][0]["continuation"]
         self.assertEqual(continuation["mode"], "terminate")
@@ -73,6 +75,7 @@ class InteractionContinuationCompilerTests(unittest.TestCase):
                 "intent": "ACKNOWLEDGE",
             }),
             "test.json",
+            default_owner="ProjectHoomans",
         )
         continuation = compiled["records"][0]["continuation"]
         self.assertEqual(continuation["target"], "other")
@@ -82,22 +85,26 @@ class InteractionContinuationCompilerTests(unittest.TestCase):
             _validate_behavior_shard(
                 behavior({"mode": "chat_forever"}),
                 "test.json",
+                default_owner="ProjectHoomans",
             )
         with self.assertRaisesRegex(CompileError, "continuation.target"):
             _validate_behavior_shard(
                 behavior({"mode": "emit", "target": "everyone"}),
                 "test.json",
+                default_owner="ProjectHoomans",
             )
         with self.assertRaisesRegex(CompileError, "continuation.intent"):
             _validate_behavior_shard(
                 behavior({"mode": "emit", "intent": "bad token"}),
                 "test.json",
+                default_owner="ProjectHoomans",
             )
 
     def test_missing_continuation_remains_backward_compatible(self) -> None:
         compiled = _validate_behavior_shard(
             behavior(None),
             "test.json",
+            default_owner="ProjectHoomans",
         )
         self.assertNotIn("continuation", compiled["records"][0])
 

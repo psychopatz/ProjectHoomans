@@ -13,7 +13,7 @@ import hashlib
 import json
 import re
 from pathlib import Path, PurePosixPath
-from typing import Any, Iterable
+from typing import Any, Iterable, Mapping
 
 from .catalog_naming import (
     ModuleNameRegistry,
@@ -35,7 +35,10 @@ from .semantic_definition_compiler import (
 )
 from .generation_ownership import (
     HOOMANS_OWNER,
+    OwnerConfigurationError,
+    conversation_prefix,
     normalize_owner,
+    package_descriptor,
     route_module_for_owner,
     source_owner,
 )
@@ -112,6 +115,12 @@ def _source_metadata(documents: Iterable[dict[str, Any]]) -> dict[str, Any]:
     if references:
         first["references"] = [references[name] for name in sorted(references)]
     return first
+
+
+def _registry_owner(model: dict[str, Any]) -> str:
+    manifest = model.get("manifest")
+    owner = manifest.get("registryOwner") if isinstance(manifest, dict) else None
+    return normalize_owner(owner)
 
 
 def _validate_relative_json_path(value: Any, label: str) -> str:
@@ -222,6 +231,16 @@ def _load_manifest(repository: Path, manifest_path: Path) -> tuple[dict[str, Any
         raise CompileError(
             f"Conversation manifest requires schema {CONVERSATION_MANIFEST_SCHEMA}"
         )
+    try:
+        default_owner = normalize_owner(manifest.get("defaultOwner"))
+        registry_owner = normalize_owner(
+            manifest.get("registryOwner"),
+            default=default_owner,
+        )
+    except OwnerConfigurationError as error:
+        raise CompileError(f"invalid Conversation manifest ownership: {error}") from error
+    manifest["defaultOwner"] = default_owner
+    manifest["registryOwner"] = registry_owner
     shards = manifest.get("shards")
     if not isinstance(shards, list) or not shards:
         raise CompileError("Conversation manifest requires at least one shard")
@@ -326,7 +345,12 @@ def _validate_director_predicate(value: Any, label: str, *, depth: int = 0) -> d
     return result
 
 
-def _validate_behavior_shard(document: dict[str, Any], path: str) -> dict[str, Any]:
+def _validate_behavior_shard(
+    document: dict[str, Any],
+    path: str,
+    *,
+    default_owner: str,
+) -> dict[str, Any]:
     values = document.get("behaviors")
     if not isinstance(values, list):
         raise CompileError(f"Behavior shard {path} requires a behaviors list")
@@ -545,10 +569,11 @@ def _validate_behavior_shard(document: dict[str, Any], path: str) -> dict[str, A
                     "reason": str(modifier.get("reason") or "")[:96],
                 }
             )
+        normalize_owner(raw.get("owner"), default=default_owner)
         record = {
             "id": record_id,
             "version": int(raw.get("version", 1)),
-            "owner": str(raw.get("owner") or "ProjectHoomans"),
+            "owner": default_owner,
             "act": act,
             "mode": mode,
             "stimuli": stimuli,
@@ -564,7 +589,12 @@ def _validate_behavior_shard(document: dict[str, Any], path: str) -> dict[str, A
     return {"records": records}
 
 
-def _validate_beat_shard(document: dict[str, Any], path: str) -> dict[str, Any]:
+def _validate_beat_shard(
+    document: dict[str, Any],
+    path: str,
+    *,
+    default_owner: str,
+) -> dict[str, Any]:
     values = document.get("beats")
     if not isinstance(values, list):
         raise CompileError(f"Beat shard {path} requires a beats list")
@@ -624,10 +654,11 @@ def _validate_beat_shard(document: dict[str, Any], path: str) -> dict[str, Any]:
         for field, value, maximum in (("cooldownTurns", cooldown, 64), ("maxTurns", max_turns, 64)):
             if isinstance(value, bool) or not isinstance(value, int) or value < 0 or value > maximum:
                 raise CompileError(f"{label}.{field} must be an integer from 0 to {maximum}")
+        normalize_owner(raw.get("owner"), default=default_owner)
         record = {
             "id": record_id,
             "version": int(raw.get("version", 1)),
-            "owner": str(raw.get("owner") or "ProjectHoomans"),
+            "owner": default_owner,
             "stimuli": stimuli,
             "entry": _validate_director_predicate(raw.get("entry"), f"{label}.entry"),
             "maintain": _validate_director_predicate(raw.get("maintain"), f"{label}.maintain"),
@@ -740,15 +771,30 @@ def _merge_realization_sources(
 def _merge_director_sources(
     shards: list[tuple[dict[str, Any], dict[str, Any], str]],
     kind: str,
+    *,
+    default_owner: str,
 ) -> dict[str, Any]:
     records: list[dict[str, Any]] = []
     for document, entry, _ in shards:
         if entry["kind"] != kind:
             continue
+        source = document.get("source")
+        owner = normalize_owner(
+            source.get("owner") if isinstance(source, dict) else None,
+            default=default_owner,
+        )
         compiled = (
-            _validate_behavior_shard(document, entry["path"])
+            _validate_behavior_shard(
+                document,
+                entry["path"],
+                default_owner=owner,
+            )
             if kind == "behaviors"
-            else _validate_beat_shard(document, entry["path"])
+            else _validate_beat_shard(
+                document,
+                entry["path"],
+                default_owner=owner,
+            )
         )
         for record in compiled["records"]:
             records.append({**record, "domain": entry["domain"]})
@@ -761,6 +807,8 @@ def _compile_shard(
     entry: dict[str, Any],
     *,
     runtime_root: Path,
+    default_owner: str,
+    package_repositories: Mapping[str, Path] | None = None,
 ) -> dict[str, Any]:
     kind = entry["kind"]
     path = entry["path"]
@@ -793,12 +841,29 @@ def _compile_shard(
                 "source": source,
                 "definitions": document.get("definitions"),
             },
-            registered_capability_ids=discover_registered_capability_ids(runtime_root),
+            registered_capability_ids=discover_registered_capability_ids(
+                runtime_root,
+                package_repositories=package_repositories,
+            ),
         )
     elif kind == "behaviors":
-        compiled = _validate_behavior_shard(document, path)
+        compiled = _validate_behavior_shard(
+            document,
+            path,
+            default_owner=normalize_owner(
+                source.get("owner"),
+                default=default_owner,
+            ),
+        )
     elif kind == "beats":
-        compiled = _validate_beat_shard(document, path)
+        compiled = _validate_beat_shard(
+            document,
+            path,
+            default_owner=normalize_owner(
+                source.get("owner"),
+                default=default_owner,
+            ),
+        )
     elif kind == "realization":
         compiled = _validate_realization_shard(document, path)
     else:
@@ -835,12 +900,14 @@ def _merge_dialogue_sources(
 def _merge_semantic_sources(
     shards: list[tuple[dict[str, Any], dict[str, Any], str]],
     runtime_root: Path,
+    default_owner: str,
+    package_repositories: Mapping[str, Path] | None = None,
 ) -> dict[str, Any]:
     documents = [document for document, entry, _ in shards if entry["kind"] == "flows"]
     if not documents:
         return {"patterns": [], "flows": [], "responsePools": [], "translations": {}}
     source = _source_metadata(documents)
-    source_owner = source.get("owner") or "ProjectHoomans"
+    source_owner = normalize_owner(source.get("owner"), default=default_owner)
     source_version = source.get("version") or "1"
     definitions = [item for document in documents for item in document.get("definitions", [])]
     definitions.sort(key=lambda item: str(item.get("id", "")))
@@ -850,7 +917,10 @@ def _merge_semantic_sources(
             "source": {"owner": source_owner, "version": source_version},
             "definitions": definitions,
         },
-        registered_capability_ids=discover_registered_capability_ids(runtime_root),
+        registered_capability_ids=discover_registered_capability_ids(
+            runtime_root,
+            package_repositories=package_repositories,
+        ),
     )
 
 
@@ -948,6 +1018,7 @@ def compile_conversation_sources(
     manifest_path: Path | None = None,
     runtime_root: Path | None = None,
     source_overrides: dict[str, dict[str, Any]] | None = None,
+    package_repositories: Mapping[str, Path] | None = None,
 ) -> dict[str, Any]:
     """Load, validate, merge, sort, fingerprint, and index Conversation shards.
 
@@ -978,7 +1049,13 @@ def compile_conversation_sources(
                 )
         else:
             document = _read_json(path, "Conversation shard")
-        compiled = _compile_shard(document, entry, runtime_root=runtime_root)
+        compiled = _compile_shard(
+            document,
+            entry,
+            runtime_root=runtime_root,
+            default_owner=manifest["defaultOwner"],
+            package_repositories=package_repositories,
+        )
         record_ids: list[str] = []
         if entry["kind"] == "content":
             record_ids.extend(str(item["semanticTemplateID"]) for item in document.get("phraseFamilies", []))
@@ -1005,7 +1082,8 @@ def compile_conversation_sources(
             "domain": entry["domain"],
             "order": entry["order"],
             "owner": normalize_owner(
-                source_meta.get("owner") if isinstance(source_meta, dict) else None
+                source_meta.get("owner") if isinstance(source_meta, dict) else None,
+                default=manifest["defaultOwner"],
             ),
             "fingerprint": _fingerprint(document),
             "recordIDs": record_ids,
@@ -1015,9 +1093,22 @@ def compile_conversation_sources(
 
     content, content_source = _content_source(loaded)
     dialogue, _dialogue_translations = _merge_dialogue_sources(loaded)
-    semantic = _merge_semantic_sources(loaded, runtime_root)
-    behaviors = _merge_director_sources(loaded, "behaviors")
-    beats = _merge_director_sources(loaded, "beats")
+    semantic = _merge_semantic_sources(
+        loaded,
+        runtime_root,
+        manifest["defaultOwner"],
+        package_repositories,
+    )
+    behaviors = _merge_director_sources(
+        loaded,
+        "behaviors",
+        default_owner=manifest["defaultOwner"],
+    )
+    beats = _merge_director_sources(
+        loaded,
+        "beats",
+        default_owner=manifest["defaultOwner"],
+    )
     realization = _merge_realization_sources(loaded)
     ui = sorted(
         [item for document, entry, _ in loaded if entry["kind"] == "ui" for item in document.get("suggestions", [])],
@@ -1031,7 +1122,8 @@ def compile_conversation_sources(
         entry = {
             **entry,
             "owner": normalize_owner(
-                source_meta.get("owner") if isinstance(source_meta, dict) else None
+                source_meta.get("owner") if isinstance(source_meta, dict) else None,
+                default=manifest["defaultOwner"],
             ),
         }
         if entry["kind"] == "content":
@@ -1196,6 +1288,10 @@ def compile_conversation_sources(
         # Private build-time provenance used for shard-targeted authoring.
         # Private fields are never written into generated runtime artifacts.
         "_repository": repository,
+        "_package_repositories": {
+            normalize_owner(owner): Path(path).expanduser().resolve()
+            for owner, path in (package_repositories or {}).items()
+        },
         "_source_documents": {
             entry["path"]: document for document, entry, _ in loaded
         },
@@ -1282,6 +1378,136 @@ def conversation_translation_bundles(model: dict[str, Any]) -> dict[str, dict[st
             if values
         }
     return bundles
+
+
+def conversation_translation_bundles_by_owner(
+    model: dict[str, Any],
+    *,
+    package_repositories: Mapping[str, Path] | None = None,
+) -> dict[str, dict[str, dict[str, dict[str, str]]]]:
+    """Partition Conversation translations by canonical package owner."""
+    languages = conversation_languages(model)
+    manifest = model.get("manifest") or {}
+    default_owner = normalize_owner(manifest.get("defaultOwner"))
+    registry_owner = normalize_owner(
+        manifest.get("registryOwner"),
+        default=default_owner,
+    )
+    bundles: dict[str, dict[str, dict[str, dict[str, str]]]] = {}
+
+    def add(
+        owner: Any,
+        language: str,
+        domain: str,
+        key: Any,
+        value: Any,
+    ) -> None:
+        if (
+            language not in languages
+            or not isinstance(key, str)
+            or not isinstance(value, str)
+        ):
+            return
+        canonical_owner = normalize_owner(owner, default=registry_owner)
+        owner_bundles = bundles.setdefault(canonical_owner, {})
+        language_bundles = owner_bundles.setdefault(language, {})
+        language_bundles.setdefault(domain, {})[key] = value
+
+    def record_owner(canonical_id: str) -> str:
+        record = conversation_record(model, canonical_id) or {}
+        return normalize_owner(record.get("owner"), default=default_owner)
+
+    for family in model["content"].get("phraseFamilies", []):
+        owner = record_owner("phrase." + str(family.get("semanticTemplateID")))
+        domain = str(
+            family.get("conversationDomain")
+            or family.get("group")
+            or "general"
+        ).title()
+        keys = [
+            phrase["key"]
+            for phrases in family.get("styles", {}).values()
+            for phrase in phrases
+            if isinstance(phrase, dict) and isinstance(phrase.get("key"), str)
+        ]
+        for language in languages:
+            values = model["content"].get("translations", {}).get(language, {})
+            for key in keys:
+                add(owner, language, domain, key, values.get(key))
+
+    for choice in model["content"].get("playerChoices", []):
+        owner = record_owner(str(choice.get("id") or ""))
+        domain = str(choice.get("conversationDomain") or "greeting").title()
+        for language in languages:
+            values = model["content"].get("translations", {}).get(language, {})
+            add(owner, language, domain, choice.get("labelKey"), values.get(choice.get("labelKey")))
+            add(owner, language, domain, choice.get("choiceKey"), values.get(choice.get("choiceKey")))
+
+    ui_key_owners: dict[str, str] = {}
+    for suggestion in model.get("ui", []):
+        owner = record_owner(str(suggestion.get("id") or ""))
+        for key in (suggestion.get("labelKey"), suggestion.get("utteranceKey")):
+            if isinstance(key, str):
+                ui_key_owners[key] = owner
+    for language in languages:
+        for key, value in model.get("uiTranslations", {}).get(language, {}).items():
+            add(ui_key_owners.get(key, registry_owner), language, "UI", key, value)
+
+    repositories = {
+        normalize_owner(owner): Path(path).expanduser().resolve()
+        for owner, path in (
+            model.get("_package_repositories") or {}
+        ).items()
+    }
+    repository = model.get("_repository")
+    if isinstance(repository, Path):
+        repositories.setdefault(HOOMANS_OWNER, repository)
+    for raw_owner, path in (package_repositories or {}).items():
+        repositories[normalize_owner(raw_owner)] = Path(path).expanduser().resolve()
+    for owner, repository_path in sorted(repositories.items()):
+        descriptor = package_descriptor(owner)
+        for language in languages:
+            suggestions_path = (
+                repository_path
+                / descriptor.translation_relative
+                / language
+                / "Conversation/Semantic/Suggestions.json"
+            )
+            if not suggestions_path.is_file():
+                continue
+            try:
+                suggestions = json.loads(
+                    suggestions_path.read_text(encoding="utf-8")
+                )
+            except (OSError, UnicodeError, json.JSONDecodeError):
+                suggestions = {}
+            if isinstance(suggestions, dict):
+                for key, value in suggestions.items():
+                    add(owner, language, "UI", key, value)
+
+    semantic_owner = normalize_owner(
+        (model.get("semantic") or {}).get("source", {}).get("owner")
+        if isinstance((model.get("semantic") or {}).get("source"), dict)
+        else None,
+        default=registry_owner,
+    )
+    for language in languages:
+        for key, value in model.get("dialogue", {}).get("translations", {}).get(language, {}).items():
+            add(registry_owner, language, "Patterns", key, value)
+        for key, value in model.get("semantic", {}).get("translations", {}).get(language, {}).items():
+            add(semantic_owner, language, "Flows", key, value)
+
+    return {
+        owner: {
+            language: {
+                domain: {key: values[key] for key in sorted(values)}
+                for domain, values in sorted(domains.items())
+                if values
+            }
+            for language, domains in sorted(languages_by_owner.items())
+        }
+        for owner, languages_by_owner in sorted(bundles.items())
+    }
 
 
 def render_conversation_ui_module(model: dict[str, Any]) -> str:
@@ -1380,9 +1606,12 @@ def _chunk_records(
 
 def render_conversation_runtime_plan(
     model: dict[str, Any],
+    *,
+    registry_owner: str | None = None,
 ) -> tuple[list[tuple[str, str]], list[dict[str, Any]]]:
     """Render bounded runtime modules using canonical source ownership."""
-    prefix = "PNC/Semantics/Generated/Conversation"
+    registry_owner = normalize_owner(registry_owner or _registry_owner(model))
+    prefix = conversation_prefix(registry_owner)
     content_modules, content_reports = render_dialogue_content_shard_plan(
         model["content"], prefix, max_bytes=CONVERSATION_MAX_SHARD_BYTES
     )
@@ -1506,7 +1735,9 @@ def render_conversation_runtime_plan(
     for (module, source), report in zip(modules, reports):
         owner = source_owner(model, report.get("sourceShard"))
         routed_module = route_module_for_owner(module, owner)
+        report["shardOwner"] = owner
         report["owner"] = owner
+        report["registryOwner"] = registry_owner
         report["module"] = routed_module
         routed_modules.append((routed_module, source))
     modules = routed_modules
@@ -1517,7 +1748,9 @@ def render_conversation_runtime_plan(
         module_prefix=prefix,
     )
     for report in index_reports:
-        report["owner"] = HOOMANS_OWNER
+        report["shardOwner"] = registry_owner
+        report["owner"] = registry_owner
+        report["registryOwner"] = registry_owner
     modules.extend(index_modules)
     reports.extend(index_reports)
     return modules, reports
@@ -1651,13 +1884,15 @@ def render_conversation_discovery_indexes(
     model: dict[str, Any],
     reports: list[dict[str, Any]],
     *,
-    module_prefix: str = "PNC/Semantics/Generated/Conversation",
+    module_prefix: str | None = None,
 ) -> tuple[
     list[tuple[str, str]],
     list[dict[str, Any]],
     dict[str, dict[str, Any]],
 ]:
     """Render small source-routing indexes without aggregating definitions."""
+    if module_prefix is None:
+        module_prefix = conversation_prefix(_registry_owner(model))
     index = conversation_discovery_index(model, reports)
     grouped: dict[tuple[str, str], dict[str, dict[str, Any]]] = {}
     for record_id, entry in index.items():
@@ -1924,13 +2159,37 @@ def conversation_context_health(
     }
 
 
-def render_conversation_registry(model: dict[str, Any], reports: list[dict[str, Any]]) -> str:
+def _lua_namespace_prelude(namespace: str) -> list[str]:
+    parts = [part for part in str(namespace).split(".") if part]
+    if len(parts) < 2:
+        raise CompileError(f"Conversation registry namespace is invalid: {namespace}")
+    lines = [f"{parts[0]} = {parts[0]} or {{}}"]
+    current = parts[0]
+    for part in parts[1:-1]:
+        current += "." + part
+        lines.append(f"{current} = {current} or {{}}")
+    full = ".".join(parts)
+    lines.extend([
+        f"local Registry = {full} or {{}}",
+        f"{full} = Registry",
+    ])
+    return lines
+
+
+def render_conversation_registry(
+    model: dict[str, Any],
+    reports: list[dict[str, Any]],
+    *,
+    registry_owner: str | None = None,
+) -> str:
+    registry_owner = normalize_owner(registry_owner or _registry_owner(model))
+    descriptor = package_descriptor(registry_owner)
     lines = [
         "-- Generated by the manifest-backed Conversation compiler; do not edit by hand.",
-        "PNC = PNC or {}",
-        "PNC.Semantics = PNC.Semantics or {}",
-        "local Registry = PNC.Semantics.ConversationRegistry or {}",
-        "PNC.Semantics.ConversationRegistry = Registry",
+        *_lua_namespace_prelude(descriptor.registry_namespace),
+        f"Registry.OWNER = {_lua_string(registry_owner)}",
+        f"Registry.REGISTRY_NAMESPACE = {_lua_string(descriptor.registry_namespace)}",
+        f"Registry.REGISTRY_MODULE = {_lua_string(descriptor.registry_module)}",
         f"Registry.SCHEMA = {_lua_string(CONVERSATION_MODEL_SCHEMA)}",
         "Registry.VERSION = 1",
         f"Registry.CONTENT_FINGERPRINT = {_lua_string(model['content']['contentFingerprint'])}",
@@ -2026,9 +2285,19 @@ def render_conversation_registry(model: dict[str, Any], reports: list[dict[str, 
     return "\n".join(lines)
 
 
-def render_conversation_manifest_lua(model: dict[str, Any], reports: list[dict[str, Any]]) -> str:
+def render_conversation_manifest_lua(
+    model: dict[str, Any],
+    reports: list[dict[str, Any]],
+    *,
+    registry_owner: str | None = None,
+) -> str:
+    registry_owner = normalize_owner(registry_owner or _registry_owner(model))
+    descriptor = package_descriptor(registry_owner)
     payload = {
         "schema": "pnc.conversation.runtime-manifest.v1",
+        "registryOwner": registry_owner,
+        "registryNamespace": descriptor.registry_namespace,
+        "registryModule": descriptor.registry_module,
         "wholeModelFingerprint": model["wholeModelFingerprint"],
         "shards": reports,
     }

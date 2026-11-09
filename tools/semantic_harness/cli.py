@@ -400,6 +400,11 @@ def cli(arguments: argparse.Namespace) -> int:
                 if getattr(arguments, "core_repository", None)
                 else None
             ),
+            dynamic_trading_repository=(
+                Path(arguments.dynamic_trading_repository)
+                if getattr(arguments, "dynamic_trading_repository", None)
+                else None
+            ),
         )
         activity_log = ActivityLog(
             path=default_activity_path(
@@ -1003,6 +1008,10 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--lua", help="Lua executable; defaults to PNC_HARNESS_LUA, lua, or luajit")
     parser.add_argument("--repository", help="Project Hoomans repository")
     parser.add_argument("--core-repository", help="PsychopatzCore repository")
+    parser.add_argument(
+        "--dynamic-trading-repository",
+        help="DynamicTrading repository containing the DTCommon package",
+    )
     parser.add_argument(
         "--ui-state",
         help="override the user-owned Semantic Lab window-state file",

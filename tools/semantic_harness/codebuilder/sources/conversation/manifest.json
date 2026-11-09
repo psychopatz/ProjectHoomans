@@ -14,6 +14,8 @@
     ]
   },
   "schema": "pnc.conversation.manifest.v1",
+  "defaultOwner": "ProjectHoomans",
+  "registryOwner": "ProjectHoomans",
   "shards": [
     {
       "domain": "greeting",

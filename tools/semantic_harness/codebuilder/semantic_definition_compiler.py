@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable, Mapping
 
 from .dialogue_contract import (
     DIALOGUE_ID,
@@ -20,6 +20,11 @@ from .dialogue_rendering import _lua_value
 from .lexicon_compiler import CompileError, _lua_string
 from .dialogue_contract import validate_branch_offers
 from .catalog_naming import ModuleNameRegistry, module_path, pascal_segment
+from .generation_ownership import (
+    HOOMANS_OWNER,
+    PACKAGE_DESCRIPTORS,
+    normalize_owner,
+)
 from .translation_support import DEFAULT_LANGUAGE, normalize_translations
 
 SEMANTIC_SCHEMA = "pnc.semantic_authoring.v1"
@@ -62,19 +67,45 @@ def load_semantic_source(path: Path) -> dict[str, Any]:
     return document
 
 
-def discover_registered_capability_ids(runtime_root: Path) -> set[str]:
-    """Read capability IDs from existing production semantic descriptors."""
-    pattern = re.compile(r'capabilityID\s*=\s*["\']([^"\']+)["\']')
-    paths = runtime_root.glob(
-        "Contents/mods/ProjectHoomans/*/media/lua/**/PNC_Semantic*.lua"
+def discover_registered_capability_ids(
+    runtime_root: Path,
+    *,
+    package_repositories: Mapping[str, Path] | None = None,
+    owners: Iterable[Any] | None = None,
+) -> set[str]:
+    """Read capability IDs from descriptor-owned semantic catalogs.
+
+    The Hoomans runtime root remains the compatibility default. Optional
+    package repositories are explicit inputs; missing optional repositories
+    contribute only their descriptor-declared IDs and do not break discovery.
+    """
+    repositories: dict[str, Path] = {HOOMANS_OWNER: runtime_root}
+    for raw_owner, repository in (package_repositories or {}).items():
+        repositories[normalize_owner(raw_owner)] = Path(repository).expanduser().resolve()
+
+    selected = (
+        [normalize_owner(owner) for owner in owners]
+        if owners is not None
+        else list(PACKAGE_DESCRIPTORS)
     )
     capabilities: set[str] = set()
-    for path in sorted(paths):
-        try:
-            text = path.read_text(encoding="utf-8")
-        except OSError:
+    for owner in selected:
+        descriptor = PACKAGE_DESCRIPTORS[owner]
+        capabilities.update(descriptor.capability_ids)
+        repository = repositories.get(owner)
+        if repository is None:
             continue
-        capabilities.update(pattern.findall(text))
+        for glob in descriptor.capability_globs:
+            for path in sorted(repository.glob(glob)):
+                try:
+                    text = path.read_text(encoding="utf-8")
+                except OSError:
+                    continue
+                for field in descriptor.capability_fields:
+                    pattern = re.compile(
+                        rf'{re.escape(field)}\s*=\s*["\']([^"\']+)["\']'
+                    )
+                    capabilities.update(pattern.findall(text))
     return capabilities
 
 
@@ -319,7 +350,8 @@ def compile_semantic_definitions(
     definitions = document.get("definitions")
     if not isinstance(definitions, list) or not definitions or len(definitions) > 32:
         raise CompileError("semantic source requires 1..32 definitions")
-    capabilities = set(registered_capability_ids or DEFAULT_REGISTERED_CAPABILITY_IDS)
+    capabilities = set(DEFAULT_REGISTERED_CAPABILITY_IDS)
+    capabilities.update(registered_capability_ids or ())
     reserved = {
         _normalize_dialogue_utterance(item)[0]
         for item in (reserved_utterances or DEFAULT_RESERVED_UTTERANCES)

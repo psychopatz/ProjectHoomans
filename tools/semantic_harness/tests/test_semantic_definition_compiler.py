@@ -1,17 +1,40 @@
 from __future__ import annotations
 
 import copy
+import tempfile
 import unittest
+from pathlib import Path
 
 from tools.semantic_harness.codebuilder.lexicon_compiler import CompileError
 from tools.semantic_harness.codebuilder.semantic_definition_compiler import (
     compile_semantic_definitions,
+    discover_registered_capability_ids,
     render_semantic_lua_shards,
     render_semantic_manifest,
 )
 
 
 class SemanticAuthoringCompilerTests(unittest.TestCase):
+    def test_capability_discovery_uses_optional_package_descriptors(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            dynamic_trading = Path(directory) / "DynamicTrading"
+            catalog = (
+                dynamic_trading
+                / "Contents/mods/DTCommon/42.20/media/lua/shared/DTCommon"
+                / "DTCommon_SemanticPack.lua"
+            )
+            catalog.parent.mkdir(parents=True)
+            catalog.write_text(
+                'local capabilityRequired = "dynamictrading.custom"\n',
+                encoding="utf-8",
+            )
+            capabilities = discover_registered_capability_ids(
+                Path(directory) / "ProjectHoomans",
+                package_repositories={"DTCommon": dynamic_trading},
+            )
+            self.assertIn("dynamictrading.trade", capabilities)
+            self.assertIn("dynamictrading.custom", capabilities)
+
     def source(self) -> dict:
         return {
             "schema": "pnc.semantic_authoring.v1",

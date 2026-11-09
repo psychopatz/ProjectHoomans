@@ -31,20 +31,28 @@ from .dialogue_content import (
 )
 from .conversation_compiler import (
     CONVERSATION_MANIFEST_RELATIVE,
-    CONVERSATION_RUNTIME_RELATIVE,
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
     conversation_affected_closure,
     conversation_context_health,
     conversation_discovery_index,
     conversation_record,
-    conversation_translation_bundles,
     render_conversation_manifest_lua,
     render_conversation_registry,
     render_conversation_runtime_plan,
 )
 from .lexicon_compiler import CompileError
-from .generation_ownership import resolve_core_repository
+from .generation_ownership import (
+    CORE_OWNER,
+    DT_COMMON_OWNER,
+    HOOMANS_OWNER,
+    conversation_prefix,
+    generated_conversation_root,
+    module_target,
+    normalize_owner,
+    owner_repository,
+    resolve_core_repository,
+)
 
 
 class SemanticLabAuthoringService:
@@ -56,6 +64,7 @@ class SemanticLabAuthoringService:
         *,
         runtime_root: Path | None = None,
         core_repository: Path | None = None,
+        dynamic_trading_repository: Path | None = None,
     ) -> None:
         self.repository = (repository or authoring.REPOSITORY).expanduser().resolve()
         self.runtime_root = (
@@ -66,9 +75,23 @@ class SemanticLabAuthoringService:
             explicit=core_repository,
             runtime_root=self.runtime_root,
         )
+        self.dynamic_trading_repository = (
+            dynamic_trading_repository.expanduser().resolve()
+            if dynamic_trading_repository is not None
+            else None
+        )
+        self.package_repositories = {
+            HOOMANS_OWNER: self.repository,
+            CORE_OWNER: self.core_repository,
+        }
+        if self.dynamic_trading_repository is not None:
+            self.package_repositories[DT_COMMON_OWNER] = (
+                self.dynamic_trading_repository
+            )
         self.dataset_catalog = SemanticDatasetCatalog(
             self.repository,
             self.runtime_root,
+            self.package_repositories,
         )
         self.block_registry = SemanticBlockRegistry(
             self.repository,
@@ -80,6 +103,7 @@ class SemanticLabAuthoringService:
             self.repository,
             self.runtime_root,
             self.core_repository,
+            self.dynamic_trading_repository,
         )
 
     def list_dataset_sources(self) -> list[dict[str, Any]]:
@@ -147,7 +171,33 @@ class SemanticLabAuthoringService:
         return compile_conversation_sources(
             self.repository,
             runtime_root=self.runtime_root,
+            package_repositories=self.package_repositories,
         )
+
+    def _conversation_registry_location(
+        self,
+        model: dict[str, Any],
+    ) -> tuple[Path, Path]:
+        """Return the descriptor-routed aggregate registry repository/path."""
+        manifest = model.get("manifest") or {}
+        owner = normalize_owner(
+            manifest.get("registryOwner"),
+        )
+        repository = owner_repository(
+            self.repository,
+            owner,
+            core_repository=self.core_repository,
+            dynamic_trading_repository=self.dynamic_trading_repository,
+            runtime_root=self.runtime_root,
+        )
+        root = generated_conversation_root(
+            self.repository,
+            owner,
+            core_repository=self.core_repository,
+            dynamic_trading_repository=self.dynamic_trading_repository,
+            runtime_root=self.runtime_root,
+        )
+        return repository, root.relative_to(repository)
 
     def _conversation_plan(
         self,
@@ -202,6 +252,22 @@ class SemanticLabAuthoringService:
                 return report
         raise KeyError(f"unknown Conversation content shard: {source_shard}")
 
+    @classmethod
+    def _generated_module_for_shard(
+        cls,
+        model: dict[str, Any],
+        source_shard: str,
+        suffix: str,
+    ) -> str:
+        """Return a generated module name from the shard's package owner."""
+        report = cls._content_shard_report(model, source_shard)
+        manifest = model.get("manifest") or {}
+        owner = normalize_owner(
+            report.get("owner"),
+            default=normalize_owner(manifest.get("defaultOwner")),
+        )
+        return f"{conversation_prefix(owner)}/{suffix}"
+
     def _content_source_path(self, source_shard: str) -> Path:
         return self.repository / CONVERSATION_SOURCE_RELATIVE / Path(source_shard)
 
@@ -247,9 +313,11 @@ class SemanticLabAuthoringService:
             key=lambda item: str(item.get("semanticTemplateID") or item.get("id") or "")
         )
         player_choices.sort(key=lambda item: str(item.get("id") or ""))
+        manifest = model.get("manifest") or {}
+        default_owner = normalize_owner(manifest.get("defaultOwner"))
         return {
             "schemaVersion": 2,
-            "source": source_metadata or {"owner": "ProjectHoomans"},
+            "source": source_metadata or {"owner": default_owner},
             "groups": {key: groups[key] for key in sorted(groups)},
             "phraseFamilies": phrase_families,
             "playerChoices": player_choices,
@@ -316,7 +384,12 @@ class SemanticLabAuthoringService:
             from .build import write_conversation_output
 
             model = self._conversation_model()
-            written = write_conversation_output(self.repository, model, core_repository=self.core_repository)
+            written = write_conversation_output(
+                self.repository,
+                model,
+                core_repository=self.core_repository,
+                dynamic_trading_repository=self.dynamic_trading_repository,
+            )
         except (OSError, ValueError, TypeError, CompileError) as error:
             return {
                 **preview,
@@ -422,7 +495,11 @@ class SemanticLabAuthoringService:
                 "sourcePath": str(self._content_source_path(source_shard)),
                 "sourceShard": source_shard,
                 "sourceFingerprint": report["fingerprint"],
-                "generatedModule": "PNC/Semantics/Generated/Conversation/Content",
+                "generatedModule": self._generated_module_for_shard(
+                    model,
+                    source_shard,
+                    "Content",
+                ),
                 "verifiedOwner": "CodeBuilder → Conversation Registry",
             })
         for choice in document.get("playerChoices", []):
@@ -441,7 +518,11 @@ class SemanticLabAuthoringService:
                 "sourcePath": str(self._content_source_path(source_shard)),
                 "sourceShard": source_shard,
                 "sourceFingerprint": report["fingerprint"],
-                "generatedModule": "PNC/Semantics/Generated/Conversation/Content/PlayerChoices",
+                "generatedModule": self._generated_module_for_shard(
+                    model,
+                    source_shard,
+                    "Content/PlayerChoices",
+                ),
                 "verifiedOwner": "CodeBuilder → Conversation Registry",
             })
         return sorted(rows, key=lambda item: str(item.get("id") or ""))
@@ -458,7 +539,11 @@ class SemanticLabAuthoringService:
         item["sourceShard"] = source_shard
         item["sourcePath"] = str(self._content_source_path(source_shard))
         item["sourceFingerprint"] = report["fingerprint"]
-        item["generatedModule"] = "PNC/Semantics/Generated/Conversation/Content"
+        item["generatedModule"] = self._generated_module_for_shard(
+            model,
+            source_shard,
+            "Content",
+        )
         item["verifiedOwner"] = "CodeBuilder → Conversation Registry"
         return item
 
@@ -589,6 +674,9 @@ class SemanticLabAuthoringService:
                 "diagnostics": [{"severity": "error", "message": str(error)}],
                 "writes": [],
             }
+        registry_repository, registry_root = self._conversation_registry_location(
+            self._conversation_model()
+        )
         return {
             **{
                 key: value for key, value in report.items()
@@ -597,13 +685,8 @@ class SemanticLabAuthoringService:
             "diagnostics": [],
             "contentFingerprint": compiled["contentFingerprint"],
             "generatedPaths": [
-                str(self.repository / path)
-                for path in (
-                    "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
-                    "Semantics/Generated/Conversation/Registry.lua",
-                    "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
-                    "Semantics/Generated/Conversation/Manifest.lua",
-                )
+                str(registry_repository / registry_root / "Registry.lua"),
+                str(registry_repository / registry_root / "Manifest.lua"),
             ],
         }
 
@@ -636,7 +719,12 @@ class SemanticLabAuthoringService:
             from .build import write_conversation_output
 
             model = self._conversation_model()
-            generated = write_conversation_output(self.repository, model, core_repository=self.core_repository)
+            generated = write_conversation_output(
+                self.repository,
+                model,
+                core_repository=self.core_repository,
+                dynamic_trading_repository=self.dynamic_trading_repository,
+            )
         except (OSError, ValueError, TypeError, CompileError) as error:
             return {
                 **report,
@@ -826,6 +914,7 @@ class SemanticLabAuthoringService:
                 candidate_model = compile_conversation_sources(
                     candidate_repo,
                     runtime_root=self.runtime_root,
+                    package_repositories=self.package_repositories,
                 )
             except (OSError, ValueError, TypeError, CompileError) as error:
                 return None, {
@@ -861,28 +950,40 @@ class SemanticLabAuthoringService:
     ) -> list[dict[str, Any]]:
         """Return bounded effect-free diffs for generated structural artifacts."""
         rendered, reports = render_conversation_runtime_plan(model)
-        artifacts: list[tuple[str, str]] = []
-        shared_prefix = (
-            "Contents/mods/ProjectHoomans/common/media/lua/shared/"
-        )
+        artifacts: list[tuple[Path, Path, str]] = []
         for module, source in rendered:
             if "/Beats/" in module or "/Behaviors/" in module:
-                artifacts.append((shared_prefix + module + ".lua", source))
-        runtime_prefix = str(CONVERSATION_RUNTIME_RELATIVE).rstrip("/")
+                repository, target = module_target(
+                    self.repository,
+                    module,
+                    core_repository=self.core_repository,
+                    dynamic_trading_repository=self.dynamic_trading_repository,
+                    runtime_root=self.runtime_root,
+                )
+                artifacts.append(
+                    (repository, target.relative_to(repository), source)
+                )
+        registry_repository, registry_root = self._conversation_registry_location(
+            model
+        )
         artifacts.extend([
             (
-                runtime_prefix + "/Registry.lua",
+                registry_repository,
+                registry_root / "Registry.lua",
                 render_conversation_registry(model, reports),
             ),
             (
-                runtime_prefix + "/Manifest.lua",
+                registry_repository,
+                registry_root / "Manifest.lua",
                 render_conversation_manifest_lua(model, reports),
             ),
         ])
-        return [
-            authoring._artifact_diff(self.repository, path, expected)
-            for path, expected in artifacts
-        ]
+        rows = []
+        for repository, relative, expected in artifacts:
+            row = authoring._artifact_diff(repository, str(relative), expected)
+            row["repository"] = str(repository)
+            rows.append(row)
+        return rows
 
     def preview_interaction_definition_edit(
         self,
@@ -950,6 +1051,7 @@ class SemanticLabAuthoringService:
                 self.repository,
                 self._conversation_model(),
                 core_repository=self.core_repository,
+                dynamic_trading_repository=self.dynamic_trading_repository,
             )
         except (OSError, ValueError, TypeError, CompileError) as error:
             return {

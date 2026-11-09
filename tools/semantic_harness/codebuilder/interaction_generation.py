@@ -14,15 +14,18 @@ from .lexicon_compiler import CompileError
 from .translation_support import pretty_json
 from .semantic_definition_compiler import discover_registered_capability_ids
 from .generation_ownership import (
+    generated_conversation_root,
     module_target,
-    resolve_core_repository,
+    normalize_owner,
+    owner_repository,
+    package_descriptor,
+    translation_root,
 )
 from .conversation_compiler import (
-    CONVERSATION_RUNTIME_RELATIVE,
     CONVERSATION_SOURCE_RELATIVE,
     CONVERSATION_UI_RUNTIME_RELATIVE,
     compile_conversation_sources,
-    conversation_translation_bundles,
+    conversation_translation_bundles_by_owner,
     render_conversation_manifest_lua,
     render_conversation_registry,
     render_conversation_runtime_plan,
@@ -47,12 +50,14 @@ class SemanticInteractionAuthoring:
         repository: Path,
         runtime_root: Path,
         core_repository: Path,
+        dynamic_trading_repository: Path | None = None,
     ) -> None:
         self.dataset_catalog = dataset_catalog
         self.block_registry = block_registry
         self.repository = repository
         self.runtime_root = runtime_root
         self.core_repository = core_repository
+        self.dynamic_trading_repository = dynamic_trading_repository
 
     def _dataset_spec(self, source_id: str) -> dict[str, Any]:
         return self.dataset_catalog._dataset_spec(source_id)
@@ -209,61 +214,128 @@ class SemanticInteractionAuthoring:
             self.repository,
             runtime_root=self.runtime_root,
             source_overrides=overrides,
+            package_repositories=self.dataset_catalog.package_repositories,
         )
         rendered, reports = render_conversation_runtime_plan(model)
         core_repository = self.core_repository
+        manifest = model.get("manifest") or {}
+        registry_owner = normalize_owner(
+            manifest.get("registryOwner"),
+        )
+        registry_repository = owner_repository(
+            self.repository,
+            registry_owner,
+            core_repository=core_repository,
+            dynamic_trading_repository=self.dynamic_trading_repository,
+            runtime_root=self.runtime_root,
+        )
+        registry_root = generated_conversation_root(
+            self.repository,
+            registry_owner,
+            core_repository=core_repository,
+            dynamic_trading_repository=self.dynamic_trading_repository,
+            runtime_root=self.runtime_root,
+        )
+        registry_relative_root = registry_root.relative_to(registry_repository)
 
         expected_artifacts: list[tuple[Path, Path, str, str]] = []
         for module, source in rendered:
-            owner_repository, target = module_target(
+            module_repository, target = module_target(
                 self.repository,
                 module,
                 core_repository=core_repository,
+                dynamic_trading_repository=self.dynamic_trading_repository,
                 runtime_root=self.runtime_root,
             )
             expected_artifacts.append(
                 (
-                    owner_repository,
-                    target.relative_to(owner_repository),
+                    module_repository,
+                    target.relative_to(module_repository),
                     source,
                     module,
                 )
             )
 
-        hoomans_artifacts = {
-            CONVERSATION_RUNTIME_RELATIVE / "Registry.lua": render_conversation_registry(
-                model, reports
+        expected_artifacts.extend([
+            (
+                registry_repository,
+                registry_relative_root / "Registry.lua",
+                render_conversation_registry(model, reports),
+                "",
             ),
-            CONVERSATION_RUNTIME_RELATIVE / "Manifest.lua": render_conversation_manifest_lua(
-                model, reports
+            (
+                registry_repository,
+                registry_relative_root / "Manifest.lua",
+                render_conversation_manifest_lua(model, reports),
+                "",
             ),
-            CONVERSATION_UI_RUNTIME_RELATIVE: render_conversation_ui_module(model),
-        }
-        translation_root = Path(
-            "Contents/mods/ProjectHoomans/common/media/translation"
-        )
-        for language, domains in sorted(
-            conversation_translation_bundles(model).items()
+            (
+                self.repository,
+                CONVERSATION_UI_RUNTIME_RELATIVE,
+                render_conversation_ui_module(model),
+                "",
+            ),
+        ])
+        for owner, bundles in sorted(
+            conversation_translation_bundles_by_owner(
+                model,
+                package_repositories=self.dataset_catalog.package_repositories,
+            ).items()
         ):
-            for domain, values in sorted(domains.items()):
-                hoomans_artifacts[
-                    translation_root / language / "Conversation" / f"{domain}.json"
-                ] = pretty_json(values)
-
-        for relative, source in sorted(
-            hoomans_artifacts.items(), key=lambda item: str(item[0])
-        ):
-            expected_artifacts = [
-                row
-                for row in expected_artifacts
-                if not (
-                    row[0] == self.repository
-                    and row[1] == relative
-                )
-            ]
-            expected_artifacts.append(
-                (self.repository, relative, source, "")
+            translation_repository = owner_repository(
+                self.repository,
+                owner,
+                core_repository=core_repository,
+                dynamic_trading_repository=self.dynamic_trading_repository,
+                runtime_root=self.runtime_root,
             )
+            package_translation_root = translation_root(
+                self.repository,
+                owner,
+                core_repository=core_repository,
+                dynamic_trading_repository=self.dynamic_trading_repository,
+                runtime_root=self.runtime_root,
+            )
+            translation_relative_root = package_translation_root.relative_to(
+                translation_repository
+            )
+            for language, domains in sorted(bundles.items()):
+                for domain, values in sorted(domains.items()):
+                    expected_artifacts.append(
+                        (
+                            translation_repository,
+                            translation_relative_root
+                            / language
+                            / "Conversation"
+                            / f"{domain}.json",
+                            pretty_json(values),
+                            "",
+                        )
+                    )
+            manifest_entries = {
+                language: [
+                    f"{language}/Conversation/{domain}.json"
+                    for domain in sorted(domains)
+                ]
+                for language, domains in sorted(bundles.items())
+            }
+            expected_artifacts.append(
+                (
+                    translation_repository,
+                    translation_relative_root
+                    / package_descriptor(owner).translation_manifest_relative,
+                    pretty_json({"version": 1, "languages": manifest_entries}),
+                    "",
+                )
+            )
+
+        # The runtime plan includes the generated UI module itself.  The
+        # aggregate UI artifact above owns that same path, so retain the
+        # aggregate form and avoid reporting duplicate writes/diffs.
+        deduplicated_artifacts: dict[tuple[Path, Path], tuple[Path, Path, str, str]] = {}
+        for artifact in expected_artifacts:
+            deduplicated_artifacts[(artifact[0], artifact[1])] = artifact
+        expected_artifacts = list(deduplicated_artifacts.values())
 
         source_diffs = [
             authoring._artifact_diff(
@@ -274,32 +346,32 @@ class SemanticInteractionAuthoring:
             for path, document in sorted(overrides.items())
         ]
         generated_diffs = []
-        for owner_repository, relative, expected, _module in sorted(
+        for artifact_repository, relative, expected, _module in sorted(
             expected_artifacts,
             key=lambda item: (str(item[0]), str(item[1])),
         ):
             row = authoring._artifact_diff(
-                owner_repository,
+                artifact_repository,
                 str(relative),
                 expected,
             )
-            row["repository"] = str(owner_repository)
+            row["repository"] = str(artifact_repository)
             generated_diffs.append(row)
 
         generated_lua = [
             {
                 "module": module,
-                "repository": str(owner_repository),
+                "repository": str(artifact_repository),
                 "path": str(relative),
                 "sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
                 "source": source,
             }
-            for owner_repository, relative, source, module in expected_artifacts
+            for artifact_repository, relative, source, module in expected_artifacts
             if module
         ]
         fingerprint_payload = "\n".join(
-            f"{owner_repository}/{relative}\0{expected}"
-            for owner_repository, relative, expected, _module in sorted(
+            f"{artifact_repository}/{relative}\0{expected}"
+            for artifact_repository, relative, expected, _module in sorted(
                 expected_artifacts,
                 key=lambda item: (str(item[0]), str(item[1])),
             )
@@ -309,8 +381,8 @@ class SemanticInteractionAuthoring:
             "canonicalSourceDiffs": source_diffs,
             "generatedArtifactDiffs": generated_diffs,
             "generatedPaths": sorted(
-                str(owner_repository / relative)
-                for owner_repository, relative, _expected, _module
+                str(artifact_repository / relative)
+                for artifact_repository, relative, _expected, _module
                 in expected_artifacts
             ),
             "generatedLua": generated_lua,
@@ -345,7 +417,10 @@ class SemanticInteractionAuthoring:
                 "writes": [],
             }
         base_document = self.load_dataset_document(source_id)
-        registered = discover_registered_capability_ids(self.runtime_root)
+        registered = discover_registered_capability_ids(
+            self.runtime_root,
+            package_repositories=self.dataset_catalog.package_repositories,
+        )
         report = compile_interaction_spec(
             spec,
             base_document,
@@ -434,8 +509,16 @@ class SemanticInteractionAuthoring:
         model = compile_conversation_sources(
             self.repository,
             runtime_root=self.runtime_root,
+            package_repositories=self.dataset_catalog.package_repositories,
         )
-        writes.extend(write_conversation_output(self.repository, model, core_repository=self.core_repository))
+        writes.extend(
+            write_conversation_output(
+                self.repository,
+                model,
+                core_repository=self.core_repository,
+                dynamic_trading_repository=self.dynamic_trading_repository,
+            )
+        )
         post_write = self.preview_interaction_spec(
             spec,
             source_id=source_id,
@@ -475,7 +558,10 @@ class SemanticInteractionAuthoring:
                 "writes": [],
             }
         base_document = self.load_dataset_document(source_id)
-        registered = discover_registered_capability_ids(self.runtime_root)
+        registered = discover_registered_capability_ids(
+            self.runtime_root,
+            package_repositories=self.dataset_catalog.package_repositories,
+        )
         report = compile_interaction_collection(
             collection,
             base_document,
@@ -560,8 +646,16 @@ class SemanticInteractionAuthoring:
         model = compile_conversation_sources(
             self.repository,
             runtime_root=self.runtime_root,
+            package_repositories=self.dataset_catalog.package_repositories,
         )
-        writes.extend(write_conversation_output(self.repository, model, core_repository=self.core_repository))
+        writes.extend(
+            write_conversation_output(
+                self.repository,
+                model,
+                core_repository=self.core_repository,
+                dynamic_trading_repository=self.dynamic_trading_repository,
+            )
+        )
         post_write = self.preview_interaction_collection(
             collection,
             source_id=source_id,
@@ -690,9 +784,17 @@ class SemanticInteractionAuthoring:
             model = compile_conversation_sources(
                 self.repository,
                 runtime_root=self.runtime_root,
+                package_repositories=self.dataset_catalog.package_repositories,
             )
             written = [Path(path) for path in canonical.get("writes", [])]
-            written.extend(write_conversation_output(self.repository, model, core_repository=self.core_repository))
+            written.extend(
+                write_conversation_output(
+                    self.repository,
+                    model,
+                    core_repository=self.core_repository,
+                    dynamic_trading_repository=self.dynamic_trading_repository,
+                )
+            )
             generation = {
                 **canonical,
                 "generationApproved": True,

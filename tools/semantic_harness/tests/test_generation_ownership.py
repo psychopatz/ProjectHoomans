@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 import tempfile
 import unittest
@@ -9,13 +10,27 @@ from pathlib import Path
 
 from tools.semantic_harness.codebuilder.build import (
     DEFAULT_OUTPUT,
+    _write_routed_modules,
     default_lexicon_output,
     write_conversation_output,
 )
 from tools.semantic_harness.codebuilder.conversation_compiler import (
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
+    conversation_translation_bundles_by_owner,
     render_conversation_runtime_plan,
+)
+from tools.semantic_harness.codebuilder.generation_ownership import (
+    DT_COMMON_OWNER,
+    HOOMANS_OWNER,
+    OwnerConfigurationError,
+    module_owner,
+    module_target,
+    normalize_owner,
+    owner_repository,
+    package_descriptor,
+    shared_lua_root,
+    translation_root,
 )
 
 
@@ -23,6 +38,92 @@ REPOSITORY = Path(__file__).resolve().parents[3]
 
 
 class GenerationOwnershipTests(unittest.TestCase):
+    def test_package_owners_are_explicit_and_unknown_values_fail_closed(self) -> None:
+        self.assertEqual(normalize_owner("core"), "PsychopatzCore")
+        self.assertEqual(normalize_owner("dynamic-trading"), DT_COMMON_OWNER)
+        self.assertEqual(
+            normalize_owner(None, default=HOOMANS_OWNER),
+            HOOMANS_OWNER,
+        )
+        self.assertEqual(
+            package_descriptor(DT_COMMON_OWNER).registry_namespace,
+            "DTCommon.Semantics.ConversationRegistry",
+        )
+        with self.assertRaises(OwnerConfigurationError):
+            normalize_owner("some-unregistered-addon")
+        with self.assertRaises(OwnerConfigurationError):
+            normalize_owner(None)
+
+    def test_three_package_routes_use_their_own_repository_and_prefix(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            hoomans = root / "ProjectHoomans"
+            core = root / "psychopatzCore"
+            dynamic_trading = root / "DynamicTrading"
+
+            self.assertEqual(
+                shared_lua_root(hoomans, "ProjectHoomans"),
+                hoomans / "Contents/mods/ProjectHoomans/common/media/lua/shared",
+            )
+            self.assertEqual(
+                shared_lua_root(hoomans, "core", core_repository=core),
+                core / "Contents/mods/PsychopatzCore/common/media/lua/shared",
+            )
+            self.assertEqual(
+                translation_root(
+                    hoomans,
+                    DT_COMMON_OWNER,
+                    dynamic_trading_repository=dynamic_trading,
+                ),
+                dynamic_trading / "Contents/mods/DTCommon/common/media/translation",
+            )
+
+            dt_module = (
+                "DTCommon/Semantics/Generated/Conversation/Trader/Offer"
+            )
+            repository, target = module_target(
+                hoomans,
+                dt_module,
+                dynamic_trading_repository=dynamic_trading,
+            )
+            self.assertEqual(repository, dynamic_trading.resolve())
+            self.assertEqual(
+                target,
+                dynamic_trading
+                / "Contents/mods/DTCommon/common/media/lua/shared"
+                / (dt_module + ".lua"),
+            )
+            with self.assertRaises(OwnerConfigurationError):
+                owner_repository(hoomans, DT_COMMON_OWNER)
+
+    def test_module_owner_does_not_guess_project_hoomans_for_unknown_modules(self) -> None:
+        self.assertEqual(
+            module_owner("DTCommon/Semantics/Generated/Conversation/Registry"),
+            DT_COMMON_OWNER,
+        )
+        with self.assertRaises(OwnerConfigurationError):
+            module_owner("PNC/SomeOtherGeneratedModule")
+
+    def test_writer_routes_synthetic_dtcommon_module_to_dynamic_trading(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            hoomans = root / "ProjectHoomans"
+            dynamic_trading = root / "DynamicTrading"
+            module = "DTCommon/Semantics/Generated/Conversation/Trader/Offer"
+            paths = _write_routed_modules(
+                hoomans,
+                None,
+                dynamic_trading,
+                [(module, "return true\n")],
+            )
+            expected = (
+                dynamic_trading
+                / "Contents/mods/DTCommon/common/media/lua/shared"
+                / (module + ".lua")
+            )
+            self.assertEqual(paths, [expected])
+            self.assertEqual(expected.read_text(encoding="utf-8"), "return true\n")
+
     def test_generic_parser_shards_route_to_core_namespace(self) -> None:
         model = compile_conversation_sources(REPOSITORY, runtime_root=REPOSITORY)
         modules, reports = render_conversation_runtime_plan(model)
@@ -34,6 +135,8 @@ class GenerationOwnershipTests(unittest.TestCase):
 
         module, report = by_source["patterns/common/identity.json"]
         self.assertEqual(report["owner"], "PsychopatzCore")
+        self.assertEqual(report["shardOwner"], "PsychopatzCore")
+        self.assertEqual(report["registryOwner"], "ProjectHoomans")
         self.assertTrue(
             module.startswith(
                 "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/"
@@ -44,6 +147,119 @@ class GenerationOwnershipTests(unittest.TestCase):
         module, report = by_source["content/command/player.json"]
         self.assertEqual(report["owner"], "ProjectHoomans")
         self.assertTrue(module.startswith("PNC/Semantics/Generated/Conversation/"), module)
+
+    def test_dtcommon_registry_fixture_uses_package_namespace_and_paths(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            hoomans = root / "ProjectHoomans"
+            core = root / "psychopatzCore"
+            dynamic_trading = root / "DynamicTrading"
+            source_root = hoomans / CONVERSATION_SOURCE_RELATIVE
+            shutil.copytree(REPOSITORY / CONVERSATION_SOURCE_RELATIVE, source_root)
+
+            manifest_path = source_root / "manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["registryOwner"] = "DTCommon"
+            manifest_path.write_text(
+                json.dumps(manifest, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            identity_path = source_root / "patterns/common/identity.json"
+            identity = json.loads(identity_path.read_text(encoding="utf-8"))
+            identity["source"]["owner"] = "DTCommon"
+            identity_path.write_text(
+                json.dumps(identity, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            greeting_path = source_root / "content/greeting.json"
+            greeting = json.loads(greeting_path.read_text(encoding="utf-8"))
+            greeting["source"]["owner"] = "DTCommon"
+            greeting_path.write_text(
+                json.dumps(greeting, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            behavior_path = (
+                source_root / "behaviors/social/acknowledge_memory.json"
+            )
+            behavior = json.loads(behavior_path.read_text(encoding="utf-8"))
+            behavior["source"]["owner"] = "DTCommon"
+            behavior_path.write_text(
+                json.dumps(behavior, indent=2) + "\n",
+                encoding="utf-8",
+            )
+
+            model = compile_conversation_sources(hoomans, runtime_root=REPOSITORY)
+            behavior_record = next(
+                item
+                for item in model["behaviors"]
+                if item["id"] == "behavior.acknowledge_memory"
+            )
+            self.assertEqual(behavior_record["owner"], "DTCommon")
+            bundles = conversation_translation_bundles_by_owner(
+                model,
+                package_repositories={"DTCommon": dynamic_trading},
+            )
+            self.assertIn("DTCommon", bundles)
+            self.assertTrue(
+                any(
+                    values
+                    for domains in bundles["DTCommon"].values()
+                    for values in domains.values()
+                )
+            )
+            modules, reports = render_conversation_runtime_plan(model)
+            by_source = {
+                report.get("sourceShard"): (module, report)
+                for (module, _source), report in zip(modules, reports)
+                if report.get("sourceShard")
+            }
+            identity_module, identity_report = by_source[
+                "patterns/common/identity.json"
+            ]
+            self.assertTrue(
+                identity_module.startswith(
+                    "DTCommon/Semantics/Generated/Conversation/"
+                ),
+                identity_module,
+            )
+            self.assertEqual(identity_report["shardOwner"], "DTCommon")
+            self.assertEqual(identity_report["registryOwner"], "DTCommon")
+
+            paths = write_conversation_output(
+                hoomans,
+                model,
+                core_repository=core,
+                dynamic_trading_repository=dynamic_trading,
+            )
+            registry = (
+                dynamic_trading
+                / "Contents/mods/DTCommon/common/media/lua/shared/"
+                / "DTCommon/Semantics/Generated/Conversation/Registry.lua"
+            )
+            manifest_lua = registry.with_name("Manifest.lua")
+            self.assertTrue(registry.is_file())
+            self.assertTrue(manifest_lua.is_file())
+            self.assertTrue(
+                any(
+                    path.name == "Greeting.json"
+                    and "DTCommon/common/media/translation" in str(path)
+                    for path in paths
+                )
+            )
+            self.assertIn("DTCommon.Semantics.ConversationRegistry", registry.read_text())
+            self.assertIn('Registry.OWNER = "DTCommon"', registry.read_text())
+            self.assertIn(
+                '["registryOwner"] = "DTCommon"',
+                manifest_lua.read_text(),
+            )
+            self.assertIn(registry, paths)
+            self.assertFalse(
+                (
+                    hoomans
+                    / "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
+                    "Semantics/Generated/Conversation/Registry.lua"
+                ).exists()
+            )
 
     def test_writer_places_core_and_hoomans_modules_in_separate_repositories(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
