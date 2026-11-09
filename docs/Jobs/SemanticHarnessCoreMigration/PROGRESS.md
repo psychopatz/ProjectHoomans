@@ -14,7 +14,7 @@
   surface, and provider-specific test estate.
 - Current tracked Hoomans scope includes 95 Lua worker modules, 404 harness
   Python files, and 212 harness tests.
-- Core currently contains the generic foundation, 9 Lua harness files, 18
+- Core currently contains the generic foundation, 10 Lua harness files, 18
   harness Python files, and 9 harness Python test modules.
 - Hoomans `runtime/config.py` still selects the Hoomans worker for the default
   `hoomans` profile; Core has a separate minimal `core` worker.
@@ -129,9 +129,18 @@ translation, and interaction-lifecycle policy. No mixed file was moved
 wholesale. The typed execution boundary and extraction sequence are recorded
 in `P2A_SEMANTIC_EXECUTION_BOUNDARY.md`.
 
+## P2-B result
+
+Core now owns the typed `SemanticExecution` callback contract. Hoomans wires
+context, text, preview, semantic-frame, and snapshot operations through it
+while retaining PNC policy and physical-adopter behavior. The contract exposes
+materialization metadata and fails closed for optional operations; DTAbstract,
+DTHoomans, and DTCommon adapter gates remain next. The boundary is recorded in
+`P2B_EXECUTION_CONTRACT.md`.
+
 ## Next Chunk
 
-**P2-B — add the typed Core semantic-execution contract.** Define the callback
-surface for context, text/frame submission, snapshots, bounded turn results,
-interaction operations, and materialization metadata; wire Hoomans to it before
-moving any mixed conversation module.
+**P2-C — register Dynamic Trading adopters against the contract.** Add
+provider-neutral DTCommon descriptors plus DTAbstract abstract and DTHoomans
+physical callback adapters, keeping merchant policy in DTCommon and physical
+materialization in DTHoomans only.

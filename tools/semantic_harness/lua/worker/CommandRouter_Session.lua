@@ -64,6 +64,8 @@ function Session.hello(context)
         -- The full production flow catalog is fetched through FLOW_CATALOG.
         -- Keeping the handshake bounded matters as automatic generation grows.
         translation = context.OutputProjection.translationSnapshot(context),
+        semanticExecution = context.SemanticExecution
+            and context.SemanticExecution:describe() or nil,
     }
 end
 
@@ -184,6 +186,8 @@ function Session.handle(context, command, payload)
                 Runtime.view and Runtime.view.semanticSuggestions
             ),
             translation = context.OutputProjection.translationSnapshot(context),
+            semanticExecution = context.SemanticExecution
+                and context.SemanticExecution:describe() or nil,
         }
     elseif command == "QUIT" then
         return { ok = true, type = "closed" }, nil, true

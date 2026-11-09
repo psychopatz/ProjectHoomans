@@ -8,10 +8,10 @@ function Conversation.handle(context, command, payload)
 
     if command == "INPUT" then
         if payload == nil then return nil, "input_required" end
-        return context.Conversation.turn(context, tostring(payload))
+        return context.SemanticExecution:submitText(tostring(payload))
     elseif command == "PREVIEW" then
         if payload == nil then return nil, "input_required" end
-        return context.Conversation.preview(context, tostring(payload))
+        return context.SemanticExecution:previewText(tostring(payload))
     elseif command == "RELATIONSHIP_PROPOSAL" then
         local npcID = type(payload) == "table" and payload.npcID
             or context.npcData.npcID
@@ -119,14 +119,12 @@ function Conversation.handle(context, command, payload)
                     and suggestions.IsGroupFrame(payload.frame))
             )
         then
-            return context.Conversation.semanticClick(
-                context,
+            return context.SemanticExecution:submitFrame(
                 Values.copy(payload.frame)
             )
         end
         context.Runtime.semanticClickFrame = Values.copy(payload.frame)
-        return context.Conversation.turn(
-            context,
+        return context.SemanticExecution:submitText(
             tostring(payload.frame.textFallback or payload.frame.candidateID or "")
         )
     elseif command == "LANGUAGE" then

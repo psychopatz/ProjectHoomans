@@ -78,6 +78,7 @@ local TransportEvidence = require "worker/TransportEvidence"
 local SessionEnvelope = require "worker/SessionEnvelope"
 local WorkingWorld = require "worker/WorkingWorld"
 local WorkerLoop = require "worker/WorkerLoop"
+local SemanticExecution = require "worker/SemanticExecution"
 
 local Runtime = RuntimeState.new()
 local Context = {
@@ -105,9 +106,44 @@ local Context = {
     Commitments = Commitments,
     SessionEnvelope = SessionEnvelope,
     WorkingWorld = WorkingWorld,
+    SemanticExecution = nil,
     EngineFacts = nil,
     EngineEvents = nil,
 }
+
+local semanticExecution, semanticExecutionReason = SemanticExecution.new({
+    providerID = "ProjectHoomans",
+    materializationMode = "physical",
+    capabilities = {
+        "semantic.conversation",
+        "semantic.identity",
+        "semantic.interaction",
+    },
+    context = Context,
+    callbacks = {
+        buildContext = function(context)
+            return context.Conversation.buildContext(context)
+        end,
+        submitText = function(context, text)
+            return context.Conversation.turn(context, text)
+        end,
+        previewText = function(context, text)
+            return context.Conversation.preview(context, text)
+        end,
+        submitFrame = function(context, frame)
+            return context.Conversation.semanticClick(context, frame)
+        end,
+        snapshot = function(context)
+            return context.ScenarioSession.snapshot(context)
+        end,
+    },
+})
+if not semanticExecution then
+    error("semantic execution contract failed: " .. tostring(
+        semanticExecutionReason
+    ))
+end
+Context.SemanticExecution = semanticExecution
 
 ScenarioSession.configureRuntime(Context)
 ProductionModules.load(Context)
