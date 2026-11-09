@@ -20854,11 +20854,11 @@
       "action": "retain reviewed current test/support/fixture/runner contract; no deletion or merge without a specific parity and deletion-gate proof",
       "overlap": "No same-domain/same-role candidate shared enough path identity for a credible consolidation; the path remains a separately owned contract."
     },
-    "tools/semantic_harness/lua/worker/Protocol.lua": {
+    "migration:semantic-worker-protocol": {
       "classification": "KEEP_BOUNDARY_SPECIFIC",
       "finalDisposition": "retained_runner_boundary_reviewed",
       "productionSubjectsInspected": [
-        "tools/semantic_harness/lua/worker/Protocol.lua"
+        "migration:semantic-worker-protocol"
       ],
       "callersInspected": [
         "tests/native/pnc_profile_marker_smoke.lua",
@@ -20896,8 +20896,8 @@
         "testClasses": 0
       },
       "evidence": [
-        "Inspected tools/semantic_harness/lua/worker/Protocol.lua directly; role=semantic Lua worker, tier=ACCEPTANCE, domain=semantic_harness:semantic, family=semantic/worker/Protocol.",
-        "Production/test subjects inspected: ['tools/semantic_harness/lua/worker/Protocol.lua']; ownership: tools/semantic_harness worker, runner, fixture, UI, codebuilder, and declarative catalog layers.",
+        "Inspected migration:semantic-worker-protocol directly; role=semantic Lua worker, tier=ACCEPTANCE, domain=semantic_harness:semantic, family=semantic/worker/Protocol.",
+        "Production/test subjects inspected: ['migration:semantic-worker-protocol']; ownership: tools/semantic_harness worker, runner, fixture, UI, codebuilder, and declarative catalog layers.",
         "Callers/entry points inspected: ['tests/native/pnc_profile_marker_smoke.lua', 'tests/pnc_colony_journal_feed_smoke.lua', 'tests/pnc_grounded_personal_dialogue_b6_smoke.lua', 'tests/pnc_semantic_harness_worker_modules_smoke.lua', 'tools/semantic_harness/lua/worker.lua', 'tools/semantic_harness/lua/worker/CommandRouter_Knowledge.lua', 'tools/semantic_harness/lua/worker/CommandRouter_Session.lua', 'tools/semantic_harness/lua/worker/Conversation_Snapshot.lua', 'tools/semantic_harness/runtime/process.py', 'tools/semantic_harness/runtime/protocol.py', 'tools/semantic_harness/runtime/state_providers.py', 'tools/semantic_harness/runtime/worker_authoring.py']; runner boundary: existing worker.lua/python_runner.py/CLI entry points and the semantic Python tests or Lua worker modules that import the path.",
         "Authority/runtime boundary: ['Semantic Harness worker process and production-Lua module loading boundary']; assertions/methods: {'testMethods': [], 'imports': []}.",
         "Cost observed in manifest: {'assertionCalls': 0, 'testMethods': 0, 'testClasses': 0}; history tip: 9c6e90c7 feat(dialogue-variation): expand and refine combat and event phrase families (P5).",

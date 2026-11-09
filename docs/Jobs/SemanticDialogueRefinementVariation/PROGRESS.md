@@ -132,7 +132,7 @@ Current compiler bound:
    - **P5E (Medical Distress & Treatment)**:
      - `content/event/medical.json`: expanded all 32 styles to 10 variants each (320 phrases). Replaced robotic clinical announcements with urgent, visceral distress calls (bandage, bleedout, dehydration, starvation, exhaustion, rescue, mercy) and authentic Tagalog localizations.
    - **Infrastructure**:
-     - Raised `DEFAULT_MAX_MESSAGE_BYTES` in `tools/semantic_harness/runtime/protocol.py` and `tools/semantic_harness/lua/worker/Protocol.lua` from 512KB to 1024KB (1MB) to support the larger serialized flow and phrase catalog on worker startup.
+     - Raised `DEFAULT_MAX_MESSAGE_BYTES` in `tools/semantic_harness/runtime/protocol.py` and Core's `tools/semantic_harness/lua/Protocol.lua` from 512KB to 1024KB (1MB) to support the larger serialized flow and phrase catalog on worker startup.
      - Regenerated 196 Lua modules and translation artifacts; all 25 unit tests passed in 29.9s.
    - **Corpus Metrics After P5**:
      - Styles at >=10 phrases: **619 / 729** (was 463).

@@ -5,9 +5,8 @@ adds the Hoomans production modules and provider commands, while Core owns the
 JSON-lines transport contract and serialization.
 
 `tools/semantic_harness/lua/worker.lua` loads Core's `Protocol` module before
-provider paths. The former Hoomans-local
-`tools/semantic_harness/lua/worker/Protocol.lua` implementation was removed;
-new provider code must not reintroduce it.
+provider paths. The former Hoomans-local protocol implementation was removed;
+new provider code must not reintroduce a second copy.
 
 The Hoomans worker keeps the same request/response envelope and preserves the
 legacy null behavior on decode. `Protocol.NULL` is available for explicit JSON
