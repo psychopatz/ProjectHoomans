@@ -111,9 +111,17 @@ implementation. Hoomans scenario defaults, health normalization, validation,
 save import, and production rehydration remain local. The boundary is recorded
 in `P1J_STATE_BOUNDARY.md`.
 
+## P1-K result
+
+The mixed Hoomans scenario façade was audited. Core already owns generic
+display-name/actor-ID derivation, deep merge, JSON load, and atomic save.
+Hoomans-only defaults, health normalization, NPC validation, available-mod
+policy, and save/import normalization remain provider/domain policy and were
+not moved into Core. The boundary is recorded in `P1K_SCENARIO_BOUNDARY.md`.
+
 ## Next Chunk
 
-**P1-K — audit the remaining mixed Python scenario layer.** Determine whether
-any additional normalization or document validation is genuinely provider
-neutral. Keep Hoomans defaults, health policy, save import, and production
-rehydration behind the adopter boundary.
+**P2-A — audit semantic execution seams.** Compare Hoomans semantic adapters,
+conversation orchestration, output projection, and interaction lifecycle code
+with Core semantic services. Move generic contracts/orchestration only; keep
+provider callbacks and provider data in adopters.
