@@ -1,0 +1,70 @@
+# Roadmap — Semantic Harness Core Migration
+
+**Parent status:** IN PROGRESS
+
+**Completion boundary:** provider-neutral Semantic Harness execution, runtime,
+and tests are owned by PsychopatzCore; Project Hoomans, DTAbstract, and
+DTHoomans provide adapters and policy only.
+
+## Contract
+
+Core owns the JSON-lines worker contract, process/session lifecycle, scenario
+document model, provider/profile registry, generic projections, and reusable
+harness tests. Adopters own gameplay policy, production-module registration,
+provider data, and optional runtime integrations.
+
+Materialization is a provider capability, not a second harness:
+
+- Project Hoomans and DTHoomans may expose `physical` materialization.
+- DTAbstract exposes `abstract` operation without requiring physical NPCs.
+- All providers use the same Core identity, traversal, conversation, and
+  transport contracts.
+
+## Phases and gates
+
+### P0 — Baseline and ownership contract
+
+Record the current split, verify repository/worktree state, centralize the
+protocol boundary, and establish the migration ledger. Gate: Core protocol
+tests and Hoomans worker integration pass; no duplicate protocol remains.
+
+### P1 — Core worker kernel
+
+Move provider-neutral transport, worker session, scenario state, bounded
+request handling, lifecycle/restart behavior, and generic projections into
+Core. Gate: Core worker can run standalone and Hoomans can consume it through a
+provider descriptor without importing Hoomans modules by default.
+
+### P2 — Core semantic execution seams
+
+Move generic conversation/session, interaction routing, identity, relationship,
+knowledge, and observation interfaces into Core. Keep provider policy behind
+capability callbacks. Gate: Hoomans, DTAbstract, and DTHoomans resolve the same
+Core interaction contract with their own provider capabilities.
+
+### P3 — Provider adapters and materialization
+
+Replace Hoomans/DT duplicated worker bootstrap and DynamicTrading-specific
+paths with thin adapters. Make physical materialization an optional Hoomans
+capability and abstract simulation the DTAbstract capability. Gate: providers
+can be enabled or disabled independently without missing-module failures.
+
+### P4 — Test migration and legacy removal
+
+Move provider-neutral tests to Core, retain only provider-specific acceptance
+tests in adopters, and delete obsolete Hoomans worker/runtime/test duplicates
+after import-zero and behavior gates pass. Gate: no stale duplicate ownership,
+Core/adopter suites pass, and the migration ledger is current.
+
+### P5 — Cross-provider acceptance
+
+Run the shared Core matrix for Core-only, Hoomans, DTAbstract, and DTHoomans
+profiles, including abstract traversal, nearby physical materialization,
+conversation, persistence/restart, and optional-provider loading. Native game
+acceptance remains a separate user-owned gate unless explicitly authorized.
+
+## Required phase discipline
+
+Each accepted phase updates `PROGRESS.md` and `HANDOFF.md`, commits exact
+phase-owned paths locally in participant repositories first and the primary
+Hoomans repository last, and never pushes or publishes Workshop content.
