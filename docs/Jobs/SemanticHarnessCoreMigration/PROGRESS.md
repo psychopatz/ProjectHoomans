@@ -14,8 +14,8 @@
   surface, and provider-specific test estate.
 - Current tracked Hoomans scope includes 95 Lua worker modules, 404 harness
   Python files, and 212 harness tests.
-- Core currently contains the generic foundation, 8 Lua harness files, 16
-  harness Python files, and 10 harness tests.
+- Core currently contains the generic foundation, 9 Lua harness files, 16
+  harness Python files, and 12 harness tests.
 - Hoomans `runtime/config.py` still selects the Hoomans worker for the default
   `hoomans` profile; Core has a separate minimal `core` worker.
 - DynamicTrading has no standalone `tools/semantic_harness` tree yet. Its
@@ -92,9 +92,19 @@ configuration, and provider-specific catalogs while delegating dispatch and
 unknown-command behavior to Core. Core router smoke coverage and Hoomans boot
 smokes pass. The exact split is recorded in `P1H_ROUTER_BOUNDARY.md`.
 
+## P1-I result
+
+The Python process lifecycle was already Core-backed through Hoomans' thin
+`runtime/process.py` compatibility facade. Core now also owns the shared Lua
+JSON-lines `WorkerLoop`; Core and Hoomans supply only provider-specific
+bootstrap, hello, and dispatch callbacks. Handshake, request IDs, protocol
+failure handling, and quit behavior are covered by Core smoke tests and both
+worker profiles boot successfully. The boundary is recorded in
+`P1I_LIFECYCLE_BOUNDARY.md`.
+
 ## Next Chunk
 
-**P1-I — audit Core worker lifecycle ownership.** Compare the minimal Core
-worker loop with the Hoomans JSON-lines process loop and identify the smallest
-provider-neutral lifecycle/process seam that can be shared without importing
-Hoomans modules into Core.
+**P1-J — audit the Python scenario/session compatibility layer.** Separate
+provider-neutral scenario normalization, worker-session state, and process
+facades from Hoomans fixture/provider policy. Move only the neutral pieces into
+Core and keep Hoomans import paths as thin compatibility adapters.

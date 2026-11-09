@@ -77,6 +77,7 @@ local Commitments = require "worker/Commitments"
 local TransportEvidence = require "worker/TransportEvidence"
 local SessionEnvelope = require "worker/SessionEnvelope"
 local WorkingWorld = require "worker/WorkingWorld"
+local WorkerLoop = require "worker/WorkerLoop"
 
 local Runtime = RuntimeState.new()
 local Context = {
@@ -157,19 +158,14 @@ ScenarioSession.importSource(
     }
 )
 
-Protocol.emit(CommandRouter.hello(Context), "__hello__")
-
-for line in io.lines() do
-    local request, reason = Protocol.readRequest(line)
-    if not request then
-        io.stderr:write("protocol error: " .. tostring(reason) .. "\n")
-        break
-    end
-    local response, failure, shouldQuit = CommandRouter.dispatch(Context, request)
-    if failure then
-        Protocol.fail(request.id, failure)
-    elseif response then
-        Protocol.emit(response, request.id)
-    end
-    if shouldQuit then break end
-end
+WorkerLoop.run(
+    Protocol,
+    function(request)
+        return CommandRouter.dispatch(Context, request)
+    end,
+    {
+        hello = function()
+            return CommandRouter.hello(Context)
+        end,
+    }
+)
