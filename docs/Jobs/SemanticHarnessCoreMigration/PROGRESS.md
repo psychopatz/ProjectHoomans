@@ -14,8 +14,8 @@
   surface, and provider-specific test estate.
 - Current tracked Hoomans scope includes 95 Lua worker modules, 404 harness
   Python files, and 212 harness tests.
-- Core currently contains the generic foundation, 9 Lua harness files, 16
-  harness Python files, and 12 harness tests.
+- Core currently contains the generic foundation, 9 Lua harness files, 18
+  harness Python files, and 9 harness Python test modules.
 - Hoomans `runtime/config.py` still selects the Hoomans worker for the default
   `hoomans` profile; Core has a separate minimal `core` worker.
 - DynamicTrading has no standalone `tools/semantic_harness` tree yet. Its
@@ -102,9 +102,18 @@ failure handling, and quit behavior are covered by Core smoke tests and both
 worker profiles boot successfully. The boundary is recorded in
 `P1I_LIFECYCLE_BOUNDARY.md`.
 
+## P1-J result
+
+Core now owns the provider-neutral Python source/working-world state engine.
+Hoomans `runtime/state.py` is a compatibility re-export; its save-backed and
+worker callers retain their established import paths without a duplicate
+implementation. Hoomans scenario defaults, health normalization, validation,
+save import, and production rehydration remain local. The boundary is recorded
+in `P1J_STATE_BOUNDARY.md`.
+
 ## Next Chunk
 
-**P1-J — audit the Python scenario/session compatibility layer.** Separate
-provider-neutral scenario normalization, worker-session state, and process
-facades from Hoomans fixture/provider policy. Move only the neutral pieces into
-Core and keep Hoomans import paths as thin compatibility adapters.
+**P1-K — audit the remaining mixed Python scenario layer.** Determine whether
+any additional normalization or document validation is genuinely provider
+neutral. Keep Hoomans defaults, health policy, save import, and production
+rehydration behind the adopter boundary.
