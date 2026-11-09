@@ -100,10 +100,13 @@ does not write a Workshop package or alter the checked-out Lua source.
 
 ## Package entrypoint
 
-The generic CodeBuilder foundation and typed dataset compiler are Core-owned.
-Hoomans keeps compatibility imports and supplies the PNC pattern/response
-policy callbacks; Hoomans remains the owner of source manifests, semantic
-catalogs, package routing, and generated artifact destinations.
+The generic CodeBuilder foundation, typed dataset compiler, and bounded
+structural rule validators are Core-owned. Core validates source-reference
+shape, predicate AST bounds, typed argument shape, and scalar condition shape;
+Hoomans supplies the PNC field/type/concept allowlists and all dialogue-specific
+pattern, response, branch, and plan policy callbacks. Hoomans keeps compatibility
+imports and remains the owner of source manifests, semantic catalogs, package
+routing, and generated artifact destinations.
 
 The application can be invoked directly without the shell launcher:
 

@@ -15,6 +15,9 @@ _load_core_process()
 _CORE_DATASET = importlib.import_module(
     "semantic_harness.codebuilder.dataset_contract"
 )
+_CORE_RULES = importlib.import_module(
+    "semantic_harness.codebuilder.rule_contract"
+)
 
 DIALOGUE_ID = re.compile(r"^[a-z][a-z0-9_.-]{0,95}$")
 DIALOGUE_TEMPLATE_ID = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,95}$")
@@ -109,72 +112,12 @@ def _validate_source_refs(
     available: set[str],
     label: str,
 ) -> list[str]:
-    if not isinstance(value, list) or not value or len(value) > 4:
-        raise CompileError(f"{label} requires 1 to 4 source references")
-    normalized = []
-    for item in value:
-        if not isinstance(item, str) or not item.strip():
-            raise CompileError(f"{label} contains an invalid source reference")
-        item = item.strip()
-        if item not in available:
-            raise CompileError(f"{label} references unknown source {item!r}")
-        if item not in normalized:
-            normalized.append(item)
-    return normalized
+    return _CORE_RULES.validate_source_refs(value, available, label)
 
 
 def _validate_branch_constraint(value: Any, label: str, depth: int = 0) -> Any:
     """Validate the bounded all/any/not predicate AST used by branch offers."""
-    if depth > 6 or not isinstance(value, dict):
-        raise CompileError(f"{label} must be a bounded predicate object")
-    allowed = {"all", "any", "not", "path", "field", "op", "value", "values"}
-    unsupported = set(value) - allowed
-    if unsupported:
-        raise CompileError(
-            f"{label} contains unsupported predicate fields: "
-            + ", ".join(sorted(unsupported))
-        )
-    structural = [key for key in ("all", "any", "not") if key in value]
-    has_leaf = "path" in value or "field" in value
-    if len(structural) > 1 or (structural and has_leaf) or (
-        not structural and not has_leaf
-    ):
-        raise CompileError(f"{label} has an invalid predicate shape")
-    if structural and any(
-        key in value for key in ("path", "field", "op", "value", "values")
-    ):
-        raise CompileError(f"{label} combines a group with a leaf predicate")
-    for key in ("all", "any"):
-        if key in value:
-            items = value[key]
-            if not isinstance(items, list) or not items or len(items) > 8:
-                raise CompileError(f"{label}.{key} must contain 1..8 predicates")
-            value[key] = [
-                _validate_branch_constraint(item, f"{label}.{key}[{index}]", depth + 1)
-                for index, item in enumerate(items)
-            ]
-    if "not" in value:
-        value["not"] = _validate_branch_constraint(
-            value["not"], f"{label}.not", depth + 1
-        )
-    if "path" in value and "field" in value:
-        raise CompileError(f"{label} cannot contain both path and field")
-    for key in ("path", "field", "op"):
-        if key in value and (not isinstance(value[key], str) or not value[key]):
-            raise CompileError(f"{label}.{key} must be a non-empty string")
-    if "values" in value:
-        values = value["values"]
-        if not isinstance(values, list) or len(values) > 8:
-            raise CompileError(f"{label}.values must contain at most 8 values")
-        if any(not isinstance(item, (str, int, float, bool)) or item is None
-               for item in values):
-            raise CompileError(f"{label}.values must contain scalar values")
-    if "value" in value and (
-        not isinstance(value["value"], (str, int, float, bool))
-        or value["value"] is None
-    ):
-        raise CompileError(f"{label}.value must be a scalar value")
-    return value
+    return _CORE_RULES.validate_predicate(value, label, depth)
 
 
 def validate_branch_offers(

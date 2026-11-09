@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-import math
+import importlib
 import re
 from typing import Any
 
 from .lexicon_compiler import CompileError
 from .translation_support import normalize_translations
+from ..runtime.process import _load_core_process
 from .dialogue_contract import (
     DIALOGUE_ID,
     DIALOGUE_TEMPLATE_ID,
@@ -26,6 +27,12 @@ from .dialogue_contract import (
 )
 
 
+_load_core_process()
+_CORE_RULES = importlib.import_module(
+    "semantic_harness.codebuilder.rule_contract"
+)
+
+
 def _variant_translations(
     variant: dict[str, Any],
     fallback: str,
@@ -38,52 +45,20 @@ def _variant_translations(
     return normalize_translations(raw, f"{label}.translations")
 
 def _validate_response_condition(value: Any, pool_id: str, variant_id: str) -> dict[str, Any]:
-    if value is None:
-        return {}
-    if not isinstance(value, dict):
-        raise CompileError(
-            f"response condition for {pool_id}:{variant_id} must be an object")
-    output: dict[str, Any] = {}
-    for field, expected in value.items():
-        if field not in DIALOGUE_RESPONSE_CONDITIONS:
-            raise CompileError(
-                f"unsupported response condition {field!r} for {pool_id}:{variant_id}")
-        values = expected if isinstance(expected, list) else [expected]
-        if not values or len(values) > 8:
-            raise CompileError(
-                f"response condition {field!r} for {pool_id}:{variant_id} is empty or too broad")
-        for item in values:
-            if isinstance(item, str):
-                if not item or len(item) > 96:
-                    raise CompileError(
-                        f"response condition value for {pool_id}:{variant_id} is invalid")
-            elif isinstance(item, bool):
-                pass
-            elif isinstance(item, (int, float)) and math.isfinite(item):
-                pass
-            else:
-                raise CompileError(
-                    f"response condition value for {pool_id}:{variant_id} must be scalar")
-        output[field] = values if isinstance(expected, list) else expected
-    return output
+    return _CORE_RULES.validate_scalar_conditions(
+        value,
+        f"{pool_id}:{variant_id}",
+        DIALOGUE_RESPONSE_CONDITIONS,
+    )
 
 
 def _validate_translation_args(value: Any, label: str) -> dict[str, str]:
     """Validate typed argument declarations without evaluating them."""
-    if value is None:
-        return {}
-    if not isinstance(value, dict) or len(value) > 8:
-        raise CompileError(f"{label} must contain at most 8 typed arguments")
-    output: dict[str, str] = {}
-    for name, argument_type in value.items():
-        if (not isinstance(name, str)
-                or not re.fullmatch(r"[a-z][a-zA-Z0-9_]{0,31}", name)
-                or argument_type not in DIALOGUE_TRANSLATION_ARG_TYPES):
-            raise CompileError(
-                f"{label} contains an invalid typed argument {name!r}"
-            )
-        output[name] = argument_type
-    return {name: output[name] for name in sorted(output)}
+    return _CORE_RULES.validate_typed_arguments(
+        value,
+        label,
+        DIALOGUE_TRANSLATION_ARG_TYPES,
+    )
 
 
 def _validate_dialogue_plan(
