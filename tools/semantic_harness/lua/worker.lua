@@ -74,6 +74,7 @@ local ScenarioSession = require "worker/ScenarioSession"
 local ProductionRehydration = require "worker/ProductionRehydration"
 local CommandRouter = require "worker/CommandRouter"
 local Commitments = require "worker/Commitments"
+local TransportEvidence = require "worker/TransportEvidence"
 
 local Runtime = RuntimeState.new()
 local Context = {
@@ -105,6 +106,12 @@ local Context = {
 
 ScenarioSession.configureRuntime(Context)
 ProductionModules.load(Context)
+if TransportEvidence and type(TransportEvidence.configure) == "function" then
+    local factCommand = PNC and PNC.Const
+        and PNC.Const.CMD_SEMANTIC_INTERACTION_LIFECYCLE
+        or "SemanticInteractionLifecycle"
+    TransportEvidence.configure({ factCommand = factCommand })
+end
 -- After *all* production capability providers are loaded, bring the
 -- existing automatic generation registry to its final startup signature.
 -- Otherwise the first FLOW_CATALOG request adds pools that the read-only

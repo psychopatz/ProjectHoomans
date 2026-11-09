@@ -12,9 +12,9 @@
 - Hoomans-local `tools/semantic_harness/lua/worker/Protocol.lua` is deleted.
 - Hoomans still owns the active Semantic Harness worker, runtime, UI, authoring
   surface, and provider-specific test estate.
-- Current tracked Hoomans scope includes 96 Lua worker modules, 403 harness
+- Current tracked Hoomans scope includes 95 Lua worker modules, 403 harness
   Python files, and 211 harness tests.
-- Core currently contains the generic foundation, 4 Lua harness files, 16
+- Core currently contains the generic foundation, 5 Lua harness files, 16
   harness Python files, and 8 harness tests.
 - Hoomans `runtime/config.py` still selects the Hoomans worker for the default
   `hoomans` profile; Core has a separate minimal `core` worker.
@@ -48,9 +48,17 @@ duplicates were deleted only after Core Lua/Python worker tests and Hoomans
 worker/persistence tests passed. The Core worker advertises the kernel
 capabilities; Hoomans resolves the modules through its Core-first package path.
 
+## P1-C result
+
+Core now owns generic transport evidence partitioning and annotation. Hoomans
+configures the existing interaction-lifecycle fact command during worker
+bootstrap; unknown commands remain dispatch evidence. The Hoomans duplicate
+was deleted only after Core transport/worker tests and Hoomans worker,
+persistence, and integration checks passed.
+
 ## Next Chunk
 
-**P1-C — isolate the transport evidence seam.** Move the generic transport
-partition/annotation mechanics behind an injectable provider command
-classifier, preserve Hoomans' current interaction-lifecycle classification,
-and add a Core/adopter matrix before moving ScenarioSession.
+**P1-D — split ScenarioSession mechanics from provider payload policy.** Trace
+the lifecycle, projection, payload, defaults, and snapshot callers; define a
+Core-neutral session envelope and provider payload extension boundary. Do not
+move Hoomans rehydration or production records wholesale.

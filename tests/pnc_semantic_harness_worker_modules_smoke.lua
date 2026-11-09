@@ -11,6 +11,7 @@ package.path = "./tools/semantic_harness/lua/?.lua;"
 local Protocol = require "Protocol"
 local RuntimeState = require "worker/RuntimeState"
 local Values = require "worker/Values"
+local TransportEvidence = require "worker/TransportEvidence"
 
 T.equal(Protocol.VERSION, 1, "harness protocol version changed unexpectedly")
 T.equal(Protocol.MAX_MESSAGE_BYTES, 1024 * 1024,
@@ -54,5 +55,12 @@ local bounded = Values.copy(source)
 bounded.nested.value = 4
 T.equal(source.nested.value, 3, "Core value copy aliased source state")
 T.equal(Values.number("4", 0), 4, "Core number normalization failed")
+
+local dispatches, facts = TransportEvidence.partition({
+    { command = "SemanticInteractionLifecycle", id = 1 },
+    { command = "UnknownCommand", id = 2 },
+})
+T.equal(#facts, 1, "Core transport evidence did not classify interaction fact")
+T.equal(#dispatches, 1, "Core transport evidence lost unknown dispatch")
 
 return T.finish("pnc_semantic_harness_worker_modules_smoke")
