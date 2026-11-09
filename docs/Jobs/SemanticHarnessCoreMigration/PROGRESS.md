@@ -58,7 +58,7 @@ persistence, and integration checks passed.
 
 ## Next Chunk
 
-**P1-D — split ScenarioSession mechanics from provider payload policy.** Trace
-the lifecycle, projection, payload, defaults, and snapshot callers; define a
-Core-neutral session envelope and provider payload extension boundary. Do not
-move Hoomans rehydration or production records wholesale.
+**P1-D design result — split ScenarioSession mechanics from provider payload
+policy.** The boundary is recorded in `P1D_SESSION_BOUNDARY.md`. The next code
+chunk is a Core `SessionEnvelope` plus a Hoomans compatibility projection; do
+not move Hoomans rehydration or production records wholesale.

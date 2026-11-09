@@ -4,17 +4,17 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P1-C"
-phase_commit_message: "phase(P1-C): refactor(hoomans): configure Core transport evidence"
+phase_commit_phase: "P1-D"
+phase_commit_message: "phase(P1-D): docs: define Core ScenarioSession boundary"
 phase_commit_vector: "project-hoomans=self"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-09T22:13:14.791212Z"
+updated_at: "2026-11-09T22:14:33.179189Z"
 state: "CLEAN_CHECKPOINT"
 parent_status: "IN_PROGRESS"
 phase: "P1"
-chunk: "P1-D"
+chunk: "P1-E"
 retrieval_tier: "verify"
 ---
 
@@ -23,47 +23,45 @@ retrieval_tier: "verify"
 
 ## What became true
 
-Core owns the bounded Lua runtime/value kernel and generic transport evidence
-partitioning. Hoomans configures its interaction-lifecycle fact command through
-the Core transport module. The Hoomans duplicates are deleted and focused Core
-and Hoomans gates pass.
+P1-D traced ScenarioSession lifecycle, payload, projection, defaults, and
+snapshot callers. The reusable boundary is a Core `SessionEnvelope`; Hoomans
+must retain rehydration, PNC relationship/knowledge state, synthetic defaults,
+and legacy response compatibility.
 
 ## Remaining
 
-Implement P1-D: split ScenarioSession lifecycle/projection mechanics from
-Hoomans production payload and rehydration policy.
+Implement P1-E: add the Core `SessionEnvelope` and a Hoomans compatibility
+projection that exposes it without changing existing response fields.
 
 ## Resume
 
-1. Verify current Core/Hoomans/DynamicTrading HEADs and worktrees.
-2. Trace ScenarioSession lifecycle, payload, projection, defaults, and snapshot
-   callers before choosing a move boundary.
-3. Define a Core-neutral session envelope with provider payload extensions;
-   leave Hoomans rehydration and production records in the adopter.
+1. Read `P1D_SESSION_BOUNDARY.md` and verify current three-repository HEADs.
+2. Add bounded Core envelope mechanics and focused Core smoke coverage.
+3. Add the Hoomans neutral-envelope projection, run existing worker/persistence
+   tests, and defer response-field deletion.
 
 ## Evidence
 
-- `CODE_VERIFIED`: Core owns RuntimeState, Values, and TransportEvidence;
-  Hoomans duplicates are absent.
-- `TEST_VERIFIED`: Core transport/worker checks and Hoomans worker-module,
-  persistence, and persistent-worker checks pass after deletion.
-- `STATIC_ONLY`: P1-D ScenarioSession boundary is not yet implemented.
+- `CODE_VERIFIED`: ScenarioSession source/caller boundary is documented.
+- `TEST_VERIFIED`: P1-C Core/Hoomans gates remain green.
+- `STATIC_ONLY`: Core SessionEnvelope implementation has not started.
 - `UNVERIFIED`: native Project Zomboid SP/MP acceptance.
 
 ## Expensive discoveries worth preserving
 
-- Hoomans Python process/protocol/session modules already delegate to Core.
-- The Hoomans Lua worker still imports the remaining provider-owned module tree.
-- ScenarioSession, Conversation, projections, routers, and engine boundaries
-  mix reusable mechanics with Hoomans policy; do not move them wholesale.
+- ScenarioSession directly reads `PNC` and Hoomans production rehydration state;
+  moving it wholesale would make Core provider-specific.
+- Existing Hoomans response fields are consumed by the Python worker/UI and
+  must remain during envelope adoption.
+- The Core envelope must namespace opaque provider payloads by provider ID.
 
 ## Blockers / open decisions
 
-- None for P1-D. Provider payload extension names must remain namespaced and
-  bounded so DTAbstract and DTHoomans can share the envelope.
+- None for P1-E. Keep the envelope bounded and preserve immutable-source and
+  working-world revision semantics.
 
 ## Acceptance
 
-Core owns the generic ScenarioSession envelope/lifecycle seam, Hoomans retains
-provider payload policy, focused Core/Hoomans tests pass, and no duplicate
-session kernel remains.
+Core owns the neutral SessionEnvelope, Hoomans exposes it through an adapter,
+existing Hoomans fields remain compatible, focused tests pass, and no provider
+policy moves into Core.
