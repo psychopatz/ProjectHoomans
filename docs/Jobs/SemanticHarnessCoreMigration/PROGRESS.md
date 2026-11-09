@@ -193,3 +193,17 @@ package checks pass.
 Hoomans runtime package for generic configuration, worker-session, worker
 client, and projection helpers; move one cohesive boundary at a time and keep
 facades only until all callers and tests import Core directly.
+
+## P3-B result
+
+Core now owns `runtime_discovery.py` for numeric Build-runtime selection and
+Lua executable probing. Hoomans `runtime/config.py` retains only Hoomans
+repository/DT discovery and `HarnessConfig`; its generic runtime helpers are
+Core imports. Core and Hoomans configuration/profile/runtime-package tests pass.
+
+## Next Chunk
+
+**P3-C — move the provider-neutral worker client configuration seam.** Keep
+Hoomans worker selection and scenario policy local, but move generic launch
+configuration and adapter metadata into Core before deleting any remaining
+facades.

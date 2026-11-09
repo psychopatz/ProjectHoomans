@@ -3,40 +3,25 @@
 from __future__ import annotations
 
 import os
-import re
-import shutil
-import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
+
+
+_CORE_TOOLS = Path(__file__).resolve().parents[3].parent / "psychopatzCore" / "tools"
+if str(_CORE_TOOLS) not in sys.path:
+    sys.path.insert(0, str(_CORE_TOOLS))
 
 from .protocol import DEFAULT_MAX_MESSAGE_BYTES
 
 
-class ConfigurationError(RuntimeError):
-    """Raised when a required harness runtime cannot be discovered."""
-
-
-_RUNTIME_DIRECTORY = re.compile(r"^\d+\.\d+$")
-
-
-def discover_newest_runtime(mod_root: str | Path) -> str:
-    """Return the newest numeric Build runtime directory under ``mod_root``."""
-
-    root = Path(mod_root).expanduser().resolve()
-    if not root.is_dir():
-        raise ConfigurationError(f"runtime root does not exist: {root}")
-
-    versions = [
-        (tuple(int(part) for part in child.name.split(".")), child.name)
-        for child in root.iterdir()
-        if child.is_dir() and _RUNTIME_DIRECTORY.fullmatch(child.name)
-    ]
-    if not versions:
-        raise ConfigurationError(
-            f"no numeric runtime directory under {root}"
-        )
-    return max(versions)[1]
-
+from semantic_harness.runtime_discovery import (
+    ConfigurationError,
+    RUNTIME_DIRECTORY_PATTERN,
+    discover_lua,
+    discover_newest_runtime,
+    probe_lua,
+)
 
 def discover_dynamic_trading_repository(
     repository: str | Path,
@@ -74,7 +59,7 @@ def discover_dynamic_trading_runtime(
             {
                 child.name
                 for child in module_root.iterdir()
-                if child.is_dir() and _RUNTIME_DIRECTORY.fullmatch(child.name)
+        if child.is_dir() and RUNTIME_DIRECTORY_PATTERN.fullmatch(child.name)
             }
         )
     compatible = set.intersection(*version_sets)
@@ -134,43 +119,6 @@ def discover_core(repository: Path, explicit: str | Path | None = None) -> Path:
     raise ConfigurationError(
         "could not locate PsychopatzCore repository; checked: " + rendered
     )
-
-
-def discover_lua(explicit: str | Path | None = None) -> Path:
-    if explicit:
-        candidates = [str(explicit)]
-    else:
-        environment = os.environ.get("PNC_HARNESS_LUA")
-        candidates = [environment] if environment else []
-        candidates.extend(["lua", "luajit"])
-    for candidate in candidates:
-        found = shutil.which(candidate)
-        if found:
-            return Path(found).resolve()
-        path = Path(candidate).expanduser()
-        if path.is_file() and path.stat().st_mode & 0o111:
-            return path.resolve()
-    raise ConfigurationError(
-        "could not locate a Lua executable; set PNC_HARNESS_LUA or use --lua"
-    )
-
-
-def probe_lua(lua_bin: Path, timeout: float = 2.0) -> tuple[bool, str]:
-    try:
-        result = subprocess.run(
-            [str(lua_bin), "-v"],
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            check=False,
-        )
-    except (OSError, subprocess.TimeoutExpired) as error:
-        return False, str(error)
-    output = (result.stdout or result.stderr or "").strip().splitlines()
-    version = output[0] if output else "unknown Lua version"
-    if result.returncode != 0:
-        return False, f"{version} (exit {result.returncode})"
-    return True, version
 
 
 @dataclass(frozen=True)
