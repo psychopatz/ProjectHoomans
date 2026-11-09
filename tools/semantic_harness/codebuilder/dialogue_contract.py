@@ -2,12 +2,19 @@
 
 from __future__ import annotations
 
-import json
+import importlib
 import re
 from pathlib import Path
 from typing import Any
 
 from .lexicon_compiler import CompileError
+from ..runtime.process import _load_core_process
+
+
+_load_core_process()
+_CORE_DATASET = importlib.import_module(
+    "semantic_harness.codebuilder.dataset_contract"
+)
 
 DIALOGUE_ID = re.compile(r"^[a-z][a-z0-9_.-]{0,95}$")
 DIALOGUE_TEMPLATE_ID = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,95}$")
@@ -77,77 +84,25 @@ DIALOGUE_BRANCH_FRAME_FIELDS = frozenset({
 })
 
 def load_dialogue_dataset(path: Path) -> dict[str, Any]:
-    try:
-        document = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as error:
-        raise CompileError(f"cannot read dialogue dataset {path}: {error}") from error
-    if not isinstance(document, dict):
-        raise CompileError("dialogue dataset root must be an object")
-    return document
+    return _CORE_DATASET.load_dataset_document(path, label="dialogue dataset")
 
 
 def _normalize_dialogue_utterance(value: Any) -> tuple[str, tuple[str, ...]]:
-    if not isinstance(value, str):
-        raise CompileError("dialogue pattern utterance must be a string")
-    text = value.lower()
-    text = re.sub(r"[\x00-\x1f\x7f]", " ", text)
-    text = re.sub(r'[, .!?;:()\[\]{}"]', " ", text)
-    normalized = re.sub(r"\s+", " ", text).strip()
-    if not normalized or not DIALOGUE_UTTERANCE.fullmatch(normalized):
-        raise CompileError(
-            f"dialogue utterance is empty or unsupported after normalization: {value!r}")
-    tokens = tuple(normalized.split(" "))
-    if len(tokens) > DIALOGUE_MAX_PATTERN_TOKENS:
-        raise CompileError(f"dialogue utterance is too long: {value!r}")
-    return normalized, tokens
+    return _CORE_DATASET.normalize_utterance(
+        value,
+        max_tokens=DIALOGUE_MAX_PATTERN_TOKENS,
+        label="dialogue pattern utterance",
+        invalid_label="dialogue utterance",
+    )
 
 
 def _validate_dialogue_source(value: Any) -> dict[str, Any]:
-    if not isinstance(value, dict):
-        raise CompileError("dialogue dataset requires source metadata")
-    name = value.get("name")
-    version = value.get("version")
-    content_license = value.get("contentLicense")
-    references = value.get("references")
-    if not all(isinstance(item, str) and item.strip()
-               for item in (name, version, content_license)):
-        raise CompileError(
-            "dialogue source requires non-empty name, version, and contentLicense")
-    if len(name) > 128 or len(version) > 32 or len(content_license) > 128:
-        raise CompileError("dialogue source metadata exceeds its length limit")
-    if not isinstance(references, list) or not references or len(references) > 8:
-        raise CompileError("dialogue source requires 1 to 8 dataset references")
-    normalized_references = []
-    for reference in references:
-        if not isinstance(reference, dict):
-            raise CompileError("dialogue dataset references must be objects")
-        reference_name = reference.get("name")
-        url = reference.get("url")
-        use = reference.get("use")
-        license_name = reference.get("license")
-        reviewed_on = reference.get("reviewedOn")
-        if not all(isinstance(item, str) and item.strip()
-                   for item in (reference_name, url, use, license_name,
-                                reviewed_on)):
-            raise CompileError(
-                "each dialogue reference requires name, url, use, license, and reviewedOn")
-        if (len(reference_name) > 128 or len(url) > 512 or len(use) > 256
-                or len(license_name) > 128 or len(reviewed_on) > 32):
-            raise CompileError("dialogue dataset reference exceeds its length limit")
-        normalized_references.append({
-            "name": reference_name.strip(),
-            "url": url.strip(),
-            "use": use.strip(),
-            "license": license_name.strip(),
-            "reviewedOn": reviewed_on.strip(),
-        })
-    return {
-        "name": name.strip(),
-        "version": version.strip(),
-        "contentLicense": content_license.strip(),
-        "references": normalized_references,
-    }
-
+    return _CORE_DATASET.validate_source_metadata(
+        value,
+        label="dialogue dataset",
+        source_label="dialogue source",
+        reference_label="dialogue reference",
+    )
 
 def _validate_source_refs(
     value: Any,
