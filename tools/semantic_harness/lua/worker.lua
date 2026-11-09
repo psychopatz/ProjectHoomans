@@ -76,6 +76,7 @@ local CommandRouter = require "worker/CommandRouter"
 local Commitments = require "worker/Commitments"
 local TransportEvidence = require "worker/TransportEvidence"
 local SessionEnvelope = require "worker/SessionEnvelope"
+local WorkingWorld = require "worker/WorkingWorld"
 
 local Runtime = RuntimeState.new()
 local Context = {
@@ -102,6 +103,7 @@ local Context = {
     ProductionRehydration = ProductionRehydration,
     Commitments = Commitments,
     SessionEnvelope = SessionEnvelope,
+    WorkingWorld = WorkingWorld,
     EngineFacts = nil,
     EngineEvents = nil,
 }

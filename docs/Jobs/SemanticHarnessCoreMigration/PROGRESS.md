@@ -14,8 +14,8 @@
   surface, and provider-specific test estate.
 - Current tracked Hoomans scope includes 95 Lua worker modules, 404 harness
   Python files, and 212 harness tests.
-- Core currently contains the generic foundation, 6 Lua harness files, 16
-  harness Python files, and 8 harness tests.
+- Core currently contains the generic foundation, 7 Lua harness files, 16
+  harness Python files, and 9 harness tests.
 - Hoomans `runtime/config.py` still selects the Hoomans worker for the default
   `hoomans` profile; Core has a separate minimal `core` worker.
 - DynamicTrading has no standalone `tools/semantic_harness` tree yet. Its
@@ -75,9 +75,18 @@ no longer the canonical path. Provider rehydration, PNC relationship/knowledge
 state, synthetic defaults, and legacy fields remain Hoomans-owned. The boundary
 and focused contract are recorded in `P1F_ENVELOPE_INTERNAL.md`.
 
+## P1-G result
+
+Core now owns the bounded `WorkingWorld` mechanics: deterministic patch
+projection, `HARNESS_MUTATION` provenance, source-baseline selection, working
+revision/reset counters, and first-baseline capture. Hoomans delegates to that
+module while retaining provider rehydration, actor setup, and gameplay reset
+policy. Numeric-key patch handling is covered by the Core implementation, and
+Hoomans compatibility tests verify patch shape and source provenance.
+
 ## Next Chunk
 
-**P1-G — classify the remaining generic ScenarioSession mechanics.** Audit the
-bounded patch-diff projection and reset/revision orchestration separately.
-Move only provider-neutral mechanics into Core with focused compatibility
-tests; keep production rehydration and PNC policy in Hoomans.
+**P1-H — audit the remaining worker session/router boundary.** Separate generic
+request lifecycle, snapshot/mutation response routing, and provider-specific
+command policy. Move only the generic orchestration into Core after the
+Hoomans compatibility and optional-provider gates are explicit.

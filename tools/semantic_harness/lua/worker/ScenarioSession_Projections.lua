@@ -3,67 +3,10 @@
 local function install(ScenarioSession)
     local Internal = ScenarioSession.Internal
 
-    local function sortedKeys(value)
-        local keys = {}
-        if type(value) ~= "table" then return keys end
-        for key in pairs(value) do keys[#keys + 1] = tostring(key) end
-        table.sort(keys)
-        return keys
-    end
-
-    local function collectPatches(imported, effective, path, patches, Values)
-        if #patches >= 512 then return end
-        if type(imported) == "table" and type(effective) == "table" then
-            local keys = {}
-            local seen = {}
-            for _, key in ipairs(sortedKeys(imported)) do
-                if not seen[key] then
-                    seen[key] = true
-                    keys[#keys + 1] = key
-                end
-            end
-            for _, key in ipairs(sortedKeys(effective)) do
-                if not seen[key] then
-                    seen[key] = true
-                    keys[#keys + 1] = key
-                end
-            end
-            table.sort(keys)
-            for _, key in ipairs(keys) do
-                if #patches >= 512 then break end
-                local childPath = path == "" and key or path .. "." .. key
-                collectPatches(
-                    imported[key], effective[key], childPath, patches, Values
-                )
-            end
-            return
-        end
-        if imported == effective then return end
-        patches[#patches + 1] = {
-            path = path,
-            imported = Values.copy(imported),
-            effective = Values.copy(effective),
-            source = "HARNESS_MUTATION",
-        }
-    end
-
     local function patchProjection(context)
-        local Runtime = context.Runtime
-        local Values = context.Values
-        local patches = {}
-        collectPatches(
-            Runtime.sourceWorkingBaseline or Runtime.sourceSnapshot or {},
-            Runtime.scenario or {},
-            "",
-            patches,
-            Values
+        return context.WorkingWorld.patches(
+            context.Runtime, context.Values
         )
-        local baseSource = Runtime.sourceMetadata
-            and Runtime.sourceMetadata.sourceKind or "MISSING"
-        for _, patch in ipairs(patches) do
-            patch.baseSource = baseSource
-        end
-        return patches
     end
 
     local function sourceSnapshotProjection(context, envelope)

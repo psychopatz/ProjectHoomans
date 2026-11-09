@@ -39,9 +39,16 @@ class SessionEnvelopeContractTests(unittest.TestCase):
                 snapshot["working"]["revision"],
             )
 
-            compact = worker.configure(deepcopy(DEFAULT_SCENARIO))[
-                "sessionEnvelope"
-            ]
+            draft = deepcopy(DEFAULT_SCENARIO)
+            draft["world"]["timeOfDay"] = 22.0
+            configured = worker.configure(draft)
+            self.assertTrue(any(
+                patch["path"] == "world.timeOfDay"
+                and patch["source"] == "HARNESS_MUTATION"
+                and patch["baseSource"] == "FIXTURE"
+                for patch in configured["workingWorld"]["patches"]
+            ))
+            compact = configured["sessionEnvelope"]
             self.assertEqual(compact["schema"], snapshot["schema"])
             self.assertIsNone(compact["source"].get("data"))
             self.assertIsNone(compact.get("providerPayloads"))

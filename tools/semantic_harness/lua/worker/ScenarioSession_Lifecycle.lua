@@ -86,10 +86,7 @@ local function install(ScenarioSession)
         Runtime.pendingProductionKnowledgeRegistry = nil
         Runtime.productionRawRegistries = type(providerHoomans) == "table"
             and Values.productionCopy(providerHoomans.rawRegistries) or nil
-        Runtime.sourceWorkingBaseline = nil
-        Runtime.captureWorkingBaseline = true
-        Runtime.workingResetCount = 0
-        Runtime.workingWorldRevision = (Runtime.workingWorldRevision or 0) + 1
+        context.WorkingWorld.beginSourceImport(Runtime)
         Runtime.replaceProductionDurableState = true
         local response = ScenarioSession.reset(
             context, Values.copy(Runtime.sourceSnapshot)
@@ -104,13 +101,10 @@ local function install(ScenarioSession)
         Runtime.scenario = Values.copy(scenario or {})
         Runtime.conversationOpened = false
         Runtime.conversationSuspended = false
-        Runtime.workingWorldRevision = (Runtime.workingWorldRevision or 0) + 1
+        context.WorkingWorld.beginReset(Runtime)
         context.RuntimeState.resetContainers(Runtime)
         ScenarioSession.configureRuntime(context)
-        if Runtime.captureWorkingBaseline == true then
-            Runtime.sourceWorkingBaseline = Values.copy(Runtime.scenario)
-            Runtime.captureWorkingBaseline = false
-        end
+        context.WorkingWorld.captureBaseline(Runtime, Values)
         local runtime = Runtime.scenario.runtime or {}
         local lifecycle = PNC.Semantics
             and PNC.Semantics.InteractionLifecycle or nil
@@ -224,12 +218,11 @@ local function install(ScenarioSession)
     function ScenarioSession.resetWorld(context)
         local Runtime = context.Runtime
         local Values = context.Values
-        Runtime.workingResetCount = (Runtime.workingResetCount or 0) + 1
+        context.WorkingWorld.incrementResetCount(Runtime)
         return ScenarioSession.reset(
             context,
             Values.copy(
-                Runtime.sourceWorkingBaseline
-                    or Runtime.sourceSnapshot or Runtime.scenario or {}
+                context.WorkingWorld.baseline(Runtime)
             )
         )
     end
@@ -238,8 +231,7 @@ local function install(ScenarioSession)
         local Runtime = context.Runtime
         local Values = context.Values
         local working = Values.copy(Runtime.scenario or {})
-        local source = Runtime.sourceWorkingBaseline
-            or Runtime.sourceSnapshot or {}
+        local source = context.WorkingWorld.baseline(Runtime)
         local actorID = tostring(actor or "npc")
         if source[actorID] ~= nil then
             working[actorID] = Values.copy(source[actorID])
