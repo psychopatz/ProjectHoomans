@@ -16,6 +16,9 @@ class RuntimePackageTests(unittest.TestCase):
         self.assertEqual(LuaProcess.__module__, "tools.semantic_harness.runtime.process")
         self.assertEqual(LuaSemanticWorker.__module__, "tools.semantic_harness.runtime.worker")
 
+    def test_protocol_is_core_owned_with_hoomans_compatibility_path(self) -> None:
+        self.assertEqual(ProtocolError.__module__, "semantic_harness.protocol")
+
 
 if __name__ == "__main__":
     unittest.main()
