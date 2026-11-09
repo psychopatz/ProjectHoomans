@@ -1,7 +1,8 @@
-"""Runtime boundary for the Semantic Lab's Python/Lua worker integration.
+"""Hoomans compatibility boundary for the Semantic Lab worker integration.
 
-The runtime package owns discovery, scenarios, the bounded JSON-lines
-protocol, child-process lifecycle, and serialized worker sessions.  It stays
-independent from Tk and CodeBuilder so those layers can be reorganized
-without changing worker behavior.
+The package keeps stable Hoomans import paths for configuration, scenario
+defaults/validation, and the worker adapter. Core owns the provider-neutral
+JSON-lines protocol, process lifecycle, document mechanics, and serialized
+worker session. This package stays independent from Tk and CodeBuilder so
+those layers can be reorganized without changing worker behavior.
 """

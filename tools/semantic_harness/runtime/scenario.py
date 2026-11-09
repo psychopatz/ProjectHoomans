@@ -2,13 +2,21 @@
 
 from __future__ import annotations
 
-import json
-from copy import deepcopy
+import importlib
 from pathlib import Path
-import re
 from typing import Any
 
 from .health import normalize_scenario, validate_npc_health
+from .process import _load_core_process
+
+
+_load_core_process()
+_CORE_SCENARIO = importlib.import_module("semantic_harness.scenario")
+
+# These mechanics are Core-owned. The aliases preserve the established Hoomans
+# import path for the authoring app, CLI, worker, and existing fixtures.
+derive_display_name = _CORE_SCENARIO.derive_display_name
+derive_actor_identifier = _CORE_SCENARIO.derive_actor_identifier
 
 
 DEFAULT_SCENARIO: dict[str, Any] = {
@@ -214,48 +222,20 @@ DEFAULT_SCENARIO: dict[str, Any] = {
 }
 
 
-def derive_display_name(forename: Any, surname: Any) -> str:
-    """Return the harness display name owned by the actor's name fields."""
-
-    return " ".join(
-        part.strip()
-        for part in (str(forename or ""), str(surname or ""))
-        if part.strip()
-    )
-
-
-def derive_actor_identifier(prefix: str, forename: Any, surname: Any) -> str:
-    """Build a stable, readable harness identifier from an actor's name."""
-
-    name = derive_display_name(forename, surname).lower()
-    slug = re.sub(r"[^a-z0-9]+", "_", name).strip("_")
-    return f"{prefix}_{slug or 'actor'}"
-
-
 def merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
     """Recursively merge an authored scenario over the safe defaults."""
 
-    output: dict[str, Any] = deepcopy(base)
-    replace_empty_objects = {"needs", "conditionStats", "personality", "identity"}
-    for key, value in override.items():
-        if (
-            isinstance(value, dict)
-            and not (not value and key in replace_empty_objects)
-            and isinstance(output.get(key), dict)
-        ):
-            output[key] = merge(output[key], value)
-        else:
-            output[key] = deepcopy(value)
-    return output
+    return _CORE_SCENARIO.deep_merge(
+        base,
+        override,
+        replace_empty_objects=("needs", "conditionStats", "personality", "identity"),
+    )
 
 
 def load_scenario(path: Path | None = None) -> dict[str, Any]:
     if path is None:
         return normalize_scenario(merge({}, DEFAULT_SCENARIO))
-    with path.open("r", encoding="utf-8") as handle:
-        authored = json.load(handle)
-    if not isinstance(authored, dict):
-        raise ValueError("scenario root must be a JSON object")
+    authored = _CORE_SCENARIO.load_json_document(path)
     return normalize_scenario(merge(DEFAULT_SCENARIO, authored))
 
 
@@ -264,18 +244,7 @@ def save_scenario(path: Path, scenario: dict[str, Any]) -> Path:
 
     normalized = normalize_scenario(scenario)
     validate_scenario(normalized)
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(path.name + ".tmp")
-    try:
-        with temporary.open("w", encoding="utf-8") as handle:
-            json.dump(normalized, handle, indent=2, ensure_ascii=False, sort_keys=True)
-            handle.write("\n")
-        temporary.replace(path)
-    finally:
-        if temporary.exists():
-            temporary.unlink()
-    return path
+    return _CORE_SCENARIO.save_json_document(path, normalized)
 
 
 def validate_scenario(scenario: dict[str, Any]) -> None:
