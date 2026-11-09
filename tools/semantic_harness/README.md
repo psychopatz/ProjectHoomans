@@ -100,6 +100,11 @@ does not write a Workshop package or alter the checked-out Lua source.
 
 ## Package entrypoint
 
+The generic CodeBuilder foundation is Core-owned. Hoomans keeps compatibility
+imports for locale normalization, generated-module naming, and compiler errors;
+Hoomans remains the owner of PNC source manifests, semantic catalogs, package
+routing, and generated artifact destinations.
+
 The application can be invoked directly without the shell launcher:
 
 ```bash
