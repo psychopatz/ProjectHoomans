@@ -13,6 +13,7 @@ local function install(ScenarioSession)
             type = responseType,
             scenario = Values.copy(Runtime.scenario),
             sourceSnapshot = Internal.SourceSnapshotProjection(context),
+            sessionEnvelope = Internal.SessionEnvelopeProjection(context),
             productionRehydration = Values.copy(Runtime.productionRehydration),
             productionFactionRehydration = Values.copy(
                 Runtime.productionFactionRehydration

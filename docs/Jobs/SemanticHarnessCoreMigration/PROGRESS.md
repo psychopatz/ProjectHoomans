@@ -12,9 +12,9 @@
 - Hoomans-local `tools/semantic_harness/lua/worker/Protocol.lua` is deleted.
 - Hoomans still owns the active Semantic Harness worker, runtime, UI, authoring
   surface, and provider-specific test estate.
-- Current tracked Hoomans scope includes 95 Lua worker modules, 403 harness
-  Python files, and 211 harness tests.
-- Core currently contains the generic foundation, 5 Lua harness files, 16
+- Current tracked Hoomans scope includes 95 Lua worker modules, 404 harness
+  Python files, and 212 harness tests.
+- Core currently contains the generic foundation, 6 Lua harness files, 16
   harness Python files, and 8 harness tests.
 - Hoomans `runtime/config.py` still selects the Hoomans worker for the default
   `hoomans` profile; Core has a separate minimal `core` worker.
@@ -56,9 +56,19 @@ bootstrap; unknown commands remain dispatch evidence. The Hoomans duplicate
 was deleted only after Core transport/worker tests and Hoomans worker,
 persistence, and integration checks passed.
 
+## P1-E result
+
+Core now owns the provider-neutral `SessionEnvelope` projection and its
+compact mutation-response form. Hoomans includes the envelope beside its
+existing compatibility payload fields, preserving provider rehydration and
+legacy response policy in the adopter. Explicit snapshots remain an inspector
+boundary with raw source/provider data; mutation responses compact those
+fields. Core and Hoomans focused envelope tests pass.
+
 ## Next Chunk
 
-**P1-D design result — split ScenarioSession mechanics from provider payload
-policy.** The boundary is recorded in `P1D_SESSION_BOUNDARY.md`. The next code
-chunk is a Core `SessionEnvelope` plus a Hoomans compatibility projection; do
-not move Hoomans rehydration or production records wholesale.
+**P1-F — use the Core envelope internally in Hoomans ScenarioSession.** Replace
+duplicate source/working projection mechanics only where the existing
+compatibility fields can remain stable. Keep Hoomans rehydration, PNC
+relationships/knowledge, synthetic defaults, and production records in the
+adopter until their policy seams are separately classified.

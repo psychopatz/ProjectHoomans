@@ -75,6 +75,7 @@ local ProductionRehydration = require "worker/ProductionRehydration"
 local CommandRouter = require "worker/CommandRouter"
 local Commitments = require "worker/Commitments"
 local TransportEvidence = require "worker/TransportEvidence"
+local SessionEnvelope = require "worker/SessionEnvelope"
 
 local Runtime = RuntimeState.new()
 local Context = {
@@ -100,6 +101,7 @@ local Context = {
     ScenarioSession = ScenarioSession,
     ProductionRehydration = ProductionRehydration,
     Commitments = Commitments,
+    SessionEnvelope = SessionEnvelope,
     EngineFacts = nil,
     EngineEvents = nil,
 }

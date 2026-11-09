@@ -110,6 +110,18 @@ local function install(ScenarioSession)
         }
     end
 
+    local function sessionEnvelopeProjection(context)
+        local SessionEnvelope = context.SessionEnvelope
+        if SessionEnvelope
+            and type(SessionEnvelope.project) == "function"
+        then
+            return SessionEnvelope.project(
+                context.Runtime, context.Values
+            )
+        end
+        return nil
+    end
+
     local function compactTransportScenario(value)
         if type(value) == "table" and type(value.npc) == "table" then
             value.npc.social = nil
@@ -129,6 +141,13 @@ local function install(ScenarioSession)
         if type(working) == "table" then
             compactTransportScenario(working.effective)
             working.baseline = nil
+        end
+        local envelope = response.sessionEnvelope
+        if type(envelope) == "table"
+            and context.SessionEnvelope
+            and type(context.SessionEnvelope.compact) == "function"
+        then
+            context.SessionEnvelope.compact(envelope)
         end
         return response
     end
@@ -289,6 +308,7 @@ local function install(ScenarioSession)
 
     Internal.SourceSnapshotProjection = sourceSnapshotProjection
     Internal.WorkingWorldProjection = workingWorldProjection
+    Internal.SessionEnvelopeProjection = sessionEnvelopeProjection
     Internal.SimulationProjection = simulationProjection
     Internal.InteractionProjection = interactionProjection
     ScenarioSession.simulationProjection = simulationProjection
