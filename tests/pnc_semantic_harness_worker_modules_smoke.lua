@@ -10,6 +10,7 @@ package.path = "./tools/semantic_harness/lua/?.lua;"
 
 local Protocol = require "Protocol"
 local RuntimeState = require "worker/RuntimeState"
+local Values = require "worker/Values"
 
 T.equal(Protocol.VERSION, 1, "harness protocol version changed unexpectedly")
 T.equal(Protocol.MAX_MESSAGE_BYTES, 1024 * 1024,
@@ -47,5 +48,11 @@ T.equal(#runtime.translationLookups, 0,
 T.equal(runtime.llmCalls, 0, "runtime reset did not clear LLM calls")
 T.equal(runtime.now, 1000, "runtime reset did not restore worker time")
 T.equal(runtime.turn, 0, "runtime reset did not restore turn count")
+
+local source = { nested = { value = 3 } }
+local bounded = Values.copy(source)
+bounded.nested.value = 4
+T.equal(source.nested.value, 3, "Core value copy aliased source state")
+T.equal(Values.number("4", 0), 4, "Core number normalization failed")
 
 return T.finish("pnc_semantic_harness_worker_modules_smoke")
