@@ -96,6 +96,29 @@ function Extensions.RebuildAll(coreSnapshot)
     PNC.HoomansWorldView.Loaded = true
     PNC.HoomansWorldView.Dirty = false
 
+    -- Faction and community loaders may have run before this callback. They
+    -- intentionally defer NPC-affiliation reconciliation while the canonical
+    -- Core view is unavailable, so finalize those indexes only after all
+    -- authoritative views have been installed.
+    if PNC.Communities
+        and type(PNC.Communities.ReconcileLoadedView) == "function"
+    then
+        local reconciled, reason =
+            PNC.Communities.ReconcileLoadedView(
+                "survivor_world_cutover"
+            )
+        if not reconciled then return false, reason end
+    end
+    if PNC.Factions
+        and type(PNC.Factions.ReconcileLoadedView) == "function"
+    then
+        local reconciled, reason =
+            PNC.Factions.ReconcileLoadedView(
+                "survivor_world_cutover"
+            )
+        if not reconciled then return false, reason end
+    end
+
     if PNC.AbstractLocations
         and PNC.AbstractLocations.RebuildIndex
     then

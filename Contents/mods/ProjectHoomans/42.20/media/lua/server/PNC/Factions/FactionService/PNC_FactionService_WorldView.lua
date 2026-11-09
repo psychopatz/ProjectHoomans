@@ -28,6 +28,42 @@ local function refreshCoreViews()
     return extensions.RebuildAll(registry:Snapshot())
 end
 
+local function cutoverPending()
+    local extensions = PNC.SurvivorWorldExtensions
+    return extensions ~= nil
+        and extensions.Active ~= true
+        and type(extensions.ActivateCutover) == "function"
+end
+
+function Factions.ReconcileLoadedView(reason)
+    local changed
+    if not Internal.authority() then return false, "not_authority" end
+    if not Factions.Loaded then return false, "not_loaded" end
+
+    changed = Internal.rebuildIndexes()
+    if Factions.ReconcilePlayerMemberships then
+        Factions.ReconcilePlayerMemberships(
+            getGameTime and getGameTime()
+                and getGameTime().getWorldAgeHours
+                and getGameTime():getWorldAgeHours() or 0
+        )
+    end
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ReconcileAll
+    then
+        PNC.FactionBehavior.ReconcileAll(reason or "view_reconcile")
+    end
+    if PNC.ProvisionScheduler then
+        for factionID in pairs(Factions.Registry.byID or {}) do
+            PNC.ProvisionScheduler.MarkFactionDirty(factionID)
+        end
+    end
+    Factions.Ready = true
+    Factions.LoadDeferred = nil
+    Factions.LastLoadReason = reason
+    return true, changed == true
+end
+
 function Factions.Load()
     local raw
     local sourceRaw
@@ -36,7 +72,10 @@ function Factions.Load()
     if PNC.Registry and PNC.Registry.EnsureLoaded then
         PNC.Registry.EnsureLoaded()
     end
-    local refreshed = refreshCoreViews()
+    local refreshed, refreshReason = refreshCoreViews()
+    if not refreshed and refreshReason ~= "cutover_not_active" then
+        return false, refreshReason
+    end
     if not refreshed then
         local reason
         raw, reason, sourceRaw = ImportSource.Read("factions")
@@ -54,24 +93,13 @@ function Factions.Load()
                 "faction_world_view_import"
             )
         end
-    end
-    Internal.rebuildIndexes()
-    if Factions.ReconcilePlayerMemberships then
-        Factions.ReconcilePlayerMemberships(
-            getGameTime and getGameTime()
-                and getGameTime().getWorldAgeHours
-                and getGameTime():getWorldAgeHours() or 0
-        )
-    end
-    if PNC.FactionBehavior
-        and PNC.FactionBehavior.ReconcileAll
-    then
-        PNC.FactionBehavior.ReconcileAll("registry_load")
-    end
-    if PNC.ProvisionScheduler then
-        for factionID in pairs(Factions.Registry.byID or {}) do
-            PNC.ProvisionScheduler.MarkFactionDirty(factionID)
+        if cutoverPending() then
+            Factions.Ready = false
+            Factions.LoadDeferred = true
+            Factions.LastLoadReason = "cutover_pending"
+            return true, Factions.Dirty
         end
+        return Factions.ReconcileLoadedView("registry_load")
     end
     return true, Factions.Dirty
 end
@@ -85,6 +113,8 @@ function Factions.LoadRaw(raw)
     if not Internal.authority() then return false, "not_authority" end
     Factions.Registry = Types.NormalizeFactionRegistry(raw)
     Factions.Loaded = true
+    Factions.Ready = true
+    Factions.LoadDeferred = nil
     Factions.Dirty = false
     return true, "loaded_raw"
 end

@@ -43,6 +43,148 @@ local function position(actor)
     }
 end
 
+local ACTOR_IDENTITY_EXTENSION = "PsychopatzCore.ActorIdentity"
+local AFFILIATION_EXTENSION = "PsychopatzCore.SurvivorWorld"
+
+local function recordAffiliation(record)
+    local source = type(record) == "table" and record or {}
+    local affiliation = type(source.affiliation) == "table"
+        and source.affiliation or {}
+    local factionID = source.factionID or source.factionId
+        or affiliation.factionID or affiliation.factionId
+    local communityID = source.communityID or source.communityId
+        or affiliation.communityID or affiliation.communityId
+    local groupID = source.groupID or source.groupId
+        or affiliation.groupID or affiliation.groupId
+    local output = {
+        factionID = factionID,
+        factionName = source.factionName or affiliation.factionName,
+        factionArchetypeID = source.factionArchetypeID
+            or affiliation.factionArchetypeID,
+        communityID = communityID,
+        groupID = groupID,
+        role = source.factionRole or source.role or affiliation.role,
+    }
+    if output.factionID == nil and output.communityID == nil
+        and output.groupID == nil
+    then
+        return nil
+    end
+    return output
+end
+
+local function affiliationChanged(previous, next)
+    for _, key in ipairs({
+        "factionID", "factionName", "factionArchetypeID", "communityID",
+        "groupID", "role",
+    }) do
+        if next[key] ~= nil and tostring(previous[key] or "")
+            ~= tostring(next[key])
+        then
+            return true
+        end
+    end
+    return false
+end
+
+-- Reconcile only records that already identify a Core actor (or use the same
+-- stable ID). This is deliberately not a PNC-to-Core actor factory: ordinary
+-- Hoomans records must opt into canonical Core ownership through a later,
+-- explicit adoption pass rather than silently creating duplicate actors.
+function Adapter.AnnotateExistingCoreRecord(record, core)
+    if type(record) ~= "table" or type(core) ~= "table" then
+        return nil, "record_and_core_required"
+    end
+    local api = actors(core)
+    if not api or type(api.Resolve) ~= "function"
+        or type(api.AttachIdentity) ~= "function"
+    then
+        return nil, "core_actor_identity_api_unavailable"
+    end
+
+    local runtime = type(record.runtime) == "table" and record.runtime or {}
+    local reference = record.coreActorID or runtime.coreActorID or record.id
+    local actor = api.Resolve(reference)
+    if not actor then return nil, "core_actor_not_found" end
+    local canonicalID = tostring(actor.actorId or actor.actorID or "")
+    if canonicalID == "" then return nil, "core_actor_id_missing" end
+
+    local currentIdentity = type(actor.extensions) == "table"
+        and actor.extensions[ACTOR_IDENTITY_EXTENSION] or nil
+    local hasRecordAlias = false
+    local identityChanged = false
+    local recordChanged = false
+    for _, alias in ipairs(currentIdentity and currentIdentity.aliases or {}) do
+        if tostring(alias) == tostring(record.id) then
+            hasRecordAlias = true
+            break
+        end
+    end
+    local lease = actor.providerLease or {}
+    local identityPatch = {}
+    if record.id and tostring(record.id) ~= canonicalID
+        and not hasRecordAlias
+    then
+        identityPatch.aliases = { tostring(record.id) }
+        identityChanged = true
+    end
+    if type(currentIdentity) ~= "table"
+        or currentIdentity.project ~= true
+        or (not currentIdentity.providerID and lease.provider)
+    then
+        identityPatch.project = true
+        if lease.provider then identityPatch.providerID = lease.provider end
+        identityChanged = true
+    end
+    if identityChanged then
+        local updated, reason = api.AttachIdentity(canonicalID, identityPatch)
+        if not updated then return nil, reason end
+        recordChanged = true
+    end
+
+    local affiliation = recordAffiliation(record)
+    local currentAffiliation = type(actor.extensions) == "table"
+        and actor.extensions[AFFILIATION_EXTENSION] or {}
+    if affiliation and type(api.AttachExtension) == "function"
+        and affiliationChanged(currentAffiliation, affiliation)
+    then
+        local updated, reason = api.AttachExtension(
+            canonicalID,
+            AFFILIATION_EXTENSION,
+            affiliation
+        )
+        if not updated then return nil, reason end
+        recordChanged = true
+    end
+
+    if tostring(record.coreActorID or "") ~= canonicalID
+        or tostring(runtime.coreActorID or "") ~= canonicalID
+    then
+        recordChanged = true
+    end
+    record.coreActorID = canonicalID
+    record.runtime = runtime
+    record.runtime.coreActorID = canonicalID
+    if recordChanged and PNC.Registry
+        and type(PNC.Registry.MarkDirty) == "function"
+    then
+        PNC.Registry.MarkDirty(record, "core_actor_identity")
+    end
+    return true, recordChanged and canonicalID or "unchanged"
+end
+
+function Adapter.ReconcileExistingCoreRecords(core)
+    if not PNC.Registry or type(PNC.Registry.ForEach) ~= "function" then
+        return 0, "registry_unavailable"
+    end
+    local reconciled = 0
+    PNC.Registry.ForEach(function(record)
+        local ok = Adapter.AnnotateExistingCoreRecord(record, core)
+        if ok then reconciled = reconciled + 1 end
+    end)
+    return reconciled, "reconciled"
+end
+
 local function projectProviderLease(record, leaseID)
     record.runtime.coreProviderLease = leaseID
     -- Provider ownership may outlive several physical MP shells. Only
@@ -407,6 +549,29 @@ function Adapter.Release(actor, core, spec)
     spec.provider = "DTHoomans"
     spec.owner = owner(spec)
     return service.Release(actor, spec)
+end
+
+local function reconcileExistingCoreRecords()
+    if isServer and isServer() ~= true then return end
+    if PsychopatzCore then
+        Adapter.ReconcileExistingCoreRecords(PsychopatzCore)
+    end
+end
+
+if Events and Events.OnInitGlobalModData
+    and type(Events.OnInitGlobalModData.Add) == "function"
+    and not Adapter.ReconcileInitHookRegistered
+then
+    Adapter.ReconcileInitHookRegistered = true
+    Events.OnInitGlobalModData.Add(reconcileExistingCoreRecords)
+end
+
+if Events and Events.OnServerStarted
+    and type(Events.OnServerStarted.Add) == "function"
+    and not Adapter.ReconcileServerHookRegistered
+then
+    Adapter.ReconcileServerHookRegistered = true
+    Events.OnServerStarted.Add(reconcileExistingCoreRecords)
 end
 
 return Adapter

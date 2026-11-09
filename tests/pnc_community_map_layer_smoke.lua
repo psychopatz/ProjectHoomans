@@ -38,6 +38,15 @@ local registered
 local sent
 local markerBlocksBase = false
 local emblemDraw
+package.preload[
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldActorMap"
+] = function()
+    return {
+        FindMarkerAt = function()
+            return markerBlocksBase and { id = "npc_hover" } or nil
+        end,
+    }
+end
 PNC = {
     MapRawEntityDebug = { ShowRawEntities = true },
     FactionEmblemRenderer = {
@@ -63,12 +72,6 @@ PNC = {
                 follower = { r = 0.15, g = 0.90, b = 0.25 },
             }
             return colors[typeID] or colors.neutral
-        end,
-    },
-    MapTravelLayer = {
-        FindMarkerAt = function()
-            return markerBlocksBase and { id = "npc_hover" }
-                or nil
         end,
     },
     MapLayers = {

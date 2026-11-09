@@ -261,6 +261,11 @@ local function spawnBody(record, position, reason)
         return nil
     end
     zombie = zombieList:get(0)
+    if PNC.BodyLifecycle
+        and PNC.BodyLifecycle.SuppressInitialBodyRender
+    then
+        PNC.BodyLifecycle.SuppressInitialBodyRender(zombie)
+    end
     -- Claim the IsoZombie before visual/equipment setup and before the next
     -- engine/mod update can observe a partially configured body.
     if ActorOwnership and ActorOwnership.MarkHoomansOwned then
@@ -303,6 +308,11 @@ local function configureBody(record, zombie)
     end
     if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
         LiveBodyControl.SetManagedBodyUseless(zombie, true)
+    end
+    if PNC.BodyLifecycle
+        and PNC.BodyLifecycle.ReleaseInitialBodyRender
+    then
+        PNC.BodyLifecycle.ReleaseInitialBodyRender(zombie)
     end
 end
 

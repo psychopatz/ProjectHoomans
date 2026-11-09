@@ -3,10 +3,10 @@ PNC.CoreGroupTraversalBridge = PNC.CoreGroupTraversalBridge or {}
 
 local Bridge = PNC.CoreGroupTraversalBridge
 local Util = require "PsychopatzCore/Actors/PsychopatzActorUtil"
-local Journey = require
-    "PsychopatzCore/World/SurvivorWorld/Traversal/PsychopatzSurvivorWorldGroupJourney"
-local CoreTraversal = require
-    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldTraversal"
+local Travel = (PsychopatzCore and PsychopatzCore.Travel)
+    or require "PsychopatzCore/Travel/PsychopatzTravel"
+local Journey = Travel.GroupJourney
+local CoreTraversal = Travel.Group
 
 local function finite(value, fallback)
     value = tonumber(value)

@@ -20,10 +20,16 @@ end
 
 function H.EnsureOne(player, character, state, spec, index, at)
     local grant = state.grants[spec.id]
+    local npcID
+    local record
     if not grant then return false, "starting_companion_grant_missing" end
+    npcID = grant.npcID
+    record = npcID and Registry.Get(npcID) or nil
     if grant and grant.status == "granted"
         and (tonumber(grant.enrichmentVersion) or 0)
             >= Starting.ENRICHMENT_VERSION
+        and record
+        and H.HasCanonicalAssignment(player, record)
     then
         if (tonumber(grant.relationshipKeyVersion) or 0)
             < Starting.RELATIONSHIP_KEY_VERSION
@@ -41,8 +47,6 @@ function H.EnsureOne(player, character, state, spec, index, at)
         end
         return true, "granted"
     end
-    local npcID = grant.npcID
-    local record = Registry.Get(npcID)
     if not record then
         local x, y, z = H.PlayerPosition(player)
         local offsetX, offsetY = H.SpawnOffset(index)

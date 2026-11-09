@@ -7,11 +7,12 @@ local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 PNC = PNC or {}
 local Presentation = PNC.PlayerSettlementMapPresentation
     or require "PNC/UI/Map/Layers/PNC_MapLayer_PlayerSettlement_Presentation"
+local ActorMap = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldActorMap"
 PNC.PlayerSettlementMapLayer = PNC.PlayerSettlementMapLayer or {}
 
 local Layer = PNC.PlayerSettlementMapLayer
 local Layers = PNC.MapLayers
-local TravelLayer = PNC.MapTravelLayer
 
 Layer.RefreshMs = tonumber(Layer.RefreshMs) or 1500
 Layer.LastRequestAt = tonumber(Layer.LastRequestAt) or 0
@@ -174,8 +175,8 @@ function Layer.Render(map)
 
     local mouseX = map.getMouseX and map:getMouseX() or 0
     local mouseY = map.getMouseY and map:getMouseY() or 0
-    local markerAtMouse = TravelLayer and TravelLayer.FindMarkerAt
-        and TravelLayer.FindMarkerAt(map, mouseX, mouseY, 3) or nil
+    local markerAtMouse = ActorMap and ActorMap.FindMarkerAt
+        and ActorMap.FindMarkerAt(mouseX, mouseY, 3) or nil
     local hovered = not markerAtMouse
         and Layer.FindAt(map, mouseX, mouseY) ~= nil
     local color = COLORS.border

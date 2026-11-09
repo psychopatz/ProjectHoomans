@@ -96,6 +96,35 @@ local function isFemaleChance(record)
     return 0
 end
 
+-- Keep a newly-created shell out of the renderer until Presence has applied
+-- its real human visuals and equipment. PNCShellCarrier is an identity
+-- carrier, not a render-ready outfit; rendering the transient carrier can
+-- reach AnimatedModel with no SkinningData and produce the vanilla
+-- "skinningData is null" warning.
+local function setInitialBodyRenderCulled(zombie, culled)
+    local ok
+    local setter
+    if not zombie then
+        return false
+    end
+    ok, setter = pcall(function()
+        return zombie.setSceneCulled
+    end)
+    if not ok or type(setter) ~= "function" then
+        return false
+    end
+    ok = pcall(setter, zombie, culled == true)
+    return ok
+end
+
+function Lifecycle.SuppressInitialBodyRender(zombie)
+    return setInitialBodyRenderCulled(zombie, true)
+end
+
+function Lifecycle.ReleaseInitialBodyRender(zombie)
+    return setInitialBodyRenderCulled(zombie, false)
+end
+
 --[[
     True when the engine refuses to create zombies at all.
 
@@ -144,7 +173,9 @@ local function spawnPrimary(record, position)
     if not list or not list.size or list:size() <= 0 then
         return nil
     end
-    return list:get(0)
+    local zombie = list:get(0)
+    Lifecycle.SuppressInitialBodyRender(zombie)
+    return zombie
 end
 
 local function randomDirection()
@@ -341,6 +372,7 @@ local function spawnFallback(record, position)
     if not zombie then
         return nil
     end
+    Lifecycle.SuppressInitialBodyRender(zombie)
     applyPrimaryParity(zombie, record)
     -- createZombie fires OnZombieCreate before this function returns. The
     -- spawn window suppresses reaping during that hand-off, but the body must

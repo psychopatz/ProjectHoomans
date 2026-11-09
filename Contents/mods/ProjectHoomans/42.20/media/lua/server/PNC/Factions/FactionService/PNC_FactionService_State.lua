@@ -12,6 +12,7 @@ local EntityRef = PNC.EntityRef
 Factions.Registry = Factions.Registry
     or Types.NewFactionRegistry()
 Factions.Loaded = Factions.Loaded or false
+Factions.Ready = Factions.Ready == true
 Factions.Dirty = Factions.Dirty or false
 Factions.IDGenerator = Factions.IDGenerator
     or function()

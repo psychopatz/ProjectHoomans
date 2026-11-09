@@ -11,7 +11,7 @@ require "PNC/UI/SettlementManagement/PNC_SettlementManagement_FishingZoneOverlay
 require "PNC/UI/Map/PNC_MapCommandRegistry"
 require "PNC/UI/Map/Commands/PNC_MapCommand_Travel"
 require "PNC/UI/Map/Commands/PNC_MapCommand_Lumber"
-require "PNC/UI/Map/Layers/PNC_MapLayer_Travel"
+require "PNC/UI/Map/PNC_MapActorPresentation"
 require "PNC/UI/Map/Layers/PNC_MapLayer_Communities"
 require "PNC/UI/Map/Layers/PNC_MapLayer_PlayerSettlement"
 require "PNC/UI/Map/Layers/PNC_MapLayer_AbstractGroups"

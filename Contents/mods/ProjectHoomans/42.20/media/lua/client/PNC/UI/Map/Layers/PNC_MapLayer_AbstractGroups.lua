@@ -3,6 +3,8 @@
 require "ISUI/Maps/ISWorldMap"
 require "PNC/UI/Mobile/PNC_MobileGroupDebugModel"
 require "PNC/UI/Mobile/PNC_MobileGroupTrackModel"
+local MarkerDiagnostics = require
+    "PsychopatzCore/UI/Map/PsychopatzMapMarkerDiagnostics"
 
 PNC = PNC or {}
 PNC.AbstractGroupMapLayer = PNC.AbstractGroupMapLayer or {}
@@ -250,6 +252,38 @@ function GroupLayer.MarkerPosition(group)
     return markerPosition(group, worldAgeHours())
 end
 
+function GroupLayer.ListDiagnostics()
+    local snapshot = ClientState.directorDebug or {}
+    rebuildTracks(snapshot)
+    local at = GroupLayer.TrackCount > 0 and worldAgeHours() or nil
+    local output = {}
+    for _, group in ipairs(snapshot.groups or {}) do
+        local groupID = tostring(group.id or "")
+        local x, y = markerPosition(group, at)
+        if groupID ~= "" and x and y then
+            output[#output + 1] = {
+                kind = "abstract_group",
+                source = "ProjectHoomans:AbstractGroups",
+                id = groupID,
+                groupID = groupID,
+                label = tostring(group.groupType or "GROUP"),
+                position = {
+                    x = tonumber(x), y = tonumber(y),
+                    z = tonumber(group.location.z) or 0,
+                },
+                presence = "abstract",
+                physicalPresence = "not_materialized",
+                mobile = group.mobile ~= nil,
+                state = group.state,
+                factionID = group.factionId,
+                rendered = isVisible() and
+                    ClientState.directorDebugAuthorized == true,
+            }
+        end
+    end
+    return output
+end
+
 function GroupLayer.ClearTracks()
     clearTracks()
 end
@@ -261,5 +295,11 @@ if Layers and Layers.Register then
         render = GroupLayer.Render,
     })
 end
+
+MarkerDiagnostics.RegisterSource("ProjectHoomans:AbstractGroups", {
+    kind = "abstract_group",
+    priority = 80,
+    list = GroupLayer.ListDiagnostics,
+})
 
 return GroupLayer

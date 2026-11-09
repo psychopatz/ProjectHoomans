@@ -7,7 +7,6 @@ local Internal = CommunityLayer.Internal or {}
 CommunityLayer.Internal = Internal
 local Layers = PNC.MapLayers
 local ClientState = PNC.Network.ClientState
-local TravelLayer = PNC.MapTravelLayer
 local text = Internal.Text
 local isVisible = Internal.IsVisible
 local relationFor = Internal.RelationFor

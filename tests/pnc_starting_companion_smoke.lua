@@ -309,7 +309,8 @@ T.equal(assignCount, 6, "reconnect performs no reassignment")
 
 -- Existing grants repair a stale faction/community link exactly once.
 lover.affiliation = nil
-record.startingCompanions.grants.PNC_IsMarried.enrichmentVersion = 2
+record.startingCompanions.grants.PNC_IsMarried.enrichmentVersion =
+    PNC.StartingCompanions.ENRICHMENT_VERSION
 granted, reason = PNC.StartingCompanions.Ensure(
     player, record.uuid, 16
 )

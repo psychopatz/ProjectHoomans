@@ -70,6 +70,11 @@ package.preload["ISUI/ISButton"] = function() return ISButton end
 package.preload["ISUI/ISContextMenu"] = function() return ISContextMenu end
 
 local requests = {}
+package.preload[
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldActorMap"
+] = function()
+    return { InvalidateCache = function() end }
+end
 PNC = {
     Client = {
         CanUseDebug = function() return true end,
@@ -80,7 +85,11 @@ PNC = {
         RequestCommunityDebug = function() return true end,
         RequestDirectorDebug = function() return true end,
     },
-    MapTravelLayer = { InvalidateEntryCache = function() end },
+}
+PsychopatzCore = {
+    DebugHub = {
+        tools = {},
+    },
 }
 isDebugEnabled = function() return true end
 getText = function(key) return key end
@@ -91,6 +100,7 @@ end
 
 T.load(MENU)
 T.load(ROOT .. "client/PNC/UI/Map/PNC_MapRawEntityDebug.lua")
+local debugTools = PsychopatzCore.DebugHub.tools
 local map = { children = {}, addChild = ISPanel.addChild }
 setmetatable(map, { __index = ISWorldMap })
 map:createChildren()
@@ -102,12 +112,19 @@ T.truthy(map.psychopatzMapToolsButton,
     "authorized map did not receive Core map tools")
 map.psychopatzMapToolsButton.onclick()
 local menu = PNC.MapHoomansMenu.instance
-T.truthy(menu and menu.entryButtons["ProjectHoomans:raw_entities"],
-    "shared map menu did not receive the raw-overlay entry")
-local rawButton = menu.entryButtons["ProjectHoomans:raw_entities"]
+T.falsy(menu and menu.entryButtons["ProjectHoomans:raw_entities"],
+    "raw-overlay debug leaked into the shared map menu")
+local rawButton = T.truthy(debugTools["pnc.map.raw_entities"],
+    "Debug Hub did not receive the raw-overlay entry")
+T.equal(rawButton.surface, "map",
+    "raw-overlay entry was not scoped to the map debug surface")
 T.equal(PNC.MapRawEntityDebug.ShowRawEntities, false,
     "undiscovered debug overlays start hidden")
-menu:onButton(rawButton)
+T.equal(rawButton.menuTitle(), "RAW HOOMANS OVERLAYS: OFF",
+    "raw-overlay menu did not expose its OFF state")
+rawButton.action()
 T.equal(PNC.MapRawEntityDebug.ShowRawEntities, true,
     "raw overlays require an explicit shared-menu toggle")
+T.equal(rawButton.menuTitle(), "RAW HOOMANS OVERLAYS: ON",
+    "raw-overlay menu did not expose its ON state")
 T.finish("pnc_world_discovery_debug_map_smoke")

@@ -1,4 +1,6 @@
 local Internal = PNC.Client.Internal
+local ActorMap = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldActorMap"
 local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
 local requestRosterRetry = Internal.RequestRosterRetry
@@ -12,10 +14,8 @@ local refreshClientBodyIdentityIndex =
     Internal.RefreshClientBodyIdentityIndex
 
 local function invalidateMapTravelCache()
-    if PNC.MapTravelLayer
-        and PNC.MapTravelLayer.InvalidateEntryCache
-    then
-        PNC.MapTravelLayer.InvalidateEntryCache()
+    if ActorMap and type(ActorMap.InvalidateCache) == "function" then
+        ActorMap.InvalidateCache()
     end
 end
 

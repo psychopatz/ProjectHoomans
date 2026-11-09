@@ -7,7 +7,8 @@ local Internal = CommunityLayer.Internal or {}
 CommunityLayer.Internal = Internal
 local ClientState = PNC.Network.ClientState
 local Palette = PNC.NPCTypePalette
-local TravelLayer = PNC.MapTravelLayer
+local ActorMap = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldActorMap"
 local EmblemRenderer = PNC.FactionEmblemRenderer
 local text = Internal.Text
 local isVisible = Internal.IsVisible
@@ -184,14 +185,9 @@ function CommunityLayer.Render(map)
     local communityLookup = communitiesBySite(snapshot)
     local mouseX = map:getMouseX()
     local mouseY = map:getMouseY()
-    local markerAtMouse = TravelLayer
-        and TravelLayer.FindMarkerAt
-        and TravelLayer.FindMarkerAt(
-            map,
-            mouseX,
-            mouseY,
-            3
-        ) or nil
+    local markerAtMouse = ActorMap
+        and ActorMap.FindMarkerAt
+        and ActorMap.FindMarkerAt(mouseX, mouseY, 3) or nil
     local hoveredSite
     local hoveredCommunity
     local hoveredColor

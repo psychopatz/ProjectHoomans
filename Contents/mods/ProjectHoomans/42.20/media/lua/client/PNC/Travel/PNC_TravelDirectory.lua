@@ -1,12 +1,10 @@
--- Client read model for map/UI journey presentation.
+-- Client read model for Hoomans travel queries and supplemental actor records.
+-- Core owns the canonical actor-map projection and rendering engine.
 
 PNC = PNC or {}
 PNC.TravelDirectory = PNC.TravelDirectory or {}
 
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
-
-local SurvivorWorldClient = require
-    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldClient"
 
 local Directory = PNC.TravelDirectory
 local ClientState = PNC.Network.ClientState
@@ -108,248 +106,6 @@ local function currentWorldHour()
         or 0
 end
 
-
-local function isAbstractCoreProjection(entry)
-    if type(entry) ~= "table" then return false end
-    return tostring(entry.providerState or "") ~= "materialized"
-end
-
-local function coreVisibilitySnapshot(entry)
-    local snapshot = resolveSnapshot(entry and entry.actorID)
-    if snapshot then return snapshot end
-    if type(entry) ~= "table" then return nil end
-    local abstract = isAbstractCoreProjection(entry)
-    local presenceState = abstract
-        and (PNC.Const.PRESENCE_ABSTRACT or "abstract")
-        or (PNC.Const.PRESENCE_LIVE or "live")
-    local portrait = SurvivorWorldClient.GetPortraitSpec
-        and SurvivorWorldClient.GetPortraitSpec(entry) or nil
-    return {
-        id = tostring(entry.actorID or ""),
-        coreActorID = tostring(entry.actorID or ""),
-        alive = true,
-        available = true,
-        persist = false,
-        runtimeView = true,
-        abstractOnly = abstract,
-        presenceMode = abstract and "abstract" or "live",
-        name = tostring(entry.label or entry.actorID or ""),
-        displayName = tostring(entry.label or entry.actorID or ""),
-        identitySeed = tostring(entry.actorID or ""),
-        portrait = portrait,
-        appearance = portrait and portrait.appearance or nil,
-        equipmentSummary = portrait and portrait.equipment or nil,
-        x = entry.position and entry.position.x,
-        y = entry.position and entry.position.y,
-        z = entry.position and entry.position.z or 0,
-        presenceState = presenceState,
-        worldDiscovery = {
-            populationGenerated = true,
-        },
-        affiliation = {
-            groupID = entry.groupID,
-            communityID = entry.communityID,
-            factionID = entry.factionID,
-            role = entry.role,
-        },
-    }
-end
-
-local function coreProjected(entry, atWorldHour, trackedActorID)
-    if type(entry) ~= "table"
-        or type(entry.position) ~= "table"
-        or entry.actorID == nil
-    then
-        return nil
-    end
-    local snapshot = coreVisibilitySnapshot(entry)
-    if not Directory.IsVisible(snapshot) then return nil end
-
-    local hour = tonumber(atWorldHour) or currentWorldHour()
-    local journey = type(entry.journey) == "table"
-        and entry.journey or nil
-    local total = journey
-        and math.max(0, tonumber(journey.distanceTotal) or 0)
-        or 0
-    local travelled = journey
-        and math.max(
-            0,
-            math.min(
-                total,
-                tonumber(journey.distanceTravelled) or 0
-            )
-        )
-        or 0
-    local organizationalFaction =
-        resolveOrganizationalFaction(snapshot)
-    if not organizationalFaction and entry.factionID then
-        organizationalFaction = {
-            id = entry.factionID,
-            role = entry.role,
-        }
-    end
-
-    local abstract = isAbstractCoreProjection(entry)
-    local presenceState = abstract
-        and (PNC.Const.PRESENCE_ABSTRACT or "abstract")
-        or (PNC.Const.PRESENCE_LIVE or "live")
-    local portrait = SurvivorWorldClient.GetPortraitSpec
-        and SurvivorWorldClient.GetPortraitSpec(entry)
-        or resolvePortrait(snapshot)
-    local runtimeRecord = {
-        id = tostring(entry.actorID),
-        coreActorID = tostring(entry.actorID),
-        persist = false,
-        runtimeView = true,
-        abstractOnly = abstract,
-        presenceMode = abstract and "abstract" or "live",
-        presenceState = presenceState,
-        provider = entry.provider,
-        providerState = entry.providerState,
-        alive = not snapshot or snapshot.alive ~= false,
-        available = true,
-        identitySeed = snapshot and snapshot.identitySeed
-            or tostring(entry.actorID),
-        name = snapshot and (
-            snapshot.name or snapshot.displayName
-        ) or tostring(entry.label or entry.actorID),
-        displayName = snapshot and (
-            snapshot.displayName or snapshot.name
-        ) or tostring(entry.label or entry.actorID),
-        tacticalClass = tostring(
-            snapshot and snapshot.tacticalClass or "neutral"
-        ),
-        appearance = portrait and portrait.appearance or nil,
-        equipment = portrait and portrait.equipment or { worn = {} },
-        equipmentSummary = portrait and portrait.equipment or { worn = {} },
-        portrait = portrait,
-        role = snapshot and snapshot.role
-            or entry.role,
-        roles = {
-            trader = tostring(
-                snapshot and snapshot.role or entry.role or ""
-            ) == "trader",
-        },
-        affiliation = snapshot and snapshot.affiliation or {
-            groupID = entry.groupID,
-            communityID = entry.communityID,
-            factionID = entry.factionID,
-            role = entry.role,
-        },
-        x = tonumber(entry.position.x),
-        y = tonumber(entry.position.y),
-        z = tonumber(entry.position.z) or 0,
-    }
-
-    return {
-        id = tostring(entry.actorID),
-        npcId = tostring(entry.actorID),
-        actorID = tostring(entry.actorID),
-        name = snapshot and Identity.GetName(snapshot)
-            or tostring(entry.label or entry.actorID),
-        tacticalClass = tostring(
-            snapshot and snapshot.tacticalClass or "neutral"
-        ),
-        organizationalFaction = organizationalFaction,
-        recruited = snapshot and snapshot.recruited == true or false,
-        colonyOwned = snapshot
-            and (snapshot.colonyOwned == true
-                or snapshot.recruited == true)
-            or false,
-        colonist = snapshot
-            and (snapshot.colonyOwned == true
-                or snapshot.recruited == true)
-            or false,
-        deathMarker = false,
-        alive = not snapshot or snapshot.alive ~= false,
-        infected = snapshot and snapshot.infected == true or false,
-        orderKind = snapshot and snapshot.orderKind or nil,
-        portrait = portrait,
-        snapshot = runtimeRecord,
-        record = runtimeRecord,
-        abstractOnly = abstract,
-        roleTag = snapshot
-            and snapshot.mapPresentation
-            and snapshot.mapPresentation.roleTag
-            or entry.role,
-        iconID = snapshot
-            and snapshot.mapPresentation
-            and snapshot.mapPresentation.iconID
-            or entry.markerID,
-        mapVisibility = snapshot
-            and snapshot.mapPresentation
-            and snapshot.mapPresentation.visibility
-            or "all",
-        presenceState = presenceState,
-        provider = entry.provider,
-        providerState = entry.providerState,
-        groupID = entry.groupID,
-        communityID = entry.communityID,
-        factionID = entry.factionID,
-        journeyId = journey and journey.journeyID or nil,
-        state = journey and journey.state
-            or entry.providerState
-            or "idle",
-        x = tonumber(entry.position.x),
-        y = tonumber(entry.position.y),
-        z = tonumber(entry.position.z) or 0,
-        percent = journey and tonumber(journey.progress) or nil,
-        distanceTotal = journey and total or nil,
-        distanceTravelled = journey and travelled or nil,
-        distanceRemaining = journey
-            and math.max(0, total - travelled) or nil,
-        etaWorldHour = journey and tonumber(journey.eta) or nil,
-        remainingWorldHours = journey
-            and tonumber(journey.eta)
-            and math.max(0, tonumber(journey.eta) - hour)
-            or nil,
-        ownerMod = journey and journey.ownerMod or nil,
-        ownerRef = journey and journey.ownerRef or nil,
-        metadata = {
-            groupID = entry.groupID,
-            communityID = entry.communityID,
-            factionID = entry.factionID,
-            role = entry.role,
-        },
-        route = journey and journey.route or nil,
-        coreActorProjection = true,
-        canonicalPosition = entry.canonicalPosition,
-        overlapIndex = entry.overlapIndex,
-        overlapCount = entry.overlapCount,
-        positionSource = entry.positionSource,
-        tracked = trackedActorID ~= nil
-            and tostring(entry.actorID)
-                == tostring(trackedActorID)
-            or false,
-    }
-end
-
--- Public adapter for any client integration that already has a canonical Core
--- SurvivorWorld actor projection and needs the same Hoomans presentation /
--- conversation entry used by the travel directory.
-Directory.ProjectCoreActor = coreProjected
-
-local function listCoreProjected(atWorldHour)
-    if not SurvivorWorldClient then return {} end
-    if SurvivorWorldClient.RequestActorsIfDue then
-        SurvivorWorldClient.RequestActorsIfDue(500)
-    end
-    local output = {}
-    local tracked = SurvivorWorldClient.GetTracked
-        and SurvivorWorldClient.GetTracked() or nil
-    local trackedActorID = tracked and tracked.actorID or nil
-    for _, entry in ipairs(
-        SurvivorWorldClient.ListActors(false) or {}
-    ) do
-        local projected = coreProjected(
-            entry,
-            atWorldHour,
-            trackedActorID
-        )
-        if projected then output[#output + 1] = projected end
-    end
-    return output
-end
 
 function Directory.RegisterVisibilityFilter(id, filter)
     id = tostring(id or "")
@@ -533,67 +289,41 @@ function Directory.GetProjected(npcId, atWorldHour)
     }
 end
 
-function Directory.ListProjected(atWorldHour)
+function Directory.ListSupplementalActors(atWorldHour)
     local output = {}
     local seen = {}
-    local id
-    local projected
 
-    -- Canonical SurvivorWorld actors use Core as the generic map/route
-    -- authority. Hoomans metadata and command policy remain adopter-owned.
-    for _, entry in ipairs(listCoreProjected(atWorldHour)) do
-        output[#output + 1] = entry
-        seen[tostring(entry.id)] = true
+    local function append(id)
+        id = tostring(id or "")
+        if id == "" or seen[id] then return end
+        local projected = Directory.GetProjected(id, atWorldHour)
+        if projected then
+            seen[id] = true
+            output[#output + 1] = projected
+        end
     end
 
-    -- Preserve Hoomans-only actors/death markers that are outside the
-    -- canonical SurvivorWorld projection.
     for id, _ in pairs(ClientState.snapshots or {}) do
-        if not seen[tostring(id)] then
-            projected = Directory.GetProjected(id, atWorldHour)
-            if projected then
-                output[#output + 1] = projected
-                seen[tostring(id)] = true
-            end
-        end
+        append(id)
     end
     for _, item in ipairs(ClientState.debugRoster or {}) do
-        id = item and tostring(item.id or "") or ""
-        if id ~= "" and not seen[id] then
-            projected = Directory.GetProjected(id, atWorldHour)
-            if projected then
-                output[#output + 1] = projected
-                seen[id] = true
-            end
-        end
+        append(item and item.id or nil)
     end
+
     if not (Core and Core.IsClientOnly and Core.IsClientOnly())
         and PNC.Registry
         and PNC.Registry.ForEach
     then
         PNC.Registry.ForEach(function(record)
-            id = record and tostring(record.id or "") or ""
-            if id ~= "" and not seen[id] then
-                projected = Directory.GetProjected(id, atWorldHour)
-                if projected then
-                    output[#output + 1] = projected
-                    seen[id] = true
-                end
-            end
+            append(record and record.id or nil)
         end)
         if PNC.Registry.ForEachDeathMarker then
             PNC.Registry.ForEachDeathMarker(function(marker)
-                id = marker and tostring(marker.id or "") or ""
-                if id ~= "" and not seen[id] then
-                    projected = Directory.GetProjected(id, atWorldHour)
-                    if projected then
-                        output[#output + 1] = projected
-                        seen[id] = true
-                    end
-                end
+                append(marker and marker.id or nil)
             end)
         end
     end
+
     table.sort(output, function(left, right)
         return tostring(left.name) < tostring(right.name)
     end)

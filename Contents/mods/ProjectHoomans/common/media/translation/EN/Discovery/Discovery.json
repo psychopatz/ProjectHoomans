@@ -9,6 +9,7 @@
     "UI_PNC_DebugDiscoveryHint": "Discovery tools no longer replace the map context menu.",
     "UI_PNC_DebugDiscoveryReset": "Reset this character's discoveries",
     "UI_PNC_DebugDiscoveryShowRaw": "[PNC DEBUG] Show undiscovered entity overlays",
+    "UI_PNC_DebugDiscoveryRawLabel": "RAW HOOMANS OVERLAYS",
     "UI_PNC_DebugDiscoveryTitle": "NPC World Debug",
     "UI_PNC_DiscoveryCall": "Call / triangulate",
     "UI_PNC_Discovery_ApproximatePosition": "Position is approximate; scan again to locate.",

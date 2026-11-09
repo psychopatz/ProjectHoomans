@@ -1,55 +1,220 @@
 # Shared actor map parity — audit and implementation plan
 
-Scope: Project Hoomans and DTAbstract actor hover, abstract journey motion and debug routes.
+## Scope
 
-The corrected knowledge contract and follow-up fixes are recorded in [KnowledgeDialogueHover](../KnowledgeDialogueHover/AUDIT_AND_FIX_PLAN.md): debug visibility never grants unknown actor hover. DTHoomans remains the commercial-to-Hoomans physical NPC adapter; it is not DTAbstract.
+Make the map and survivor-world behavior provider-agnostic for these supported
+profiles:
 
-## Evidence
+1. Project Hoomans + DTHoomans, where nearby traders materialize as Hoomans
+   NPCs and remote traders remain abstract.
+2. Standalone DTAbstract, where traders never materialize and remain abstract.
 
-- Core ActorMap owns canonical actor markers, selection, tracking, routes and Hover. The earlier cache changes preserve that renderer but only redraw positions received in snapshots.
-- Core Hover must refuse unknown identities. Visible debug dots are not evidence of learned identity; known non-colonists use the player knowledge adapter. Stale projection flags and pending presentation rows must not override an arrived name fact.
-- Hoomans' hover adapter interprets every portrait as legacy PNC appearance data, even when Core supplies its canonical face/gender portrait schema.
-- The PNC abstract-group overlay projects movement independently. Core already owns GroupJourney.Normalize/ProjectPosition, but its client actor-list presentation does not use that math between received projections.
-- DynamicTrading's discovery debug geography independently decides debug visibility. Generic actor and debug presentation must not require parallel provider-specific implementations.
+Both profiles must use the same Core actor, group, settlement, travel,
+discovery, map, hover, selection, tracking, and save/reload contracts.
 
-## Ownership
+## Agreed architecture
 
-PsychopatzCore owns permission-checked debug presentation, actor hover lifecycle, compact journey projection, actor-map routes and cached rendering. Hoomans supplies learned identity, legacy portrait conversion and its existing raw-overlay menu adapter. DTAbstract supplies abstract actor/world state and commercial decoration; it reuses Core presentation. DTHoomans continues its existing provider handoff and physical NPC responsibilities.
+PsychopatzCore is the sole authority for canonical actor identity, group
+membership, settlement identity, journey state, route projection, and the actor
+map renderer. DTHoomans and DTAbstract differ only in world presence:
 
-## Plan
+- DTHoomans materializes the existing Core actor when nearby and eligible for
+  live simulation, then dematerializes it when remote.
+- DTAbstract never creates a physical body and always uses the Core abstract
+  projection.
 
-1. Add an explicit, authorization-checked Core debug-presentation state, without mutating discovery/learned facts or save state.
-2. Connect the Hoomans raw-overlay action and DTAbstract debug geography to that public contract; keep actor cards gated by learned identity in every mode.
-3. Prefer Core portrait conversion for canonical portraits; retain legacy conversion only for legacy records.
-4. Project abstract group-position actors using existing Core journey math at presentation refresh cadence, preserving canonical inputs and provider-owned live positions. Carry wait state/arrival radius in the bounded projection so projection does not skip stops.
-5. Show shared routes during debug inspection; refresh a hovered card when its actor projection changes instead of keeping the first actor-ID-only binding indefinitely.
-6. Add provider-parity, authorization, non-mutation, movement/wait/live-body and cache regressions. Run related Core/DT tests, Hoomans full suite and Kahlua checks.
+The full stable contract is recorded in [ARCHITECTURE.md](ARCHITECTURE.md).
 
-Native confirmation: after restart, toggle raw debug on/off, verify known non-colonist Hoomans and DTAbstract actors have cards and unknown actors do not, observe movement along routes and waits, then confirm normal-play identity restrictions and smooth map rendering. Native verification remains user-owned; static/mocked evidence is not an FPS measurement.
+## Audit findings
 
-## Implementation completed
+### Marker taxonomy
 
-- Added the shared Core Map Tools action **Show survivor debug inspection**. Core checks current debug authorization on enable and on use. Its three menu/help strings have matching EN/TL entries in the existing Debug catalogs.
-- Hoomans' raw-overlay controller now delegates to Core. Its old menu entry is hidden when the shared action exists, and its three raw/discovery layer consumers read the shared state. DTAbstract reads that same state; its local `showAll` hint cannot bypass the shared contract.
-- Core hover requires learned identity in both normal and debug modes; learned facts and discovery are not written. New projection objects refresh the hovered target, while the portrait panel's appearance/equipment key avoids unnecessary model rebinding. Canonical face/gender portraits use Core conversion; legacy PNC portraits retain their adapter.
-- Shared actor-map routes render for debug inspection as well as selection/tracking. Existing group/site diagnostic overlays remain domain-specific summaries, not a second canonical actor renderer.
-- Found and repaired an additional transport defect: `ActorProjection.ValidateEntry` discarded `positionSource`. It now preserves the field, plus journey wait duration and arrival radius.
-- `Client.ListActors(false)` projects group-position abstract actors using existing GroupJourney normalization/projection math before overlap spreading. Raw entries stay untouched. Per-member server offsets are preserved by applying movement relative to the snapshot's world-hour timestamp. Materialized/live/provider-controlled positions are not extrapolated. Backward clocks, incomplete journeys and route-distance mismatches retain the received position rather than inventing movement.
-- Marker/decorator and directory caches remain in place; movement refresh uses the existing 500 ms presentation cadence. This does not simulate or spawn NPCs in DTAbstract and does not modify provider leases or Hoomans follow AI.
+- Project Hoomans' `AbstractGroups` layer uses a yellow `SCAVENGER` color and
+  draws persistent abstract survivor groups. A yellow square is not evidence of
+  a DTHoomans trader or a physical NPC.
+- Project Hoomans' `WorldDiscovery` layer draws unresolved settlement and mobile
+  group signals. `Located` is a discovery phase, not physical presence.
+- DTAbstract's discovery overlay also renders settlement/group/signal knowledge,
+  not trader actors. Trader actors must come from the Core actor map and receive
+  Dynamic Trading decoration.
+- Hoomans community geometry uses a separate `communityDebug` snapshot, so a
+  discovered settlement signal and an actual settlement site can currently be
+  visible through different data paths.
 
-## Verification
+### DTHoomans path
 
-- Hoomans: full Lua suite 1008/1008 passed.
-- Core: related map/world/portrait/projection tests 25/25 passed.
-- DynamicTrading: map/presentation tests 5/5 passed.
-- Kahlua: 13 affected/current map-related runtime files checked with zero errors.
-- EN/TL: three new shared Debug keys, valid JSON and matching keys.
-- Added parity tests for ProjectHoomans, DTAbstract and DTHoomans journey projection; wait/pause/live-body guards; raw-state non-mutation; the real shared client list; debug authorization and permission revocation; unknown-hover rejection in both modes; refreshed portrait targets; canonical female portrait conversion; shared debug routes and DTAbstract geography. Earlier repeated-frame cache assertions still pass.
+The intended chain is:
 
-Graph coverage checks reported no recorded parser gaps for inspected paths. Several files were changed or absent from the older index; those were inspected directly. This remains a bounded source-and-harness audit, not proof of native UI behavior or measured FPS.
+`DTCommon trader -> DTHoomans provider -> Hoomans faction/mobile group -> Core
+journey -> Hoomans physical body when nearby -> Core actor projection`
 
-## Remaining native acceptance
+Hoomans' abstract traversal bridge already imports Core journey primitives. The
+remaining work is to make the physical controller, materialization handoff,
+watchdog, rebase, and arrival lifecycle consume the same Core journey contract
+without creating parallel journey truth.
 
-Restart with the updated local Core, Hoomans and DynamicTrading files. In Map Tools enable **Show survivor debug inspection**. Verify non-colonist portraits and routes, movement of a known travelling DTAbstract/Hoomans group, pause/wait behavior, and live body marker accuracy. Verify unknown identities remain non-hoverable with inspection both enabled and disabled. Test DTAbstract with no Hoomans loaded, and MP admin/non-admin permission changes. Compare map performance with the previous smooth version. Existing standalone group/site summaries do not guarantee a portrait for a marker that represents a whole entity rather than an individual actor.
+### DTAbstract path
 
-No Workshop upload, save mutation, discovery grant, native gameplay control, or profiler-setting change was performed. All unrelated in-progress edits were preserved.
+The intended chain is:
+
+`DTCommon trader -> DTAbstract provider -> Core actor/group -> Core abstract
+journey -> Core actor-map projection`
+
+This path must work without Project Hoomans loaded. It must never depend on a
+Hoomans faction, body, pathing service, or Hoomans-only map layer.
+
+### Debug lifecycle
+
+The map Debug window has a stale singleton defect. Its close path clears the
+menu reference but not `PsychopatzMapDebugWindow.instance`; a later open can
+reuse an invisible window that has already been removed from the UI manager.
+This explains the intermittent Debug-button failure. Existing smoke coverage
+does not assert the UI singleton is cleared.
+
+### Performance
+
+The network refresh paths are bounded, but every map render still walks the
+registered Core, Hoomans, and Dynamic Trading overlays. Dense maps therefore
+pay for repeated marker iteration, world-to-screen transforms, labels, hover
+checks, and route lines. A runtime profile is still required before assigning
+one definitive hotspot or selecting an optimization budget.
+
+## Implementation phases
+
+### Phase 1 — shared Debug reliability and diagnostics
+
+- Make Debug `Open`/`Close` idempotent and stale-instance-safe.
+- Add open-close-open and map-close-reopen regression tests.
+- Add a Core marker diagnostic contract containing source, kind, IDs, position,
+  discovery phase, presence mode, materialization state, journey state, and
+  route availability.
+- Keep diagnostics permission-checked and free when disabled.
+
+Gate: Debug reliably opens after repeated use, and every visible marker can be
+classified as actor, abstract group, discovery signal, or settlement site.
+
+### Phase 2 — Core journey/controller contract
+
+- Make Core journey ID, progress, route, rebase, arrival, and cancellation
+  events the only canonical movement lifecycle.
+- Keep Project Zomboid pathfinding and live-body details behind a Hoomans
+  controller adapter.
+- Preserve the abstract Core controller for DTAbstract.
+- Ensure materialization changes presence state only; it never creates a new
+  actor or journey.
+
+Gate: abstract and physical actors have identical Core identity and journey
+state before, during, and after handoff.
+
+### Phase 3 — provider parity
+
+- DTHoomans: validate nearby materialization, remote dematerialization, body
+  lease recovery, physical position authority, and one-time arrival forwarding.
+- DTAbstract: validate no-Hoomans loading, permanent abstract projection, route
+  interpolation, waits, pause, arrival, and save/reload.
+- Make disabled-provider behavior fail closed without breaking Core or the
+  remaining provider.
+
+Gate: both profiles produce the same actor-map marker contract; only presence
+mode differs.
+
+### Phase 4 — settlement and discovery reconciliation
+
+- Expose one Core settlement/site projection.
+- Let Hoomans and Dynamic Trading contribute metadata through adapters.
+- Replace ambiguous `Unknown signal` labels with kind, phase, and known identity
+  when available.
+- Explicitly distinguish discovery knowledge from confirmed settlement geometry.
+
+Gate: settlement signals, sites, traders, and abstract groups cannot be
+mistaken for one another in the map or diagnostics.
+
+### Phase 5 — measured performance work
+
+- Instrument overlay time, marker counts, route segments, label counts, snapshot
+  sizes, and request counts.
+- Add revision-based projection caches and visible-bounds filtering.
+- Apply label level-of-detail and bounded route rendering for dense maps.
+- Verify that disabled debug layers perform no work.
+
+Gate: dense-map profiling shows bounded work and no provider causes duplicate
+actor markers or unbounded refreshes.
+
+## Validation matrix
+
+- Core only.
+- Project Hoomans only.
+- Project Hoomans + DTHoomans, nearby materialized trader.
+- Project Hoomans + DTHoomans, remote abstract trader.
+- Core + standalone DTAbstract with Hoomans disabled.
+- Both provider packages present but only one owns a trader record.
+- Save/reload during travel.
+- Arrival and rebase during materialization handoff.
+- Repeated map open, Debug open/close, pan, zoom, hover, and tracking.
+- Dense populated map with each debug layer disabled and enabled.
+
+## Evidence status
+
+- `CODE_VERIFIED`: Core owns the canonical actor-map engine and exposes the
+  provider-neutral travel primitives.
+- `CODE_VERIFIED`: Hoomans abstract traversal and DTAbstract use Core travel
+  primitives.
+- `CODE_VERIFIED`: DTHoomans is registered as a physical provider and routes
+  commercial movement through Hoomans mobile-group services.
+- `STATIC_ONLY`: physical DTHoomans materialization parity and native map
+  performance have not been verified in a live Project Zomboid session.
+- `RECORDED_NOT_RERUN`: existing focused and full harness results recorded in
+  `PROGRESS.md`.
+
+## Phase 1 implementation result — 2026-11-09
+
+- Core Debug close now clears both the menu and window singleton; `Open` closes
+  stale invisible instances before creating or reusing a modal.
+- Core `MapMarkerDiagnostics` normalizes bounded provider rows and summarizes
+  kind, source, presence, and integration errors. The authorized map Debug menu
+  opens a throttled inspector with explicit `MARKER DIAGNOSTICS: ON/OFF` state.
+- Core actor diagnostics classify provider lease state as `materialized` or
+  `abstract` and retain actor, trader, body, group, community, journey, and
+  route fields. Hoomans and DTAbstract register their non-actor marker types
+  through the same Core registry.
+- Focused implementation tests passed: Core Debug/diagnostics/actor **4/4**,
+  Hoomans map **5/5**, and DynamicTrading DTAbstract map/host **4/4**.
+- `luac -p`, PZ Kahlua verification, and `git diff --check` passed for the
+  changed Lua surfaces. Runtime materialization and dense-map performance are
+  still `STATIC_ONLY`.
+
+## Audit execution — 2026-11-09
+
+The architecture scanner covered the Project Hoomans repository with health
+80.2, coverage 76.9, confidence 62.5, and pressure 100. Its broad findings
+include pre-existing Director/Communities dependency cycles and large domain
+functions. Those are not being treated as blockers for this map vertical slice;
+the migration will use narrow public contracts rather than refactor unrelated
+domains.
+
+Graph and source verification established:
+
+- Core `ActorMap.BuildMarkers` is the canonical marker assembly point. It
+  prefers Core actors, deduplicates optional sources by actor ID, and applies
+  provider decorators before rendering.
+- Core actor rendering is called from the Core map host every map render. The
+  actor data and network roster are cached, but screen transforms, hover tests,
+  labels, dots, and eligible routes remain per-render work.
+- DTCommon joins trader records to Core actor projections and carries journey,
+  route, provider state, and body ID into the trader view. A trader without a
+  Core actor projection cannot receive the canonical trader marker.
+- DTHoomans reads the live Hoomans body position while materialized; otherwise
+  it uses the Core abstract world projection. Dematerialization captures the
+  body position and rebases the remaining Core journey before provider release.
+- DTHoomans starts commercial movement through Hoomans mobile-group services;
+  Hoomans' traversal bridge commits the resulting group journey through Core.
+  DTAbstract starts and advances its abstract journey directly through Core.
+
+Focused audit tests passed: Hoomans map/travel **7/7**, DynamicTrading
+provider/map **9/9**, and Core map/travel/debug **5/5**. These are harness
+results, not native UI or FPS proof. Core and Dynamic Trading graph coverage was
+partly marked metadata-changed/not-tracked, and several Hoomans map files were
+missing coverage records; those findings were verified by direct source reads.
+
+No native game launch, save mutation, Workshop publication, or profiler-setting
+change is part of this implementation slice.

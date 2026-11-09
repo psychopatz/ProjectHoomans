@@ -2,6 +2,8 @@
 
 require "ISUI/Maps/ISWorldMap"
 require "PNC/WorldDiscovery/PNC_WorldDiscoveryPresentation"
+local MarkerDiagnostics = require
+    "PsychopatzCore/UI/Map/PsychopatzMapMarkerDiagnostics"
 
 PNC = PNC or {}
 PNC.WorldDiscoveryMapLayer = PNC.WorldDiscoveryMapLayer or {}
@@ -185,6 +187,35 @@ function Layer.FindAt(map, mouseX, mouseY, padding)
     return best
 end
 
+function Layer.ListDiagnostics()
+    local output = {}
+    for _, entity in ipairs(State.worldDiscovery
+        and State.worldDiscovery.entities or {})
+    do
+        if entity.x and entity.y then
+            output[#output + 1] = {
+                kind = "discovery_signal",
+                source = "ProjectHoomans:WorldDiscovery",
+                id = tostring(entity.entityID or ""),
+                entityID = entity.entityID,
+                signalKind = entity.kind,
+                phase = tonumber(entity.phase) or 0,
+                phaseName = entity.phaseName,
+                label = labelFor(entity),
+                position = {
+                    x = tonumber(entity.x), y = tonumber(entity.y),
+                    z = tonumber(entity.z) or 0,
+                },
+                presence = "unknown",
+                resolved = isResolved(entity),
+                approximate = entity.approximate == true,
+                rendered = visible() and not isResolved(entity),
+            }
+        end
+    end
+    return output
+end
+
 function Layer.Render(map)
     if not visible() or not map or not map.mapAPI then return end
     local now = PNC.Core.Now()
@@ -234,6 +265,12 @@ if PNC.MapLayers and PNC.MapLayers.Register then
         render = Layer.Render,
     })
 end
+
+MarkerDiagnostics.RegisterSource("ProjectHoomans:WorldDiscovery", {
+    kind = "discovery_signal",
+    priority = 70,
+    list = Layer.ListDiagnostics,
+})
 
 if PNC.TravelDirectory and PNC.TravelDirectory.RegisterVisibilityFilter then
     PNC.TravelDirectory.RegisterVisibilityFilter(

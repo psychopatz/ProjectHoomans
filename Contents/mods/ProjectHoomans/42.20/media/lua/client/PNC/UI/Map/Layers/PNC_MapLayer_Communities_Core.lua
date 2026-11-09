@@ -4,6 +4,8 @@ require "ISUI/Maps/ISWorldMap"
 require "ISUI/ISContextMenu"
 require "PNC/Presentation/PNC_NPCTypePalette"
 require "PNC/UI/Factions/PNC_FactionEmblemRenderer"
+local MarkerDiagnostics = require
+    "PsychopatzCore/UI/Map/PsychopatzMapMarkerDiagnostics"
 
 PNC = PNC or {}
 PNC.CommunityMapLayer = PNC.CommunityMapLayer or {}
@@ -12,7 +14,6 @@ local CommunityLayer = PNC.CommunityMapLayer
 local Layers = PNC.MapLayers
 local ClientState = PNC.Network.ClientState
 local Palette = PNC.NPCTypePalette
-local TravelLayer = PNC.MapTravelLayer
 local EmblemRenderer = PNC.FactionEmblemRenderer
 
 local function text(key, fallback)
@@ -321,5 +322,42 @@ Internal.PointSegmentDistance = pointSegmentDistance
 Internal.BoundsLineDistance = boundsLineDistance
 Internal.RadiusLineDistance = radiusLineDistance
 Internal.LineDistance = lineDistance
+
+function CommunityLayer.ListDiagnostics()
+    local snapshot = ClientState.communityDebug or {}
+    local lookup = communitiesBySite(snapshot)
+    local output = {}
+    for _, site in ipairs(snapshot.sites or {}) do
+        local home = site.home
+        if home and home.x and home.y then
+            local community = lookup[site.id]
+            output[#output + 1] = {
+                kind = "settlement_site",
+                source = "ProjectHoomans:Communities",
+                id = tostring(site.id or ""),
+                siteID = site.id,
+                communityID = community and community.id,
+                label = labelFor(site, community),
+                status = site.status,
+                siteKind = site.kind,
+                position = {
+                    x = tonumber(home.x), y = tonumber(home.y),
+                    z = tonumber(home.z) or 0,
+                },
+                radius = tonumber(home.radius),
+                presence = "settlement",
+                rendered = isVisible()
+                    and ClientState.communityDebugAuthorized == true,
+            }
+        end
+    end
+    return output
+end
+
+MarkerDiagnostics.RegisterSource("ProjectHoomans:Communities", {
+    kind = "settlement_site",
+    priority = 60,
+    list = CommunityLayer.ListDiagnostics,
+})
 
 return CommunityLayer

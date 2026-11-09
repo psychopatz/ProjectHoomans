@@ -1,4 +1,6 @@
 local BodyBinding = require "PNC/PresenceSync/PNC_MultiplayerBodyBinding_Runtime"
+local ActorMap = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldActorMap"
 local Internal = PNC.Client.Internal
 local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
@@ -11,10 +13,8 @@ local refreshClientBodyIdentityIndex =
     Internal.RefreshClientBodyIdentityIndex
 
 local function invalidateMapTravelCache()
-    if PNC.MapTravelLayer
-        and PNC.MapTravelLayer.InvalidateEntryCache
-    then
-        PNC.MapTravelLayer.InvalidateEntryCache()
+    if ActorMap and type(ActorMap.InvalidateCache) == "function" then
+        ActorMap.InvalidateCache()
     end
 end
 

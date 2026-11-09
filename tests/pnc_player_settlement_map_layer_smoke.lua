@@ -14,6 +14,16 @@ local markerBlocksSettlement = false
 local basesVisible = true
 local emblemDraw
 
+package.preload[
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldActorMap"
+] = function()
+    return {
+        FindMarkerAt = function()
+            return markerBlocksSettlement and { id = "npc" } or nil
+        end,
+    }
+end
+
 ISWorldMap = {}
 UIFont = { Small = "small" }
 getText = function(key)
@@ -47,11 +57,6 @@ PNC = {
         Register = function(id, definition)
             registered = { id = id, definition = definition }
             return true
-        end,
-    },
-    MapTravelLayer = {
-        FindMarkerAt = function()
-            return markerBlocksSettlement and { id = "npc" } or nil
         end,
     },
     FactionEmblemRenderer = {

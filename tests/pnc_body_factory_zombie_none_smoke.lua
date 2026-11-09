@@ -27,6 +27,7 @@ local function makeBody()
         setGodMod = function(_, value) record.godMod = value end,
         setHealth = function(_, value) record.health = value end,
         setFemaleEtc = function(_, value) record.female = value end,
+        setSceneCulled = function(_, value) record.sceneCulled = value == true end,
         dressInPersistentOutfit = function(_, outfit)
             record.carrierOutfit = outfit
             record.outfitID = 424242
@@ -113,6 +114,8 @@ T.equal(fallbackRecord.godMod, false,
     "fallback body retained engine invulnerability")
 T.equal(fallbackRecord.health, 1,
     "fallback body health does not match the shell")
+T.equal(fallbackRecord.sceneCulled, true,
+    "fallback body was exposed to the renderer before configuration")
 T.equal(fallbackRecord.female, true,
     "fallback body gender hint was not applied")
 T.equal(owned, 1, "fallback body was not marked as owned")
@@ -149,6 +152,12 @@ T.equal(fallbackBody:getModData().PNC_UUID, nil,
     "primary factory stamped identity before materialization")
 T.equal(fallbackRecord.female, nil,
     "primary bodies must not be re-configured by the factory")
+T.equal(fallbackRecord.sceneCulled, true,
+    "primary body was exposed to the renderer before configuration")
+T.truthy(Lifecycle.ReleaseInitialBodyRender(fallbackBody),
+    "render gate could not be released")
+T.equal(fallbackRecord.sceneCulled, false,
+    "render gate did not release the configured body")
 
 -- Both factories fail: a typed reason must be returned, and the spawn window
 -- must still close so the next spawn is not rejected as re-entrant.

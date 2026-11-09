@@ -37,6 +37,27 @@ local function refreshCoreViews()
     return extensions.RebuildAll(registry:Snapshot())
 end
 
+local function cutoverPending()
+    local extensions = PNC.SurvivorWorldExtensions
+    return extensions ~= nil
+        and extensions.Active ~= true
+        and type(extensions.ActivateCutover) == "function"
+end
+
+function Communities.ReconcileLoadedView(reason)
+    local changed = false
+    if not authority() then return false, "not_authority" end
+    if not Communities.Loaded then return false, "not_loaded" end
+
+    changed = reconcileNPCReferences() or changed
+    changed = rebuildDerivedIndexes() or changed
+    changed = reconcileLeaders() or changed
+    Communities.Ready = true
+    Communities.LoadDeferred = nil
+    Communities.LastLoadReason = reason
+    return true, changed
+end
+
 function Communities.Load()
     local raw
     local sourceRaw
@@ -48,7 +69,10 @@ function Communities.Load()
     if PNC.Factions and PNC.Factions.EnsureLoaded then
         PNC.Factions.EnsureLoaded()
     end
-    local refreshed = refreshCoreViews()
+    local refreshed, refreshReason = refreshCoreViews()
+    if not refreshed and refreshReason ~= "cutover_not_active" then
+        return false, refreshReason
+    end
     if not refreshed then
         local reason
         raw, reason, sourceRaw = ImportSource.Read("communities")
@@ -66,10 +90,14 @@ function Communities.Load()
                 "community_world_view_import"
             )
         end
+        if cutoverPending() then
+            Communities.Ready = false
+            Communities.LoadDeferred = true
+            Communities.LastLoadReason = "cutover_pending"
+            return true, Communities.Dirty
+        end
+        return Communities.ReconcileLoadedView("registry_load")
     end
-    reconcileNPCReferences()
-    rebuildDerivedIndexes()
-    reconcileLeaders()
     return true, Communities.Dirty
 end
 
@@ -81,6 +109,8 @@ function Communities.LoadRaw(raw)
     if not authority() then return false, "not_authority" end
     Communities.Registry = Types.NormalizeRegistry(raw)
     Communities.Loaded = true
+    Communities.Ready = true
+    Communities.LoadDeferred = nil
     Communities.Dirty = false
     return true, "loaded_raw"
 end

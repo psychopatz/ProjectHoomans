@@ -6,7 +6,7 @@ require "ISUI/ISButton"
 PNC = PNC or {}
 local Tracking = PNC.MapTracking
     or require "PNC/UI/Map/PNC_MapTracking"
-local Menu = require "PsychopatzCore/UI/Map/PsychopatzMapToolsMenu"
+local Host = require "PsychopatzCore/UI/Map/PsychopatzMapHost"
 
 local function text(key, fallback)
     local value = getText and PNC.Translation.GetKey(key) or nil
@@ -151,9 +151,11 @@ function Tracking.Close()
     if Tracking.instance then Tracking.instance:close() end
 end
 
-if Menu and Menu.Register then
-    Menu.Register("ProjectHoomans:track_base", {
-        order = 30,
+if Host and Host.Tools and Host.Tools.Register then
+    Host.Tools.Register("ProjectHoomans:track_base", {
+        order = 10,
+        field = "pncTrackButton",
+        width = 88,
         title = function()
             local value = getText and PNC.Translation.GetKey(
                 "UI_PNC_MapTrack_Button")
@@ -169,10 +171,7 @@ if Menu and Menu.Register then
         end,
         icon = "media/ui/MP/mp_ui_internet.png",
         iconSize = 22,
-        onActivate = function()
-            Menu.Close()
-            return Tracking.Open() ~= nil
-        end,
+        onActivate = function() return Tracking.Open() ~= nil end,
         onMapClose = Tracking.Close,
     })
 end

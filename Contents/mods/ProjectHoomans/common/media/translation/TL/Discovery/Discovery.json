@@ -9,6 +9,7 @@
     "UI_PNC_DebugDiscoveryHint": "Hindi na pinapalitan ng mga tool sa pagtuklas ang menu ng konteksto ng mapa.",
     "UI_PNC_DebugDiscoveryReset": "I-reset ang mga natuklasan ng character na ito",
     "UI_PNC_DebugDiscoveryShowRaw": "[PNC PAG-DEBUG] Ipakita undiscovered entity overlays",
+    "UI_PNC_DebugDiscoveryRawLabel": "RAW HOOMANS OVERLAYS",
     "UI_PNC_DebugDiscoveryTitle": "Pag-debug ng Mundo ng NPC",
     "UI_PNC_DiscoveryCall": "Tumawag / triangulate",
     "UI_PNC_Discovery_ApproximatePosition": "Tinatayang posisyon; muling mag-scan para matukoy.",

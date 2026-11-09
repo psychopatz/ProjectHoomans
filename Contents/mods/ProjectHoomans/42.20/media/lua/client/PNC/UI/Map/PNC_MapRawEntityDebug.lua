@@ -6,8 +6,10 @@ PNC.MapRawEntityDebug = PNC.MapRawEntityDebug or {}
 
 local CoreMap = require
     "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldClient"
+local ActorMap = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldActorMap"
 local DebugMap = PNC.MapRawEntityDebug
-local Menu = require "PsychopatzCore/UI/Map/PsychopatzMapToolsMenu"
+local Hub = require "PsychopatzCore/UI/PsychopatzDebugHubRegistry"
 
 DebugMap.ShowRawEntities = DebugMap.ShowRawEntities == true
 
@@ -17,6 +19,12 @@ local function text(key, fallback)
         and translation.GetKey(key) or nil
     if value and value ~= "" and value ~= key then return value end
     return fallback or key
+end
+
+local function menuTitle()
+    local label = text("UI_PNC_DebugDiscoveryRawLabel",
+        "RAW HOOMANS OVERLAYS")
+    return label .. (DebugMap.IsEnabled() and ": ON" or ": OFF")
 end
 
 local function canDebug()
@@ -48,40 +56,29 @@ function DebugMap.ToggleRawEntities()
             PNC.Client.RequestDirectorDebug()
         end
     end
-    if PNC.MapTravelLayer
-        and type(PNC.MapTravelLayer.InvalidateEntryCache) == "function" then
-        PNC.MapTravelLayer.InvalidateEntryCache()
-    end
-    if Menu.instance and type(Menu.instance.syncButtons) == "function" then
-        Menu.instance:syncButtons()
+    if ActorMap and type(ActorMap.InvalidateCache) == "function" then
+        ActorMap.InvalidateCache()
     end
     return DebugMap.ShowRawEntities
 end
 
-if Menu and type(Menu.Register) == "function" then
-    Menu.Register("ProjectHoomans:raw_entities", {
-        order = 40,
-        visible = function()
-            return canDebug() and not (Menu.EntriesByID
-                and Menu.EntriesByID["PsychopatzCore:actor_debug_presentation"])
-        end,
-        title = function()
-            return text(
-                DebugMap.IsEnabled()
-                    and "UI_PNC_DebugDiscoveryHideRaw"
-                    or "UI_PNC_DebugDiscoveryShowRaw",
-                DebugMap.IsEnabled()
-                    and "Hide raw Hoomans overlays"
-                    or "Show raw Hoomans overlays"
-            )
-        end,
-        tooltip = function()
+if Hub and type(Hub.RegisterTool) == "function" then
+    Hub.RegisterTool({
+        id = "pnc.map.raw_entities",
+        title = text("UI_PNC_DebugDiscoveryShowRaw",
+            "Toggle raw Hoomans overlays"),
+        description = text("UI_PNC_DebugDiscoveryRawHelp",
+            "Toggle undiscovered Hoomans entity overlays."),
+        source = "Project Hoomans",
+        surface = "map",
+        menuTitle = menuTitle,
+        menuTooltip = function()
             return text("UI_PNC_DebugDiscoveryRawHelp",
                 "Toggle undiscovered Hoomans entity overlays.")
         end,
-        onActivate = function()
-            return DebugMap.ToggleRawEntities()
-        end,
+        order = 80,
+        available = canDebug,
+        action = function() return DebugMap.ToggleRawEntities() end,
     })
 end
 

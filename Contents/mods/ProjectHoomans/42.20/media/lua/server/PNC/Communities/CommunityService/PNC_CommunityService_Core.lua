@@ -16,6 +16,7 @@ local FactionTypes = PNC.FactionTypes
 
 Communities.Registry = Communities.Registry or Types.NewRegistry()
 Communities.Loaded = Communities.Loaded or false
+Communities.Ready = Communities.Ready == true
 Communities.Dirty = Communities.Dirty or false
 Communities.IDGenerator = Communities.IDGenerator
     or function()

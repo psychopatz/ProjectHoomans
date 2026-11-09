@@ -67,11 +67,16 @@ function Starting.Ensure(player, characterUUID, at)
     local needsWork = false
     for index = 1, #selections do
         local grant = state.grants[selections[index].id]
+        local existing = grant and grant.npcID
+            and Registry.Get(grant.npcID) or nil
         if not grant or grant.status ~= "granted"
             or (tonumber(grant.enrichmentVersion) or 0)
                 < Starting.ENRICHMENT_VERSION
             or (tonumber(grant.relationshipKeyVersion) or 0)
                 < Starting.RELATIONSHIP_KEY_VERSION
+            or (grant.status == "granted"
+                and (not existing
+                    or not H.HasCanonicalAssignment(player, existing)))
         then
             needsWork = true
             break
