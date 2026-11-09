@@ -144,3 +144,21 @@ DTHoomans, and DTCommon adapter gates remain next. The boundary is recorded in
 provider-neutral DTCommon descriptors plus DTAbstract abstract and DTHoomans
 physical callback adapters, keeping merchant policy in DTCommon and physical
 materialization in DTHoomans only.
+
+## P2-C result
+
+Core provider descriptors now carry the bounded
+`semantic.harness_execution.v1` callback declaration. DynamicTrading adds a
+thin `tools/semantic_harness/provider_adapters.py` manifest that composes
+`PsychopatzCore + DTCommon + DTAbstract` as `dtabstract` and
+`PsychopatzCore + DTCommon + DTHoomans` as `dthoomans`. The profiles share the
+same callback contract; only materialization mode and provider capabilities
+differ. DTCommon remains merchant-policy owner and no legacy worker files were
+deleted.
+
+## Next Chunk
+
+**P2-D — connect profile selection to the Core-owned worker.** Add an explicit
+Core profile-loader/worker bootstrap seam that can consume the optional DT
+manifest without importing Hoomans or creating a DT worker. Keep the current
+Hoomans worker as a compatibility path until P3/P4 gates pass.

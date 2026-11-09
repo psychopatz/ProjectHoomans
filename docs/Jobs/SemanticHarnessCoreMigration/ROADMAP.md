@@ -40,14 +40,17 @@ provider descriptor without importing Hoomans modules by default.
 Move generic conversation/session, interaction routing, identity, relationship,
 knowledge, and observation interfaces into Core. Keep provider policy behind
 capability callbacks. Gate: Hoomans, DTAbstract, and DTHoomans resolve the same
-Core interaction contract with their own provider capabilities.
+Core interaction contract with their own provider capabilities. P2-C records
+the shared execution descriptor and Dynamic Trading's abstract/physical
+profile compositions; P2-D connects those profiles to the Core-owned worker.
 
 ### P3 — Provider adapters and materialization
 
 Replace Hoomans/DT duplicated worker bootstrap and DynamicTrading-specific
-paths with thin adapters. Make physical materialization an optional Hoomans
-capability and abstract simulation the DTAbstract capability. Gate: providers
-can be enabled or disabled independently without missing-module failures.
+paths with thin adapters. Make physical materialization an optional
+Hoomans/DTHoomans capability and abstract simulation the DTAbstract capability.
+Gate: providers can be enabled or disabled independently without missing-
+module failures.
 
 ### P4 — Test migration and legacy removal
 
