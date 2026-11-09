@@ -30,6 +30,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             repository=arguments.repository,
             core_repository=arguments.core_repository,
             lua_bin=arguments.lua,
+            profile=arguments.profile,
             startup_timeout=arguments.startup_timeout,
             request_timeout=arguments.timeout,
             json_output=arguments.doctor_json,

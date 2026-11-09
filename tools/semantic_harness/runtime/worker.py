@@ -37,6 +37,7 @@ class LuaSemanticWorker:
         repository: Path | None = None,
         core_repository: Path | None = None,
         worker_script: Path | None = None,
+        profile: str = "hoomans",
         startup_timeout: float = 8.0,
         request_timeout: float = 5.0,
         shutdown_timeout: float = 1.0,
@@ -59,7 +60,8 @@ class LuaSemanticWorker:
             repository=repository or REPOSITORY,
             core_repository=core_repository or CORE_REPOSITORY,
             lua_bin=lua_bin,
-            worker_script=worker_script or LUA_WORKER,
+            worker_script=worker_script,
+            profile=profile,
             startup_timeout=startup_timeout,
             request_timeout=request_timeout,
             shutdown_timeout=shutdown_timeout,
@@ -87,7 +89,8 @@ class LuaSemanticWorker:
         self._sources = WorkerSourceOperations(self)
         try:
             self.runtime.start()
-            self.import_source(scenario)
+            if self.config.profile != "core":
+                self.import_source(scenario)
         except Exception:
             self.runtime.close()
             raise
@@ -790,6 +793,8 @@ class LuaSemanticWorker:
 
     def capabilities(self) -> dict[str, Any]:
         capabilities = self._request("CAPABILITIES")
+        if self.config.profile == "core":
+            return capabilities
         # Keep the capability handshake bounded as the generated production
         # catalog grows. The catalog remains available through the same
         # production FlowEditor seam, but is fetched as its own bounded
@@ -811,6 +816,8 @@ class LuaSemanticWorker:
 
         self.runtime.close()
         self.runtime.start()
+        if self.config.profile == "core":
+            return self.capabilities()
         source = self.source_snapshot.to_dict()
         return self.import_source(
             source["data"],

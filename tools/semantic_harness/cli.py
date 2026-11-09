@@ -441,6 +441,7 @@ def cli(arguments: argparse.Namespace) -> int:
             "lua_bin": arguments.lua,
             "repository": Path(arguments.repository) if arguments.repository else None,
             "core_repository": Path(arguments.core_repository) if arguments.core_repository else None,
+            "profile": arguments.profile,
             "startup_timeout": arguments.startup_timeout,
             "request_timeout": arguments.timeout,
             "shutdown_timeout": arguments.shutdown_timeout,
@@ -1008,6 +1009,12 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--lua", help="Lua executable; defaults to PNC_HARNESS_LUA, lua, or luajit")
     parser.add_argument("--repository", help="Project Hoomans repository")
     parser.add_argument("--core-repository", help="PsychopatzCore repository")
+    parser.add_argument(
+        "--profile",
+        default="hoomans",
+        choices=("hoomans", "core"),
+        help="worker profile; core selects the Core-only worker explicitly",
+    )
     parser.add_argument(
         "--dynamic-trading-repository",
         help="DynamicTrading repository containing the DTCommon package",

@@ -31,6 +31,7 @@ def run_doctor(
     repository: str | Path | None = None,
     core_repository: str | Path | None = None,
     lua_bin: str | Path | None = None,
+    profile: str = "hoomans",
     startup_timeout: float = 8.0,
     request_timeout: float = 5.0,
     json_output: bool = False,
@@ -129,6 +130,7 @@ def run_doctor(
                 repository=resolved_repository,
                 core_repository=resolved_core,
                 lua_bin=resolved_lua,
+                profile=profile,
                 startup_timeout=startup_timeout,
                 request_timeout=request_timeout,
             )

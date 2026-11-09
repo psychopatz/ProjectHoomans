@@ -8,9 +8,14 @@ import unittest
 
 from tools.semantic_harness.runtime.config import (
     ConfigurationError,
+    HarnessConfig,
     discover_newest_runtime,
     discover_dynamic_trading_runtime,
 )
+
+
+REPOSITORY = Path(__file__).resolve().parents[3]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
 class RuntimeConfigTests(unittest.TestCase):
@@ -39,6 +44,25 @@ class RuntimeConfigTests(unittest.TestCase):
             (root / "Contents/mods/DTCommon/42.21").mkdir()
 
             self.assertEqual(discover_dynamic_trading_runtime(root), "42.20")
+
+    def test_core_profile_selects_core_worker_without_hoomans_runtime(self) -> None:
+        config = HarnessConfig.discover(
+            repository=REPOSITORY,
+            core_repository=CORE_REPOSITORY,
+            lua_bin="lua",
+            profile="core",
+        )
+
+        self.assertEqual(config.profile, "core")
+        self.assertIsNone(config.hoomans_runtime)
+        self.assertIsNone(config.dynamic_trading_repository)
+        self.assertEqual(
+            config.worker_script,
+            (
+                CORE_REPOSITORY
+                / "tools/semantic_harness/lua/worker.lua"
+            ).resolve(),
+        )
 
 
 if __name__ == "__main__":

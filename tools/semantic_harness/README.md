@@ -255,6 +255,12 @@ discovery/version, worker syntax, repository paths, and the real worker
 on `PATH`, and set `PNC_HARNESS_CORE_REPOSITORY` when the core checkout is not
 next to Project Hoomans.
 
+The generic Python worker client is owned by PsychopatzCore. This package keeps
+`runtime/process.py` as a compatibility adapter for existing Hoomans callers.
+The default `hoomans` profile still loads the Hoomans production worker. Use
+`--profile core` explicitly to boot the standalone Core worker without loading
+PNC production modules.
+
 Python venv isolation does not bundle Lua. The launcher therefore discovers an
 explicit Lua executable or reports a bounded actionable error; it does not
 silently replace deterministic Lua semantics with an LLM.

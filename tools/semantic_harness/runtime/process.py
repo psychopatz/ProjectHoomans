@@ -1,170 +1,129 @@
-"""Bounded, correlated JSON-lines client for the persistent Lua worker."""
+"""Compatibility adapter to the Core-owned semantic worker client.
+
+The Hoomans package keeps this import path for existing callers, but the
+process lifecycle, protocol correlation, bounded diagnostics, and shutdown
+handling now live in PsychopatzCore.
+"""
 
 from __future__ import annotations
 
+import importlib
 import os
-import queue
-import signal
-import subprocess
-import threading
-import time
-import weakref
-from collections import deque
+import sys
+from pathlib import Path
 from typing import Any
 
-from .config import HarnessConfig
-from .protocol import ProtocolError, decode_message, encode_request
-from .activity import ActivityLog
+
+def _load_core_process(core_repository: str | Path | None = None) -> Any:
+    candidates: list[Path] = []
+    if core_repository:
+        candidates.append(Path(core_repository).expanduser().resolve())
+    for name in (
+        "SEMANTIC_HARNESS_CORE_REPOSITORY",
+        "PNC_HARNESS_CORE_REPOSITORY",
+    ):
+        value = os.environ.get(name)
+        if value:
+            candidates.append(Path(value).expanduser().resolve())
+    candidates.append(
+        Path(__file__).resolve().parents[3].parent / "psychopatzCore"
+    )
+    for candidate in candidates:
+        tools_root = candidate / "tools"
+        package_root = tools_root / "semantic_harness"
+        if not (package_root / "process.py").is_file():
+            continue
+        rendered = str(tools_root)
+        if rendered not in sys.path:
+            sys.path.insert(0, rendered)
+        return importlib.import_module("semantic_harness.process")
+    raise ImportError(
+        "Core semantic harness process client is unavailable; checked: "
+        + ", ".join(str(candidate) for candidate in candidates)
+    )
 
 
-_ACTIVE_PROCESSES: weakref.WeakSet["LuaProcess"] = weakref.WeakSet()
-_SHUTDOWN_HANDLER_INSTALLED = False
+_CORE_PROCESS = _load_core_process()
+HarnessError = _CORE_PROCESS.HarnessError
+install_shutdown_handler = _CORE_PROCESS.install_shutdown_handler
 
 
-def install_shutdown_handler() -> None:
-    """Ensure external termination closes every active Lua child first."""
+def _launch_spec(config: Any) -> Any:
+    core_process = _load_core_process(config.core_repository)
+    profile = str(getattr(config, "profile", "hoomans") or "hoomans").lower()
+    environment = {
+        # These legacy names are still required by the compatibility Hoomans
+        # worker. Core's worker client itself uses neutral SEMANTIC_HARNESS_*
+        # names and does not depend on these aliases.
+        "PNC_HARNESS_REPOSITORY": str(config.repository),
+        "PNC_HARNESS_CORE_REPOSITORY": str(config.core_repository),
+        "PZ_TEST_REPOSITORY": str(config.repository),
+        "PZ_TEST_CORE_REPOSITORY": str(config.core_repository),
+    }
+    if getattr(config, "candidate_overlay_root", None) is not None:
+        environment["PNC_HARNESS_CANDIDATE_OVERLAY_ROOT"] = str(
+            config.candidate_overlay_root
+        )
+        environment["PNC_HARNESS_CANDIDATE_OVERLAY_MODULE"] = (
+            config.candidate_overlay_module or ""
+        )
+    if getattr(config, "hoomans_runtime", None) is not None:
+        environment["PZ_TEST_HOOMANS_RUNTIME"] = config.hoomans_runtime
+    if getattr(config, "core_runtime", None) is not None:
+        environment["PZ_TEST_CORE_RUNTIME"] = config.core_runtime
+    if getattr(config, "dynamic_trading_repository", None) is not None:
+        environment["PNC_HARNESS_DYNAMIC_TRADING_REPOSITORY"] = str(
+            config.dynamic_trading_repository
+        )
+    if getattr(config, "dynamic_trading_runtime", None) is not None:
+        environment["PZ_TEST_DYNAMIC_TRADING_RUNTIME"] = (
+            config.dynamic_trading_runtime
+        )
 
-    global _SHUTDOWN_HANDLER_INSTALLED
-    if _SHUTDOWN_HANDLER_INSTALLED or threading.current_thread() is not threading.main_thread():
-        return
-
-    def handle_signal(signum: int, _frame: Any) -> None:
-        for runtime in list(_ACTIVE_PROCESSES):
-            runtime.close()
-        raise SystemExit(128 + signum)
-
-    signal.signal(signal.SIGTERM, handle_signal)
-    signal.signal(signal.SIGINT, handle_signal)
-    _SHUTDOWN_HANDLER_INSTALLED = True
-
-
-class HarnessError(RuntimeError):
-    """A bounded worker lifecycle or protocol failure."""
+    worker_arguments = (
+        (str(config.core_repository),)
+        if profile == "core"
+        else (str(config.repository), str(config.core_repository))
+    )
+    return core_process.WorkerLaunchSpec(
+        lua_bin=config.lua_bin,
+        worker_script=config.worker_script,
+        core_repository=config.core_repository,
+        working_directory=config.repository,
+        profile=profile,
+        worker_arguments=worker_arguments,
+        environment=environment,
+        startup_timeout=config.startup_timeout,
+        request_timeout=config.request_timeout,
+        shutdown_timeout=config.shutdown_timeout,
+        max_message_bytes=config.max_message_bytes,
+    )
 
 
 class LuaProcess:
-    """Own one Lua child process and serialize all requests through it."""
+    """Preserve the Hoomans runtime API while delegating to Core."""
 
-    def __init__(
-        self, config: HarnessConfig, activity_log: ActivityLog | None = None
-    ) -> None:
+    def __init__(self, config: Any, activity_log: Any | None = None) -> None:
         self.config = config
-        self.activity_log = activity_log
-        self.process: subprocess.Popen[bytes] | None = None
-        self._state = "STOPPED"
-        self._state_lock = threading.RLock()
-        self._request_lock = threading.Lock()
-        self._pending_lock = threading.Lock()
-        self._pending: dict[str, queue.Queue[dict[str, Any]]] = {}
-        self._hello: queue.Queue[dict[str, Any]] = queue.Queue(maxsize=1)
-        self._stderr: deque[str] = deque(maxlen=32)
-        self._failure: str | None = None
-        self._request_sequence = 0
-        self._reader_thread: threading.Thread | None = None
-        self._stderr_thread: threading.Thread | None = None
+        core_process = _load_core_process(config.core_repository)
+        self._delegate = core_process.LuaProcess(
+            _launch_spec(config),
+            activity_log=activity_log,
+        )
+
+    @property
+    def process(self) -> Any:
+        return self._delegate.process
 
     @property
     def state(self) -> str:
-        with self._state_lock:
-            return self._state
+        return self._delegate.state
 
     def status(self) -> dict[str, Any]:
-        process = self.process
-        return {
-            "state": self.state,
-            "pid": process.pid if process is not None else None,
-            "returncode": process.poll() if process is not None else None,
-            "failure": self._failure,
-            "stderr": list(self._stderr),
-        }
+        return self._delegate.status()
 
     def start(self) -> dict[str, Any]:
-        with self._state_lock:
-            if self._state not in {"STOPPED", "FAILED"}:
-                raise HarnessError(f"worker is already {self._state.lower()}")
-            self._state = "STARTING"
-            self._failure = None
-        environment = os.environ.copy()
-        environment.update(
-            {
-                "PNC_HARNESS_REPOSITORY": str(self.config.repository),
-                "PNC_HARNESS_CORE_REPOSITORY": str(self.config.core_repository),
-                "PZ_TEST_REPOSITORY": str(self.config.repository),
-                "PZ_TEST_CORE_REPOSITORY": str(self.config.core_repository),
-            }
-        )
-        if self.config.candidate_overlay_root is not None:
-            environment["PNC_HARNESS_CANDIDATE_OVERLAY_ROOT"] = str(
-                self.config.candidate_overlay_root
-            )
-            environment["PNC_HARNESS_CANDIDATE_OVERLAY_MODULE"] = (
-                self.config.candidate_overlay_module or ""
-            )
-        else:
-            environment.pop("PNC_HARNESS_CANDIDATE_OVERLAY_ROOT", None)
-            environment.pop("PNC_HARNESS_CANDIDATE_OVERLAY_MODULE", None)
-        if self.config.hoomans_runtime is not None:
-            environment["PZ_TEST_HOOMANS_RUNTIME"] = self.config.hoomans_runtime
-        if self.config.core_runtime is not None:
-            environment["PZ_TEST_CORE_RUNTIME"] = self.config.core_runtime
-        if self.config.dynamic_trading_repository is not None:
-            environment["PNC_HARNESS_DYNAMIC_TRADING_REPOSITORY"] = str(
-                self.config.dynamic_trading_repository
-            )
-        if self.config.dynamic_trading_runtime is not None:
-            environment["PZ_TEST_DYNAMIC_TRADING_RUNTIME"] = (
-                self.config.dynamic_trading_runtime
-            )
-        try:
-            self.process = subprocess.Popen(
-                [
-                    str(self.config.lua_bin),
-                    str(self.config.worker_script),
-                    str(self.config.repository),
-                    str(self.config.core_repository),
-                ],
-                cwd=self.config.repository,
-                env=environment,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                bufsize=0,
-            )
-            _ACTIVE_PROCESSES.add(self)
-            self._record_activity(
-                "start",
-                repository=str(self.config.repository),
-                pid=self.process.pid,
-            )
-        except OSError as error:
-            self._set_failure(f"could not start Lua worker: {error}")
-            raise HarnessError(self._failure or str(error)) from error
-        self._reader_thread = threading.Thread(
-            target=self._read_stdout,
-            name="semantic-harness-lua-reader",
-            daemon=True,
-        )
-        self._stderr_thread = threading.Thread(
-            target=self._read_stderr,
-            name="semantic-harness-lua-stderr",
-            daemon=True,
-        )
-        self._reader_thread.start()
-        self._stderr_thread.start()
-        try:
-            hello = self._hello.get(timeout=self.config.startup_timeout)
-        except queue.Empty as error:
-            detail = self._failure or self._diagnostic("worker did not send READY")
-            self.close()
-            raise HarnessError(detail) from error
-        if hello.get("ok") is not True or hello.get("type") != "hello":
-            detail = hello.get("error", "worker handshake failed")
-            self.close()
-            raise HarnessError(str(detail))
-        with self._state_lock:
-            self._state = "READY"
-        self._record_activity("ready", pid=self.process.pid if self.process else None)
-        return hello
+        return self._delegate.start()
 
     def request(
         self,
@@ -173,183 +132,10 @@ class LuaProcess:
         *,
         timeout: float | None = None,
     ) -> dict[str, Any]:
-        with self._request_lock:
-            if self.state != "READY":
-                raise HarnessError(self._failure or f"worker is {self.state.lower()}")
-            process = self.process
-            if process is None or process.stdin is None:
-                raise HarnessError("Lua worker pipes are unavailable")
-            self._request_sequence += 1
-            request_id = f"harness-{self._request_sequence}"
-            started_at = time.perf_counter()
-            self._record_activity(
-                "request",
-                command=command,
-                requestID=request_id,
-                pid=process.pid,
-            )
-            try:
-                encoded = encode_request(request_id, command, payload)
-            except ProtocolError as error:
-                raise HarnessError(str(error)) from error
-            if len(encoded) > self.config.max_message_bytes:
-                raise HarnessError("request exceeds the message limit")
-            response_queue: queue.Queue[dict[str, Any]] = queue.Queue(maxsize=1)
-            with self._pending_lock:
-                self._pending[request_id] = response_queue
-            try:
-                process.stdin.write(encoded)
-                process.stdin.flush()
-            except (BrokenPipeError, OSError) as error:
-                self._set_failure(f"could not write Lua request: {error}")
-                self._record_activity(
-                    "error",
-                    command=command,
-                    requestID=request_id,
-                    message=str(error),
-                )
-                raise HarnessError(self._diagnostic("Lua worker write failed")) from error
-            try:
-                response = response_queue.get(timeout=timeout or self.config.request_timeout)
-            except queue.Empty as error:
-                self._set_failure(f"request timeout: {command}")
-                self._record_activity(
-                    "timeout",
-                    command=command,
-                    requestID=request_id,
-                    durationMs=round((time.perf_counter() - started_at) * 1000, 1),
-                )
-                raise HarnessError(self._diagnostic(f"Lua worker timed out on {command}")) from error
-            finally:
-                with self._pending_lock:
-                    self._pending.pop(request_id, None)
-            if response.get("ok") is False:
-                self._record_activity(
-                    "response_error",
-                    command=command,
-                    requestID=request_id,
-                    durationMs=round((time.perf_counter() - started_at) * 1000, 1),
-                    message=str(response.get("error", "Lua worker request failed")),
-                )
-                raise HarnessError(str(response.get("error", "Lua worker request failed")))
-            self._record_activity(
-                "response",
-                command=command,
-                requestID=request_id,
-                durationMs=round((time.perf_counter() - started_at) * 1000, 1),
-                ok=True,
-            )
-            return response
-
-    def _record_activity(self, event: str, **details: Any) -> None:
-        if self.activity_log is not None:
-            self.activity_log.record("worker", event, **details)
-
-    def _read_stdout(self) -> None:
-        process = self.process
-        if process is None or process.stdout is None:
-            return
-        while True:
-            line = process.stdout.readline()
-            if not line:
-                if self.state not in {"STOPPING", "STOPPED"}:
-                    self._set_failure(self._diagnostic("Lua worker exited without a response"))
-                return
-            if len(line) > self.config.max_message_bytes:
-                self._set_failure("Lua worker response exceeds the message limit")
-                return
-            try:
-                message = decode_message(line, max_bytes=self.config.max_message_bytes)
-            except ProtocolError as error:
-                self._set_failure(str(error))
-                return
-            if message.get("type") == "hello":
-                try:
-                    self._hello.put_nowait(message)
-                except queue.Full:
-                    self._set_failure("duplicate Lua worker handshake")
-                continue
-            request_id = message.get("id")
-            if not isinstance(request_id, str):
-                self._set_failure("Lua worker response has no request id")
-                return
-            with self._pending_lock:
-                response_queue = self._pending.get(request_id)
-            if response_queue is None:
-                self._set_failure(f"Lua worker returned unknown request id: {request_id}")
-                return
-            try:
-                response_queue.put_nowait(message)
-            except queue.Full:
-                self._set_failure(f"duplicate Lua worker response: {request_id}")
-                return
-
-    def _read_stderr(self) -> None:
-        process = self.process
-        if process is None or process.stderr is None:
-            return
-        for raw_line in iter(process.stderr.readline, b""):
-            line = raw_line.decode("utf-8", errors="replace").rstrip()
-            if line:
-                self._stderr.append(line[:4096])
-
-    def _set_failure(self, reason: str) -> None:
-        with self._state_lock:
-            if self._state in {"STOPPED", "STOPPING"}:
-                return
-            self._state = "FAILED"
-            self._failure = reason
-        failure = {"ok": False, "error": reason}
-        with self._pending_lock:
-            pending = list(self._pending.values())
-        for response_queue in pending:
-            try:
-                response_queue.put_nowait(failure)
-            except queue.Full:
-                pass
-        process = self.process
-        if process is not None and process.poll() is None:
-            try:
-                process.terminate()
-            except OSError:
-                pass
-
-    def _diagnostic(self, prefix: str) -> str:
-        process = self.process
-        returncode = process.poll() if process is not None else None
-        stderr = "; ".join(self._stderr)
-        suffix = f"; stderr: {stderr}" if stderr else ""
-        return f"{prefix} (state={self.state}, returncode={returncode}){suffix}"
+        return self._delegate.request(command, payload, timeout=timeout)
 
     def close(self) -> None:
-        process = self.process
-        if process is None:
-            with self._state_lock:
-                self._state = "STOPPED"
-            return
-        with self._state_lock:
-            if self._state != "STOPPED":
-                self._state = "STOPPING"
-        if process.poll() is None:
-            try:
-                process.terminate()
-                process.wait(timeout=self.config.shutdown_timeout)
-            except (OSError, subprocess.TimeoutExpired):
-                try:
-                    process.kill()
-                    process.wait(timeout=self.config.shutdown_timeout)
-                except (OSError, subprocess.TimeoutExpired):
-                    pass
-        for stream in (process.stdin, process.stdout, process.stderr):
-            if stream is not None and not stream.closed:
-                stream.close()
-        for thread in (self._reader_thread, self._stderr_thread):
-            if thread is not None and thread is not threading.current_thread():
-                thread.join(timeout=0.2)
-        with self._state_lock:
-            self._state = "STOPPED"
-        _ACTIVE_PROCESSES.discard(self)
-        self._record_activity("closed")
+        self._delegate.close()
 
     def __enter__(self) -> "LuaProcess":
         self.start()
@@ -357,3 +143,6 @@ class LuaProcess:
 
     def __exit__(self, *_: object) -> None:
         self.close()
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self._delegate, name)

@@ -15,6 +15,7 @@ def worker_kwargs(app: Any) -> dict[str, Any]:
         "core_repository": Path(app.arguments.core_repository)
         if app.arguments.core_repository
         else None,
+        "profile": getattr(app.arguments, "profile", "hoomans"),
         "startup_timeout": app.arguments.startup_timeout,
         "request_timeout": app.arguments.timeout,
         "shutdown_timeout": app.arguments.shutdown_timeout,

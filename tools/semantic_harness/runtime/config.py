@@ -179,6 +179,7 @@ class HarnessConfig:
     core_repository: Path
     lua_bin: Path
     worker_script: Path
+    profile: str = "hoomans"
     hoomans_runtime: str | None = None
     core_runtime: str | None = None
     dynamic_trading_repository: Path | None = None
@@ -198,42 +199,59 @@ class HarnessConfig:
         core_repository: str | Path | None = None,
         lua_bin: str | Path | None = None,
         worker_script: str | Path | None = None,
+        profile: str = "hoomans",
         startup_timeout: float = 8.0,
         request_timeout: float = 5.0,
         shutdown_timeout: float = 1.0,
     ) -> "HarnessConfig":
+        profile = str(profile or "hoomans").strip().lower()
+        if profile not in {"hoomans", "core"}:
+            raise ConfigurationError(
+                f"unsupported Hoomans harness profile: {profile}; "
+                "supported profiles are hoomans and core"
+            )
         repo = discover_repository(repository)
         core = discover_core(repo, core_repository)
         lua = discover_lua(lua_bin)
         worker = (
             Path(worker_script)
             if worker_script
-            else Path(__file__).resolve().parents[1] / "lua" / "worker.lua"
+            else (
+                core / "tools" / "semantic_harness" / "lua" / "worker.lua"
+                if profile == "core"
+                else Path(__file__).resolve().parents[1] / "lua" / "worker.lua"
+            )
         )
         worker = worker.expanduser().resolve()
         if not worker.is_file():
             raise ConfigurationError(f"Lua worker script does not exist: {worker}")
         if startup_timeout <= 0 or request_timeout <= 0 or shutdown_timeout <= 0:
             raise ConfigurationError("timeouts must be positive")
-        hoomans_runtime = os.environ.get("PZ_TEST_HOOMANS_RUNTIME") or (
-            discover_newest_runtime(repo / "Contents/mods/ProjectHoomans")
-        )
+        hoomans_runtime = None
+        if profile == "hoomans":
+            hoomans_runtime = os.environ.get("PZ_TEST_HOOMANS_RUNTIME") or (
+                discover_newest_runtime(repo / "Contents/mods/ProjectHoomans")
+            )
         core_runtime = os.environ.get("PZ_TEST_CORE_RUNTIME") or (
             discover_newest_runtime(core / "Contents/mods/PsychopatzCore")
         )
-        dynamic_trading_repository = discover_dynamic_trading_repository(repo)
-        dynamic_trading_runtime = os.environ.get(
-            "PZ_TEST_DYNAMIC_TRADING_RUNTIME"
-        )
-        if dynamic_trading_runtime is None and dynamic_trading_repository:
-            dynamic_trading_runtime = discover_dynamic_trading_runtime(
-                dynamic_trading_repository
+        dynamic_trading_repository = None
+        dynamic_trading_runtime = None
+        if profile == "hoomans":
+            dynamic_trading_repository = discover_dynamic_trading_repository(repo)
+            dynamic_trading_runtime = os.environ.get(
+                "PZ_TEST_DYNAMIC_TRADING_RUNTIME"
             )
+            if dynamic_trading_runtime is None and dynamic_trading_repository:
+                dynamic_trading_runtime = discover_dynamic_trading_runtime(
+                    dynamic_trading_repository
+                )
         return cls(
             repository=repo,
             core_repository=core,
             lua_bin=lua,
             worker_script=worker,
+            profile=profile,
             hoomans_runtime=hoomans_runtime,
             core_runtime=core_runtime,
             dynamic_trading_repository=dynamic_trading_repository,
