@@ -1,6 +1,6 @@
 # Roadmap — Unified NPC Population and Expansion Architecture
 
-**Status:** P2A CORE FACTION PROFILE SLICE IMPLEMENTED — CANONICAL FACTION WRITER NEXT.
+**Status:** P2B CORE FACTION MUTATION SLICE IMPLEMENTED — HOOMANS MEMBERSHIP ADAPTER NEXT.
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -44,9 +44,10 @@ The remaining split is at the ownership boundaries:
 1. Dynamic Trading still owns a trader-specific generation façade and
    trader-specific population cadence instead of registering a generic source
    with Core.
-2. Hoomans still has a large generation/materialization path and a local
-   faction mutation service. The shared profile registry has moved to Core,
-   but canonical faction writes and membership mutation have not.
+2. Hoomans still has a large generation/materialization path and local
+   compatibility membership state. Core now owns the public generic faction
+   mutation service, but Hoomans membership commands still need to delegate
+   their generic member/leader updates explicitly.
 3. Map/hover projections can expose a marker before its canonical actor or
    provider lease is hydrated. The resulting `UNKNOWN` value is not a valid
    presence mode; it is an invalid or incomplete projection that must be
@@ -148,6 +149,21 @@ entry; no PZ body/materialization code is imported into Core.
 **Checkpoint:** implemented in PsychopatzCore and ProjectHoomans. The next
 slice must move canonical faction mutation and membership behind Core before
 Dynamic Trading is migrated.
+
+### P2B — Core faction mutation service (implemented)
+
+Add `SurvivorWorld.FactionService` as the shared mutation boundary for
+canonical faction upsert, member add/remove, leader assignment, and status
+changes. Route the Hoomans Core adapter's faction commit through this service;
+keep Hoomans' PNC compatibility projection and domain behavior unchanged.
+
+**Gate:** Core-only command tests pass; adapter mutations still preserve Core
+normalization and persistence dirtiness; Hoomans mobile and faction tests pass;
+no Core module imports Hoomans or Dynamic Trading.
+
+**Checkpoint:** implemented. The remaining P2B work is replacing direct
+Hoomans membership mutations with Core commands and reconciling the returned
+canonical projection before Dynamic Trading migration.
 
 ### P3 — Dynamic Trading adapter migration
 

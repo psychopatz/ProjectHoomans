@@ -104,6 +104,12 @@ contract, while Hoomans owns how a supported profile becomes a PZ NPC.
 
 ### Hoomans materializer contract
 
+Core faction mutations use the `SurvivorWorld.FactionService` command surface.
+Adopters submit validated faction candidates or explicit member, leader, and
+status commands; the Core registry normalizes and persists the canonical
+result. Hoomans may maintain a compatibility projection, but it must not
+write a second generic faction record outside this boundary.
+
 Hoomans accepts a committed Core group and either adopts or materializes each
 member through one idempotent boundary. It owns:
 

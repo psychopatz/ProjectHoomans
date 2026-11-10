@@ -12,6 +12,8 @@ local Adapter = PNC.CoreSurvivorWorldAdapter
 local Authority = PNC.CoreSurvivorWorldAuthority
     or require "PNC/Director/PNC_CoreSurvivorWorldAuthority"
 local World = Authority.World
+local FactionService = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldFactionService"
 
 local function registry()
     local current = Authority.Registry
@@ -145,7 +147,7 @@ function Adapter.CommitFaction(faction, reason)
     local current, failure = Adapter.EnsureCanonical()
     if not current then return nil, failure end
     local canonical
-    canonical, failure = current:UpsertFaction(faction)
+    canonical, failure = FactionService.Upsert(current, faction)
     if not canonical then return nil, failure end
     local ok
     ok, failure = dirty(reason or "pnc_faction_mutation")

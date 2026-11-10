@@ -3,10 +3,10 @@ handoff_schema: 2
 checkpoint_mode: "documentation_checkpoint"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
-state: "READY_FOR_P2B_CORE_FACTION_WRITER"
+state: "READY_FOR_P2B_HOOMANS_MEMBERSHIP_ADAPTER"
 parent_status: "IN_PROGRESS"
-phase: "P2A"
-chunk: "core-faction-writer-and-hoomans-adapter"
+phase: "P2B"
+chunk: "hoomans-membership-adapter"
 retrieval_tier: "verify"
 ---
 
@@ -33,11 +33,11 @@ will be created.
 
 ## Resume action
 
-Continue P2A by moving canonical faction mutation and membership behind Core,
-then make Hoomans a compatibility/materialization adapter. Keep Dynamic
-Trading unchanged until the Core writer and Hoomans boundary are stable. The
-Core-owned profile, map-presence, and monitor-presence slices are implemented
-and verified.
+Continue P2B by making Hoomans membership commands delegate generic member,
+leader, and status changes to Core, then reconcile the returned canonical
+projection into the Hoomans compatibility view. Keep Dynamic Trading unchanged
+until this boundary is stable. The Core-owned profile and mutation services,
+map-presence, and monitor-presence slices are implemented and verified.
 
 ## Evidence and repository state
 
@@ -54,13 +54,18 @@ and verified.
   bridge, Hoomans faction-foundation, and mobile-group smokes pass. The
   existing faction-service declaration-count mismatch remains unrelated
   (`87` expected versus `88` actual).
+- `CODE_VERIFIED`: Core `SurvivorWorld.FactionService` owns the shared generic
+  faction command surface; Hoomans `CommitFaction` routes through it.
+- `TEST_VERIFIED`: Core faction-service smoke and Hoomans Core-adapter,
+  faction-profile bridge, and mobile-group smokes pass.
 - `TEST_VERIFIED`: focused Hoomans and Core P2 map/materializer smokes pass;
   the unrelated faction-boundary declaration-count smoke remains stale at
   `87` expected versus `88` actual.
 - `STATIC_ONLY`: no native Project Zomboid acceptance is claimed.
 - Project Hoomans has the P2 profile/presence implementation committed as
-  `5417deac` and the Core profile bridge committed as `f10667c5`;
-  canonical faction mutation remains the next chunk.
+  `5417deac` and the Core profile bridge committed as `f10667c5`.
+  The Core mutation service is committed as `7bcaa1d`; the Hoomans adapter
+  checkpoint is the current participant implementation.
 - Dynamic Trading and PsychopatzCore contain pre-existing generated
   `.architecture-refactor/output/architecture-audit.md` modifications from
   the audit. Preserve them; they are not part of this implementation phase.

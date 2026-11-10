@@ -1,6 +1,6 @@
 # Progress — Unified NPC Population and Expansion Architecture
 
-**Status:** P2A IN PROGRESS — CORE FACTION PROFILE CONTRACT VERIFIED
+**Status:** P2B IN PROGRESS — CORE FACTION MUTATION CONTRACT VERIFIED
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -24,6 +24,10 @@
 - Hoomans' fixed mobile allow-list has been replaced by a Core-owned profile
   registry exposed through the compatibility façade; canonical faction writes,
   membership mutation, and actor adoption/hydration remain to be migrated.
+- Core now exposes `SurvivorWorld.FactionService` for canonical faction
+  upsert, member add/remove, leader assignment, and status mutation. The
+  Hoomans Core adapter routes faction commits through that service; direct
+  Hoomans membership commands remain the next adapter slice.
 - Map/hover and monitor projections now normalize valid live/abstract state;
   an unhydrated canonical actor must still be repaired or hidden, and
   `UNKNOWN` remains an invalid projection rather than a supported mode.
@@ -93,13 +97,13 @@ Core participant commit: `cff123f` (`phase(P2): normalize Core actor presence pr
 
 ## Current phase
 
-**P2A — Core faction contract extraction.** The Core profile registry and
-Hoomans compatibility façade are verified. The next boundary is making Core
-the canonical faction writer before completing actor adoption/hydration.
+**P2B — Core faction mutation extraction.** The Core profile registry and
+mutation service are verified. The next boundary is making Hoomans membership
+commands delegate generic member/leader changes to Core.
 
 ## Next Chunk
 
-**Move canonical faction mutation and membership behind Core.** Preserve
+**Move Hoomans membership mutation behind the Core commands.** Preserve
 Hoomans ownership of PNC records, body creation, abstract/live projection,
 monitor, map, and debug integration. Do not migrate Dynamic Trading until
 the Core writer and Hoomans adapter are tested.
