@@ -10,3 +10,6 @@ physical Hoomans runtime.
 
 See `ROADMAP.md` for gates, `PROGRESS.md` for execution truth, and
 `HANDOFF.md` for the next bounded chunk.
+
+The forward expansion and unified source-registration plan now lives in
+[`../UnifiedNPCPopulationExpansionArchitecture/`](../UnifiedNPCPopulationExpansionArchitecture/).
