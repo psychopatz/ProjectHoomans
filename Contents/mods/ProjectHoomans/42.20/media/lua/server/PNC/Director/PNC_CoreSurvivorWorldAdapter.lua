@@ -118,6 +118,26 @@ function Adapter.ReconcileExistingWorld()
     }, #failures > 0 and "partial" or "reconciled"
 end
 
+local function ensureFactionDependency(current, value, kind)
+    local factionID = type(value) == "table"
+        and (value.factionID or value.factionId) or nil
+    if not factionID or current:GetFaction(factionID) then
+        return current
+    end
+
+    local report, reason = Adapter.ReconcileExistingWorld()
+    if not report then
+        return nil, "core_" .. tostring(kind)
+            .. "_reconcile_failed:" .. tostring(reason)
+    end
+    current = registry()
+    if not current or not current:GetFaction(factionID) then
+        return nil, "survivor_world_" .. tostring(kind)
+            .. "_faction_missing"
+    end
+    return current
+end
+
 function Adapter.CommitFaction(faction, reason)
     if type(faction) ~= "table" then
         return nil, "faction_required"
@@ -138,6 +158,9 @@ function Adapter.CommitCommunity(community, reason)
         return nil, "community_required"
     end
     local current, failure = Adapter.EnsureCanonical()
+    if not current then return nil, failure end
+    current, failure = ensureFactionDependency(
+        current, community, "community")
     if not current then return nil, failure end
     local canonical
     canonical, failure = current:UpsertCommunity(community)
@@ -168,6 +191,8 @@ function Adapter.CommitGroup(group, reason)
         return nil, "group_required"
     end
     local current, failure = Adapter.EnsureCanonical()
+    if not current then return nil, failure end
+    current, failure = ensureFactionDependency(current, group, "group")
     if not current then return nil, failure end
     local canonical
     canonical, failure = current:UpsertGroup(group)

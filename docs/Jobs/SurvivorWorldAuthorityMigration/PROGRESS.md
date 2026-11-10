@@ -28,6 +28,18 @@
   preflight so Core actors are hydrated after PNC registries load and stale
   provider plans are reconciled before commit.
 
+## Follow-up repair
+
+- Added the Core-owned `EnsureAbstract` adoption seam so released actors are
+  claimed by one bodyless provider lease and abstract providers can hand off
+  without taking over a materialized body.
+- Made Core bootstrap actors abstract by default, hid released SurvivorWorld
+  actors from map projection, and removed provider-name fallback from trader
+  hover presence metadata so normal actors cannot render as `UNKNOWN`.
+- Routed DTAbstract adoption through the shared Core seam and synchronized
+  Hoomans `presenceState` during actor adoption; direct community/group commits
+  now preflight missing faction dependencies through shared reconciliation.
+
 ## Evidence
 
 - Core focused smoke tests: 3 passed.
@@ -39,6 +51,8 @@
 - Dynamic Trading provider-runtime and hotswap smoke tests: passed.
 - Modified production Lua passes `pz-verify`; modified Lua passes `luac -p`.
 - `git diff --check` passes in Core, Hoomans, and Dynamic Trading.
+- New Core abstract-lease, released-map-ghost, Hoomans adoption, and
+  DTAbstract provider-handoff regressions pass.
 
 ## Pending
 

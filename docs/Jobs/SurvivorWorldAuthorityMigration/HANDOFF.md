@@ -4,15 +4,16 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P5-F"
-phase_commit_message: "phase(P5-F): phase(P5-F): centralize survivor-world presence authority"
-phase_commit_vector: "project-hoomans=self;psychopatz-core=1a0189e91b26979cfa1b9499f67f16029fc2034e;dynamic-trading=9127b0466b728e547767635ea3ab95a41c0089b7"
+phase_commit_phase: "P5-G"
+phase_commit_message: "phase(P5-G): repair shared abstract survivor-world presence"
+phase_commit_vector: "project-hoomans=self;psychopatz-core=54937327046783a64c22e463b7bdcfbd5976ada4;dynamic-trading=fee37b9c0bf6cc4015c4e7c2416aa0bd4c527567"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-10T07:38:31.771618Z"
+updated_at: "2026-11-10T08:38:40.800052Z"
 state: "CLEAN_CHECKPOINT"
 ---
+
 
 
 

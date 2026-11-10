@@ -36,6 +36,13 @@ T.equal(record.coreActorID, "npc:adoption:test",
     "adopter record receives canonical actor ID")
 T.equal(record.runtime.coreActorID, "npc:adoption:test",
     "runtime record receives canonical actor ID")
+local canonical = registry:Get("npc:adoption:test")
+T.equal(canonical.providerLease.provider, "ProjectHoomans",
+    "released adopter is claimed by the shared abstract provider")
+T.equal(canonical.providerLease.state, "abstract",
+    "adopter never leaves a released map actor")
+T.equal(record.presenceState, PNC.Const.PRESENCE_ABSTRACT,
+    "adopter record mirrors Core abstract presence")
 T.equal(registry:Count(), 1, "adoption creates one canonical actor")
 
 local second, secondReason = Adapter.EnsureActor(record, PsychopatzCore)

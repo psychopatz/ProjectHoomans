@@ -31,6 +31,37 @@ local function providerID(spec)
     return value ~= "" and value or "ProjectHoomans"
 end
 
+local function survivorWorldPresence()
+    local presence = PsychopatzCore
+        and PsychopatzCore.SurvivorWorldPresence or nil
+    if not presence then
+        presence = require
+            "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldPresence"
+    end
+    return presence
+end
+
+local function ensureAbstractLease(actor, record)
+    local lease = actor and actor.providerLease or {}
+    if lease.state ~= "released" then return actor end
+
+    local runtime = type(record.runtime) == "table" and record.runtime or {}
+    local requested = tostring(runtime.coreProvider or "")
+    if requested ~= "DTAbstract" and requested ~= "ProjectHoomans" then
+        requested = "ProjectHoomans"
+    end
+    local adopted, reason = survivorWorldPresence().EnsureAbstract(
+        actor.actorId,
+        {
+            provider = requested,
+            owner = requested .. ":abstract",
+            now = PNC.Core.Now(),
+        }
+    )
+    if not adopted then return nil, reason end
+    return adopted
+end
+
 local function displayName(actor)
     local identity = actor and actor.identity or {}
     local survivor = identity.survivor or {}
@@ -171,6 +202,18 @@ function Adapter.AnnotateExistingCoreRecord(record, core)
     record.coreActorID = canonicalID
     record.runtime = runtime
     record.runtime.coreActorID = canonicalID
+    local expectedPresence
+    if lease.state == "materialized" then
+        expectedPresence = PNC.Const.PRESENCE_LIVE
+    elseif lease.state == "abstract" then
+        expectedPresence = PNC.Const.PRESENCE_ABSTRACT
+    end
+    if expectedPresence ~= nil
+        and record.presenceState ~= expectedPresence
+    then
+        record.presenceState = expectedPresence
+        recordChanged = true
+    end
     if recordChanged and PNC.Registry
         and type(PNC.Registry.MarkDirty) == "function"
     then
@@ -239,6 +282,9 @@ function Adapter.EnsureActor(record, core)
         end
     end
 
+    actor, reason = ensureAbstractLease(actor, record)
+    if not actor then return nil, reason end
+
     return Adapter.AnnotateExistingCoreRecord(record, core)
 end
 
@@ -286,6 +332,11 @@ local function buildRecord(actor, baseRecord)
     record.runtime.coreActorID = tostring(actor.actorId)
     projectProviderLease(record, lease.leaseID)
     record.runtime.coreProvider = lease.provider
+    if lease.state == "materialized" then
+        record.presenceState = PNC.Const.PRESENCE_LIVE
+    elseif lease.state == "abstract" then
+        record.presenceState = PNC.Const.PRESENCE_ABSTRACT
+    end
     return record
 end
 
