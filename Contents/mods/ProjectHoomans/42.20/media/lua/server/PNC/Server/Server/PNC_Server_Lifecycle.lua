@@ -23,6 +23,14 @@ function H.OnClientCommand(module, command, player, args)
 end
 
 function H.OnServerStarted()
+    local bootstrapServer = PsychopatzCore
+        and PsychopatzCore.SurvivorWorldBootstrapServer or nil
+    if bootstrapServer
+        and type(bootstrapServer.EnsureRuntime) == "function"
+    then
+        bootstrapServer.EnsureRuntime()
+    end
+
     -- The payload budget guard wraps the engine send function, which can only
     -- be verified once the server socket exists.
     local network = PNC.Network
@@ -47,6 +55,20 @@ function H.OnServerStarted()
     end
     if PNC.HoomansWorldView and PNC.HoomansWorldView.Load then
         PNC.HoomansWorldView.Load()
+    end
+    if PNC.Persistence
+        and PNC.Persistence.CoreProvider
+        and type(PNC.Persistence.CoreProvider.HydrateCoreActors) == "function"
+        and PsychopatzCore
+    then
+        local hydrated, hydrationStatus =
+            PNC.Persistence.CoreProvider.HydrateCoreActors(PsychopatzCore)
+        if PNC.Core and PNC.Core.LogInfo then
+            PNC.Core.LogInfo(
+                "PNC Core actor hydration count=" .. tostring(hydrated)
+                    .. " status=" .. tostring(hydrationStatus)
+            )
+        end
     end
     if PNC.UniqueNPCRegistry and PNC.UniqueNPCRegistry.Reconcile then
         PNC.UniqueNPCRegistry.Reconcile()

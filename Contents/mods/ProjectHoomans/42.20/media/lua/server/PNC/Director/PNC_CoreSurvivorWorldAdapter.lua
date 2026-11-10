@@ -194,6 +194,88 @@ function Adapter.RemoveGroup(groupID, reason)
     return true
 end
 
+local function generatedPlanActorRegistry()
+    local actors = PsychopatzCore and PsychopatzCore.Actors or nil
+    return actors and actors.DefaultRegistry or nil
+end
+
+local function refreshGeneratedViews()
+    local extensions = PNC.SurvivorWorldExtensions
+    if not extensions or extensions.Active ~= true
+        or type(extensions.RefreshFromCore) ~= "function"
+    then
+        return nil, "survivor_world_extensions_inactive"
+    end
+    local refreshed, reason = extensions.RefreshFromCore()
+    if not refreshed then return nil, reason end
+
+    local provider = PNC.Persistence and PNC.Persistence.CoreProvider
+    if provider and type(provider.HydrateCoreActors) == "function"
+        and PsychopatzCore
+    then
+        local hydrated, hydrationReason =
+            provider.HydrateCoreActors(PsychopatzCore)
+        if type(hydrationReason) == "table" then
+            return nil, "core_actor_hydration_partial"
+        end
+        if hydrated == nil then
+            return nil, hydrationReason
+        end
+    end
+    return true
+end
+
+function Adapter.CanCommitGeneratedPlans()
+    local extensions = PNC.SurvivorWorldExtensions
+    return World and World.Bootstrap
+        and type(World.Bootstrap.CommitCommunityPlan) == "function"
+        and type(World.Bootstrap.CommitGroupPlan) == "function"
+        and extensions and extensions.Active == true
+        and generatedPlanActorRegistry() ~= nil
+end
+
+function Adapter.CommitGeneratedCommunityPlan(plan, reason)
+    if not Adapter.CanCommitGeneratedPlans() then
+        return nil, "core_generated_plan_commit_unavailable"
+    end
+    local current, failure = Adapter.EnsureCanonical()
+    if not current then return nil, failure end
+    local community
+    community, failure = World.Bootstrap.CommitCommunityPlan(
+        current,
+        plan,
+        generatedPlanActorRegistry()
+    )
+    if not community then return nil, failure end
+    local ok
+    ok, failure = dirty(reason or "pnc_generated_community")
+    if not ok then return nil, failure end
+    ok, failure = refreshGeneratedViews()
+    if not ok then return nil, failure end
+    return current:GetCommunity(plan.communityID)
+end
+
+function Adapter.CommitGeneratedGroupPlan(plan, reason)
+    if not Adapter.CanCommitGeneratedPlans() then
+        return nil, "core_generated_plan_commit_unavailable"
+    end
+    local current, failure = Adapter.EnsureCanonical()
+    if not current then return nil, failure end
+    local group
+    group, failure = World.Bootstrap.CommitGroupPlan(
+        current,
+        plan,
+        generatedPlanActorRegistry()
+    )
+    if not group then return nil, failure end
+    local ok
+    ok, failure = dirty(reason or "pnc_generated_group")
+    if not ok then return nil, failure end
+    ok, failure = refreshGeneratedViews()
+    if not ok then return nil, failure end
+    return current:GetGroup(plan.groupID)
+end
+
 function Adapter.GetFaction(factionID)
     local current = registry()
     return current and current:GetFaction(factionID) or nil

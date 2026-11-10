@@ -8,6 +8,7 @@ PNC.Persistence = PNC.Persistence or {}
 local Persistence = PNC.Persistence
 local Adapter = Persistence.CoreProvider or {}
 Persistence.CoreProvider = Adapter
+local Types = PNC.Types
 local ActorInventoryBridge =
     require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_ActorBridge"
 
@@ -280,6 +281,172 @@ local function buildRecord(actor, baseRecord)
     projectProviderLease(record, lease.leaseID)
     record.runtime.coreProvider = lease.provider
     return record
+end
+
+local function survivorWorldAffiliation(actor)
+    local extensions = actor
+        and type(actor.extensions) == "table"
+        and actor.extensions or {}
+    local affiliation = extensions[AFFILIATION_EXTENSION]
+    return type(affiliation) == "table" and affiliation or nil
+end
+
+local function coreActorDefinition(actor, projected)
+    local affiliation = survivorWorldAffiliation(actor) or {}
+    local identity = actor and actor.identity or {}
+    local world = projected and projected.world or actor and actor.world or {}
+    local location = world and world.location or {}
+    local point = location and location.position or {}
+    local lease = actor and actor.providerLease or {}
+    return {
+        id = tostring(actor.actorId),
+        displayName = projected and projected.displayName
+            or identity.displayName,
+        identitySeed = identity.identitySeed,
+        identity = identity,
+        appearance = projected and projected.appearance
+            or actor.appearance,
+        personalInventory = projected and projected.personalInventory
+            or actor.personalInventory,
+        archetypeID = actor.archetypeID
+            or identity.archetypeID
+            or "core.survivor",
+        tacticalClass = "neutral",
+        x = tonumber(point.x) or 0,
+        y = tonumber(point.y) or 0,
+        z = tonumber(point.z) or 0,
+        coreActorID = tostring(actor.actorId),
+        factionID = affiliation.factionID,
+        factionName = affiliation.factionName,
+        factionArchetypeID = affiliation.factionArchetypeID,
+        factionRole = affiliation.role,
+        communityID = affiliation.communityID,
+        groupID = affiliation.groupID,
+        runtime = {
+            coreActorID = tostring(actor.actorId),
+            coreProviderLease = lease.leaseID,
+            coreProvider = lease.provider,
+        },
+    }
+end
+
+local function applyCoreActorProjection(record, actor, projected)
+    local definition = coreActorDefinition(actor, projected)
+    local changed = false
+    local function assign(key, value)
+        if value ~= nil and record[key] ~= value then
+            record[key] = value
+            changed = true
+        end
+    end
+
+    assign("name", definition.displayName)
+    assign("displayName", definition.displayName)
+    assign("identitySeed", definition.identitySeed)
+    assign("identity", definition.identity)
+    assign("appearance", definition.appearance)
+    assign("personalInventory", definition.personalInventory)
+    assign("archetypeID", definition.archetypeID)
+    assign("x", definition.x)
+    assign("y", definition.y)
+    assign("z", definition.z)
+    assign("coreActorID", definition.coreActorID)
+    assign("factionID", definition.factionID)
+    assign("factionName", definition.factionName)
+    assign("factionArchetypeID", definition.factionArchetypeID)
+    assign("factionRole", definition.factionRole)
+    assign("communityID", definition.communityID)
+    assign("groupID", definition.groupID)
+
+    record.runtime = record.runtime or {}
+    for key, value in pairs(definition.runtime) do
+        if value ~= nil and record.runtime[key] ~= value then
+            record.runtime[key] = value
+            changed = true
+        end
+    end
+    if record.presenceState == nil then
+        record.presenceState = PNC.Const.PRESENCE_ABSTRACT
+        changed = true
+    end
+    if record.runtime.lifecycle == nil then
+        record.runtime.lifecycle = {
+            phase = "abstract",
+            bodyState = "missing",
+            lastReason = "core_actor_hydrated",
+            lastTransitionAt = PNC.Core.Now(),
+            lastAuditAt = 0,
+            lastError = nil,
+            corpseState = "none",
+        }
+        changed = true
+    end
+    if changed and PNC.Registry
+        and type(PNC.Registry.MarkDirty) == "function"
+    then
+        PNC.Registry.MarkDirty(record, "core_actor_hydration")
+    end
+    return record, changed
+end
+
+function Adapter.HydrateCoreActor(actor, core)
+    if type(actor) ~= "table" or type(core) ~= "table" then
+        return nil, "actor_and_core_required"
+    end
+    local actorID = tostring(actor.actorId or "")
+    if actorID == "" then return nil, "core_actor_id_missing" end
+    if not survivorWorldAffiliation(actor) then
+        return nil, "not_survivor_world_actor"
+    end
+    if not PNC.Registry or type(PNC.Registry.Get) ~= "function"
+        or type(PNC.Registry.AddRecord) ~= "function"
+    then
+        return nil, "pnc_registry_unavailable"
+    end
+
+    local projected, reason = Adapter.Project(actor, core)
+    if not projected then return nil, reason end
+    local record = PNC.Registry.Get(actorID)
+    if record then
+        applyCoreActorProjection(record, actor, projected)
+        return record, "existing"
+    end
+
+    if not Types or type(Types.NewRecord) ~= "function" then
+        return nil, "pnc_record_types_unavailable"
+    end
+    record, reason = Types.NewRecord(
+        coreActorDefinition(actor, projected)
+    )
+    if not record then return nil, reason end
+    applyCoreActorProjection(record, actor, projected)
+    if not PNC.Registry.AddRecord(record) then
+        return nil, "pnc_core_actor_record_add_failed"
+    end
+    return record, "created"
+end
+
+function Adapter.HydrateCoreActors(core)
+    if type(core) ~= "table" then return 0, "core_required" end
+    local service = actors(core)
+    local registry = service and service.DefaultRegistry
+    if not registry or type(registry.List) ~= "function" then
+        return 0, "core_actor_registry_unavailable"
+    end
+    local hydrated = 0
+    local failures = {}
+    for _, actor in ipairs(registry:List()) do
+        local record, reason = Adapter.HydrateCoreActor(actor, core)
+        if record then
+            hydrated = hydrated + 1
+        elseif reason ~= "not_survivor_world_actor" then
+            failures[#failures + 1] = {
+                actorID = tostring(actor.actorId or ""),
+                reason = tostring(reason or "hydration_failed"),
+            }
+        end
+    end
+    return hydrated, #failures == 0 and "hydrated" or failures
 end
 
 local function bodyID(body, spec)
