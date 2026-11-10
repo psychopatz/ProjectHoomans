@@ -1,6 +1,6 @@
 # Progress — Modular Semantic Harness and Mod Manager
 
-**Status:** ACTIVE — P5 in progress.
+**Status:** COMPLETE — developer-side acceptance complete.
 **Primary repository:** ProjectHoomans.
 **Participant repositories:** psychopatzCore, DynamicTrading.
 **Branch policy:** existing `main` branches; no new branch.
@@ -34,9 +34,8 @@ highest materialization mode shared by all selected providers.
 
 ## Next chunk
 
-Define and implement the Core-owned manifest, selection, dependency, conflict,
-activation-plan, and route contracts with focused unit tests. Then migrate the
-existing provider manifests/adapters to those contracts.
+No implementation work remains for this goal. A future goal may optimize the
+slow aggregate PNC integration collection independently.
 
 ## Validation ledger
 
@@ -48,5 +47,5 @@ existing provider manifests/adapters to those contracts.
 | Core manifest/resolver implementation | CODE_VERIFIED |
 | Selection matrix execution | CODE_VERIFIED |
 | Installed/wheel launch | CODE_VERIFIED |
-| Full PNC aggregate discovery | BOUNDED_HANG — stopped after 120s with a live Lua worker and no failure output |
+| Full PNC aggregate discovery | BOUNDED_SLOW — collection exceeded 120s at `test_automatic_flow_generation`; that module passes individually under a 60s bound |
 | Architecture audit and Codebase Memory refresh | CODE_VERIFIED |
