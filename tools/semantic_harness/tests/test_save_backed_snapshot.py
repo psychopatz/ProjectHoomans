@@ -7,42 +7,9 @@ import unittest
 
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
 from semantic_harness.state import (
-    HarnessWorkingWorld,
-    ImportedSourceSnapshot,
     Provenance,
 )
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
-
-
-class SnapshotModelTests(unittest.TestCase):
-    def test_imported_source_is_immutable_and_working_reset_restores_baseline(self) -> None:
-        scenario = merge({}, DEFAULT_SCENARIO)
-        source = ImportedSourceSnapshot.from_scenario(
-            scenario,
-            source=Provenance.SAVE,
-            source_id="save:slot-1",
-            mode="offline_save",
-        )
-        baseline = deepcopy(source.to_dict()["data"])
-        working = HarnessWorkingWorld(source)
-
-        with self.assertRaises(TypeError):
-            source.data["npc"]["relationship"]["approval"] = 90
-
-        working.data["npc"]["relationship"]["approval"] = 90
-        patches = working.patches
-        self.assertTrue(any(patch["path"].endswith("approval") for patch in patches))
-        self.assertTrue(all(
-            patch["source"] == Provenance.HARNESS_MUTATION.value
-            and patch["baseSource"] == Provenance.SAVE.value
-            for patch in patches
-        ))
-        self.assertEqual(source.to_dict()["data"], baseline)
-
-        working.reset()
-        self.assertEqual(working.data, baseline)
-        self.assertEqual(working.patches, [])
-        self.assertEqual(source.to_dict()["data"], baseline)
 
 
 class LuaSnapshotAcceptanceTests(unittest.TestCase):

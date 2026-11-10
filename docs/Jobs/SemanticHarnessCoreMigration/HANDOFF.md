@@ -5,18 +5,19 @@ target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
 phase_commit_phase: "P5-C"
-phase_commit_message: "phase(P5-C): docs: prepare P5-C native acceptance runbook"
-phase_commit_vector: "project-hoomans=self;psychopatz-core=c07babcee33291256bf20847200341265a755969;dynamic-trading=0bd7b1472f6b921275f136f9a0900bacd2eb2e3d"
+phase_commit_message: "phase(P5-C): test(P5-C): remove Hoomans duplicate Core contracts"
+phase_commit_vector: "project-hoomans=self;psychopatz-core=0690ee9ff1406298123ee60522ee4dddf459b2d2;dynamic-trading=0bd7b1472f6b921275f136f9a0900bacd2eb2e3d"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-10T02:06:31.853397Z"
+updated_at: "2026-11-10T02:19:52.109217Z"
 state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
 phase: "P5"
 chunk: "P5-C"
 retrieval_tier: "verify"
 ---
+
 
 
 

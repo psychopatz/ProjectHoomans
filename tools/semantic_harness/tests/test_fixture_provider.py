@@ -11,19 +11,6 @@ from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 
 
 class OfflineFixtureProviderTests(unittest.TestCase):
-    def test_engine_values_are_explicit_editable_fixtures(self) -> None:
-        projection = OfflineEngineFixtureProvider().catalog(DEFAULT_SCENARIO)
-        self.assertEqual(projection["source"], "FIXTURE")
-        fields = {field["id"]: field for field in projection["fields"]}
-        for field_id in (
-            "player.needs",
-            "npc.needs",
-            "world.timeOfDay",
-            "world.weather",
-        ):
-            self.assertEqual(fields[field_id]["source"], "FIXTURE")
-            self.assertTrue(fields[field_id]["editable"])
-
     def test_fixture_payload_and_provenance_survive_working_world_mutation(self) -> None:
         scenario = merge({}, DEFAULT_SCENARIO)
         with LuaSemanticWorker(scenario) as worker:
