@@ -108,9 +108,21 @@ boundary.
 
 ## Next chunk
 
-**P5 — cross-provider acceptance.** Run Core-only, Hoomans, DTAbstract, and
-DTHoomans import/load and shared-contract matrices, then hand off the native
-SP/MP acceptance matrix. Native acceptance remains user-owned.
+## P5-A — cross-provider developer matrix
+
+Core-only checks passed 15/15, Hoomans optional-provider/real-Lua checks passed
+8/8, DynamicTrading profile-adapter checks passed 4/4, and the DynamicTrading
+Lua semantic-execution adapter smoke passed. The matrix covers Core-only,
+Hoomans with optional Dynamic Trading disabled/enabled, DTAbstract abstract
+metadata, and DTHoomans physical metadata. No native Project Zomboid process
+was launched. Commit: pending phase boundary.
+
+## Next chunk
+
+**P5-B — user-owned native SP/MP acceptance.** Exercise restart persistence,
+independent Project Hoomans/Dynamic Trading toggles, nearby DTHoomans physical
+materialization, DTAbstract abstract traversal, and shared conversation/trade
+behavior in real saves.
 
 ## Known residuals
 

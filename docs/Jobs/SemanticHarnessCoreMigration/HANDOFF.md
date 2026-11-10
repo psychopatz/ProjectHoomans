@@ -4,19 +4,20 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P4-F"
-phase_commit_message: "phase(P4-F): phase(P4-F): centralize generic engine projections"
+phase_commit_phase: "P5-A"
+phase_commit_message: "phase(P5-A): phase(P5-A): verify cross-provider developer matrix"
 phase_commit_vector: "project-hoomans=self"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-10T01:27:16.172719Z"
+updated_at: "2026-11-10T01:29:33.491199Z"
 state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
 phase: "P4"
 chunk: "P4-C"
 retrieval_tier: "verify"
 ---
+
 
 
 
@@ -132,6 +133,15 @@ authoring, knowledge, and provider-policy code. Core generic projection
 modules contain no adopter identifiers. Core 43/43 and the Hoomans
 engine-projection/worker slice 23 tests passed, with environment-dependent
 skips.
+
+## P5-A result
+
+The developer-side cross-provider matrix passed: Core profile/worker/process/
+registry/layout checks 15/15; Hoomans optional-provider and real-Lua checks
+8/8; DynamicTrading provider-adapter checks 4/4; and the DynamicTrading Lua
+semantic-execution adapter smoke passed. Core-only, Hoomans, DTAbstract, and
+DTHoomans metadata paths are covered. No native Project Zomboid process was
+launched.
 
 ## Residual findings
 
