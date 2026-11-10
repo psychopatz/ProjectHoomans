@@ -10,7 +10,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import Any, Protocol
 
-from .item_catalog import search_item_catalog
+from semantic_harness.item_catalog import search_item_catalog
 from .scenario import validate_scenario
 
 

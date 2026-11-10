@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from .health import normalize_scenario, validate_npc_health
+from semantic_harness.health import normalize_scenario, validate_npc_health
 from semantic_harness.scenario import (
     derive_actor_identifier,
     derive_display_name,

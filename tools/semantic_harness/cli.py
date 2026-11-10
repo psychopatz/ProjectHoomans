@@ -25,7 +25,8 @@ from .runtime.config import ConfigurationError
 from .runtime.scenario import load_scenario
 from .runtime.save_browser import SavedWorldBrowser
 from .runtime.save_catalog import SaveCatalog
-from .runtime.worker import HarnessError, LuaSemanticWorker
+from .runtime.worker import LuaSemanticWorker
+from semantic_harness.process import HarnessError
 from semantic_harness.activity import (
     ActivityLog,
     default_activity_path,

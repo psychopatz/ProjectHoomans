@@ -19,7 +19,8 @@ from ..runtime.config import (
     probe_lua,
 )
 from ..runtime.scenario import DEFAULT_SCENARIO, merge
-from ..runtime.worker import HarnessError, LuaSemanticWorker
+from ..runtime.worker import LuaSemanticWorker
+from semantic_harness.process import HarnessError
 
 
 def _check(name: str, ok: bool, detail: str, *, required: bool = True) -> dict[str, Any]:

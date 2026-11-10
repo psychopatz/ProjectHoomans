@@ -92,15 +92,25 @@ request/status/capability access. Hoomans `LuaSemanticWorker` subclasses it;
 Hoomans retains only scenario policy, fixture provenance, save-backed bounded
 side requests, and provider-specific operation spokes. Core gained two focused
 worker tests and now passes 38 semantic-harness tests. Hoomans' focused worker
-runtime slice passes 16 tests. Commit: pending phase boundary.
+runtime slice passed 16 tests. Commits: Core `1e37bc8`; Hoomans `28e7afd`.
+
+## P4-F — engine projection ownership audit
+
+Core now owns offline engine fixtures, health normalization, item-script
+catalog parsing, bounded live-profiler projection, and native Build 42 player
+decoding. Hoomans retains only thin adapters for PNC identity matching and
+Project Hoomans profiler namespaces; its remaining runtime files are
+Hoomans-specific save, scenario, physical-worker, authoring, and knowledge
+policy. Core's generic projection modules contain no adopter identifiers.
+Developer-side gates: Core 43 tests passed; Hoomans engine-projection/worker
+slice 23 tests passed with environment-dependent skips. Commit: pending phase
+boundary.
 
 ## Next chunk
 
-**P4-F — remaining runtime/test ownership audit.** Verify each remaining
-Hoomans runtime module and test import against the Core/adopter contract. Move
-only provider-neutral pieces, preserve Hoomans save/gameplay/physical policy,
-and delete only proven obsolete duplicates. Native SP/MP acceptance remains
-user-owned after developer-side gates are complete.
+**P5 — cross-provider acceptance.** Run Core-only, Hoomans, DTAbstract, and
+DTHoomans import/load and shared-contract matrices, then hand off the native
+SP/MP acceptance matrix. Native acceptance remains user-owned.
 
 ## Known residuals
 

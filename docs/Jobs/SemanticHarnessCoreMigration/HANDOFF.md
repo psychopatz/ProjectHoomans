@@ -4,19 +4,20 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P4-E"
-phase_commit_message: "phase(P4-E): phase(P4-E): move generic worker lifecycle to Core"
+phase_commit_phase: "P4-F"
+phase_commit_message: "phase(P4-F): phase(P4-F): centralize generic engine projections"
 phase_commit_vector: "project-hoomans=self"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-10T01:14:51.710266Z"
+updated_at: "2026-11-10T01:27:16.172719Z"
 state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
 phase: "P4"
 chunk: "P4-C"
 retrieval_tier: "verify"
 ---
+
 
 
 
@@ -120,6 +121,17 @@ reset/reload/restart, and generic request/status/capability access. Hoomans
 `LuaSemanticWorker` subclasses it and retains only Hoomans scenario policy,
 fixture provenance, bounded save/registry/item side requests, and semantic
 operation spokes. Core suite 38/38 and Hoomans worker/runtime slice 16/16 pass.
+
+## P4-F result
+
+Core now owns the provider-neutral engine fixture, health, item catalog,
+profiler projection, and native player decoder modules. Hoomans retains only
+thin adapters for PNC identity matching and Project Hoomans profiler aliases;
+remaining Hoomans runtime modules are save, scenario, physical-worker,
+authoring, knowledge, and provider-policy code. Core generic projection
+modules contain no adopter identifiers. Core 43/43 and the Hoomans
+engine-projection/worker slice 23 tests passed, with environment-dependent
+skips.
 
 ## Residual findings
 

@@ -12,8 +12,8 @@ from semantic_harness.state import Provenance
 from semantic_harness.worker import SemanticWorker
 
 from .config import HarnessConfig, build_worker_launch_spec
-from .fixture_provider import OfflineEngineFixtureProvider
-from .item_catalog import search_item_catalog
+from semantic_harness.fixture_provider import OfflineEngineFixtureProvider
+from semantic_harness.item_catalog import search_item_catalog
 from .scenario import load_scenario, normalize_scenario, validate_scenario
 from .worker_authoring import WorkerAuthoringOperations
 from .worker_conversation import WorkerConversationOperations

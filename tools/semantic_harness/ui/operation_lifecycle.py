@@ -6,7 +6,8 @@ from concurrent.futures import Future
 from typing import Any, Callable
 
 from ..runtime.config import ConfigurationError
-from ..runtime.worker import HarnessError, LuaSemanticWorker
+from ..runtime.worker import LuaSemanticWorker
+from semantic_harness.process import HarnessError
 from semantic_harness.worker_session import WorkerResult
 
 

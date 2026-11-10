@@ -7,7 +7,7 @@ import sys
 from typing import Any
 
 from ..runtime.config import ConfigurationError
-from ..runtime.worker import HarnessError
+from semantic_harness.process import HarnessError
 
 
 def close_app(app: Any) -> None:

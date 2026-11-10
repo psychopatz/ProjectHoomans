@@ -11,7 +11,7 @@ import unittest
 from copy import deepcopy
 
 from tools.semantic_harness.cli import _parser
-from tools.semantic_harness.runtime.item_catalog import _parse_script_text
+from semantic_harness.item_catalog import _parse_script_text
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.dialogs.inventory_editor import StructuredInventoryEditor

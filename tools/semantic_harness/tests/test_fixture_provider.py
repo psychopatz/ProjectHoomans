@@ -5,7 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 import unittest
 
-from tools.semantic_harness.runtime.fixture_provider import OfflineEngineFixtureProvider
+from semantic_harness.fixture_provider import OfflineEngineFixtureProvider
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
 

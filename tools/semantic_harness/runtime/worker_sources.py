@@ -6,7 +6,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Protocol
 
-from .fixture_provider import OfflineEngineFixtureProvider
+from semantic_harness.fixture_provider import OfflineEngineFixtureProvider
 from .live_profiler_provider import LiveProfilerProvider
 from .save_browser import SavedWorldBrowser
 from .save_catalog import SaveCatalog
