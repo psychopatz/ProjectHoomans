@@ -84,6 +84,24 @@ The ownership inventory is recorded in `P4B_OWNERSHIP_AUDIT.md`:
 Developer-side gates are green: Core 36 tests, Hoomans focused P4-A boundary
 suite 26 tests, DynamicTrading matrix 4 tests plus Lua adapter smoke.
 
+## P4-E — Core high-level worker façade
+
+Core now owns `semantic_harness.worker.SemanticWorker` for process startup,
+source snapshots, working-world state, reset/reload/restart, and generic
+request/status/capability access. Hoomans `LuaSemanticWorker` subclasses it;
+Hoomans retains only scenario policy, fixture provenance, save-backed bounded
+side requests, and provider-specific operation spokes. Core gained two focused
+worker tests and now passes 38 semantic-harness tests. Hoomans' focused worker
+runtime slice passes 16 tests. Commit: pending phase boundary.
+
+## Next chunk
+
+**P4-F — remaining runtime/test ownership audit.** Verify each remaining
+Hoomans runtime module and test import against the Core/adopter contract. Move
+only provider-neutral pieces, preserve Hoomans save/gameplay/physical policy,
+and delete only proven obsolete duplicates. Native SP/MP acceptance remains
+user-owned after developer-side gates are complete.
+
 ## Known residuals
 
 The broad Hoomans harness retains three pre-existing catalog/translation

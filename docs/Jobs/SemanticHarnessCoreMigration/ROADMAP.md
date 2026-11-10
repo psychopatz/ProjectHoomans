@@ -70,6 +70,26 @@ must not overwrite records already canonical in Core.
 Gate: Core and Hoomans adoption/world-adapter smokes pass; Core has no Hoomans
 imports; affiliation and group synchronization no longer depend on a restart.
 
+### P4-E — Core high-level worker façade
+
+Move the provider-neutral Python worker lifecycle, source snapshot, working
+world, reset, reload, and restart mechanics into PsychopatzCore. Adopters may
+provide normalization, validation, and bounded source-payload hooks, but may
+not reimplement Core process/session/state mechanics.
+
+Gate: Core worker façade tests pass; Hoomans worker/runtime contract tests pass;
+Hoomans keeps only provider policy and source adapters; Core imports no adopter.
+
+### P4-F — remaining runtime/test ownership audit
+
+Audit every remaining Hoomans `runtime/` and harness test import. Move any
+provider-neutral contract or reusable test into Core, retain Hoomans save,
+fixture, production-module, authoring, and physical materialization policy,
+and remove only proven obsolete duplicates.
+
+Gate: no provider-neutral duplicate remains in Hoomans; Core-only, Hoomans,
+DTAbstract, and DTHoomans import/load tests pass independently.
+
 ### P5 — Cross-provider acceptance
 
 Run the shared Core matrix for Core-only, Hoomans, DTAbstract, and DTHoomans

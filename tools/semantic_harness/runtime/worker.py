@@ -7,13 +7,9 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
-from semantic_harness.process import HarnessError, LuaProcess
-from semantic_harness.activity import ActivityLog, default_activity_path
-from semantic_harness.state import (
-    HarnessWorkingWorld,
-    ImportedSourceSnapshot,
-    Provenance,
-)
+from semantic_harness.activity import ActivityLog
+from semantic_harness.state import Provenance
+from semantic_harness.worker import SemanticWorker
 
 from .config import HarnessConfig, build_worker_launch_spec
 from .fixture_provider import OfflineEngineFixtureProvider
@@ -26,13 +22,11 @@ from .worker_matrix import WorkerMatrixOperations
 from .worker_sources import WorkerSourceOperations
 
 
-PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = Path(__file__).resolve().parents[3]
 CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
-LUA_WORKER = PACKAGE_ROOT / "lua" / "worker.lua"
 
 
-class LuaSemanticWorker:
+class LuaSemanticWorker(SemanticWorker):
     """Own one isolated Lua runtime and exchange structured turn records."""
 
     def __init__(
@@ -51,16 +45,6 @@ class LuaSemanticWorker:
         candidate_overlay_root: Path | None = None,
         candidate_overlay_module: str | None = None,
     ) -> None:
-        scenario = normalize_scenario(scenario)
-        validate_scenario(scenario)
-        self.source_snapshot = ImportedSourceSnapshot.from_scenario(
-            scenario,
-            source=Provenance.FIXTURE,
-            source_id="fixture:synthetic-scenario",
-            mode="developer_test",
-        )
-        self.working_world = HarnessWorkingWorld(self.source_snapshot)
-        self.scenario = self.working_world.data
         self.config = config or HarnessConfig.discover(
             repository=repository or REPOSITORY,
             core_repository=core_repository or CORE_REPOSITORY,
@@ -82,55 +66,26 @@ class LuaSemanticWorker:
                     ("PNC/Semantics/SemanticDialogueResponseCatalog/"
                      "PNC_SemanticDialogueResponseCatalog_FlowGreeting")),
             )
-        self.activity_log = activity_log or ActivityLog(
-            path=default_activity_path(self.config.repository),
-            client="api",
-        )
-        self.runtime = LuaProcess(
+        super().__init__(
+            scenario,
             build_worker_launch_spec(self.config),
-            activity_log=self.activity_log,
+            activity_log=activity_log,
+            import_source_on_start=self.config.profile != "core",
         )
         self._authoring = WorkerAuthoringOperations(self)
         self._conversation = WorkerConversationOperations(self)
         self._knowledge = WorkerKnowledgeOperations(self)
         self._matrix = WorkerMatrixOperations(self)
         self._sources = WorkerSourceOperations(self)
-        try:
-            self.runtime.start()
-            if self.config.profile != "core":
-                self.import_source(scenario)
-        except Exception:
-            self.runtime.close()
-            raise
 
-    @property
-    def process(self) -> Any:
-        """Compatibility access for diagnostics; prefer status()."""
+    def _normalize_scenario(self, scenario: dict[str, Any]) -> dict[str, Any]:
+        return normalize_scenario(scenario)
 
-        return self.runtime.process
-
-    def status(self) -> dict[str, Any]:
-        return self.runtime.status()
-
-    def _request(self, command: str, value: Any = None) -> dict[str, Any]:
-        return self.runtime.request(command, value)
-
-    def configure(self, scenario: dict[str, Any]) -> dict[str, Any]:
-        """Apply a working-world draft without replacing the imported source."""
-
-        scenario = normalize_scenario(scenario)
+    def _validate_scenario(self, scenario: dict[str, Any]) -> None:
         validate_scenario(scenario)
-        response = self._request("CONFIG", scenario)
-        self.working_world.replace(scenario)
-        self.scenario = self.working_world.data
-        return response
 
-    def reset(self) -> dict[str, Any]:
-        """Reset the conversation/runtime containers, preserving world edits."""
-
-        response = self._request("RESET")
-        self._sync_effective_scenario(response)
-        return response
+    def _load_scenario(self, path: Path) -> dict[str, Any]:
+        return load_scenario(path)
 
     def import_source(
         self,
@@ -143,15 +98,15 @@ class LuaSemanticWorker:
         provenance: dict[str, Any] | None = None,
         provider_payloads: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Install a new immutable source and derive a fresh working world."""
+        """Add Hoomans fixture provenance before Core installs the source."""
 
-        scenario = normalize_scenario(scenario)
-        validate_scenario(scenario)
+        normalized = normalize_scenario(scenario)
+        validate_scenario(normalized)
         fixture_provider = OfflineEngineFixtureProvider()
         effective_payloads = deepcopy(provider_payloads or {})
         effective_payloads.setdefault(
             fixture_provider.provider_id,
-            fixture_provider.project(scenario),
+            fixture_provider.project(normalized),
         )
         effective_provenance = deepcopy(provenance or {})
         effective_provenance.setdefault("schema", "semantic.provenance.v1")
@@ -162,10 +117,10 @@ class LuaSemanticWorker:
             default_source = Provenance.MISSING.value
         effective_provenance.setdefault("defaultSource", default_source)
         effective_paths = effective_provenance.setdefault("paths", {})
-        for path, value in fixture_provider.provenance_paths(scenario).items():
+        for path, value in fixture_provider.provenance_paths(normalized).items():
             effective_paths.setdefault(path, value)
-        snapshot = ImportedSourceSnapshot.from_scenario(
-            scenario,
+        return super().import_source(
+            normalized,
             source=source,
             source_id=source_id,
             mode=mode,
@@ -173,7 +128,12 @@ class LuaSemanticWorker:
             provenance=effective_provenance,
             provider_payloads=effective_payloads,
         )
-        snapshot_data = snapshot.to_dict()
+
+    def _build_source_payload(
+        self, snapshot_data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Keep Hoomans registry and item fixtures in bounded side requests."""
+
         wire_provider_payloads = deepcopy(snapshot_data["providerPayloads"])
         project_hoomans = wire_provider_payloads.get("ProjectHoomans")
         raw_registries = (
@@ -182,20 +142,14 @@ class LuaSemanticWorker:
             else None
         )
         if isinstance(raw_registries, dict) and raw_registries:
-            # Faction/community registries are persisted source state, not a
-            # Python projection. Install them through a bounded side request
-            # so the selected NPC record and registry do not exceed the
-            # worker's JSON-lines message limit together.
             raw_registries = deepcopy(raw_registries)
             raw_knowledge = raw_registries.pop("npcKnowledge", None)
             if raw_registries:
                 self._request("INSTALL_PRODUCTION_REGISTRIES", raw_registries)
             if isinstance(raw_knowledge, dict):
-                # Knowledge is a separate persisted registry and can be much
-                # larger than the faction/community transport. Keep the raw
-                # record intact while giving it its own bounded request.
                 self._request("INSTALL_PRODUCTION_KNOWLEDGE", raw_knowledge)
             project_hoomans.pop("rawRegistries", None)
+
         project_zomboid = wire_provider_payloads.get("ProjectZomboid")
         item_type_fixture = (
             project_zomboid.get("itemTypeRegistry")
@@ -206,100 +160,32 @@ class LuaSemanticWorker:
             isinstance(item_type_fixture, dict)
             and isinstance(item_type_fixture.get("types"), list)
         ):
-            # The engine item registry is a genuine offline PZ fixture. Install
-            # it through its own bounded worker request so the raw save record
-            # and registry do not compete for the single JSON-line size limit.
             self._request("INSTALL_ENGINE_ITEM_TYPES", item_type_fixture)
             if isinstance(project_zomboid, dict):
                 project_zomboid.pop("itemTypeRegistry", None)
-        wire_scenario = snapshot_data["data"]
+
+        wire_scenario = deepcopy(snapshot_data["data"])
         if str(snapshot_data["metadata"].get("sourceKind")) == "SAVE":
-            # The selected NPC's persisted social graph is already carried in
-            # ProjectHoomans.rawRecords and is consumed by production Lua.
-            # Keep the detached request bounded when raw faction/community
-            # registries are transported alongside it; the Python source
-            # snapshot above remains complete for provenance and reset.
-            wire_scenario = deepcopy(wire_scenario)
             if isinstance(wire_scenario.get("npc"), dict):
                 wire_scenario["npc"].pop("social", None)
-        response = self._request(
-            "IMPORT_SOURCE",
-            {
-                "scenario": wire_scenario,
-                "metadata": snapshot_data["metadata"],
-                "provenance": snapshot_data["provenance"],
-                "providerPayloads": wire_provider_payloads,
-            },
-        )
-        # Keep provider projections available to the Python/UI read model. Lua
-        # only needs the source metadata/provenance for its response, while
-        # actor inspectors must be able to explain native SAVE/FIXTURE/LIVE
-        # state without rereading or reinterpreting a source.
-        if isinstance(response, dict):
-            response_source = response.setdefault("sourceSnapshot", {})
-            if isinstance(response_source, dict):
-                response_source["providerPayloads"] = deepcopy(
-                    snapshot.to_dict()["providerPayloads"]
-                )
-        self.source_snapshot = snapshot
-        self.working_world = HarnessWorkingWorld(snapshot)
-        self._sync_effective_scenario(response, establish_baseline=True)
-        return response
+        return {
+            "scenario": wire_scenario,
+            "metadata": deepcopy(snapshot_data["metadata"]),
+            "provenance": deepcopy(snapshot_data["provenance"]),
+            "providerPayloads": wire_provider_payloads,
+        }
 
-    def reload_source(
+    def _after_source_import(
         self,
-        scenario: dict[str, Any] | None = None,
-        *,
-        path: Path | None = None,
-        source: Provenance | str = Provenance.FIXTURE,
-        source_id: str | None = None,
-        mode: str = "developer_test",
+        snapshot: Any,
+        response: dict[str, Any],
     ) -> dict[str, Any]:
-        """Explicitly reread/reinstall a source; reset never calls this path."""
-
-        if path is not None:
-            scenario = load_scenario(Path(path))
-            source_id = source_id or f"fixture:file:{Path(path).resolve()}"
-        if scenario is None:
-            scenario = self.source_snapshot.to_dict()["data"]
-        return self.import_source(
-            scenario,
-            source=source,
-            source_id=source_id or "fixture:synthetic-scenario",
-            mode=mode,
-        )
-
-    def reset_turn(self) -> dict[str, Any]:
-        return self._request("RESET_TURN")
-
-    def reset_conversation(self) -> dict[str, Any]:
-        response = self._request("RESET_CONVERSATION")
-        self._sync_effective_scenario(response)
+        response_source = response.setdefault("sourceSnapshot", {})
+        if isinstance(response_source, dict):
+            response_source["providerPayloads"] = deepcopy(
+                snapshot.to_dict()["providerPayloads"]
+            )
         return response
-
-    def reset_selected_actor(self, actor: str = "npc") -> dict[str, Any]:
-        response = self._request("RESET_ACTOR_MUTATIONS", {"actor": str(actor)})
-        self._sync_effective_scenario(response)
-        return response
-
-    def reset_working_world(self) -> dict[str, Any]:
-        """Restore the imported snapshot without rereading its source."""
-
-        response = self._request("RESET_WORLD")
-        self.working_world.reset()
-        self._sync_effective_scenario(response)
-        return response
-
-    def _sync_effective_scenario(
-        self, response: dict[str, Any], *, establish_baseline: bool = False
-    ) -> None:
-        scenario = response.get("scenario") if isinstance(response, dict) else None
-        if isinstance(scenario, dict):
-            if establish_baseline:
-                self.working_world.set_baseline(scenario)
-            else:
-                self.working_world.replace(scenario)
-            self.scenario = self.working_world.data
 
     def input(self, text: str) -> dict[str, Any]:
         return self._conversation.input(text)
