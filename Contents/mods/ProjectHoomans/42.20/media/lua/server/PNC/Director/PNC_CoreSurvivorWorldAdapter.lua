@@ -155,6 +155,71 @@ function Adapter.CommitFaction(faction, reason)
     return canonical
 end
 
+local function commitFactionCommand(command, reason)
+    local current, failure = Adapter.EnsureCanonical()
+    if not current then return nil, failure end
+    local canonical, commandReason = command(current)
+    if not canonical then return nil, commandReason end
+    if commandReason == "unchanged" then
+        return canonical, commandReason
+    end
+    local ok
+    ok, failure = dirty(reason)
+    if not ok then return nil, failure end
+    return canonical, commandReason
+end
+
+function Adapter.AddFactionMember(factionID, actorID, reason)
+    return commitFactionCommand(
+        function(current)
+            return FactionService.AddMember(current, factionID, actorID)
+        end,
+        reason or "pnc_faction_member_added"
+    )
+end
+
+function Adapter.RemoveFactionMember(factionID, actorID, reason)
+    return commitFactionCommand(
+        function(current)
+            return FactionService.RemoveMember(current, factionID, actorID)
+        end,
+        reason or "pnc_faction_member_removed"
+    )
+end
+
+function Adapter.SetFactionLeader(factionID, actorID, reason)
+    return commitFactionCommand(
+        function(current)
+            return FactionService.SetLeader(current, factionID, actorID)
+        end,
+        reason or "pnc_faction_leader_changed"
+    )
+end
+
+function Adapter.TransferFactionMember(
+    sourceFactionID,
+    destinationFactionID,
+    actorID,
+    reason
+)
+    local current, failure = Adapter.EnsureCanonical()
+    if not current then return nil, failure end
+    local source, destination, commandReason = FactionService.TransferMember(
+        current,
+        sourceFactionID,
+        destinationFactionID,
+        actorID
+    )
+    if not source then return nil, destination end
+    if commandReason == "unchanged" then
+        return source, destination, commandReason
+    end
+    local ok
+    ok, failure = dirty(reason or "pnc_faction_member_transferred")
+    if not ok then return nil, failure end
+    return source, destination, commandReason
+end
+
 function Adapter.CommitCommunity(community, reason)
     if type(community) ~= "table" then
         return nil, "community_required"

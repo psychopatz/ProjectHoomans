@@ -40,6 +40,9 @@ function Factions.AddNPC(factionID, npcID, options)
     local at
     local dogTagChanged
     local behaviorChanged
+    local canonical
+    local coreReason
+    local usedCore = false
     if not Internal.authority() then return false, "not_authority" end
     Factions.EnsureLoaded()
     options = type(options) == "table" and options or {}
@@ -92,11 +95,31 @@ function Factions.AddNPC(factionID, npcID, options)
         end
         return false, "unchanged"
     end
+    local adapter = PNC.CoreSurvivorWorldAdapter
+    if adapter and type(adapter.AddFactionMember) ~= "function" then
+        return false, "core_faction_member_add_unsupported"
+    end
+    if adapter then
+        canonical, coreReason = adapter.AddFactionMember(
+            factionID,
+            npcID,
+            "pnc_faction_member_added"
+        )
+        if not canonical then
+            return false, coreReason or "core_faction_member_add_failed"
+        end
+        Internal.applyCanonicalFaction(faction, canonical)
+        usedCore = true
+    end
     faction.memberIDs[npcID] = true
     Internal.commitAffiliation(record, nextAffiliation)
     dogTagChanged = refreshFactionDogTag(record, faction)
-    Internal.touchFaction(faction)
-    Internal.touchRegistry()
+    if usedCore then
+        Internal.touchFactionView(faction)
+    else
+        Internal.touchFaction(faction)
+        Internal.touchRegistry()
+    end
     if PNC.FactionBehavior
         and PNC.FactionBehavior.ApplyNPC
     then
@@ -124,6 +147,9 @@ function Factions.RemoveNPC(
     local record
     local affiliation
     local former
+    local canonical
+    local coreReason
+    local usedCore = false
     if not Internal.authority() then return false, "not_authority" end
     Factions.EnsureLoaded()
     faction = Internal.registryRecord(factionID)
@@ -151,6 +177,22 @@ function Factions.RemoveNPC(
         formerFactionIDs = former,
         revision = affiliation.revision,
     })
+    local adapter = PNC.CoreSurvivorWorldAdapter
+    if adapter and type(adapter.RemoveFactionMember) ~= "function" then
+        return false, "core_faction_member_remove_unsupported"
+    end
+    if adapter then
+        canonical, coreReason = adapter.RemoveFactionMember(
+            factionID,
+            npcID,
+            "pnc_faction_member_removed"
+        )
+        if not canonical then
+            return false, coreReason or "core_faction_member_remove_failed"
+        end
+        Internal.applyCanonicalFaction(faction, canonical)
+        usedCore = true
+    end
     if PNC.Communities
         and PNC.Communities.OnFactionMembershipChanging
     then
@@ -164,8 +206,12 @@ function Factions.RemoveNPC(
         faction.leaderNPCID = nil
     end
     Internal.commitAffiliation(record, nextAffiliation)
-    Internal.touchFaction(faction)
-    Internal.touchRegistry()
+    if usedCore then
+        Internal.touchFactionView(faction)
+    else
+        Internal.touchFaction(faction)
+        Internal.touchRegistry()
+    end
     if PNC.FactionBehavior
         and PNC.FactionBehavior.ApplyUnaffiliated
     then
@@ -199,6 +245,10 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
     local leaveReason
     local dogTagChanged
     local behaviorChanged
+    local sourceCanonical
+    local destinationCanonical
+    local coreReason
+    local usedCore = false
     if not Internal.authority() then return false, "not_authority" end
     Factions.EnsureLoaded()
     options = type(options) == "table" and options or {}
@@ -228,6 +278,43 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
     leaveReason = Constants.VALID_LEAVE_REASONS[options.leaveReason]
         and options.leaveReason or "transferred"
     former = affiliation.formerFactionIDs
+    local adapter = PNC.CoreSurvivorWorldAdapter
+    if adapter and source
+        and type(adapter.TransferFactionMember) ~= "function"
+    then
+        return false, "core_faction_transfer_unsupported"
+    end
+    if adapter and source
+    then
+        sourceCanonical, destinationCanonical, coreReason =
+            adapter.TransferFactionMember(
+                source.id,
+                destination.id,
+                npcID,
+                "pnc_faction_member_transferred"
+            )
+        if not sourceCanonical then
+            return false, coreReason or "core_faction_transfer_failed"
+        end
+        Internal.applyCanonicalFaction(source, sourceCanonical)
+        Internal.applyCanonicalFaction(destination, destinationCanonical)
+        usedCore = true
+    elseif adapter
+    then
+        if type(adapter.AddFactionMember) ~= "function" then
+            return false, "core_faction_member_add_unsupported"
+        end
+        destinationCanonical, coreReason = adapter.AddFactionMember(
+            destination.id,
+            npcID,
+            "pnc_faction_member_added"
+        )
+        if not destinationCanonical then
+            return false, coreReason or "core_faction_member_add_failed"
+        end
+        Internal.applyCanonicalFaction(destination, destinationCanonical)
+        usedCore = true
+    end
     if source then
         if PNC.Communities
             and PNC.Communities.OnFactionMembershipChanging
@@ -244,7 +331,9 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
         if source.leaderNPCID == npcID then
             source.leaderNPCID = nil
         end
-        Internal.touchFaction(source)
+        if not usedCore then
+            Internal.touchFaction(source)
+        end
     end
     local nextAffiliation = Types.NormalizeAffiliation({
         factionID = destination.id,
@@ -260,8 +349,16 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
     destination.memberIDs[npcID] = true
     Internal.commitAffiliation(record, nextAffiliation)
     dogTagChanged = refreshFactionDogTag(record, destination)
-    Internal.touchFaction(destination)
-    Internal.touchRegistry()
+    if usedCore then
+        Internal.touchFactionView(destination, source ~= nil)
+        if source then
+            Internal.touchFactionView(source, true)
+            Internal.touchRegistry()
+        end
+    else
+        Internal.touchFaction(destination)
+        Internal.touchRegistry()
+    end
     if PNC.FactionBehavior
         and PNC.FactionBehavior.ApplyNPC
     then

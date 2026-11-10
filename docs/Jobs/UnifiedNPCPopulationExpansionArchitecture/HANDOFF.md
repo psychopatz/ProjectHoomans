@@ -3,10 +3,10 @@ handoff_schema: 2
 checkpoint_mode: "documentation_checkpoint"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
-state: "READY_FOR_P2B_HOOMANS_MEMBERSHIP_ADAPTER"
+state: "READY_FOR_P2C_ACTOR_ADOPTION"
 parent_status: "IN_PROGRESS"
-phase: "P2B"
-chunk: "hoomans-membership-adapter"
+phase: "P2C"
+chunk: "canonical-actor-adoption-and-hydration"
 retrieval_tier: "verify"
 ---
 
@@ -33,11 +33,11 @@ will be created.
 
 ## Resume action
 
-Continue P2B by making Hoomans membership commands delegate generic member,
-leader, and status changes to Core, then reconcile the returned canonical
-projection into the Hoomans compatibility view. Keep Dynamic Trading unchanged
-until this boundary is stable. The Core-owned profile and mutation services,
-map-presence, and monitor-presence slices are implemented and verified.
+Continue P2C by adopting and hydrating canonical Core actors before Hoomans
+materializes or presents them. Keep Dynamic Trading unchanged until this
+identity boundary is stable. The Core-owned profile and mutation services,
+Hoomans NPC membership adapter, map-presence, and monitor-presence slices are
+implemented and verified.
 
 ## Evidence and repository state
 
@@ -55,9 +55,13 @@ map-presence, and monitor-presence slices are implemented and verified.
   existing faction-service declaration-count mismatch remains unrelated
   (`87` expected versus `88` actual).
 - `CODE_VERIFIED`: Core `SurvivorWorld.FactionService` owns the shared generic
-  faction command surface; Hoomans `CommitFaction` routes through it.
+  faction command surface, including transfer; Hoomans `CommitFaction` and
+  the NPC membership adapter route through it.
 - `TEST_VERIFIED`: Core faction-service smoke and Hoomans Core-adapter,
   faction-profile bridge, and mobile-group smokes pass.
+- `TEST_VERIFIED`: Core faction transfer, Hoomans member add/remove/leader
+  adapter commands, faction-foundation, mobile-group, and trader-staffing
+  smokes pass.
 - `TEST_VERIFIED`: focused Hoomans and Core P2 map/materializer smokes pass;
   the unrelated faction-boundary declaration-count smoke remains stale at
   `87` expected versus `88` actual.

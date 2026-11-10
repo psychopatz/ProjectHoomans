@@ -107,8 +107,13 @@ contract, while Hoomans owns how a supported profile becomes a PZ NPC.
 Core faction mutations use the `SurvivorWorld.FactionService` command surface.
 Adopters submit validated faction candidates or explicit member, leader, and
 status commands; the Core registry normalizes and persists the canonical
-result. Hoomans may maintain a compatibility projection, but it must not
-write a second generic faction record outside this boundary.
+result. Hoomans NPC add/remove/transfer/leader operations use the explicit
+member command surface and reconcile the returned canonical projection before
+applying PNC-specific side effects. Hoomans may maintain a compatibility
+projection, but it must not write a second generic faction record outside this
+boundary. If the adapter is present but a required Core command is missing,
+the operation fails closed rather than falling back to a second generic
+writer.
 
 Hoomans accepts a committed Core group and either adopts or materializes each
 member through one idempotent boundary. It owns:

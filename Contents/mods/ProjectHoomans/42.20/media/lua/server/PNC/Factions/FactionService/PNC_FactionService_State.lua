@@ -95,6 +95,39 @@ function Internal.touchFaction(faction)
     end
 end
 
+function Internal.touchFactionView(faction, deferRegistryTouch)
+    faction.revision = math.max(
+        0,
+        math.floor(tonumber(faction.revision) or 0)
+    ) + 1
+    if deferRegistryTouch ~= true then
+        Internal.touchRegistry()
+    end
+end
+
+function Internal.applyCanonicalFaction(faction, canonical)
+    if type(faction) ~= "table" or type(canonical) ~= "table" then
+        return false, "canonical_faction_required"
+    end
+    faction.name = canonical.name
+    faction.archetypeID = canonical.archetypeID
+    faction.status = canonical.status
+    faction.createdAt = canonical.createdAt
+    faction.archivedAt = canonical.archivedAt
+    faction.tags = Internal.copy(canonical.tags or {})
+    faction.leaderNPCID = canonical.leaderActorID
+    faction.memberIDs = {}
+    for _, actorID in ipairs(canonical.memberActorIDs or {}) do
+        faction.memberIDs[actorID] = true
+    end
+    faction.revision = math.max(
+        0,
+        math.floor(tonumber(canonical.revision)
+            or tonumber(faction.revision) or 0)
+    )
+    return true
+end
+
 function Internal.touchRegistry()
     Factions.Registry.revision = math.max(
         0,

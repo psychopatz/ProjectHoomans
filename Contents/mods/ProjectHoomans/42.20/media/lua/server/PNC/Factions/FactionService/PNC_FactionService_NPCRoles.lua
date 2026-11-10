@@ -85,6 +85,10 @@ function Factions.SetLeader(
     local oldRecord
     local oldAffiliation
     local at
+    local oldLeaderID
+    local canonical
+    local coreReason
+    local usedCore = false
     if not Internal.authority() then return false, "not_authority" end
     Factions.EnsureLoaded()
     options = type(options) == "table" and options or {}
@@ -97,12 +101,36 @@ function Factions.SetLeader(
     if not record then return false, "npc_not_found" end
     affiliation = Internal.affiliationFor(record)
     at = Internal.finiteTimestamp(worldAgeHours, 0)
+    oldLeaderID = faction.leaderNPCID
+    if faction.leaderNPCID == npcID
+        and record.affiliation
+        and record.affiliation.role == "leader"
+        and record.affiliation.rank == "leader"
+    then
+        return false, "unchanged"
+    end
     if affiliation.factionID ~= factionID then
         if options.addIfMissing ~= true then
             return false, "leader_not_member"
         end
         if affiliation.factionID then
             return false, "npc_already_affiliated"
+        end
+        local adapter = PNC.CoreSurvivorWorldAdapter
+        if adapter and type(adapter.AddFactionMember) ~= "function" then
+            return false, "core_faction_member_add_unsupported"
+        end
+        if adapter then
+            canonical, coreReason = adapter.AddFactionMember(
+                factionID,
+                npcID,
+                "pnc_faction_member_added"
+            )
+            if not canonical then
+                return false, coreReason or "core_faction_member_add_failed"
+            end
+            Internal.applyCanonicalFaction(faction, canonical)
+            usedCore = true
         end
         affiliation = Types.NormalizeAffiliation({
             factionID = factionID,
@@ -124,10 +152,26 @@ function Factions.SetLeader(
         affiliation.role = "leader"
         affiliation.rank = "leader"
     end
-    if faction.leaderNPCID
-        and faction.leaderNPCID ~= npcID
+    local adapter = PNC.CoreSurvivorWorldAdapter
+    if adapter and type(adapter.SetFactionLeader) ~= "function" then
+        return false, "core_faction_leader_unsupported"
+    end
+    if adapter then
+        canonical, coreReason = adapter.SetFactionLeader(
+            factionID,
+            npcID,
+            "pnc_faction_leader_changed"
+        )
+        if not canonical then
+            return false, coreReason or "core_faction_leader_failed"
+        end
+        Internal.applyCanonicalFaction(faction, canonical)
+        usedCore = true
+    end
+    if oldLeaderID
+        and oldLeaderID ~= npcID
     then
-        oldRecord = PNC.Registry.Get(faction.leaderNPCID)
+        oldRecord = PNC.Registry.Get(oldLeaderID)
         if oldRecord then
             oldAffiliation = Internal.affiliationFor(oldRecord, faction)
             oldAffiliation.rank = "member"
@@ -140,17 +184,14 @@ function Factions.SetLeader(
             Internal.commitAffiliation(oldRecord, oldAffiliation)
         end
     end
-    if faction.leaderNPCID == npcID
-        and record.affiliation
-        and record.affiliation.role == "leader"
-        and record.affiliation.rank == "leader"
-    then
-        return false, "unchanged"
-    end
     faction.leaderNPCID = npcID
     Internal.commitAffiliation(record, affiliation)
-    Internal.touchFaction(faction)
-    Internal.touchRegistry()
+    if usedCore then
+        Internal.touchFactionView(faction)
+    else
+        Internal.touchFaction(faction)
+        Internal.touchRegistry()
+    end
     return true, "leader_set", Internal.copy(faction)
 end
 

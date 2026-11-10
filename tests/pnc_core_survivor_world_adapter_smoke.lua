@@ -69,6 +69,21 @@ T.equal(faction.leaderActorID, "actor_leader",
 T.equal(#faction.memberActorIDs, 2,
     "PNC member set must normalize into Core")
 
+local memberAdded = assert(Adapter.AddFactionMember(
+    "faction_new", "actor_extra", "test_member_add"))
+T.equal(#memberAdded.memberActorIDs, 3,
+    "adapter delegates member add to Core")
+local leaderChanged = assert(Adapter.SetFactionLeader(
+    "faction_new", "actor_extra", "test_leader"))
+T.equal(leaderChanged.leaderActorID, "actor_extra",
+    "adapter delegates leader change to Core")
+local memberRemoved = assert(Adapter.RemoveFactionMember(
+    "faction_new", "actor_extra", "test_member_remove"))
+T.equal(#memberRemoved.memberActorIDs, 2,
+    "adapter delegates member removal to Core")
+T.equal(memberRemoved.leaderActorID, nil,
+    "Core clears the removed leader through the adapter")
+
 local community = assert(Adapter.CommitCommunity({
     id = "community_new",
     factionID = "faction_new",

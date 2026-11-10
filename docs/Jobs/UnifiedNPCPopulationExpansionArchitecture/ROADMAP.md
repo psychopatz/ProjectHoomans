@@ -1,6 +1,6 @@
 # Roadmap — Unified NPC Population and Expansion Architecture
 
-**Status:** P2B CORE FACTION MUTATION SLICE IMPLEMENTED — HOOMANS MEMBERSHIP ADAPTER NEXT.
+**Status:** P2C HOOMANS MEMBERSHIP ADAPTER IMPLEMENTED — ACTOR ADOPTION/HYDRATION NEXT.
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -46,8 +46,10 @@ The remaining split is at the ownership boundaries:
    with Core.
 2. Hoomans still has a large generation/materialization path and local
    compatibility membership state. Core now owns the public generic faction
-   mutation service, but Hoomans membership commands still need to delegate
-   their generic member/leader updates explicitly.
+   mutation service, and Hoomans NPC membership commands delegate their
+   generic member/leader/transfer updates through that service. Actor
+   adoption/hydration and the remaining Hoomans-specific faction projections
+   are still in scope.
 3. Map/hover projections can expose a marker before its canonical actor or
    provider lease is hydrated. The resulting `UNKNOWN` value is not a valid
    presence mode; it is an invalid or incomplete projection that must be
@@ -161,9 +163,33 @@ keep Hoomans' PNC compatibility projection and domain behavior unchanged.
 normalization and persistence dirtiness; Hoomans mobile and faction tests pass;
 no Core module imports Hoomans or Dynamic Trading.
 
-**Checkpoint:** implemented. The remaining P2B work is replacing direct
-Hoomans membership mutations with Core commands and reconciling the returned
-canonical projection before Dynamic Trading migration.
+**Checkpoint:** implemented. Hoomans' Core adapter now exposes the explicit
+member add/remove, transfer, and leader commands. The NPC add/remove/transfer
+and leader paths reconcile the returned canonical projection before applying
+PNC affiliation, dogtag, behavior, and scheduler side effects. The detached
+unit-test fallback remains available only when no Core adapter is loaded;
+once an adapter is present, missing command capabilities fail closed. The
+remaining P2 boundary is canonical actor adoption/hydration and a later
+status/lifecycle command pass before Dynamic Trading migration.
+
+### P2C — Hoomans generic membership adapter (implemented)
+
+Route Hoomans generic NPC membership mutations through Core's faction command
+surface. Core owns the canonical member list and leader identity; Hoomans
+continues to own PNC records, affiliation history, dogtags, faction behavior,
+provision scheduling, and the physical/abstract NPC lifecycle. Transfers use
+one Core command so the source and destination canonical records move together,
+with explicit rollback failure reporting.
+
+**Gate:** Core transfer and command tests pass; the Hoomans adapter preserves
+Core normalization and dirty reasons; NPC add/remove/transfer/leader behavior,
+mobile-group, and trader-staffing tests pass; no partial adapter capability can
+silently fall back to a second generic writer.
+
+**Checkpoint:** implemented in the current Core and Project Hoomans
+worktrees. Player membership commands and actor adoption/hydration remain
+Hoomans-specific follow-up boundaries. Dynamic Trading migration has not
+started.
 
 ### P3 — Dynamic Trading adapter migration
 
