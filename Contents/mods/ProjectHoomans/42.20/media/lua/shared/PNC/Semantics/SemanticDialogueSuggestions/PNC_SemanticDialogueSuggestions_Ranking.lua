@@ -103,7 +103,7 @@ function Ranking.ClassFor(candidate, actor, currentTopic)
         return "DIRECT_RESPONSE"
     end
     if kind == "permitted_capability" or kind == "dynamic_trading"
-        or candidate and candidate.providerID == "dynamictrading.trader"
+        or candidate and candidate.providerID == "DT.trader"
         or candidate and candidate.action ~= nil
     then
         return "GAMEPLAY_ACTION"

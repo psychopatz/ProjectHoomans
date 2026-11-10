@@ -21,7 +21,7 @@ The native console records:
 The current flow is:
 
 1. Project Hoomans delegates the context-menu Talk action to the shared
-   `dynamictrading.trader` opener.
+   `DT.trader` opener.
 2. DTHoomans sends `ConversationAccessRequest` for the clicked member.
 3. The server accepts the selected member and returns its actor ID.
 4. The shared conversation builder cannot resolve that actor in the current

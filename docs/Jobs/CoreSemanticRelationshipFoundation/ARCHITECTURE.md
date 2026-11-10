@@ -198,7 +198,7 @@ An actor/session exposes capabilities such as:
 core.conversation
 core.relationships
 
-dynamictrading.trade
+DT.trade
 dynamictrading.radio
 dynamictrading.commercial_info
 

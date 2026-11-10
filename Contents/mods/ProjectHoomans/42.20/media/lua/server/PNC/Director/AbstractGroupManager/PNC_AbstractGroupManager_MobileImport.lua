@@ -27,10 +27,14 @@ function Groups.ImportMobileFaction(factionOrID, options)
     if not faction or not PNC.Factions.IsMobileGroup(faction) then
         return nil, "not_mobile_group"
     end
+    local commercial = PNC.FactionArchetypes
+        and PNC.FactionArchetypes.HasCapability
+        and PNC.FactionArchetypes.HasCapability(
+            faction.archetypeID, "commercial") == true
     local location, reason = Locations.RegisterSite(faction.mobile.site, {
         tags = { SHELTER = true,
             SAFE = faction.archetypeID == "refugee",
-            COMMERCIAL = faction.archetypeID == "trader" },
+            COMMERCIAL = commercial },
     })
     if not location then return nil, reason end
     local existing = Groups.FindByFactionID(faction.id)

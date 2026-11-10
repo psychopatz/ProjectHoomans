@@ -32,6 +32,12 @@ local actor = assert(actorRegistry:Create({
     actorId = "actor:adapter",
     identitySeed = "adapter",
     world = { position = { x = 100, y = 200, z = 0 } },
+    providerLease = {
+        provider = "PsychopatzCore",
+        owner = "fixture:adapter",
+        state = "abstract",
+        acquiredAt = 0,
+    },
     extensions = {
         ["PsychopatzCore.SurvivorWorld"] = {
             factionID = faction.id,

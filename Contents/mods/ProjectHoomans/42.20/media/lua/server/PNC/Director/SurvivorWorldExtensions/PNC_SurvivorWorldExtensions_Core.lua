@@ -185,4 +185,22 @@ Extensions.Internal.Copy = copy
 Extensions.Internal.SetFromArray = setFromArray
 Extensions.Internal.Reset = Reset
 
+function Extensions.IsCoreFactionProjectable(coreFaction)
+    if type(coreFaction) ~= "table" then return false end
+    local policy = PNC.OptionalProviderPolicy
+    if not policy then return true end
+    return policy.ShouldProject(nil, {
+        factionArchetypeID = coreFaction.archetypeID,
+    }) == true
+end
+
+function Extensions.IsCoreRecordProjectable(coreSnapshot, record)
+    if type(record) ~= "table" then return false end
+    local factionID = record.factionID or record.factionId
+    local faction = coreSnapshot
+        and coreSnapshot.factions
+        and factionID and coreSnapshot.factions[factionID] or nil
+    return not faction or Extensions.IsCoreFactionProjectable(faction)
+end
+
 return Extensions

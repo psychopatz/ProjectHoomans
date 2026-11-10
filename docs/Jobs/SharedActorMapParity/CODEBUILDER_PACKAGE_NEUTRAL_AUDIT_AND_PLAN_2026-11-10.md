@@ -117,7 +117,7 @@ translations in the wrong package even if its Lua shard were routed correctly.
 `semantic_definition_compiler.py:65-75` scans only
 `Contents/mods/ProjectHoomans/*/media/lua/**/PNC_Semantic*.lua`.
 
-DTCommon capabilities such as `dynamictrading.trade` are outside that search
+DTCommon capabilities such as `DT.trade` are outside that search
 root. A package-neutral semantic flow compiler cannot validate DT capabilities
 through the current discovery function, and the default capability set is also
 PNC-specific (`semantic_definition_compiler.py:44-51`).
@@ -420,7 +420,7 @@ waiting for a safe non-runtime window because Project Zomboid is currently
 running and its media watcher must not observe in-place generated-file writes.
 
 - Package descriptors now declare translation-manifest locations and
-  capability catalog inputs. DTCommon declares `dynamictrading.trade` and its
+  capability catalog inputs. DTCommon declares `DT.trade` and its
   semantic-pack scan patterns; Hoomans retains its compatibility scan pattern.
 - Capability discovery accepts explicit optional package repositories and
   merges descriptor-declared IDs with discovered IDs. Conversation shards,

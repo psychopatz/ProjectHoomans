@@ -34,7 +34,7 @@ local Openers = T.load(
 )
 local opened
 Openers.Register({
-    id = "dynamictrading.trader",
+    id = "DT.trader",
     priority = 100,
     canOpen = function(entry) return entry.id == "trader-npc" end,
     open = function(entry, player)

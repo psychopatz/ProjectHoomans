@@ -214,11 +214,15 @@ function Extensions.RebuildAbstract(coreSnapshot)
     for groupID, coreGroup in pairs(
         coreSnapshot.groups or {}
     ) do
-        raw.groupsByID[groupID] = rawGroup(
-            coreGroup,
-            extension.groups
-                and extension.groups[groupID]
-        )
+        if Extensions.IsCoreRecordProjectable(
+            coreSnapshot, coreGroup)
+        then
+            raw.groupsByID[groupID] = rawGroup(
+                coreGroup,
+                extension.groups
+                    and extension.groups[groupID]
+            )
+        end
     end
 
     return PNC.AbstractWorldTypes.NormalizeRegistry(raw)

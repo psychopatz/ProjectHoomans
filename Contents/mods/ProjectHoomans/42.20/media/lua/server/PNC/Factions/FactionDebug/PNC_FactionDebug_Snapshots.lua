@@ -38,7 +38,10 @@ local function buildRoster(player, playerKey, diplomacyFaction, at)
     local roster = {}
     local diagnostics = {}
     for _, record in pairs(PNC.Registry.Data or {}) do
-        if record.alive ~= false then
+        if record.alive ~= false
+            and (not record.runtime
+                or record.runtime.providerUnavailable ~= true)
+        then
             roster[#roster + 1] = npcSummary(record)
             diagnostics[#diagnostics + 1] = npcDiagnostic(
                 record, player, playerKey, diplomacyFaction, at)

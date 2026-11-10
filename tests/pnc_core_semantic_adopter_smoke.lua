@@ -61,8 +61,8 @@ T.equal(pack.id, "pack.projecthoomans.social_core", "id matches")
 local dtContext = {
     actorID = "dt_trader_bob",
     capabilities = {
-        ["dynamictrading.trade"] = true,
-        ["dynamictrading.merchant"] = true,
+        ["DT.trade"] = true,
+        ["DT.merchant"] = true,
     },
     traderRole = "merchant",
     isCompanion = false,
@@ -84,7 +84,7 @@ end
 -- Verify DT trade action is present
 local hasTrade = false
 for _, action in ipairs(dtActions) do
-    if action.id == "dynamictrading.trade" then
+    if action.id == "DT.trade" then
         hasTrade = true
         break
     end
@@ -116,7 +116,7 @@ for _, action in ipairs(companionActions) do
     if action.id == "hoomans.command.follow" then hasFollow = true end
     if action.id == "hoomans.command.camp" then hasCamp = true end
     if action.id == "hoomans.inventory.inspect" then hasInspect = true end
-    if string.find(action.id, "dynamictrading.", 1, true) then
+    if action.id == "DT.trade" then
         hasTradeOnCompanion = true
     end
 end

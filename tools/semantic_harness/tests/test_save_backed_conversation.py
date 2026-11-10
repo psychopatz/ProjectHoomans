@@ -308,7 +308,7 @@ class SaveBackedConversationTests(unittest.TestCase):
             self.assertTrue(integration["traderOverlay"]["enabled"])
             self.assertEqual(
                 integration["traderOverlay"]["providerID"],
-                "dynamictrading.trader",
+                "DT.trader",
             )
             self.assertTrue(integration["dynamicTrading"]["loaded"])
 

@@ -140,7 +140,7 @@ T.equal(affiliationDefault.membershipStatus,
     "unaffiliated", "default status")
 T.equal(affiliationDefault.role, "civilian", "default role")
 T.equal(affiliationDefault.rank, "member", "default rank")
-for _, id in ipairs({ "settler", "looter", "trader", "refugee" }) do
+for _, id in ipairs({ "settler", "looter", "refugee" }) do
     local definition = Archetypes.Get(id)
     T.truthy(definition ~= nil, "archetype " .. id)
     T.truthy(definition.allowedRoles[definition.defaultRole],
@@ -193,7 +193,7 @@ local _, _, looters = Factions.Create({
 local looterID = looters.id
 local _, _, traders = Factions.Create({
     name = "Knox Exchange",
-    archetypeID = "trader",
+    archetypeID = "settler",
     createdAt = 100,
 })
 local traderID = traders.id

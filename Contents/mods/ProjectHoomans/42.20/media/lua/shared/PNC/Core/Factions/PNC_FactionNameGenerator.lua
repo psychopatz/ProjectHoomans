@@ -35,18 +35,6 @@ local POOLS = {
         site = { "Den", "Hideout", "Hold", "Lair" },
         article = true,
     },
-    trader = {
-        first = {
-            "Bluegrass", "Bridgeway", "Crossroads", "Frontier",
-            "Iron Road", "Long Haul", "Northstar", "Riverside",
-            "Safe Passage", "Three Rivers", "Westbound",
-        },
-        second = {
-            "Caravan", "Exchange Caravan", "Mercantile Caravan",
-            "Supply Caravan", "Trading Caravan",
-        },
-        site = { "Depot", "Exchange", "Market", "Waystation" },
-    },
     refugee = {
         first = {
             "Dawn", "Eastbound", "Hope", "Lantern", "New Day",

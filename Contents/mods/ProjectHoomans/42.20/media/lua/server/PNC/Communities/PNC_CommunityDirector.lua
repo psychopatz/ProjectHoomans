@@ -10,7 +10,6 @@ PNC.CommunityDirector.Internal = PNC.CommunityDirector.Internal or {}
 require "PNC/Communities/CommunityDirector/PNC_CommunityDirector_Core"
 require "PNC/Communities/CommunityDirector/PNC_CommunityDirector_SiteSelection"
 require "PNC/Communities/CommunityDirector/PNC_CommunityDirector_NPCSpawner"
-require "PNC/Communities/CommunityDirector/PNC_CommunityDirector_TraderStaffing"
 require "PNC/Communities/CommunityDirector/PNC_CommunityDirector_Generation"
 
 return PNC.CommunityDirector

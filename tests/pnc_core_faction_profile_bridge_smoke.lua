@@ -7,14 +7,10 @@ local Archetypes = require
 local Profiles = require
     "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldFactionProfiles"
 
-local trader = Profiles.Get("trader")
-T.truthy(trader, "Hoomans built-in profile is registered in Core")
-T.equal(trader.sourceMod, "ProjectHoomans",
-    "profile source is explicit")
-T.equal(trader.defaultRole, Archetypes.GetDefaultRole("trader"),
-    "Hoomans facade reads Core default role")
-T.equal(trader.capabilities.mobile, true,
-    "mobile capability is stored in Core")
+T.falsy(Profiles.Get("trader"),
+    "Hoomans does not register a Dynamic Trading alias")
+T.falsy(Profiles.Get("DT.trader"),
+    "optional Dynamic Trading profile is absent when its provider is absent")
 
 local registered, reason = Archetypes.Register("fixture:core_profile", {
     label = "Core Profile Fixture",

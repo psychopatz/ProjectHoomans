@@ -131,10 +131,12 @@ function Extensions.RebuildFactions(coreSnapshot)
     for factionID, coreFaction in pairs(
         coreSnapshot.factions or {}
     ) do
-        raw.byID[factionID] = rawFaction(
-            coreFaction,
-            extensions[factionID]
-        )
+        if Extensions.IsCoreFactionProjectable(coreFaction) then
+            raw.byID[factionID] = rawFaction(
+                coreFaction,
+                extensions[factionID]
+            )
+        end
     end
     return PNC.FactionTypes.NormalizeFactionRegistry(raw)
 end

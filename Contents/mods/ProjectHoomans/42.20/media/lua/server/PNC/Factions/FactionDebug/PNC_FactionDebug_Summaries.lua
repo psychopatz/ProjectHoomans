@@ -28,7 +28,10 @@ local function factionSummary(faction)
     if mobile and mobile.active == true then
         if faction.archetypeID == "looter" then
             archetypeLabel = "Mobile Looter Group"
-        elseif faction.archetypeID == "trader" then
+        elseif Archetypes.HasCapability
+            and Archetypes.HasCapability(
+                faction.archetypeID, "commercial")
+        then
             archetypeLabel = "Trading Caravan"
         end
     end

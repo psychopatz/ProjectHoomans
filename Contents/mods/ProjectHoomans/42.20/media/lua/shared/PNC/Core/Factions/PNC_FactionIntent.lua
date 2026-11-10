@@ -140,7 +140,10 @@ function Intent.Resolve(spec)
         return result("avoid", false, false, false,
             "cautious_outsider_policy")
     end
-    if archetypeID == "trader"
+    if PNC.FactionArchetypes
+        and PNC.FactionArchetypes.HasCapability
+        and PNC.FactionArchetypes.HasCapability(
+            archetypeID, "commercial")
         or policy.outsiderPolicy == "commercial"
     then
         return result("tolerate", false, false, false,

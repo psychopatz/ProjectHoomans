@@ -24,10 +24,6 @@ H.RoleOrder = H.RoleOrder or {
         "leader", "raider", "enforcer", "scavenger",
         "guard", "medic",
     },
-    trader = {
-        "leader", "trader", "guard", "medic",
-        "mechanic", "scavenger", "laborer",
-    },
     refugee = {
         "leader", "medic", "guard", "caregiver",
         "scavenger",

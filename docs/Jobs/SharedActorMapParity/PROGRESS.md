@@ -89,7 +89,7 @@ bootstrap and DTHoomans' canonical-actor path preserve that metadata. DTHoomans
 also carries the shared SurvivorWorld faction affiliation onto the Core actor,
 so its projection does not depend on a provider-specific `dt...` marker lookup.
 DynamicTrading conversation now resolves aliases before projection lookup and
-permits trade through `dynamictrading.trade`, independent of the actor role.
+permits trade through `DT.trade`, independent of the actor role.
 The common trader-world runtime publishes when Core actor projection state is
 dirty, closing the registration/projection race that produced invisible or
 untalkable traders.

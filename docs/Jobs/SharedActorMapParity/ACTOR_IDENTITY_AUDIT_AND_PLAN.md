@@ -73,7 +73,7 @@ The Core identity record should expose:
 - `providerID`: producer/adopter metadata only;
 - `presenceState`: `materialized`, `abstract`, or `released`;
 - `sourceID`, group/community/faction context, and capabilities such as
-  `conversation` and `dynamictrading.trade`.
+  `conversation` and `DT.trade`.
 
 The only intended provider distinction is presence:
 

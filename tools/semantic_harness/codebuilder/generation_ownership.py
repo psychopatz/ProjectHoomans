@@ -102,7 +102,7 @@ PACKAGE_DESCRIPTORS = {
         registry_module=DT_COMMON_CONVERSATION_PREFIX + "/Registry",
         registry_namespace="DTCommon.Semantics.ConversationRegistry",
         translation_manifest_relative=Path("manifests/Conversation.json"),
-        capability_ids=("dynamictrading.trade",),
+        capability_ids=("DT.trade",),
         capability_globs=(
             "Contents/mods/DTCommon/*/media/lua/**/DTCommon_Semantic*.lua",
         ),

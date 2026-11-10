@@ -96,14 +96,13 @@ Config.Population = {
         SCAVENGER = "refugee", WANDERER = "refugee",
     },
     SETTLEMENT_FACTION_WEIGHTS = {
-        settler = 0.55, trader = 0.18,
-        refugee = 0.17, looter = 0.10,
+        settler = 0.73,
+        refugee = 0.17,
+        looter = 0.10,
     },
     SETTLEMENT_PREFERENCES = {
         settler = { HOUSE = 1.25, RURAL = 1.30,
             RESIDENTIAL = 1.15, COMMERCIAL = 0.75, INDUSTRIAL = 0.85 },
-        trader = { COMMERCIAL = 1.35, ROAD = 1.25,
-            INDUSTRIAL = 1.05, HOUSE = 0.85 },
         refugee = { HOUSE = 1.20, RURAL = 1.15,
             SAFE = 1.25, COMMERCIAL = 0.75 },
         looter = { COMMERCIAL = 1.25, INDUSTRIAL = 1.25,

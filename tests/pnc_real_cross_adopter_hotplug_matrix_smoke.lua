@@ -437,7 +437,7 @@ T.equal(bobRelAfterDT.extensions.DynamicTrading.totalTrades, 1, "DT extension at
 T.equal(bobRelAfterDT.extensions.ProjectHoomans.bond.class, "friend", "Hoomans bond intact")
 
 -- 4. SIMULATE REMOVING DYNAMIC TRADING
-PackRegistry.UnregisterPack("pack.dynamictrading.trader_story")
+PackRegistry.UnregisterPack("pack.DT.trader_story")
 
 -- Hoomans interacts with Bob while DT is inactive
 hoomansElenaRecord.social = PNC.Persistence.CoreSocial.FromCoreSocial(coreElenaAfterDT.social)
@@ -497,7 +497,7 @@ local convService = ActorConversationService.New({
 -- Test 3A: DT-only capabilities must NOT parse Hoomans COMMAND
 do
     local dtContext = {
-        capabilities = { "core.conversation", "dynamictrading.trade", "dynamictrading.whereabouts" },
+        capabilities = { "core.conversation", "DT.trade", "DT.whereabouts" },
         targetKey = aliceCanonicalKey,
     }
     local res, why = convService:Submit("follow me", dtContext)
@@ -510,7 +510,7 @@ end
 -- Test 3B: DT-only capabilities accept DT trade
 do
     local dtContext = {
-        capabilities = { "core.conversation", "dynamictrading.trade", "dynamictrading.whereabouts" },
+        capabilities = { "core.conversation", "DT.trade", "DT.whereabouts" },
         targetKey = aliceCanonicalKey,
     }
     local res, why = convService:Submit("trade", dtContext)
@@ -894,13 +894,13 @@ print("[cross-adopter] Sequence 4 PASSED.")
 print("[cross-adopter] Starting Sequence 5: Pack Unregister / Re-register Lifecycle")
 
 do
-    T.truthy(PackRegistry.GetPack("pack.dynamictrading.trader_story") ~= nil, "DT pack initially registered")
+    T.truthy(PackRegistry.GetPack("pack.DT.trader_story") ~= nil, "DT pack initially registered")
     T.truthy(PackRegistry.GetPack("pack.projecthoomans.social_core") ~= nil, "Hoomans pack initially registered")
 
     -- Unregister DT pack
-    local unregOk, unregErr = PackRegistry.UnregisterPack("pack.dynamictrading.trader_story")
+    local unregOk, unregErr = PackRegistry.UnregisterPack("pack.DT.trader_story")
     T.truthy(unregOk, unregErr)
-    T.falsy(PackRegistry.GetPack("pack.dynamictrading.trader_story") ~= nil, "DT pack unregistered")
+    T.falsy(PackRegistry.GetPack("pack.DT.trader_story") ~= nil, "DT pack unregistered")
 
     -- Verify no DT patterns remain in registry
     local patterns = Semantics.Registry.GetPatterns()
@@ -910,7 +910,7 @@ do
 
     -- Re-register DT pack
     DTCommon.SemanticPack.Init()
-    T.truthy(PackRegistry.GetPack("pack.dynamictrading.trader_story") ~= nil, "DT pack re-registered cleanly")
+    T.truthy(PackRegistry.GetPack("pack.DT.trader_story") ~= nil, "DT pack re-registered cleanly")
 
     -- Unregister Hoomans pack
     local unregHOk, unregHErr = PackRegistry.UnregisterPack("pack.projecthoomans.social_core")

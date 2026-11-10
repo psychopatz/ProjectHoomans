@@ -57,10 +57,6 @@ local ROLE_ORDER = {
         "leader", "raider", "enforcer", "scavenger",
         "guard", "medic",
     },
-    trader = {
-        "leader", "trader", "guard", "medic",
-        "mechanic", "scavenger", "laborer",
-    },
     refugee = {
         "leader", "trader", "guard", "medic",
         "caregiver", "scavenger",
@@ -68,7 +64,13 @@ local ROLE_ORDER = {
 }
 
 function H.FactionRole(archetypeID, index)
-    local ordered = ROLE_ORDER[archetypeID] or {}
+    local ordered = ROLE_ORDER[archetypeID]
+    if not ordered and PNC.FactionArchetypes
+        and type(PNC.FactionArchetypes.GetMobileRoleOrder) == "function"
+    then
+        ordered = PNC.FactionArchetypes.GetMobileRoleOrder(archetypeID)
+    end
+    ordered = ordered or {}
     return ordered[index]
         or PNC.FactionArchetypes.GetDefaultRole(
             archetypeID

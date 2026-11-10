@@ -9,6 +9,7 @@ local Persistence = PNC.Persistence
 local Adapter = Persistence.CoreProvider or {}
 Persistence.CoreProvider = Adapter
 local Types = PNC.Types
+local OptionalPolicy = PNC.OptionalProviderPolicy
 local ActorInventoryBridge =
     require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_ActorBridge"
 
@@ -329,6 +330,9 @@ local function buildRecord(actor, baseRecord)
     record.y = point.y
     record.z = point.z
     record.runtime = record.runtime or {}
+    if OptionalPolicy then
+        OptionalPolicy.ClearUnavailable(record)
+    end
     record.runtime.coreActorID = tostring(actor.actorId)
     projectProviderLease(record, lease.leaseID)
     record.runtime.coreProvider = lease.provider
@@ -460,6 +464,18 @@ function Adapter.HydrateCoreActor(actor, core)
     end
     local actorID = tostring(actor.actorId or "")
     if actorID == "" then return nil, "core_actor_id_missing" end
+    if OptionalPolicy
+        and not OptionalPolicy.ShouldProject(actor)
+    then
+        local unavailable = PNC.Registry
+            and type(PNC.Registry.Get) == "function"
+            and PNC.Registry.Get(actorID) or nil
+        if unavailable then
+            OptionalPolicy.MarkUnavailable(
+                unavailable, "optional_provider_unavailable")
+        end
+        return nil, "optional_provider_unavailable"
+    end
     if not survivorWorldAffiliation(actor) then
         return nil, "not_survivor_world_actor"
     end
@@ -504,7 +520,9 @@ function Adapter.HydrateCoreActors(core)
         local record, reason = Adapter.HydrateCoreActor(actor, core)
         if record then
             hydrated = hydrated + 1
-        elseif reason ~= "not_survivor_world_actor" then
+        elseif reason ~= "not_survivor_world_actor"
+            and reason ~= "optional_provider_unavailable"
+        then
             failures[#failures + 1] = {
                 actorID = tostring(actor.actorId or ""),
                 reason = tostring(reason or "hydration_failed"),

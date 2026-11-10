@@ -32,7 +32,7 @@ class SemanticAuthoringCompilerTests(unittest.TestCase):
                 Path(directory) / "ProjectHoomans",
                 package_repositories={"DTCommon": dynamic_trading},
             )
-            self.assertIn("dynamictrading.trade", capabilities)
+            self.assertIn("DT.trade", capabilities)
             self.assertIn("dynamictrading.custom", capabilities)
 
     def source(self) -> dict:

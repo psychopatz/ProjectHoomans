@@ -257,9 +257,23 @@ T.equal(deepEqual(
 ), true, "mobile normalization is idempotent")
 
 PNC.Factions.IDGenerator = function() return "faction_trading_caravan" end
+T.truthy(PNC.FactionArchetypes.Register("fixture:commercial_mobile", {
+    label = "Trading Caravan",
+    description = "Provider-neutral non-hostile mobile fixture.",
+    allowedRoles = { leader = true, guard = true, scavenger = true },
+    defaultRole = "guard",
+    policyDefaults = { outsiderPolicy = "commercial" },
+    capabilities = { commercial = true },
+    mobile = {
+        enabled = true,
+        roleOrder = { "leader", "guard", "scavenger" },
+        npcArchetype = "General",
+        hostile = false,
+    },
+}), "registered commercial mobile fixture")
 local caravanOK, _, caravan = PNC.Factions.Create({
     name = "Frontier Trading Caravan",
-    archetypeID = "trader",
+    archetypeID = "fixture:commercial_mobile",
     createdAt = worldHour,
 })
 T.truthy(caravanOK, "trading caravan faction created")
@@ -284,7 +298,7 @@ for _, npcID in ipairs(caravanGenerated.npcIDs) do
     T.equal(record.affiliation.communityID, nil,
         "trading caravan member has no settlement affiliation")
     T.equal(record.orderSpec.kind, PNC.Const.ORDER_ROAM,
-        "trading caravan roams across the map")
+        "commercial mobile group roams across the map without hostility")
 end
 
 T.truthy(PNC.FactionArchetypes.Register("fixture:expansion_mobile", {

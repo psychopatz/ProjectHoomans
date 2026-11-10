@@ -48,9 +48,18 @@ function H.Touch(group, reason)
 end
 
 function H.GroupTypeForFaction(faction)
-    local mapping = { looter = "LOOTER", trader = "TRADER",
-        refugee = "REFUGEE", settler = "SETTLEMENT_PARTY" }
-    return mapping[faction and faction.archetypeID] or "WANDERER"
+    local archetypeID = faction and faction.archetypeID
+    if archetypeID == "looter" then return "LOOTER" end
+    if archetypeID == "refugee" then return "REFUGEE" end
+    if archetypeID == "settler" then return "SETTLEMENT_PARTY" end
+    if PNC.FactionArchetypes
+        and PNC.FactionArchetypes.HasCapability
+        and PNC.FactionArchetypes.HasCapability(
+            archetypeID, "commercial")
+    then
+        return "TRADER"
+    end
+    return "WANDERER"
 end
 
 function H.MemberIDs(faction)

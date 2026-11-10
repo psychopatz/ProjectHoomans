@@ -11,6 +11,7 @@ PNC.CoreSurvivorWorldPresentationAdapter =
 local Adapter = PNC.CoreSurvivorWorldPresentationAdapter
 local World = require
     "PsychopatzCore/SurvivorWorld/PsychopatzSurvivorWorld"
+local Policy = PNC.OptionalProviderPolicy
 
 Adapter.PROVIDER_ID = "ProjectHoomans.LiveBody"
 Adapter.PRIORITY = 500
@@ -49,5 +50,21 @@ local ok, reason = World.Presentation.RegisterPositionProvider(
 
 Adapter.Registered = ok == true
 Adapter.LastRegistrationReason = reason
+
+if World.Presentation
+    and type(World.Presentation.RegisterEntryFilter) == "function"
+    and Policy
+then
+    local filterOK, filterReason = World.Presentation.RegisterEntryFilter(
+        "ProjectHoomans:OptionalProviders",
+        {
+            filter = function(entry, actor)
+                return Policy.ShouldProject(actor, entry)
+            end,
+        }
+    )
+    Adapter.FilterRegistered = filterOK == true
+    Adapter.FilterRegistrationReason = filterReason
+end
 
 return Adapter

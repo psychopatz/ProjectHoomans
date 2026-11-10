@@ -116,7 +116,7 @@ local _, _, bravo = Factions.Create({
 })
 local _, _, charlie = Factions.Create({
     name = "Charlie",
-    archetypeID = "trader",
+    archetypeID = "settler",
     createdAt = worldHour,
 })
 local _, _, delta = Factions.Create({

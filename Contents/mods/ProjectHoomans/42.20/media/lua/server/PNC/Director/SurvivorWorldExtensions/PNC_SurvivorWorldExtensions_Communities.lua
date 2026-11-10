@@ -90,10 +90,14 @@ function Extensions.RebuildCommunities(coreSnapshot)
     for communityID, coreCommunity in pairs(
         coreSnapshot.communities or {}
     ) do
-        raw.byID[communityID] = rawCommunity(
-            coreCommunity,
-            extensions[communityID]
-        )
+        if Extensions.IsCoreRecordProjectable(
+            coreSnapshot, coreCommunity)
+        then
+            raw.byID[communityID] = rawCommunity(
+                coreCommunity,
+                extensions[communityID]
+            )
+        end
     end
     return PNC.CommunityTypes.NormalizeRegistry(raw)
 end

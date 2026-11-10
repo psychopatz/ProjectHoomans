@@ -48,7 +48,8 @@ local leased, leaseReason = Adapter.Acquire(actor, PsychopatzCore, {
     now = 1,
 })
 T.truthy(leased, leaseReason)
-T.equal(leased.providerLease.provider, "DTHoomans", "Hoomans provider")
+T.equal(leased.providerLease.provider, "ProjectHoomans",
+    "Hoomans provider remains standalone when DTHoomans is absent")
 
 local body = { bodyID = "body:p8:hoomans" }
 local stamped = false

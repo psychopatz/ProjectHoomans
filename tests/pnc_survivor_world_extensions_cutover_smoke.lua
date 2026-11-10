@@ -41,7 +41,7 @@ local core = assert(World.ActivateRuntime({ worldSeed = 5150 }))
 assert(core:UpsertFaction({
     id = "faction_ext",
     name = "Core Traders",
-    archetypeID = "trader",
+    archetypeID = "settler",
     status = "inactive",
     leaderActorID = "npc_ext_leader",
     memberActorIDs = { "npc_ext_leader", "npc_ext_guard" },
@@ -131,7 +131,7 @@ PNC.Factions = {
             faction_ext = {
                 id = "faction_ext",
                 name = "Legacy Traders",
-                archetypeID = "trader",
+                archetypeID = "settler",
                 status = "inactive",
                 leaderNPCID = "npc_ext_leader",
                 memberIDs = {

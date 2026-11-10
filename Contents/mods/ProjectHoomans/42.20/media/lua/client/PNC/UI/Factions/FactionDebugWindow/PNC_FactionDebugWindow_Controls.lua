@@ -34,7 +34,6 @@ local CONTROLS = {
     { id = "create_looter_group", titleKey = "UI_PNC_FactionCreateLooterGroup", variant = "danger", views = views("overview") },
     { id = "create_ambient_looter_group", titleKey = "UI_PNC_FactionCreateAmbientLooterGroup", variant = "warning", views = views("overview") },
     { id = "create_strategic_looter_group", titleKey = "UI_PNC_FactionCreateStrategicLooterGroup", variant = "danger", views = views("overview") },
-    { id = "create_trader", titleKey = "UI_PNC_FactionCreateTrader", variant = "default", views = views("overview") },
     { id = "create_refugee", titleKey = "UI_PNC_FactionCreateRefugee", variant = "default", views = views("overview") },
     { id = "create_mobile_road_group", titleKey = "UI_PNC_FactionCreateMobileRoadGroup", variant = "warning", views = views("mobile") },
     { id = "create_mobile_player_route_group", titleKey = "UI_PNC_FactionCreateMobilePlayerRouteGroup", variant = "danger", views = views("mobile") },

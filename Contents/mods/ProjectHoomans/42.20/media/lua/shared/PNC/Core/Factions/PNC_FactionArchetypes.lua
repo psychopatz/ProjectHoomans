@@ -76,39 +76,6 @@ local DEFINITIONS = {
             hostile = true,
         },
     },
-    trader = {
-        id = "trader",
-        label = "Trading Caravan",
-        description = "A mobile survivor caravan focused on exchange, transport, and commercial relationships while travelling between settlements.",
-        allowedRoles = {
-            leader = true, trader = true, guard = true, medic = true,
-            mechanic = true, scavenger = true, laborer = true,
-            civilian = true,
-        },
-        defaultRole = "civilian",
-        behavior = {
-            hostileToOutsiders = false,
-        },
-        policyDefaults = {
-            aggression = 0.20,
-            retaliation = 0.40,
-            caution = 0.65,
-            hospitality = 0.60,
-            opportunism = 0.75,
-            outsiderPolicy = "commercial",
-            warThreshold = 76,
-            peaceThreshold = 30,
-        },
-        mobile = {
-            enabled = true,
-            roleOrder = {
-                "leader", "trader", "guard", "medic",
-                "mechanic", "scavenger", "laborer",
-            },
-            npcArchetype = "General",
-            hostile = false,
-        },
-    },
     refugee = {
         id = "refugee",
         label = "Refugee Group",
@@ -192,6 +159,10 @@ local function customCount()
 end
 
 local function corePayload(archetypeID, definition)
+    local capabilities = copy(definition.capabilities)
+    capabilities = type(capabilities) == "table" and capabilities or {}
+    capabilities.mobile = definition.mobile
+        and definition.mobile.enabled == true
     return {
         id = archetypeID,
         label = definition.label,
@@ -200,9 +171,7 @@ local function corePayload(archetypeID, definition)
         allowedRoles = definition.allowedRoles,
         defaultRole = definition.defaultRole,
         policyDefaults = definition.policyDefaults,
-        capabilities = {
-            mobile = definition.mobile and definition.mobile.enabled == true,
-        },
+        capabilities = capabilities,
         extensions = {
             [SOURCE_ID] = {
                 behavior = definition.behavior,
@@ -216,6 +185,18 @@ local function legacyDefinition(profile)
     if not profile then return nil end
     local extension = profile.extensions
         and profile.extensions[SOURCE_ID] or {}
+    if type(extension) ~= "table"
+        or (extension.mobile == nil and extension.behavior == nil)
+    then
+        for _, candidate in pairs(profile.extensions or {}) do
+            if type(candidate) == "table"
+                and (candidate.mobile ~= nil or candidate.behavior ~= nil)
+            then
+                extension = candidate
+                break
+            end
+        end
+    end
     local mobile = extension.mobile
     local behavior = extension.behavior or {
         hostileToOutsiders = false,
@@ -228,6 +209,8 @@ local function legacyDefinition(profile)
         defaultRole = profile.defaultRole,
         behavior = copy(behavior),
         policyDefaults = copy(profile.policyDefaults),
+        capabilities = copy(profile.capabilities),
+        sourceMod = profile.sourceMod,
         mobile = copy(mobile),
     }
 end
@@ -249,6 +232,24 @@ end
 
 function Archetypes.Exists(archetypeID)
     return CoreProfiles.Exists(archetypeID)
+end
+
+function Archetypes.HasCapability(archetypeID, capability)
+    local profile = CoreProfiles.Get(archetypeID)
+    return profile ~= nil
+        and type(profile.capabilities) == "table"
+        and profile.capabilities[tostring(capability or "")] == true
+end
+
+function Archetypes.FindByCapability(capability)
+    for _, profile in ipairs(CoreProfiles.List()) do
+        if type(profile.capabilities) == "table"
+            and profile.capabilities[tostring(capability or "")] == true
+        then
+            return profile.id
+        end
+    end
+    return nil
 end
 
 function Archetypes.List()
@@ -350,6 +351,7 @@ function Archetypes.Register(archetypeID, definition)
             hostileToOutsiders = false,
         }),
         policyDefaults = policyDefaults,
+        capabilities = copy(definition.capabilities),
         mobile = normalizeMobile(
             definition.mobile,
             allowedRoles,

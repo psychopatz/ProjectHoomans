@@ -118,8 +118,12 @@ function Lifecycle.BuildDebugRoster()
     if not registry then return list end
     if registry.ForEach then
         registry.ForEach(function(record)
-            local diagnostic = Lifecycle.BuildDiagnostics(record)
-            if diagnostic then list[#list + 1] = diagnostic end
+            if not record.runtime
+                or record.runtime.providerUnavailable ~= true
+            then
+                local diagnostic = Lifecycle.BuildDiagnostics(record)
+                if diagnostic then list[#list + 1] = diagnostic end
+            end
         end)
     end
     if registry.ForEachDeathMarker then

@@ -289,7 +289,7 @@ local _, _, looterFaction = Factions.Create({
 })
 local _, _, traderFaction = Factions.Create({
     name = "Knox Traders",
-    archetypeID = "trader",
+    archetypeID = "settler",
     createdAt = hour,
 })
 local _, _, tollLooterFaction = Factions.Create({

@@ -64,11 +64,6 @@ local function applyCreationPayload(payload, internal)
         payload.mobilePathMode = "player"
         payload.mobileControlMode = "strategic"
         payload.refreshMobileObjective = true
-    elseif internal == "create_trader" then
-        payload.factionAction = "create"
-        payload.archetypeID = "trader"
-        payload.creationKind = "mobile_group"
-        payload.refreshMobileObjective = true
     elseif internal == "create_refugee" then
         payload.factionAction = "create"
         payload.archetypeID = "refugee"

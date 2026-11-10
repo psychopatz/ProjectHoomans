@@ -83,7 +83,7 @@ local function sync(updated)
     return registry:Get(actor.actorId)
 end
 
-local leased, leaseReason = HoomansProvider.Acquire(actor, PsychopatzCore, {
+local leased, leaseReason = DTProvider.Acquire(actor, PsychopatzCore, {
     owner = "ProjectHoomans:p9",
     authority = "server",
     now = 1,
@@ -93,20 +93,15 @@ actor = sync(leased)
 
 local body = { bodyID = "body:p9:combined" }
 local bodyConfigured = false
-local materialized, materializeReason = HoomansProvider.Materialize(
+local materialized, materializeReason = DTProvider.Materialize(
     actor, PsychopatzCore, {
         owner = "ProjectHoomans:p9",
         authority = "server",
         now = 2,
-        lifecycle = {
-            SpawnLiveBody = function()
-                return body, "p9-fixture"
-            end,
-            StampLiveBody = function(record, spawned)
-                bodyConfigured = record.runtime.bodyLease ~= nil
-                    and spawned == body
-            end,
-        },
+        bodyFactory = function()
+            bodyConfigured = true
+            return "p9-fixture", body
+        end,
         applyProjection = function(spawned, projection, record)
             return spawned == body
                 and projection.identity.identitySeed
@@ -114,8 +109,7 @@ local materialized, materializeReason = HoomansProvider.Materialize(
                 and projection.appearance.contract.policyHash
                     == record.appearance.contract.policyHash
         end,
-    }
-)
+    })
 truthy(materialized, materializeReason)
 truthy(bodyConfigured, "combined body lease configuration")
 actor = sync(materialized.actor)
@@ -151,7 +145,7 @@ truthy(pricing.relationshipModifier > 0,
     "combined relationship pricing reads Core social")
 equal(record.ca.provider, "DTHoomans", "DT records provider lease")
 
-local dematerialized, dematerializeReason = HoomansProvider.Dematerialize(
+local dematerialized, dematerializeReason = DTProvider.Dematerialize(
     actor, PsychopatzCore, {
         owner = "ProjectHoomans:p9",
         authority = "server",
@@ -166,7 +160,7 @@ truthy(dematerialized, dematerializeReason)
 actor = sync(dematerialized.actor)
 equal(actor.providerLease.state, "abstract", "combined body release")
 
-local released, releaseReason = HoomansProvider.Release(actor, PsychopatzCore, {
+local released, releaseReason = DTProvider.Release(actor, PsychopatzCore, {
     owner = "ProjectHoomans:p9",
     authority = "server",
     now = 26,
