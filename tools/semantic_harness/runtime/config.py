@@ -203,6 +203,8 @@ class HarnessConfig:
         else:
             provider_ids = ("PsychopatzCore", "ProjectHoomans")
             materialization_mode = "physical"
+            if dynamic_trading_repository is not None and dynamic_trading_runtime:
+                provider_ids += ("DTCommon", "DTHoomans")
         return cls(
             repository=repo,
             core_repository=core,

@@ -73,10 +73,11 @@ class RuntimeConfigTests(unittest.TestCase):
             profile="hoomans",
         )
         spec = build_worker_launch_spec(config)
-        self.assertEqual(
-            spec.provider_ids,
-            ("PsychopatzCore", "ProjectHoomans"),
-        )
+        self.assertIn("PsychopatzCore", spec.provider_ids)
+        self.assertIn("ProjectHoomans", spec.provider_ids)
+        if config.dynamic_trading_repository is not None:
+            self.assertIn("DTCommon", spec.provider_ids)
+            self.assertIn("DTHoomans", spec.provider_ids)
         self.assertEqual(spec.materialization_mode, "physical")
         self.assertEqual(
             spec.neutral_environment()["SEMANTIC_HARNESS_MATERIALIZATION_MODE"],

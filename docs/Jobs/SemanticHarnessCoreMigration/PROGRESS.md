@@ -228,6 +228,21 @@ worker handshake for direct Core imports, then add a Core-only matrix that
 proves optional DTAbstract and DTHoomans metadata can be enabled independently
 without importing provider-owned gameplay policy.
 
+## P3-E result
+
+Hoomans launch metadata now includes DTCommon/DTHoomans only when the optional
+DynamicTrading runtime is present. DynamicTrading abstract and physical
+profile selections both round-trip through Core `WorkerLaunchSpec` with the
+same neutral environment contract. Provider policy remains in the adopters.
+
+## Next Chunk
+
+**P4 — remove remaining obsolete harness ownership and complete acceptance.**
+Audit all remaining Hoomans runtime/worker Lua modules for provider-neutral
+duplicates, migrate only behavior-covered boundaries into Core, remove stale
+tests/docs/imports, and run the Core/Hoomans/DT matrix plus the user-owned
+native SP/MP handoff gates.
+
 ## P3-D result
 
 Core now owns the shared Lua launch-metadata parser and both Core and Hoomans
