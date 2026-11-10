@@ -5,18 +5,19 @@ target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
 phase_commit_phase: "P5-B"
-phase_commit_message: "phase(P5-B): phase(P5-B): document Core optional-adopter worker loading"
+phase_commit_message: "phase(P5-B): docs: refresh P5-B handoff checkpoint"
 phase_commit_vector: "project-hoomans=self"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-10T01:56:35.274487Z"
+updated_at: "2026-11-10T01:59:34.782031Z"
 state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
 phase: "P5"
 chunk: "P5-C"
 retrieval_tier: "verify"
 ---
+
 
 
 
