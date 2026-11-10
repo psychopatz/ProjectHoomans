@@ -87,10 +87,9 @@ local function affiliationChanged(previous, next)
     return false
 end
 
--- Reconcile only records that already identify a Core actor (or use the same
--- stable ID). This is deliberately not a PNC-to-Core actor factory: ordinary
--- Hoomans records must opt into canonical Core ownership through a later,
--- explicit adoption pass rather than silently creating duplicate actors.
+-- Reconcile Hoomans records against the canonical Core actor registry. The
+-- stable Hoomans record ID is the adoption key; Core's idempotent Ensure seam
+-- prevents a reload or provider hot-plug from replacing an enriched actor.
 function Adapter.AnnotateExistingCoreRecord(record, core)
     if type(record) ~= "table" or type(core) ~= "table" then
         return nil, "record_and_core_required"
@@ -173,13 +172,76 @@ function Adapter.AnnotateExistingCoreRecord(record, core)
     return true, recordChanged and canonicalID or "unchanged"
 end
 
+function Adapter.EnsureActor(record, core)
+    if type(record) ~= "table" or type(core) ~= "table" then
+        return nil, "record_and_core_required"
+    end
+    if not record.id or tostring(record.id) == "" then
+        return nil, "record_id_required"
+    end
+
+    local api = actors(core)
+    if not api then return nil, "core_actor_api_unavailable" end
+
+    local runtime = type(record.runtime) == "table" and record.runtime or {}
+    local reference = record.coreActorID
+        or runtime.coreActorID
+        or record.id
+    local actor = type(api.Resolve) == "function"
+        and api.Resolve(reference) or nil
+    if not actor and type(api.Get) == "function" then
+        actor = api.Get(reference)
+    end
+
+    if not actor then
+        local ensure = api.Ensure
+        if type(ensure) ~= "function"
+            and api.DefaultRegistry
+            and type(api.DefaultRegistry.Ensure) == "function"
+        then
+            ensure = function(spec)
+                return api.DefaultRegistry:Ensure(spec)
+            end
+        end
+        if type(ensure) ~= "function" then
+            return nil, "core_actor_ensure_unavailable"
+        end
+
+        actor = ensure({
+            actorId = tostring(record.id),
+            ownerMod = "ProjectHoomans",
+            identitySeed = record.identitySeed,
+            identity = record.identity,
+            archetypeID = record.archetypeID or "core.survivor",
+            world = {
+                location = {
+                    position = {
+                        x = tonumber(record.x) or 0,
+                        y = tonumber(record.y) or 0,
+                        z = tonumber(record.z) or 0,
+                    },
+                },
+            },
+            source = {
+                provider = "ProjectHoomans",
+                recordID = tostring(record.id),
+            },
+        })
+        if not actor then
+            return nil, "core_actor_ensure_failed"
+        end
+    end
+
+    return Adapter.AnnotateExistingCoreRecord(record, core)
+end
+
 function Adapter.ReconcileExistingCoreRecords(core)
     if not PNC.Registry or type(PNC.Registry.ForEach) ~= "function" then
         return 0, "registry_unavailable"
     end
     local reconciled = 0
     PNC.Registry.ForEach(function(record)
-        local ok = Adapter.AnnotateExistingCoreRecord(record, core)
+        local ok = Adapter.EnsureActor(record, core)
         if ok then reconciled = reconciled + 1 end
     end)
     return reconciled, "reconciled"
@@ -555,6 +617,27 @@ local function reconcileExistingCoreRecords()
     if isServer and isServer() ~= true then return end
     if PsychopatzCore then
         Adapter.ReconcileExistingCoreRecords(PsychopatzCore)
+        local worldAdapter = PNC.CoreSurvivorWorldAdapter
+        if worldAdapter
+            and type(worldAdapter.ReconcileExistingWorld) == "function"
+        then
+            local report, reason = worldAdapter.ReconcileExistingWorld()
+            if not report then
+                if PNC.Core and PNC.Core.LogWarn then
+                    PNC.Core.LogWarn(
+                        "PNC Core SurvivorWorld reconciliation deferred"
+                            .. " reason=" .. tostring(reason or "unknown")
+                    )
+                end
+            elseif #report.failures > 0
+                and PNC.Core and PNC.Core.LogWarn
+            then
+                PNC.Core.LogWarn(
+                    "PNC Core SurvivorWorld reconciliation partial"
+                        .. " failures=" .. tostring(#report.failures)
+                )
+            end
+        end
     end
 end
 

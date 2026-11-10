@@ -134,4 +134,75 @@ T.equal(Adapter.GetCommunity("community_new").name, "New Camp",
 T.equal(Adapter.GetLocation("aloc_new").id, "aloc_new",
     "adapter location query")
 
+PNC.Factions = {
+    List = function()
+        return {
+            {
+                id = "faction_repaired",
+                name = "Repaired Faction",
+                archetypeID = "trader",
+                memberIDs = { actor_leader = true },
+            },
+        }
+    end,
+}
+PNC.AbstractLocations = {
+    List = function()
+        return {
+            {
+                id = "aloc_repaired",
+                type = "SETTLEMENT",
+                x = 300, y = 400, z = 0,
+            },
+        }
+    end,
+}
+PNC.Communities = {
+    List = function()
+        return {
+            {
+                id = "community_repaired",
+                factionID = "faction_repaired",
+                name = "Repaired Camp",
+                home = { x = 300, y = 400, z = 0, radius = 12 },
+                memberIDs = { actor_leader = true },
+            },
+        }
+    end,
+}
+PNC.AbstractGroups = {
+    List = function()
+        return {
+            {
+                id = "agroup_repaired",
+                factionId = "faction_repaired",
+                homeCommunityId = "community_repaired",
+                groupType = "TRADER",
+                memberIds = { "actor_leader" },
+                location = {
+                    id = "aloc_repaired",
+                    type = "SETTLEMENT",
+                    x = 300, y = 400, z = 0,
+                },
+            },
+        }
+    end,
+}
+
+local repair, repairReason = Adapter.ReconcileExistingWorld()
+T.truthy(repair, repairReason)
+T.equal(repair.added, 4,
+    "repair imports missing provider world records")
+T.equal(repair.factions, 1, "repair imports the missing faction")
+T.equal(repair.locations, 1, "repair imports the missing location")
+T.equal(repair.communities, 1, "repair imports the missing community")
+T.equal(repair.groups, 1, "repair imports the missing group")
+T.truthy(registry:GetGroup("agroup_repaired"),
+    "repaired group is available in Core")
+
+local repeatRepair, repeatReason = Adapter.ReconcileExistingWorld()
+T.truthy(repeatRepair, repeatReason)
+T.equal(repeatRepair.added, 0,
+    "world repair is idempotent for already-canonical records")
+
 T.finish("pnc_core_survivor_world_adapter_smoke")

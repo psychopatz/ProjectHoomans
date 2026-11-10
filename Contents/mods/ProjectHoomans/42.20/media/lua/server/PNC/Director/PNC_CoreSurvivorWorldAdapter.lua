@@ -39,6 +39,85 @@ local function dirty(reason)
     return true
 end
 
+local function listRecords(service, methodName, options)
+    if type(service) ~= "table"
+        or type(service[methodName]) ~= "function"
+    then
+        return {}
+    end
+    local records = service[methodName](options)
+    return type(records) == "table" and records or {}
+end
+
+-- Repair saves that already passed through the Hoomans cutover while Core's
+-- SurvivorWorld registry was only partially populated. This is deliberately
+-- one-way and additive: Core remains authoritative for records it already
+-- owns, while missing provider records are normalized through Core's public
+-- registry contract in dependency order.
+function Adapter.ReconcileExistingWorld()
+    local current, failure = Adapter.EnsureCanonical()
+    if not current then return nil, failure end
+
+    local added = {
+        factions = 0,
+        locations = 0,
+        communities = 0,
+        groups = 0,
+    }
+    local failures = {}
+
+    local function add(kind, value, getter, upserter)
+        if type(value) ~= "table" then return end
+        local id = value.id
+            or value.factionID
+            or value.communityID
+            or value.locationID
+            or value.groupID
+        if not id or current[getter](current, id) then return end
+        local canonical, reason = current[upserter](current, value)
+        if canonical then
+            added[kind] = added[kind] + 1
+        else
+            failures[#failures + 1] = {
+                kind = kind,
+                id = tostring(id),
+                reason = tostring(reason or "upsert_failed"),
+            }
+        end
+    end
+
+    for _, faction in ipairs(listRecords(PNC.Factions, "List", {
+        includeProvisional = true,
+    })) do
+        add("factions", faction, "GetFaction", "UpsertFaction")
+    end
+    for _, location in ipairs(listRecords(PNC.AbstractLocations, "List")) do
+        add("locations", location, "GetLocation", "UpsertLocation")
+    end
+    for _, community in ipairs(listRecords(PNC.Communities, "List")) do
+        add("communities", community, "GetCommunity", "UpsertCommunity")
+    end
+    for _, group in ipairs(listRecords(PNC.AbstractGroups, "List")) do
+        add("groups", group, "GetGroup", "UpsertGroup")
+    end
+
+    local total = added.factions + added.locations
+        + added.communities + added.groups
+    if total > 0 then
+        local ok, reason = dirty("pnc_survivor_world_reconcile")
+        if not ok then return nil, reason end
+    end
+
+    return {
+        added = total,
+        factions = added.factions,
+        locations = added.locations,
+        communities = added.communities,
+        groups = added.groups,
+        failures = failures,
+    }, #failures > 0 and "partial" or "reconciled"
+end
+
 function Adapter.CommitFaction(faction, reason)
     if type(faction) ~= "table" then
         return nil, "faction_required"

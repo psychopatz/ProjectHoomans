@@ -59,6 +59,17 @@ tests in adopters, and delete obsolete Hoomans worker/runtime/test duplicates
 after import-zero and behavior gates pass. Gate: no stale duplicate ownership,
 Core/adopter suites pass, and the migration ledger is current.
 
+#### P4-D — canonical actor and SurvivorWorld adoption repair
+
+Close the runtime migration seam exposed by restart and native diagnostics:
+provider-owned Hoomans records must be idempotently adopted into Core actors,
+and partially migrated Hoomans factions, locations, communities, and groups
+must be repaired into Core in dependency order. The repair remains additive and
+must not overwrite records already canonical in Core.
+
+Gate: Core and Hoomans adoption/world-adapter smokes pass; Core has no Hoomans
+imports; affiliation and group synchronization no longer depend on a restart.
+
 ### P5 — Cross-provider acceptance
 
 Run the shared Core matrix for Core-only, Hoomans, DTAbstract, and DTHoomans

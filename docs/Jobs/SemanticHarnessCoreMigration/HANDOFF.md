@@ -4,19 +4,20 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P4-C"
-phase_commit_message: "phase(P4-C): prepare native acceptance matrix"
+phase_commit_phase: "P4-D"
+phase_commit_message: "phase(P4-D): repair canonical actor and world adoption"
 phase_commit_vector: "project-hoomans=self"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-10T00:17:21.028039Z"
+updated_at: "2026-11-10T00:54:59.567144Z"
 state: "CLEAN_CHECKPOINT"
 parent_status: "IN_PROGRESS"
 phase: "P4"
 chunk: "P4-B"
 retrieval_tier: "verify"
 ---
+
 
 
 
@@ -67,14 +68,30 @@ Hoomans runtime/Lua modules are provider policy, save/profiler ingestion,
 authoring, or physical-worker integration and require a separate behavior
 contract before any further move.
 
+## P4-D result
+
+The active native log exposed two concrete migration defects. Hoomans records
+were created without a canonical Core actor, so social synchronization returned
+`core_actor_not_found`; partially migrated Hoomans world records could then
+reference factions absent from Core, so group commits returned
+`survivor_world_group_faction_missing`.
+
+The phase implementation adds Core's idempotent actor ensure seam, Hoomans
+actor adoption at lifecycle and affiliation boundaries, and an additive
+Hoomans SurvivorWorld repair ordered as factions, locations, communities, then
+groups. Existing Core records are not overwritten. Fresh native confirmation is
+not claimed yet.
+
 ## Resume
 
 1. Verify the three repository worktrees and phase commits.
-2. Run Core's full semantic-harness suite, the Hoomans migration/regression
+2. Commit the accepted P4-D Core participant changes first, then the
+   ProjectHoomans primary changes with this handoff.
+3. Run Core's full semantic-harness suite, the Hoomans migration/regression
    slice, and DynamicTrading provider adapter gates.
-3. Execute the P4-C native SP/MP acceptance matrix when the user provides the
+4. Execute the P4-C native SP/MP acceptance matrix when the user provides the
    running game/save authority.
-4. Keep native Project Zomboid SP/MP validation user-owned unless explicitly
+5. Keep native Project Zomboid SP/MP validation user-owned unless explicitly
    requested.
 
 ## Evidence

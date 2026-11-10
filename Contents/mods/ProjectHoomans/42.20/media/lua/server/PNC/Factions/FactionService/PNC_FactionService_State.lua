@@ -111,6 +111,13 @@ function Internal.commitAffiliation(record, affiliation)
         ) or 0)
     ) + 1
     record.affiliation = affiliation
+    local coreProvider = PNC.Persistence
+        and PNC.Persistence.CoreProvider or nil
+    if coreProvider and type(coreProvider.EnsureActor) == "function"
+        and PsychopatzCore
+    then
+        coreProvider.EnsureActor(record, PsychopatzCore)
+    end
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "affiliation")
     end

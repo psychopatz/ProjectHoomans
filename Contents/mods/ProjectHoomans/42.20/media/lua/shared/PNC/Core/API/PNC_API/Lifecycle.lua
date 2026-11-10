@@ -122,6 +122,20 @@ local function finalizeNewRecord(record, definition)
     OrderSystem.SetOrder(record, definition.orderSpec)
     OrderSystem.SetHostility(record, definition.hostility or Types.DefaultHostility(definition.tacticalClass))
     Registry.AddRecord(record)
+    local coreProvider = PNC.Persistence
+        and PNC.Persistence.CoreProvider or nil
+    if coreProvider and type(coreProvider.EnsureActor) == "function"
+        and PsychopatzCore
+    then
+        local adopted, adoptionReason = coreProvider.EnsureActor(
+            record, PsychopatzCore)
+        if not adopted then
+            Core.LogWarn(
+                "PNC Core actor adoption deferred id=" .. tostring(record.id)
+                    .. " reason=" .. tostring(adoptionReason or "unknown")
+            )
+        end
+    end
     if definition.factionID
         and PNC.Factions
         and PNC.Factions.AddNPC
@@ -144,6 +158,11 @@ local function finalizeNewRecord(record, definition)
                     .. tostring(definition.factionID)
                     .. " reason=" .. tostring(reason)
             )
+        elseif coreProvider
+            and type(coreProvider.EnsureActor) == "function"
+            and PsychopatzCore
+        then
+            coreProvider.EnsureActor(record, PsychopatzCore)
         end
     end
     if definition.forceLive == true then

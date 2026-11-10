@@ -93,9 +93,25 @@ and are not migration import failures.
 
 Native Project Zomboid SP/MP behavior is not claimed by these tests.
 
+## P4-D result
+
+Core now exposes idempotent `Actors.Ensure`/`Registry:Ensure` for adopter-owned
+stable actor IDs. Hoomans adopts new and existing records through that seam,
+keeps affiliation mutations synchronized, and performs an additive repair for
+partially migrated factions, locations, communities, and groups in dependency
+order. Existing canonical Core records are preserved.
+
+Validation: Core actor smoke, Hoomans actor-adoption smoke, SurvivorWorld
+adapter smoke, social mutation smoke, semantic diagnostics smoke, Lua syntax,
+and PZ Kahlua verification pass. Native console evidence identified the
+original `core_actor_not_found` and `survivor_world_group_faction_missing`
+failures; a fresh native run is still required.
+
+Commits: pending this phase boundary.
+
 ## Next chunk
 
-**P4-C — user-owned native acceptance handoff.** Run the explicit SP/MP matrix:
+**P4-C — user-owned native acceptance handoff after P4-D.** Run the explicit SP/MP matrix:
 restart persistence, optional-mod enable/disable combinations, nearby physical
 DTHoomans materialization, DTAbstract abstract traversal, and cross-provider
 conversation/trade interaction. Keep the parent goal active until that gate is
