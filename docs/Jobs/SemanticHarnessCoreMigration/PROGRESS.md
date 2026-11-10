@@ -99,6 +99,16 @@ direct Lua load checks. Core generic worker files contain no adopter imports.
 
 Commits: Core `c07babc`; DynamicTrading `0bd7b147`; Hoomans `e5cc2ec`.
 
+### P5-C developer-side test ownership slice
+
+The pure provider-neutral fixture-field contract is now covered in Core's
+`test_engine_projections.py`. Hoomans no longer carries the duplicate offline
+fixture contract or pure `HarnessWorkingWorld` snapshot-model test; its
+remaining snapshot/fixture tests exercise the real Hoomans Lua integration.
+
+Validation: Core semantic-harness suite 46/46; affected Hoomans integration
+tests 2/2. Commits: Core `0690ee9`; Hoomans `ceae0578`.
+
 ## Next chunk
 
 **P5-C — user-owned native SP/MP acceptance.** Execute

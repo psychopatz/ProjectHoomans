@@ -5,18 +5,19 @@ target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
 phase_commit_phase: "P5-C"
-phase_commit_message: "phase(P5-C): test(P5-C): remove Hoomans duplicate Core contracts"
+phase_commit_message: "phase(P5-C): docs: record P5-C test ownership checkpoint"
 phase_commit_vector: "project-hoomans=self;psychopatz-core=0690ee9ff1406298123ee60522ee4dddf459b2d2;dynamic-trading=0bd7b1472f6b921275f136f9a0900bacd2eb2e3d"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-10T02:19:52.109217Z"
+updated_at: "2026-11-10T02:21:44.450032Z"
 state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
 phase: "P5"
 chunk: "P5-C"
 retrieval_tier: "verify"
 ---
+
 
 
 
@@ -93,8 +94,8 @@ not claimed yet.
 
 ## Resume
 
-1. Verify the P5-B phase commit vector across Core, DynamicTrading, and
-   Hoomans.
+1. Verify the committed P5-C developer-side checkpoint across Core,
+   DynamicTrading, and Hoomans.
 2. Hand the P5-C native SP/MP matrix to the user with the running game/save
    authority.
 3. Keep native Project Zomboid validation user-owned unless explicitly
@@ -105,9 +106,9 @@ not claimed yet.
 - `CODE_VERIFIED`: Core owns neutral launch metadata and optional-adopter
   loading; Hoomans has no remaining callers of the three deleted runtime
   paths.
-- `TEST_VERIFIED`: Core 45/45, DynamicTrading provider tests 5/5, Hoomans
-  runtime/provider slice 11/11, DT Lua adapter smoke, and direct Lua load
-  checks.
+- `TEST_VERIFIED`: Core 46/46, DynamicTrading provider tests 5/5, Hoomans
+  runtime/provider slice 11/11, affected Hoomans integration tests 2/2, DT
+  Lua adapter smoke, and direct Lua load checks.
 - `STATIC_ONLY`: native Project Zomboid behavior and full SP/MP provider
   traversal remain unverified.
 - `UNVERIFIED`: native Project Zomboid SP/MP behavior remains user-owned.
@@ -171,6 +172,18 @@ DynamicTrading supplies `provider_worker_launch_values()` as its thin adapter.
 Actual DTAbstract and DTHoomans modules load through the same Core worker and
 receive the same operation dispatch; only `abstract` versus `physical`
 materialization differs. No native Project Zomboid process was launched.
+
+## P5-C developer-side test ownership result
+
+The provider-neutral fixture-field assertion now lives in Core's
+`test_engine_projections.py`. Hoomans' duplicate offline fixture contract and
+pure `HarnessWorkingWorld` snapshot-model test were removed after the Core
+contract suite passed. Hoomans retains the snapshot/fixture tests that start
+the real Hoomans Lua worker and exercise PNC integration. Core passed 46/46;
+the affected Hoomans integration tests passed 2/2.
+
+Commits: Core `0690ee9`; Hoomans `ceae0578`. DynamicTrading required no code
+change for this test-ownership slice.
 
 ## P5-C preparation
 
