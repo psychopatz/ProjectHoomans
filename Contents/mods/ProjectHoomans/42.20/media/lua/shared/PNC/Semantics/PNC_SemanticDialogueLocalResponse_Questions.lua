@@ -31,6 +31,21 @@ return function(ir, state, context)
     if ir.subject == "IDENTITY" then
         return Internal.ResolveIdentityQuestion(ir, state, context)
     end
+    if ir.subject == "IDENTITY_NICKNAME" then
+        return Internal.ResolveIdentityFacetQuestion(
+            "nickname", ir, state, context
+        )
+    end
+    if ir.subject == "IDENTITY_SURNAME" then
+        return Internal.ResolveIdentityFacetQuestion(
+            "surname", ir, state, context
+        )
+    end
+    if ir.subject == "IDENTITY_FACTION" then
+        return Internal.ResolveIdentityFacetQuestion(
+            "faction", ir, state, context
+        )
+    end
     if ir.subject == "RELATIONSHIP_STATUS" then
         return Internal.ResolveRelationshipStatus(ir, state, context)
     end

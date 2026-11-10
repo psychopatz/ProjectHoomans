@@ -309,6 +309,7 @@ function Internal.sanitizeIdentity(rawIdentity, record)
         backstory = Internal.sanitizeBackstoryMetadata(identity.backstory),
         archetypeID = archetypeID,
         displayName = Internal.normalizeString(identity.displayName or record.name),
+        nickname = Internal.normalizeString(identity.nickname or identity.alias),
         isFemale = identity.isFemale == true or record.isFemale == true,
         survivor = {
             forename = Internal.normalizeString(survivor.forename),

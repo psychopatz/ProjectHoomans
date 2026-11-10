@@ -228,7 +228,7 @@ local ClientState = PNC.Network.ClientState
 
 T.falsy(Identity.IsNameKnown(npcID),
     "spawned NPC name is unknown before the disclosure")
-T.equal(Identity.GetName(npcID), "Unknown survivor",
+T.equal(Identity.GetName(npcID), "Stranger",
     "unknown spawned NPC never leaks its transport name")
 
 -- ------------------------------------------------------- authoritative exchange
@@ -246,8 +246,8 @@ T.truthy(payload and payload.accepted == true, "accepted result is returned")
 T.equal(payload.responseKey,
     "UI_PNC_Conversation_Semantic_IdentityExchangeConfirmed",
     "reply carries the confirmed identity exchange key")
-T.equal(payload.responseArgs[2], identityName,
-    "reply formats the canonical NPC name")
+T.equal(payload.responseArgs[2], "Deon",
+    "reply formats the NPC nickname")
 T.truthy(type(payload.presentation) == "table",
     "accepted result carries the canonical identity projection")
 T.equal(payload.presentation.state, "known",

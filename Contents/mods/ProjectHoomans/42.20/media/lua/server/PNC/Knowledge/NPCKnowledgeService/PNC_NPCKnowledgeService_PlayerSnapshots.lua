@@ -73,12 +73,28 @@ function Knowledge.BuildPlayerSnapshotForPlayer(player, npcID)
         and PNC.Factions.GetPresentation
         and PNC.Factions.GetPresentation(record.affiliation.factionID) or nil
     local knownName = Knowledge.GetDescriptor(characterUUID, npcID, "identity.name")
+    local knownFullName = Knowledge.GetDescriptor(
+        characterUUID, npcID, "identity.full_name"
+    )
+    local knownNickname = Knowledge.GetDescriptor(
+        characterUUID, npcID, "identity.nickname"
+    )
+    local knownForename = Knowledge.GetDescriptor(
+        characterUUID, npcID, "identity.forename"
+    )
+    local knownSurname = Knowledge.GetDescriptor(
+        characterUUID, npcID, "identity.surname"
+    )
     local knownArchetype = Knowledge.GetDescriptor(
         characterUUID, npcID, "identity.archetype"
     )
     local knownFaction = Knowledge.GetDescriptor(characterUUID, npcID, "faction.identity")
     snapshot.identity = {
-        displayName = knownName and knownName.value or nil,
+        displayName = knownName and knownName.value
+            or knownFullName and knownFullName.value or nil,
+        nickname = knownNickname and knownNickname.value or nil,
+        forename = knownForename and knownForename.value or nil,
+        surname = knownSurname and knownSurname.value or nil,
         archetypeLabel = knownArchetype and identity.archetypeLabel or nil,
         factionName = knownFaction and faction and faction.name or nil,
         factionRole = knownFaction and record.affiliation and record.affiliation.role or nil,

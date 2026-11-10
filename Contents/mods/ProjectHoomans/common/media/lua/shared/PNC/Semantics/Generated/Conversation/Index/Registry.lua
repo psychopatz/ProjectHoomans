@@ -127,10 +127,16 @@ return {
         ["recordCount"] = 2,
     },
     {
+        ["domain"] = "dynamic_trading",
+        ["kind"] = "pack",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Pack/DynamicTrading",
+        ["recordCount"] = 1,
+    },
+    {
         ["domain"] = "common",
         ["kind"] = "pattern",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Pattern/Common",
-        ["recordCount"] = 47,
+        ["recordCount"] = 49,
     },
     {
         ["domain"] = "grounded_personal",
@@ -172,6 +178,6 @@ return {
         ["domain"] = "static_suggestions",
         ["kind"] = "ui",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Ui/StaticSuggestions",
-        ["recordCount"] = 10,
+        ["recordCount"] = 13,
     },
 }

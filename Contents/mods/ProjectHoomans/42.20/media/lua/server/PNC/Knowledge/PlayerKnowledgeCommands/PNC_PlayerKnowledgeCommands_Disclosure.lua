@@ -16,6 +16,25 @@ function H.IntroductionText(npcID)
     return "I'm " .. tostring(name) .. "."
 end
 
+function H.NicknameText(npcID)
+    local record = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(npcID)
+    local identity = record and record.identity or nil
+    local nickname = identity and (identity.nickname or identity.alias) or nil
+    if (not nickname or tostring(nickname) == "")
+        and PNC.IdentityNames
+        and type(PNC.IdentityNames.ResolveNickname) == "function"
+    then
+        local survivor = identity and identity.survivor or {}
+        nickname = PNC.IdentityNames.ResolveNickname(
+            survivor and (survivor.forename or survivor.firstName),
+            identity and identity.seed or record and record.identitySeed,
+            { version = PNC.IdentityNames.NICKNAME_GENERATOR_VERSION }
+        )
+    end
+    nickname = tostring(nickname or "")
+    return nickname ~= "" and "I'm " .. nickname .. "." or nil
+end
+
 function H.BackstoryDisclosureText(npcID, topicID)
     local memory = PNC.Conversation and PNC.Conversation.Memory or nil
     local kind = PNC.NPCKnowledge

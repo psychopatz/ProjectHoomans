@@ -25,6 +25,42 @@ function Internal.RegisterEnvironmentIdentityQuestions()
         0.96,
         85
     )
+    registerPattern(
+        "pnc.question.identity.nickname",
+        { "@NICKNAME" },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "IDENTITY_NICKNAME",
+            socialContext = { directed = true, identityFacet = "nickname" },
+        },
+        0.98,
+        92
+    )
+    registerPattern(
+        "pnc.question.identity.surname",
+        { "@SURNAME" },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "IDENTITY_SURNAME",
+            socialContext = { directed = true, identityFacet = "surname" },
+        },
+        0.98,
+        92
+    )
+    registerPattern(
+        "pnc.question.identity.faction",
+        { "@FACTION_IDENTITY" },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "IDENTITY_FACTION",
+            socialContext = { directed = true, identityFacet = "faction" },
+        },
+        0.98,
+        92
+    )
 end
 
 return Internal

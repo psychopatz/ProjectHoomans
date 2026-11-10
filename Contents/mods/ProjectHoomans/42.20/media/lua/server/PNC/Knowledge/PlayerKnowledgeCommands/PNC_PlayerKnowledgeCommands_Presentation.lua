@@ -6,6 +6,16 @@ local H = Commands.Internal
 local Network = PNC.Network
 local Core = PNC.Core
 
+local function identityDisplayName(identity)
+    identity = type(identity) == "table" and identity or {}
+    local fullName = tostring(identity.displayName or "")
+    local nickname = tostring(identity.nickname or "")
+    if fullName ~= "" and nickname ~= "" then
+        return fullName .. " (" .. nickname .. ")"
+    end
+    return fullName ~= "" and fullName or nickname ~= "" and nickname or nil
+end
+
 function H.PresentationFor(player, npcID, requestID)
     local context, reason = H.ContextFor(player, "npc_presentation")
     if not context then
@@ -35,15 +45,22 @@ function H.PresentationFor(player, npcID, requestID)
         }
     end
     snapshot, nameFact = H.SanitizeSnapshot(snapshot)
-    local known = nameFact and nameFact.value ~= nil
     local identity = snapshot.identity or {}
+    local displayName = identityDisplayName(identity)
+    local fullNameKnown = identity.displayName ~= nil
+        and tostring(identity.displayName) ~= ""
+    local nicknameKnown = identity.nickname ~= nil
+        and tostring(identity.nickname) ~= ""
+    local known = displayName ~= nil
     return {
         requestID = requestID,
         npcID = npcID,
         state = known and "known" or "unknown",
-        canAskName = not known,
-        displayName = known and tostring(nameFact.value) or "Unknown survivor",
-        archetypeLabel = known and identity.archetypeLabel or nil,
+        identityLevel = fullNameKnown and "full_name"
+            or nicknameKnown and "nickname" or "unknown",
+        canAskName = not fullNameKnown,
+        displayName = displayName or "Unknown survivor",
+        archetypeLabel = identity.archetypeLabel,
         factionName = identity.factionName,
         portrait = snapshot.portrait,
         relationship = snapshot.relationship,

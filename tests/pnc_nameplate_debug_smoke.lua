@@ -1091,7 +1091,7 @@ T.truthy(overlayManager.entries["unknown-npc"].scopes.debug,
 T.falsy(overlayManager.entries["unknown-npc"].actionVisible,
     "debug scope does not promote activity text")
 T.equal(overlayManager.entries["unknown-npc"].name,
-    "Unknown survivor",
+    "Stranger",
     "undisclosed identity remains private in entry data")
 
 PNC.NameplateSpeech.SetPending(

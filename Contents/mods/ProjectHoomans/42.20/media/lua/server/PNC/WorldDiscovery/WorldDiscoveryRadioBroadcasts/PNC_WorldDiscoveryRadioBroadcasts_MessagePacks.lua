@@ -113,7 +113,10 @@ end, {
 
 pack("trader", 100, function(context)
     return context.groupType == "TRADER"
-        or context.archetypeID == "trader"
+        or PNC.FactionArchetypes
+        and PNC.FactionArchetypes.HasCapability
+        and PNC.FactionArchetypes.HasCapability(
+            context.archetypeID, "commercial")
 end, {
     function(context) return lines(
         "<bzzt>",

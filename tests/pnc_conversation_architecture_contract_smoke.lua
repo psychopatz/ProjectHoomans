@@ -72,7 +72,7 @@ T.truthy(exists(T.path("ProjectHoomans", "client",
     "Necroa provider caption adapter has a neutral ownership name")
 
 local workerSource = T.repository
-    .. "/tools/semantic_harness/lua/worker/ProductionModules_ConversationSemantic.lua"
+    .. "/tools/providers/pnc/lua/worker/ProductionModules_ConversationSemantic.lua"
 local workerHandle = assert(io.open(workerSource, "rb"))
 local workerText = workerHandle:read("*a")
 workerHandle:close()
@@ -90,7 +90,7 @@ T.truthy(composition:find("PNC_Necroa_ZombieCaptionAdapter", 1, true),
     "client composition loads the provider caption adapter")
 
 local sourceRoot = T.repository
-    .. "/tools/semantic_harness/codebuilder/sources/conversation/content"
+    .. "/tools/providers/pnc/codebuilder/sources/conversation/content"
 local quotedRoot = "'" .. sourceRoot:gsub("'", "'\\''") .. "'"
 local contentFiles = {}
 local finder = assert(io.popen(
@@ -116,7 +116,7 @@ for _, fileName in ipairs(contentFiles) do
     end
 end
 T.falsy(io.open(
-    T.repository .. "/tools/semantic_harness/codebuilder/sources/"
+    T.repository .. "/tools/providers/pnc/codebuilder/sources/"
         .. "semantic_dialogue_content.json", "rb"),
     "monolithic Dialogue Content source is retired")
 

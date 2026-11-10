@@ -14,6 +14,26 @@ local function identityKnown(context)
         and roles.authorityEligible == true
 end
 
+local function identityFacetKnown(context, facet)
+    context = type(context) == "table" and context or {}
+    local knowledge = type(context.npcKnowledge) == "table"
+        and context.npcKnowledge or {}
+    local identity = type(knowledge.identity) == "table"
+        and knowledge.identity or {}
+    local value = identity[facet]
+    if facet == "nickname" then
+        value = value or knowledge.knownNickname
+    elseif facet == "surname" then
+        value = value or knowledge.knownSurname
+    elseif facet == "factionName" then
+        value = value or knowledge.factionName or knowledge.factionID
+        if not value and knowledge.factionKnown == true then
+            return true
+        end
+    end
+    return value ~= nil and tostring(value) ~= ""
+end
+
 local function pendingIdentity(context)
     local state = context and context.semanticContextState
     return context and context.pendingIdentityExchange
@@ -152,6 +172,7 @@ end
 
 return {
     identityKnown = identityKnown,
+    identityFacetKnown = identityFacetKnown,
     pendingIdentity = pendingIdentity,
     identityChoiceCandidates = identityChoiceCandidates,
 }

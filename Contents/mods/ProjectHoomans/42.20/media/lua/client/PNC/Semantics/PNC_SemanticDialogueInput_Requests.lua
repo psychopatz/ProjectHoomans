@@ -60,6 +60,9 @@ function Requests.RequestCognitionForIR(view, ir)
             or subject == "DATE"
             or subject == "WEATHER"
             or subject == "IDENTITY"
+            or subject == "IDENTITY_NICKNAME"
+            or subject == "IDENTITY_SURNAME"
+            or subject == "IDENTITY_FACTION"
             or subject == "GIFT_PREFERENCE"
             or subject == "NPC_BACKSTORY"
         then

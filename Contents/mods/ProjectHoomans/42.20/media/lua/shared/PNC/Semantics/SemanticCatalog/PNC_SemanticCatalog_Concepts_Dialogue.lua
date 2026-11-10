@@ -81,6 +81,23 @@ function Internal.RegisterDialogueConcepts()
     registerConcept("IDENTITY", {
         "name", "who are you", "what is your name", "what's your name",
     })
+    registerConcept("NICKNAME", {
+        "nickname", "nick name", "what is your nickname",
+        "what's your nickname", "what do people call you",
+        "what should i call you", "what are you called",
+    }, 5)
+    registerConcept("SURNAME", {
+        "surname", "last name", "family name", "what is your surname",
+        "what's your surname", "what is your last name",
+        "what's your last name", "what is your family name",
+        "what's your family name",
+    }, 5)
+    registerConcept("FACTION_IDENTITY", {
+        "faction", "which faction are you with", "what faction are you in",
+        "what group are you with", "which group are you with",
+        "who are you with", "who do you belong to",
+        "are you with any faction",
+    }, 5)
 end
 
 return Internal

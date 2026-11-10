@@ -22,7 +22,7 @@ The `tools/semantic_harness` directory exists only in Core after cutover.
 - `core`: Core only; no adopter imports or files required.
 - `pnc`: Core plus the PNC provider; no DT dependency.
 - `dtabstract`: Core plus DT provider; no PNC dependency.
-- `dthoomans`: Core plus DT and PNC providers, only when explicitly selected.
+- `dthoomans`: Core plus the DTCommon/DTHoomans providers; PNC is not required.
 - `combined`: Core plus both providers and shared world-discovery/radio composition.
 
 Core loads provider registrars through explicit profile composition and validated manifests. It must not use hardcoded adopter imports or path aliases that recreate the old bridge.

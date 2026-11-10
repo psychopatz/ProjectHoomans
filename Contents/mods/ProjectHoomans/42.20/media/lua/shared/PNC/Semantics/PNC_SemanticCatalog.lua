@@ -154,6 +154,12 @@ local function registerGeneratedVerbForms()
 end
 
 local function registerPattern(id, match, emit, confidence, priority, options)
+    local existing = Registry.Patterns and Registry.Patterns[id]
+    if type(existing) == "table"
+        and existing.owner == "pack.core.interaction_foundation"
+    then
+        return true, existing
+    end
     local definition = {
         id = id,
         match = match,

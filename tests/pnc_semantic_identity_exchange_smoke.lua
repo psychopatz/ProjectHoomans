@@ -237,25 +237,40 @@ local truthful, truthfulPayload = Commands.HandleSemanticIdentity({}, {
 T.truthy(truthful, "player forename claim is accepted")
 T.truthy(truthfulPayload.truthful, "truthful claim is marked truthful")
 T.equal(truthfulPayload.responseText,
-    "Okay Patrick, nice to meet you. I'm Mara Vale.",
-    "forename claim confirms the player and introduces the NPC")
+    "Okay Patrick, nice to meet you. I'm Mara.",
+    "forename claim confirms the player and introduces the NPC nickname")
 T.equal(truthfulPayload.responseKey,
     "UI_PNC_Conversation_Semantic_IdentityExchangeConfirmed",
     "truthful claim carries the localized identity confirmation key")
 T.equal(truthfulPayload.responseArgs[1], "Patrick",
     "truthful claim formats the player's canonical first name")
-T.equal(truthfulPayload.responseArgs[2], "Mara Vale",
-    "truthful claim formats the canonical NPC name")
+T.equal(truthfulPayload.responseArgs[2], "Mara",
+    "truthful claim formats the NPC nickname")
 T.equal(disclosures, 1,
     "truthful claim commits the existing NPC identity disclosure fact")
-T.equal(knowledgeDisclosure.topicID, "identity_name",
-    "truthful claim requests the NPC identity fact from the knowledge API")
+T.equal(knowledgeDisclosure.topicID, "identity_nickname",
+    "truthful claim requests the NPC nickname fact from the knowledge API")
 T.equal(knowledgeDisclosure.origin, "semantic_identity_claim",
     "knowledge disclosure retains its semantic identity provenance")
 T.equal(knowledgeDisclosure.verifiedIdentityClaim, true,
     "knowledge disclosure only follows the server-verified player claim")
 T.truthy(effects[1].respect > 0,
     "truthful introduction improves the relationship")
+
+relationship.familiarity = 25
+local fullTruthful, fullPayload = Commands.HandleSemanticIdentity({}, {
+    requestID = "identity:full-name",
+    npcID = "npc_mara",
+    kind = "identity_claim",
+    claimedName = "Patrick",
+    conversationToken = "lease",
+})
+T.truthy(fullTruthful and fullPayload.truthful,
+    "relationship threshold permits the full identity exchange")
+T.equal(knowledgeDisclosure.topicID, "identity_full_name",
+    "thresholded exchange requests the separate full identity topic")
+T.equal(fullPayload.responseArgs[2], "Mara Vale",
+    "thresholded exchange still returns the canonical full name")
 
 local falseClaim, falsePayload = Commands.HandleSemanticIdentity({}, {
     requestID = "identity:false",
@@ -273,7 +288,7 @@ T.equal(falsePayload.responseKey,
     "false name claim carries a dedicated localized response key")
 T.falsy(string.find(falsePayload.responseText or "", "Mara", 1, true),
     "false name claim never discloses the NPC name")
-T.truthy(effects[2].respect < 0 and effects[2].approval < 0,
+T.truthy(effects[3].respect < 0 and effects[3].approval < 0,
     "false name claim causes reputation loss")
 
 local evasion, evasionPayload = Commands.HandleSemanticIdentity({}, {
@@ -285,7 +300,7 @@ local evasion, evasionPayload = Commands.HandleSemanticIdentity({}, {
 T.truthy(evasion, "identity evasion is processed authoritatively")
 T.equal(evasionPayload.trustLabel, "untrustworthy",
     "identity evasion also creates the untrustworthy label")
-T.truthy(effects[3].respect < 0 and effects[3].approval < 0,
+T.truthy(effects[4].respect < 0 and effects[4].approval < 0,
     "identity evasion causes reputation loss")
 
 -- Exercise the actual client wire builder and SP/MP dispatch, not a

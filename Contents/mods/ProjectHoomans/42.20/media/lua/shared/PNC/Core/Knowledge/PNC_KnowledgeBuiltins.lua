@@ -137,8 +137,34 @@ Providers.Register("pnc_identity", {
         -- resolution, which `GetCharacterSummary` also performs and which can
         -- fail for a runtime-spawned record with an unresolved archetype id.
         local identity = type(record) == "table" and record.identity or nil
-        if field == "displayName" and type(identity) == "table" then
-            local name = identity.displayName
+        if type(identity) == "table"
+            and (field == "displayName" or field == "nickname")
+        then
+            local name = field == "nickname"
+                and (identity.nickname or identity.alias)
+                or identity.displayName
+            if field == "nickname" and not name
+                and PNC.IdentityNames
+                and type(PNC.IdentityNames.ResolveNickname) == "function"
+            then
+                local survivor = type(identity.survivor) == "table"
+                    and identity.survivor or {}
+                name = PNC.IdentityNames.ResolveNickname(
+                    survivor.forename or survivor.firstName,
+                    identity.seed or record.identitySeed,
+                    { version = PNC.IdentityNames.NICKNAME_GENERATOR_VERSION }
+                )
+            end
+            if type(name) == "string" and name ~= "" then return name end
+        end
+        if type(identity) == "table"
+            and (field == "forename" or field == "surname")
+        then
+            local survivor = type(identity.survivor) == "table"
+                and identity.survivor or {}
+            local name = field == "forename"
+                and (survivor.forename or survivor.firstName)
+                or (survivor.surname or survivor.lastName)
             if type(name) == "string" and name ~= "" then return name end
         end
         local summary = PNC.Identity and PNC.Identity.GetCharacterSummary
@@ -258,6 +284,41 @@ Descriptors.Register({
     discovery = introduction, capabilities = { disclosable = true, decayable = false },
     presentation = { truthField = "displayName", topicID = "identity_name" },
 })
+Descriptors.Register({
+    id = "identity.nickname", version = 1, category = "identity",
+    providerID = "pnc_identity", resolverID = "direct_fact",
+    valueType = "text_enum", privacy = "personal",
+    discovery = introduction,
+    capabilities = { disclosable = true, decayable = false },
+    presentation = {
+        truthField = "nickname", topicID = "identity_nickname",
+    },
+})
+local fullIdentity = {
+    allowInference = false,
+    allowObservation = false,
+    allowDisclosure = true,
+    minimumFamiliarity = 25,
+    suspectedThreshold = .30,
+    knownThreshold = .70,
+}
+for _, identityFacet in ipairs({
+    { id = "identity.full_name", field = "displayName" },
+    { id = "identity.forename", field = "forename" },
+    { id = "identity.surname", field = "surname" },
+}) do
+    Descriptors.Register({
+        id = identityFacet.id, version = 1, category = "identity",
+        providerID = "pnc_identity", resolverID = "direct_fact",
+        valueType = "text_enum", privacy = "personal",
+        discovery = fullIdentity,
+        capabilities = { disclosable = true, decayable = false },
+        presentation = {
+            truthField = identityFacet.field,
+            topicID = "identity_full_name",
+        },
+    })
+end
 Descriptors.Register({
     id = "history.relationship", version = 1, category = "history",
     providerID = "pnc_starting_relationship", resolverID = "direct_fact",

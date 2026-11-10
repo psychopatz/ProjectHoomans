@@ -66,6 +66,15 @@ local function definitionForSubject(subject, followUp)
     if subject == "WELLBEING" then return definitionFor("question.wellbeing") end
     if subject == "NEEDS" then return definitionFor("question.needs") end
     if subject == "IDENTITY" then return definitionFor("question.identity") end
+    if subject == "IDENTITY_NICKNAME" then
+        return definitionFor("question.identity_nickname")
+    end
+    if subject == "IDENTITY_SURNAME" then
+        return definitionFor("question.identity_surname")
+    end
+    if subject == "IDENTITY_FACTION" then
+        return definitionFor("question.identity_faction")
+    end
     if subject == "NPC_HEALTH_STATE" then return definitionFor("question.health") end
     if subject == "TIME" then return definitionFor("question.time") end
     if subject == "DATE" then return definitionFor("question.date") end

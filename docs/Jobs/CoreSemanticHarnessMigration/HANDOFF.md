@@ -1,19 +1,21 @@
 # Core Semantic Harness Migration Handoff
 
 updated_at: 2026-11-11T00:00:00Z
+state: COMPLETE_DEVELOPER_SIDE
+phase: Phase 5 — hard deletion and verification
+checkpoint: Core and DynamicTrading participant commits are complete; the
+ProjectHoomans primary commit contains this handoff and the provider cutover.
 
-state: DIRTY_RESUMABLE
+accepted:
 
-parent_status: active
+- Core is the sole Semantic Harness owner and package entrypoint.
+- ProjectHoomans and DynamicTrading old harness trees and root harness metadata
+  are deleted.
+- Shared identity/nickname/display, static-suggestion, and radio/discovery
+  contracts are Core-owned and generated from the Core/provider manifest model.
+- DTAbstract is independently resolvable with Core and DT; PNC is not required.
+- Focused Python/Lua suites, generator regeneration, and deletion scans pass.
 
-phase: Phase 0 — baseline and ownership freeze
-
-checkpoint: Phase 0 baseline and preservation boundary recorded in BASELINE.md; all three repositories inspected; existing dirty work preserved.
-
-next_action: Add the Core package/entrypoint scaffold without overwriting existing Core semantic files.
-
-validation: STATIC_ONLY — repository fingerprints and harness inventories recorded; post-cutover migration tests not run.
-
-blockers: None. Existing dirty work must remain separate from phase-owned changes.
-
-acceptance_condition: Core is the sole harness owner, provider packages are explicit and outside adopter harness namespaces, all profile gates pass, and both legacy adopter harness trees are deleted.
+user_owned_next_step: Load the enabled mod combinations in Project Zomboid and
+exercise PNC identity disclosure, DTAbstract trader dialogue, and radio/world
+discovery in SP/MP as appropriate. No Workshop publication was performed.

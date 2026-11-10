@@ -17,6 +17,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / "tests"
 sys.path.insert(0, str(ROOT))
+CORE_REPOSITORY = Path(
+    os.environ.get("PZ_TEST_CORE_REPOSITORY", ROOT.parent / "psychopatzCore")
+).expanduser().resolve()
+sys.path.insert(0, str(CORE_REPOSITORY))
 
 from tools.semantic_harness.runtime.config import discover_newest_runtime
 from tools.semantic_harness.testing.suite import (

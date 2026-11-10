@@ -14,7 +14,7 @@ T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresenta
 local Identity = PNC.NPCIdentityPresentation
 local stranger = { id = "npc-stranger", displayName = "Morgan Reed" }
 
-T.equal(Identity.GetName(stranger), "Unknown survivor",
+T.equal(Identity.GetName(stranger), "Stranger",
     "raw transport name is hidden until learned")
 T.equal(Identity.GetContextLabel(stranger), "Talk to stranger",
     "unknown NPC context label")
@@ -44,6 +44,30 @@ T.equal(Identity.GetArchetype(stranger), "doctor",
     "learned archetype")
 T.equal(Identity.GetFactionName(stranger), "Ashwood Haven",
     "learned faction")
+
+PNC.Network.ClientState.npcKnowledge["npc-stranger"].categories[1].descriptors[#PNC.Network.ClientState.npcKnowledge["npc-stranger"].categories[1].descriptors + 1] = {
+    descriptorID = "identity.nickname",
+    value = "Mo",
+    status = "confirmed",
+}
+T.equal(Identity.GetName(stranger), "Morgan Reed (Mo)",
+    "full identity appends the learned nickname")
+T.equal(Identity.GetFullName(stranger), "Morgan Reed",
+    "full identity remains separately available")
+T.equal(Identity.GetNickname(stranger), "Mo",
+    "nickname remains separately available")
+
+PNC.Network.ClientState.npcKnowledge["npc-nickname-only"] = {
+    categories = {
+        {
+            descriptors = {
+                { descriptorID = "identity.nickname", value = "Pat", status = "confirmed" },
+            },
+        },
+    },
+}
+T.equal(Identity.GetName({ id = "npc-nickname-only" }), "Pat",
+    "nickname is the visible identity before full name disclosure")
 
 T.equal(Identity.GetName({
     id = "npc-companion", displayName = "Riley", recruited = true,

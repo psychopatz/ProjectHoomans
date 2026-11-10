@@ -72,7 +72,7 @@ function TalkParity.StartProjection(context, value, view)
         dynamicTrading = context.Values.copy(dynamicTradingLoad),
         traderOverlay = {
             enabled = traderOverlay,
-            providerID = traderOverlay and "dynamictrading.trader" or nil,
+            providerID = traderOverlay and "DT.trader" or nil,
             targetType = resolved.targetType,
             tacticalClass = resolved.tacticalClass,
         },

@@ -22,6 +22,9 @@ local function authorizeDisclosure(player, npcID, options)
     local origin = tostring(options.origin or "conversation")
     local topicID = tostring(options.topicID or "")
     local verifiedIdentityClaim = options.verifiedIdentityClaim == true
+    local identityTopic = topicID == "identity_name"
+        or topicID == "identity_nickname"
+        or topicID == "identity_full_name"
     if not context then return nil, nil, reason end
     if not record then return nil, nil, "npc_not_found" end
     if not API.ORIGINS[origin] then return nil, nil, "invalid_knowledge_origin" end
@@ -30,14 +33,14 @@ local function authorizeDisclosure(player, npcID, options)
     -- compared the player's claim with their authoritative character record.
     -- HandleDisclosure forwards a whitelist of request fields, so a client
     -- cannot supply verifiedIdentityClaim through the network route.
-    if topicID == "identity_name" and origin ~= "debug"
+    if identityTopic and origin ~= "debug"
         and (origin ~= "semantic_identity_claim"
             or verifiedIdentityClaim ~= true)
     then
         return nil, nil, "identity_claim_required"
     end
     if origin == "semantic_identity_claim"
-        and (topicID ~= "identity_name" or verifiedIdentityClaim ~= true)
+        and (not identityTopic or verifiedIdentityClaim ~= true)
     then
         return nil, nil, "identity_claim_required"
     end

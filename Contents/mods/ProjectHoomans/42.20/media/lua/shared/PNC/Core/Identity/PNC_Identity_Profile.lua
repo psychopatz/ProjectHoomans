@@ -177,6 +177,17 @@ function Identity.ApplyRecordIdentity(record, source)
     resolvedIdentity.archetypeID = archetype.id
     resolvedIdentity.archetypeLabel = archetype.label
     resolvedIdentity.displayName = Identity.ResolveDisplayName({ identity = resolvedIdentity, displayName = source and source.displayName or nil, name = source and source.name or nil }, seed, resolvedIdentity.isFemale == true, archetype.id)
+    if not normalizeString(resolvedIdentity.nickname)
+        and Names and type(Names.ResolveNickname) == "function"
+    then
+        local survivor = type(resolvedIdentity.survivor) == "table"
+            and resolvedIdentity.survivor or {}
+        resolvedIdentity.nickname = Names.ResolveNickname(
+            survivor.forename or survivor.firstName,
+            seed,
+            { version = Names.NICKNAME_GENERATOR_VERSION }
+        )
+    end
     record.identity = resolvedIdentity
     record.identitySeed = resolvedIdentity.seed
     record.archetypeID = resolvedIdentity.archetypeID

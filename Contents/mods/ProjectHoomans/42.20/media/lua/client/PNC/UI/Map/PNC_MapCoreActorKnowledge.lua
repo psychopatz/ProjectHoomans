@@ -52,7 +52,12 @@ local function knowledge(entryOrID)
     local factionName = Identity
         and type(Identity.GetFactionName) == "function"
         and Identity.GetFactionName(actorID) or nil
-    local nameKnown = knownName ~= nil and knownName ~= ""
+    local identityParts = Identity
+        and type(Identity.GetIdentityParts) == "function"
+        and Identity.GetIdentityParts(actorID) or {}
+    local nameKnown = identityParts.level ~= "unknown"
+        and identityParts.displayName ~= nil
+        or knownName ~= nil and knownName ~= ""
     return {
         -- The learned identity API is the authority. A stale presentation
         -- row can remain `unknown` while the name fact has already arrived.
@@ -62,7 +67,19 @@ local function knowledge(entryOrID)
         pending = not nameKnown and presentation
             and presentation.knowledgePending == true or false,
         nameKnown = nameKnown,
-        knownName = knownName,
+        identity = {
+            displayName = identityParts.fullName,
+            fullName = identityParts.fullName,
+            forename = identityParts.firstName,
+            surname = identityParts.surname,
+            nickname = identityParts.nickname,
+        },
+        knownIdentity = identityParts,
+        knownName = nameKnown and identityParts.displayName or knownName,
+        nicknameKnown = identityParts.nickname ~= nil,
+        knownNickname = identityParts.nickname,
+        surnameKnown = identityParts.surname ~= nil,
+        knownSurname = identityParts.surname,
         factionKnown = faction ~= nil,
         factionID = faction and (faction.factionID or faction.id) or nil,
         factionName = factionName,

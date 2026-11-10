@@ -7,6 +7,28 @@ local Internal = Suggestions.Internal
 local normalized = Internal.normalized
 local resolvedText = Internal.resolvedText
 
+local function identityTopic(value)
+    value = string.lower(tostring(value or ""))
+    if string.find(value, "nickname", 1, true) then
+        return "IDENTITY_NICKNAME"
+    end
+    if string.find(value, "surname", 1, true)
+        or string.find(value, "family_name", 1, true)
+        or string.find(value, "last_name", 1, true)
+    then
+        return "IDENTITY_SURNAME"
+    end
+    if string.find(value, "faction", 1, true)
+        or string.find(value, "group_identity", 1, true)
+    then
+        return "IDENTITY_FACTION"
+    end
+    if string.find(value, "identity", 1, true) then
+        return "IDENTITY"
+    end
+    return nil
+end
+
 local function responseTopic(result, messages)
     local decision = result and result.decision or {}
     local response = type(decision.response) == "table"
@@ -31,9 +53,8 @@ local function responseTopic(result, messages)
         if string.find(value, "needs", 1, true) then
             return "NEEDS"
         end
-        if string.find(value, "identity", 1, true) then
-            return "IDENTITY"
-        end
+        local identity = identityTopic(value)
+        if identity then return identity end
         if string.find(value, "medical", 1, true)
             or string.find(value, "health", 1, true)
         then
@@ -76,9 +97,8 @@ local function responseTopic(result, messages)
                 if string.find(messageValue, "needs", 1, true) then
                     return "NEEDS"
                 end
-                if string.find(messageValue, "identity", 1, true) then
-                    return "IDENTITY"
-                end
+                local identity = identityTopic(messageValue)
+                if identity then return identity end
                 if string.find(messageValue, "medical", 1, true)
                     or string.find(messageValue, "health", 1, true)
                 then
@@ -114,6 +134,20 @@ local function canonicalTopic(value)
     end
     if value == "needs" or string.find(value, "need", 1, true) then
         return "needs"
+    end
+    if string.find(value, "nickname", 1, true) then
+        return "identity_nickname"
+    end
+    if string.find(value, "surname", 1, true)
+        or string.find(value, "family_name", 1, true)
+        or string.find(value, "last_name", 1, true)
+    then
+        return "identity_surname"
+    end
+    if string.find(value, "faction", 1, true)
+        or string.find(value, "group_identity", 1, true)
+    then
+        return "identity_faction"
     end
     if value == "identity" or string.find(value, "identity", 1, true) then
         return "identity"
@@ -220,6 +254,15 @@ local RELATED_TOPICS = {
     time = { time = true, date = true },
     date = { time = true, date = true },
     weather = { weather = true },
+    identity = {
+        identity = true,
+        identity_nickname = true,
+        identity_surname = true,
+        identity_faction = true,
+    },
+    identity_nickname = { identity_nickname = true },
+    identity_surname = { identity_surname = true },
+    identity_faction = { identity_faction = true },
 }
 
 local function topicMatches(definition, topic)
@@ -233,6 +276,12 @@ local function topicGroupID(topic)
     topic = canonicalTopic(topic)
     if topic == "date" then topic = "time" end
     if topic == "needs" or topic == "medical" then topic = "wellbeing" end
+    if topic == "identity_nickname"
+        or topic == "identity_surname"
+        or topic == "identity_faction"
+    then
+        topic = "identity"
+    end
     return topic and "topic:" .. topic or nil
 end
 

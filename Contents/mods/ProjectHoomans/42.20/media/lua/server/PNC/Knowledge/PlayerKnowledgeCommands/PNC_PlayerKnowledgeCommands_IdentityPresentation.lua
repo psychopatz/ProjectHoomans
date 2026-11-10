@@ -87,6 +87,33 @@ local function npcName(record)
     return ""
 end
 
+local function npcNickname(record)
+    local identity = record and record.identity or nil
+    local nickname = clean(identity and (identity.nickname or identity.alias))
+    if nickname ~= "" then return nickname end
+    if PNC.IdentityNames
+        and type(PNC.IdentityNames.ResolveNickname) == "function"
+    then
+        local survivor = identity and identity.survivor or {}
+        local resolved = clean(PNC.IdentityNames.ResolveNickname(
+            survivor and (survivor.forename or survivor.firstName),
+            identity and identity.seed or record and record.identitySeed,
+            { version = PNC.IdentityNames.NICKNAME_GENERATOR_VERSION }
+        ))
+        if resolved ~= "" then return resolved end
+    end
+    return clean(string.match(npcName(record), "^(%S+)") or "")
+end
+
+local function displayName(record, nicknameKnown)
+    local full = npcName(record)
+    local nickname = nicknameKnown and npcNickname(record) or ""
+    if full ~= "" and nickname ~= "" then
+        return full .. " (" .. nickname .. ")"
+    end
+    return full ~= "" and full or nickname
+end
+
 local function firstName(value)
     value = clean(value)
     return string.match(value, "^(%S+)") or value
@@ -101,10 +128,12 @@ local function localized(key, fallback, ...)
 end
 
 function Presentation.BuildResponse(
-    record, truthful, introduction, playerName, disclosureSucceeded
+    record, truthful, introduction, playerName, disclosureSucceeded,
+    disclosedName
 )
     if truthful then
-        local name = npcName(record)
+        local name = clean(disclosedName)
+        if name == "" then name = displayName(record, false) end
         local playerFirst = firstName(playerName)
         if name == "" and introduction then
             local introduced = clean(introduction)
@@ -138,17 +167,25 @@ function Presentation.BuildResponse(
 end
 
 function Presentation.ResolveClaim(
-    player, request, record, truthful, verifiedPlayerName
+    player, request, record, truthful, verifiedPlayerName, relationship
 )
     local introduction
     local disclosureSucceeded = false
+    local disclosedName
     if truthful and clean(verifiedPlayerName) ~= "" then
         local knowledge = PNC.NPCKnowledgeAPI
         if knowledge and type(knowledge.DiscloseForPlayer) == "function" then
+            relationship = type(relationship) == "table" and relationship or {}
+            local familiarity = tonumber(
+                relationship.familiarity or relationship.familiarityValue
+            ) or 0
+            local fullIdentity = familiarity >= 25
+            local topicID = fullIdentity
+                and "identity_full_name" or "identity_nickname"
             local disclosure = knowledge.DiscloseForPlayer(player, {
                 npcID = request.npcID,
-                topicID = "identity_name",
-                requestID = request.requestID .. ":identity_name",
+                topicID = topicID,
+                requestID = request.requestID .. ":" .. topicID,
                 conversationToken = request.args.conversationToken
                     or request.args.token,
                 origin = "semantic_identity_claim",
@@ -156,12 +193,30 @@ function Presentation.ResolveClaim(
             })
             disclosureSucceeded = type(disclosure) == "table"
                 and disclosure.accepted == true
-        end
-        if disclosureSucceeded then
-            local commands = PNC.PlayerKnowledgeCommands
-            local internal = commands and commands.Internal or nil
-            if internal and type(internal.IntroductionText) == "function" then
-                introduction = internal.IntroductionText(request.npcID)
+            if disclosureSucceeded then
+                local snapshot = disclosure.snapshot or {}
+                local identity = snapshot.identity or {}
+                if fullIdentity then
+                    disclosedName = npcName(record)
+                    local nickname = identity.nickname
+                    if nickname and tostring(nickname) ~= "" then
+                        disclosedName = disclosedName .. " ("
+                            .. tostring(nickname) .. ")"
+                    end
+                else
+                    disclosedName = tostring(identity.nickname
+                        or npcNickname(record) or "")
+                end
+                local commands = PNC.PlayerKnowledgeCommands
+                local internal = commands and commands.Internal or nil
+                if fullIdentity
+                    and internal
+                    and type(internal.IntroductionText) == "function"
+                then
+                    introduction = internal.IntroductionText(request.npcID)
+                elseif internal and type(internal.NicknameText) == "function" then
+                    introduction = internal.NicknameText(request.npcID)
+                end
             end
         end
     end
@@ -170,7 +225,8 @@ function Presentation.ResolveClaim(
         truthful,
         introduction,
         verifiedPlayerName,
-        disclosureSucceeded
+        disclosureSucceeded,
+        disclosedName
     )
 end
 

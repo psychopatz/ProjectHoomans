@@ -147,11 +147,19 @@ local function npcIdentity(npcID, fallbackName)
     ) then
         return NameParts.Split(fallbackName, fallbackName, "")
     end
-    if identityPresentation and identityPresentation.IsNameKnown
-        and not identityPresentation.IsNameKnown(
+    if identityPresentation
+        and type(identityPresentation.GetIdentityParts) == "function"
+    then
+        local parts = identityPresentation.GetIdentityParts(
             snapshot or { id = npcID }
         )
-    then
+        if type(parts) == "table" and parts.level ~= "unknown" then
+            return NameParts.Split(
+                parts.displayName,
+                parts.firstName,
+                parts.surname
+            )
+        end
         -- Do not leak transport-level forename/surname data before the
         -- player's identity knowledge says the name is known.
         return NameParts.Split(displayedName)

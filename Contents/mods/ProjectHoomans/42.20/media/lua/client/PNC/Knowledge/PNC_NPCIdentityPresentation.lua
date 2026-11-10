@@ -6,11 +6,16 @@ PNC = PNC or {}
 PNC.NPCIdentityPresentation = PNC.NPCIdentityPresentation or {}
 
 local Identity = PNC.NPCIdentityPresentation
+local ActorNames = require "PsychopatzCore/Actors/PsychopatzActorNames"
 local function clientState()
     return PNC.Network and PNC.Network.ClientState or nil
 end
 
-Identity.UnknownName = "Unknown survivor"
+-- `Unknown survivor` remains a server transport placeholder.  It must never
+-- be presented as if the player learned it; the GUI label for an unknown NPC
+-- is always the localized Stranger label.
+Identity.UnknownName = "Stranger"
+Identity.UnknownTransportName = "Unknown survivor"
 Identity.UnknownArchetype = "Unknown background"
 Identity.UnknownFaction = "Unknown"
 
@@ -67,10 +72,90 @@ function Identity.GetFact(npc, descriptorID)
     return nil
 end
 
+local function factValue(npc, descriptorID)
+    local fact = Identity.GetFact(npc, descriptorID)
+    local value = fact and fact.value or nil
+    if value == nil then return nil end
+    value = tostring(value)
+    if value == "" or Identity.IsPlaceholderName(value) then return nil end
+    return value
+end
+
+local function clean(value)
+    value = tostring(value or "")
+    value = string.gsub(value, "^%s+", "")
+    value = string.gsub(value, "%s+$", "")
+    return value ~= "" and value or nil
+end
+
+local function splitName(value)
+    return ActorNames.Split(value)
+end
+
+local function appendNickname(fullName, nickname)
+    return ActorNames.FormatDisplayName(fullName, nickname)
+end
+
+function Identity.GetIdentityParts(npc)
+    local fullName = factValue(npc, "identity.name")
+        or factValue(npc, "identity.full_name")
+    local nickname = factValue(npc, "identity.nickname")
+    local firstName = factValue(npc, "identity.forename")
+    local surname = factValue(npc, "identity.surname")
+    local state = clientState()
+    local rawAllowed = not state or isPlayerCompanion(npc)
+    local source = rawAllowed and sourceFor(npc) or nil
+    local identity = type(source) == "table" and source.identity or source
+    local survivor = type(identity) == "table"
+        and type(identity.survivor) == "table" and identity.survivor or {}
+
+    if rawAllowed then
+        fullName = fullName or clean(identity and identity.displayName
+            or source and (source.displayName or source.name))
+        firstName = firstName or clean(survivor.forename
+            or survivor.firstName or source and source.forename)
+        surname = surname or clean(survivor.surname
+            or survivor.lastName or source and source.surname)
+        nickname = nickname or clean(identity and (identity.nickname
+            or identity.alias))
+    end
+
+    if fullName and (not firstName or not surname) then
+        local parsedFirst, parsedSurname = splitName(fullName)
+        firstName = firstName or parsedFirst
+        surname = surname or parsedSurname
+    end
+    if not fullName and firstName and surname then
+        fullName = firstName .. " " .. surname
+    end
+
+    local displayName = appendNickname(fullName, nickname)
+        or nickname or firstName or surname or Identity.UnknownName
+    local level = "unknown"
+    if fullName then
+        level = "full_name"
+    elseif nickname then
+        level = "nickname"
+    elseif firstName or surname then
+        level = "name_part"
+    end
+    return {
+        displayName = displayName,
+        fullName = fullName,
+        firstName = firstName,
+        surname = surname,
+        lastName = surname,
+        nickname = nickname,
+        level = level,
+    }
+end
+
+function Identity.GetIdentityLevel(npc)
+    return Identity.GetIdentityParts(npc).level
+end
+
 function Identity.IsNameKnown(npc)
-    if not clientState() then return true end
-    return isPlayerCompanion(npc)
-        or Identity.GetFact(npc, "identity.name") ~= nil
+    return Identity.GetIdentityLevel(npc) ~= "unknown"
 end
 
 -- Presentation placeholders are transport values, not names the player learned.
@@ -82,6 +167,7 @@ local placeholderNames
 local function buildPlaceholderNames()
     local values = {
         Identity.UnknownName,
+        Identity.UnknownTransportName,
         Identity.UnknownArchetype,
         Identity.UnknownFaction,
         "STRANGER",
@@ -104,10 +190,7 @@ function Identity.IsPlaceholderName(value)
 end
 
 function Identity.GetName(npc)
-    local fact = Identity.GetFact(npc, "identity.name")
-    if fact then return tostring(fact.value or Identity.UnknownName) end
-    if Identity.IsNameKnown(npc) then return Identity.GetDebugName(npc) end
-    return not clientState() and Identity.GetDebugName(npc) or Identity.UnknownName
+    return Identity.GetIdentityParts(npc).displayName
 end
 
 -- A descriptor can exist without a usable value (a snapshot whose truth failed
@@ -116,21 +199,16 @@ end
 -- deliberately returns the placeholder, and rendering it as a learned name
 -- produces a plate that reads "Unknown survivor" as if the player had been told.
 function Identity.GetKnownName(npc)
-    local fact = Identity.GetFact(npc, "identity.name")
-    if fact then
-        local value = tostring(fact.value or "")
-        if value ~= "" and not Identity.IsPlaceholderName(value) then
-            return value
-        end
-    end
-    if Identity.IsNameKnown(npc) then
-        local debugName = tostring(Identity.GetDebugName(npc, "") or "")
-        if debugName ~= "" and not Identity.IsPlaceholderName(debugName) then
-            return debugName
-        end
-    end
-    if not clientState() then return Identity.GetDebugName(npc) end
-    return nil
+    local parts = Identity.GetIdentityParts(npc)
+    return parts.level ~= "unknown" and parts.displayName or nil
+end
+
+function Identity.GetFullName(npc)
+    return Identity.GetIdentityParts(npc).fullName
+end
+
+function Identity.GetNickname(npc)
+    return Identity.GetIdentityParts(npc).nickname
 end
 
 function Identity.GetArchetype(npc)

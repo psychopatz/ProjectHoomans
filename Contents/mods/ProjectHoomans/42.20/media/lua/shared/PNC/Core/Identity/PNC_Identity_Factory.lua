@@ -103,6 +103,7 @@ function Identity.GenerateResolvedIdentity(source)
     local resolvedFemale = explicitFemale
     local forename
     local surname
+    local nickname
     local displayName
     local generatedName
     local appearance
@@ -130,6 +131,11 @@ function Identity.GenerateResolvedIdentity(source)
     )) or normalizeString(
         survivorOverride.surname or survivorOverride.lastName
     )
+    local explicitNickname = normalizeString(source and (
+        source.nickname or source.alias
+    )) or normalizeString(
+        identityOverride and (identityOverride.nickname or identityOverride.alias)
+    ) or normalizeString(survivorOverride.nickname)
     if (not explicitForename or not explicitSurname)
         and Names and type(Names.Generate) == "function"
     then
@@ -192,11 +198,18 @@ function Identity.GenerateResolvedIdentity(source)
             }
         ) or "Survivor"
     end
+    nickname = explicitNickname
+        or Names and type(Names.ResolveNickname) == "function"
+        and Names.ResolveNickname(forename, seed, {
+            version = Names.NICKNAME_GENERATOR_VERSION,
+        })
+        or nil
     return {
         seed = seed,
         archetypeID = normalizeString(source and source.archetypeID or nil),
         archetypeLabel = normalizeString(source and source.archetypeLabel or nil),
         displayName = displayName,
+        nickname = nickname,
         isFemale = resolvedFemale,
         survivor = {
             forename = forename,

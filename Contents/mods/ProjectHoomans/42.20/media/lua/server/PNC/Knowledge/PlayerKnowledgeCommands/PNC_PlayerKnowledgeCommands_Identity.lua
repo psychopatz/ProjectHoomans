@@ -150,7 +150,8 @@ function Commands.HandleSemanticIdentity(player, args)
                 request,
                 record,
                 truthful,
-                actualName
+                actualName,
+                after
             )
     elseif kind == Identity.EVENT_EVASION then
         responseText, responseKey, responseArgs =

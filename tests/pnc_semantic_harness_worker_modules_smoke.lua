@@ -5,7 +5,7 @@ local coreRepository = os.getenv("PZ_TEST_CORE_REPOSITORY")
 package.path = coreRepository .. "/Contents/mods/PsychopatzCore/common/media/lua/shared/?.lua;"
     .. coreRepository .. "/tools/semantic_harness/lua/?.lua;"
     .. package.path
-package.path = "./tools/semantic_harness/lua/?.lua;"
+package.path = "./tools/providers/pnc/lua/?.lua;"
     .. package.path
 
 local Protocol = require "Protocol"

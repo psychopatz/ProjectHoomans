@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/Semantics/Generated/Conversation/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "f1b0eba0b168bd724c4fd5c971a2436fd910a0eddb7639601071f6dcf1e70c97"
-Registry.WHOLE_MODEL_FINGERPRINT = "e63463b3b3aabecf6c52b4568c79f30e9f8382e4094420a347846060a1c00a82"
+Registry.WHOLE_MODEL_FINGERPRINT = "3a74f8935b81e12cf4a36ee2ebece6bf44beebde57360a4b4ee8bafbffe25353"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -17,6 +17,7 @@ Registry.RESPONSE_POOLS = {}
 Registry.FLOWS = {}
 Registry.BEHAVIORS = {}
 Registry.BEATS = {}
+Registry.PACKS = {}
 Registry.UI = {}
 local function appendContent(loaded)
     if type(loaded) ~= "table" then return end
@@ -45,6 +46,10 @@ end
 local function appendBeats(loaded)
     if type(loaded) ~= "table" then return end
     for _, value in ipairs(loaded) do Registry.BEATS[#Registry.BEATS + 1] = value end
+end
+local function appendPacks(loaded)
+    if type(loaded) ~= "table" then return end
+    for _, value in ipairs(loaded) do Registry.PACKS[#Registry.PACKS + 1] = value end
 end
 local function appendUI(loaded)
     if type(loaded) ~= "table" then return end
@@ -228,69 +233,73 @@ local loaded88 = require "PsychopatzCore/Semantics/Generated/Conversation/Patter
 appendPatterns(loaded88)
 local loaded89 = require "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/Identity"
 appendPatterns(loaded89)
-local loaded90 = require "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/WeatherNeeds"
+local loaded90 = require "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/IdentityFacets"
 appendPatterns(loaded90)
-local loaded91 = require "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/WellbeingActivity"
+local loaded91 = require "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/WeatherNeeds"
 appendPatterns(loaded91)
-local loaded92 = require "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal"
+local loaded92 = require "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/WellbeingActivity"
 appendPatterns(loaded92)
-local loaded93 = require "PNC/Semantics/Generated/Conversation/Responses/Common/NeedsWeather"
-appendResponses(loaded93)
-local loaded94 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Questions"
+local loaded93 = require "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal"
+appendPatterns(loaded93)
+local loaded94 = require "PNC/Semantics/Generated/Conversation/Responses/Common/NeedsWeather"
 appendResponses(loaded94)
-local loaded95 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Social"
+local loaded95 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Questions"
 appendResponses(loaded95)
-local loaded96 = require "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses"
+local loaded96 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Social"
 appendResponses(loaded96)
-local loaded97 = require "PNC/Semantics/Generated/Conversation/Responses/SemanticFlows"
+local loaded97 = require "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses"
 appendResponses(loaded97)
-local loaded98 = require "PNC/Semantics/Generated/Conversation/Flows/SemanticFlows"
-appendFlows(loaded98)
-local loaded99 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeMemory"
-appendBehaviors(loaded99)
-local loaded100 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeNews"
+local loaded98 = require "PNC/Semantics/Generated/Conversation/Responses/SemanticFlows"
+appendResponses(loaded98)
+local loaded99 = require "PNC/Semantics/Generated/Conversation/Flows/SemanticFlows"
+appendFlows(loaded99)
+local loaded100 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeMemory"
 appendBehaviors(loaded100)
-local loaded101 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeRepair"
+local loaded101 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeNews"
 appendBehaviors(loaded101)
-local loaded102 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeReply"
+local loaded102 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeRepair"
 appendBehaviors(loaded102)
-local loaded103 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeThanks"
+local loaded103 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeReply"
 appendBehaviors(loaded103)
-local loaded104 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AskMemoryFollowup"
+local loaded104 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeThanks"
 appendBehaviors(loaded104)
-local loaded105 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Challenge"
+local loaded105 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AskMemoryFollowup"
 appendBehaviors(loaded105)
-local loaded106 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/ClarifyContext"
+local loaded106 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Challenge"
 appendBehaviors(loaded106)
-local loaded107 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Deescalate"
+local loaded107 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/ClarifyContext"
 appendBehaviors(loaded107)
-local loaded108 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/EndConversation"
+local loaded108 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Deescalate"
 appendBehaviors(loaded108)
-local loaded109 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Reconcile"
+local loaded109 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/EndConversation"
 appendBehaviors(loaded109)
-local loaded110 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/RetaliateVerbally"
+local loaded110 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Reconcile"
 appendBehaviors(loaded110)
-local loaded111 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters"
+local loaded111 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/RetaliateVerbally"
 appendBehaviors(loaded111)
-local loaded112 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDirector"
+local loaded112 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters"
 appendBehaviors(loaded112)
-local loaded113 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Warn"
+local loaded113 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDirector"
 appendBehaviors(loaded113)
-local loaded114 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/WorldEventWarn"
+local loaded114 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Warn"
 appendBehaviors(loaded114)
-local loaded115 = require "PNC/Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation"
-appendBeats(loaded115)
-local loaded116 = require "PNC/Semantics/Generated/Conversation/Beats/Social/Reconciliation"
+local loaded115 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/WorldEventWarn"
+appendBehaviors(loaded115)
+local loaded116 = require "PNC/Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation"
 appendBeats(loaded116)
-local loaded117 = require "PNC/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact"
+local loaded117 = require "PNC/Semantics/Generated/Conversation/Beats/Social/Reconciliation"
 appendBeats(loaded117)
-local loaded118 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn"
-local loaded119 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl"
-local loaded120 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesEn"
-local loaded121 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesTl"
-local loaded122 = require "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes"
-local loaded123 = require "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions"
-appendUI(loaded123)
+local loaded118 = require "PNC/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact"
+appendBeats(loaded118)
+local loaded119 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn"
+local loaded120 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl"
+local loaded121 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesEn"
+local loaded122 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesTl"
+local loaded123 = require "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes"
+local loaded124 = require "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions"
+appendUI(loaded124)
+local loaded125 = require "PsychopatzCore/Semantics/Generated/Conversation/UI/StaticSuggestionsCore"
+appendUI(loaded125)
 for key, family in pairs(Registry.PHRASE_FAMILIES) do
     if type(family) == "table" and family.id then Registry.PHRASE_FAMILIES[key] = family end
 end

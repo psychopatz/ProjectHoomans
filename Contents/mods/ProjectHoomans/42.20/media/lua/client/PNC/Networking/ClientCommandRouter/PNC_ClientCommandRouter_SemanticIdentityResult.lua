@@ -36,6 +36,10 @@ local function applyIdentityResultState(args, dependencies)
             characterUUID = tostring(ClientState.playerContext
                 and ClientState.playerContext.characterUUID or ""),
             displayName = disclosedName,
+                identityLevel = args.presentation
+                    and args.presentation.identityLevel
+                    or string.find(disclosedName, "(", 1, true)
+                        and "full_name" or "nickname",
         }
         dependencies.markDisclosurePending(npcID, disclosedName)
     end

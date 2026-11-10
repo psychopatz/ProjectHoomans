@@ -22,7 +22,10 @@ end
 local function identityNameFact(snapshot)
     for _, category in ipairs(snapshot and snapshot.categories or {}) do
         for _, descriptor in ipairs(category.descriptors or {}) do
-            if descriptor.descriptorID == "identity.name"
+            if (descriptor.descriptorID == "identity.name"
+                or descriptor.descriptorID == "identity.full_name"
+                or descriptor.descriptorID == "identity.nickname"
+                or descriptor.descriptorID == "identity.forename")
                 and descriptor.value ~= nil
             then
                 return descriptor
@@ -30,6 +33,22 @@ local function identityNameFact(snapshot)
         end
     end
     return nil
+end
+
+local function identityDisplayName(snapshot)
+    local identity = snapshot and snapshot.identity or {}
+    local fullName = identity and identity.displayName
+    local nickname = identity and identity.nickname
+    local fact = identityNameFact(snapshot)
+    if fullName and tostring(fullName) ~= ""
+        and nickname and tostring(nickname) ~= ""
+    then
+        return tostring(fullName) .. " (" .. tostring(nickname) .. ")"
+    end
+    return fullName and tostring(fullName)
+        or nickname and tostring(nickname)
+        or fact and tostring(fact.value or "")
+        or nil
 end
 
 local function projectionIsCurrent(payload)
@@ -100,14 +119,19 @@ function Internal.ApplyNPCKnowledgeSnapshot(snapshot, reason)
             PNC.KnowledgeInterest.Acknowledge(npcID)
         end
         local nameFact = identityNameFact(snapshot)
-        if nameFact then
+        local displayName = identityDisplayName(snapshot)
+        if nameFact and displayName then
+            local fullNameKnown = snapshot.identity
+                and snapshot.identity.displayName ~= nil
             auditIdentityKnowledgeMirror(npcID, snapshot)
             ClientState.npcPresentations = ClientState.npcPresentations or {}
             local presentation = ClientState.npcPresentations[npcID] or {}
             presentation.npcID = npcID
             presentation.state = "known"
-            presentation.canAskName = false
-            presentation.displayName = tostring(nameFact.value)
+            presentation.identityLevel = fullNameKnown
+                and "full_name" or "nickname"
+            presentation.canAskName = not fullNameKnown
+            presentation.displayName = displayName
             presentation.snapshot = snapshot
             presentation.characterUUID = snapshot.characterUUID
                 or ClientState.playerContext

@@ -171,15 +171,6 @@ return {
         ["kind"] = "pattern",
         ["source"] = "patterns/common/identity.json",
     },
-    ["pnc.dataset.question.identity.what_do_people_call_you"] = {
-        ["domain"] = "common",
-        ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/Identity",
-        },
-        ["id"] = "pnc.dataset.question.identity.what_do_people_call_you",
-        ["kind"] = "pattern",
-        ["source"] = "patterns/common/identity.json",
-    },
     ["pnc.dataset.question.identity.what_do_you_go_by"] = {
         ["domain"] = "common",
         ["generated"] = {
@@ -428,5 +419,41 @@ return {
         ["id"] = "pnc.dataset.sgd.weather.how_is_the_weather_on_9th_of_march",
         ["kind"] = "pattern",
         ["source"] = "patterns/common/weather_needs.json",
+    },
+    ["pnc.question.identity.faction"] = {
+        ["dependents"] = {
+            "question.identity_faction",
+        },
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/IdentityFacets",
+        },
+        ["id"] = "pnc.question.identity.faction",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/identity_facets.json",
+    },
+    ["pnc.question.identity.nickname"] = {
+        ["dependents"] = {
+            "question.identity_nickname",
+        },
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/IdentityFacets",
+        },
+        ["id"] = "pnc.question.identity.nickname",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/identity_facets.json",
+    },
+    ["pnc.question.identity.surname"] = {
+        ["dependents"] = {
+            "question.identity_surname",
+        },
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/IdentityFacets",
+        },
+        ["id"] = "pnc.question.identity.surname",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/identity_facets.json",
     },
 }

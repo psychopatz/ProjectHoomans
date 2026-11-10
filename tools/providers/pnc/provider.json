@@ -1,0 +1,15 @@
+{
+  "schema": "semantic.provider_manifest.v1",
+  "providerID": "ProjectHoomans",
+  "profiles": ["pnc", "combined"],
+  "displayName": "PNC",
+  "providerIDs": ["ProjectHoomans"],
+  "luaModulePaths": ["${repository}/tools/providers/pnc/lua/?.lua"],
+  "luaModules": ["provider/PNC"],
+  "pythonWorker": "tools.providers.pnc.runtime.worker:LuaSemanticWorker",
+  "pythonScenario": "tools.providers.pnc.runtime.scenario:DEFAULT_SCENARIO",
+  "workerScript": "${repository}/tools/providers/pnc/lua/worker.lua",
+  "workerProfile": "pnc",
+  "pythonProvider": "tools.providers.pnc.provider_adapters:register_pnc_profiles",
+  "conversationManifest": "tools/providers/pnc/codebuilder/sources/conversation/manifest.json"
+}

@@ -65,6 +65,15 @@ local function nameParts(fullName, firstName, lastName)
 end
 
 local function npcIdentity(entry, projection, displayedName)
+    if IdentityPresentation
+        and type(IdentityPresentation.GetIdentityParts) == "function"
+    then
+        local parts = IdentityPresentation.GetIdentityParts(entry)
+        if type(parts) == "table" and parts.level ~= "unknown" then
+            return parts.fullName, parts.firstName, parts.surname,
+                parts.displayName
+        end
+    end
     local snapshot = projection and projection.snapshot
         or entry and entry.snapshot or {}
     local record = entry and entry.record or {}
@@ -97,13 +106,13 @@ local function visibleIdentityArguments(
         playerUUID = playerContext.characterUUID or playerContext.playerUUID,
         state = clientState,
     })
-    local npcFull, npcFirst, npcLast = npcIdentity(
+    local npcFull, npcFirst, npcLast, npcDisplay = npcIdentity(
         entry, projection, npcName
     )
     local address = AddressResolver.Resolve({
         target = entry,
         identityKnown = npcKnown,
-        knownName = npcKnown and npcFull or nil,
+        knownName = npcKnown and (npcDisplay or npcFull) or nil,
         relationshipKind = entry and (
             entry.relationshipKind or entry.relationshipCategory
         ),
@@ -123,16 +132,15 @@ local function visibleIdentityArguments(
             clientState.semanticAddressHistory[npcID], address
         )
     end
-    local displayAddress = address.address
-    if not address.known and address.id == "stranger" then
-        -- Preserve the existing localized Conversation identity label while
-        -- keeping the semantic address value itself lowercase and contextual.
-        displayAddress = stranger
-    end
-    npcFull = displayAddress
+    -- Addressing is a social-language projection.  It must never overwrite
+    -- the identity fields consumed by speaker headers and name placeholders.
+    -- Unknown NPCs therefore remain Stranger in the GUI even when the spoken
+    -- line uses mate, pal, bro, or another contextual address.
     if not address.known then
-        npcFirst = displayAddress
-        npcLast = ""
+        npcFull = nil
+        npcFirst = nil
+        npcLast = nil
+        npcDisplay = stranger
     end
     return {
         playerName = playerAddress.addressName,
@@ -144,9 +152,9 @@ local function visibleIdentityArguments(
         playerNameKnown = playerAddress.known,
         playerIsFemale = playerAddress.isFemale,
         playerNicknameID = playerAddress.nicknameID,
-        npcName = npcFull or stranger,
+        npcName = npcDisplay or npcFull or stranger,
         npcFullName = npcFull or stranger,
-        npcFirstName = npcFirst or npcFull or stranger,
+        npcFirstName = npcFirst or npcDisplay or stranger,
         npcLastName = npcLast or "",
         npcSurname = npcLast or "",
         npcAddress = address.address,
@@ -258,11 +266,19 @@ local function identityProjection(entry)
         and verifiedDisclosure.verified == true
         and tostring(verifiedDisclosure.characterUUID or "")
             == tostring(playerContext.characterUUID or "")
+    local verifiedIdentityLevel = identityClaimVerified
+        and verifiedDisclosure.identityLevel or nil
+    local identityParts = IdentityPresentation.GetIdentityParts
+        and IdentityPresentation.GetIdentityParts(entry) or {}
     local learnedName = IdentityPresentation.GetFact(entry, "identity.name")
+        or IdentityPresentation.GetFact(entry, "identity.full_name")
     local identityKnown = IdentityPresentation.IsNameKnown(entry)
     local storedName = identityClaimVerified
         and tostring(verifiedDisclosure.displayName or "") or ""
-    local knownName = storedName ~= "" and storedName
+    local knownName = identityParts.level ~= "unknown"
+        and identityParts.displayName or nil
+    knownName = storedName ~= "" and storedName
+        or knownName
         or learnedName and learnedName.value
         or projection and projection.displayName
     -- Every candidate must be a real name. A descriptor without a usable value
@@ -286,6 +302,18 @@ local function identityProjection(entry)
     local state = (identityKnown or identityClaimVerified) and knownName
         and tostring(knownName) ~= "" and "known"
         or "unknown"
+    local identityLevel = identityParts.level
+    if verifiedIdentityLevel then
+        identityLevel = verifiedIdentityLevel
+    elseif learnedName and learnedName.value then
+        identityLevel = "full_name"
+    elseif knownName and identityLevel == "unknown" then
+        identityLevel = "nickname"
+    end
+    if projection then
+        projection.identityLevel = identityLevel
+        projection.identity = identityParts
+    end
     if projection and not identityClaimVerified then
         -- Older saves may contain an identity fact learned through the
         -- premature disclosure route. It is not proof of a verified exchange.

@@ -96,6 +96,122 @@ local function resolveIdentityQuestion(ir, state, context)
     }
 end
 
+local function cleanIdentityFacet(value)
+    value = tostring(value or "")
+    value = string.gsub(value, "^%s+", "")
+    value = string.gsub(value, "%s+$", "")
+    if value == "" then return nil end
+    local normalized = string.lower(value)
+    if normalized == "stranger"
+        or normalized == "unknown survivor"
+        or normalized == "unknown"
+    then
+        return nil
+    end
+    return value
+end
+
+local function knowledgeIdentity(context)
+    local knowledge = context and context.npcKnowledge or nil
+    local identity = type(knowledge) == "table"
+        and knowledge.identity or nil
+    if type(identity) == "table" then return identity end
+    local entry = context and context.entry or nil
+    local snapshot = type(entry) == "table" and entry.snapshot or nil
+    identity = type(snapshot) == "table" and snapshot.identity or nil
+    return type(identity) == "table" and identity or {}
+end
+
+local function fullNameWithoutNickname(value)
+    value = cleanIdentityFacet(value)
+    if not value then return nil end
+    value = string.gsub(value, "%s*%([^()]*)%)%s*$", "")
+    return cleanIdentityFacet(value)
+end
+
+local function identityFacetValue(context, facet)
+    local identity = knowledgeIdentity(context)
+    if facet == "nickname" then
+        local nickname = cleanIdentityFacet(identity.nickname)
+        if nickname then return nickname end
+        local visible = cleanIdentityFacet(context and context.npcName)
+        local parenthetical = visible
+            and string.match(visible, "%(([^()]*)%)%s*$") or nil
+        if parenthetical then return cleanIdentityFacet(parenthetical) end
+        if context and context.identityLevel == "nickname" then
+            return visible
+        end
+        return nil
+    end
+    if facet == "surname" then
+        local surname = cleanIdentityFacet(identity.surname)
+            or cleanIdentityFacet(context and context.npcSurname)
+        if surname then return surname end
+        local fullName = fullNameWithoutNickname(
+            identity.displayName or context and context.npcFullName
+        )
+        return fullName and cleanIdentityFacet(
+            string.match(fullName, "^%S+%s+(.+)$")
+        ) or nil
+    end
+    if facet == "faction" then
+        local faction = cleanIdentityFacet(
+            context and context.factionName or identity.factionName
+        )
+        if faction then return faction end
+        local knownFaction = context and context.knownFaction
+        return type(knownFaction) == "table"
+            and cleanIdentityFacet(knownFaction.name) or nil
+    end
+    return nil
+end
+
+local function resolveIdentityFacetQuestion(facet, ir, state, context)
+    local value = identityFacetValue(context, facet)
+    local templateID
+    local fallback
+    local unknown
+    if facet == "nickname" then
+        templateID = value
+            and "semantic.question.identity.nickname.known"
+            or "semantic.question.identity.nickname.unknown"
+        fallback = value
+            and "Most people call me " .. value .. "."
+            or "I don't share what people call me yet."
+        unknown = "IDENTITY_NICKNAME"
+    elseif facet == "surname" then
+        templateID = value
+            and "semantic.question.identity.surname.known"
+            or "semantic.question.identity.surname.unknown"
+        fallback = value
+            and "My surname is " .. value .. "."
+            or "I keep my surname private for now."
+        unknown = "IDENTITY_SURNAME"
+    else
+        templateID = value
+            and "semantic.question.identity.faction.known"
+            or "semantic.question.identity.faction.unknown"
+        fallback = value
+            and "I'm with " .. value .. "."
+            or "I don't share who I'm with yet."
+        unknown = "IDENTITY_FACTION"
+    end
+    return {
+        templateID = templateID,
+        fallback = fallback,
+        args = copyArgs({
+            nickname = facet == "nickname" and value or nil,
+            surname = facet == "surname" and value or nil,
+            factionName = facet == "faction" and value or nil,
+        }),
+        dialogueAct = "FACT_ANSWER",
+        topic = unknown,
+        uncertainty = value and "known" or "unknown",
+        groundedFactRefs = value and { "identity." .. facet } or {},
+        selectionSource = "identity_knowledge",
+    }
+end
+
 local function resolveActivity(ir, state, context)
     return catalogResponse(
         "semantic.question.activity", ir, state, context, {
@@ -183,6 +299,7 @@ Internal.ResolveTime = resolveTime
 Internal.ResolveDate = resolveDate
 Internal.ResolveWeather = resolveWeather
 Internal.ResolveIdentityQuestion = resolveIdentityQuestion
+Internal.ResolveIdentityFacetQuestion = resolveIdentityFacetQuestion
 Internal.ResolveActivity = resolveActivity
 Internal.ResolveWhatsUp = resolveWhatsUp
 Internal.ResolveWellbeing = resolveWellbeing

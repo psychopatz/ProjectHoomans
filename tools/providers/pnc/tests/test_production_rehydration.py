@@ -1,0 +1,282 @@
+"""production Lua rehydration boundary acceptance coverage."""
+
+from __future__ import annotations
+
+from copy import deepcopy
+import hashlib
+from pathlib import Path
+import tempfile
+import unittest
+
+from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
+from tools.providers.pnc.runtime.save_import import SaveBackedImporter
+from tools.providers.pnc.runtime.worker import LuaSemanticWorker
+from tools.providers.pnc.tests.test_save_catalog import pz_file
+
+
+CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")
+
+
+class ProductionRehydrationTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.save_path = Path(self.directory.name) / "global_mod_data.bin"
+        self.save_path.write_bytes(
+            pz_file(
+                [
+                    (
+                        "PNC_PlayerCharacters",
+                        [
+                            ("schemaVersion", 6),
+                            (
+                                "byUUID",
+                                {
+                                    "char_rehydration_fixture": {
+                                        "uuid": "char_rehydration_fixture",
+                                        "accountKey": "slot_rehydration_fixture",
+                                        "displayName": "RehydrationFixture Player",
+                                        "status": "active",
+                                    }
+                                },
+                            ),
+                        ],
+                    ),
+                    ("PNC_Core_Global", [("schemaVersion", 16)]),
+                    (
+                        "PNC_NPCKnowledge",
+                        [
+                            ("schemaVersion", 1),
+                            ("revision", 7),
+                            (
+                                "byCharacter",
+                                {
+                                    "char_rehydration_fixture": {
+                                        "byNPC": {
+                                            "npcRehydrationFixture": {
+                                                "npcID": "npcRehydrationFixture",
+                                                "revision": 3,
+                                                "firstMetAt": 12,
+                                                "lastInteractionAt": 18,
+                                                "discovered": {
+                                                    "identity.name": {
+                                                        "descriptorID": "identity.name",
+                                                        "status": "confirmed",
+                                                        "value": "Lua Rehydrated NPC",
+                                                        "confidence": 1,
+                                                        "primarySource": "save_test",
+                                                    },
+                                                    "identity.archetype": {
+                                                        "descriptorID": "identity.archetype",
+                                                        "status": "confirmed",
+                                                        "value": "General",
+                                                        "confidence": 0.9,
+                                                        "primarySource": "save_test",
+                                                    },
+                                                },
+                                                "journalEntries": {
+                                                    1: {
+                                                        "id": "journal_rehydration_fixture",
+                                                        "type": "save_test",
+                                                        "translationKey": "UI_PNC_SaveTest",
+                                                        "params": {"source": "raw"},
+                                                        "createdAt": 18,
+                                                    }
+                                                },
+                                                "manualNotes": {
+                                                    1: {
+                                                        "id": "note_rehydration_fixture",
+                                                        "text": "Recorded by the save-backed test.",
+                                                        "createdAt": 18,
+                                                    }
+                                                },
+                                                "giftPreferences": {
+                                                    "Base.Bandage": {
+                                                        "disposition": "like",
+                                                        "sourceType": "gift_reaction",
+                                                        "createdAt": 18,
+                                                    }
+                                                },
+                                            }
+                                        }
+                                    }
+                                },
+                            ),
+                        ],
+                    ),
+                    (
+                        "PNC_npcRehydrationFixture",
+                        [
+                            ("schemaVersion", 16),
+                            ("recordRevision", 4),
+                            ("id", "npcRehydrationFixture"),
+                            (
+                                "identity",
+                                {
+                                    "displayName": "Lua Rehydrated NPC",
+                                    "isFemale": True,
+                                    "archetypeID": "General",
+                                    "seed": 1401,
+                                    "survivor": {
+                                        "forename": "Lua",
+                                        "surname": "Rehydrated",
+                                    },
+                                },
+                            ),
+                            ("hostility", {"mode": "neutral"}),
+                        ],
+                    ),
+                ]
+            )
+        )
+
+    def test_raw_save_record_is_rehydrated_by_production_and_reset_isolated(self) -> None:
+        source_bytes = hashlib.sha256(self.save_path.read_bytes()).digest()
+        selection = SaveBackedImporter(
+            core_repository=CORE_REPOSITORY,
+        ).load(self.save_path, player_uuid="char_rehydration_fixture", npc_id="npcRehydrationFixture")
+        raw = selection.provider_payloads["ProjectHoomans"]["rawRecords"]["npc"]
+        self.assertEqual(raw["id"], "npcRehydrationFixture")
+
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            imported = worker.import_saved_selection(
+                self.save_path,
+                player_uuid="char_rehydration_fixture",
+                npc_id="npcRehydrationFixture",
+            )
+            status = imported["productionRehydration"]
+            self.assertEqual(status["status"], "HYDRATED")
+            self.assertEqual(
+                status["deserializer"],
+                "PNC.Persistence.DeserializeRecord",
+            )
+            self.assertEqual(
+                status["inventoryHydrator"],
+                "PNC.Inventory.EnsureRecordInventory",
+            )
+            self.assertEqual(status["registry"], "isolated PNC.Registry")
+            self.assertEqual(
+                imported["scenario"]["npc"]["displayName"],
+                "Lua Rehydrated NPC",
+            )
+
+            source_before = deepcopy(worker.source_snapshot.to_dict())
+            worker.configure(deepcopy(worker.scenario))
+            reset = worker.reset_working_world()
+            self.assertEqual(reset["workingWorld"]["patches"], [])
+            self.assertEqual(worker.source_snapshot.to_dict(), source_before)
+            self.assertEqual(
+                hashlib.sha256(self.save_path.read_bytes()).digest(),
+                source_bytes,
+            )
+
+    def test_raw_knowledge_registry_is_rehydrated_by_production_inspector(self) -> None:
+        source_bytes = hashlib.sha256(self.save_path.read_bytes()).digest()
+        selection = SaveBackedImporter(
+            core_repository=CORE_REPOSITORY,
+        ).load(self.save_path, player_uuid="char_rehydration_fixture", npc_id="npcRehydrationFixture")
+        raw_knowledge = selection.provider_payloads["ProjectHoomans"][
+            "rawRegistries"
+        ]["npcKnowledge"]
+        self.assertEqual(raw_knowledge["revision"], 7)
+
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            imported = worker.import_saved_selection(
+                self.save_path,
+                player_uuid="char_rehydration_fixture",
+                npc_id="npcRehydrationFixture",
+            )
+            self.assertEqual(
+                imported["productionKnowledgeRehydration"]["status"],
+                "HYDRATED",
+            )
+            self.assertEqual(
+                imported["productionKnowledgeRehydration"]["loadOwner"],
+                "PNC.NPCKnowledge.Load",
+            )
+
+            inspection = worker.inspect_npc_dossier()
+            dossier = inspection["npcDossier"]
+            snapshot = dossier["snapshot"]
+            self.assertEqual(dossier["status"], "HYDRATED")
+            self.assertEqual(snapshot["npcID"], "npcRehydrationFixture")
+            self.assertEqual(snapshot["revision"], 3)
+            self.assertEqual(len(snapshot["journalEntries"]), 1)
+            self.assertEqual(len(snapshot["manualNotes"]), 1)
+            self.assertEqual(
+                snapshot["giftPreferences"]["Base.Bandage"],
+                "like",
+            )
+            descriptor_values = {
+                descriptor.get("descriptorID"): descriptor.get("value")
+                for category in snapshot["categories"]
+                for descriptor in category.get("descriptors", [])
+            }
+            self.assertEqual(
+                descriptor_values["identity.name"],
+                "Lua Rehydrated NPC",
+            )
+
+            source_snapshot = deepcopy(worker.source_snapshot.to_dict())
+            worker.reset_working_world()
+            reset = worker.inspect_npc_dossier()
+            self.assertEqual(reset["npcDossier"], dossier)
+            self.assertEqual(worker.source_snapshot.to_dict(), source_snapshot)
+
+        self.assertEqual(
+            hashlib.sha256(self.save_path.read_bytes()).digest(),
+            source_bytes,
+        )
+
+    def test_developer_fixture_mode_remains_explicit(self) -> None:
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            snapshot = worker.snapshot()
+            self.assertEqual(
+                snapshot["productionRehydration"]["status"],
+                "NOT_APPLICABLE",
+            )
+
+    def test_runtime_relationship_override_uses_production_and_resets(self) -> None:
+        source_bytes = self.save_path.read_bytes()
+        selection = SaveBackedImporter(
+            core_repository=CORE_REPOSITORY,
+        ).load(self.save_path, player_uuid="char_rehydration_fixture", npc_id="npcRehydrationFixture")
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            imported = worker.import_saved_selection(
+                self.save_path,
+                player_uuid="char_rehydration_fixture",
+                npc_id="npcRehydrationFixture",
+            )
+            self.assertEqual(
+                imported["productionPlayerRehydration"]["entityKey"],
+                selection.player_entity_key,
+            )
+            source_snapshot = deepcopy(worker.source_snapshot.to_dict())
+
+            overridden = worker.apply_runtime_relationship_baseline(
+                {"approval": 77, "respect": 66, "familiarity": 55},
+                npc_id="npcRehydrationFixture",
+            )
+            self.assertEqual(
+                overridden["runtimeRelationshipOverride"]["owner"],
+                "PNC.Relationships.SetDebugBaseline",
+            )
+            self.assertEqual(
+                overridden["runtimeRelationshipOverride"]["source"],
+                "HARNESS_RUNTIME_OVERRIDE",
+            )
+            relationship = worker.snapshot()["scenario"]["npc"]["relationship"]
+            self.assertEqual(relationship["approval"], 77)
+            self.assertEqual(relationship["respect"], 66)
+            self.assertEqual(relationship["familiarity"], 55)
+            self.assertEqual(worker.source_snapshot.to_dict(), source_snapshot)
+
+            reset = worker.reset_working_world()
+            self.assertFalse(reset.get("runtimeRelationshipOverrides"))
+            self.assertEqual(worker.source_snapshot.to_dict(), source_snapshot)
+
+        self.assertEqual(self.save_path.read_bytes(), source_bytes)
+
+
+if __name__ == "__main__":
+    unittest.main()
