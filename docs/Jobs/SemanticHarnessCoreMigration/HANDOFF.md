@@ -4,19 +4,20 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P5-B"
-phase_commit_message: "phase(P5-B): docs: record cross-repository P5-B checkpoint"
+phase_commit_phase: "P5-C"
+phase_commit_message: "phase(P5-C): docs: prepare P5-C native acceptance runbook"
 phase_commit_vector: "project-hoomans=self;psychopatz-core=c07babcee33291256bf20847200341265a755969;dynamic-trading=0bd7b1472f6b921275f136f9a0900bacd2eb2e3d"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-10T02:00:30.089057Z"
+updated_at: "2026-11-10T02:06:31.853397Z"
 state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
 phase: "P5"
 chunk: "P5-C"
 retrieval_tier: "verify"
 ---
+
 
 
 
@@ -169,6 +170,16 @@ DynamicTrading supplies `provider_worker_launch_values()` as its thin adapter.
 Actual DTAbstract and DTHoomans modules load through the same Core worker and
 receive the same operation dispatch; only `abstract` versus `physical`
 materialization differs. No native Project Zomboid process was launched.
+
+## P5-C preparation
+
+The executable native acceptance checklist is
+`P5C_NATIVE_ACCEPTANCE_RUNBOOK.md`. It covers Core-only bootstrap, Hoomans
+physical materialization, DTHoomans shared identity/conversation/trade,
+DTAbstract abstract traversal, independent adopter toggles, restart persistence,
+and native multiplayer authority/reconnect. It is explicitly user-owned and
+currently **UNVERIFIED**; no native Project Zomboid process was launched by
+this phase.
 
 ## Next
 

@@ -101,11 +101,14 @@ Commits: Core `c07babc`; DynamicTrading `0bd7b147`; Hoomans `e5cc2ec`.
 
 ## Next chunk
 
-**P5-C — user-owned native SP/MP acceptance.** Exercise restart persistence,
-independent Project Hoomans/Dynamic Trading toggles, nearby DTHoomans physical
-materialization, DTAbstract abstract traversal, and shared conversation/trade
-behavior in real saves. Keep the parent goal active until that gate is verified
-or explicitly handed back as the remaining user-owned acceptance.
+**P5-C — user-owned native SP/MP acceptance.** Execute
+[`P5C_NATIVE_ACCEPTANCE_RUNBOOK.md`](P5C_NATIVE_ACCEPTANCE_RUNBOOK.md) across
+the Core-only, Hoomans, DTHoomans, DTAbstract, toggle, restart, and MP rows.
+Exercise restart persistence, independent Project Hoomans/Dynamic Trading
+toggles, nearby DTHoomans physical materialization, DTAbstract abstract
+traversal, and shared conversation/trade behavior in real saves. Keep the
+parent goal active until the gate is verified or explicitly handed back as the
+remaining user-owned acceptance.
 
 ## Known residuals
 

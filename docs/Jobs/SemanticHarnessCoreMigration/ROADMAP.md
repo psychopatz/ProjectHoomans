@@ -113,11 +113,13 @@ contracts with optional-provider loading disabled or enabled independently.
 
 #### P5-C — native SP/MP acceptance
 
-After the developer-side loader gate, exercise restart persistence, independent
-Project Hoomans/Dynamic Trading toggles, nearby DTHoomans physical
-materialization, DTAbstract abstract traversal, and shared conversation/trade
-behavior in real saves. This remains user-owned unless the user explicitly
-authorizes native Project Zomboid operation.
+After the developer-side loader gate, execute
+[`P5C_NATIVE_ACCEPTANCE_RUNBOOK.md`](P5C_NATIVE_ACCEPTANCE_RUNBOOK.md) to
+exercise restart persistence, independent Project Hoomans/Dynamic Trading
+toggles, nearby DTHoomans physical materialization, DTAbstract abstract
+traversal, shared conversation/trade behavior, and native multiplayer authority
+in real saves. This remains user-owned unless the user explicitly authorizes
+native Project Zomboid operation.
 
 ## Required phase discipline
 
