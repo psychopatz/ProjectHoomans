@@ -37,6 +37,28 @@ local function applyMemberSpec(spawnDefinition, memberSpec)
     return spawnDefinition
 end
 
+-- Materialize a group that Core has already planned and committed. This is
+-- deliberately separate from GenerateForFaction: Hoomans owns the physical
+-- record/body/mobile projection, while Core remains the only creator of the
+-- canonical group and actor roster.
+function Director.MaterializeCoreGroup(factionID, spec)
+    spec = type(spec) == "table" and spec or {}
+    if type(spec.actorIDs) ~= "table" or #spec.actorIDs < 1 then
+        return false, "canonical_actor_ids_required"
+    end
+    if type(spec.memberSpecs) ~= "table"
+        or #spec.memberSpecs ~= #spec.actorIDs
+    then
+        return false, "canonical_member_specs_required"
+    end
+
+    local request = {}
+    for key, value in pairs(spec) do request[key] = value end
+    request.canonicalGroup = true
+    request.uniqueNPC = false
+    return Director.GenerateForFaction(factionID, request)
+end
+
 function Director.GenerateForFaction(factionID, spec)
     if not H.Authority() then return false, "not_authority" end
     spec = type(spec) == "table" and spec or {}
@@ -77,6 +99,13 @@ function Director.GenerateForFaction(factionID, spec)
     local count = H.GroupSize(spec.groupSize)
     local plannedActorIDs = type(spec.actorIDs) == "table"
         and spec.actorIDs or nil
+    if spec.canonicalGroup == true
+        and (not plannedActorIDs
+            or type(spec.memberSpecs) ~= "table"
+            or #spec.memberSpecs ~= #plannedActorIDs)
+    then
+        return false, "canonical_group_contract_invalid"
+    end
     if plannedActorIDs and #plannedActorIDs ~= count then
         return false, "actor_plan_size_mismatch"
     end

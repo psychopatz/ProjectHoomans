@@ -43,7 +43,7 @@ for name in pairs(publicFunctions) do
     T.equal(type(PNC.MobileGroupDirector[name]), "function",
         "entry point preserves MobileGroupDirector." .. name)
 end
-T.equal(publicCount, 11, "mobile-group-director public function count")
+T.equal(publicCount, 12, "mobile-group-director public function count")
 T.equal(PNC.MobileGroupDirectorInternal.PumpIntervalMs, 5000,
     "pump interval remains initialized before pump provider")
 
