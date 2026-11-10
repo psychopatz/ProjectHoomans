@@ -70,6 +70,30 @@ function H.OnServerStarted()
             )
         end
     end
+    -- Core is the canonical SurvivorWorld owner. Reconcile the Hoomans
+    -- provider view only after all PNC registries have loaded, otherwise a
+    -- fresh save can publish Core actors before factions/communities/groups
+    -- have crossed the adapter boundary.
+    local worldAdapter = PNC.CoreSurvivorWorldAdapter
+    if worldAdapter
+        and type(worldAdapter.ReconcileExistingWorld) == "function"
+    then
+        local report, reconcileReason =
+            worldAdapter.ReconcileExistingWorld()
+        if not report and PNC.Core and PNC.Core.LogWarn then
+            PNC.Core.LogWarn(
+                "PNC Core SurvivorWorld startup reconciliation deferred"
+                    .. " reason=" .. tostring(reconcileReason or "unknown")
+            )
+        elseif report and #report.failures > 0
+            and PNC.Core and PNC.Core.LogWarn
+        then
+            PNC.Core.LogWarn(
+                "PNC Core SurvivorWorld startup reconciliation partial"
+                    .. " failures=" .. tostring(#report.failures)
+            )
+        end
+    end
     if PNC.UniqueNPCRegistry and PNC.UniqueNPCRegistry.Reconcile then
         PNC.UniqueNPCRegistry.Reconcile()
     end

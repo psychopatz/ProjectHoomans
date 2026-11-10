@@ -234,11 +234,29 @@ function Adapter.CanCommitGeneratedPlans()
         and generatedPlanActorRegistry() ~= nil
 end
 
+local function ensureGeneratedPlanFaction(current, plan)
+    local factionID = type(plan) == "table" and plan.factionID or nil
+    if not factionID or current:GetFaction(factionID) then
+        return current
+    end
+    local report, reason = Adapter.ReconcileExistingWorld()
+    if not report then
+        return nil, "core_generation_reconcile_failed:" .. tostring(reason)
+    end
+    current = registry()
+    if not current or not current:GetFaction(factionID) then
+        return nil, "core_generated_plan_faction_missing"
+    end
+    return current
+end
+
 function Adapter.CommitGeneratedCommunityPlan(plan, reason)
     if not Adapter.CanCommitGeneratedPlans() then
         return nil, "core_generated_plan_commit_unavailable"
     end
     local current, failure = Adapter.EnsureCanonical()
+    if not current then return nil, failure end
+    current, failure = ensureGeneratedPlanFaction(current, plan)
     if not current then return nil, failure end
     local community
     community, failure = World.Bootstrap.CommitCommunityPlan(
@@ -260,6 +278,8 @@ function Adapter.CommitGeneratedGroupPlan(plan, reason)
         return nil, "core_generated_plan_commit_unavailable"
     end
     local current, failure = Adapter.EnsureCanonical()
+    if not current then return nil, failure end
+    current, failure = ensureGeneratedPlanFaction(current, plan)
     if not current then return nil, failure end
     local group
     group, failure = World.Bootstrap.CommitGroupPlan(

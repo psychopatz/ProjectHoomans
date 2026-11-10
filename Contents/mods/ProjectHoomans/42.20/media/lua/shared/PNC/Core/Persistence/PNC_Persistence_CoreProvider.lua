@@ -25,6 +25,12 @@ local function owner(spec)
     return type(spec) == "table" and spec.owner or "ProjectHoomans"
 end
 
+local function providerID(spec)
+    local value = type(spec) == "table" and spec.provider or nil
+    value = tostring(value or "")
+    return value ~= "" and value or "ProjectHoomans"
+end
+
 local function displayName(actor)
     local identity = actor and actor.identity or {}
     local survivor = identity.survivor or {}
@@ -326,6 +332,8 @@ local function coreActorDefinition(actor, projected)
             coreActorID = tostring(actor.actorId),
             coreProviderLease = lease.leaseID,
             coreProvider = lease.provider,
+            coreProviderState = lease.state,
+            coreProviderBodyID = lease.bodyID,
         },
     }
 end
@@ -365,14 +373,20 @@ local function applyCoreActorProjection(record, actor, projected)
             changed = true
         end
     end
-    if record.presenceState == nil then
-        record.presenceState = PNC.Const.PRESENCE_ABSTRACT
+    local expectedPresence = definition.runtime.coreProviderState
+        == "materialized"
+        and PNC.Const.PRESENCE_LIVE
+        or PNC.Const.PRESENCE_ABSTRACT
+    if record.presenceState ~= expectedPresence then
+        record.presenceState = expectedPresence
         changed = true
     end
     if record.runtime.lifecycle == nil then
         record.runtime.lifecycle = {
-            phase = "abstract",
-            bodyState = "missing",
+            phase = expectedPresence == PNC.Const.PRESENCE_LIVE
+                and "live" or "abstract",
+            bodyState = expectedPresence == PNC.Const.PRESENCE_LIVE
+                and "bound" or "missing",
             lastReason = "core_actor_hydrated",
             lastTransitionAt = PNC.Core.Now(),
             lastAuditAt = 0,
@@ -565,7 +579,7 @@ function Adapter.Acquire(actor, core, spec)
         return nil, "core_provider_unavailable"
     end
     spec = type(spec) == "table" and spec or {}
-    spec.provider = "DTHoomans"
+    spec.provider = providerID(spec)
     spec.owner = owner(spec)
     return service.Acquire(actor, spec)
 end
@@ -640,7 +654,7 @@ function Adapter.Materialize(actor, core, spec)
     end
 
     nextActor, reason = service.Materialize(actor, {
-        provider = "DTHoomans",
+        provider = providerID(spec),
         owner = owner(spec),
         bodyID = id,
         authority = spec.authority,
@@ -739,7 +753,7 @@ function Adapter.Dematerialize(actor, core, spec)
     if removed == false then return nil, "body_release_failed" end
 
     nextActor, reason = service.Dematerialize(actor, {
-        provider = "DTHoomans",
+        provider = providerID(spec),
         owner = owner(spec),
         bodyID = spec.bodyID or projection.providerLease.bodyID,
         authority = spec.authority,
@@ -750,7 +764,7 @@ function Adapter.Dematerialize(actor, core, spec)
     record.personalInventory = capturedInventory
     record.runtime.coreInventoryCapturedMode = captureMode
     record.runtime.bodyLease = nil
-    record.runtime.coreProvider = "DTHoomans"
+    record.runtime.coreProvider = providerID(spec)
     return {
         actor = nextActor,
         record = record,
@@ -775,7 +789,7 @@ function Adapter.Release(actor, core, spec)
         return nil, "core_provider_unavailable"
     end
     spec = type(spec) == "table" and spec or {}
-    spec.provider = "DTHoomans"
+    spec.provider = providerID(spec)
     spec.owner = owner(spec)
     return service.Release(actor, spec)
 end
