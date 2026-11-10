@@ -6,7 +6,7 @@ import re
 from typing import Any
 
 from .lexicon_compiler import CompileError
-from .translation_support import normalize_translations
+from semantic_harness.codebuilder.translation_support import normalize_translations
 from semantic_harness.codebuilder.rule_contract import (
     validate_scalar_conditions,
     validate_typed_arguments,

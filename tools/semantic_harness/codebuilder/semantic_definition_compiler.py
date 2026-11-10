@@ -19,13 +19,13 @@ from .dialogue_contract import (
 from .dialogue_rendering import _lua_value
 from .lexicon_compiler import CompileError, _lua_string
 from .dialogue_contract import validate_branch_offers
-from .catalog_naming import ModuleNameRegistry, module_path, pascal_segment
+from semantic_harness.codebuilder.catalog_naming import ModuleNameRegistry, module_path, pascal_segment
 from .generation_ownership import (
     HOOMANS_OWNER,
     PACKAGE_DESCRIPTORS,
     normalize_owner,
 )
-from .translation_support import DEFAULT_LANGUAGE, normalize_translations
+from semantic_harness.codebuilder.translation_support import DEFAULT_LANGUAGE, normalize_translations
 
 SEMANTIC_SCHEMA = "pnc.semantic_authoring.v1"
 

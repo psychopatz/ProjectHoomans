@@ -12,7 +12,7 @@ import re
 import subprocess
 from typing import Any
 
-from ..codebuilder.translation_support import DEFAULT_LANGUAGE, normalize_language, normalize_translations
+from semantic_harness.codebuilder.translation_support import DEFAULT_LANGUAGE, normalize_language, normalize_translations
 
 from .conversation_inspector import build_conversation_inspector
 from ..runtime.scenario import DEFAULT_SCENARIO, merge

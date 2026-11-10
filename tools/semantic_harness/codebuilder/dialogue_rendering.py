@@ -8,8 +8,8 @@ from typing import Any
 
 from .lexicon_compiler import CompileError, _lua_string
 from .dialogue_contract import DIALOGUE_LUA_CHUNK_MAX_CHARS
-from .catalog_naming import ModuleNameRegistry, module_path, pascal_segment
-from .translation_support import pretty_json
+from semantic_harness.codebuilder.catalog_naming import ModuleNameRegistry, module_path, pascal_segment
+from semantic_harness.codebuilder.translation_support import pretty_json
 
 def _lua_value(value: Any, indent: int = 0) -> str:
     if value is None:

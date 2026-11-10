@@ -4,19 +4,20 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P3-E"
-phase_commit_message: "phase(P3-E): compose optional DynamicTrading launch matrix"
+phase_commit_phase: "P4-A"
+phase_commit_message: "phase(P4-A): remove remaining Core-only Hoomans facades and tests"
 phase_commit_vector: "project-hoomans=self"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-10T00:01:11.379618Z"
+updated_at: "2026-11-10T00:09:08.373153Z"
 state: "CLEAN_CHECKPOINT"
 parent_status: "IN_PROGRESS"
-phase: "P3"
-chunk: "P3-E"
+phase: "P4"
+chunk: "P4-A"
 retrieval_tier: "verify"
 ---
+
 
 
 
@@ -56,13 +57,21 @@ DynamicTrading runtime is discovered. DynamicTrading's abstract and physical
 profile selections both round-trip through Core `WorkerLaunchSpec` with the
 same neutral environment contract.
 
+## P4-A result
+
+The import-zero audit removed the remaining pure Hoomans activity/state and
+CodeBuilder naming/translation facades plus duplicate generic tests. Remaining
+Hoomans runtime/Lua modules are provider policy, save/profiler ingestion,
+authoring, or physical-worker integration and require a separate behavior
+contract before any further move.
+
 ## Resume
 
 1. Verify the three repository worktrees and phase commits.
 2. Run Core's full semantic-harness suite, the Hoomans migration/regression
    slice, and DynamicTrading provider adapter gates.
-3. Audit remaining Hoomans runtime/worker Lua modules for provider-neutral
-   duplicates as the P4 cleanup boundary.
+3. Verify Core has no adopter imports and complete the P4-B ownership report
+   and optional-provider acceptance matrix.
 4. Keep native Project Zomboid SP/MP validation user-owned unless explicitly
    requested.
 

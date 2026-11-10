@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import unittest
 
-from tools.semantic_harness.codebuilder import catalog_naming, translation_support
+from semantic_harness.codebuilder.catalog_naming import ModuleNameRegistry
+from semantic_harness.codebuilder.translation_support import normalize_language
 from tools.semantic_harness.codebuilder.dialogue_dataset import (
     compile_dialogue_dataset,
 )
@@ -25,11 +26,11 @@ from semantic_harness.codebuilder import rule_contract
 class CoreCodeBuilderBoundaryTests(unittest.TestCase):
     def test_generic_codebuilder_helpers_are_core_owned(self) -> None:
         self.assertEqual(
-            translation_support.normalize_language.__module__,
+            normalize_language.__module__,
             "semantic_harness.codebuilder.translation_support",
         )
         self.assertEqual(
-            catalog_naming.ModuleNameRegistry.__module__,
+            ModuleNameRegistry.__module__,
             "semantic_harness.codebuilder.catalog_naming",
         )
 

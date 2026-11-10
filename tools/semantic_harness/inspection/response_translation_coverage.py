@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from ..runtime.worker import LuaSemanticWorker
-from ..codebuilder.translation_support import DEFAULT_LANGUAGE, normalize_language
+from semantic_harness.codebuilder.translation_support import DEFAULT_LANGUAGE, normalize_language
 
 MAX_MANIFEST_ASSETS = 64
 MAX_TRANSLATION_ASSET_BYTES = 256 * 1024

@@ -15,7 +15,7 @@ import re
 from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Mapping
 
-from .catalog_naming import (
+from semantic_harness.codebuilder.catalog_naming import (
     ModuleNameRegistry,
     pascal_segment,
     source_owned_module,
@@ -28,7 +28,7 @@ from .dialogue_content import (
 )
 from .dialogue_dataset import compile_dialogue_dataset
 from .lexicon_compiler import CompileError
-from .translation_support import DEFAULT_LANGUAGE, merge_language_sets, normalize_language
+from semantic_harness.codebuilder.translation_support import DEFAULT_LANGUAGE, merge_language_sets, normalize_language
 from .semantic_definition_compiler import (
     compile_semantic_definitions,
     discover_registered_capability_ids,

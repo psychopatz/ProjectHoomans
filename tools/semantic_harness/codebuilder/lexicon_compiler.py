@@ -427,7 +427,7 @@ def render_lua_shards(
     module_prefix: str,
 ) -> list[tuple[str, str]]:
     """Render a readable hub plus bounded lexicon data modules."""
-    from .catalog_naming import ModuleNameRegistry, module_path
+    from semantic_harness.codebuilder.catalog_naming import ModuleNameRegistry, module_path
 
     parent = module_prefix.rsplit("/", 1)[0]
     registry = ModuleNameRegistry()

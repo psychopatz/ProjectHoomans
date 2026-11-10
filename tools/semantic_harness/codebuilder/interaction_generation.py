@@ -11,7 +11,7 @@ from . import authoring
 
 from .blocks import SemanticBlockRegistry
 from .lexicon_compiler import CompileError
-from .translation_support import pretty_json
+from semantic_harness.codebuilder.translation_support import pretty_json
 from .semantic_definition_compiler import discover_registered_capability_ids
 from .generation_ownership import (
     generated_conversation_root,

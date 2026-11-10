@@ -21,7 +21,7 @@ if __package__ in {None, ""}:
         load_allowlist,
         render_lua_shards,
     )
-    from tools.semantic_harness.codebuilder.translation_support import (
+    from semantic_harness.codebuilder.translation_support import (
         normalize_language,
         pretty_json,
     )
@@ -56,7 +56,7 @@ else:
         load_allowlist,
         render_lua_shards,
     )
-    from .translation_support import normalize_language, pretty_json
+    from semantic_harness.codebuilder.translation_support import normalize_language, pretty_json
     from .generation_ownership import (
         CORE_OWNER,
         DT_COMMON_OWNER,

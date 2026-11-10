@@ -13,7 +13,7 @@ from .semantic_definition_compiler import (
     compile_semantic_definitions,
     discover_registered_capability_ids,
 )
-from .translation_support import pretty_json
+from semantic_harness.codebuilder.translation_support import pretty_json
 
 CONVERSATION_SOURCE_ROOT = Path(
     "tools/semantic_harness/codebuilder/sources/conversation"

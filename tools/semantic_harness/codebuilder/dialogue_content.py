@@ -14,9 +14,9 @@ import math
 import re
 from typing import Any
 
-from .catalog_naming import ModuleNameRegistry, source_owned_module
+from semantic_harness.codebuilder.catalog_naming import ModuleNameRegistry, source_owned_module
 from .lexicon_compiler import CompileError, _lua_string
-from .translation_support import DEFAULT_LANGUAGE, normalize_translations
+from semantic_harness.codebuilder.translation_support import DEFAULT_LANGUAGE, normalize_translations
 
 
 CONTENT_SCHEMA = "pnc.semantic_dialogue_content.v2"

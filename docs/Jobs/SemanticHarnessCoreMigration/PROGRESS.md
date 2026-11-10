@@ -243,6 +243,22 @@ duplicates, migrate only behavior-covered boundaries into Core, remove stale
 tests/docs/imports, and run the Core/Hoomans/DT matrix plus the user-owned
 native SP/MP handoff gates.
 
+## P4-A result
+
+The import-zero audit removed the last pure Hoomans Python facades for Core
+activity/state and Core CodeBuilder naming/translation, along with duplicate
+generic tests. Remaining Hoomans runtime and Lua modules carry provider policy
+or physical-worker integration; no further deletion is justified without a
+behavior-preserving Core contract and matrix coverage.
+
+## Next Chunk
+
+**P4-B — final ownership audit and acceptance matrix.** Verify Core contains
+no adopter imports, enumerate every remaining Hoomans/DynamicTrading harness
+module by ownership, run optional-provider enable/disable tests, and prepare
+the native SP/MP handoff. Do not mark the parent goal complete until the
+ownership report and all developer-side gates are current.
+
 ## P3-D result
 
 Core now owns the shared Lua launch-metadata parser and both Core and Hoomans

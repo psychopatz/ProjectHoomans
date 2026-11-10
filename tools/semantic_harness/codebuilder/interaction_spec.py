@@ -9,7 +9,7 @@ import re
 from typing import Any
 
 from .lexicon_compiler import CompileError
-from .translation_support import DEFAULT_LANGUAGE, normalize_translations
+from semantic_harness.codebuilder.translation_support import DEFAULT_LANGUAGE, normalize_translations
 from .dialogue_contract import (
     DIALOGUE_BACKSTORY_KINDS,
     DIALOGUE_ID,

@@ -9,7 +9,7 @@ from pathlib import Path
 import sys
 
 from .codebuilder.service import SemanticLabAuthoringService
-from .codebuilder.translation_support import normalize_language
+from semantic_harness.codebuilder.translation_support import normalize_language
 from .inspection.rendering import print_result as _print_result
 from .inspection.response_candidate import preview_authored_variant
 from .inspection.response_turn_trace import inspect_response_turn

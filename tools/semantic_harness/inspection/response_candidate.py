@@ -18,7 +18,7 @@ from ..codebuilder.conversation_compiler import (
     compile_conversation_sources,
     conversation_record,
 )
-from ..codebuilder.translation_support import (
+from semantic_harness.codebuilder.translation_support import (
     DEFAULT_LANGUAGE,
     normalize_translations,
 )
