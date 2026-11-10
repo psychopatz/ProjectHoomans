@@ -1,6 +1,6 @@
 # Roadmap — Unified NPC Population and Expansion Architecture
 
-**Status:** P2C HOOMANS MEMBERSHIP ADAPTER IMPLEMENTED — ACTOR ADOPTION/HYDRATION NEXT.
+**Status:** P3 ADAPTER MIGRATION SLICE IMPLEMENTED — NATIVE ACCEPTANCE NEXT.
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -41,9 +41,12 @@ representation.
 
 The remaining split is at the ownership boundaries:
 
-1. Dynamic Trading still owns a trader-specific generation façade and
-   trader-specific population cadence instead of registering a generic source
-   with Core.
+1. Dynamic Trading now requests the Core bootstrap/generation contract and
+   resolves canonical trader groups; it no longer owns a competing actor,
+   group, or persistence pipeline. The canonical `DT.trader` profile and
+   trader presets live in DTCommon's `common` layer, while physical settlement
+   staffing lives in DTHoomans. A future Core-scheduled source registration
+   can still move cadence policy behind the existing generic source seam.
 2. Hoomans still has a large generation/materialization path and local
    compatibility membership state. Core now owns the public generic faction
    mutation service, and Hoomans NPC membership commands delegate their
@@ -134,7 +137,8 @@ registered faction-archetype definitions. Core map/hover projection accepts
 canonical `presenceState`, and the Hoomans supplemental directory repairs
 missing legacy state to `abstract` (or hides `corpse`). The remaining P2 gate
 is canonical actor adoption/hydration. The NPC monitor uses the same
-normalization, and Dynamic Trading migration has not started.
+normalization. Dynamic Trading now consumes the same Core profile/generation
+result through its optional DTAbstract/DTHoomans adapters.
 
 ### P2A — Core-owned faction profile contract (implemented)
 
@@ -204,6 +208,15 @@ actor/group result.
 DTAbstract and DTHoomans switch representation without a second actor,
 group, PNC record, or body identity; disabling the mod does not erase Core
 state.
+
+**Implemented slice:** DTCommon registers the `DT.trader` Core faction
+profile and owns the shared `DT.*` capability/action namespace and common
+trader presets. DTAbstract requests Core's provider-neutral primary trader
+bootstrap, while DTHoomans owns the physical settlement staffing adapter.
+Project Hoomans filters unavailable optional-provider projections and keeps
+Core records canonical when either provider is disabled. The full Dynamic
+Trading suite and the cross-adopter hotplug matrix pass; native fresh-save
+and nearby materialization checks remain user-owned.
 
 ### P4 — Expansion contract proof (conceptual fixture only)
 
@@ -282,5 +295,5 @@ Gang package, or production Gang feature.
 Core actor-map and hover projections now read `presenceState` as well as
 provider lease state. Hoomans map-directory projection normalizes missing or
 legacy live/abstract state before rendering, so a valid visible NPC cannot
-leak `UNKNOWN` as its presence badge. The next P2 slice must close the
-canonical actor adoption/hydration boundary before P3.
+leak `UNKNOWN` as its presence badge. Canonical actor adoption/hydration
+remains a follow-up boundary during P3.

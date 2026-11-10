@@ -1,6 +1,6 @@
 # Progress — Unified NPC Population and Expansion Architecture
 
-**Status:** P2C IMPLEMENTED — ACTOR ADOPTION/HYDRATION NEXT
+**Status:** P3 ADAPTER MIGRATION SLICE IMPLEMENTED — NATIVE ACCEPTANCE NEXT
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -14,13 +14,17 @@
   commit seams, including stable group/faction/member identity and provenance.
 - Project Hoomans owns physical PNC/NPC materialization through the existing
   Core adapter and `MaterializeCoreGroup` boundary.
-- Dynamic Trading has abstract and Hoomans-backed provider paths and already
-  supplies trader presets/member specifications.
+- Dynamic Trading now consumes the Core canonical generation/profile contract:
+  DTCommon owns the `DT.trader` profile, `DT.*` capability/action IDs, and
+  common trader presets; DTHoomans owns physical settlement staffing.
 
 ### `STATIC_ONLY` — remaining architectural split
 
-- Dynamic Trading still owns trader-specific generation façade/cadence code;
-  it has not yet become a generic Core source registration.
+- Dynamic Trading no longer owns a competing actor/group/persistence writer;
+  DTAbstract requests the Core provider-neutral bootstrap and both provider
+  modes resolve the same canonical actor/group result. A future Core-scheduled
+  source registration may still centralize cadence policy behind the existing
+  generic source seam.
 - Hoomans' fixed mobile allow-list has been replaced by a Core-owned profile
   registry exposed through the compatibility façade; canonical faction writes
   and generic NPC membership mutation now use Core, while actor
@@ -34,10 +38,10 @@
   an unhydrated canonical actor must still be repaired or hidden, and
   `UNKNOWN` remains an invalid projection rather than a supported mode.
 - The exact writer/provenance chain for recurring new-save names such as Nina
-  Cole and Vara Moss remains a runtime trace to perform before deleting any
-  compatibility or bootstrap path.
-- Canonical actor adoption/hydration remains the next Hoomans boundary;
-  Dynamic Trading has not been migrated to Core source registration yet.
+  Cole and Vara Moss still needs native runtime confirmation; stale optional
+  projections are now rejected/hidden when their provider is unavailable.
+- Canonical actor adoption/hydration and native fresh-save acceptance remain
+  the next Hoomans boundaries.
 
 ### `TEST_VERIFIED` — supporting evidence already available
 
@@ -99,16 +103,19 @@ Core participant commit: `cff123f` (`phase(P2): normalize Core actor presence pr
 
 ## Current phase
 
-**P2C — Hoomans membership adapter.** The Core profile and faction mutation
-contracts are verified, and Hoomans NPC membership commands now delegate
-generic member/add, remove, transfer, and leader changes to Core.
+**P3 — Dynamic Trading adapter migration slice.** The Core profile and
+faction mutation contracts are verified; Hoomans NPC membership commands
+delegate generic member/add, remove, transfer, and leader changes to Core;
+DTCommon/DTHoomans now own the trader-specific profile/presence pieces while
+Core remains the canonical actor/group authority.
 
 ## Next Chunk
 
-**Adopt and hydrate canonical actors in Hoomans.** Preserve Hoomans ownership
+**Native fresh-save and actor adoption/repair.** Preserve Hoomans ownership
 of PNC records, body creation, abstract/live projection, monitor, map, and
 debug integration. Reconcile missing canonical actors before materialization;
-do not migrate Dynamic Trading until this identity boundary is tested.
+verify that disabling DT leaves Core/Hoomans valid while hiding only optional
+DT projections.
 
 ## Accepted P2C — Hoomans membership adapter
 
@@ -124,8 +131,9 @@ compiles with `luac5.3` and passes `pz-verify` with zero Kahlua errors. The
 unrelated `pnc_faction_service_presence_boundary_smoke` remains stale at
 `87` expected versus `88` actual public declarations.
 
-The remaining P2 work is canonical actor adoption/hydration; Dynamic Trading
-has not been migrated.
+The remaining follow-up is canonical actor adoption/hydration plus native
+fresh-save/restart validation; no second Dynamic Trading generation pipeline
+was introduced.
 
 ## Completion rule
 
