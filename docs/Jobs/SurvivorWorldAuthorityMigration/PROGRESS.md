@@ -13,12 +13,16 @@
   Core generation is unavailable.
 - Preserved Dynamic Trading source behavior; its existing Core group commit
   path now receives the same Core population bookkeeping.
+- Added a Dynamic Trading handoff regression proving that a pre-hydrated
+  Hoomans record survives `DTAbstract` to `DTHoomans` materialization and
+  dematerialization without replacement or temporary-projection metadata.
 
 ## Evidence
 
 - Core focused smoke tests: 3 passed.
 - Hoomans focused regression tests: 8 passed.
 - Dynamic Trading focused regression tests: 12 passed.
+- Dynamic Trading pre-hydrated-record hotswap regression: passed.
 - Modified production Lua passes `pz-verify`; modified Lua passes `luac -p`.
 - `git diff --check` passes in Core, Hoomans, and Dynamic Trading.
 
