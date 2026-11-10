@@ -59,7 +59,7 @@ and verified.
   `87` expected versus `88` actual.
 - `STATIC_ONLY`: no native Project Zomboid acceptance is claimed.
 - Project Hoomans has the P2 profile/presence implementation committed as
-  `5417deac`; the Core profile bridge is the current P2A implementation and
+  `5417deac` and the Core profile bridge committed as `f10667c5`;
   canonical faction mutation remains the next chunk.
 - Dynamic Trading and PsychopatzCore contain pre-existing generated
   `.architecture-refactor/output/architecture-audit.md` modifications from
