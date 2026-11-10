@@ -26,7 +26,7 @@ PsychopatzCore
                  |
                  v
 Project Hoomans
-  - PNC records and faction policy
+  - PNC records and Hoomans-specific faction behavior
   - abstract/live presence projection
   - body creation and nearby lifecycle
   - NPC monitor, map, and debug adapters
@@ -88,6 +88,19 @@ Core returns a canonical result containing:
 Core owns validation, ID allocation, collision handling, idempotency, and
 durable commit. An expansion may propose IDs only as deterministic hints; it
 cannot make them authoritative.
+
+### Core faction profile contract
+
+Core owns the provider-neutral faction profile registry and its stable role
+contract. A profile contains identity, source provenance, allowed roles,
+default role, generic policy defaults, capabilities, and namespaced extension
+payloads. Adopters register profiles through Core and receive copy-safe query
+results; they do not maintain a second profile registry.
+
+Project Hoomans may retain Hoomans-specific behavior, physical NPC archetype
+choices, and mobile materialization details in its namespaced extension. Those
+fields are not interpreted by Core. Core owns the profile identity and role
+contract, while Hoomans owns how a supported profile becomes a PZ NPC.
 
 ### Hoomans materializer contract
 
@@ -151,7 +164,7 @@ Required behavior:
 | --- | --- | --- |
 | Core `BuildGroupPlan` and `CommitGroupPlan` | Canonical generation foundation exists | Add generic source registration/orchestration around it |
 | Hoomans `MaterializeCoreGroup` | Physical integration already has a seam | Stabilize it as the only expansion-to-body boundary |
-| Hoomans fixed faction/mobile archetype gates | New expansion types would require edits or bypasses | Registered mobile profile now supplies role/NPC/hostility policy; canonical adoption remains |
+| Hoomans fixed faction/mobile archetype gates | New expansion types would require edits or bypasses | Core-owned profile registry now supplies the shared role contract; Hoomans retains materialization extensions |
 | DT trader generation façade and `TraderWorld` cadence | Trader domain still owns generic-looking generation flow | Register DT source with Core; retain trader policy locally |
 | DTAbstract/DTHoomans providers | Useful representation split | Keep both as projections of the same Core result |
 | map marker/hover before hydration | Incomplete projection can leak as `UNKNOWN` | Core now reads canonical `presenceState`; finish the canonical actor hydration gate before P3 |

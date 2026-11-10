@@ -3,10 +3,10 @@ handoff_schema: 2
 checkpoint_mode: "documentation_checkpoint"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
-state: "READY_FOR_P2_ADOPTION_IMPLEMENTATION"
+state: "READY_FOR_P2B_CORE_FACTION_WRITER"
 parent_status: "IN_PROGRESS"
-phase: "P2"
-chunk: "canonical-actor-adoption-and-hydration"
+phase: "P2A"
+chunk: "core-faction-writer-and-hoomans-adapter"
 retrieval_tier: "verify"
 ---
 
@@ -33,10 +33,11 @@ will be created.
 
 ## Resume action
 
-Continue P2 in Project Hoomans by closing the canonical actor
-adoption/hydration gate. Keep Dynamic Trading unchanged until that Hoomans
-boundary is stable. The registered-profile, map-presence, and monitor-
-presence slices are already implemented and verified.
+Continue P2A by moving canonical faction mutation and membership behind Core,
+then make Hoomans a compatibility/materialization adapter. Keep Dynamic
+Trading unchanged until the Core writer and Hoomans boundary are stable. The
+Core-owned profile, map-presence, and monitor-presence slices are implemented
+and verified.
 
 ## Evidence and repository state
 
@@ -46,12 +47,20 @@ presence slices are already implemented and verified.
   `cff123f`; Hoomans registered mobile profiles, supplemental map-directory
   normalization, and monitor normalization are present in the current primary
   worktree.
+- `CODE_VERIFIED`: Core faction profiles are now owned by
+  `SurvivorWorld.FactionProfiles`; Hoomans' archetype API is a compatibility
+  façade over that registry. PsychopatzCore commit `4112111`.
+- `TEST_VERIFIED`: Core faction-profile, Core composition, Hoomans/Core
+  bridge, Hoomans faction-foundation, and mobile-group smokes pass. The
+  existing faction-service declaration-count mismatch remains unrelated
+  (`87` expected versus `88` actual).
 - `TEST_VERIFIED`: focused Hoomans and Core P2 map/materializer smokes pass;
   the unrelated faction-boundary declaration-count smoke remains stale at
   `87` expected versus `88` actual.
 - `STATIC_ONLY`: no native Project Zomboid acceptance is claimed.
 - Project Hoomans has the P2 profile/presence implementation committed as
-  `5417deac`; the next adoption/hydration chunk remains.
+  `5417deac`; the Core profile bridge is the current P2A implementation and
+  canonical faction mutation remains the next chunk.
 - Dynamic Trading and PsychopatzCore contain pre-existing generated
   `.architecture-refactor/output/architecture-audit.md` modifications from
   the audit. Preserve them; they are not part of this implementation phase.

@@ -1,6 +1,6 @@
 # Roadmap — Unified NPC Population and Expansion Architecture
 
-**Status:** P2 PROFILE/PRESENCE SLICE IMPLEMENTED — P2 ADOPTION GATE NEXT.
+**Status:** P2A CORE FACTION PROFILE SLICE IMPLEMENTED — CANONICAL FACTION WRITER NEXT.
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -24,7 +24,8 @@ domain expansion intent/policy
 ```
 
 Dynamic Trading and any future domain expansion are consumers of this model.
-Project Hoomans remains the NPC framework and physical materialization owner.
+Project Hoomans remains the NPC framework and physical materialization owner;
+Core now also owns the shared faction-profile registry and role contract.
 PsychopatzCore
 is the provider-neutral authority for canonical actors, groups, IDs,
 provenance, and durable population state.
@@ -43,9 +44,9 @@ The remaining split is at the ownership boundaries:
 1. Dynamic Trading still owns a trader-specific generation façade and
    trader-specific population cadence instead of registering a generic source
    with Core.
-2. Hoomans still has hardcoded faction/archetype policy for mobile groups and
-   a large generation/materialization path instead of accepting extensible
-   Core group plans through a stable materializer contract.
+2. Hoomans still has a large generation/materialization path and a local
+   faction mutation service. The shared profile registry has moved to Core,
+   but canonical faction writes and membership mutation have not.
 3. Map/hover projections can expose a marker before its canonical actor or
    provider lease is hydrated. The resulting `UNKNOWN` value is not a valid
    presence mode; it is an invalid or incomplete projection that must be
@@ -131,6 +132,22 @@ canonical `presenceState`, and the Hoomans supplemental directory repairs
 missing legacy state to `abstract` (or hides `corpse`). The remaining P2 gate
 is canonical actor adoption/hydration. The NPC monitor uses the same
 normalization, and Dynamic Trading migration has not started.
+
+### P2A — Core-owned faction profile contract (implemented)
+
+Add the Core `SurvivorWorld.FactionProfiles` registry with bounded,
+idempotent registration, conflict detection, copy-safe queries, source
+provenance, shared role/default-role validation, capabilities, and namespaced
+extensions. Project Hoomans' `PNC.FactionArchetypes` remains source-compatible
+for existing callers but now registers and reads profiles through Core.
+
+**Gate:** Core tests pass without Hoomans loaded; Hoomans built-in and custom
+profiles are visible through Core; custom profile cleanup removes the Core
+entry; no PZ body/materialization code is imported into Core.
+
+**Checkpoint:** implemented in PsychopatzCore and ProjectHoomans. The next
+slice must move canonical faction mutation and membership behind Core before
+Dynamic Trading is migrated.
 
 ### P3 — Dynamic Trading adapter migration
 

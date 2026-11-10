@@ -5,6 +5,9 @@ PNC = PNC or {}
 PNC.FactionArchetypes = PNC.FactionArchetypes or {}
 
 local Archetypes = PNC.FactionArchetypes
+local CoreProfiles = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldFactionProfiles"
+local SOURCE_ID = "ProjectHoomans"
 
 local DEFINITIONS = {
     settler = {
@@ -188,62 +191,111 @@ local function customCount()
     return count
 end
 
+local function corePayload(archetypeID, definition)
+    return {
+        id = archetypeID,
+        label = definition.label,
+        description = definition.description,
+        sourceMod = SOURCE_ID,
+        allowedRoles = definition.allowedRoles,
+        defaultRole = definition.defaultRole,
+        policyDefaults = definition.policyDefaults,
+        capabilities = {
+            mobile = definition.mobile and definition.mobile.enabled == true,
+        },
+        extensions = {
+            [SOURCE_ID] = {
+                behavior = definition.behavior,
+                mobile = definition.mobile,
+            },
+        },
+    }
+end
+
+local function legacyDefinition(profile)
+    if not profile then return nil end
+    local extension = profile.extensions
+        and profile.extensions[SOURCE_ID] or {}
+    local mobile = extension.mobile
+    local behavior = extension.behavior or {
+        hostileToOutsiders = false,
+    }
+    return {
+        id = profile.id,
+        label = profile.label,
+        description = profile.description,
+        allowedRoles = copy(profile.allowedRoles),
+        defaultRole = profile.defaultRole,
+        behavior = copy(behavior),
+        policyDefaults = copy(profile.policyDefaults),
+        mobile = copy(mobile),
+    }
+end
+
+for archetypeID, definition in pairs(DEFINITIONS) do
+    local registered, reason = CoreProfiles.Register(
+        archetypeID,
+        corePayload(archetypeID, definition)
+    )
+    if not registered and reason ~= "already_registered" then
+        error("failed to register faction profile "
+            .. tostring(archetypeID) .. ": " .. tostring(reason))
+    end
+end
+
 function Archetypes.Get(archetypeID)
-    local definition = type(archetypeID) == "string"
-        and DEFINITIONS[archetypeID] or nil
-    return definition and copy(definition) or nil
+    return legacyDefinition(CoreProfiles.Get(archetypeID))
 end
 
 function Archetypes.Exists(archetypeID)
-    return type(archetypeID) == "string"
-        and DEFINITIONS[archetypeID] ~= nil
+    return CoreProfiles.Exists(archetypeID)
 end
 
 function Archetypes.List()
     local output = {}
-    for id, definition in pairs(DEFINITIONS) do
-        output[id] = copy(definition)
+    for _, profile in ipairs(CoreProfiles.List()) do
+        output[profile.id] = legacyDefinition(profile)
     end
     return output
 end
 
 function Archetypes.IsRoleAllowed(archetypeID, role)
-    local definition = DEFINITIONS[archetypeID]
+    local definition = CoreProfiles.Get(archetypeID)
     return definition ~= nil
         and definition.allowedRoles[role] == true
 end
 
 function Archetypes.GetDefaultRole(archetypeID)
-    local definition = DEFINITIONS[archetypeID]
+    local definition = CoreProfiles.Get(archetypeID)
     return definition and definition.defaultRole or "civilian"
 end
 
 function Archetypes.GetPolicyDefaults(archetypeID)
-    local definition = DEFINITIONS[archetypeID]
+    local definition = CoreProfiles.Get(archetypeID)
     return definition and copy(definition.policyDefaults) or nil
 end
 
 function Archetypes.SupportsMobile(archetypeID)
-    local definition = DEFINITIONS[archetypeID]
+    local definition = CoreProfiles.Get(archetypeID)
     return definition ~= nil
-        and definition.mobile ~= nil
-        and definition.mobile.enabled == true
+        and definition.capabilities ~= nil
+        and definition.capabilities.mobile == true
 end
 
 function Archetypes.GetMobileRoleOrder(archetypeID)
-    local definition = DEFINITIONS[archetypeID]
+    local definition = legacyDefinition(CoreProfiles.Get(archetypeID))
     local mobile = definition and definition.mobile or nil
     return mobile and copy(mobile.roleOrder) or nil
 end
 
 function Archetypes.GetMobileNPCArchetype(archetypeID)
-    local definition = DEFINITIONS[archetypeID]
+    local definition = legacyDefinition(CoreProfiles.Get(archetypeID))
     local mobile = definition and definition.mobile or nil
     return mobile and mobile.npcArchetype or nil
 end
 
 function Archetypes.IsMobileHostile(archetypeID)
-    local definition = DEFINITIONS[archetypeID]
+    local definition = legacyDefinition(CoreProfiles.Get(archetypeID))
     local mobile = definition and definition.mobile or nil
     return mobile and mobile.hostile == true or false
 end
@@ -252,7 +304,7 @@ function Archetypes.Register(archetypeID, definition)
     if not validID(archetypeID) then
         return false, "faction_archetype_id_invalid"
     end
-    if DEFINITIONS[archetypeID] then
+    if CoreProfiles.Exists(archetypeID) then
         return false, "faction_archetype_exists"
     end
     if customCount() >= MAX_CUSTOM then
@@ -288,7 +340,7 @@ function Archetypes.Register(archetypeID, definition)
             warThreshold = 70,
             peaceThreshold = 25,
         }
-    DEFINITIONS[archetypeID] = {
+    local normalized = {
         id = archetypeID,
         label = tostring(definition.label or archetypeID),
         description = tostring(definition.description or ""),
@@ -304,6 +356,13 @@ function Archetypes.Register(archetypeID, definition)
             defaultRole
         ),
     }
+    local registered, reason = CoreProfiles.Register(
+        archetypeID,
+        corePayload(archetypeID, normalized)
+    )
+    if not registered then
+        return false, reason or "faction_archetype_registration_failed"
+    end
     CUSTOM[archetypeID] = true
     return true
 end
@@ -314,13 +373,13 @@ end
 
 function Archetypes.ResetCustomForTests()
     for archetypeID in pairs(CUSTOM) do
-        DEFINITIONS[archetypeID] = nil
+        CoreProfiles.Unregister(archetypeID)
         CUSTOM[archetypeID] = nil
     end
 end
 
 function Archetypes.IsHostileToOutsiders(archetypeID)
-    local definition = DEFINITIONS[archetypeID]
+    local definition = legacyDefinition(CoreProfiles.Get(archetypeID))
     return definition ~= nil
         and definition.behavior ~= nil
         and definition.behavior.hostileToOutsiders == true

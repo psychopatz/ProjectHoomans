@@ -1,6 +1,6 @@
 # Progress — Unified NPC Population and Expansion Architecture
 
-**Status:** P2 IN PROGRESS — PROFILE/MAP/MONITOR PRESENCE SLICE VERIFIED
+**Status:** P2A IN PROGRESS — CORE FACTION PROFILE CONTRACT VERIFIED
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -21,8 +21,9 @@
 
 - Dynamic Trading still owns trader-specific generation façade/cadence code;
   it has not yet become a generic Core source registration.
-- Hoomans' fixed mobile allow-list has been replaced by registered profiles;
-  canonical actor adoption/hydration remains the next boundary.
+- Hoomans' fixed mobile allow-list has been replaced by a Core-owned profile
+  registry exposed through the compatibility façade; canonical faction writes,
+  membership mutation, and actor adoption/hydration remain to be migrated.
 - Map/hover and monitor projections now normalize valid live/abstract state;
   an unhydrated canonical actor must still be repaired or hidden, and
   `UNKNOWN` remains an invalid projection rather than a supported mode.
@@ -92,16 +93,16 @@ Core participant commit: `cff123f` (`phase(P2): normalize Core actor presence pr
 
 ## Current phase
 
-**P2 — Hoomans materializer and extensible NPC policy.** The profile,
-map-presence, and monitor-presence slice is verified; the next boundary is
-canonical actor adoption/hydration.
+**P2A — Core faction contract extraction.** The Core profile registry and
+Hoomans compatibility façade are verified. The next boundary is making Core
+the canonical faction writer before completing actor adoption/hydration.
 
 ## Next Chunk
 
-**Complete P2 canonical actor adoption/hydration.** Preserve Hoomans
-ownership of PNC records, body creation, abstract/live projection, monitor,
-map, and debug integration. Do not migrate Dynamic Trading until that
-Hoomans boundary is tested.
+**Move canonical faction mutation and membership behind Core.** Preserve
+Hoomans ownership of PNC records, body creation, abstract/live projection,
+monitor, map, and debug integration. Do not migrate Dynamic Trading until
+the Core writer and Hoomans adapter are tested.
 
 ## Completion rule
 
