@@ -6,7 +6,7 @@ import re
 import unittest
 from pathlib import Path
 
-from tools.providers.pnc.runtime.config import discover_newest_runtime
+from tools.semantic_harness.runtime_discovery import discover_newest_runtime
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]

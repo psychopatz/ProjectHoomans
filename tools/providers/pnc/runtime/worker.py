@@ -10,8 +10,12 @@ from typing import Any
 from tools.semantic_harness.activity import ActivityLog
 from tools.semantic_harness.state import Provenance
 from tools.semantic_harness.worker import SemanticWorker
+from tools.semantic_harness.process import WorkerLaunchSpec
 
-from .config import HarnessConfig, build_worker_launch_spec
+from tools.semantic_harness.runtime.config import (
+    HarnessConfig,
+    build_worker_launch_spec,
+)
 from tools.semantic_harness.fixture_provider import OfflineEngineFixtureProvider
 from tools.semantic_harness.item_catalog import search_item_catalog
 from .scenario import load_scenario, normalize_scenario, validate_scenario
@@ -41,6 +45,7 @@ class LuaSemanticWorker(SemanticWorker):
         request_timeout: float = 5.0,
         shutdown_timeout: float = 1.0,
         config: HarnessConfig | None = None,
+        launch_spec: WorkerLaunchSpec | None = None,
         activity_log: ActivityLog | None = None,
         candidate_overlay_root: Path | None = None,
         candidate_overlay_module: str | None = None,
@@ -66,9 +71,18 @@ class LuaSemanticWorker(SemanticWorker):
                     ("PNC/Semantics/SemanticDialogueResponseCatalog/"
                      "PNC_SemanticDialogueResponseCatalog_FlowGreeting")),
             )
+        effective_launch_spec = launch_spec or build_worker_launch_spec(self.config)
+        if launch_spec is None and self.config.provider_worker_script is not None:
+            effective_launch_spec = replace(
+                effective_launch_spec,
+                worker_script=self.config.provider_worker_script,
+                profile=(
+                    self.config.provider_worker_profile or self.config.profile
+                ),
+            )
         super().__init__(
             scenario,
-            build_worker_launch_spec(self.config),
+            effective_launch_spec,
             activity_log=activity_log,
             import_source_on_start=self.config.profile != "core",
         )

@@ -1,15 +1,47 @@
 {
-  "schema": "semantic.provider_manifest.v1",
+  "schema": "semantic.provider_manifest.v2",
   "providerID": "ProjectHoomans",
-  "profiles": ["pnc", "combined"],
   "displayName": "PNC",
-  "providerIDs": ["ProjectHoomans"],
-  "luaModulePaths": ["${repository}/tools/providers/pnc/lua/?.lua"],
-  "luaModules": ["provider/PNC"],
-  "pythonWorker": "tools.providers.pnc.runtime.worker:LuaSemanticWorker",
-  "pythonScenario": "tools.providers.pnc.runtime.scenario:DEFAULT_SCENARIO",
-  "workerScript": "${repository}/tools/providers/pnc/lua/worker.lua",
-  "workerProfile": "pnc",
+  "providers": [
+    {
+      "providerID": "ProjectHoomans",
+      "displayName": "Project Hoomans",
+      "repositoryKind": "project_hoomans",
+      "requires": ["PsychopatzCore"],
+      "capabilities": [
+        "semantic.conversation",
+        "semantic.identity",
+        "semantic.interaction",
+        "semantic.suggestions",
+        "world.discovery",
+        "world.radio"
+      ],
+      "routeClaims": {
+        "semantic.conversation": 100,
+        "semantic.identity": 100,
+        "semantic.interaction": 100,
+        "semantic.suggestions": 100,
+        "world.discovery": 100,
+        "world.radio": 100
+      },
+      "materializationModes": ["physical"],
+      "optional": true,
+      "luaModulePaths": ["${repository}/tools/providers/pnc/lua/?.lua"],
+      "luaModule": "provider/PNC",
+      "runtimeModules": ["ProjectHoomans"],
+      "environment": {
+        "SEMANTIC_HARNESS_PNC_REPOSITORY": "${repository}",
+        "PZ_TEST_REPOSITORY": "${repository}",
+        "PZ_TEST_HOOMANS_RUNTIME": "${runtime:ProjectHoomans}",
+        "PZ_TEST_CORE_RUNTIME": "${runtime:PsychopatzCore}"
+      },
+      "pythonWorker": "tools.providers.pnc.runtime.worker:LuaSemanticWorker",
+      "pythonScenario": "tools.providers.pnc.runtime.scenario:DEFAULT_SCENARIO",
+      "workerScript": "${repository}/tools/providers/pnc/lua/worker.lua",
+      "workerProfile": "pnc",
+      "workerPriority": 100
+    }
+  ],
   "pythonProvider": "tools.providers.pnc.provider_adapters:register_pnc_profiles",
   "conversationManifest": "tools/providers/pnc/codebuilder/sources/conversation/manifest.json"
 }

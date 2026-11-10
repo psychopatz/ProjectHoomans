@@ -18,7 +18,7 @@ local capabilities = {
     "RELATIONSHIP_PROPOSAL", "RELATIONSHIP_PREVIEW",
     "APPLY_RUNTIME_RELATIONSHIP_BASELINE",
     "SUGGESTION_PREDICATE", "SUGGESTION_CLICK",
-    "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
+    "FLOW_REGISTER", "SEMANTIC_PROVIDER", "PING", "CAPABILITIES", "QUIT",
     "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
     "REPLAY_SEMANTIC_QUEST",
     "COMMITMENT", "BACKSTORY", "BACKSTORY_FACT",
@@ -49,6 +49,12 @@ function Session.hello(context)
         profile = Runtime.launchProfile,
         providers = Runtime.launchProviders,
         materializationMode = Runtime.launchMaterializationMode,
+        providerAdapters = context.ProviderRuntime
+            and context.ProviderRuntime.descriptions or {},
+        routes = context.ProviderRuntime
+            and context.ProviderRuntime.routes or {},
+        activationPlan = context.ProviderRuntime
+            and context.ProviderRuntime.activationPlan or nil,
         capabilities = capabilities,
         loadedModules = Runtime.loadedModules,
         moduleManifest = Runtime.moduleManifest,
@@ -194,6 +200,56 @@ function Session.handle(context, command, payload)
             translation = context.OutputProjection.translationSnapshot(context),
             semanticExecution = context.SemanticExecution
                 and context.SemanticExecution:describe() or nil,
+        }
+    elseif command == "SEMANTIC_PROVIDER" then
+        local request = type(payload) == "table" and payload or {}
+        local operation = tostring(request.operation or "")
+        local capability = tostring(
+            request.capability or "semantic.conversation"
+        )
+        local providerID = request.providerID
+            or (context.ProviderRuntime
+                and context.ProviderRuntime.routes
+                and context.ProviderRuntime.routes[capability])
+        local execution = context.ProviderRuntime
+            and context.ProviderRuntime.executions[providerID]
+        if not execution then
+            return nil, "provider_execution_unavailable"
+        end
+        -- Provider callbacks are an external integration boundary. Keep the
+        -- worker alive and return a bounded diagnostic if an adapter rejects.
+        local called, result, reason = pcall(function()
+            if operation == "buildContext" then
+                return execution:buildContext()
+            elseif operation == "submitText" then
+                return execution:submitText(request.text)
+            elseif operation == "previewText" then
+                return execution:previewText(request.text)
+            elseif operation == "submitFrame" then
+                return execution:submitFrame(request.frame)
+            elseif operation == "snapshot" then
+                return execution:snapshot()
+            elseif operation == "interaction" then
+                return execution:interaction(
+                    request.interaction,
+                    request.value
+                )
+            end
+            return nil, "provider_operation_unknown:" .. operation
+        end)
+        if not called then
+            return nil, "provider_callback_failed:" .. tostring(result)
+        end
+        if result == nil and reason ~= nil then
+            return nil, tostring(reason)
+        end
+        return {
+            ok = true,
+            type = "semantic_provider",
+            providerID = providerID,
+            capability = capability,
+            operation = operation,
+            result = result,
         }
     elseif command == "QUIT" then
         return { ok = true, type = "closed" }, nil, true

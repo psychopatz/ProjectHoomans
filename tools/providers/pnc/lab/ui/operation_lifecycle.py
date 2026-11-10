@@ -5,7 +5,7 @@ from __future__ import annotations
 from concurrent.futures import Future
 from typing import Any, Callable
 
-from tools.providers.pnc.runtime.config import ConfigurationError
+from tools.semantic_harness.runtime.config import ConfigurationError
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.process import HarnessError
 from tools.semantic_harness.worker_session import WorkerResult

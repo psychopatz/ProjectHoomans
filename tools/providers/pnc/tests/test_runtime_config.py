@@ -6,12 +6,14 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.providers.pnc.runtime.config import (
+from tools.semantic_harness.runtime.config import (
     ConfigurationError,
     HarnessConfig,
     build_worker_launch_spec,
+)
+from tools.semantic_harness.runtime_discovery import (
     discover_newest_runtime,
-    discover_dynamic_trading_runtime,
+    discover_shared_runtime,
 )
 
 
@@ -44,7 +46,10 @@ class RuntimeConfigTests(unittest.TestCase):
                 (module_root / "42.20").mkdir(parents=True)
             (root / "Contents/mods/DTCommon/42.21").mkdir()
 
-            self.assertEqual(discover_dynamic_trading_runtime(root), "42.20")
+            self.assertEqual(
+                discover_shared_runtime(root, ("DTCommon", "DTHoomans")),
+                "42.20",
+            )
 
     def test_core_profile_selects_core_worker_without_hoomans_runtime(self) -> None:
         config = HarnessConfig.discover(
@@ -55,8 +60,11 @@ class RuntimeConfigTests(unittest.TestCase):
         )
 
         self.assertEqual(config.profile, "core")
-        self.assertIsNone(config.hoomans_runtime)
-        self.assertIsNone(config.dynamic_trading_repository)
+        self.assertNotIn("ProjectHoomans", config.provider_ids)
+        self.assertNotIn(
+            "ProjectHoomans",
+            (config.activation_plan or {}).get("repositories", {}),
+        )
         self.assertEqual(
             config.worker_script,
             (
@@ -75,7 +83,7 @@ class RuntimeConfigTests(unittest.TestCase):
         spec = build_worker_launch_spec(config)
         self.assertIn("PsychopatzCore", spec.provider_ids)
         self.assertIn("ProjectHoomans", spec.provider_ids)
-        if config.dynamic_trading_repository is not None:
+        if "DTCommon" in config.provider_ids:
             self.assertIn("DTCommon", spec.provider_ids)
             self.assertIn("DTHoomans", spec.provider_ids)
         self.assertEqual(spec.materialization_mode, "physical")

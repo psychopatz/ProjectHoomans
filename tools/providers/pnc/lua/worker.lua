@@ -24,8 +24,6 @@ local function path(root, relative)
 end
 
 local packagePaths = {
-    path(coreRepository, "tools/semantic_harness/lua/?.lua"),
-    path(repository, "tools/providers/pnc/lua/?.lua"),
     path(repository, "Contents/mods/ProjectHoomans/" .. hoomansRuntime .. "/media/lua/shared/?.lua"),
     path(repository, "Contents/mods/ProjectHoomans/" .. hoomansRuntime .. "/media/lua/server/?.lua"),
     path(repository, "Contents/mods/ProjectHoomans/" .. hoomansRuntime .. "/media/lua/client/?.lua"),
@@ -34,6 +32,8 @@ local packagePaths = {
     path(coreRepository, "Contents/mods/PsychopatzCore/" .. coreRuntime .. "/media/lua/shared/?.lua"),
     path(coreRepository, "Contents/mods/PsychopatzCore/common/media/lua/client/?.lua"),
     path(coreRepository, "Contents/mods/PsychopatzCore/" .. coreRuntime .. "/media/lua/client/?.lua"),
+    path(coreRepository, "tools/semantic_harness/lua/?.lua"),
+    path(repository, "tools/providers/pnc/lua/?.lua"),
     package.path,
 }
 if dynamicTradingRuntime then
@@ -56,6 +56,11 @@ if dynamicTradingRuntime then
         "Contents/mods/DTHoomans/common/media/lua/shared/?.lua"
     )
 end
+package.path = table.concat(packagePaths, ";")
+
+local ProviderLoader = require "worker/ProviderLoader"
+local providerLaunch = ProviderLoader.readConfiguration()
+ProviderLoader.extendPackagePaths(packagePaths, providerLaunch.modulePaths)
 package.path = table.concat(packagePaths, ";")
 
 local Protocol = require "Protocol"
@@ -120,38 +125,46 @@ local Context = {
     EngineEvents = nil,
 }
 
-local semanticExecution, semanticExecutionReason = SemanticExecution.new({
-    providerID = "ProjectHoomans",
-    materializationMode = launch.materializationMode,
-    capabilities = {
-        "semantic.conversation",
-        "semantic.identity",
-        "semantic.interaction",
-    },
-    context = Context,
-    callbacks = {
-        buildContext = function(context)
-            return context.Conversation.buildContext(context)
-        end,
-        submitText = function(context, text)
-            return context.Conversation.turn(context, text)
-        end,
-        previewText = function(context, text)
-            return context.Conversation.preview(context, text)
-        end,
-        submitFrame = function(context, frame)
-            return context.Conversation.semanticClick(context, frame)
-        end,
-        snapshot = function(context)
-            return context.ScenarioSession.snapshot(context)
-        end,
-    },
-})
-if not semanticExecution then
-    error("semantic execution contract failed: " .. tostring(
-        semanticExecutionReason
-    ))
+local providerCallbacks = {
+    buildContext = function(context)
+        return context.Conversation.buildContext(context)
+    end,
+    submitText = function(context, text)
+        return context.Conversation.turn(context, text)
+    end,
+    previewText = function(context, text)
+        return context.Conversation.preview(context, text)
+    end,
+    submitFrame = function(context, frame)
+        return context.Conversation.semanticClick(context, frame)
+    end,
+    snapshot = function(context)
+        return context.ScenarioSession.snapshot(context)
+    end,
+    interaction = function(context, operation, payload)
+        return {
+            accepted = false,
+            reason = "provider_interaction_callback_unconfigured",
+            operation = operation,
+            payload = payload,
+        }
+    end,
+}
+local providerRuntime, providerLoadReason = ProviderLoader.load(
+    SemanticExecution,
+    providerLaunch,
+    Context,
+    providerCallbacks,
+    launch.providers
+)
+if not providerRuntime then
+    error(providerLoadReason)
 end
+local semanticExecution = providerRuntime.executions.ProjectHoomans
+if not semanticExecution then
+    error("Project Hoomans provider was not activated")
+end
+Context.ProviderRuntime = providerRuntime
 Context.SemanticExecution = semanticExecution
 
 ScenarioSession.configureRuntime(Context)

@@ -6,7 +6,7 @@ import argparse
 import sys
 from typing import Any
 
-from tools.providers.pnc.runtime.config import ConfigurationError
+from tools.semantic_harness.runtime.config import ConfigurationError
 from tools.semantic_harness.process import HarnessError
 
 

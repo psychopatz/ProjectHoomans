@@ -21,7 +21,7 @@ from .inspection.response_observatory import (
     review_variant_proposal, compare_quality_reports,
 )
 from tools.semantic_harness.testing.runner import ConflictLedger, load_case, run_case
-from tools.providers.pnc.runtime.config import ConfigurationError
+from tools.semantic_harness.runtime.config import ConfigurationError
 from tools.providers.pnc.runtime.scenario import load_scenario
 from tools.providers.pnc.runtime.save_browser import SavedWorldBrowser
 from tools.providers.pnc.runtime.save_catalog import SaveCatalog

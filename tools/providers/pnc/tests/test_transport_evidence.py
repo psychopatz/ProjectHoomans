@@ -4,7 +4,7 @@ import json
 import subprocess
 import unittest
 
-from tools.providers.pnc.runtime.config import discover_lua
+from tools.semantic_harness.runtime_discovery import discover_lua
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 

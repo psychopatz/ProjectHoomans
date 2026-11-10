@@ -13,7 +13,7 @@ import unittest
 
 from tools.providers.pnc.lab.cli import _parser
 from tools.semantic_harness.runtime.npc_profiles import apply_npc_profile
-from tools.providers.pnc.runtime.config import discover_newest_runtime
+from tools.semantic_harness.runtime_discovery import discover_newest_runtime
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 from tools.providers.pnc.lab.ui.shell import SemanticHarnessApp
