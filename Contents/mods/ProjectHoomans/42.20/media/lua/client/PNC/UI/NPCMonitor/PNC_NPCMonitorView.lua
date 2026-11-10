@@ -32,7 +32,13 @@ end
 function View.DrawRosterContent(list, y, entry)
     local item = entry.item
     local right = list:getWidth() - 10
-    local presenceWidth = UI.DrawBadge(list, item.presenceState or "unknown", right, y + 5, Support.PresenceColor(item))
+    local presenceWidth = UI.DrawBadge(
+        list,
+        Support.NormalizePresenceState(item),
+        right,
+        y + 5,
+        Support.PresenceColor(item)
+    )
     if Support.IsRecording(item) then
         UI.DrawBadge(list, "REC", right - presenceWidth - 6, y + 5, "danger")
     end

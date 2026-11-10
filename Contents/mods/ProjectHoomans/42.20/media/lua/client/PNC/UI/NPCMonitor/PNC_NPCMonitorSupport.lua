@@ -11,21 +11,44 @@ function Support.Tr(key, fallback)
     return value
 end
 
+function Support.NormalizePresenceState(item)
+    local value = item and item.presenceState
+    local runtime = item and item.runtime
+    if value == nil or tostring(value) == "" then
+        value = item and item.providerState
+            or item and item.presenceMode
+            or type(runtime) == "table" and runtime.presenceState
+            or nil
+    end
+    value = string.lower(tostring(value or ""))
+    if value == "live" or value == "materialized" or value == "physical" then
+        return "live"
+    end
+    if value == "corpse" or item and item.alive == false then
+        return "corpse"
+    end
+    -- A roster row without a state is an unloaded NPC, not a fourth user
+    -- visible mode. Keep the monitor aligned with Core/map projection.
+    return "abstract"
+end
+
 function Support.HasProblem(item)
     if not item then return false end
     if item.lastError then return true end
-    if item.presenceState == "live" then return item.bodyState ~= "bound" end
+    local presenceState = Support.NormalizePresenceState(item)
+    if presenceState == "live" then return item.bodyState ~= "bound" end
     if item.bodyState == "duplicate" or item.bodyState == "stale_cleaned" then return true end
     if item.lastCleanupState == "duplicate" or item.lastCleanupState == "stale_cleaned" then return true end
-    return item.presenceState == "corpse"
+    return presenceState == "corpse"
         and item.corpseState ~= "inert_loaded"
         and item.corpseState ~= "unloaded"
 end
 
 function Support.MatchesFilter(item, filter)
-    if filter == "Live" then return item.presenceState == "live" end
-    if filter == "Abstract" then return item.presenceState == "abstract" end
-    if filter == "Corpse" then return item.presenceState == "corpse" end
+    local presenceState = Support.NormalizePresenceState(item)
+    if filter == "Live" then return presenceState == "live" end
+    if filter == "Abstract" then return presenceState == "abstract" end
+    if filter == "Corpse" then return presenceState == "corpse" end
     if filter == "Problems" then return Support.HasProblem(item) end
     return true
 end
@@ -52,8 +75,9 @@ end
 
 function Support.PresenceColor(item)
     if Support.HasProblem(item) then return "danger" end
-    if item.presenceState == "live" then return "success" end
-    if item.presenceState == "corpse" then return "warning" end
+    local presenceState = Support.NormalizePresenceState(item)
+    if presenceState == "live" then return "success" end
+    if presenceState == "corpse" then return "warning" end
     return "accent"
 end
 
@@ -85,7 +109,8 @@ function Support.PopulateDetails(list, item, authorized, audit)
     addDetail(list, "Name", item.name)
     addDetail(list, "UUID", item.id)
     addDetail(list, "Tactical class", item.tacticalClass)
-    addDetail(list, "Presence", tostring(item.presenceState or "-") .. " / " .. tostring(item.phase or "-"), Support.PresenceColor(item))
+    addDetail(list, "Presence", Support.NormalizePresenceState(item)
+        .. " / " .. tostring(item.phase or "-"), Support.PresenceColor(item))
     addDetail(list, "Body", tostring(item.bodyState or "-") .. " / corpse " .. tostring(item.corpseState or "-"))
     if item.deathMarker == true then
         addDetail(list, "Metadata", "Lightweight death marker", "warning")

@@ -10,6 +10,7 @@ local H = PNC.MobileGroupDirectorInternal
 local Constants = PNC.FactionConstants
 local CommunityConstants = PNC.CommunityConstants
 local Factions = PNC.Factions
+local Archetypes = PNC.FactionArchetypes
 local Resolver = PNC.CommunitySiteResolver
 local Core = PNC.Core
 local Const = PNC.Const
@@ -97,7 +98,9 @@ function H.FactionRole(faction, index, override)
     if type(override) == "table" and override[index] then
         return override[index]
     end
-    local roles = H.RoleOrder[faction.archetypeID] or {}
+    local roles = Archetypes.GetMobileRoleOrder
+        and Archetypes.GetMobileRoleOrder(faction.archetypeID)
+        or H.RoleOrder[faction.archetypeID] or {}
     return roles[index]
         or PNC.FactionArchetypes.GetDefaultRole(
             faction.archetypeID
@@ -126,11 +129,19 @@ function H.ValidRoleOrder(faction, override)
 end
 
 function H.NPCArchetype(faction)
+    if Archetypes.GetMobileNPCArchetype then
+        local configured = Archetypes.GetMobileNPCArchetype(
+            faction.archetypeID
+        )
+        if configured then return configured end
+    end
     return faction.archetypeID == "looter"
         and "Scavenger" or "General"
 end
 
 function H.MobileOrder(faction, mobile, site)
+    local hostile = Archetypes.IsMobileHostile
+        and Archetypes.IsMobileHostile(faction.archetypeID) == true
     local home = site and site.home or {}
     if mobile
         and mobile.activity
@@ -141,7 +152,7 @@ function H.MobileOrder(faction, mobile, site)
         }
     end
     local mode = H.PathMode(mobile and mobile.pathMode)
-    if faction.archetypeID ~= "looter"
+    if not hostile
         and H.PlayerRoamAreaOrder
         and H.IsPlayerRoamArea
         and H.IsPlayerRoamArea(mobile)
@@ -152,14 +163,14 @@ function H.MobileOrder(faction, mobile, site)
         local ambient = H.AmbientOrder(faction, mobile, site)
         if ambient then return ambient end
     end
-    if faction.archetypeID ~= "looter"
+    if not hostile
         and H.PlayerRoamStreetPoolOrder
         and H.IsPlayerRoamStreetPool
         and H.IsPlayerRoamStreetPool(mobile)
     then
         return H.PlayerRoamStreetPoolOrder(faction, mobile, site)
     end
-    if faction.archetypeID == "looter" then
+    if hostile then
         if mode == Constants.MOBILE_PATH_PLAYER then
             return {
                 kind = Const.ORDER_HOSTILE_HUNT,

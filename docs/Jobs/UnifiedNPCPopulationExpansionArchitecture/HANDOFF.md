@@ -3,10 +3,10 @@ handoff_schema: 2
 checkpoint_mode: "documentation_checkpoint"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
-state: "READY_FOR_P1_DESIGN"
+state: "READY_FOR_P2_ADOPTION_IMPLEMENTATION"
 parent_status: "IN_PROGRESS"
-phase: "P0"
-chunk: "documentation-baseline"
+phase: "P2"
+chunk: "canonical-actor-adoption-and-hydration"
 retrieval_tier: "verify"
 ---
 
@@ -27,24 +27,34 @@ The target ownership model is explicit:
   incomplete projection that must be rejected or repaired.
 
 The ordered implementation is P1 Core contract, P2 Hoomans materializer and
-policy extension, P3 Dynamic Trading adapter, P4 future-expansion proof, and
-P5 diagnostics/migration/native acceptance.
+policy extension, P3 Dynamic Trading adapter, P4 a test-only conceptual
+extension proof, and P5 diagnostics/migration/native acceptance. No Gang mod
+will be created.
 
 ## Resume action
 
-Begin P1 in PsychopatzCore only. Define and test the generic source
-registration/activation/orchestration contract around the existing
-`SurvivorWorld.Generation` plan/commit seams. Keep the first change
-provider-neutral and avoid editing Dynamic Trading or Hoomans generation code
-until the Core contract is stable.
+Continue P2 in Project Hoomans by closing the canonical actor
+adoption/hydration gate. Keep Dynamic Trading unchanged until that Hoomans
+boundary is stable. The registered-profile, map-presence, and monitor-
+presence slices are already implemented and verified.
 
 ## Evidence and repository state
 
-- `STATIC_ONLY`: this checkpoint is an architecture/audit baseline; no native
-  Project Zomboid acceptance is claimed.
-- Project Hoomans was clean before this documentation update.
+- `CODE_VERIFIED`: Core P1 is committed as `6c16192` and its focused source,
+  generation, registry, schema, bounds, bootstrap, and PNC-import smokes pass.
+- `CODE_VERIFIED`: P2 Core map/hover presence normalization is committed as
+  `cff123f`; Hoomans registered mobile profiles, supplemental map-directory
+  normalization, and monitor normalization are present in the current primary
+  worktree.
+- `TEST_VERIFIED`: focused Hoomans and Core P2 map/materializer smokes pass;
+  the unrelated faction-boundary declaration-count smoke remains stale at
+  `87` expected versus `88` actual.
+- `STATIC_ONLY`: no native Project Zomboid acceptance is claimed.
+- Project Hoomans has the P2 profile/presence implementation and this
+  documentation checkpoint; the primary commit is still pending the next
+  adoption/monitor chunk.
 - Dynamic Trading and PsychopatzCore contain pre-existing generated
   `.architecture-refactor/output/architecture-audit.md` modifications from
-  the audit. Preserve them; they are not part of this documentation change.
+  the audit. Preserve them; they are not part of this implementation phase.
 - No Workshop publication or native game launch was performed for this
   checkpoint.

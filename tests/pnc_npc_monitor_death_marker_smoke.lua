@@ -76,6 +76,10 @@ T.load(CLIENT_ROOT .. "PNC/UI/NPCMonitor/PNC_NPCMonitorSupport.lua")
 
 T.equal(PNC.NPCMonitorSupport.MatchesFilter(dead, "Corpse"), true,
     "death marker visible in corpse filter")
+T.equal(PNC.NPCMonitorSupport.NormalizePresenceState({ alive = true }),
+    "abstract", "monitor repaired missing presence state")
+T.equal(PNC.NPCMonitorSupport.MatchesFilter({ alive = true }, "Abstract"),
+    true, "monitor missing presence state did not enter abstract filter")
 local details = { items = {} }
 function details:clear() self.items = {} end
 function details:addItem(label, value)

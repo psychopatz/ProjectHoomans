@@ -10,6 +10,7 @@ local H = PNC.MobileGroupDirectorInternal
 local Constants = PNC.FactionConstants
 local CommunityConstants = PNC.CommunityConstants
 local Factions = PNC.Factions
+local Archetypes = PNC.FactionArchetypes
 local Resolver = PNC.CommunitySiteResolver
 local Core = PNC.Core
 local Const = PNC.Const
@@ -68,9 +69,8 @@ function Director.GenerateForFaction(factionID, spec)
     if faction.status ~= "active" then
         return false, "faction_not_active"
     end
-    if faction.archetypeID ~= "looter"
-        and faction.archetypeID ~= "trader"
-        and faction.archetypeID ~= "refugee"
+    if not Archetypes.SupportsMobile
+        or not Archetypes.SupportsMobile(faction.archetypeID)
     then
         return false, "mobile_archetype_not_allowed"
     end

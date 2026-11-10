@@ -106,6 +106,31 @@ local function currentWorldHour()
         or 0
 end
 
+local function normalizePresenceState(snapshot)
+    local value = snapshot and snapshot.presenceState
+    local providerState = snapshot and (
+        snapshot.providerState or snapshot.presenceMode
+    ) or nil
+    if value == nil or tostring(value) == "" then value = providerState end
+    value = string.lower(tostring(value or providerState or ""))
+    if value == PNC.Const.PRESENCE_LIVE
+        or value == "materialized"
+        or value == "physical"
+    then
+        return PNC.Const.PRESENCE_LIVE
+    end
+    if value == PNC.Const.PRESENCE_CORPSE
+        or snapshot and snapshot.alive == false
+        or snapshot and snapshot.deathMarker == true
+    then
+        return PNC.Const.PRESENCE_CORPSE
+    end
+    -- A visible, alive Hoomans record is never allowed to enter the map
+    -- projection without a usable state. Missing/legacy provider metadata is
+    -- the unloaded representation, not a third runtime presence mode.
+    return PNC.Const.PRESENCE_ABSTRACT
+end
+
 
 function Directory.RegisterVisibilityFilter(id, filter)
     id = tostring(id or "")
@@ -132,7 +157,7 @@ function Directory.IsVisible(snapshot)
             and tonumber(snapshot.y) ~= nil
     end
     if not snapshot or snapshot.alive == false
-        or snapshot.presenceState == PNC.Const.PRESENCE_CORPSE
+        or normalizePresenceState(snapshot) == PNC.Const.PRESENCE_CORPSE
         or travel and tostring(travel.visibility or "all") == "hidden"
     then
         return false
@@ -162,8 +187,10 @@ function Directory.GetProjected(npcId, atWorldHour)
     local projected
     local total
     local travelled
+    local presenceState
     local hour = tonumber(atWorldHour) or currentWorldHour()
     if not Directory.IsVisible(snapshot) then return nil end
+    presenceState = normalizePresenceState(snapshot)
 
     if not travel then
         return {
@@ -196,8 +223,8 @@ function Directory.GetProjected(npcId, atWorldHour)
                 and snapshot.mapPresentation.iconID or nil,
             mapVisibility = snapshot.mapPresentation
                 and snapshot.mapPresentation.visibility or "all",
-            presenceState = snapshot.presenceState,
-            state = snapshot.presenceState == PNC.Const.PRESENCE_LIVE
+            presenceState = presenceState,
+            state = presenceState == PNC.Const.PRESENCE_LIVE
                 and "live" or "idle",
             x = tonumber(snapshot.x),
             y = tonumber(snapshot.y),
@@ -223,7 +250,7 @@ function Directory.GetProjected(npcId, atWorldHour)
             travel.destination
         )
     end
-    if snapshot.presenceState == PNC.Const.PRESENCE_LIVE
+    if presenceState == PNC.Const.PRESENCE_LIVE
         or not Projection
         or not Projection.Project
     then
@@ -266,14 +293,14 @@ function Directory.GetProjected(npcId, atWorldHour)
             and snapshot.mapPresentation.iconID or nil,
         mapVisibility = snapshot.mapPresentation
             and snapshot.mapPresentation.visibility or "all",
-        presenceState = snapshot.presenceState,
+        presenceState = presenceState,
         journeyId = projected.journeyId,
         state = projected.state,
-        x = snapshot.presenceState == PNC.Const.PRESENCE_LIVE
+        x = presenceState == PNC.Const.PRESENCE_LIVE
             and tonumber(snapshot.x) or tonumber(projected.x) or tonumber(snapshot.x),
-        y = snapshot.presenceState == PNC.Const.PRESENCE_LIVE
+        y = presenceState == PNC.Const.PRESENCE_LIVE
             and tonumber(snapshot.y) or tonumber(projected.y) or tonumber(snapshot.y),
-        z = snapshot.presenceState == PNC.Const.PRESENCE_LIVE
+        z = presenceState == PNC.Const.PRESENCE_LIVE
             and tonumber(snapshot.z) or tonumber(projected.z) or tonumber(snapshot.z),
         percent = total <= 0 and 1 or travelled / total,
         distanceTotal = total,

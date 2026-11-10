@@ -52,11 +52,8 @@ function Factions.SetNeeds(factionID, needs, reason)
 end
 
 function Internal.mobileArchetypeAllowed(faction)
-    return faction and (
-        faction.archetypeID == "looter"
-        or faction.archetypeID == "trader"
-        or faction.archetypeID == "refugee"
-    )
+    return faction and Archetypes.SupportsMobile
+        and Archetypes.SupportsMobile(faction.archetypeID) == true
 end
 
 function Factions.SetMobileGroup(factionID, spec, reason)

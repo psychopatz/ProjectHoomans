@@ -11,10 +11,10 @@ allowed to become a second population authority.
 ## Target layering
 
 ```text
-Dynamic Trading / future Gang / other expansion
+Dynamic Trading / future domain expansion
   - source registration
   - domain profiles and member specs
-  - commercial, gang, or other behavior
+  - commercial or other domain behavior
   - source-specific cadence/caps as policy
                  |
                  v
@@ -34,7 +34,8 @@ Project Hoomans
 
 Core must remain below both adopters in the dependency graph. Hoomans may
 depend on Core. Dynamic Trading may depend on Core and optionally Hoomans for
-physical representation. A future Gang mod follows the same shape.
+physical representation. Any future domain expansion follows the same shape;
+no such expansion is created by this job.
 
 ## Canonical lifecycle
 
@@ -105,7 +106,11 @@ Core adoption/reconciliation seam.
 
 ### Expansion contract
 
-An expansion supplies domain data and behavior:
+An expansion supplies domain data and behavior. A gang-like source is only a
+conceptual test value for this boundary; this job does not create a Gang mod
+or any other new expansion.
+
+An expansion supplies:
 
 - source registration;
 - faction/profile/member specifications;
@@ -146,10 +151,10 @@ Required behavior:
 | --- | --- | --- |
 | Core `BuildGroupPlan` and `CommitGroupPlan` | Canonical generation foundation exists | Add generic source registration/orchestration around it |
 | Hoomans `MaterializeCoreGroup` | Physical integration already has a seam | Stabilize it as the only expansion-to-body boundary |
-| Hoomans fixed faction/mobile archetype gates | New expansion types would require edits or bypasses | Register faction/role/materialization policy |
+| Hoomans fixed faction/mobile archetype gates | New expansion types would require edits or bypasses | Registered mobile profile now supplies role/NPC/hostility policy; canonical adoption remains |
 | DT trader generation façade and `TraderWorld` cadence | Trader domain still owns generic-looking generation flow | Register DT source with Core; retain trader policy locally |
 | DTAbstract/DTHoomans providers | Useful representation split | Keep both as projections of the same Core result |
-| map marker/hover before hydration | Incomplete projection can leak as `UNKNOWN` | Gate projection on canonical actor + normalized presence |
+| map marker/hover before hydration | Incomplete projection can leak as `UNKNOWN` | Core now reads canonical `presenceState`; finish the canonical actor hydration gate before P3 |
 
 The planned APIs should be thin public registration/facade seams. Do not make
 the first migration a broad file split; isolate ownership and add contract
@@ -169,10 +174,11 @@ new actors merely because a marker or name exists.
 
 ## Forbidden designs
 
-- Dynamic Trading or a Gang mod calling a private Hoomans generator directly.
+- An expansion calling a private Hoomans generator directly.
 - Project Hoomans creating a second actor when a source changes from abstract
   to live.
-- Core containing trader/gang behavior or importing adopter modules.
+- Core containing trader or other domain behavior, or importing adopter
+  modules.
 - Map hover inferring state from a provider label or marker color.
 - A compatibility fallback that silently becomes a second writer after the
   Core contract is active.

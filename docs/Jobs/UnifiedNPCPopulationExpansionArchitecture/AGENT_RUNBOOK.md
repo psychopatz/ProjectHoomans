@@ -40,7 +40,9 @@ Work only on the materializer and extensible faction/role/actor policy seams.
 Use the Core group result as input. Preserve Hoomans ownership of PNC records,
 physical bodies, abstract/live switching, NPC monitor, map integration, and
 debug override. Add tests that an arbitrary registered profile materializes
-without adding a new Hoomans generation writer.
+without adding a new Hoomans generation writer. Normalize missing/legacy
+presence state at the map and monitor projection boundaries; `UNKNOWN` is an
+invalid projection result, not a third runtime mode.
 
 ### P3 — Dynamic Trading
 
@@ -51,9 +53,10 @@ materializer adapter. Prove both paths retain the exact Core actor IDs.
 
 ### P4/P5 — Extension proof and acceptance
 
-Use a test-only gang-like source to prove that new domain content needs only
-registration and policy. Then run diagnostics, save/restart repair checks, and
-the user-owned native Project Zomboid acceptance matrix.
+Use a test-only domain-shaped source to prove that new content needs only
+registration and policy. Gang-like values, if useful, are fixture data only;
+do not create a Gang mod. Then run diagnostics, save/restart repair checks,
+and the user-owned native Project Zomboid acceptance matrix.
 
 ## Required verification
 

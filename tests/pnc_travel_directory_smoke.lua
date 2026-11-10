@@ -255,6 +255,20 @@ local known = T.truthy(PNC.TravelDirectory.GetProjected("known:alice"))
 T.truthy(known.roleTag == "trader" and known.iconID == "trader",
     "map presentation metadata was not exposed by the directory")
 
+PNC.Network.ClientState.snapshots["legacy:missing_presence"] = {
+    id = "legacy:missing_presence",
+    name = "Legacy Abstract NPC",
+    tacticalClass = "neutral",
+    x = 4,
+    y = 4,
+    z = 0,
+}
+local legacy = T.truthy(
+    PNC.TravelDirectory.GetProjected("legacy:missing_presence")
+)
+T.equal(legacy.presenceState, "abstract",
+    "legacy map record leaked a missing presence state")
+
 PNC.Network.ClientState.snapshots["known:bob"] = {
     id = "known:bob",
     name = "Unknown NPC",

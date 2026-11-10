@@ -30,6 +30,15 @@ local DEFINITIONS = {
             warThreshold = 70,
             peaceThreshold = 25,
         },
+        mobile = {
+            enabled = false,
+            roleOrder = {
+                "leader", "trader", "guard", "medic", "farmer",
+                "builder", "scavenger", "cook", "mechanic",
+            },
+            npcArchetype = "General",
+            hostile = false,
+        },
     },
     looter = {
         id = "looter",
@@ -53,6 +62,15 @@ local DEFINITIONS = {
             outsiderPolicy = "predatory",
             warThreshold = 58,
             peaceThreshold = 20,
+        },
+        mobile = {
+            enabled = true,
+            roleOrder = {
+                "leader", "raider", "enforcer", "scavenger",
+                "guard", "medic",
+            },
+            npcArchetype = "Scavenger",
+            hostile = true,
         },
     },
     trader = {
@@ -78,6 +96,15 @@ local DEFINITIONS = {
             warThreshold = 76,
             peaceThreshold = 30,
         },
+        mobile = {
+            enabled = true,
+            roleOrder = {
+                "leader", "trader", "guard", "medic",
+                "mechanic", "scavenger", "laborer",
+            },
+            npcArchetype = "General",
+            hostile = false,
+        },
     },
     refugee = {
         id = "refugee",
@@ -101,6 +128,15 @@ local DEFINITIONS = {
             warThreshold = 80,
             peaceThreshold = 28,
         },
+        mobile = {
+            enabled = true,
+            roleOrder = {
+                "leader", "trader", "guard", "medic",
+                "caregiver", "scavenger",
+            },
+            npcArchetype = "General",
+            hostile = false,
+        },
     },
 }
 
@@ -111,6 +147,45 @@ local function copy(value)
         output[key] = type(item) == "table" and copy(item) or item
     end
     return output
+end
+
+local CUSTOM = {}
+local MAX_CUSTOM = 32
+
+local function validID(value)
+    return type(value) == "string"
+        and #value > 0 and #value <= 128
+        and string.match(value, "^[%w_%-%.:]+$") ~= nil
+end
+
+local function normalizeMobile(value, allowedRoles, defaultRole)
+    value = type(value) == "table" and value or {}
+    local roleOrder = {}
+    for index = 1, math.min(#(value.roleOrder or {}), 32) do
+        local role = value.roleOrder[index]
+        if type(role) == "string"
+            and allowedRoles[role] == true
+        then
+            roleOrder[#roleOrder + 1] = role
+        end
+    end
+    if #roleOrder == 0 and defaultRole then
+        roleOrder[1] = defaultRole
+    end
+    return {
+        enabled = value.enabled == true,
+        roleOrder = roleOrder,
+        npcArchetype = type(value.npcArchetype) == "string"
+            and value.npcArchetype ~= "" and value.npcArchetype
+            or "General",
+        hostile = value.hostile == true,
+    }
+end
+
+local function customCount()
+    local count = 0
+    for _ in pairs(CUSTOM) do count = count + 1 end
+    return count
 end
 
 function Archetypes.Get(archetypeID)
@@ -146,6 +221,102 @@ end
 function Archetypes.GetPolicyDefaults(archetypeID)
     local definition = DEFINITIONS[archetypeID]
     return definition and copy(definition.policyDefaults) or nil
+end
+
+function Archetypes.SupportsMobile(archetypeID)
+    local definition = DEFINITIONS[archetypeID]
+    return definition ~= nil
+        and definition.mobile ~= nil
+        and definition.mobile.enabled == true
+end
+
+function Archetypes.GetMobileRoleOrder(archetypeID)
+    local definition = DEFINITIONS[archetypeID]
+    local mobile = definition and definition.mobile or nil
+    return mobile and copy(mobile.roleOrder) or nil
+end
+
+function Archetypes.GetMobileNPCArchetype(archetypeID)
+    local definition = DEFINITIONS[archetypeID]
+    local mobile = definition and definition.mobile or nil
+    return mobile and mobile.npcArchetype or nil
+end
+
+function Archetypes.IsMobileHostile(archetypeID)
+    local definition = DEFINITIONS[archetypeID]
+    local mobile = definition and definition.mobile or nil
+    return mobile and mobile.hostile == true or false
+end
+
+function Archetypes.Register(archetypeID, definition)
+    if not validID(archetypeID) then
+        return false, "faction_archetype_id_invalid"
+    end
+    if DEFINITIONS[archetypeID] then
+        return false, "faction_archetype_exists"
+    end
+    if customCount() >= MAX_CUSTOM then
+        return false, "faction_archetype_capacity"
+    end
+    if type(definition) ~= "table"
+        or type(definition.allowedRoles) ~= "table"
+    then
+        return false, "faction_archetype_definition_required"
+    end
+
+    local allowedRoles = {}
+    for role, enabled in pairs(definition.allowedRoles) do
+        if type(role) == "string" and enabled == true then
+            allowedRoles[role] = true
+        end
+    end
+    local defaultRole = definition.defaultRole
+    if type(defaultRole) ~= "string"
+        or not allowedRoles[defaultRole]
+    then
+        return false, "faction_archetype_default_role_invalid"
+    end
+
+    local policyDefaults = type(definition.policyDefaults) == "table"
+        and copy(definition.policyDefaults) or {
+            aggression = 0.5,
+            retaliation = 0.5,
+            caution = 0.5,
+            hospitality = 0.5,
+            opportunism = 0.5,
+            outsiderPolicy = "neutral",
+            warThreshold = 70,
+            peaceThreshold = 25,
+        }
+    DEFINITIONS[archetypeID] = {
+        id = archetypeID,
+        label = tostring(definition.label or archetypeID),
+        description = tostring(definition.description or ""),
+        allowedRoles = allowedRoles,
+        defaultRole = defaultRole,
+        behavior = copy(definition.behavior or {
+            hostileToOutsiders = false,
+        }),
+        policyDefaults = policyDefaults,
+        mobile = normalizeMobile(
+            definition.mobile,
+            allowedRoles,
+            defaultRole
+        ),
+    }
+    CUSTOM[archetypeID] = true
+    return true
+end
+
+function Archetypes.IsCustom(archetypeID)
+    return CUSTOM[archetypeID] == true
+end
+
+function Archetypes.ResetCustomForTests()
+    for archetypeID in pairs(CUSTOM) do
+        DEFINITIONS[archetypeID] = nil
+        CUSTOM[archetypeID] = nil
+    end
 end
 
 function Archetypes.IsHostileToOutsiders(archetypeID)

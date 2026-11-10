@@ -1,7 +1,6 @@
 # Roadmap — Unified NPC Population and Expansion Architecture
 
-**Status:** DOCUMENTATION BASELINE — implementation has not started for this
-goal.
+**Status:** P2 PROFILE/PRESENCE SLICE IMPLEMENTED — P2 ADOPTION GATE NEXT.
 
 **Primary repository:** ProjectHoomans (`main`)
 
@@ -10,7 +9,7 @@ goal.
 ## Objective
 
 Establish one canonical NPC population pipeline that can serve Project
-Hoomans, Dynamic Trading, and future domain expansions such as a Gang mod.
+Hoomans, Dynamic Trading, and future domain expansions.
 Activating an expansion should register and enable that expansion's NPC
 source; it must not create a second generation, identity, persistence, or
 materialization pipeline.
@@ -24,8 +23,9 @@ domain expansion intent/policy
         -> abstract/live provider projection
 ```
 
-Dynamic Trading and a future Gang mod are domain expansions. Project Hoomans
-remains the NPC framework and physical materialization owner. PsychopatzCore
+Dynamic Trading and any future domain expansion are consumers of this model.
+Project Hoomans remains the NPC framework and physical materialization owner.
+PsychopatzCore
 is the provider-neutral authority for canonical actors, groups, IDs,
 provenance, and durable population state.
 
@@ -67,7 +67,7 @@ behavior remain native Project Zomboid acceptance gates.
 | Population activation/caps | Owns generic orchestration and validation | Exposes materialization capability | Supplies source-specific policy values |
 | PNC records and NPC bodies | No engine-specific body ownership | Owns physical materialization and PNC lifecycle | Requests materialization through Hoomans |
 | Abstract/live projection | Owns canonical state vocabulary and identity | Owns abstract/body projection mechanics | Chooses capability/profile; does not duplicate actor state |
-| Domain behavior | Provider-neutral contracts only | NPC/faction/materialization policy | Trader, gang, territory, commercial, or other domain policy |
+| Domain behavior | Provider-neutral contracts only | NPC/faction/materialization policy | Trader, territory, commercial, or other domain policy |
 | Map/debug inspection | Shared Core gate/identity contract | Map/NPC UI adapter | Provides domain labels and diagnostics only |
 
 The single-writer rule is mandatory: an expansion may request a canonical
@@ -76,7 +76,7 @@ create the physical NPC representation.
 
 ## Phases and gates
 
-### P0 — Documentation and evidence baseline (current)
+### P0 — Documentation and evidence baseline (complete)
 
 Record the ownership contract, current seams, observed failure modes, and the
 implementation order in this job directory. Do not edit production code in
@@ -98,9 +98,13 @@ Source-specific policy values remain supplied by the expansion; Core owns the
 generic scheduling/validation contract and the no-duplicate/no-collision
 rules. Core must not import Hoomans or Dynamic Trading.
 
-**Gate:** a fake source and the existing trader source can use the same Core
-contract; repeated requests are idempotent or explicitly rejected; all actor
-and group IDs are Core-owned; Core tests pass without either adopter loaded.
+**Gate:** a fake source can use the Core contract; repeated requests are
+idempotent or explicitly rejected; all actor and group IDs are Core-owned; and
+Core tests pass without either adopter loaded. Existing trader adoption is a
+separate P3 gate and is not claimed by P1.
+
+**Implementation checkpoint:** complete in PsychopatzCore. See the checkpoint
+below and the progress ledger for the accepted commit.
 
 ### P2 — Hoomans materializer and extensible NPC policy
 
@@ -119,6 +123,15 @@ Hoomans; no unknown presence mode can reach map hover or monitor; missing or
 unhydrated canonical actors are repaired/hidden rather than rendered as
 `UNKNOWN`.
 
+**Current checkpoint:** the registered mobile-profile slice and the map/read
+model presence boundary are implemented. Hoomans now resolves mobile role,
+NPC archetype, hostile movement policy, and materialization eligibility from
+registered faction-archetype definitions. Core map/hover projection accepts
+canonical `presenceState`, and the Hoomans supplemental directory repairs
+missing legacy state to `abstract` (or hides `corpse`). The remaining P2 gate
+is canonical actor adoption/hydration; Dynamic Trading migration has not
+started.
+
 ### P3 — Dynamic Trading adapter migration
 
 Make Dynamic Trading a source/profile provider on the Core contract. Keep
@@ -133,16 +146,16 @@ DTAbstract and DTHoomans switch representation without a second actor,
 group, PNC record, or body identity; disabling the mod does not erase Core
 state.
 
-### P4 — Expansion contract proof for a future Gang mod
+### P4 — Expansion contract proof (conceptual fixture only)
 
-Prove the extension boundary with a Core/Hoomans contract fixture or a small
-test-only gang source. The proof should supply gang faction/profile/member
-data and domain behavior while reusing Core IDs and Hoomans materialization.
-Do not create a production Gang mod as part of this goal.
+Prove the extension boundary with a Core/Hoomans contract fixture or a
+test-only domain source. Illustrative gang-like values may be used in that
+fixture to exercise faction/profile/member data, but no Gang mod, Gang
+package, or Gang production feature is part of this goal.
 
-**Gate:** the hypothetical source requires no edits to Core's canonical
+**Gate:** the illustrative source requires no edits to Core's canonical
 identity schema and no direct writes to PNC/body state; only registration,
-profiles, and gang policy are new.
+profiles, and domain policy are new.
 
 ### P5 — Diagnostics, migration, and native acceptance
 
@@ -159,7 +172,7 @@ diagnosed as a rejected projection if encountered.
 
 ## Non-goals
 
-- Do not make Project Hoomans responsible for trader, gang, or other domain
+- Do not make Project Hoomans responsible for trader or other domain
   intent.
 - Do not create a Core implementation that imports Dynamic Trading or Hoomans.
 - Do not create a second NPC generation path for each expansion.
@@ -186,3 +199,29 @@ No adopter-specific generation rewrite should begin before the P1 contract is
 accepted. The existing authority migration and semantic-harness jobs remain
 historical/supporting records; this job is the parent roadmap for the NPC
 population/expansion boundary.
+
+## P1 implementation checkpoint
+
+P1 is implemented in PsychopatzCore. The public
+`SurvivorWorld.Generation.Sources` registry accepts source descriptors,
+activation state, generation kind, defaults, caps, cooldowns, and bounded
+metadata. `GenerateGroup` and `GenerateCommunity` require an idempotency key,
+assign the Core generation serial, build the canonical plan, commit through
+the existing SurvivorWorld bootstrap, and persist source/kind/request
+provenance. No adopter was changed in this phase.
+
+## P2 implementation checkpoint
+
+The first P2 slice is implemented in Project Hoomans and PsychopatzCore.
+Hoomans mobile materialization no longer depends on a fixed
+`looter`/`trader`/`refugee` allow-list: registered archetypes provide bounded
+mobile profiles, role order, NPC archetype, and hostile movement policy. A
+test-only expansion-shaped fixture proves that a newly registered profile
+uses the existing Hoomans materializer path; it does not create a Gang mod,
+Gang package, or production Gang feature.
+
+Core actor-map and hover projections now read `presenceState` as well as
+provider lease state. Hoomans map-directory projection normalizes missing or
+legacy live/abstract state before rendering, so a valid visible NPC cannot
+leak `UNKNOWN` as its presence badge. The next P2 slice must close the
+canonical actor adoption/hydration boundary before P3.

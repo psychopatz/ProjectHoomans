@@ -287,6 +287,63 @@ for _, npcID in ipairs(caravanGenerated.npcIDs) do
         "trading caravan roams across the map")
 end
 
+T.truthy(PNC.FactionArchetypes.Register("fixture:expansion_mobile", {
+    label = "Expansion Mobile Group",
+    description = "Test-only expansion materialization profile.",
+    allowedRoles = {
+        leader = true,
+        guard = true,
+        scavenger = true,
+    },
+    defaultRole = "guard",
+    policyDefaults = {
+        aggression = 0.35,
+        retaliation = 0.45,
+        caution = 0.55,
+        hospitality = 0.40,
+        opportunism = 0.35,
+        outsiderPolicy = "neutral",
+        warThreshold = 72,
+        peaceThreshold = 25,
+    },
+    mobile = {
+        enabled = true,
+        roleOrder = { "leader", "guard", "scavenger" },
+        npcArchetype = "General",
+        hostile = false,
+    },
+}), "registered expansion-shaped materializer profile")
+PNC.Factions.IDGenerator = function()
+    return "faction_fixture_expansion_mobile"
+end
+local expansionOK, _, expansionFaction = PNC.Factions.Create({
+    name = "Expansion Mobile Fixture",
+    archetypeID = "fixture:expansion_mobile",
+    createdAt = worldHour,
+})
+T.truthy(expansionOK, "expansion-shaped faction created")
+local expansionGenerated
+expansionOK, _, expansionGenerated =
+    PNC.MobileGroupDirector.GenerateForFaction(
+        expansionFaction.id,
+        {
+            groupSize = 2,
+            presenceMode = "abstract",
+            worldAgeHours = worldHour,
+            mobilePathMode = "random",
+        }
+    )
+T.truthy(expansionOK, "registered expansion profile materialized")
+T.equal(expansionGenerated.createdCount, 2,
+    "registered expansion population")
+T.equal(PNC.Factions.Get(expansionFaction.id).mobile.active, true,
+    "registered expansion became a mobile faction")
+for _, npcID in ipairs(expansionGenerated.npcIDs) do
+    local record = PNC.Registry.Get(npcID)
+    T.equal(record.orderSpec.kind, PNC.Const.ORDER_ROAM,
+        "registered expansion uses generic mobile roaming")
+end
+
 local caravanPathChanged = PNC.MobileGroupDirector.SetPathMode(
     caravan.id, "player"
 )
