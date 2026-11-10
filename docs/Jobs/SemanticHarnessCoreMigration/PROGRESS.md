@@ -97,7 +97,7 @@ Validation: Core semantic-harness suite 45/45; DynamicTrading provider tests
 5/5; Hoomans runtime/provider slice 11/11; DynamicTrading Lua adapter smoke;
 direct Lua load checks. Core generic worker files contain no adopter imports.
 
-Commit: pending phase boundary.
+Commits: Core `c07babc`; DynamicTrading `0bd7b147`; Hoomans `e5cc2ec`.
 
 ## Next chunk
 
