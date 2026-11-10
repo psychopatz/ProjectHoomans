@@ -97,6 +97,28 @@ profiles, including abstract traversal, nearby physical materialization,
 conversation, persistence/restart, and optional-provider loading. Native game
 acceptance remains a separate user-owned gate unless explicitly authorized.
 
+#### P5-B — Core optional-adopter worker loading
+
+Close the executable gap between declarative profile metadata and the Core
+worker. Core must load adopter-supplied Lua adapter modules only through
+neutral launch metadata, validate the shared `SemanticExecution` contract, and
+dispatch generic provider operations without naming Project Hoomans or
+Dynamic Trading. DTAbstract and DTHoomans must both run through this loader;
+their only harness distinction is abstract versus physical materialization.
+
+Gate: Core standalone worker tests pass without adopters; actual DTAbstract and
+DTHoomans modules load through the Core worker and receive the same generic
+operation dispatch; Hoomans continues to consume Core lifecycle/process
+contracts with optional-provider loading disabled or enabled independently.
+
+#### P5-C — native SP/MP acceptance
+
+After the developer-side loader gate, exercise restart persistence, independent
+Project Hoomans/Dynamic Trading toggles, nearby DTHoomans physical
+materialization, DTAbstract abstract traversal, and shared conversation/trade
+behavior in real saves. This remains user-owned unless the user explicitly
+authorizes native Project Zomboid operation.
+
 ## Required phase discipline
 
 Each accepted phase updates `PROGRESS.md` and `HANDOFF.md`, commits exact

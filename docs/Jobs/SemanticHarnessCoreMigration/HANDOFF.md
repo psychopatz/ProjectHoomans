@@ -4,19 +4,20 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P5-A"
-phase_commit_message: "phase(P5-A): phase(P5-A): verify cross-provider developer matrix"
+phase_commit_phase: "P5-B"
+phase_commit_message: "phase(P5-B): phase(P5-B): document Core optional-adopter worker loading"
 phase_commit_vector: "project-hoomans=self"
 phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-10T01:29:33.491199Z"
+updated_at: "2026-11-10T01:56:35.274487Z"
 state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
 phase: "P5"
-chunk: "P5-B"
+chunk: "P5-C"
 retrieval_tier: "verify"
 ---
+
 
 
 
@@ -88,20 +89,23 @@ not claimed yet.
 
 ## Resume
 
-1. Verify the three repository worktrees and P4-D phase commits.
-2. Execute the P4-C native SP/MP acceptance matrix when the user provides the
-   running game/save authority.
-3. Keep native Project Zomboid SP/MP validation user-owned unless explicitly
+1. Verify the P5-B phase commit vector across Core, DynamicTrading, and
+   Hoomans.
+2. Hand the P5-C native SP/MP matrix to the user with the running game/save
+   authority.
+3. Keep native Project Zomboid validation user-owned unless explicitly
    requested.
 
 ## Evidence
 
-- `CODE_VERIFIED`: Core owns the neutral launch metadata seam and Hoomans has
-  no remaining callers of the three deleted runtime paths.
-- `TEST_VERIFIED`: Core suite 36 tests; Hoomans migration/regression slice;
-  DynamicTrading provider-adapter Python and Lua smoke gates.
-- `STATIC_ONLY`: provider callbacks are declared and adapter-smoked but not
-  executed by the minimal Core worker.
+- `CODE_VERIFIED`: Core owns neutral launch metadata and optional-adopter
+  loading; Hoomans has no remaining callers of the three deleted runtime
+  paths.
+- `TEST_VERIFIED`: Core 45/45, DynamicTrading provider tests 5/5, Hoomans
+  runtime/provider slice 11/11, DT Lua adapter smoke, and direct Lua load
+  checks.
+- `STATIC_ONLY`: native Project Zomboid behavior and full SP/MP provider
+  traversal remain unverified.
 - `UNVERIFIED`: native Project Zomboid SP/MP behavior remains user-owned.
 - No Workshop publication is claimed.
 
@@ -149,3 +153,23 @@ The broader Hoomans `test_harness` suite retains the previously documented
 three unrelated translation/identity catalog failures: false-name response
 disclosure, Tagalog identity translation, and Tagalog identity/self-reflection
 catalog use. They are outside this migration boundary.
+
+## P5-B result
+
+PsychopatzCore now owns the optional-adopter worker loading seam.
+`WorkerLaunchSpec` emits neutral module-path, module-name, and
+execution-provider metadata. The Core Lua worker loads only the modules named
+by that metadata, validates their Core `SemanticExecution` result, advertises
+the loaded descriptions, and dispatches generic `SEMANTIC_PROVIDER` operations.
+Empty metadata preserves the standalone Core worker.
+
+DynamicTrading supplies `provider_worker_launch_values()` as its thin adapter.
+Actual DTAbstract and DTHoomans modules load through the same Core worker and
+receive the same operation dispatch; only `abstract` versus `physical`
+materialization differs. No native Project Zomboid process was launched.
+
+## Next
+
+P5-C is the user-owned native SP/MP matrix: restart persistence, independent
+mod toggles, nearby DTHoomans materialization, DTAbstract abstract traversal,
+and shared conversation/trade behavior. The parent goal remains in progress.

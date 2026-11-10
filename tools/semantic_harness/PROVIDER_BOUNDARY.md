@@ -15,3 +15,11 @@ null values when building provider-neutral payloads.
 This is the first Lua worker-boundary migration slice. Hoomans-specific worker
 state, production module loading, and semantic policy remain provider-owned
 until their own audited migration slices are completed.
+
+PsychopatzCore also exposes a neutral optional-adopter worker loader. Adopters
+may provide Lua package-path templates, adapter module names, and the selected
+execution provider through `WorkerLaunchSpec`; Core validates and dispatches
+the shared `SemanticExecution` contract without naming an adopter. The real
+Project Hoomans worker remains the Hoomans-owned production composition, while
+its Python lifecycle, process, session, and state mechanics continue to come
+from Core.
