@@ -129,8 +129,8 @@ NPC archetype, hostile movement policy, and materialization eligibility from
 registered faction-archetype definitions. Core map/hover projection accepts
 canonical `presenceState`, and the Hoomans supplemental directory repairs
 missing legacy state to `abstract` (or hides `corpse`). The remaining P2 gate
-is canonical actor adoption/hydration; Dynamic Trading migration has not
-started.
+is canonical actor adoption/hydration. The NPC monitor uses the same
+normalization, and Dynamic Trading migration has not started.
 
 ### P3 — Dynamic Trading adapter migration
 

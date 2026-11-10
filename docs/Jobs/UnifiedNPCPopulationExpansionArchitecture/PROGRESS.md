@@ -21,11 +21,11 @@
 
 - Dynamic Trading still owns trader-specific generation façade/cadence code;
   it has not yet become a generic Core source registration.
-- Hoomans mobile/faction policy still contains fixed trader/looter/refugee
-  assumptions and a high-fan-out generation function.
-- Map/hover projection can observe a marker or record before the canonical
-  actor/provider lease is fully resolved. `UNKNOWN` must be treated as an
-  invalid projection, not a supported mode.
+- Hoomans' fixed mobile allow-list has been replaced by registered profiles;
+  canonical actor adoption/hydration remains the next boundary.
+- Map/hover and monitor projections now normalize valid live/abstract state;
+  an unhydrated canonical actor must still be repaired or hidden, and
+  `UNKNOWN` remains an invalid projection rather than a supported mode.
 - The exact writer/provenance chain for recurring new-save names such as Nina
   Cole and Vara Moss remains a runtime trace to perform before deleting any
   compatibility or bootstrap path.

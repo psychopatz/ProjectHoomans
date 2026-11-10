@@ -50,9 +50,8 @@ presence slices are already implemented and verified.
   the unrelated faction-boundary declaration-count smoke remains stale at
   `87` expected versus `88` actual.
 - `STATIC_ONLY`: no native Project Zomboid acceptance is claimed.
-- Project Hoomans has the P2 profile/presence implementation and this
-  documentation checkpoint; the primary commit is still pending the next
-  adoption/monitor chunk.
+- Project Hoomans has the P2 profile/presence implementation committed as
+  `5417deac`; the next adoption/hydration chunk remains.
 - Dynamic Trading and PsychopatzCore contain pre-existing generated
   `.architecture-refactor/output/architecture-audit.md` modifications from
   the audit. Preserve them; they are not part of this implementation phase.
