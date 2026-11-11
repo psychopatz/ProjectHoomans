@@ -24,16 +24,16 @@ state: "CLEAN_CHECKPOINT"
 
 ## Current state
 
-Core now contains the legacy bundle migration boundary and the normalized
-46-bundle manifest. The Core EN/TL catalogs contain the migrated PNC and DT
-legacy wording. A real build generated 88 PNC and 4 DT legacy runtime JSON
-files with exact locale parity.
+Core now contains the canonical Conversation bundle renderer and the
+normalized 46-bundle manifest. The Core EN/TL catalogs contain the PNC and DT
+bundle wording. A real build generated 88 PNC and 4 DT runtime JSON files
+with exact locale parity.
 
 PNC runtime consumers use `PNC_ConversationTextCatalog` and generated
-`common/media/translation/<LANG>/Conversation/Legacy/` paths. The old PNC
-conversation tree and both DT legacy source trees are removed from the
-working trees. No non-document source references remain for
-`media/conversation`, `ConversationTextLoader`, or `TextLoader`.
+`common/media/translation/<LANG>/Conversation/Bundles/` paths. The old PNC
+conversation tree and both DT source trees are removed from the working
+trees. No non-document source references remain for `media/conversation`,
+`ConversationTextLoader`, or `TextLoader`.
 
 ## Verification
 
@@ -59,7 +59,7 @@ working trees. No non-document source references remain for
 
 ## Safety
 
-Do not restore the deleted conversation trees or add compatibility shims.
+Do not restore the deleted conversation trees or add migration shims.
 Do not stage the pre-existing architecture reports, unrelated audit scripts,
 or unrelated test changes. Do not launch Project Zomboid or publish Workshop
 content unless the user explicitly assigns that live validation.

@@ -11,7 +11,7 @@ Helpers.PREFIX = "projecthoomans:"
 function Helpers.Source(kind, audience, bundle)
     return {
         modID = Helpers.MOD_ID,
-        pathPattern = "media/translation/{language}/Conversation/Legacy/" .. kind .. "/" .. audience .. "/" .. bundle .. ".json",
+        pathPattern = "media/translation/{language}/Conversation/Bundles/" .. kind .. "/" .. audience .. "/" .. bundle .. ".json",
         domain = "pnc." .. kind .. "." .. audience .. "." .. bundle,
     }
 end

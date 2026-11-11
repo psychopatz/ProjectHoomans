@@ -46,19 +46,18 @@
   205 generated files, 505 phrase families, 56 patterns, and 13 UI
   definitions before the legacy-bundle migration.
 
-## Accepted P4 — runtime migration and legacy removal
+## Accepted P4 — canonical runtime bundle rendering
 
-- The 44 Project Hoomans legacy conversation bundles and 2 Dynamic Trading
-  bundles are represented in Core `legacy_bundles.json` with explicit
-  `owner` and `modID`.
+- The 44 Project Hoomans conversation bundles and 2 Dynamic Trading bundles
+  are represented in Core `conversation_bundles.json` with explicit `owner`
+  and `modID`.
 - Their wording is merged into the Core EN/TL authoring catalogs and rendered
   into package-owned runtime paths under
-  `common/media/translation/<LANG>/Conversation/Legacy/`.
-- The old PNC loader was renamed to the catalog boundary and every runtime
-  consumer was migrated to the generated translation path.
-- The old PNC conversation tree and the old DTCommon/DTHoomans conversation
-  trees have no runtime files remaining.
-- JSON parity is clean for all 88 PNC and 4 DT legacy locale files.
+  `common/media/translation/<LANG>/Conversation/Bundles/`.
+- Every runtime consumer uses the canonical generated translation path.
+- Migration-only catalog utilities and the old conversation trees have no
+  runtime files or source references remaining.
+- JSON parity is clean for all 88 PNC and 4 DT locale files.
 - Verification passes: Core unittest suite 92/92, focused PNC
   conversation smoke suite 4/4, four DT conversation bridge smokes, and
   `pz-verify` with zero i18n/Kahlua/bloat findings.

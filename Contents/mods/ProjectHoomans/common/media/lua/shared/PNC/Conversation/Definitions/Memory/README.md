@@ -37,7 +37,7 @@ the argument array. Keep placeholders identical in both language bundles.
 
 Add new modules to GossipTemplates/00_PNC_ConversationGossipTemplates.lua.
 Text keys are declared by the generated legacy bundle manifest and materialized
-under `media/translation/<LANG>/Conversation/Legacy/`.
+under `media/translation/<LANG>/Conversation/Bundles/`.
 
 ## Event memory
 

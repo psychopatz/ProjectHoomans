@@ -84,7 +84,7 @@ PsychopatzCore = {
 }
 
 local applied
-local legacyCalls = {}
+local adopterCalls = {}
 PNC = {
     Core = {
         DeepCopy = function(value)
@@ -108,11 +108,11 @@ PNC = {
             end,
         },
         RequestWorldDiscovery = function(action, options)
-            legacyCalls[#legacyCalls + 1] = {
+            adopterCalls[#adopterCalls + 1] = {
                 action = action,
                 options = options,
             }
-            return true, "legacy"
+            return true, "adopter_transport"
         end,
     },
 }
@@ -146,8 +146,8 @@ T.equal(coreCalls[#coreCalls].action, "snapshot_due",
     "generic snapshot did not use Core transport")
 T.equal(coreCalls[#coreCalls].interval, 4321,
     "generic snapshot refresh interval changed")
-T.equal(#legacyCalls, 0,
-    "generic snapshot unexpectedly used PNC legacy transport")
+T.equal(#adopterCalls, 0,
+    "generic snapshot unexpectedly used PNC adopter transport")
 
 ok, reason = PNC.Client.RequestWorldDiscovery(
     "debug_discover_all",
@@ -164,9 +164,9 @@ ok, reason = PNC.Client.RequestWorldDiscovery(
     { range = 50 }
 )
 T.truthy(ok, reason)
-T.equal(#legacyCalls, 1,
+T.equal(#adopterCalls, 1,
     "Hoomans radio policy did not remain on adopter transport")
-T.equal(legacyCalls[1].action, "radio_scan",
+T.equal(adopterCalls[1].action, "radio_scan",
     "Hoomans action changed during fallback")
 
 currentCoreSnapshot = {
@@ -194,7 +194,7 @@ hooks[1](
 T.equal(
     PNC.Network.ClientState.worldDiscovery.revision,
     5,
-    "Core server snapshot did not refresh PNC compatibility state"
+    "Core server snapshot did not refresh PNC projected state"
 )
 T.equal(
     PNC.Network.ClientState.worldDiscovery.entities[1].entityID,

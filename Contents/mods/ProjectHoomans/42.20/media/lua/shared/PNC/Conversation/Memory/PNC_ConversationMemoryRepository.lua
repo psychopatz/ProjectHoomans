@@ -10,12 +10,12 @@ PNC.Conversation.Memory = Memory
 
 Memory.BACKSTORY_SOURCE = Memory.BACKSTORY_SOURCE or {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Legacy/backstory/shared/facts.json",
+    pathPattern = "media/translation/{language}/Conversation/Bundles/backstory/shared/facts.json",
     domain = "pnc.backstory.shared.facts",
 }
 Memory.GOSSIP_SOURCE = Memory.GOSSIP_SOURCE or {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Legacy/gossip/shared/templates.json",
+    pathPattern = "media/translation/{language}/Conversation/Bundles/gossip/shared/templates.json",
     domain = "pnc.gossip.shared.templates",
 }
 

@@ -1,7 +1,7 @@
--- Client compatibility bridge from the canonical Core SurvivorWorld
--- discovery transport to existing Hoomans discovery presentation/policy.
--- Generic snapshot/debug actions use Core; Hoomans-only radio/contact actions
--- remain on the legacy adopter command surface.
+-- Client bridge from the canonical Core SurvivorWorld discovery transport to
+-- the Hoomans discovery presentation and policy surface. Generic
+-- snapshot/debug actions use Core; Hoomans-only radio/contact actions remain
+-- on the adopter-owned command surface.
 
 PNC = PNC or {}
 PNC.CoreWorldDiscoveryClientAdapter =
@@ -135,7 +135,7 @@ function Adapter.Request(action, options)
         Adapter.LastCoreFailure = reason
     end
 
-    local fallback = Adapter.LegacyRequest
+    local fallback = Adapter.AdopterRequest
     if type(fallback) ~= "function" then
         return false, "discovery_transport_unavailable"
     end
@@ -149,7 +149,7 @@ function Adapter.Install()
     then
         return false, "pnc_discovery_client_unavailable"
     end
-    Adapter.LegacyRequest = PNC.Client.RequestWorldDiscovery
+    Adapter.AdopterRequest = PNC.Client.RequestWorldDiscovery
     PNC.Client.RequestWorldDiscovery = Adapter.Request
     Adapter.Installed = true
     Adapter.SyncSnapshot()

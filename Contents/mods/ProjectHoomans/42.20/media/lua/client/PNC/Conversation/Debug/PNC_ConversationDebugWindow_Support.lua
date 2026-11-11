@@ -8,7 +8,7 @@ local Layout = Internal.Layout
 
 local DEBUG_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Legacy/system/shared/debugger.json",
+    pathPattern = "media/translation/{language}/Conversation/Bundles/system/shared/debugger.json",
     domain = "pnc.system.shared.debugger",
 }
 

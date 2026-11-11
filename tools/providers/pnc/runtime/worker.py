@@ -390,11 +390,6 @@ class LuaSemanticWorker(SemanticWorker):
 
         return self._conversation.conversation_projection()
 
-    def talk_projection(self) -> dict[str, Any]:
-        """Compatibility alias for the production Talk presentation seam."""
-
-        return self._conversation.talk_projection()
-
     def persona_catalog(
         self, register_relationship_kind: dict[str, Any] | None = None
     ) -> dict[str, Any]:

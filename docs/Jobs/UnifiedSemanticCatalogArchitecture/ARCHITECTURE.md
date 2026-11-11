@@ -17,7 +17,7 @@ into adopter repositories and do not create a second compiler.
 tools/semantic_harness/codebuilder/sources/conversation/
 ├── manifest.json
 ├── content/ responses/ patterns/ flows/ behaviors/ beats/ realization/ ui/
-├── legacy_bundles.json
+├── conversation_bundles.json
 └── translations/
     ├── EN.json
     ├── TL.json
@@ -30,8 +30,8 @@ identity and provenance; the typed payload is selected by `kind`.
 not physical paths.
 
 The manifest owns source ordering, source roots, external mounts,
-`sourceProfiles`, and auxiliary migration manifests. Source roots and
-auxiliary bundles declare their package owner explicitly.
+`sourceProfiles`, and auxiliary bundle manifests. Source roots and auxiliary
+bundles declare their package owner explicitly.
 
 ## Compiler module boundaries
 
@@ -68,27 +68,26 @@ artifacts, not authoring sources.
 }
 ```
 
-## Legacy bundle migration
+## Runtime bundle rendering
 
-`legacy_bundle_catalog.py` is an offline CodeBuilder migration and
-materialization boundary. It discovers the former flat locale bundles,
-assigns deterministic bundle IDs, records owner/mod-ID metadata, merges their
-keys into the Core EN/TL catalogs, and renders package-owned runtime files.
+`conversation_bundle_catalog.py` is the CodeBuilder materialization boundary.
+It validates the canonical bundle manifest, resolves wording from the complete
+Core EN/TL catalogs, and renders package-owned runtime files.
 
-Generated legacy runtime paths are:
+Generated runtime paths are:
 
 ```text
-<mod>/common/media/translation/<LANG>/Conversation/Legacy/<domain>/<audience>/<bundle>.json
+<mod>/common/media/translation/<LANG>/Conversation/Bundles/<domain>/<audience>/<bundle>.json
 ```
 
 PNC and Dynamic Trading runtime consumers read those generated paths through
-the renamed `PNC_ConversationTextCatalog` boundary. The former
-`media/conversation` trees are removed after parity and zero-reference
-checks; no runtime bridge remains.
+the `PNC_ConversationTextCatalog` boundary. The former `media/conversation`
+trees and migration-only catalog utilities are removed; no runtime bridge
+remains.
 
 ## Validation contract
 
-The migration gate requires deterministic catalog validation, JSON parity
-against every migrated source bundle, focused PNC and DT conversation smokes,
-Kahlua validation, and a real build through the Core compiler. P5 additionally
+The rendering gate requires deterministic catalog validation, JSON parity
+against every package bundle, focused PNC and DT conversation smokes, Kahlua
+validation, and a real build through the Core compiler. P5 additionally
 requires composition validation for each dependency-closed mod selection.
