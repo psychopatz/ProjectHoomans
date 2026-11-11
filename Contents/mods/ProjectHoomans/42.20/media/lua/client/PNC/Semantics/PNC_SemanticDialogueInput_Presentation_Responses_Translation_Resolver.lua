@@ -22,6 +22,9 @@ local function semanticTranslationKey(response)
     if string.sub(templateID, 1, 7) == "UI_PNC_" then
         return templateID
     end
+    if string.sub(templateID, 1, 21) == "conversation.content." then
+        return templateID
+    end
     if templateID == "semantic.question.identity" then
         local fallback = tostring(response and response.fallback or "")
         if string.find(string.lower(fallback), "liars", 1, true) then

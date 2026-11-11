@@ -25,12 +25,6 @@ APOLOGY_IDS = (
     "semantic.social.apology.withdrawn",
 )
 STYLES = ("neutral", "warm", "terse", "guarded")
-FAMILY_NAMES = {
-    "default": "Default",
-    "friendly": "Friendly",
-    "stressed": "Stressed",
-    "withdrawn": "Withdrawn",
-}
 TRANSLATIONS = {
     "EN": {
         "default": {
@@ -134,10 +128,7 @@ class SocialApologyWordingShardTests(unittest.TestCase):
     ) -> None:
         for language, families in TRANSLATIONS.items():
             expected = {
-                (
-                    "UI_PNC_Conversation_Content_SemanticSocialApology"
-                    f"{FAMILY_NAMES[family]}{style.title()}01"
-                ): value
+                f"conversation.content.semantic.social.apology.{family}.{style}.01": value
                 for family, styles in families.items()
                 for style, value in styles.items()
             }

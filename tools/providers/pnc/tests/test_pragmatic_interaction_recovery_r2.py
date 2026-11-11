@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import json
 from pathlib import Path
 import shutil
 import tempfile
@@ -67,11 +68,11 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
 
         bundles = conversation_translation_bundles(model)
         self.assertIn(
-            "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateNeutral01",
+            "conversation.content.semantic.interaction.argument.retaliate.neutral.01",
             bundles["EN"]["Social"],
         )
         self.assertIn(
-            "UI_PNC_Conversation_Content_SemanticInteractionArgumentRetaliateNeutral01",
+            "conversation.content.semantic.interaction.argument.retaliate.neutral.01",
             bundles["TL"]["Social"],
         )
 
@@ -122,6 +123,30 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
             self.assertEqual(
                 refreshed["styles"]["neutral"][0]["translations"]["TL"],
                 "Talagang sinusubok mo ako ngayon.",
+            )
+            source = json.loads(
+                (
+                    repository
+                    / CONVERSATION_SOURCE_RELATIVE
+                    / "content/social/interaction/argument_retaliate.json"
+                ).read_text(encoding="utf-8")
+            )
+            for family in source["phraseFamilies"]:
+                for phrases in family["styles"].values():
+                    for phrase in phrases:
+                        self.assertNotIn("translations", phrase)
+            english_catalog = json.loads(
+                (
+                    repository
+                    / CONVERSATION_SOURCE_RELATIVE
+                    / "translations/EN.json"
+                ).read_text(encoding="utf-8")
+            )
+            self.assertEqual(
+                english_catalog["entries"][
+                    "conversation.content.semantic.interaction.argument.retaliate.neutral.01"
+                ]["text"],
+                "You are really pushing me now.",
             )
             en = (
                 repository

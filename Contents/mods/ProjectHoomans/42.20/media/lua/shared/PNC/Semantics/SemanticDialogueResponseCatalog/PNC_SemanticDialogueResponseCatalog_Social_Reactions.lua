@@ -23,9 +23,9 @@ local function followUp(id, fallback, reference)
 end
 
 local HORDE_CHOICE_KEYS = {
-    engage = "UI_PNC_Conversation_Content_SemanticCombatHordeChoiceEngageNeutral01",
-    avoid = "UI_PNC_Conversation_Content_SemanticCombatHordeChoiceAvoidNeutral01",
-    hold = "UI_PNC_Conversation_Content_SemanticCombatHordeChoiceHoldNeutral01",
+    engage = "conversation.content.semantic.combat.horde.choice.engage.neutral.01",
+    avoid = "conversation.content.semantic.combat.horde.choice.avoid.neutral.01",
+    hold = "conversation.content.semantic.combat.horde.choice.hold.neutral.01",
 }
 
 local function tacticalChoice(id, fallback, action)

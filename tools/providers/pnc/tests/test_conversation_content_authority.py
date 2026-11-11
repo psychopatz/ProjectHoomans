@@ -195,7 +195,7 @@ class ConversationContentAuthorityTests(unittest.TestCase):
             frame = candidate["frame"]
             self.assertEqual(
                 frame["labelKey"],
-                "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+                "conversation.content.choice.conversation.landing:whats_up.choice",
             )
             self.assertEqual(frame["labelFallback"], label_fallback)
             self.assertEqual(frame["textFallback"], "What's up?")

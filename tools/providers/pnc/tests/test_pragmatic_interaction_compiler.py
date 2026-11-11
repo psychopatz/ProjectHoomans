@@ -180,8 +180,7 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
             self.assertIn("XX", bundles)
             self.assertIn("Social", bundles["XX"])
             self.assertIn(
-                "UI_PNC_Conversation_Content_"
-                "SemanticInteractionArgumentRetaliateNeutral01",
+                "conversation.content.semantic.interaction.argument.retaliate.neutral.01",
                 bundles["XX"]["Social"],
             )
 

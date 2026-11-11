@@ -33,59 +33,59 @@ NEEDS_IDS = (
 )
 EXPECTED = {
     "EN": {
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferFatigueNeutral01":
+        "conversation.content.semantic.question.needs.offer.fatigue.neutral.01":
             "A little rest would help, but this isn't something I can count.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerGuarded01":
+        "conversation.content.semantic.question.needs.offer.hunger.guarded.01":
             "I need food. Keep your distance.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerNeutral01":
+        "conversation.content.semantic.question.needs.offer.hunger.neutral.01":
             "Food would help, but I don't have an exact amount yet.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerTerse01":
+        "conversation.content.semantic.question.needs.offer.hunger.terse.01":
             "I need food.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerWarm01":
+        "conversation.content.semantic.question.needs.offer.hunger.warm.01":
             "Food would help, if you can spare it.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferThirstNeutral01":
+        "conversation.content.semantic.question.needs.offer.thirst.neutral.01":
             "Water would help, but I don't have an exact amount yet.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferUnknownNeutral01":
+        "conversation.content.semantic.question.needs.offer.unknown.neutral.01":
             "I don't know what I need right now.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalHungerNeutral01":
+        "conversation.content.semantic.question.needs.proposal.hunger.neutral.01":
             "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalThirstNeutral01":
+        "conversation.content.semantic.question.needs.proposal.thirst.neutral.01":
             "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalUnknownNeutral01":
+        "conversation.content.semantic.question.needs.proposal.unknown.neutral.01":
             "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityHungerNeutral01":
+        "conversation.content.semantic.question.needs.quantity.hunger.neutral.01":
             "I know food is what I need, but I can't give you an exact amount yet.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityThirstNeutral01":
+        "conversation.content.semantic.question.needs.quantity.thirst.neutral.01":
             "I know water is what I need, but I can't give you an exact amount yet.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityUnknownNeutral01":
+        "conversation.content.semantic.question.needs.quantity.unknown.neutral.01":
             "I can't confirm an exact amount yet. Which item do you mean?",
     },
     "TL": {
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferFatigueNeutral01":
+        "conversation.content.semantic.question.needs.offer.fatigue.neutral.01":
             "Makakatulong ang kaunting pahinga, pero hindi ito mabibilang.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerGuarded01":
+        "conversation.content.semantic.question.needs.offer.hunger.guarded.01":
             "Kailangan ko ng pagkain. Lumayo ka.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerNeutral01":
+        "conversation.content.semantic.question.needs.offer.hunger.neutral.01":
             "Makakatulong ang pagkain, pero wala akong eksaktong dami ngayon.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerTerse01":
+        "conversation.content.semantic.question.needs.offer.hunger.terse.01":
             "Kailangan ko ng pagkain.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerWarm01":
+        "conversation.content.semantic.question.needs.offer.hunger.warm.01":
             "Makakatulong ang pagkain, kung may maibibigay ka.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferThirstNeutral01":
+        "conversation.content.semantic.question.needs.offer.thirst.neutral.01":
             "Makakatulong ang tubig, pero wala akong eksaktong dami ngayon.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferUnknownNeutral01":
+        "conversation.content.semantic.question.needs.offer.unknown.neutral.01":
             "Hindi ko alam kung ano ang kailangan ko ngayon.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalHungerNeutral01":
+        "conversation.content.semantic.question.needs.proposal.hunger.neutral.01":
             "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalThirstNeutral01":
+        "conversation.content.semantic.question.needs.proposal.thirst.neutral.01":
             "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalUnknownNeutral01":
+        "conversation.content.semantic.question.needs.proposal.unknown.neutral.01":
             "Ituturing ko muna itong panukala, pero kailangan ko munang tiyakin ang gamit at dami bago ako magtala ng pangako.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityHungerNeutral01":
+        "conversation.content.semantic.question.needs.quantity.hunger.neutral.01":
             "Alam kong pagkain ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityThirstNeutral01":
+        "conversation.content.semantic.question.needs.quantity.thirst.neutral.01":
             "Alam kong tubig ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
-        "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityUnknownNeutral01":
+        "conversation.content.semantic.question.needs.quantity.unknown.neutral.01":
             "Hindi ko makumpirma ang eksaktong dami. Anong gamit ang tinutukoy mo?",
     },
 }
@@ -176,19 +176,19 @@ class NeedsWordingShardTests(unittest.TestCase):
     ) -> None:
         expected = {
             "EN": (
-                "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerNeutral01",
+                "conversation.content.semantic.question.needs.offer.hunger.neutral.01",
                 "Food would help, but I don't have an exact amount yet.",
-                "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityHungerNeutral01",
+                "conversation.content.semantic.question.needs.quantity.hunger.neutral.01",
                 "I know food is what I need, but I can't give you an exact amount yet.",
-                "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalHungerNeutral01",
+                "conversation.content.semantic.question.needs.proposal.hunger.neutral.01",
                 "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
             ),
             "TL": (
-                "UI_PNC_Conversation_Content_SemanticQuestionNeedsOfferHungerNeutral01",
+                "conversation.content.semantic.question.needs.offer.hunger.neutral.01",
                 "Makakatulong ang pagkain, pero wala akong eksaktong dami ngayon.",
-                "UI_PNC_Conversation_Content_SemanticQuestionNeedsQuantityHungerNeutral01",
+                "conversation.content.semantic.question.needs.quantity.hunger.neutral.01",
                 "Alam kong pagkain ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
-                "UI_PNC_Conversation_Content_SemanticQuestionNeedsProposalHungerNeutral01",
+                "conversation.content.semantic.question.needs.proposal.hunger.neutral.01",
                 "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
             ),
         }

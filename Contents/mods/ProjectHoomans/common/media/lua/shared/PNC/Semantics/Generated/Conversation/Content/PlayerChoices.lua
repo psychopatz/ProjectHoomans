@@ -2,11 +2,11 @@
 return {
     ["conversation.landing:whats_up"] = {
         ["canonicalConcept"] = "CONVERSATION_LANDING_WHATS_UP",
-        ["choiceKey"] = "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+        ["choiceKey"] = "conversation.content.choice.conversation.landing:whats_up.choice",
         ["hubID"] = "whats_up",
         ["id"] = "conversation.landing:whats_up",
         ["kind"] = "player_landing_choice",
-        ["labelKey"] = "UI_PNC_Conversation_Content_ConversationLandingWhatsUp_Label",
+        ["labelKey"] = "conversation.content.choice.conversation.landing:whats_up.label",
         ["route"] = "semantic_hub",
     },
 }

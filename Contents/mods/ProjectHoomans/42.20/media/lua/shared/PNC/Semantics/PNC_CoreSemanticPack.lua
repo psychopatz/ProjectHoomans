@@ -81,10 +81,10 @@ function Pack.Register(core)
                     { field = "relationship.approval", op = ">=", value = 30 },
                 },
                 entryNode = "opening",
-                textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultFriendly01",
+                textKey = "conversation.content.semantic.flow.greeting.opening.friendly.warm.01",
                 nodes = {
                     opening = {
-                        textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultFriendly01",
+                        textKey = "conversation.content.semantic.flow.greeting.opening.friendly.warm.01",
                         choices = {},
                     },
                 },
@@ -97,10 +97,10 @@ function Pack.Register(core)
                     { field = "relationship.approval", op = ">=", value = -20 },
                 },
                 entryNode = "opening",
-                textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
+                textKey = "conversation.content.semantic.flow.greeting.opening.default.neutral.01",
                 nodes = {
                     opening = {
-                        textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
+                        textKey = "conversation.content.semantic.flow.greeting.opening.default.neutral.01",
                         choices = {},
                     },
                 },
@@ -113,10 +113,10 @@ function Pack.Register(core)
                     { field = "relationship.approval", op = "<", value = -20 },
                 },
                 entryNode = "opening",
-                textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningWary01",
+                textKey = "conversation.content.semantic.flow.greeting.opening.default.guarded.01",
                 nodes = {
                     opening = {
-                        textKey = "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningWary01",
+                        textKey = "conversation.content.semantic.flow.greeting.opening.default.guarded.01",
                         choices = {},
                     },
                 },
@@ -129,10 +129,10 @@ function Pack.Register(core)
                     { field = "relationship.approval", op = ">=", value = 20 },
                 },
                 entryNode = "opening",
-                textKey = "UI_PNC_Conversation_Content_SemanticFlowWellbeingGood01",
+                textKey = "conversation.content.semantic.question.wellbeing.default.warm.01",
                 nodes = {
                     opening = {
-                        textKey = "UI_PNC_Conversation_Content_SemanticFlowWellbeingGood01",
+                        textKey = "conversation.content.semantic.question.wellbeing.default.warm.01",
                         choices = {},
                     },
                 },
@@ -145,10 +145,10 @@ function Pack.Register(core)
                     { field = "relationship.approval", op = ">=", value = -20 },
                 },
                 entryNode = "opening",
-                textKey = "UI_PNC_Conversation_Content_SemanticFlowWellbeingNeutral01",
+                textKey = "conversation.content.semantic.question.wellbeing.default.neutral.01",
                 nodes = {
                     opening = {
-                        textKey = "UI_PNC_Conversation_Content_SemanticFlowWellbeingNeutral01",
+                        textKey = "conversation.content.semantic.question.wellbeing.default.neutral.01",
                         choices = {},
                     },
                 },

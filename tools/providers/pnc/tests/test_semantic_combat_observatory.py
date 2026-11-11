@@ -95,7 +95,7 @@ def tactical_fixture() -> dict:
                         "templateID":
                             "semantic.combat.tactical_spatial.zombie.clock",
                         "translationKey":
-                            "UI_PNC_Conversation_Content_SemanticCombatTacticalSpatialZombieClockNeutral01",
+                            "conversation.content.semantic.combat.tactical_spatial.zombie.clock.neutral.01",
                     },
                     "offerIDs": [
                         "semantic.combat.horde.choice.engage",

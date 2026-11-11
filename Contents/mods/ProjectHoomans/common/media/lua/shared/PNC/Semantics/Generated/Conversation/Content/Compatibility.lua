@@ -10,7 +10,8 @@ return {
                 {
                     ["fallback"] = "Bandit fire! Pull back and cover the wounded colonist.",
                     ["id"] = "phrase.semantic.compat.bandits.hooman_hurt.colonist.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatBanditsHoomanHurtColonistNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.bandits.hooman_hurt.colonist.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -25,7 +26,8 @@ return {
                 {
                     ["fallback"] = "Bandit fire! Stay with the wounded survivor and watch the flank.",
                     ["id"] = "phrase.semantic.compat.bandits.hooman_hurt.default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatBanditsHoomanHurtDefaultNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.bandits.hooman_hurt.default.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -40,7 +42,8 @@ return {
                 {
                     ["fallback"] = "Bandit fire! Stay together and cover the wounded family member.",
                     ["id"] = "phrase.semantic.compat.bandits.hooman_hurt.family.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatBanditsHoomanHurtFamilyNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.bandits.hooman_hurt.family.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -55,7 +58,8 @@ return {
                 {
                     ["fallback"] = "Bandit fire. Stay close; I have got you.",
                     ["id"] = "phrase.semantic.compat.bandits.hooman_hurt.lover.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatBanditsHoomanHurtLoverNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.bandits.hooman_hurt.lover.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -70,7 +74,8 @@ return {
                 {
                     ["fallback"] = "Here you go, good girl.",
                     ["id"] = "phrase.semantic.compat.companion_dogs.feed.female.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatCompanionDogsFeedFemaleNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.companion_dogs.feed.female.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -85,7 +90,8 @@ return {
                 {
                     ["fallback"] = "Here you go, good boy.",
                     ["id"] = "phrase.semantic.compat.companion_dogs.feed.male.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatCompanionDogsFeedMaleNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.companion_dogs.feed.male.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -100,7 +106,8 @@ return {
                 {
                     ["fallback"] = "Here you go, good dog.",
                     ["id"] = "phrase.semantic.compat.companion_dogs.feed.unknown.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatCompanionDogsFeedUnknownNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.companion_dogs.feed.unknown.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -115,7 +122,8 @@ return {
                 {
                     ["fallback"] = "Who is a good girl?",
                     ["id"] = "phrase.semantic.compat.companion_dogs.greeting.female.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatCompanionDogsGreetingFemaleNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.companion_dogs.greeting.female.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -130,7 +138,8 @@ return {
                 {
                     ["fallback"] = "Who is a good boy?",
                     ["id"] = "phrase.semantic.compat.companion_dogs.greeting.male.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatCompanionDogsGreetingMaleNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.companion_dogs.greeting.male.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -145,7 +154,8 @@ return {
                 {
                     ["fallback"] = "Who is a good dog?",
                     ["id"] = "phrase.semantic.compat.companion_dogs.greeting.unknown.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatCompanionDogsGreetingUnknownNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.companion_dogs.greeting.unknown.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -160,7 +170,8 @@ return {
                 {
                     ["fallback"] = "Mask up. We keep the camp safe together.",
                     ["id"] = "phrase.semantic.compat.necroa.mask_warning.colonist.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatNecroaMaskWarningColonistNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.necroa.mask_warning.colonist.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -175,7 +186,8 @@ return {
                 {
                     ["fallback"] = "Put your mask back on. Knox is airborne.",
                     ["id"] = "phrase.semantic.compat.necroa.mask_warning.default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatNecroaMaskWarningDefaultNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.necroa.mask_warning.default.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -190,7 +202,8 @@ return {
                 {
                     ["fallback"] = "Put your mask on, family. I am not losing you to the air.",
                     ["id"] = "phrase.semantic.compat.necroa.mask_warning.family.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatNecroaMaskWarningFamilyNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.necroa.mask_warning.family.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -205,7 +218,8 @@ return {
                 {
                     ["fallback"] = "Put your mask back on. The air is not safe.",
                     ["id"] = "phrase.semantic.compat.necroa.player_mask_removed.default.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatNecroaPlayerMaskRemovedDefaultNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.necroa.player_mask_removed.default.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -220,7 +234,8 @@ return {
                 {
                     ["fallback"] = "Put your mask back on before you become a problem.",
                     ["id"] = "phrase.semantic.compat.necroa.player_mask_removed.hostile.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatNecroaPlayerMaskRemovedHostileNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.necroa.player_mask_removed.hostile.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -235,7 +250,8 @@ return {
                 {
                     ["fallback"] = "Please put your mask back on, love. This air is not safe.",
                     ["id"] = "phrase.semantic.compat.necroa.player_mask_removed.lover.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatNecroaPlayerMaskRemovedLoverNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.necroa.player_mask_removed.lover.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -250,7 +266,8 @@ return {
                 {
                     ["fallback"] = "Those survivors seem friendly. Keep your hands visible.",
                     ["id"] = "phrase.semantic.compat.projectalife.encounter.friendly.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeEncounterFriendlyNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.projectalife.encounter.friendly.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -265,7 +282,8 @@ return {
                 {
                     ["fallback"] = "That group looks hostile. Keep cover between us and them.",
                     ["id"] = "phrase.semantic.compat.projectalife.encounter.hostile.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeEncounterHostileNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.projectalife.encounter.hostile.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -280,7 +298,8 @@ return {
                 {
                     ["fallback"] = "Someone is out there. Let us watch before we approach.",
                     ["id"] = "phrase.semantic.compat.projectalife.encounter.unknown.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeEncounterUnknownNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.projectalife.encounter.unknown.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -295,7 +314,8 @@ return {
                 {
                     ["fallback"] = "That faction may be hostile toward us now. Stay alert.",
                     ["id"] = "phrase.semantic.compat.projectalife.faction.hostile.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeFactionHostileNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.projectalife.faction.hostile.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -310,7 +330,8 @@ return {
                 {
                     ["fallback"] = "They just opened fire on us. Stay close.",
                     ["id"] = "phrase.semantic.compat.projectalife.faction.incoming.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeFactionIncomingNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.projectalife.faction.incoming.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -325,7 +346,8 @@ return {
                 {
                     ["fallback"] = "We hit them. They may retaliate soon.",
                     ["id"] = "phrase.semantic.compat.projectalife.faction.outgoing.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeFactionOutgoingNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.projectalife.faction.outgoing.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -340,7 +362,8 @@ return {
                 {
                     ["fallback"] = "Something is flying over us. Keep listening.",
                     ["id"] = "phrase.semantic.compat.projectalife.meta.aircraft.heli.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeMetaAircraftHeliNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.projectalife.meta.aircraft.heli.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -355,7 +378,8 @@ return {
                 {
                     ["fallback"] = "That aircraft sounds close. Stay sharp.",
                     ["id"] = "phrase.semantic.compat.projectalife.meta.aircraft.military.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeMetaAircraftMilitaryNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.projectalife.meta.aircraft.military.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -370,7 +394,8 @@ return {
                 {
                     ["fallback"] = "I do not like that sound. Stay close.",
                     ["id"] = "phrase.semantic.compat.projectalife.meta.ambience.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeMetaAmbienceNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.projectalife.meta.ambience.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -385,7 +410,8 @@ return {
                 {
                     ["fallback"] = "That crash sounded close. Keep your eyes open.",
                     ["id"] = "phrase.semantic.compat.projectalife.meta.crash.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeMetaCrashNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.projectalife.meta.crash.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },
@@ -400,7 +426,8 @@ return {
                 {
                     ["fallback"] = "Someone is shooting nearby. Keep your head down.",
                     ["id"] = "phrase.semantic.compat.projectalife.meta.gunfire.neutral.01",
-                    ["key"] = "UI_PNC_Conversation_Content_SemanticCompatProjectalifeMetaGunfireNeutral01",
+                    ["key"] = "conversation.content.semantic.compat.projectalife.meta.gunfire.neutral.01",
+                    ["phraseID"] = "neutral.01",
                 },
             },
         },

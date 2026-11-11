@@ -345,7 +345,7 @@ local weatherFallbacks = {
 T.truthy(weatherFallbacks[queued[8].payload.fallback],
     "provider-disabled greeting still uses the bounded local response pool")
 T.truthy(string.find(queued[8].payload.translationKey or "",
-    "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningRain",
+    "conversation.content.semantic.flow.greeting.opening.rain.neutral.",
     1, true),
     "provider-disabled greeting retains canonical content provenance")
 T.equal(view.lastSemanticDialogueResult.decision.route, "deterministic",

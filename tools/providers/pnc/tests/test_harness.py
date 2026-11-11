@@ -403,7 +403,7 @@ class SemanticHarnessTests(unittest.TestCase):
         self.assertEqual(name_reply["toolCalls"][0]["label"], "ask_name")
         self.assertTrue(any(
             lookup["key"].startswith(
-                "UI_PNC_Conversation_Content_SemanticToolReplyAskNameNamed"
+                "conversation.content.semantic.tool_reply.ask_name.named."
             )
             for lookup in name_reply["translationLookups"]
         ))
@@ -412,7 +412,7 @@ class SemanticHarnessTests(unittest.TestCase):
         self.assertTrue(camp_reply["text"])
         self.assertTrue(any(
             lookup["key"].startswith(
-                "UI_PNC_Conversation_Content_SemanticToolReplyOrderCamp"
+                "conversation.content.semantic.tool_reply.order_camp."
             )
             for lookup in camp_reply["translationLookups"]
         ))

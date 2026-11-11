@@ -175,11 +175,11 @@ class SemanticAuthorityBoundaryTests(unittest.TestCase):
                 self.assertTrue(path.exists(), str(path))
                 self.assertTrue(json.loads(path.read_text()), str(path))
             self.assertIn(
-                "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
+                "conversation.content.semantic.flow.greeting.opening.default.neutral.01",
                 json.loads(greeting.read_text()),
             )
             self.assertIn(
-                "UI_PNC_Conversation_Content_SemanticEmotePlayerThumbsdownNeutral01",
+                "conversation.content.semantic.emote.player.thumbsdown.neutral.01",
                 json.loads(social.read_text()),
             )
             self.assertIn(

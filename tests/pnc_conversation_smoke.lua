@@ -1182,14 +1182,14 @@ local commandContent = T.read(
     "media/translation/EN/Conversation/Command.json")
 T.truthy(string.find(
     commandContent,
-    "UI_PNC_Conversation_Content_SemanticCommandPlayerAttackAutoNeutral01",
+    "conversation.content.semantic.command.player.attack_auto.neutral.01",
     1, true), "command wording lives in generated Conversation domain content")
 local greetingContent = T.read(
     "ProjectHoomans", "common_mod",
     "media/translation/EN/Conversation/Greeting.json")
 T.truthy(string.find(
     greetingContent,
-    "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
+    "conversation.content.semantic.flow.greeting.opening.default.neutral.01",
     1, true), "greeting wording lives in generated Conversation domain content")
 T.finish("pnc_conversation_smoke")
 

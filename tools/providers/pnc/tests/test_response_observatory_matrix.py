@@ -328,12 +328,12 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                     for key in data:
                         occurrence.setdefault(key, []).append(rel)
                 keys = (
-                    "UI_PNC_Conversation_Content_SemanticCommandFollowQueuedNeutral01",
-                    "UI_PNC_Conversation_Content_SemanticCommandStayQueuedNeutral01",
-                    "UI_PNC_Conversation_Content_SemanticCommandFollowRejectedNeutral01",
-                    "UI_PNC_Conversation_Content_SemanticCommandStayRejectedNeutral01",
-                    "UI_PNC_Conversation_Content_SemanticCommandFollowFailedNeutral01",
-                    "UI_PNC_Conversation_Content_SemanticCommandStayFailedNeutral01",
+                    "conversation.content.semantic.command.follow.queued.neutral.01",
+                    "conversation.content.semantic.command.stay.queued.neutral.01",
+                    "conversation.content.semantic.command.follow.rejected.neutral.01",
+                    "conversation.content.semantic.command.stay.rejected.neutral.01",
+                    "conversation.content.semantic.command.follow.failed.neutral.01",
+                    "conversation.content.semantic.command.stay.failed.neutral.01",
                 )
                 for key in keys:
                     self.assertEqual(

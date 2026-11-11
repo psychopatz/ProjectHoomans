@@ -67,7 +67,7 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                 ]
                 self.assertTrue(
                     greeting_payloads[0]["translationKey"].startswith(
-                        "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral"
+                        "conversation.content.semantic.flow.greeting.opening.default.neutral."
                     )
                 )
                 self.assertEqual(
@@ -76,7 +76,7 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                 )
                 self.assertTrue(
                     greeting_payloads[1]["translationKey"].startswith(
-                        "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningQuestionDefaultNeutral"
+                        "conversation.content.semantic.flow.greeting.opening.question.default.neutral."
                     )
                 )
                 self.assertEqual(
@@ -90,7 +90,7 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                 identity_payload = identity["messages"][0]["payload"]
                 self.assertTrue(
                     identity_payload["translationKey"].startswith(
-                        "UI_PNC_Conversation_Content_SemanticQuestionIdentity"
+                        "conversation.content.semantic.question.identity."
                     )
                     or identity_payload["translationKey"].startswith(
                         "UI_PNC_Conversation_Semantic_QuestionIdentity"
@@ -112,9 +112,6 @@ class SemanticTranslationIntegrationTests(unittest.TestCase):
                 wellbeing_payload = wellbeing["messages"][0]["payload"]
                 self.assertTrue(
                     wellbeing_payload["translationKey"].startswith(
-                        "UI_PNC_Conversation_Content_SemanticQuestionWellbeing"
-                    )
-                    or wellbeing_payload["translationKey"].startswith(
                         "UI_PNC_Conversation_Semantic_QuestionWellbeingDataset"
                     )
                 )
