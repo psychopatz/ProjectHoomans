@@ -4,7 +4,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 require "PNC/Conversation/PNC_ConversationHistory"
-require "PNC/Conversation/Blocks/PNC_ConversationTextLoader"
+require "PNC/Conversation/Blocks/PNC_ConversationTextCatalog"
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}

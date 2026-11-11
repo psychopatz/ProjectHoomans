@@ -14,7 +14,7 @@ local Provider = {
 
 local SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/conversation/system/shared/{language}/categories.json",
+    pathPattern = "media/translation/{language}/Conversation/Legacy/system/shared/categories.json",
     domain = "pnc.system.shared.categories",
 }
 
@@ -28,8 +28,8 @@ local function auditTalk(eventName, data)
 end
 
 local function tr(key)
-    if PNC.Conversation and PNC.Conversation.TextLoader then
-        PNC.Conversation.TextLoader.EnsureSource(SOURCE, { key })
+    if PNC.Conversation and PNC.Conversation.TextCatalog then
+        PNC.Conversation.TextCatalog.EnsureSource(SOURCE, { key })
     end
     local text = PsychopatzCore and PsychopatzCore.Conversation
         and PsychopatzCore.Conversation.Text

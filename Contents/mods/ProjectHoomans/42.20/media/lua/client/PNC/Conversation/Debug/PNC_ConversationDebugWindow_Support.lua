@@ -8,12 +8,12 @@ local Layout = Internal.Layout
 
 local DEBUG_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/conversation/system/shared/{language}/debugger.json",
+    pathPattern = "media/translation/{language}/Conversation/Legacy/system/shared/debugger.json",
     domain = "pnc.system.shared.debugger",
 }
 
 local function tr(key, args)
-    PNC.Conversation.TextLoader.EnsureSource(DEBUG_SOURCE, { key })
+    PNC.Conversation.TextCatalog.EnsureSource(DEBUG_SOURCE, { key })
     return PsychopatzCore.Conversation.Text.Resolve({
         key = key, domain = DEBUG_SOURCE.domain, args = args,
     })

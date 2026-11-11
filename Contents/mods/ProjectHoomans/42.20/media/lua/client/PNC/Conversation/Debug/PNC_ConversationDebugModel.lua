@@ -6,11 +6,11 @@ local Model = PNC.ConversationDebugModel
 local Registry = PNC.Conversation.Registry
 local Selector = PNC.Conversation.Selector
 local Rules = PNC.Conversation.Rules
-local Loader = PNC.Conversation.TextLoader
+local Loader = PNC.Conversation.TextCatalog
 
 local DEBUG_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/conversation/system/shared/{language}/debugger.json",
+    pathPattern = "media/translation/{language}/Conversation/Legacy/system/shared/debugger.json",
     domain = "pnc.system.shared.debugger",
 }
 

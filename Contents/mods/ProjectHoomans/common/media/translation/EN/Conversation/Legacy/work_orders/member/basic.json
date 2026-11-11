@@ -1,0 +1,7 @@
+{
+  "choice.orders": "I have work for you.",
+  "choice.status": "Report on your current work.",
+  "opening": "I'm ready. What needs doing?",
+  "response.orders": "Tell me what needs doing.",
+  "response.status": "Everything is on track for now."
+}

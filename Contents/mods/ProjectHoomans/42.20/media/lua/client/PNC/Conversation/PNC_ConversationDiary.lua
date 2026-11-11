@@ -25,7 +25,7 @@ end
 local function resolveConversationText(entry, key)
     local conversation = PNC.Conversation
     local registry = conversation and conversation.Registry
-    local loader = conversation and conversation.TextLoader
+    local loader = conversation and conversation.TextCatalog
     local text = PsychopatzCore and PsychopatzCore.Conversation
         and PsychopatzCore.Conversation.Text or nil
     local block = registry and registry.GetBlock

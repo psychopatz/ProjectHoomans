@@ -56,10 +56,10 @@ package.preload["PNC/Conversation/PNC_ConversationHistory"] = function()
     return PNC.Conversation.History
 end
 package.preload[
-    "PNC/Conversation/Blocks/PNC_ConversationTextLoader"
+    "PNC/Conversation/Blocks/PNC_ConversationTextCatalog"
 ] = function()
-    PNC.Conversation.TextLoader = {}
-    return PNC.Conversation.TextLoader
+    PNC.Conversation.TextCatalog = {}
+    return PNC.Conversation.TextCatalog
 end
 T.load("ProjectHoomans", "server",
     "PNC/Conversation/PNC_ConversationAuthority.lua")
@@ -77,7 +77,7 @@ for i = 1, #providers do
 end
 package.preload["PNC/Conversation/PNC_ConversationHistory"] = nil
 package.preload[
-    "PNC/Conversation/Blocks/PNC_ConversationTextLoader"
+    "PNC/Conversation/Blocks/PNC_ConversationTextCatalog"
 ] = nil
 
 T.finish("pnc_conversation_authority_presence_boundary_smoke")

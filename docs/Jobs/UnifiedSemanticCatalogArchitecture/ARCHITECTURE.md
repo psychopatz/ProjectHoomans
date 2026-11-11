@@ -2,14 +2,14 @@
 
 ## Ownership
 
-PsychopatzCore owns the harness, schemas, compiler, validators, and shared
-semantic catalogs. Project Hoomans owns Hoomans-specific dialogue policy and
-content. Dynamic Trading owns trading provider packs. Physical source hosting
-in Core does not imply gameplay ownership; every shard declares its package
-owner.
+PsychopatzCore owns the semantic harness, schemas, compiler, validators,
+shared catalogs, and generated semantic contracts. Project Hoomans owns
+Hoomans-specific dialogue policy and content. Dynamic Trading owns trading
+provider packs. Physical source hosting in Core does not imply gameplay
+ownership; every shard and auxiliary bundle declares its package owner.
 
-External packs are mounted into the Core CodeBuilder input graph. They are not
-copied into adopter repositories and do not create a second compiler.
+External packs mount into the Core CodeBuilder input graph. They are not copied
+into adopter repositories and do not create a second compiler.
 
 ## Canonical source model
 
@@ -17,60 +17,41 @@ copied into adopter repositories and do not create a second compiler.
 tools/semantic_harness/codebuilder/sources/conversation/
 ├── manifest.json
 ├── content/ responses/ patterns/ flows/ behaviors/ beats/ realization/ ui/
+├── legacy_bundles.json
 └── translations/
     ├── EN.json
     ├── TL.json
     └── <locale>.json
 ```
 
-Each semantic shard has a common envelope and a typed payload. The envelope is
-identity and ownership; the payload is selected by `kind`.
+Each semantic shard uses `psychopatz.semantic.shard.v2`. The envelope owns
+identity and provenance; the typed payload is selected by `kind`.
+`shardId`, record IDs, and translation keys are stable semantic identities,
+not physical paths.
 
-```json
-{
-  "schema": "psychopatz.semantic.shard.v2",
-  "shardId": "conversation.content.social.reactions",
-  "kind": "content",
-  "domain": "social",
-  "owner": "ProjectHoomans",
-  "sourceProfile": "conversation.source.project.hoomans.dialogue.1234567890",
-  "phraseFamilies": [],
-  "playerChoices": []
-}
-```
-
-Supported typed payloads are `phraseFamilies`/`playerChoices` for content,
-`patterns`, `responsePools`, `definitions`, `behaviors`, `beats`,
-`realizations`, `packs`, and `suggestions` for their respective kinds.
-
-The manifest owns ordering, source roots, external mounts, and the
-`sourceProfiles` provenance index. Profiles hold repeated generator/license
-metadata once; they are not embedded in every shard or record. Source roots
-declare their owner, while each file carries its own shard/profile identity.
-
-Record IDs and translation keys are semantic identities, not file paths.
-Moving a record between shards must not change either identity.
-Catalog `sourceShard` fields use the stable shard ID; physical source-path
-renames therefore do not invalidate locale metadata.
+The manifest owns source ordering, source roots, external mounts,
+`sourceProfiles`, and auxiliary migration manifests. Source roots and
+auxiliary bundles declare their package owner explicitly.
 
 ## Compiler module boundaries
 
-`conversation_compiler.py` remains the stable orchestration and public API hub.
-Its filesystem boundary is `conversation_manifest.py`, shard-local contracts
-and merge rules are in `conversation_validation.py`, locale-key hydration is
-in `conversation_catalog.py`, and source assembly is in
-`conversation_assembly.py`. Runtime chunking/rendering, discovery/indexing,
-health evidence, and registry serialization are owned by
+`conversation_compiler.py` is the stable public orchestration API.
+`conversation_manifest.py` owns filesystem and manifest boundaries.
+`conversation_validation.py` owns shard-local contracts and merge rules.
+`conversation_catalog.py` owns locale hydration and inline-translation
+rejection. `conversation_assembly.py` owns semantic source assembly.
 `conversation_rendering.py`, `conversation_discovery.py`,
-`conversation_health.py`, and `conversation_registry.py` respectively.
-These modules are direct imports, not legacy bridges; there is one loader and
-one validation path.
+`conversation_health.py`, and `conversation_registry.py` own output
+rendering, indexing, health evidence, and registry serialization respectively.
+
+Modules import their direct owner; there is one loader and one validation path.
+No permanent compatibility shim or duplicate harness is part of the design.
 
 ## Translation model
 
 CodeBuilder authoring uses one complete, self-contained JSON catalog per
-locale. Runtime translation directories remain package-specific generated
-artifacts and are not the authoring source.
+locale. Runtime translation directories are package-specific generated
+artifacts, not authoring sources.
 
 ```json
 {
@@ -87,13 +68,27 @@ artifacts and are not the authoring source.
 }
 ```
 
-Locale validation requires EN, exact key parity, valid placeholders, stable
-source-shard references, and deterministic duplicate-key rejection. Missing
-non-English wording falls back to EN according to the runtime contract.
+## Legacy bundle migration
 
-## Migration boundary
+`legacy_bundle_catalog.py` is an offline CodeBuilder migration and
+materialization boundary. It discovers the former flat locale bundles,
+assigns deterministic bundle IDs, records owner/mod-ID metadata, merges their
+keys into the Core EN/TL catalogs, and renders package-owned runtime files.
 
-`conversation_shard_migration.py` is an offline, one-shot converter for the
-legacy envelope. It is dry-run safe and is not loaded by runtime code. After
-all source and external mounts are converted, the old envelope and inline
-provenance shape have no supported runtime reader.
+Generated legacy runtime paths are:
+
+```text
+<mod>/common/media/translation/<LANG>/Conversation/Legacy/<domain>/<audience>/<bundle>.json
+```
+
+PNC and Dynamic Trading runtime consumers read those generated paths through
+the renamed `PNC_ConversationTextCatalog` boundary. The former
+`media/conversation` trees are removed after parity and zero-reference
+checks; no runtime bridge remains.
+
+## Validation contract
+
+The migration gate requires deterministic catalog validation, JSON parity
+against every migrated source bundle, focused PNC and DT conversation smokes,
+Kahlua validation, and a real build through the Core compiler. P5 additionally
+requires composition validation for each dependency-closed mod selection.

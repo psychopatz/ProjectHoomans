@@ -2,7 +2,7 @@
 -- Keep this path and ConversationDebugUI namespace compatible with callers.
 require "PsychopatzCore/UI/PsychopatzUI"
 require "PsychopatzCore/UI/Conversation/PsychopatzConversationText"
-require "PNC/Conversation/Blocks/PNC_ConversationTextLoader"
+require "PNC/Conversation/Blocks/PNC_ConversationTextCatalog"
 require "PNC/Conversation/Debug/PNC_ConversationDebugModel"
 
 PNC.ConversationDebugUI = PNC.ConversationDebugUI or {}

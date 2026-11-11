@@ -11,14 +11,14 @@ local H = PNC.ConversationDebugModelInternal
 local copy = H.Copy
 local Registry = PNC.Conversation.Registry
 local Selector = PNC.Conversation.Selector
-local Loader = PNC.Conversation.TextLoader
+local Loader = PNC.Conversation.TextCatalog
 local SandboxContext = {}
 
 if not copy then return Model end
 
 local DEBUG_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/conversation/system/shared/{language}/debugger.json",
+    pathPattern = "media/translation/{language}/Conversation/Legacy/system/shared/debugger.json",
     domain = "pnc.system.shared.debugger",
 }
 

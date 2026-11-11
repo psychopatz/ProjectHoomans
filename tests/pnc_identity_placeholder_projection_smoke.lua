@@ -23,7 +23,7 @@ PsychopatzCore = {
 
 PNC = {
     Conversation = {
-        TextLoader = {
+        TextCatalog = {
             EnsureSource = function() return true end,
         },
     },

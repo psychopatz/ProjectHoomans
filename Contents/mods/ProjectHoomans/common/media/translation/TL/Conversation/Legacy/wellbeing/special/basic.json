@@ -1,0 +1,7 @@
+{
+  "choice.condition": "Kamusta ka na talaga?",
+  "choice.offer_help": "Hayaan mo akong tumulong.",
+  "opening": "Magiging tapat ako sa iyo, {playerFirstName}. Magtanong.",
+  "response.condition": "Mas mabuti na ngayong nandito ka na.",
+  "response.offer_help": "Sige. Manatiling malapit sa isang minuto."
+}

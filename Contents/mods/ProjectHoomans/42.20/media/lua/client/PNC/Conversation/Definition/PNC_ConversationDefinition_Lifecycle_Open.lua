@@ -44,10 +44,10 @@ function Conversation.HandleCeasefireResult(args)
     Conversation.lastCeasefireResult = args
     local source = {
         modID = "ProjectHoomans",
-        pathPattern = "media/conversation/greetings/hostile/{language}/parley.json",
+        pathPattern = "media/translation/{language}/Conversation/Legacy/greetings/hostile/parley.json",
         domain = "pnc.greetings.hostile.parley",
     }
-    Conversation.TextLoader.EnsureSource(source, {
+    Conversation.TextCatalog.EnsureSource(source, {
         "result.accepted", "result.rejected",
     })
     local value = PsychopatzCore.Conversation.Text.Resolve({

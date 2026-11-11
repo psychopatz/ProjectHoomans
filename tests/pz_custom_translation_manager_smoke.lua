@@ -222,7 +222,7 @@ T.falsy(string.find(localizedOrderReply or "", "I ", 1, true),
 
 local Loader = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Conversation/Blocks/PNC_ConversationTextLoader.lua")
+    "PNC/Conversation/Blocks/PNC_ConversationTextCatalog.lua")
 local Json = require "PsychopatzCore/Serialization/PsychopatzJson"
 local conversationManifest = Json.Decode(T.read(
     "ProjectHoomans", "common_mod",

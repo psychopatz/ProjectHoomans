@@ -1,6 +1,6 @@
 -- Conversation owns its compact durable event schema and selection metadata.
 -- Shared runtime registry for seed-derived backstories and compact gossip IDs.
-require "PNC/Conversation/Blocks/PNC_ConversationTextLoader"
+require "PNC/Conversation/Blocks/PNC_ConversationTextCatalog"
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
@@ -10,12 +10,12 @@ PNC.Conversation.Memory = Memory
 
 Memory.BACKSTORY_SOURCE = Memory.BACKSTORY_SOURCE or {
     modID = "ProjectHoomans",
-    pathPattern = "media/conversation/backstory/shared/{language}/facts.json",
+    pathPattern = "media/translation/{language}/Conversation/Legacy/backstory/shared/facts.json",
     domain = "pnc.backstory.shared.facts",
 }
 Memory.GOSSIP_SOURCE = Memory.GOSSIP_SOURCE or {
     modID = "ProjectHoomans",
-    pathPattern = "media/conversation/gossip/shared/{language}/templates.json",
+    pathPattern = "media/translation/{language}/Conversation/Legacy/gossip/shared/templates.json",
     domain = "pnc.gossip.shared.templates",
 }
 

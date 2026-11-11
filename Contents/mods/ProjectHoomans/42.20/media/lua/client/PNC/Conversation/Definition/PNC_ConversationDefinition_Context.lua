@@ -9,7 +9,7 @@ local IdentityPresentation = PNC.NPCIdentityPresentation
 local AddressResolver = PNC.Semantics
     and PNC.Semantics.AddressResolver
     or require "PNC/Semantics/PNC_SemanticAddressResolver"
-local Loader = Conversation.TextLoader
+local Loader = Conversation.TextCatalog
 
 if type(Addressing) ~= "table"
     or type(Addressing.ResolveForNPC) ~= "function"
@@ -27,7 +27,7 @@ end
 
 local SYSTEM_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/conversation/system/shared/{language}/categories.json",
+    pathPattern = "media/translation/{language}/Conversation/Legacy/system/shared/categories.json",
     domain = "pnc.system.shared.categories",
 }
 

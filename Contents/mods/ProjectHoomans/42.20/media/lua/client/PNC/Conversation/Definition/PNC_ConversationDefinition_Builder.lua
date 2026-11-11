@@ -12,10 +12,10 @@ if type(Conversation.Time) ~= "table"
 then
     pcall(require, "PNC/Conversation/PNC_ConversationTime")
 end
-if type(Conversation.TextLoader) ~= "table"
-    or type(Conversation.TextLoader.EnsureSource) ~= "function"
+if type(Conversation.TextCatalog) ~= "table"
+    or type(Conversation.TextCatalog.EnsureSource) ~= "function"
 then
-    pcall(require, "PNC/Conversation/Blocks/PNC_ConversationTextLoader")
+    pcall(require, "PNC/Conversation/Blocks/PNC_ConversationTextCatalog")
 end
 if type(Conversation.Backgrounds) ~= "table"
     or type(Conversation.Backgrounds.Get) ~= "function"

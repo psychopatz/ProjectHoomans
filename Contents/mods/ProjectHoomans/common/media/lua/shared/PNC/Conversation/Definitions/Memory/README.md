@@ -9,8 +9,8 @@ live under common.
 
 Each Lua module registers one fact with Memory.RegisterBackstory. Keep IDs and
 values stable, use a class of colonist, neutral, hostile, or shared, and add
-every text key to both common/media/conversation/backstory/shared/EN/facts.json
-and common/media/conversation/backstory/shared/TL/facts.json.
+every text key to both Core's EN and TL authoring catalogs under
+`tools/semantic_harness/codebuilder/sources/conversation/translations/`.
 
 The profile is selected from record.identity.seed with a separate salt for
 each fact kind. The selected job, hometown, education, hobby, family
@@ -36,8 +36,8 @@ Memory.BuildGossipPacket, whose payload contains the numeric code and only
 the argument array. Keep placeholders identical in both language bundles.
 
 Add new modules to GossipTemplates/00_PNC_ConversationGossipTemplates.lua.
-Text keys live in common/media/conversation/gossip/shared/EN/templates.json
-and common/media/conversation/gossip/shared/TL/templates.json.
+Text keys are declared by the generated legacy bundle manifest and materialized
+under `media/translation/<LANG>/Conversation/Legacy/`.
 
 ## Event memory
 

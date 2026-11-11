@@ -13,7 +13,7 @@ local ActorConversationContext = PNC.Semantics
 local Internal = Authority.Internal
 local Registry = PNC.Conversation.Registry
 local History = PNC.Conversation.History
-local TextLoader = PNC.Conversation.TextLoader
+local TextCatalog = PNC.Conversation.TextCatalog
 local InteractionPersistence = PNC.Conversation
     and PNC.Conversation.InteractionLifecyclePersistence or nil
 local personalRelationshipQueries = Internal.PersonalRelationshipQueries
@@ -138,13 +138,13 @@ function Authority.BuildContext(player, record, token)
         return History.Get(subjectID, { scope = scope }, context)
     end
     context.blockValidator = function(block)
-        return TextLoader.EnsureSource(
+        return TextCatalog.EnsureSource(
             block.textSource,
             Registry.CollectTextKeys(block)
         )
     end
     context.categoryValidator = function(categoryDefinition)
-        return TextLoader.EnsureSource(
+        return TextCatalog.EnsureSource(
             categoryDefinition.textSource,
             { categoryDefinition.labelKey }
         )

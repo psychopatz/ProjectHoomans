@@ -6,7 +6,7 @@ local WINDOW = T.path("ProjectHoomans", "client", "")
 package.preload["PsychopatzCore/UI/PsychopatzUI"] = function() return true end
 package.preload["PsychopatzCore/UI/Conversation/PsychopatzConversationText"] =
     function() return true end
-package.preload["PNC/Conversation/Blocks/PNC_ConversationTextLoader"] =
+package.preload["PNC/Conversation/Blocks/PNC_ConversationTextCatalog"] =
     function() return true end
 
 local function button(definition)
@@ -112,7 +112,7 @@ PsychopatzCore = {
 UIFont = { Small = 1 }
 PNC = {
     Conversation = {
-        TextLoader = { EnsureSource = function() end },
+        TextCatalog = { EnsureSource = function() end },
     },
     Client = { CanUseDebug = function() return true end },
 }

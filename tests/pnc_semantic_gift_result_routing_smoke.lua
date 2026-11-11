@@ -62,7 +62,7 @@ PNC = {
             },
         },
         Registry = { GetBlock = function() return nil end },
-        TextLoader = { EnsureSource = function() return true end },
+        TextCatalog = { EnsureSource = function() return true end },
     },
     Semantics = {
         GiftLifecycle = {

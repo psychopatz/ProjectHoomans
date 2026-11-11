@@ -1,4 +1,4 @@
-require "PNC/Conversation/Blocks/PNC_ConversationTextLoader"
+require "PNC/Conversation/Blocks/PNC_ConversationTextCatalog"
 local DialogueSession = require "PNC/Semantics/PNC_SemanticDialogueSession"
 
 PNC = PNC or {}
@@ -12,14 +12,14 @@ local Internal = Composer.Internal
 local Registry = Conversation.Registry
 local Selector = Conversation.Selector
 local Rules = Conversation.Rules
-local Loader = Conversation.TextLoader
+local Loader = Conversation.TextCatalog
 local Diary = Conversation.Diary
 Composer.requestSerial = tonumber(Composer.requestSerial) or 0
 Composer.localRequests = Composer.localRequests or {}
 
 local SYSTEM_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/conversation/system/shared/{language}/categories.json",
+    pathPattern = "media/translation/{language}/Conversation/Legacy/system/shared/categories.json",
     domain = "pnc.system.shared.categories",
 }
 local function activeView(npcID)
