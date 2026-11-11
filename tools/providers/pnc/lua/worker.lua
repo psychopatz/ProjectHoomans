@@ -36,26 +36,6 @@ local packagePaths = {
     path(repository, "tools/providers/pnc/lua/?.lua"),
     package.path,
 }
-if dynamicTradingRuntime then
-    packagePaths[#packagePaths + 1] = path(
-        dynamicTradingRepository,
-        "Contents/mods/DTCommon/" .. dynamicTradingRuntime
-            .. "/media/lua/shared/?.lua"
-    )
-    packagePaths[#packagePaths + 1] = path(
-        dynamicTradingRepository,
-        "Contents/mods/DTCommon/common/media/lua/shared/?.lua"
-    )
-    packagePaths[#packagePaths + 1] = path(
-        dynamicTradingRepository,
-        "Contents/mods/DTHoomans/" .. dynamicTradingRuntime
-            .. "/media/lua/shared/?.lua"
-    )
-    packagePaths[#packagePaths + 1] = path(
-        dynamicTradingRepository,
-        "Contents/mods/DTHoomans/common/media/lua/shared/?.lua"
-    )
-end
 package.path = table.concat(packagePaths, ";")
 
 local ProviderLoader = require "worker/ProviderLoader"
@@ -92,9 +72,25 @@ local launch = LaunchMetadata.read({
     providers = { "PsychopatzCore", "ProjectHoomans" },
     materializationMode = "physical",
 })
+ProviderLoader.installActivationGlobals(launch.providers)
+local bootstrapLogs = {}
+print = function(...)
+    bootstrapLogs[#bootstrapLogs + 1] = table.concat({ ... }, " ")
+end
+require "PsychopatzCore/Composition/PC_SharedComposition"
+ProviderLoader.extendRuntimePackagePaths(
+    packagePaths,
+    providerLaunch.runtimeBootstraps
+)
+package.path = table.concat(packagePaths, ";")
+local runtimeLoad, runtimeLoadReason = ProviderLoader.loadRuntime(providerLaunch)
+if not runtimeLoad then
+    error(runtimeLoadReason)
+end
 Runtime.launchProfile = launch.profile
 Runtime.launchProviders = launch.providers
 Runtime.launchMaterializationMode = launch.materializationMode
+Runtime.providerBootstrapLogs = bootstrapLogs
 local Context = {
     repository = repository,
     coreRepository = coreRepository,
@@ -103,6 +99,8 @@ local Context = {
     hoomansRuntime = hoomansRuntime,
     coreRuntime = coreRuntime,
     Runtime = Runtime,
+    activeProviders = launch.providers,
+    runtimeBootstraps = runtimeLoad,
     RuntimeState = RuntimeState,
     Protocol = Protocol,
     Values = Values,
@@ -124,6 +122,7 @@ local Context = {
     EngineFacts = nil,
     EngineEvents = nil,
 }
+Runtime.loadedRuntimeBootstraps = runtimeLoad
 
 local providerCallbacks = {
     buildContext = function(context)
@@ -166,6 +165,7 @@ if not semanticExecution then
 end
 Context.ProviderRuntime = providerRuntime
 Context.SemanticExecution = semanticExecution
+Runtime.scenario = Values.copy(ScenarioSession.initialScenario)
 
 ScenarioSession.configureRuntime(Context)
 ProductionModules.load(Context)

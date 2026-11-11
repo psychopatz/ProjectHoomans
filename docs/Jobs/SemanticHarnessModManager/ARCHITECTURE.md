@@ -1,28 +1,31 @@
-# Architecture — Modular Semantic Harness and Mod Manager
+# Architecture — Modular Semantic Harness Mod Manager
 
 ## Ownership
 
-PsychopatzCore owns reusable mechanisms: manifest discovery, schema
-validation, selection resolution, dependency/conflict checks, activation-plan
-serialization, capability routing, generic workers, diagnostics, and the CLI.
+PsychopatzCore owns provider-neutral manifest discovery, schema validation,
+dependency/conflict resolution, activation-plan serialization, capability
+routing, live shared-runtime bootstrap loading, generic workers, diagnostics,
+CLI, and GUI selection.
 
-Providers own domain policy and content: Project Hoomans semantic behavior and
-world discovery, Dynamic Trading merchant/trader behavior, and future
-expansion-specific capabilities.
+Providers own domain policy and content. Project Hoomans owns conversation,
+identity, suggestions, and world-discovery policy. Dynamic Trading owns its
+common, abstract, and Hoomans trading policy. Future expansions contribute
+manifests instead of adding Core conditionals.
 
-Core must not contain product-specific branches for Project Hoomans, Dynamic
-Trading, or future provider IDs. Presets are data, not Python conditionals.
+## Activation contract
 
-## Contracts
-
-The manager produces one deterministic activation plan consumed by Python and
-Lua:
+The manager emits one deterministic plan consumed by Python and Lua:
 
 ```json
 {
   "schema": "semantic.harness.activation.v1",
   "enabled": ["PsychopatzCore", "ProjectHoomans", "DTCommon", "DTHoomans"],
   "loadOrder": ["PsychopatzCore", "ProjectHoomans", "DTCommon", "DTHoomans"],
+  "runtimeBootstraps": [
+    {"providerID": "PsychopatzCore", "id": "PsychopatzCore.shared"},
+    {"providerID": "DTCommon", "id": "DTCommon.shared"},
+    {"providerID": "DTHoomans", "id": "DTHoomans.shared"}
+  ],
   "routes": {
     "semantic.conversation": "ProjectHoomans",
     "semantic.identity": "ProjectHoomans",
@@ -32,26 +35,24 @@ Lua:
 }
 ```
 
-Provider manifests declare stable provider ID, display name, dependencies,
-optional dependencies, conflicts, capabilities, entrypoints, materialization
-modes, route claims, and discovery metadata. Provider IDs are not inferred
-from directory order.
+Provider manifests declare stable IDs, dependencies, conflicts, capabilities,
+route claims, materialization modes, module paths, and required live bootstrap
+entrypoints. The resolver expands those paths against the selected repository
+checkouts and rejects missing required files before worker startup.
 
-## Required selections
+## Required compositions
 
-- Core only: `PsychopatzCore`
-- Project Hoomans: Core + `ProjectHoomans`
-- DTAbstract: Core + `DTCommon` + `DTAbstract`
-- Project Hoomans + DTHoomans: Core + `ProjectHoomans` + `DTCommon` + `DTHoomans`
-- Custom selections: any manifest-compatible future expansion combination.
+- Project Hoomans: Core + `ProjectHoomans`.
+- DTAbstract: Core + `DTCommon` + `DTAbstract`.
+- Project Hoomans with DTHoomans: Core + `ProjectHoomans` + `DTCommon` + `DTHoomans`.
+- Future combinations: manifest-compatible custom selections.
 
-`combined` may remain a compatibility alias, but it must resolve to an
-explicit selection and must not be claimed by individual providers.
+PsychopatzCore is infrastructure, not a standalone harness profile. The old
+provider-registry, profile-loader, and adopter-registration paths are removed;
+manifests and `ModManager` are the single composition path. Runtime activation
+does not copy fixtures or use scenario `availableMods` as a substitute for the
+selected dependency graph.
 
-## Failure policy
-
-Required dependency, schema, conflict, route, or load-order failures reject a
-selection before worker startup. Optional provider failures produce a bounded
-degraded diagnostic and leave unrelated providers usable. Activation is
-validate -> prepare -> activate -> commit; a failed activation cannot leave a
-partial route table.
+Required dependency, schema, conflict, route, and bootstrap failures reject a
+selection before worker startup. Optional provider failures remain bounded and
+are reported through the normal handshake.

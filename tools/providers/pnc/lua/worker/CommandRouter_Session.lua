@@ -55,6 +55,8 @@ function Session.hello(context)
             and context.ProviderRuntime.routes or {},
         activationPlan = context.ProviderRuntime
             and context.ProviderRuntime.activationPlan or nil,
+        runtimeBootstraps = Runtime.loadedRuntimeBootstraps,
+        providerBootstrapLogs = Runtime.providerBootstrapLogs,
         capabilities = capabilities,
         loadedModules = Runtime.loadedModules,
         moduleManifest = Runtime.moduleManifest,
@@ -182,6 +184,8 @@ function Session.handle(context, command, payload)
             profile = Runtime.launchProfile,
             providers = Runtime.launchProviders,
             materializationMode = Runtime.launchMaterializationMode,
+            runtimeBootstraps = Runtime.loadedRuntimeBootstraps,
+            providerBootstrapLogs = Runtime.providerBootstrapLogs,
             capabilities = capabilities,
             loadedModules = Runtime.loadedModules,
             moduleManifest = Runtime.moduleManifest,

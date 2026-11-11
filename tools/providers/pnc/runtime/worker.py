@@ -84,7 +84,7 @@ class LuaSemanticWorker(SemanticWorker):
             scenario,
             effective_launch_spec,
             activity_log=activity_log,
-            import_source_on_start=self.config.profile != "core",
+            import_source_on_start=True,
         )
         self._authoring = WorkerAuthoringOperations(self)
         self._conversation = WorkerConversationOperations(self)
@@ -701,8 +701,6 @@ class LuaSemanticWorker(SemanticWorker):
 
     def capabilities(self) -> dict[str, Any]:
         capabilities = self._request("CAPABILITIES")
-        if self.config.profile == "core":
-            return capabilities
         # Keep the capability handshake bounded as the generated production
         # catalog grows. The catalog remains available through the same
         # production FlowEditor seam, but is fetched as its own bounded
@@ -724,8 +722,6 @@ class LuaSemanticWorker(SemanticWorker):
 
         self.runtime.close()
         self.runtime.start()
-        if self.config.profile == "core":
-            return self.capabilities()
         source = self.source_snapshot.to_dict()
         return self.import_source(
             source["data"],

@@ -4,199 +4,71 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P5-C"
-phase_commit_message: "phase(P5-C): docs: record P5-C test ownership checkpoint"
-phase_commit_vector: "project-hoomans=self;psychopatz-core=0690ee9ff1406298123ee60522ee4dddf459b2d2;dynamic-trading=0bd7b1472f6b921275f136f9a0900bacd2eb2e3d"
-phase_residual_vector: "project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
-residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
-codebase_memory_indexed_commit: "d1da19d15426956852ddf4e0d9517f028797b541"
-updated_at: "2026-11-10T02:21:44.450032Z"
-state: "USER_ACCEPTANCE"
-parent_status: "IN_PROGRESS"
-phase: "P5"
-chunk: "P5-C"
+phase_commit_phase: "P6"
+phase_commit_message: "phase(P6): complete live Core-backed semantic compositions"
+phase_commit_vector: "project-hoomans=self;psychopatz-core=f6096eeb8617ae10d79ec18a3894929c62eb1f29;dynamic-trading=f77ca2f52fd36c571ced04b5b4204f975b1bf1af"
+phase_residual_vector: "project-hoomans=e5db3fd088b4fd119d9c786d7ffbcb06721b1ee3a96e757e3192f2256795b7f4;psychopatz-core=cede79004bafdbf72349204affa4e0a500aa778ec1c92b4fd7115aed1acd737f;dynamic-trading=83003f8c81e085093442d12dbe0a57a49f66dcb218dd080dc85791fd7fa12655"
+residual_worktree_fingerprint: "e5db3fd088b4fd119d9c786d7ffbcb06721b1ee3a96e757e3192f2256795b7f4"
+codebase_memory_indexed_commit: "5bdcacc31dab7c49d5bd14294739b2467699098d"
+updated_at: "2026-11-11T09:17:39.230645Z"
+state: "CLEAN_CHECKPOINT"
+parent_status: "COMPLETE"
+phase: "USER_ACCEPTANCE"
+chunk: "native SP/MP acceptance is user-owned"
 retrieval_tier: "verify"
 ---
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Handoff — Semantic Harness Core Migration
+# Session Handoff
 
 ## What became true
 
-P3-C moves the generic worker-client configuration seam into Core. Core's
-`WorkerLaunchSpec` can consume validated profile metadata and emits the
-neutral `SEMANTIC_HARNESS_*` launch environment. Core's process lifecycle
-remains the only implementation of transport, correlation, bounded errors,
-and shutdown handling.
+- Core is infrastructure injected into every product composition; it is not a
+  standalone preset or custom selection.
+- The live manifest path resolves and loads the real shared-runtime entrypoints
+  for PNC, DTAbstract, and PNC with DTHoomans.
+- Project Hoomans and Dynamic Trading no longer carry the deleted semantic
+  harness registry/profile/adopter-registration shims.
 
-Project Hoomans keeps provider policy local: repository/runtime discovery,
-physical worker selection, private environment aliases, worker arguments,
-scenario defaults, and production-module registration. Its
-`build_worker_launch_spec()` adapter now creates Core's launch spec directly.
+## Remaining
 
-All production and test callers now import Core directly for process,
-protocol, and serialized session mechanics. The unreferenced Hoomans facade
-files `runtime/process.py`, `runtime/protocol.py`, and
-`runtime/worker_session.py` were deleted. Remaining Hoomans scenario,
-activity, configuration, UI, and production-policy modules are intentional
-adopter surfaces or compatibility boundaries for the next chunk.
-
-DynamicTrading remains optional and owns only its declarative provider
-manifest, DTCommon merchant policy, DTAbstract abstract capability, and
-DTHoomans physical capability. Core does not import DynamicTrading or
-Project Hoomans.
-
-## P3-E result
-
-Hoomans includes DTCommon/DTHoomans in launch metadata only when the optional
-DynamicTrading runtime is discovered. DynamicTrading's abstract and physical
-profile selections both round-trip through Core `WorkerLaunchSpec` with the
-same neutral environment contract.
-
-## P4-A result
-
-The import-zero audit removed the remaining pure Hoomans activity/state and
-CodeBuilder naming/translation facades plus duplicate generic tests. Remaining
-Hoomans runtime/Lua modules are provider policy, save/profiler ingestion,
-authoring, or physical-worker integration and require a separate behavior
-contract before any further move.
-
-## P4-D result
-
-The active native log exposed two concrete migration defects. Hoomans records
-were created without a canonical Core actor, so social synchronization returned
-`core_actor_not_found`; partially migrated Hoomans world records could then
-reference factions absent from Core, so group commits returned
-`survivor_world_group_faction_missing`.
-
-The phase implementation adds Core's idempotent actor ensure seam, Hoomans
-actor adoption at lifecycle and affiliation boundaries, and an additive
-Hoomans SurvivorWorld repair ordered as factions, locations, communities, then
-groups. Existing Core records are not overwritten. Fresh native confirmation is
-not claimed yet.
+- Native Project Zomboid SP/MP validation remains user-owned and was not
+  launched by this developer-side phase.
 
 ## Resume
 
-1. Verify the committed P5-C developer-side checkpoint across Core,
-   DynamicTrading, and Hoomans.
-2. Hand the P5-C native SP/MP matrix to the user with the running game/save
-   authority.
-3. Keep native Project Zomboid validation user-owned unless explicitly
-   requested.
+Use the live composition smoke commands and the Core/PNC focused test slices
+before changing the manifest contract.
+
+Exact next action:
+
+1. If native acceptance is requested, run the SP/MP composition matrix against
+   real saves.
+2. Otherwise continue future expansions by adding provider manifests and
+   selecting them through the shared Core manager.
 
 ## Evidence
 
-- `CODE_VERIFIED`: Core owns neutral launch metadata and optional-adopter
-  loading; Hoomans has no remaining callers of the three deleted runtime
-  paths.
-- `TEST_VERIFIED`: Core 46/46, DynamicTrading provider tests 5/5, Hoomans
-  runtime/provider slice 11/11, affected Hoomans integration tests 2/2, DT
-  Lua adapter smoke, and direct Lua load checks.
-- `STATIC_ONLY`: native Project Zomboid behavior and full SP/MP provider
-  traversal remain unverified.
-- `UNVERIFIED`: native Project Zomboid SP/MP behavior remains user-owned.
-- No Workshop publication is claimed.
+- `CODE_VERIFIED`: Core manifest manager and runtime bootstrap contract.
+- `TEST_VERIFIED`: Core semantic harness 55 tests; PNC runtime configuration 4
+  tests; changed Lua syntax checks.
+- `RUNTIME_VERIFIED`: `run_harness.sh` loaded the live bootstrap entries for
+  `pnc`, `dtabstract`, and `pnc-with-dthoomans`.
+- `UNVERIFIED`: native Project Zomboid SP/MP behavior.
 
-## P4-B result
+## Expensive discoveries worth preserving
 
-The final ownership inventory is recorded in
-`P4B_OWNERSHIP_AUDIT.md`. Core has no adopter imports, deleted Hoomans
-Core-only paths are absent, and the focused developer-side gates pass. The
-remaining unverified work is native SP/MP acceptance of restart persistence,
-optional-mod toggles, nearby physical materialization, abstract traversal,
-and cross-provider conversation/trade behavior.
+- Runtime bootstrap paths must be resolved from the selected repository roots;
+  scenario `availableMods` is not an activation source.
+- The PNC + DTHoomans composition loads DTCommon before DTHoomans and lets Core
+  own both the dependency order and live shared entrypoint execution.
 
-## P4-E result
+## Blockers / open decisions
 
-PsychopatzCore now owns the provider-neutral high-level `SemanticWorker`
-facade for process startup, source snapshots, working-world state,
-reset/reload/restart, and generic request/status/capability access. Hoomans
-`LuaSemanticWorker` subclasses it and retains only Hoomans scenario policy,
-fixture provenance, bounded save/registry/item side requests, and semantic
-operation spokes. Core suite 38/38 and Hoomans worker/runtime slice 16/16 pass.
+- None for the developer-side harness objective.
 
-## P4-F result
+## Acceptance
 
-Core now owns the provider-neutral engine fixture, health, item catalog,
-profiler projection, and native player decoder modules. Hoomans retains only
-thin adapters for PNC identity matching and Project Hoomans profiler aliases;
-remaining Hoomans runtime modules are save, scenario, physical-worker,
-authoring, knowledge, and provider-policy code. Core generic projection
-modules contain no adopter identifiers. Core 43/43 and the Hoomans
-engine-projection/worker slice 23 tests passed, with environment-dependent
-skips.
-
-## P5-A result
-
-The developer-side cross-provider matrix passed: Core profile/worker/process/
-registry/layout checks 15/15; Hoomans optional-provider and real-Lua checks
-8/8; DynamicTrading provider-adapter checks 4/4; and the DynamicTrading Lua
-semantic-execution adapter smoke passed. Core-only, Hoomans, DTAbstract, and
-DTHoomans metadata paths are covered. No native Project Zomboid process was
-launched.
-
-## Residual findings
-
-The broader Hoomans `test_harness` suite retains the previously documented
-three unrelated translation/identity catalog failures: false-name response
-disclosure, Tagalog identity translation, and Tagalog identity/self-reflection
-catalog use. They are outside this migration boundary.
-
-## P5-B result
-
-PsychopatzCore now owns the optional-adopter worker loading seam.
-`WorkerLaunchSpec` emits neutral module-path, module-name, and
-execution-provider metadata. The Core Lua worker loads only the modules named
-by that metadata, validates their Core `SemanticExecution` result, advertises
-the loaded descriptions, and dispatches generic `SEMANTIC_PROVIDER` operations.
-Empty metadata preserves the standalone Core worker.
-
-DynamicTrading supplies `provider_worker_launch_values()` as its thin adapter.
-Actual DTAbstract and DTHoomans modules load through the same Core worker and
-receive the same operation dispatch; only `abstract` versus `physical`
-materialization differs. No native Project Zomboid process was launched.
-
-## P5-C developer-side test ownership result
-
-The provider-neutral fixture-field assertion now lives in Core's
-`test_engine_projections.py`. Hoomans' duplicate offline fixture contract and
-pure `HarnessWorkingWorld` snapshot-model test were removed after the Core
-contract suite passed. Hoomans retains the snapshot/fixture tests that start
-the real Hoomans Lua worker and exercise PNC integration. Core passed 46/46;
-the affected Hoomans integration tests passed 2/2.
-
-Commits: Core `0690ee9`; Hoomans `ceae0578`. DynamicTrading required no code
-change for this test-ownership slice.
-
-## P5-C preparation
-
-The executable native acceptance checklist is
-`P5C_NATIVE_ACCEPTANCE_RUNBOOK.md`. It covers Core-only bootstrap, Hoomans
-physical materialization, DTHoomans shared identity/conversation/trade,
-DTAbstract abstract traversal, independent adopter toggles, restart persistence,
-and native multiplayer authority/reconnect. It is explicitly user-owned and
-currently **UNVERIFIED**; no native Project Zomboid process was launched by
-this phase.
-
-## Next
-
-P5-C is the user-owned native SP/MP matrix: restart persistence, independent
-mod toggles, nearby DTHoomans materialization, DTAbstract abstract traversal,
-and shared conversation/trade behavior. The parent goal remains in progress.
+The developer-side phase is accepted when this handoff is committed with the
+participant commit vector and verification passes. Native game acceptance is a
+separate user-owned condition.

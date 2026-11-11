@@ -102,9 +102,16 @@ function ModFiles.configure(context)
     getActivatedMods = function()
         return {
             contains = function(_, modID)
-                local available = context.runtime
-                    and context.runtime.availableMods or {}
-                return available[tostring(modID or "")] == true
+                local wanted = tostring(modID or "")
+                for _, providerID in ipairs(context.activeProviders or {}) do
+                    if tostring(providerID) == wanted then return true end
+                end
+                local launchProviders = context.Runtime
+                    and context.Runtime.launchProviders or {}
+                for _, providerID in ipairs(launchProviders) do
+                    if tostring(providerID) == wanted then return true end
+                end
+                return false
             end,
         }
     end

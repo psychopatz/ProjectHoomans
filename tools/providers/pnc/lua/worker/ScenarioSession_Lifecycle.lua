@@ -130,9 +130,15 @@ local function install(ScenarioSession)
             and type(context.ProductionModules.loadOptional) == "function"
         then
             local loaded, reason = context.ProductionModules.loadOptional(context)
+            local dynamicTradingSelected = false
+            for _, providerID in ipairs(context.activeProviders or {}) do
+                if tostring(providerID) == "DTHoomans" then
+                    dynamicTradingSelected = true
+                    break
+                end
+            end
             Runtime.dynamicTradingLoad = {
-                requested = runtime.availableMods
-                    and runtime.availableMods.DTHoomans == true or false,
+                requested = dynamicTradingSelected,
                 loaded = loaded == true,
                 reason = reason,
                 logs = Values.copy(Runtime.productionLogs),

@@ -266,63 +266,40 @@ end
 
 function ProductionModules.loadOptional(context)
     local Runtime = context.Runtime
-    local runtime = Runtime.scenario and Runtime.scenario.runtime or {}
-    local mods = runtime.availableMods or {}
-    local index
-    local handle
-    local ok
-    local reason
-    local previousPrint
     local npc
     local traderService
     local traderID
 
-    if mods.DTHoomans ~= true then
-        return false, "disabled"
+    local selected = false
+    for _, providerID in ipairs(context.activeProviders or {}) do
+        if tostring(providerID) == "DTHoomans" then
+            selected = true
+            break
+        end
     end
-    local runtimeVersion = context.dynamicTradingRuntime
-    if not runtimeVersion then
-        return false, "runtime_unavailable"
+    if not selected then
+        return false, "not_selected"
     end
-    local repository = context.dynamicTradingRepository
-    local sharedRoot = repository
-        .. "/Contents/mods/DTCommon/" .. runtimeVersion .. "/media/lua/shared"
-    local hoomansRoot = repository
-        .. "/Contents/mods/DTHoomans/" .. runtimeVersion .. "/media/lua/shared"
-    local files = {
-        sharedRoot .. "/DTCommon/00_DTCommon_Init.lua",
-        hoomansRoot .. "/DTHoomans/00_DTHoomans_Init.lua",
-    }
     if Runtime.dynamicTradingLoaded then
         return true, "already_loaded"
     end
-    for index = 1, #files do
-        handle = io.open(files[index], "rb")
-        if not handle then
-            return false, "missing_dependency_file"
+
+    local runtimeEntries = Runtime.loadedRuntimeBootstraps
+        and Runtime.loadedRuntimeBootstraps.entries or {}
+    local bootstrapLoaded = false
+    for _, entry in ipairs(runtimeEntries) do
+        if tostring(entry.providerID or "") == "DTHoomans" then
+            bootstrapLoaded = true
+            break
         end
-        handle:close()
+    end
+    if not bootstrapLoaded then
+        return false, "runtime_bootstrap_not_loaded"
     end
 
-    previousPrint = print
-    print = function(...)
-        Runtime.productionLogs = Runtime.productionLogs or {}
-        Runtime.productionLogs[#Runtime.productionLogs + 1] = {
-            level = "INFO",
-            message = table.concat({ ... }, " "),
-        }
-    end
-    ok, reason = pcall(function()
-        dofile(files[1])
-        dofile(files[2])
-    end)
-    print = previousPrint
-    if not ok then
-        error("optional Dynamic Trading load failed: " .. tostring(reason))
-    end
-    -- Optional semantic packs register capabilities after the worker's
-    -- startup catalog pass. Re-run the existing catalog owner so the newly
-    -- loaded Dynamic Trading action is discoverable through the normal
+    -- The Core activation plan already loaded DTCommon and DTHoomans from
+    -- their live shared entrypoints. Re-run the existing catalog owner so the
+    -- newly loaded Dynamic Trading action is discoverable through the normal
     -- provider lane; do not synthesize a worker-side candidate.
     local capabilityCatalog = PNC and PNC.Semantics
         and PNC.Semantics.CapabilityCatalog or nil

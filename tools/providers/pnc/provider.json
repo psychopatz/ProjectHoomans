@@ -8,6 +8,7 @@
       "displayName": "Project Hoomans",
       "repositoryKind": "project_hoomans",
       "requires": ["PsychopatzCore"],
+      "conflicts": ["DTAbstract"],
       "capabilities": [
         "semantic.conversation",
         "semantic.identity",
@@ -42,6 +43,5 @@
       "workerPriority": 100
     }
   ],
-  "pythonProvider": "tools.providers.pnc.provider_adapters:register_pnc_profiles",
   "conversationManifest": "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
 }

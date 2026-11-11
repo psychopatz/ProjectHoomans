@@ -51,28 +51,6 @@ class RuntimeConfigTests(unittest.TestCase):
                 "42.20",
             )
 
-    def test_core_profile_selects_core_worker_without_hoomans_runtime(self) -> None:
-        config = HarnessConfig.discover(
-            repository=REPOSITORY,
-            core_repository=CORE_REPOSITORY,
-            lua_bin="lua",
-            profile="core",
-        )
-
-        self.assertEqual(config.profile, "core")
-        self.assertNotIn("ProjectHoomans", config.provider_ids)
-        self.assertNotIn(
-            "ProjectHoomans",
-            (config.activation_plan or {}).get("repositories", {}),
-        )
-        self.assertEqual(
-            config.worker_script,
-            (
-            CORE_REPOSITORY
-            / "tools/semantic_harness/lua/worker.lua"
-            ).resolve(),
-        )
-
     def test_pnc_profile_uses_core_launch_metadata(self) -> None:
         config = HarnessConfig.discover(
             repository=REPOSITORY,
@@ -83,9 +61,8 @@ class RuntimeConfigTests(unittest.TestCase):
         spec = build_worker_launch_spec(config)
         self.assertIn("PsychopatzCore", spec.provider_ids)
         self.assertIn("ProjectHoomans", spec.provider_ids)
-        if "DTCommon" in config.provider_ids:
-            self.assertIn("DTCommon", spec.provider_ids)
-            self.assertIn("DTHoomans", spec.provider_ids)
+        self.assertNotIn("DTCommon", config.provider_ids)
+        self.assertNotIn("DTHoomans", config.provider_ids)
         self.assertEqual(spec.materialization_mode, "physical")
         self.assertEqual(
             spec.neutral_environment()["SEMANTIC_HARNESS_MATERIALIZATION_MODE"],
