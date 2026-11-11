@@ -91,7 +91,7 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
             current = service.load_dialogue_content(content_id)
             self.assertEqual(
                 current["sourceShard"],
-                "content/social/interaction/argument_retaliate.json",
+                "content/social/interaction/argument/retaliate.json",
             )
             edited = deepcopy(current)
             edited["styles"]["neutral"][0]["translations"]["EN"] = (
@@ -128,7 +128,7 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
                 (
                     repository
                     / CONVERSATION_SOURCE_RELATIVE
-                    / "content/social/interaction/argument_retaliate.json"
+                    / "content/social/interaction/argument/retaliate.json"
                 ).read_text(encoding="utf-8")
             )
             for family in source["phraseFamilies"]:

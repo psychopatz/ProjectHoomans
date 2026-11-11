@@ -15,8 +15,9 @@ from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 MANIFEST = (
-    REPOSITORY
+    CORE_REPOSITORY
     / "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
 )
 WELLBEING_IDS = (
@@ -104,17 +105,26 @@ class WellbeingWordingShardTests(unittest.TestCase):
         model = compile_conversation_sources(
             REPOSITORY, manifest_path=MANIFEST,
         )
-        entry = next(
+        wellbeing_paths = {
+            "content/wellbeing/general.json",
+            "content/wellbeing/needs.json",
+            "content/wellbeing/emotional.json",
+        }
+        entries = [
             shard for shard in model["shards"]
-            if shard["path"] == "content/wellbeing.json"
-        )
-        self.assertEqual(entry["domain"], "wellbeing")
+            if shard["path"] in wellbeing_paths
+        ]
+        self.assertEqual({entry["domain"] for entry in entries}, {"wellbeing"})
         self.assertEqual(
             {
                 model["locations"]["phrase." + template_id]["sourceShard"]
                 for template_id in WELLBEING_IDS
             },
-            {"content/wellbeing.json"},
+            {
+                "content/wellbeing/general.json",
+                "content/wellbeing/needs.json",
+                "content/wellbeing/emotional.json",
+            },
         )
         self.assertEqual(
             [

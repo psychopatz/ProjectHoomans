@@ -161,12 +161,12 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
             shutil.copytree(CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE, source_root)
             path = (
                 source_root
-                / "content/social/interaction/argument_retaliate.json"
+                / "content/social/interaction/argument/retaliate.json"
             )
             document = json.loads(path.read_text(encoding="utf-8"))
             document["phraseFamilies"][0]["styles"]["neutral"][0][
-                "translations"
-            ]["XX"] = "Synthetic interaction wording."
+                "XX"
+            ] = "Synthetic interaction wording."
             path.write_text(
                 json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True)
                 + "\n",

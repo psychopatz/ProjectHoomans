@@ -14,8 +14,9 @@ from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 MANIFEST = (
-    REPOSITORY
+    CORE_REPOSITORY
     / "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
 )
 APOLOGY_IDS = (

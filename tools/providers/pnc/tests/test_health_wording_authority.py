@@ -14,8 +14,9 @@ from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 MANIFEST = (
-    REPOSITORY
+    CORE_REPOSITORY
     / "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
 )
 HEALTH_IDS = (
@@ -111,7 +112,14 @@ class HealthWordingShardTests(unittest.TestCase):
         self.assertEqual(set(owned), set(HEALTH_IDS))
         for item in owned.values():
             self.assertEqual(item["conversationDomain"], "health")
-            self.assertEqual(item["sourceShard"], "content/health.json")
+            expected_source = (
+                "content/health/health_state.json"
+                if item["semanticTemplateID"].startswith(
+                    "semantic.question.health_state."
+                )
+                else "content/health/medical_bite.json"
+            )
+            self.assertEqual(item["sourceShard"], expected_source)
             self.assertEqual(item["group"], "facts")
             self.assertEqual(set(item["styles"]), set(STYLES))
             self.assertTrue(all(10 <= len(item["styles"][style]) <= 16 for style in STYLES))
