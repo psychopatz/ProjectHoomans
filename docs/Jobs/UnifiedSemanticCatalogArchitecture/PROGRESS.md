@@ -3,8 +3,8 @@
 **Status:** COMPLETE
 **Primary repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`
 **Participants:** PsychopatzCore, DynamicTrading
-**Current phase:** P5 — composition-matrix and harness acceptance
-**Accepted slices:** P0A, P0B, P1A, P1B, P1C, P2A, P2B, P3A, P3B, P3C, P3D, P3E, P4A, P4B, P4C, P5A
+**Current phase:** Canonical conversation bundle cleanup
+**Accepted slices:** P0A, P0B, P1A, P1B, P1C, P2A, P2B, P3A, P3B, P3C, P3D, P3E, P4A, P4B, P4C, P5A, canonical cleanup
 **Next chunk:** none — all goal gates are complete.
 
 ## Verified baseline
@@ -80,3 +80,16 @@
 - The doctor regression was fixed and covered by Core’s 93/93 unittest suite.
 
 The unified semantic catalog architecture and harness migration are complete.
+
+## Accepted canonical cleanup
+
+- Core now renders `conversation_bundles.json` through
+  `conversation_bundle_catalog.py`; migration-only catalog modules and tests
+  were removed.
+- Runtime bundles are named and routed under `Conversation/Bundles/` in
+  Project Hoomans and Dynamic Trading, with no source references to the former
+  path or identifiers.
+- Unused Python projection aliases were removed, and Dynamic Trading uses only
+  `ExecuteTradeBasket`; single-row command input is normalized before it
+  reaches the service.
+- The Core, PNC, and DT focused verification gates remain green after cleanup.
