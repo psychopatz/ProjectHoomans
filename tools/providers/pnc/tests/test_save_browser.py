@@ -10,7 +10,7 @@ import time
 import tkinter as tk
 import unittest
 
-from tools.semantic_harness.cli import _parser
+from tools.semantic_harness.entrypoints.cli import _parser
 from tools.semantic_harness.runtime.save_browser import SavedWorldBrowser
 from tools.semantic_harness.runtime.state_providers import SemanticStateCatalog
 from tools.providers.pnc.tests.test_save_catalog import pz_file

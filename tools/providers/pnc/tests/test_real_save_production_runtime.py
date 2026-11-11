@@ -10,7 +10,7 @@ from pathlib import Path
 import unittest
 from contextlib import redirect_stdout
 
-from tools.semantic_harness.cli import _parser, cli
+from tools.semantic_harness.entrypoints.cli import _parser, cli
 from tools.semantic_harness.inspection.conversation_inspector import (
     build_conversation_inspector,
 )

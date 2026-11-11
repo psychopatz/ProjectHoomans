@@ -6,7 +6,7 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.semantic_harness.state import (
+from tools.semantic_harness.core.state import (
     Provenance,
 )
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker

@@ -14,7 +14,7 @@ import tkinter as tk
 import unittest
 from typing import Any, Callable
 
-from tools.semantic_harness.cli import _parser
+from tools.semantic_harness.entrypoints.cli import _parser
 from tools.providers.pnc.runtime.player_engine_state import (
     OfflinePlayerEngineStateProvider,
 )

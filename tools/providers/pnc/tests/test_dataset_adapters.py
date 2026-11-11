@@ -16,7 +16,7 @@ from tools.semantic_harness.codebuilder.dataset_adapters import (
     preview_dataset_adapter,
     promote_reviewed_candidates,
 )
-from tools.semantic_harness.cli import _parser, cli
+from tools.semantic_harness.entrypoints.cli import _parser, cli
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]

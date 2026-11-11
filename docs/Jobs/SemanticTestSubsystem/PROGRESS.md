@@ -32,7 +32,7 @@
   - Verified with `test_behavior_fixture_parity.py` (44.02s, 4/4 suites pass).
   - Retained low-level imperative Lua contract tests for service mocks, cognition boundary facts, action plan providers, and internal memory providers.
 - **Tooling Integration (P5) Verified:**
-  - Integrated into `tools.semantic_harness.cli` (`--run-semantic-tests`, `--semantic-test-file`, `--semantic-test-suite`, `--semantic-test-filter`).
+  - Integrated into `tools.semantic_harness.entrypoints.cli` (`--run-semantic-tests`, `--semantic-test-file`, `--semantic-test-suite`, `--semantic-test-filter`).
   - Supports `--jsonl` compact structured output and integrates with `ActivityLog`.
 - **Cleanup and Efficiency (P6) Verified:**
   - Duplicate-case and schema linter implemented at `tools/semantic_harness/testing/lint.py`.

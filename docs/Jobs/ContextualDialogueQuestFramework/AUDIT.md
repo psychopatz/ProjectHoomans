@@ -4,7 +4,7 @@
 
 | Concern | Source evidence | Result |
 | --- | --- | --- |
-| GUI application | `tools/semantic_harness/app.py`, `ui/shell.py`, `ui/flow_editor/`, `run_harness.sh` | One actual Tk application, persistent production Lua worker; compiler is NOT a second GUI |
+| GUI application | `tools/semantic_harness/entrypoints/app.py`, `ui/shell.py`, `ui/flow_editor/`, `run_harness.sh` | One actual Tk application, persistent production Lua worker; compiler is NOT a second GUI |
 | Embedded CodeBuilder | `tools/semantic_harness/codebuilder/{lexicon_compiler,dialogue_dataset,semantic_definition_compiler}.py`, `build.py`, `sources/*.json`, tests, README | One internal headless compiler/build subsystem under Semantic Harness; no peer-level package |
 | Canonical imports | Harness callers import concrete CodeBuilder modules directly | No legacy compiler package or forwarding import layer remains |
 | Duplicated orchestration | `codebuilder/authoring.py` and `codebuilder/build.py` own distinct authoring/build contracts; the Semantic Lab service routes callers to them | Remaining service consolidation opportunity; NOT proof that NLP compiler algorithms are duplicated |

@@ -9,7 +9,7 @@ import tkinter as tk
 import unittest
 from copy import deepcopy
 
-from tools.semantic_harness.cli import _parser
+from tools.semantic_harness.entrypoints.cli import _parser
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.shell import (

@@ -3,7 +3,7 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.semantic_harness.process import HarnessError
+from tools.semantic_harness.transport.process import HarnessError
 
 
 class ResponseObservatoryTests(unittest.TestCase):

@@ -11,9 +11,9 @@ import time
 import tkinter as tk
 import unittest
 
-from tools.semantic_harness.cli import _parser
+from tools.semantic_harness.entrypoints.cli import _parser
 from tools.semantic_harness.runtime.npc_profiles import apply_npc_profile
-from tools.semantic_harness.runtime_discovery import discover_newest_runtime
+from tools.semantic_harness.discovery.runtime import discover_newest_runtime
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.shell import SemanticHarnessApp

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from tools.semantic_harness.process import HarnessError
+from tools.semantic_harness.transport.process import HarnessError
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 

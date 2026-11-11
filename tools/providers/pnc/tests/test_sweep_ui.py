@@ -9,7 +9,7 @@ import tempfile
 import tkinter as tk
 import unittest
 
-from tools.semantic_harness.cli import _parser, cli
+from tools.semantic_harness.entrypoints.cli import _parser, cli
 from tools.semantic_harness.testing.sweep_cluster import (
     DialogueClusterReport,
     DialogueQualityCluster,

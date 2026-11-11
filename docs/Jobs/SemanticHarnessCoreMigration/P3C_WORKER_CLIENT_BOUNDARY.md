@@ -20,14 +20,14 @@ than delegating through a Hoomans process wrapper.
 
 All production and test callers now import Core directly for protocol,
 process, and serialized worker-session mechanics. The following unreferenced
-Hoomans compatibility files were deleted:
+duplicate Hoomans files were deleted:
 
-- `tools/semantic_harness/runtime/process.py`
-- `tools/semantic_harness/runtime/protocol.py`
-- `tools/semantic_harness/runtime/worker_session.py`
+- `tools/semantic_harness/transport/process.py`
+- `tools/semantic_harness/transport/protocol.py`
+- `tools/semantic_harness/core/worker_session.py`
 
 Hoomans scenario defaults/validation, runtime discovery, activity-path
-compatibility, UI, and production-module policy remain adopter-owned.
+validation, UI, and production-module policy remain adopter-owned.
 
 ## Gates
 

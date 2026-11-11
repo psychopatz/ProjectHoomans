@@ -10,7 +10,7 @@ import tkinter as tk
 import unittest
 from typing import Any, Callable, Iterable
 
-from tools.semantic_harness.cli import _parser
+from tools.semantic_harness.entrypoints.cli import _parser
 from tools.providers.pnc.runtime.save_catalog import SaveCatalog
 from tools.semantic_harness.ui.shell import SemanticHarnessApp
 

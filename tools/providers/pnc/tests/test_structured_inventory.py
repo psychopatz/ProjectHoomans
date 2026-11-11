@@ -10,8 +10,8 @@ import tkinter as tk
 import unittest
 from copy import deepcopy
 
-from tools.semantic_harness.cli import _parser
-from tools.semantic_harness.item_catalog import _parse_script_text
+from tools.semantic_harness.entrypoints.cli import _parser
+from tools.semantic_harness.core.item_catalog import _parse_script_text
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.ui.dialogs.inventory_editor import StructuredInventoryEditor

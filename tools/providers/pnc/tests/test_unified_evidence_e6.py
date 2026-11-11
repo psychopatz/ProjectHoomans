@@ -2,7 +2,7 @@
 from hashlib import sha256
 from pathlib import Path
 import unittest
-from tools.semantic_harness.runtime_discovery import discover_newest_runtime
+from tools.semantic_harness.discovery.runtime import discover_newest_runtime
 from tools.providers.pnc.tests.test_unified_evidence_e0 import saved_worker, storage
 
 ROOT = Path(__file__).resolve().parents[4]

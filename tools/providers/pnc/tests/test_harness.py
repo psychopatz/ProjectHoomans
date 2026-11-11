@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 import unittest
 
-from tools.semantic_harness.process import HarnessError, LuaProcess
+from tools.semantic_harness.transport.process import HarnessError, LuaProcess
 from tools.semantic_harness.runtime.config import (
     HarnessConfig,
     build_worker_launch_spec,

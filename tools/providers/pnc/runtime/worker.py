@@ -7,17 +7,17 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
-from tools.semantic_harness.activity import ActivityLog
-from tools.semantic_harness.state import Provenance
-from tools.semantic_harness.worker import SemanticWorker
-from tools.semantic_harness.process import WorkerLaunchSpec
+from tools.semantic_harness.core.activity import ActivityLog
+from tools.semantic_harness.core.state import Provenance
+from tools.semantic_harness.core.worker import SemanticWorker
+from tools.semantic_harness.transport.process import WorkerLaunchSpec
 
 from tools.semantic_harness.runtime.config import (
     HarnessConfig,
     build_worker_launch_spec,
 )
-from tools.semantic_harness.fixture_provider import OfflineEngineFixtureProvider
-from tools.semantic_harness.item_catalog import search_item_catalog
+from tools.semantic_harness.core.fixture_provider import OfflineEngineFixtureProvider
+from tools.semantic_harness.core.item_catalog import search_item_catalog
 from .scenario import load_scenario, normalize_scenario, validate_scenario
 from .worker_authoring import WorkerAuthoringOperations
 from .worker_conversation import WorkerConversationOperations

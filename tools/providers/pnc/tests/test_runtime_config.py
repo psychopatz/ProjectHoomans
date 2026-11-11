@@ -11,7 +11,7 @@ from tools.semantic_harness.runtime.config import (
     HarnessConfig,
     build_worker_launch_spec,
 )
-from tools.semantic_harness.runtime_discovery import (
+from tools.semantic_harness.discovery.runtime import (
     discover_newest_runtime,
     discover_shared_runtime,
 )

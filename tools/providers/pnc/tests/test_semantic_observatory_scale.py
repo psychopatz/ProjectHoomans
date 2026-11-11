@@ -11,8 +11,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.semantic_harness.activity import ActivityLog
-from tools.semantic_harness.process import HarnessError
+from tools.semantic_harness.core.activity import ActivityLog
+from tools.semantic_harness.transport.process import HarnessError
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 

@@ -9,8 +9,8 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 
-from tools.semantic_harness import app
-from tools.semantic_harness.cli import _parser, cli
+from tools.semantic_harness.entrypoints import app
+from tools.semantic_harness.entrypoints.cli import _parser, cli
 from tools.semantic_harness.codebuilder.dialogue_contract import (
     validate_branch_offers,
 )

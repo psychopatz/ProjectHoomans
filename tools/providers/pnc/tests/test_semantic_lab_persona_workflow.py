@@ -10,7 +10,7 @@ import time
 import tkinter as tk
 import unittest
 
-from tools.semantic_harness.cli import _parser
+from tools.semantic_harness.entrypoints.cli import _parser
 from tools.semantic_harness.inspection.conversation_inspector import (
     build_conversation_inspector,
 )
