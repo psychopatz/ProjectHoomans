@@ -3,91 +3,78 @@
 ## Ownership
 
 PsychopatzCore owns the semantic harness, schemas, compiler, validators,
-shared catalogs, and generated semantic contracts. Project Hoomans owns
-Hoomans-specific dialogue policy and content. Dynamic Trading owns trading
-provider packs. Physical source hosting in Core does not imply gameplay
-ownership; every shard and auxiliary bundle declares its package owner.
-
-External packs mount into the Core CodeBuilder input graph. They are not copied
-into adopter repositories and do not create a second compiler.
+manifest, and generated semantic contracts. Project Hoomans owns its dialogue
+policy/content, while Dynamic Trading owns its provider pack. Physical source
+hosting in Core does not change gameplay ownership: every shard and bundle
+declares its package owner. External packs mount into the Core input graph and
+do not create a second compiler or copied harness.
 
 ## Canonical source model
 
 ```text
 tools/semantic_harness/codebuilder/sources/conversation/
 ├── manifest.json
-├── content/ responses/ patterns/ flows/ behaviors/ beats/ realization/ ui/
-├── conversation_bundles.json
-└── translations/
-    ├── EN.json
-    ├── TL.json
-    └── <locale>.json
+├── content/
+├── responses/
+├── patterns/
+├── flows/
+├── behaviors/
+├── beats/
+├── realization/
+├── ui/
+└── conversation_bundles.json
 ```
 
-Each semantic shard uses `psychopatz.semantic.shard.v2`. The envelope owns
-identity and provenance; the typed payload is selected by `kind`.
-`shardId`, record IDs, and translation keys are stable semantic identities,
-not physical paths.
+Every semantic shard uses `psychopatz.semantic.shard.v3`. The manifest owns
+filesystem ordering, package ownership, external mounts, and source profiles;
+source records own their player-facing locale maps. Phrase IDs and runtime
+translation keys are compiler products, not authoring fields. Array order is
+the phrase slot identity and is append-only within a style.
 
-The manifest owns source ordering, source roots, external mounts,
-`sourceProfiles`, and auxiliary bundle manifests. Source roots and auxiliary
-bundles declare their package owner explicitly.
+## Compiler boundaries
 
-## Compiler module boundaries
+`conversation_compiler.py` is the public orchestration API.
+`conversation_manifest.py` owns filesystem boundaries,
+`conversation_validation.py` owns typed shard validation,
+`conversation_assembly.py` owns source assembly, and the rendering, discovery,
+health, and registry modules own their respective outputs. There is no source
+catalog hydrator or compatibility bridge.
 
-`conversation_compiler.py` is the stable public orchestration API.
-`conversation_manifest.py` owns filesystem and manifest boundaries.
-`conversation_validation.py` owns shard-local contracts and merge rules.
-`conversation_catalog.py` owns locale hydration and inline-translation
-rejection. `conversation_assembly.py` owns semantic source assembly.
-`conversation_rendering.py`, `conversation_discovery.py`,
-`conversation_health.py`, and `conversation_registry.py` own output
-rendering, indexing, health evidence, and registry serialization respectively.
-
-Modules import their direct owner; there is one loader and one validation path.
-No permanent compatibility shim or duplicate harness is part of the design.
+The authoring service presents locale maps to the editor and writes the
+owning source shard. It resolves provenance from manifest profiles in memory;
+it never writes a repeated source envelope into a recipe.
 
 ## Translation model
 
-CodeBuilder authoring uses one complete, self-contained JSON catalog per
-locale. Runtime translation directories are package-specific generated
-artifacts, not authoring sources.
+Authoring recipes keep comparable locale maps next to each phrase, response,
+choice, or UI suggestion. The compiler aggregates those maps into generated
+package output under each mod's `common/media/translation/<LANG>` directory.
+Runtime translation files are build artifacts, not authoring inputs.
 
-```json
-{
-  "schema": "psychopatz.semantic.translation.v1",
-  "language": "EN",
-  "fallback": "EN",
-  "entries": {
-    "conversation.social.reactions.greeting.001": {
-      "text": "Good morning.",
-      "context": "NPC greeting",
-      "sourceShard": "conversation.content.social.reactions"
-    }
-  }
-}
+The compiler emits phrase records using these derived identities:
+
+```text
+phrase.<semanticTemplateID>.<style>.<index02>
+conversation.content.<semanticTemplateID>.<style>.<index02>
 ```
 
 ## Runtime bundle rendering
 
-`conversation_bundle_catalog.py` is the CodeBuilder materialization boundary.
-It validates the canonical bundle manifest, resolves wording from the complete
-Core EN/TL catalogs, and renders package-owned runtime files.
-
-Generated runtime paths are:
+`conversation_bundle_catalog.py` validates the bundle manifest, resolves inline
+recipe text, and renders package-owned runtime files:
 
 ```text
-<mod>/common/media/translation/<LANG>/Conversation/Bundles/<domain>/<audience>/<bundle>.json
+<mod>/common/media/translation/<LANG>/Conversation/Bundles/
+  <domain>/<audience>/<bundle>.json
 ```
 
-PNC and Dynamic Trading runtime consumers read those generated paths through
-the `PNC_ConversationTextCatalog` boundary. The former `media/conversation`
-trees and migration-only catalog utilities are removed; no runtime bridge
-remains.
+PNC and Dynamic Trading read those generated paths through their package
+runtime boundaries. The former source catalog directory and migration-only
+catalog modules are absent.
 
 ## Validation contract
 
-The rendering gate requires deterministic catalog validation, JSON parity
-against every package bundle, focused PNC and DT conversation smokes, Kahlua
-validation, and a real build through the Core compiler. P5 additionally
-requires composition validation for each dependency-closed mod selection.
+The rendering gate requires deterministic source compilation, runtime EN/TL
+parity, bounded shard/index sizes, focused PNC and DT tests, and a real build
+through the Core compiler. Composition validation covers PNC, PNC + Dynamic
+Trading, DTAbstract, and future provider manifests.

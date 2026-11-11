@@ -77,7 +77,7 @@ class ConversationCompilerTests(unittest.TestCase):
         expected_pools = sum(
             len(document.get("responsePools", []))
             for path, document in source_documents.items()
-            if path.startswith("flows/")
+            if path.startswith("responses/")
         )
         expected_ui = sum(
             len(document.get("suggestions", []))
@@ -126,7 +126,7 @@ class ConversationCompilerTests(unittest.TestCase):
             social_path = (
                 repository
                 / CONVERSATION_SOURCE_RELATIVE
-                / "content/social/emotes/player.json"
+                / "content/social/emotes/emotes_player.json"
             )
             greeting = json.loads(greeting_path.read_text(encoding="utf-8"))
             social = json.loads(social_path.read_text(encoding="utf-8"))
@@ -233,7 +233,7 @@ class ConversationCompilerTests(unittest.TestCase):
             )
             greeting = json.loads(greeting_path.read_text(encoding="utf-8"))
             phrase = greeting["phraseFamilies"][0]["styles"]["neutral"][0]
-            phrase["translations"]["XX"] = "Synthetic locale text."
+            phrase["XX"] = "Synthetic locale text."
             greeting_path.write_text(
                 json.dumps(
                     greeting,

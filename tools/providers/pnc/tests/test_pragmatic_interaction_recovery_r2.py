@@ -134,19 +134,18 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
             for family in source["phraseFamilies"]:
                 for phrases in family["styles"].values():
                     for phrase in phrases:
-                        self.assertNotIn("translations", phrase)
-            english_catalog = json.loads(
+                        self.assertNotIn("phraseID", phrase)
+                        self.assertNotIn("translationKey", phrase)
+            self.assertEqual(
+                source["phraseFamilies"][0]["styles"]["neutral"][0]["EN"],
+                "You are really pushing me now.",
+            )
+            self.assertFalse(
                 (
                     repository
                     / CONVERSATION_SOURCE_RELATIVE
-                    / "translations/EN.json"
-                ).read_text(encoding="utf-8")
-            )
-            self.assertEqual(
-                english_catalog["entries"][
-                    "conversation.content.semantic.interaction.argument.retaliate.neutral.01"
-                ]["text"],
-                "You are really pushing me now.",
+                    / "translations"
+                ).exists()
             )
             en = (
                 repository

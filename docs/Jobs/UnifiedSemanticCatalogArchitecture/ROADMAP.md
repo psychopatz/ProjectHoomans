@@ -4,56 +4,65 @@
 
 Create one scalable, mod-agnostic semantic CodeBuilder system owned by
 PsychopatzCore. Project Hoomans, Dynamic Trading, and future expansion packs
-must consume the same typed shard, ownership, identity, and locale-catalog
+consume the same typed shard, ownership, identity, and runtime-locale
 contracts without split harnesses or permanent compatibility shims.
 
 ## Completion gates
 
-- Core is the only semantic harness and CodeBuilder authority.
+- Core is the only semantic harness CodeBuilder authority.
 - Every shard has a unique `shardId`, explicit `owner`, typed `kind`, and
   bounded domain scope.
-- Semantic sources contain stable identities and no inline locale maps.
-- CodeBuilder has exactly one authoring catalog per locale (`EN.json`,
-  `TL.json`, and future locale files).
-- Locale catalogs pass deterministic key, placeholder, fallback, and duplicate
-  key checks.
-- Generated source and translation artifacts remain within context budgets.
-- Core-only, PNC-only, PNC + Dynamic Trading, DTAbstract, DTHoomans, and
-  expansion-pack compositions compile independently.
-- All runtime consumers migrate from the old PNC conversation tree; the legacy
-  tree is removed only after references reach zero.
-- No permanent compatibility shim remains.
+- Source recipes are self-contained: authored locale maps live beside the
+  records they describe.
+- Phrase identity and runtime translation keys are compiler-derived from the
+  semantic template, style, and append-only array order.
+- No Core authoring `translations/` directory, catalog hydrator, catalog
+  generator, or compatibility shim remains.
+- Generated EN/TL and future-locale artifacts remain package-owned under each
+  mod's `common/media/translation` tree.
+- Bundle recipes carry inline locale text and render to package-owned runtime
+  bundle paths.
+- Core-only infrastructure, PNC, PNC + Dynamic Trading, DTAbstract,
+  DTHoomans, and future expansion compositions compile independently.
+- No legacy runtime conversation tree remains after its references reach zero.
 
 ## Phases
 
 ### P0 — Contract inventory
 
-Freeze record and translation-key inventories, define v2 contracts, and add
-structural validation without changing runtime output.
+Freeze record inventories, define the v3 shard contract, and add structural
+validation without changing runtime output.
 
-### P1 — Canonical locale catalogs
+### P1 — Self-contained source recipes
 
-Create one CodeBuilder catalog per locale, migrate inline wording using stable
-keys, validate locale parity and placeholders, and preserve fallback behavior.
+Inline authored locale maps in typed records, derive compiler identities,
+migrate bundle text, and remove the authoring catalog seam while preserving
+generated runtime output.
 
 ### P2 — Semantic shard normalization
 
-Normalize envelopes and ownership, move repeated provenance to manifest
-profiles, resolve naming collisions, and split only where domain boundaries
-require it while preserving runtime identity.
+Normalize ownership, move repeated provenance into manifest profiles, resolve
+naming collisions, and split only at domain boundaries while preserving
+runtime identity.
 
 ### P3 — Compiler modularization and output health
 
-Separate manifest loading, schema validation, catalog hydration, merge/index
-construction, output routing, rendering, and health checks. Add generated
-manifest and translation-size parity checks.
+Keep manifest loading, shard validation, assembly, rendering, discovery,
+health, registry serialization, and package routing as focused Core modules.
 
-### P4 — Runtime migration and legacy removal
+### P4 — Runtime consumer migration
 
-Update PNC runtime consumers to load the unified generated outputs, then remove
-the old `common/media/conversation` tree after all call sites are migrated.
+Migrate Project Hoomans and Dynamic Trading consumers to Core-generated
+artifacts and remove duplicated semantic trees.
 
-### P5 — Cross-mod acceptance
+### P5 — Composition harness
 
-Regenerate and test every supported mod composition, update documentation, and
-close the goal only after deterministic output and focused/full test gates pass.
+Validate dependency-closed mod compositions, including PNC, PNC + Dynamic
+Trading, DTAbstract, and future provider manifests.
+
+### P6 — Self-contained recipe completion
+
+The accepted implementation phase for this job removes the obsolete source
+catalog reader/writer/generator, migrates all Core-owned shards and the DT
+external pack to v3, keeps the editor's locale-facing view stable, and
+verifies actual Core, PNC, DT, and harness execution.

@@ -3490,5 +3490,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "3989e51dcd5b303a59cc90608d318522ef99d3b737f6eeaa099847af2f86ff78",
+    ["wholeModelFingerprint"] = "aa4d28220453e514108a1abb5a4c1f7efa7ab05a524e077f681c69c8e3522234",
 }
