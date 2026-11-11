@@ -57,9 +57,14 @@ renames therefore do not invalidate locale metadata.
 
 `conversation_compiler.py` remains the stable orchestration and public API hub.
 Its filesystem boundary is `conversation_manifest.py`, shard-local contracts
-and merge rules are in `conversation_validation.py`, and locale-key hydration
-is in `conversation_catalog.py`. These modules are direct imports, not legacy
-bridges; there is one loader and one validation path.
+and merge rules are in `conversation_validation.py`, locale-key hydration is
+in `conversation_catalog.py`, and source assembly is in
+`conversation_assembly.py`. Runtime chunking/rendering, discovery/indexing,
+health evidence, and registry serialization are owned by
+`conversation_rendering.py`, `conversation_discovery.py`,
+`conversation_health.py`, and `conversation_registry.py` respectively.
+These modules are direct imports, not legacy bridges; there is one loader and
+one validation path.
 
 ## Translation model
 

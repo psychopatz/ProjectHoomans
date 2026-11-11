@@ -4,8 +4,8 @@
 **Primary repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`  
 **Participants:** PsychopatzCore, DynamicTrading  
 **Current phase:** P3 — Compiler modularization  
-**Accepted slices:** P0A, P0B, P1A, P1B, P1C, P2A, P2B, P3A  
-**Next chunk:** P3B — extract rendering and discovery/index boundaries without changing output.
+**Accepted slices:** P0A, P0B, P1A, P1B, P1C, P2A, P2B, P3A, P3B, P3C, P3D, P3E  
+**Next chunk:** P4 — migrate runtime consumers from the legacy conversation tree to Core-generated semantic artifacts.
 
 ## Verified baseline
 
@@ -52,10 +52,15 @@
 - The compiler remains the orchestration/public API hub; no compatibility shim or duplicate loader was added.
 - Core tests passed: 89 tests; the real Core → Project Hoomans → Dynamic Trading build remained at 205 generated files, 505 phrase families, 56 patterns, and 13 UI definitions.
 
+## Accepted P3B–P3E — bounded compiler modules
+
+- Rendering/chunking, discovery/indexing, shared contracts/limits, health checks, registry serialization, and shard assembly now have dedicated modules.
+- `conversation_compiler.py` remains the public orchestration hub and is reduced to 814 lines; existing service/build/inspection imports continue through direct module ownership.
+- No generated Lua artifacts changed during the refactor; every real build produced 205 generated files, 505 phrase families, 56 patterns, and 13 UI definitions.
+- Core semantic-harness tests passed: 89 tests after each extraction gate.
+
 ## Not yet accepted
 
-- The remaining P2 work is bounded splitting of any future domain hotspots; current source sizes are within hard budgets.
-- The compiler remains a large module; its modularization is P3.
 - PNC runtime consumers still reference the legacy conversation tree; removal is P4 after call-site migration.
 - Core-only, PNC-only, DTAbstract, DTHoomans, and expansion-pack matrix acceptance is P5.
 - No permanent compatibility shim is authorized in the final architecture.
