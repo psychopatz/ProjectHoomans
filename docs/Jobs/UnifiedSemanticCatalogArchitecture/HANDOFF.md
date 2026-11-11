@@ -4,19 +4,20 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "P2B"
-phase_commit_message: "phase(P2B): phase(P2B): accept normalized semantic paths and outputs"
-updated_at: "2026-11-11T14:16:14.500483Z"
+phase_commit_phase: "P3A"
+phase_commit_message: "phase(P3A): phase(P3A): modularize Conversation compiler boundaries"
+updated_at: "2026-11-11T14:31:37.823008Z"
 state: "CLEAN_CHECKPOINT"
 parent_status: "IN_PROGRESS"
-phase: "P2 — Semantic shard normalization"
-chunk: "P3A — compiler modularization and output health"
+phase: "P3 — Compiler modularization"
+chunk: "P3B — rendering and discovery/index boundaries"
 retrieval_tier: "verify"
-phase_commit_vector: "project-hoomans=self;psychopatz-core=8f5d2af12d3cbf6dc60f8010b92e49f667c3dc49;dynamic-trading=8ece4d3c8dbb3b6bc8bac176ce77eef506cbabe7"
+phase_commit_vector: "project-hoomans=self;psychopatz-core=05a6d13c8a8c9cdd495e3540d1571ff882610f60;dynamic-trading=8ece4d3c8dbb3b6bc8bac176ce77eef506cbabe7"
 phase_residual_vector: "project-hoomans=e5db3fd088b4fd119d9c786d7ffbcb06721b1ee3a96e757e3192f2256795b7f4;psychopatz-core=858b44f5cf795c753aa278225bad8d630c071ea03b602a079ceb03f5303cfb33;dynamic-trading=dafa3368287d0774225ebc447f3c3705b85f8754cabd2d9274abf52640d86d90"
 residual_worktree_fingerprint: "e5db3fd088b4fd119d9c786d7ffbcb06721b1ee3a96e757e3192f2256795b7f4"
 codebase_memory_indexed_commit: "5bdcacc31dab7c49d5bd14294739b2467699098d"
 ---
+
 
 
 # Session Handoff
@@ -47,7 +48,7 @@ codebase_memory_indexed_commit: "5bdcacc31dab7c49d5bd14294739b2467699098d"
 
 ## Resume
 
-1. Inventory compiler responsibilities and public seams before moving code.
-2. Extract one behavior-preserving component at a time with focused tests.
-3. Re-run catalog, composition, context-health, and generated-output parity
+1. Extract rendering and discovery/index components with their focused tests.
+2. Re-run catalog, composition, context-health, and generated-output parity
    gates after each extraction.
+3. Migrate PNC runtime consumers only after the compiler boundaries are stable.

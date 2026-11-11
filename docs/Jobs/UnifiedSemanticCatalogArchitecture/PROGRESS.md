@@ -3,9 +3,9 @@
 **Status:** IN_PROGRESS  
 **Primary repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`  
 **Participants:** PsychopatzCore, DynamicTrading  
-**Current phase:** P2 — Semantic shard normalization  
-**Accepted slices:** P0A, P0B, P1A, P1B, P1C, P2A, P2B  
-**Next chunk:** P3A — split the compiler into bounded manifest, catalog, merge/index, rendering, and health modules without changing output.
+**Current phase:** P3 — Compiler modularization  
+**Accepted slices:** P0A, P0B, P1A, P1B, P1C, P2A, P2B, P3A  
+**Next chunk:** P3B — extract rendering and discovery/index boundaries without changing output.
 
 ## Verified baseline
 
@@ -43,6 +43,14 @@
 - The catalog audit reports zero issues across 122 shards: no inline wording, repeated source metadata, duplicate stems, path-kind mismatches, or budget violations.
 - Runtime artifacts were regenerated; stale generated names are gone and new registry references resolve.
 - The focused Core semantic-harness suite passed: 87 tests.
+
+## Accepted P3A — manifest, validation, and catalog boundaries
+
+- Manifest parsing, path safety, source-root discovery, and external-pack mounting now live in `conversation_manifest.py`.
+- Shard-local validation and director/realization merge rules now live in `conversation_validation.py`.
+- Locale-key hydration and inline-translation rejection now live in `conversation_catalog.py`.
+- The compiler remains the orchestration/public API hub; no compatibility shim or duplicate loader was added.
+- Core tests passed: 89 tests; the real Core → Project Hoomans → Dynamic Trading build remained at 205 generated files, 505 phrase families, 56 patterns, and 13 UI definitions.
 
 ## Not yet accepted
 
