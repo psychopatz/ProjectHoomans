@@ -1,68 +1,63 @@
-# Unified Semantic Catalog Architecture
+# Unified Semantic Catalog Architecture Roadmap
 
 ## Objective
 
-Create one scalable, mod-agnostic semantic CodeBuilder system owned by
+Maintain one scalable, mod-agnostic semantic CodeBuilder system owned by
 PsychopatzCore. Project Hoomans, Dynamic Trading, and future expansion packs
-consume the same typed shard, ownership, identity, and runtime-locale
-contracts without split harnesses or permanent compatibility shims.
+consume the same typed source graph, ownership model, identity derivation,
+and runtime-locale contracts.
 
 ## Completion gates
 
-- Core is the only semantic harness CodeBuilder authority.
-- Every shard has a unique `shardId`, explicit `owner`, typed `kind`, and
+- Core is the only semantic harness and CodeBuilder authority.
+- Every normal shard has a unique `shardId`, explicit owner, typed kind, and
   bounded domain scope.
-- Source recipes are self-contained: authored locale maps live beside the
-  records they describe.
-- Phrase identity and runtime translation keys are compiler-derived from the
-  semantic template, style, and append-only array order.
-- No Core authoring `translations/` directory, catalog hydrator, catalog
-  generator, or compatibility shim remains.
-- Generated EN/TL and future-locale artifacts remain package-owned under each
-  mod's `common/media/translation` tree.
-- Bundle recipes carry inline locale text and render to package-owned runtime
-  bundle paths.
-- Core-only infrastructure, PNC, PNC + Dynamic Trading, DTAbstract,
-  DTHoomans, and future expansion compositions compile independently.
-- No legacy runtime conversation tree remains after its references reach zero.
+- Recipes keep locale text beside the authored record; generated translations
+  remain package-owned runtime artifacts.
+- Runtime identity and translation keys are compiler-derived from semantic
+  template IDs, styles, and append-only phrase order.
+- No authoring translation catalog, copied harness, or compatibility shim is
+  required by any participating mod.
+- Bundle recipes are indexed, sharded, owner-validated, and rendered only to
+  the package that owns them.
+- PNC-only, PNC + Dynamic Trading, DTAbstract, DTHoomans, and future provider
+  compositions can be resolved without a second semantic implementation.
 
 ## Phases
 
 ### P0 — Contract inventory
 
-Freeze record inventories, define the v3 shard contract, and add structural
+Freeze record inventories, define the typed shard contract, and add structural
 validation without changing runtime output.
 
-### P1 — Self-contained source recipes
+### P1 — Self-contained recipes
 
-Inline authored locale maps in typed records, derive compiler identities,
-migrate bundle text, and remove the authoring catalog seam while preserving
-generated runtime output.
+Inline authored locale maps, derive compiler identities, migrate bundle text,
+and remove the authoring catalog seam while preserving generated output.
 
-### P2 — Semantic shard normalization
+### P2 — Nested source sharding
 
-Normalize ownership, move repeated provenance into manifest profiles, resolve
-naming collisions, and split only at domain boundaries while preserving
-runtime identity.
+Split oversized conversation content by semantic domain and use recursive Core
+source roots. Split bundle recipes behind an explicit auxiliary index while
+preserving IDs, owners, runtime paths, and locale output.
 
-### P3 — Compiler modularization and output health
+### P3 — Compiler health
 
-Keep manifest loading, shard validation, assembly, rendering, discovery,
+Keep manifest loading, typed validation, assembly, rendering, discovery,
 health, registry serialization, and package routing as focused Core modules.
 
 ### P4 — Runtime consumer migration
 
-Migrate Project Hoomans and Dynamic Trading consumers to Core-generated
-artifacts and remove duplicated semantic trees.
+Ensure Project Hoomans and Dynamic Trading consume only Core-generated semantic
+artifacts and provider-owned external shards.
 
-### P5 — Composition harness
+### P5 — Composition acceptance
 
-Validate dependency-closed mod compositions, including PNC, PNC + Dynamic
-Trading, DTAbstract, and future provider manifests.
+Validate PNC-only, all-enabled, DTAbstract, DTHoomans, and future-provider
+manifest compositions with focused tests and real compiler builds.
 
-### P6 — Self-contained recipe completion
+## Current status
 
-The accepted implementation phase for this job removes the obsolete source
-catalog reader/writer/generator, migrates all Core-owned shards and the DT
-external pack to v3, keeps the editor's locale-facing view stable, and
-verifies actual Core, PNC, DT, and harness execution.
+P0 through P2 are implemented for the current Conversation source inventory.
+The current handoff records exact commits, test evidence, preserved unrelated
+dirty work, and the two known unrelated PNC smoke failures.

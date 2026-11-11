@@ -3,12 +3,12 @@ handoff_schema: 3
 checkpoint_mode: committed_handoff
 target_repo: /home/psychopatz/Zomboid/Workshop/ProjectHoomans
 branch: main
-phase: Standardized self-contained Conversation recipes
+phase: Nested Conversation source and bundle sharding
 retrieval_tier: COMPLETE
-primary_phase_commit: 3c926573
+primary_phase_commit: 5ad172fe0fe06e7139c1d2030c8232196767aa3a
 participant_commits:
-  psychopatzCore: 9f34a15
-  DynamicTrading: 77d29f8a
+  psychopatzCore: c079cbf8cde239f903c057a07c193af7e05ff75f
+  DynamicTrading: 77d29f8a9017a4692f9edde5185a6df2f38d81d3
 state: COMMITTED_UNRELATED_DIRTY_PRESERVED
 updated_at: 2026-11-12T00:00:00+08:00
 ---
@@ -17,34 +17,39 @@ updated_at: 2026-11-12T00:00:00+08:00
 
 ## Contract delivered
 
-PsychopatzCore is the only semantic harness and CodeBuilder authority. Core
-Conversation sources now use self-contained locale maps for content, UI
-suggestions, UI text records, and realization constructions. Generated runtime
-keys and locale-specific realization IDs remain compiler output. Dynamic Trading
-has a provider-local source manifest and optional UI shard mounted by the Core
-manifest; it does not carry a second harness.
+PsychopatzCore owns the semantic harness, manifest, compiler, validators, and
+generated semantic contracts. Project Hoomans and Dynamic Trading consume the
+same Core-owned graph through their package-owned output routes.
 
-The PNC direct composition contains Core + Project Hoomans UI only. The
-all-enabled composition also emits Dynamic Trading UI under DTCommon. Deleted
-PNC `Conversation/Semantic/Suggestions.json` files and locale-split realization
-sources are intentional removals, not compatibility shims.
+Conversation authoring is self-contained and nested by domain. The bundle
+catalog is indexed by `conversation/bundles/manifest.json` and has 15 domain
+shards. Bundle ownership, duplicate IDs, locale completeness, safe runtime
+paths, and package filtering are validated before rendering.
 
-## Verified gates
+No old bundle source file, copied harness, or compatibility bridge remains.
+Generated EN/TL output remains under each mod's `common/media/translation`
+tree, and the direct PNC build does not include Dynamic Trading content.
 
-- Core: 85/85 Python tests.
-- Dynamic Trading: 88/88 tests.
-- PNC focused semantic/ownership/realization tests: 28/28.
-- Core and DT source audits: no legacy authoring fields, no locale-split files,
-  and no hard-size violations.
-- Builds verified for PNC-only and all-enabled compositions.
+## Acceptance evidence
 
-The full PNC runner still reports two known unrelated runtime failures:
-`pnc_population_director_smoke.lua` and the custom translation-manager smoke
-assertion. They remain unmodified and are recorded in `PROGRESS.md`.
+- Core CodeBuilder: **86/86**.
+- Dynamic Trading: **88/88**.
+- Affected PNC shard/authority/compiler tests: **20/20**.
+- PNC-only build: **339** generated files; all-enabled build: **351**.
+- Both builds preserve 505 phrase families and 56 patterns.
+- Source audit: no legacy authoring fields, locale-split filenames, or size
+  violations.
+- Full PNC Lua runner: **1016/1018 passed**; the two known unrelated smoke
+  failures are recorded in `PROGRESS.md` and were not modified.
 
-## Next chunk
+## Repository state
 
-Split the three preferred-size content shards by semantic domain, preserving
-record IDs, ownership, locale output, and runtime fingerprints where the
-contract permits. Then re-run the full PNC runner and update this handoff with
-the primary commit hash.
+All phase-owned changes are committed on `main`. Existing unrelated dirty
+files remain preserved and unstaged. No Workshop publication or native live
+game acceptance was performed.
+
+## Future extension rule
+
+Future expansion packs add provider manifests and external shards to the Core
+graph. They must not add a second semantic harness, a parallel bundle reader,
+or a compatibility layer.
