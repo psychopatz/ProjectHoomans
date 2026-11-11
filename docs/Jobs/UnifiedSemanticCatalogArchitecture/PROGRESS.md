@@ -3,36 +3,31 @@
 **Status:** IN_PROGRESS  
 **Primary repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`  
 **Participants:** PsychopatzCore, DynamicTrading  
-**Current phase:** P0 — Contract and inventory  
-**Accepted slices:** P0A — Read-only catalog audit seam; P0B — Strict catalog contract and inventory  
-**Next chunk:** Create the canonical one-file-per-locale CodeBuilder catalogs and migrate compiler input to stable catalog keys without changing runtime output.
+**Current phase:** P1 — Canonical locale catalogs  
+**Accepted slices:** P0A, P0B, P1A — Catalog materialization  
+**Next chunk:** Migrate compiler input from inline wording to the canonical locale catalogs, then prove generated-output parity before removing legacy fields.
 
 ## Verified baseline
 
-- Core CodeBuilder contains 122 conversation source JSON files plus its manifest.
-- The largest source shards exceed the preferred 64 KiB budget.
-- Project Hoomans currently generates 30 Conversation translation JSON files per locale, including files above the current generated-size budget.
+- Core CodeBuilder contains 122 semantic source JSON files plus its manifest.
+- Project Hoomans currently generates 30 Conversation translation JSON files per locale.
 - Project Hoomans still has runtime references to `media/conversation/...`.
 - Dynamic Trading contributes an external trading pack through the shared CodeBuilder graph.
 - Existing unrelated dirty work in all three repositories is preserved.
 
-## Accepted P0A
+## Accepted P0/P1 slices
 
-- Added Core `catalog_audit.py`, a deterministic read-only audit for semantic source trees.
-- Added focused tests and exported the audit through the Core CodeBuilder package.
-- The audit ran against Core, the Dynamic Trading external pack, and the Project Hoomans legacy conversation tree without writing to any of them.
-- Core audit result: 122 source JSON files, 91 with inline translations, 122 with repeated source metadata, 3 over the preferred source budget, and no locale catalog directory.
-- The existing Core semantic-harness suite ran with 69 tests passing.
-- The merged Core + Project Hoomans + Dynamic Trading compiler still produced EN/TL output and passed context health with 20 warnings and 0 errors.
-
-## Accepted P0B
-
-- Added strict v2 semantic-shard and locale-catalog contracts. The contract rejects implicit owners, inline translations, repeated source metadata, malformed identities, duplicate JSON keys, locale key drift, and placeholder mismatches.
-- Added a deterministic compiled-model inventory command for cross-repository record and translation-key freezing.
-- Inventory result: 123 manifest-resolved shards, 703 record IDs, 14,052 generated translation keys, EN/TL locales, and Project Hoomans/Core owners.
-- Focused and full Core semantic-harness tests ran with 75 tests passing.
+- The read-only catalog audit, strict v2 contracts, and compiled-model inventory are committed.
+- Core now contains one authoring catalog per discovered locale: `translations/EN.json` and `translations/TL.json`.
+- Each locale catalog contains 7,006 deterministic entries and validates with exact EN/TL key parity and placeholder checks.
+- Catalog metadata preserves source shard, context, and package-owner information for later migration review.
+- CodeBuilder shard discovery excludes `translations/` so locale catalogs cannot be mistaken for semantic shards.
+- Focused and full Core semantic-harness tests ran with 76 tests passing.
+- The merged Core + Project Hoomans + Dynamic Trading compiler still resolves EN/TL, 123 shards, 157 rendered modules, and context health with 20 warnings and 0 errors.
 
 ## Not yet accepted
 
-- No source or runtime files have been migrated.
+- The compiler still consumes legacy inline translation maps.
+- Inline translation fields have not been removed from semantic shards.
+- Runtime output has not yet been switched to read the new source catalogs.
 - No compatibility shim is authorized for the final state.
