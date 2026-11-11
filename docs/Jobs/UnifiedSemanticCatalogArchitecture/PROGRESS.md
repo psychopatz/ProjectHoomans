@@ -1,11 +1,11 @@
 # Unified Semantic Catalog Progress
 
-**Status:** IN_PROGRESS
+**Status:** COMPLETE
 **Primary repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`
 **Participants:** PsychopatzCore, DynamicTrading
 **Current phase:** P5 — composition-matrix and harness acceptance
-**Accepted slices:** P0A, P0B, P1A, P1B, P1C, P2A, P2B, P3A, P3B, P3C, P3D, P3E, P4A, P4B, P4C
-**Next chunk:** validate real repository-backed mod compositions and harness startup.
+**Accepted slices:** P0A, P0B, P1A, P1B, P1C, P2A, P2B, P3A, P3B, P3C, P3D, P3E, P4A, P4B, P4C, P5A
+**Next chunk:** none — all goal gates are complete.
 
 ## Verified baseline
 
@@ -63,9 +63,21 @@
   conversation smoke suite 4/4, four DT conversation bridge smokes, and
   `pz-verify` with zero i18n/Kahlua/bloat findings.
 
-## Remaining acceptance
+## Accepted P5 — composition matrix and harness startup
 
-- Run the composition matrix for Core dependency closure, PNC-only,
-  PNC + Dynamic Trading, DTAbstract, DTHoomans, and an optional expansion pack.
-- Verify the harness GUI starts and selects real repository-backed compositions
-  with no fixture-only or compatibility-shim path.
+- PNC resolves to `PsychopatzCore → ProjectHoomans` and boots successfully.
+- PNC + Dynamic Trading resolves to
+  `PsychopatzCore → ProjectHoomans → DTCommon → DTHoomans` and boots
+  successfully.
+- DTAbstract resolves to
+  `PsychopatzCore → DTCommon → DTAbstract` and boots successfully without
+  Project Hoomans.
+- Core-only selection is rejected as infrastructure, not exposed as a
+  standalone product profile.
+- A direct future-expansion provider manifest is discovered and dependency
+  resolved without Core code changes.
+- `run_harness.sh --gui` created the live `Semantic Lab — pnc` Tk window
+  at `1320x860`; the process stayed alive until explicitly stopped.
+- The doctor regression was fixed and covered by Core’s 93/93 unittest suite.
+
+The unified semantic catalog architecture and harness migration are complete.
