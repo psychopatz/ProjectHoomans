@@ -10,7 +10,7 @@ parent_status: COMPLETE
 phase_commit: self
 phase_commit_phase: Self-contained CodeBuilder recipe migration
 phase_commit_message: refactor: make conversation recipes self-contained
-phase_commit_vector: project-hoomans=self;psychopatz-core=79751b1;dynamic-trading=45250e3e
+phase_commit_vector: project-hoomans=self;psychopatz-core=10de3b1;dynamic-trading=45250e3e
 state: CLEAN_CHECKPOINT
 updated_at: 2026-11-12T00:00:00+08:00
 ---
