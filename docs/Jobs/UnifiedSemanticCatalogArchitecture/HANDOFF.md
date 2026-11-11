@@ -3,18 +3,16 @@ handoff_schema: 2
 checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
-phase: "Canonical conversation bundle cleanup"
-chunk: "cleanup complete"
-retrieval_tier: "verify"
+phase: "Explicit Conversation authoring records"
+chunk: "migration and writer-boundary verification complete"
+retrieval_tier: "COMPLETE"
 parent_status: "COMPLETE"
 phase_commit: "self"
-phase_commit_phase: "Canonical bundle cleanup"
-phase_commit_message: "refactor: use canonical conversation bundle paths"
-phase_commit_vector: "project-hoomans=self;psychopatz-core=09a1c69;dynamic-trading=b9d7c945"
-phase_residual_vector: "project-hoomans=e5db3fd088b4fd119d9c786d7ffbcb06721b1ee3a96e757e3192f2256795b7f4;psychopatz-core=858b44f5cf795c753aa278225bad8d630c071ea03b602a079ceb03f5303cfb33;dynamic-trading=dafa3368287d0774225ebc447f3c3705b85f8754cabd2d9274abf52640d86d90"
-residual_worktree_fingerprint: "e5db3fd088b4fd119d9c786d7ffbcb06721b1ee3a96e757e3192f2256795b7f4"
-codebase_memory_indexed_commit: "5bdcacc31dab7c49d5bd14294739b2467699098d"
-updated_at: "2026-11-11T23:53:54+08:00"
+phase_commit_phase: "Explicit Conversation authoring records"
+phase_commit_message: "refactor: adopt canonical conversation content keys"
+phase_commit_vector: "project-hoomans=5e9b37ed;psychopatz-core=12590d64;dynamic-trading=c8a013b7"
+phase_residual_vector: "project-hoomans=5e9b37edbc784733cce00b52a38ee9b9c5d770b2;psychopatz-core=12590d64fb3814573f75e111e895575fdb8b9d8d;dynamic-trading=c8a013b7c215ef4573fb9e5a44fe842872ce3f04"
+updated_at: "2026-11-12T00:00:00+08:00"
 state: "CLEAN_CHECKPOINT"
 ---
 
@@ -24,10 +22,11 @@ state: "CLEAN_CHECKPOINT"
 
 ## Current state
 
-Core now contains the canonical Conversation bundle renderer and the
-normalized 46-bundle manifest. The Core EN/TL catalogs contain the PNC and DT
-bundle wording. A real build generated 88 PNC and 4 DT runtime JSON files
-with exact locale parity.
+Core now owns explicit stable Conversation phrase records and the canonical
+one-file-per-locale authoring catalogs. The content compiler is schema v3 and
+the generated PNC/DT artifacts use canonical `conversation.content.*` keys.
+The writer boundary updates EN/TL catalogs without reintroducing locale maps
+into source shards.
 
 PNC runtime consumers use `PNC_ConversationTextCatalog` and generated
 `common/media/translation/<LANG>/Conversation/Bundles/` paths. The old PNC
@@ -37,32 +36,28 @@ trees. No non-document source references remain for `media/conversation`,
 
 ## Verification
 
-- Core semantic-harness unittest suite: 92/92.
-- PNC focused conversation smoke suite: 4/4.
-- DT core, shared-parity, DTHoomans bridge, and DTAbstract bridge smokes: 4/4.
-- `pz-verify`: 3,316 Lua files scanned; zero i18n, Kahlua, and bloat findings.
-- JSON parity: 88 PNC source locale files and 4 DT source locale files.
+- Core semantic-harness unittest suite: 90/90 in the current checkout.
+- PNC content, translation, authority, pragmatic-edit, and flow suites pass.
+- PNC Lua conversation, local-route, and identity smoke tests pass.
+- DT core, shared-parity, DTHoomans bridge, and DTAbstract bridge smokes: 5/5.
+- Harness `--ping --no-gui` passes for `pnc`, `pnc-with-dthoomans`, and
+  `dtabstract`.
+- `pz-verify` reports no i18n, Kahlua, or bloat errors in the changed runtime.
+- Source audit: 6,912 explicit phrase records, zero inline locale fields,
+  7,524 EN entries, and 7,524 TL entries.
+- One observatory matrix suite is not green because Tkinter aborts during
+  cross-thread teardown (`Tcl_AsyncDelete`); no migration assertion failed.
 
 ## Completion
 
-- Core migration commit: `8e06c89dc0ea0be3b0e827b4f42254fb4e17cec7`.
-- Dynamic Trading migration commit:
-  `d6e3616f9c637d5777018e5bbfcfb7ed33b99d04`.
-- Project Hoomans migration commit:
-  `414ad653febc9eb9d56098a829e60405aef16f83`.
-- Core doctor repair commit:
-  `bab8b8176d2ce88f06e851ff617ff86a51ed7c6c`.
-- Checkpoint/documentation commit:
-  `e7f0f10f`.
-- Canonical bundle cleanup commits:
-  Core `09a1c69`, Dynamic Trading `b9d7c945`, and Project Hoomans
-  `25369bf1`.
-- The live composition matrix and GUI startup gate pass as recorded in
-  `PROGRESS.md`.
+- Core explicit-record commit: `12590d64`.
+- Dynamic Trading registry refresh: `c8a013b7`.
+- Project Hoomans canonical-key commit: `5e9b37ed`.
+- Earlier migration and bundle-cleanup commits remain in the history above.
 
 ## Safety
 
-Do not restore the deleted conversation trees or add migration shims.
-Do not stage the pre-existing architecture reports, unrelated audit scripts,
-or unrelated test changes. Do not launch Project Zomboid or publish Workshop
-content unless the user explicitly assigns that live validation.
+Do not restore deleted conversation trees or add migration shims. The residual
+dirty files are unrelated pre-existing audit/report work and remain unstaged.
+Do not launch Project Zomboid or publish Workshop content unless the user
+explicitly assigns that live validation.

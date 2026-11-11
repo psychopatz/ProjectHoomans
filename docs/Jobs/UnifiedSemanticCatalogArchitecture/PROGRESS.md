@@ -93,3 +93,22 @@ The unified semantic catalog architecture and harness migration are complete.
   `ExecuteTradeBasket`; single-row command input is normalized before it
   reaches the service.
 - The Core, PNC, and DT focused verification gates remain green after cleanup.
+
+## Accepted explicit Conversation authoring records
+
+- All 6,912 phrase slots now carry explicit `phraseID` and `translationKey`
+  records; array order no longer derives identity.
+- The content compiler now uses schema v3 and rejects missing explicit phrase
+  identity or inline locale fields.
+- EN/TL source catalogs remain one complete JSON file per locale. The source
+  migration preserved all 6,914 mapped texts with zero parity mismatches.
+- Semantic translation manifests exclude bundle-owned files, preventing
+  generic bundle keys from colliding in the global Conversation catalog.
+- The authoring writer updates locale catalogs directly and keeps content
+  shards translation-free; its regression test now covers that boundary.
+- Core, PNC, and DT focused tests plus all three harness composition pings
+  pass. The response observatory suite remains an existing Tkinter teardown
+  abort (`Tcl_AsyncDelete`), not a migration assertion failure.
+
+The unified semantic catalog architecture remains complete. No next chunk is
+required for this phase.
