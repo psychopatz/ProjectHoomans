@@ -16,22 +16,22 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.lab.testing.sweep_batch import (
+from tools.semantic_harness.testing.sweep_batch import (
     SweepBatchExecutor,
     SweepExecutionCancelled,
     SweepManifest,
 )
-from tools.providers.pnc.lab.testing.sweep_cluster import ClusterAggregator
-from tools.providers.pnc.lab.testing.sweep_dimensions import extract_dimension_inventory
-from tools.providers.pnc.lab.testing.sweep_evidence import extract_evidence_rows_from_turn, resolve_trace_handle
-from tools.providers.pnc.lab.testing.sweep_planner import CoveragePlan, CoveragePlanner, PlannedCase
-from tools.providers.pnc.lab.testing.sweep_quality import QualityAnalyzer
-from tools.providers.pnc.lab.testing.sweep_reachability import (
+from tools.semantic_harness.testing.sweep_cluster import ClusterAggregator
+from tools.semantic_harness.testing.sweep_dimensions import extract_dimension_inventory
+from tools.semantic_harness.testing.sweep_evidence import extract_evidence_rows_from_turn, resolve_trace_handle
+from tools.semantic_harness.testing.sweep_planner import CoveragePlan, CoveragePlanner, PlannedCase
+from tools.semantic_harness.testing.sweep_quality import QualityAnalyzer
+from tools.semantic_harness.testing.sweep_reachability import (
     ReachabilityAnalyzer,
     VariantReachabilityState,
     enumerate_all_response_pools,
 )
-from tools.providers.pnc.lab.testing.sweep_service import DialogueQualitySweepService
+from tools.semantic_harness.testing.sweep_service import DialogueQualitySweepService
 
 
 class SweepAcceptanceTests(unittest.TestCase):
@@ -453,7 +453,7 @@ class SweepAcceptanceTests(unittest.TestCase):
 
     def test_frontier_expansion_discovers_unique_variant(self) -> None:
         """Verify that frontier expansion discovers at least one additional unique selected variant beyond baseline review."""
-        from tools.providers.pnc.lab.testing.sweep_reachability import ObservedVariantLedger
+        from tools.semantic_harness.testing.sweep_reachability import ObservedVariantLedger
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             svc = DialogueQualitySweepService(base_dir=tmp_dir)

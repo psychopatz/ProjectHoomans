@@ -23,3 +23,11 @@ the shared `SemanticExecution` contract without naming an adopter. The real
 Project Hoomans worker remains the Hoomans-owned production composition, while
 its Python lifecycle, process, session, and state mechanics continue to come
 from Core.
+
+The provider package contains only Hoomans adapters, production Lua worker
+modules, provider fixtures/content policy, and provider tests. Shared
+CodeBuilder sources, the executable Semantic Harness, launcher, UI,
+inspection, generic testing, and mod manager live only in Core under
+`tools/semantic_harness`. Launch the shared harness from Core with `--preset
+pnc --repository <ProjectHoomans>` or compose it with Dynamic Trading using
+`--preset pnc-with-dthoomans`.

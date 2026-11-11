@@ -8,17 +8,18 @@ import shutil
 import tempfile
 import unittest
 
-from tools.providers.pnc.codebuilder.conversation_compiler import (
+from tools.semantic_harness.codebuilder.conversation_compiler import (
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
     conversation_translation_bundles,
 )
-from tools.providers.pnc.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
 class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
@@ -78,7 +79,7 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
             shutil.copytree(
-                REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
+                CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
                 repository / CONVERSATION_SOURCE_RELATIVE,
             )
             service = SemanticLabAuthoringService(

@@ -161,10 +161,10 @@ class C0AHistoricalEvidenceTests(unittest.TestCase):
     def test_storage_capture_remains_observer_only(self) -> None:
         paths = [
             REPOSITORY
-            / "tools/providers/pnc/codebuilder/sources/conversation/"
+            / "tools/semantic_harness/codebuilder/sources/conversation/"
             "manifest.json",
             REPOSITORY
-            / "tools/providers/pnc/codebuilder/sources/conversation/"
+            / "tools/semantic_harness/codebuilder/sources/conversation/"
             "content/social/reactions.json",
             REPOSITORY
             / "Contents/mods/ProjectHoomans/common/media/lua/shared/"

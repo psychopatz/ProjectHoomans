@@ -3,7 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 import unittest
 
-from tools.providers.pnc.lab.inspection.conversation_inspector import (
+from tools.semantic_harness.inspection.conversation_inspector import (
     build_conversation_inspector,
 )
 from tools.semantic_harness.inspection.rendering import conversation_first

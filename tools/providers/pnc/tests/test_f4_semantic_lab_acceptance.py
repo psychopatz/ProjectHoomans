@@ -8,13 +8,14 @@ import shutil
 import tempfile
 import unittest
 
-from tools.providers.pnc.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.tests.test_interaction_spec import backstory_spec
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 BACKSTORY_BLOCKS = [
     "language.trigger",
     "language.backstory_subject",
@@ -69,11 +70,11 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
             root / "Contents" / "mods" / "ProjectHoomans",
         )
         source_target = (
-            root / "tools/providers/pnc/codebuilder/sources/conversation"
+            root / "tools/semantic_harness/codebuilder/sources/conversation"
         )
         source_target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copytree(
-            REPOSITORY / "tools/providers/pnc/codebuilder/sources/conversation",
+            CORE_REPOSITORY / "tools/semantic_harness/codebuilder/sources/conversation",
             source_target,
         )
         shutil.copytree(
@@ -176,7 +177,7 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
             with LuaSemanticWorker(
                 _worker_scenario(),
                 repository=root,
-                core_repository=REPOSITORY.parent / "psychopatzCore",
+                core_repository=CORE_REPOSITORY,
             ) as worker:
                 first_turn = worker.input("tell me about your work history")
                 self.assertEqual(
@@ -281,7 +282,7 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
             with LuaSemanticWorker(
                 player_a,
                 repository=root,
-                core_repository=REPOSITORY.parent / "psychopatzCore",
+                core_repository=CORE_REPOSITORY,
             ) as worker:
                 former_a = worker.input("tell me about your work history")
                 knowledge_a = former_a["contextAfter"]["dossier"]
@@ -307,7 +308,7 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
             with LuaSemanticWorker(
                 _worker_scenario(language="TL"),
                 repository=root,
-                core_repository=REPOSITORY.parent / "psychopatzCore",
+                core_repository=CORE_REPOSITORY,
             ) as worker:
                 tagalog = worker.input("tell me about your hometown")
                 payload = tagalog["messages"][0]["payload"]
@@ -333,7 +334,7 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
             with LuaSemanticWorker(
                 _worker_scenario(),
                 repository=root,
-                core_repository=REPOSITORY.parent / "psychopatzCore",
+                core_repository=CORE_REPOSITORY,
             ) as worker:
                 empty = worker.knowledge_metrics()
                 worker.backstory(90210, npc_id="npc-f4-generated")
@@ -341,14 +342,14 @@ class SemanticLabF4AcceptanceTests(unittest.TestCase):
             with LuaSemanticWorker(
                 _worker_scenario(),
                 repository=root,
-                core_repository=REPOSITORY.parent / "psychopatzCore",
+                core_repository=CORE_REPOSITORY,
             ) as worker:
                 worker.input("tell me about your work history")
                 one_fact = worker.knowledge_metrics()
             with LuaSemanticWorker(
                 _worker_scenario(),
                 repository=root,
-                core_repository=REPOSITORY.parent / "psychopatzCore",
+                core_repository=CORE_REPOSITORY,
             ) as worker:
                 ten_facts = worker.knowledge_metrics(1, 10)
 

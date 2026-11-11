@@ -9,8 +9,8 @@ import tempfile
 import json
 import unittest
 
-from tools.providers.pnc.lab.inspection.response_candidate import preview_authored_variant
-from tools.providers.pnc.lab.inspection.response_observatory import (
+from tools.semantic_harness.inspection.response_candidate import preview_authored_variant
+from tools.semantic_harness.inspection.response_observatory import (
     run_quality_matrix, compare_quality_reports, review_variant_proposal,
 )
 
@@ -43,7 +43,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
         )
 
     def test_goodbye_root_closes_while_typed_goodbye_does_not(self):
-        from tools.providers.pnc.lab.inspection.response_observatory import (
+        from tools.semantic_harness.inspection.response_observatory import (
             run_quality_matrix,
         )
         cases = [
@@ -369,7 +369,7 @@ class ResponseQualityMatrixTests(unittest.TestCase):
                         ), npc)
 
     def test_bundled_real_lua_context_matrices(self):
-        from tools.providers.pnc.lab.inspection.response_observatory import run_quality_matrix
+        from tools.semantic_harness.inspection.response_observatory import run_quality_matrix
         root = Path(__file__).resolve().parents[4]
         for filename in (
             "observatory_core_en_tl.json",
@@ -500,7 +500,7 @@ class ObservatoryTkTests(unittest.TestCase):
         from tkinter.scrolledtext import ScrolledText
         from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
         from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-        from tools.providers.pnc.lab.studio.observatory_pane import (
+        from tools.semantic_harness.studio.observatory_pane import (
             SemanticObservatoryPane,
         )
 
@@ -551,7 +551,7 @@ class ObservatoryTkTests(unittest.TestCase):
         from tkinter.scrolledtext import ScrolledText
         from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
         from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-        from tools.providers.pnc.lab.studio.observatory_pane import (
+        from tools.semantic_harness.studio.observatory_pane import (
             SemanticObservatoryPane,
         )
         repository = Path(__file__).resolve().parents[4]

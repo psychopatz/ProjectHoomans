@@ -1,7 +1,8 @@
 # PNC provider package
 
 This directory contains Project Hoomans/PNC-specific adapters, production Lua
-worker modules, fixtures, CodeBuilder source policy, and provider tests.
+worker modules, provider fixtures/content policy, and provider tests. The
+shared CodeBuilder and Semantic Lab implementation live only in Core.
 
 The executable Semantic Harness, launcher, UI, inspection, generic testing,
 mod manager, and Core contracts are owned by PsychopatzCore under

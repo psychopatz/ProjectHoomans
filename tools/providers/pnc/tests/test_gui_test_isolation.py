@@ -10,8 +10,8 @@ import unittest
 from unittest.mock import patch
 
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
-from tools.providers.pnc.lab.ui.state import save as save_ui_state
-from tools.providers.pnc.lab.ui.state import state_path
+from tools.semantic_harness.ui.state import save as save_ui_state
+from tools.semantic_harness.ui.state import state_path
 
 
 @unittest.skipUnless(os.environ.get("DISPLAY"), "Tk display is unavailable")

@@ -6,10 +6,10 @@ from copy import deepcopy
 import json
 import unittest
 
-from tools.providers.pnc.lab.inspection.conversation_inspector import build_conversation_inspector
+from tools.semantic_harness.inspection.conversation_inspector import build_conversation_inspector
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.lab.ui.dialogs.settings import collect_scenario_settings
+from tools.semantic_harness.ui.dialogs.settings import collect_scenario_settings
 
 
 class SemanticLabPersonaSurfaceTests(unittest.TestCase):

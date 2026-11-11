@@ -7,7 +7,7 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.lab.testing.sweep_reachability import (
+from tools.semantic_harness.testing.sweep_reachability import (
     REACHABILITY_SCHEMA_V1,
     ObservedVariantLedger,
     ReachabilityAnalyzer,

@@ -9,13 +9,13 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 
-from tools.providers.pnc.lab import app
-from tools.providers.pnc.lab.cli import _parser, cli
-from tools.providers.pnc.codebuilder.dialogue_contract import (
+from tools.semantic_harness import app
+from tools.semantic_harness.cli import _parser, cli
+from tools.semantic_harness.codebuilder.dialogue_contract import (
     validate_branch_offers,
 )
-from tools.providers.pnc.codebuilder.lexicon_compiler import CompileError
-from tools.providers.pnc.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.codebuilder.lexicon_compiler import CompileError
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]

@@ -8,19 +8,19 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.providers.pnc.codebuilder.build import (
+from tools.semantic_harness.codebuilder.build import (
     DEFAULT_OUTPUT,
     _write_routed_modules,
     default_lexicon_output,
     write_conversation_output,
 )
-from tools.providers.pnc.codebuilder.conversation_compiler import (
+from tools.semantic_harness.codebuilder.conversation_compiler import (
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
     conversation_translation_bundles_by_owner,
     render_conversation_runtime_plan,
 )
-from tools.providers.pnc.codebuilder.generation_ownership import (
+from tools.semantic_harness.codebuilder.generation_ownership import (
     CORE_OWNER,
     DT_COMMON_OWNER,
     HOOMANS_OWNER,
@@ -37,6 +37,7 @@ from tools.providers.pnc.codebuilder.generation_ownership import (
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
 class GenerationOwnershipTests(unittest.TestCase):
@@ -186,7 +187,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             core = root / "psychopatzCore"
             dynamic_trading = root / "DynamicTrading"
             source_root = hoomans / CONVERSATION_SOURCE_RELATIVE
-            shutil.copytree(REPOSITORY / CONVERSATION_SOURCE_RELATIVE, source_root)
+            shutil.copytree(CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE, source_root)
 
             manifest_path = source_root / "manifest.json"
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -317,7 +318,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             hoomans = root / "ProjectHoomans"
             core = root / "psychopatzCore"
             shutil.copytree(
-                REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
+                CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
                 hoomans / CONVERSATION_SOURCE_RELATIVE,
             )
             model = compile_conversation_sources(

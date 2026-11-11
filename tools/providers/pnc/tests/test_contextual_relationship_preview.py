@@ -10,10 +10,10 @@ import time
 import tkinter as tk
 import unittest
 
-from tools.providers.pnc.lab.cli import _parser
+from tools.semantic_harness.cli import _parser
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.lab.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.ui.shell import SemanticHarnessApp
 
 
 class ContextualRelationshipPreviewTests(unittest.TestCase):

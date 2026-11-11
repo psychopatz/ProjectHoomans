@@ -6,7 +6,7 @@ from concurrent.futures import Future
 import unittest
 from unittest.mock import Mock
 
-from tools.providers.pnc.lab.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.ui.shell import SemanticHarnessApp
 
 
 class WorkerSessionUITests(unittest.TestCase):

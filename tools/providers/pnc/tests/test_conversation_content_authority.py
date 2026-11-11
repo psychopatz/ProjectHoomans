@@ -6,12 +6,12 @@ from copy import deepcopy
 from pathlib import Path
 import unittest
 
-from tools.providers.pnc.codebuilder.conversation_compiler import (
+from tools.semantic_harness.codebuilder.conversation_compiler import (
     compile_conversation_sources,
     render_conversation_registry,
     render_conversation_runtime_plan,
 )
-from tools.providers.pnc.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 

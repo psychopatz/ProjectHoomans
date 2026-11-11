@@ -6,7 +6,7 @@ from copy import deepcopy
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.lab.ui.shell import semantic_suggestion_rows
+from tools.semantic_harness.ui.shell import semantic_suggestion_rows
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 

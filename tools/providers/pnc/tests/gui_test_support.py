@@ -10,9 +10,9 @@ import tkinter as tk
 import unittest
 from typing import Any, Callable, Iterable
 
-from tools.providers.pnc.lab.cli import _parser
+from tools.semantic_harness.cli import _parser
 from tools.providers.pnc.runtime.save_catalog import SaveCatalog
-from tools.providers.pnc.lab.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.ui.shell import SemanticHarnessApp
 
 
 def require_supported_save(test_case: unittest.TestCase) -> dict[str, Any]:

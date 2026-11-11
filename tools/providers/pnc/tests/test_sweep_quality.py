@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import unittest
 
-from tools.providers.pnc.lab.testing.sweep_cluster import (
+from tools.semantic_harness.testing.sweep_cluster import (
     CLUSTER_SCHEMA_V1,
     ClusterAggregator,
     DialogueClusterReport,
     DialogueQualityCluster,
 )
-from tools.providers.pnc.lab.testing.sweep_quality import QualityAnalyzer
+from tools.semantic_harness.testing.sweep_quality import QualityAnalyzer
 
 
 class SweepQualityTests(unittest.TestCase):

@@ -9,8 +9,8 @@ import shutil
 import tempfile
 import unittest
 
-from tools.providers.pnc.codebuilder.service import SemanticLabAuthoringService
-from tools.providers.pnc.codebuilder.interaction_spec import (
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.codebuilder.interaction_spec import (
     edit_interaction_graph,
     graph_block,
     graph_connection,
@@ -21,16 +21,17 @@ from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
 def _copy_conversation_sources(repository: Path) -> None:
     target = (
         repository
-        / "tools/providers/pnc/codebuilder/sources/conversation"
+        / "tools/semantic_harness/codebuilder/sources/conversation"
     )
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(
-        REPOSITORY / "tools/providers/pnc/codebuilder/sources/conversation",
+        CORE_REPOSITORY / "tools/semantic_harness/codebuilder/sources/conversation",
         target,
     )
 
@@ -232,7 +233,7 @@ class InteractionSpecTests(unittest.TestCase):
             repository = Path(directory)
             _copy_conversation_sources(repository)
             source_path = repository / (
-                "tools/providers/pnc/codebuilder/sources/conversation/"
+                "tools/semantic_harness/codebuilder/sources/conversation/"
                 "flows/semantic_flows.json"
             )
             service = SemanticLabAuthoringService(
@@ -358,7 +359,7 @@ class InteractionSpecTests(unittest.TestCase):
             repository = Path(directory)
             _copy_conversation_sources(repository)
             source_path = repository / (
-                "tools/providers/pnc/codebuilder/sources/conversation/"
+                "tools/semantic_harness/codebuilder/sources/conversation/"
                 "flows/grounded_personal_responses.json"
             )
             service = SemanticLabAuthoringService(repository=repository, runtime_root=REPOSITORY)

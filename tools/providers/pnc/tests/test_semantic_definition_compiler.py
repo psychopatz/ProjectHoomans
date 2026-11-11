@@ -5,8 +5,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.providers.pnc.codebuilder.lexicon_compiler import CompileError
-from tools.providers.pnc.codebuilder.semantic_definition_compiler import (
+from tools.semantic_harness.codebuilder.lexicon_compiler import CompileError
+from tools.semantic_harness.codebuilder.semantic_definition_compiler import (
     compile_semantic_definitions,
     discover_registered_capability_ids,
     render_semantic_lua_shards,

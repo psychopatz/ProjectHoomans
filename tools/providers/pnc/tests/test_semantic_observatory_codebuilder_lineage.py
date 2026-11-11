@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from copy import deepcopy
 
-from tools.providers.pnc.lab.inspection.response_source_lineage import (
+from tools.semantic_harness.inspection.response_source_lineage import (
     inspect_codebuilder_lineage,
 )
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
@@ -45,7 +45,7 @@ class ObservatoryCodeBuilderLineageTests(unittest.TestCase):
                          "unchanged")
 
     def test_falsified_canonical_content_never_becomes_verified_owner(self):
-        from tools.providers.pnc.codebuilder.service import (
+        from tools.semantic_harness.codebuilder.service import (
             SemanticLabAuthoringService,
         )
         service = SemanticLabAuthoringService()
@@ -82,7 +82,7 @@ class ObservatoryLineageTkTests(unittest.TestCase):
         import tkinter as tk
         from tkinter import ttk
         from tkinter.scrolledtext import ScrolledText
-        from tools.providers.pnc.lab.studio.observatory_pane import (
+        from tools.semantic_harness.studio.observatory_pane import (
             SemanticObservatoryPane,
         )
         root = tk.Tk()

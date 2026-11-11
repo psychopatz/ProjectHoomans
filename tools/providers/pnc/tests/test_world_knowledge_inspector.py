@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from tools.providers.pnc.lab.inspection.world_knowledge import (
+from tools.semantic_harness.inspection.world_knowledge import (
     build_world_knowledge_inspector,
 )
 from tools.providers.pnc.tests.test_grounded_world_knowledge_gossip import (

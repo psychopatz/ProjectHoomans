@@ -5,7 +5,7 @@ from pathlib import Path
 import json
 import unittest
 
-from tools.providers.pnc.codebuilder.conversation_compiler import (
+from tools.semantic_harness.codebuilder.conversation_compiler import (
     compile_conversation_sources,
     conversation_discovery_index,
     render_conversation_runtime_plan,

@@ -8,7 +8,7 @@ from pathlib import Path
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.testing.runner import load_case, run_case
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.lab.ui.shell import semantic_suggestion_rows
+from tools.semantic_harness.ui.shell import semantic_suggestion_rows
 
 
 ORIGINAL_TRACE_CASE = (

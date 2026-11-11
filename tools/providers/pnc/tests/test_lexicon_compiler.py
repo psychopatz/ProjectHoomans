@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.providers.pnc.codebuilder.lexicon_compiler import (
+from tools.semantic_harness.codebuilder.lexicon_compiler import (
     CompileError,
     compile_wordnet,
     load_allowlist,
@@ -18,7 +18,7 @@ from tools.providers.pnc.codebuilder.lexicon_compiler import (
 
 REPOSITORY = Path(__file__).resolve().parents[4]
 PRODUCTION_ALLOWLIST = REPOSITORY / (
-    "tools/providers/pnc/codebuilder/sources/wordnet_concepts.json"
+    "tools/semantic_harness/codebuilder/sources/wordnet_concepts.json"
 )
 
 

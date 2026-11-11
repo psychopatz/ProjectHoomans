@@ -11,11 +11,11 @@ import tkinter as tk
 import unittest
 from copy import deepcopy
 
-from tools.providers.pnc.lab.cli import _parser
+from tools.semantic_harness.cli import _parser
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 from tools.semantic_harness.activity import ActivityLog
-from tools.providers.pnc.lab.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
 
 

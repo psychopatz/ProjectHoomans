@@ -13,7 +13,7 @@ import unittest
 from tools.providers.pnc.tests.test_grounded_world_knowledge_gossip import (
     scenario_for,
 )
-from tools.providers.pnc.lab.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
 
 

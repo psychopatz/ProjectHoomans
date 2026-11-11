@@ -62,7 +62,7 @@ class ResponseObservatoryTests(unittest.TestCase):
             )
 
     def test_observed_lookup_does_not_invent_generated_selection(self):
-        from tools.providers.pnc.lab.inspection.response_turn_trace import (
+        from tools.semantic_harness.inspection.response_turn_trace import (
             inspect_response_turn,
         )
         from tools.providers.pnc.runtime.scenario import merge
@@ -94,7 +94,7 @@ class ResponseObservatoryTests(unittest.TestCase):
     def test_production_lua_coverage_distinguishes_dominance_from_unreachable(self):
         import json
         from pathlib import Path
-        from tools.providers.pnc.lab.inspection.response_selection_coverage import (
+        from tools.semantic_harness.inspection.response_selection_coverage import (
             selection_coverage,
         )
         root = Path(__file__).resolve().parents[4]
@@ -146,7 +146,7 @@ class ResponseObservatoryTests(unittest.TestCase):
         self.assertNotIn("unreachable", str(lower).lower())
 
     def test_selection_coverage_rejects_invalid_or_excess_contexts(self):
-        from tools.providers.pnc.lab.inspection.response_selection_coverage import (
+        from tools.semantic_harness.inspection.response_selection_coverage import (
             selection_coverage,
         )
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:

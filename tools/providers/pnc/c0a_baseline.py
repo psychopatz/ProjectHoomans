@@ -15,7 +15,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Iterable
 
-from tools.providers.pnc.codebuilder.conversation_compiler import (
+from tools.semantic_harness.codebuilder.conversation_compiler import (
     CONVERSATION_MANIFEST_RELATIVE,
     CONVERSATION_RUNTIME_RELATIVE,
     CONVERSATION_SOURCE_RELATIVE,

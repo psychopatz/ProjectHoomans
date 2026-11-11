@@ -89,8 +89,10 @@ T.falsy(composition:find("PNC_Necroa_ZombieFlavor", 1, true),
 T.truthy(composition:find("PNC_Necroa_ZombieCaptionAdapter", 1, true),
     "client composition loads the provider caption adapter")
 
-local sourceRoot = T.repository
-    .. "/tools/providers/pnc/codebuilder/sources/conversation/content"
+local coreRepository = assert(os.getenv("PZ_TEST_CORE_REPOSITORY"),
+    "PZ_TEST_CORE_REPOSITORY is required")
+local sourceRoot = coreRepository
+    .. "/tools/semantic_harness/codebuilder/sources/conversation/content"
 local quotedRoot = "'" .. sourceRoot:gsub("'", "'\\''") .. "'"
 local contentFiles = {}
 local finder = assert(io.popen(
@@ -116,7 +118,7 @@ for _, fileName in ipairs(contentFiles) do
     end
 end
 T.falsy(io.open(
-    T.repository .. "/tools/providers/pnc/codebuilder/sources/"
+    coreRepository .. "/tools/semantic_harness/codebuilder/sources/"
         .. "semantic_dialogue_content.json", "rb"),
     "monolithic Dialogue Content source is retired")
 

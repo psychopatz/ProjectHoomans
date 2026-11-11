@@ -9,21 +9,21 @@ import tempfile
 import tkinter as tk
 import unittest
 
-from tools.providers.pnc.lab.cli import _parser, cli
-from tools.providers.pnc.lab.testing.sweep_cluster import (
+from tools.semantic_harness.cli import _parser, cli
+from tools.semantic_harness.testing.sweep_cluster import (
     DialogueClusterReport,
     DialogueQualityCluster,
 )
-from tools.providers.pnc.lab.testing.sweep_dimensions import extract_dimension_inventory
-from tools.providers.pnc.lab.testing.sweep_planner import CoveragePlan, CoveragePlanner, PlannedCase
-from tools.providers.pnc.lab.testing.sweep_review import (
+from tools.semantic_harness.testing.sweep_dimensions import extract_dimension_inventory
+from tools.semantic_harness.testing.sweep_planner import CoveragePlan, CoveragePlanner, PlannedCase
+from tools.semantic_harness.testing.sweep_review import (
     REVIEW_BUNDLE_SCHEMA_V1,
     build_llm_review_bundle,
     create_replay_plan,
 )
-from tools.providers.pnc.lab.testing.sweep_service import DialogueQualitySweepService
+from tools.semantic_harness.testing.sweep_service import DialogueQualitySweepService
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
-from tools.providers.pnc.lab.ui.quality_sweep_controller import (
+from tools.semantic_harness.ui.quality_sweep_controller import (
     on_qs_apply_filter,
     on_qs_cancel,
     on_qs_cluster_select,
@@ -31,7 +31,7 @@ from tools.providers.pnc.lab.ui.quality_sweep_controller import (
     on_qs_plan,
     on_qs_refresh,
 )
-from tools.providers.pnc.lab.ui.simulation_sweep_controller import (
+from tools.semantic_harness.ui.simulation_sweep_controller import (
     on_sweep_cluster_select,
     on_sweep_plan,
     on_sweep_refresh,

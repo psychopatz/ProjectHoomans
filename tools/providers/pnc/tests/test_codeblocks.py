@@ -7,12 +7,12 @@ import json
 import tempfile
 import unittest
 
-from tools.providers.pnc.codebuilder.codeblocks import (
+from tools.semantic_harness.codebuilder.codeblocks import (
     codeblocks_to_flow,
     flow_to_codeblocks,
     validate_codeblock_document,
 )
-from tools.providers.pnc.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 

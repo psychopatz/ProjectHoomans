@@ -9,20 +9,21 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.providers.pnc.codebuilder.conversation_compiler import (
+from tools.semantic_harness.codebuilder.conversation_compiler import (
     CONVERSATION_MAX_SHARD_BYTES,
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
     conversation_translation_bundles,
     render_conversation_runtime_plan,
 )
-from tools.providers.pnc.codebuilder.build import _write_conversation_translation_manifest
-from tools.providers.pnc.codebuilder.lexicon_compiler import CompileError
-from tools.providers.pnc.codebuilder.service import SemanticLabAuthoringService
-from tools.providers.pnc.codebuilder.generation_ownership import CORE_OWNER
+from tools.semantic_harness.codebuilder.build import _write_conversation_translation_manifest
+from tools.semantic_harness.codebuilder.lexicon_compiler import CompileError
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.codebuilder.generation_ownership import CORE_OWNER
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
 class ConversationCompilerTests(unittest.TestCase):
@@ -30,7 +31,7 @@ class ConversationCompilerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
             shutil.copytree(
-                REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
+                CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
                 repository / CONVERSATION_SOURCE_RELATIVE,
             )
             manifest_path = repository / CONVERSATION_SOURCE_RELATIVE / "manifest.json"
@@ -112,13 +113,13 @@ class ConversationCompilerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
             shutil.copytree(
-                REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
+                CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
                 repository / CONVERSATION_SOURCE_RELATIVE,
             )
             before = compile_conversation_sources(
                 repository,
                 package_repositories={
-                    CORE_OWNER: REPOSITORY.parent / "psychopatzCore",
+                    CORE_OWNER: CORE_REPOSITORY,
                 },
             )
             greeting_path = repository / CONVERSATION_SOURCE_RELATIVE / "content/greeting.json"
@@ -140,7 +141,7 @@ class ConversationCompilerTests(unittest.TestCase):
             after = compile_conversation_sources(
                 repository,
                 package_repositories={
-                    CORE_OWNER: REPOSITORY.parent / "psychopatzCore",
+                    CORE_OWNER: CORE_REPOSITORY,
                 },
             )
 
@@ -164,7 +165,7 @@ class ConversationCompilerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
             shutil.copytree(
-                REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
+                CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
                 repository / CONVERSATION_SOURCE_RELATIVE,
             )
             service = SemanticLabAuthoringService(
@@ -210,7 +211,7 @@ class ConversationCompilerTests(unittest.TestCase):
         )
         self.assertFalse(
             any(
-                "tools/providers/pnc/codebuilder/generated/conversation"
+                "tools/semantic_harness/codebuilder/generated/conversation"
                 in path
                 for path in paths
             ),
@@ -222,7 +223,7 @@ class ConversationCompilerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
             shutil.copytree(
-                REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
+                CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
                 repository / CONVERSATION_SOURCE_RELATIVE,
             )
             greeting_path = (

@@ -6,12 +6,12 @@ import unittest
 from pathlib import Path
 from copy import deepcopy
 
-from tools.providers.pnc.codebuilder.dialogue_content import (
+from tools.semantic_harness.codebuilder.dialogue_content import (
     MAX_PHRASES_PER_STYLE,
     compile_dialogue_content,
     CompileError,
 )
-from tools.providers.pnc.codebuilder.variation_auditor import (
+from tools.semantic_harness.codebuilder.variation_auditor import (
     CLASSIFICATION_EXPAND,
     CLASSIFICATION_PLAYER_UI,
     CLASSIFICATION_THIRD_PARTY,

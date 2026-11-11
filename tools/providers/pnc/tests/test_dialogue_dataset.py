@@ -5,12 +5,12 @@ import json
 import unittest
 from pathlib import Path
 
-from tools.providers.pnc.codebuilder.dialogue_contract import CompileError
-from tools.providers.pnc.codebuilder.service import SemanticLabAuthoringService
-from tools.providers.pnc.codebuilder.dialogue_dataset import (
+from tools.semantic_harness.codebuilder.dialogue_contract import CompileError
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.codebuilder.dialogue_dataset import (
     compile_dialogue_dataset,
 )
-from tools.providers.pnc.codebuilder.dialogue_rendering import (
+from tools.semantic_harness.codebuilder.dialogue_rendering import (
     render_dialogue_lua,
     render_dialogue_translation,
 )

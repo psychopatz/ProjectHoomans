@@ -2,7 +2,7 @@
 from __future__ import annotations
 import os
 import unittest
-from tools.providers.pnc.lab.inspection.response_translation_coverage import translation_coverage
+from tools.semantic_harness.inspection.response_translation_coverage import translation_coverage
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
@@ -47,7 +47,7 @@ class TranslationManifestTkTests(unittest.TestCase):
         import tkinter as tk
         from tkinter import ttk
         from tkinter.scrolledtext import ScrolledText
-        from tools.providers.pnc.lab.studio.observatory_pane import SemanticObservatoryPane
+        from tools.semantic_harness.studio.observatory_pane import SemanticObservatoryPane
         root = tk.Tk()
         root.withdraw()
         try:

@@ -91,7 +91,7 @@ class UnifiedEvidenceE7Tests(unittest.TestCase):
             self.assertEqual(source, worker.source_snapshot.to_dict())
 
     def test_lab_diagnostics_expose_independent_evidence_signals(self):
-        from tools.providers.pnc.lab.ui.interaction_inspector import interaction_summary
+        from tools.semantic_harness.ui.interaction_inspector import interaction_summary
         with saved_worker() as worker:
             worker.input("fuck you")
             result = worker.input("im sorry")

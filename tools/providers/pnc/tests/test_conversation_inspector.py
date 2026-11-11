@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from tools.providers.pnc.lab.inspection.conversation_inspector import build_conversation_inspector
+from tools.semantic_harness.inspection.conversation_inspector import build_conversation_inspector
 from tools.semantic_harness.inspection.rendering import conversation_first
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker

@@ -7,7 +7,7 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.lab.ui.dialogs.settings import collect_scenario_settings
+from tools.semantic_harness.ui.dialogs.settings import collect_scenario_settings
 
 
 class ContextualBondsTests(unittest.TestCase):

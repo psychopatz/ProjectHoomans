@@ -14,14 +14,14 @@ import tkinter as tk
 import unittest
 from typing import Any, Callable
 
-from tools.providers.pnc.lab.cli import _parser
+from tools.semantic_harness.cli import _parser
 from tools.providers.pnc.runtime.player_engine_state import (
     OfflinePlayerEngineStateProvider,
 )
 from tools.semantic_harness.runtime.save_browser import SavedWorldBrowser
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.lab.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
 
 

@@ -11,13 +11,13 @@ import time
 import tkinter as tk
 import unittest
 
-from tools.providers.pnc.lab.cli import _parser
+from tools.semantic_harness.cli import _parser
 from tools.semantic_harness.runtime.npc_profiles import apply_npc_profile
 from tools.semantic_harness.runtime_discovery import discover_newest_runtime
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.lab.ui.shell import SemanticHarnessApp
-from tools.providers.pnc.lab.ui.suggestion_projection import (
+from tools.semantic_harness.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.ui.suggestion_projection import (
     conversation_presented_rows,
     npc_message_text,
 )

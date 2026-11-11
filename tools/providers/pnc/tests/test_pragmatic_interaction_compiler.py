@@ -8,7 +8,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.providers.pnc.codebuilder.conversation_compiler import (
+from tools.semantic_harness.codebuilder.conversation_compiler import (
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
     conversation_translation_bundles,
@@ -17,6 +17,7 @@ from tools.providers.pnc.codebuilder.conversation_compiler import (
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
 class PragmaticInteractionCompilerTests(unittest.TestCase):
@@ -101,7 +102,7 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
             shutil.copytree(
-                REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
+                CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
                 repository / CONVERSATION_SOURCE_RELATIVE,
             )
             path = (
@@ -123,7 +124,7 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
             source_root = repository / CONVERSATION_SOURCE_RELATIVE
-            shutil.copytree(REPOSITORY / CONVERSATION_SOURCE_RELATIVE, source_root)
+            shutil.copytree(CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE, source_root)
             manifest_path = source_root / "manifest.json"
             manifest_before = manifest_path.read_bytes()
             sample = json.loads(
@@ -157,7 +158,7 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
             source_root = repository / CONVERSATION_SOURCE_RELATIVE
-            shutil.copytree(REPOSITORY / CONVERSATION_SOURCE_RELATIVE, source_root)
+            shutil.copytree(CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE, source_root)
             path = (
                 source_root
                 / "content/social/interaction/argument_retaliate.json"

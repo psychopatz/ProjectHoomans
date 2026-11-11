@@ -9,8 +9,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.providers.pnc.codebuilder.build import write_conversation_output
-from tools.providers.pnc.codebuilder.conversation_compiler import (
+from tools.semantic_harness.codebuilder.build import write_conversation_output
+from tools.semantic_harness.codebuilder.conversation_compiler import (
     CONVERSATION_MAX_INDEX_BYTES,
     CONVERSATION_MAX_RECORDS_PER_SHARD,
     CONVERSATION_MAX_SHARD_BYTES,
@@ -22,11 +22,12 @@ from tools.providers.pnc.codebuilder.conversation_compiler import (
     conversation_discovery_index,
     render_conversation_runtime_plan,
 )
-from tools.providers.pnc.codebuilder.lexicon_compiler import CompileError
-from tools.providers.pnc.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.codebuilder.lexicon_compiler import CompileError
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
 class ConversationContextHealthC5Tests(unittest.TestCase):
@@ -197,7 +198,7 @@ class ConversationContextHealthC5Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             repository = Path(directory)
             shutil.copytree(
-                REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
+                CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
                 repository / CONVERSATION_SOURCE_RELATIVE,
             )
             path = (

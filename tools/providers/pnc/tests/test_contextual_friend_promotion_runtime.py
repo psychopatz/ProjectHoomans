@@ -11,14 +11,14 @@ import unittest
 from copy import deepcopy
 from pathlib import Path
 
-from tools.providers.pnc.lab.cli import _parser
+from tools.semantic_harness.cli import _parser
 from tools.providers.pnc.runtime.scenario import (
     DEFAULT_SCENARIO,
     load_scenario,
     save_scenario,
 )
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.lab.ui.shell import SemanticHarnessApp
+from tools.semantic_harness.ui.shell import SemanticHarnessApp
 from tools.providers.pnc.tests.gui_test_support import SemanticLabGuiTestCase
 
 

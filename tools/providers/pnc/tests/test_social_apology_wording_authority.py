@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import unittest
 
-from tools.providers.pnc.codebuilder.conversation_compiler import (
+from tools.semantic_harness.codebuilder.conversation_compiler import (
     compile_conversation_sources,
 )
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
@@ -16,7 +16,7 @@ from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 REPOSITORY = Path(__file__).resolve().parents[4]
 MANIFEST = (
     REPOSITORY
-    / "tools/providers/pnc/codebuilder/sources/conversation/manifest.json"
+    / "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
 )
 APOLOGY_IDS = (
     "semantic.social.apology.default",

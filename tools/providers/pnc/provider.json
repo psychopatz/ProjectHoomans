@@ -43,5 +43,5 @@
     }
   ],
   "pythonProvider": "tools.providers.pnc.provider_adapters:register_pnc_profiles",
-  "conversationManifest": "tools/providers/pnc/codebuilder/sources/conversation/manifest.json"
+  "conversationManifest": "tools/semantic_harness/codebuilder/sources/conversation/manifest.json"
 }

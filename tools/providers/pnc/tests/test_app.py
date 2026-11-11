@@ -13,14 +13,14 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.providers.pnc.lab import app
-import tools.providers.pnc.lab.cli as cli_module
-from tools.providers.pnc.lab.cli import _parser, cli
-from tools.providers.pnc.lab.ui.shell import npc_message_text
+from tools.semantic_harness import app
+import tools.semantic_harness.cli as cli_module
+from tools.semantic_harness.cli import _parser, cli
+from tools.semantic_harness.ui.shell import npc_message_text
 from tools.semantic_harness.inspection.rendering import pretty
 from tools.semantic_harness.testing.runner import HarnessRun
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.lab.ui.dialogs.settings import collect_scenario_settings
+from tools.semantic_harness.ui.dialogs.settings import collect_scenario_settings
 
 
 def settings_values() -> dict[str, object]:
@@ -98,8 +98,8 @@ class AppEntryTests(unittest.TestCase):
         arguments = _parser().parse_args(["--case", "identity.json", "--jsonl"])
         output = io.StringIO()
         with (
-            patch("tools.providers.pnc.lab.cli.load_case", return_value=object()),
-            patch("tools.providers.pnc.lab.cli.run_case", return_value=report),
+            patch("tools.semantic_harness.cli.load_case", return_value=object()),
+            patch("tools.semantic_harness.cli.run_case", return_value=report),
             redirect_stdout(output),
         ):
             self.assertEqual(cli(arguments), 3)
@@ -113,8 +113,8 @@ class AppEntryTests(unittest.TestCase):
         output = io.StringIO()
         with (
             patch.object(cli_module.sys, "stdin", io.StringIO("first\nsecond\n")),
-            patch("tools.providers.pnc.lab.cli.LuaSemanticWorker") as worker_type,
-            patch("tools.providers.pnc.lab.cli.ConflictLedger") as ledger_type,
+            patch("tools.semantic_harness.cli.LuaSemanticWorker") as worker_type,
+            patch("tools.semantic_harness.cli.ConflictLedger") as ledger_type,
             redirect_stdout(output),
         ):
             worker = worker_type.return_value.__enter__.return_value
@@ -142,7 +142,7 @@ class AppEntryTests(unittest.TestCase):
             [
                 sys.executable,
                 "-c",
-                "import sys; import tools.providers.pnc.lab.app; print('tkinter' in sys.modules)",
+                "import sys; import tools.semantic_harness.app; print('tkinter' in sys.modules)",
             ],
             capture_output=True,
             text=True,
@@ -159,8 +159,8 @@ class AppEntryTests(unittest.TestCase):
             state_path = os.path.join(directory, "ui-state.json")
             probe = (
                 "import tkinter as tk; "
-                "from tools.providers.pnc.lab.cli import _parser; "
-                "from tools.providers.pnc.lab.ui.shell import SemanticHarnessApp; "
+                "from tools.semantic_harness.cli import _parser; "
+                "from tools.semantic_harness.ui.shell import SemanticHarnessApp; "
                 "root = tk.Tk(); "
                 f"arguments = _parser().parse_args(['--ui-state', {state_path!r}, '--reset-ui-state']); "
                 "instance = SemanticHarnessApp(root, arguments); "

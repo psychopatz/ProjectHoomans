@@ -8,14 +8,15 @@ import shutil
 import tempfile
 import unittest
 
-from tools.providers.pnc.codebuilder.service import SemanticLabAuthoringService
-from tools.providers.pnc.lab.inspection.conversation_inspector import build_conversation_inspector
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.inspection.conversation_inspector import build_conversation_inspector
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.tests.test_interaction_spec import backstory_spec, stay_spec
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 BACKSTORY_BLOCKS = [
     "language.trigger",
     "language.backstory_subject",
@@ -54,11 +55,11 @@ class V1VisualAuthoringTests(unittest.TestCase):
             root / "Contents" / "mods" / "ProjectHoomans",
         )
         source_target = (
-            root / "tools/providers/pnc/codebuilder/sources/conversation"
+            root / "tools/semantic_harness/codebuilder/sources/conversation"
         )
         source_target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copytree(
-            REPOSITORY / "tools/providers/pnc/codebuilder/sources/conversation",
+            CORE_REPOSITORY / "tools/semantic_harness/codebuilder/sources/conversation",
             source_target,
         )
         shutil.copytree(
@@ -147,7 +148,7 @@ class V1VisualAuthoringTests(unittest.TestCase):
             with LuaSemanticWorker(
                 self.scenario(),
                 repository=root,
-                core_repository=REPOSITORY.parent / "psychopatzCore",
+                core_repository=CORE_REPOSITORY,
             ) as worker:
                 backstory_turn = worker.input("what was your v1 profession")
                 action_turn = worker.input("v1 orchard lantern")
@@ -190,7 +191,7 @@ class V1VisualAuthoringTests(unittest.TestCase):
             with LuaSemanticWorker(
                 self.scenario(),
                 repository=root,
-                core_repository=REPOSITORY.parent / "psychopatzCore",
+                core_repository=CORE_REPOSITORY,
             ) as worker:
                 changed_turn = worker.input("v1 orchard lantern")
             self.assertEqual(

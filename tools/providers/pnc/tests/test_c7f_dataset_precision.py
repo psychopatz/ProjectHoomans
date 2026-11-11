@@ -5,13 +5,13 @@ from __future__ import annotations
 from pathlib import Path
 import unittest
 
-from tools.providers.pnc.codebuilder.c7f_holdout import (
+from tools.semantic_harness.codebuilder.c7f_holdout import (
     HOLDOUT_PATH,
     load_c7f_holdout,
     score_c7f_holdout,
 )
-from tools.providers.pnc.codebuilder.service import SemanticLabAuthoringService
-from tools.providers.pnc.codebuilder.dialogue_dataset import (
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.codebuilder.dialogue_dataset import (
     compile_dialogue_dataset,
 )
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO

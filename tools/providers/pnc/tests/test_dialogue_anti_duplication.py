@@ -7,7 +7,7 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.lab.testing.sweep_quality import ALLOWED_SHORT_WORDS, QualityAnalyzer
+from tools.semantic_harness.testing.sweep_quality import ALLOWED_SHORT_WORDS, QualityAnalyzer
 
 
 class DialogueAntiDuplicationTests(unittest.TestCase):

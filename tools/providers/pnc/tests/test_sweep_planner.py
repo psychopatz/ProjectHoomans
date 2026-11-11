@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import unittest
 
-from tools.providers.pnc.lab.testing.sweep_buckets import (
+from tools.semantic_harness.testing.sweep_buckets import (
     RELATIONSHIP_BUCKETS,
     NEED_BUCKETS,
     build_bucket_inventory,
     get_bucket_policy,
 )
-from tools.providers.pnc.lab.testing.sweep_dimensions import extract_dimension_inventory
-from tools.providers.pnc.lab.testing.sweep_planner import (
+from tools.semantic_harness.testing.sweep_dimensions import extract_dimension_inventory
+from tools.semantic_harness.testing.sweep_planner import (
     CoveragePlan,
     CoveragePlanner,
     PlannedCase,

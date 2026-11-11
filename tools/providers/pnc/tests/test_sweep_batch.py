@@ -9,7 +9,7 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.lab.testing.sweep_batch import (
+from tools.semantic_harness.testing.sweep_batch import (
     MANIFEST_SCHEMA_V1,
     StaleFingerprintError,
     SweepBatch,
@@ -18,8 +18,8 @@ from tools.providers.pnc.lab.testing.sweep_batch import (
     SweepManifest,
     split_plan_into_batches,
 )
-from tools.providers.pnc.lab.testing.sweep_dimensions import extract_dimension_inventory
-from tools.providers.pnc.lab.testing.sweep_planner import CoveragePlan, CoveragePlanner, PlannedCase
+from tools.semantic_harness.testing.sweep_dimensions import extract_dimension_inventory
+from tools.semantic_harness.testing.sweep_planner import CoveragePlan, CoveragePlanner, PlannedCase
 
 
 class SweepBatchTests(unittest.TestCase):

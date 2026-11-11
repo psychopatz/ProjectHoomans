@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from tools.providers.pnc.lab.studio.semantic_tree import (
+from tools.semantic_harness.studio.semantic_tree import (
     build_semantic_tree,
     filter_semantic_tree,
 )

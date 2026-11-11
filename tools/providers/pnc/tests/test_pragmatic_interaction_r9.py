@@ -6,11 +6,11 @@ from copy import deepcopy
 from pathlib import Path
 import unittest
 
-from tools.providers.pnc.codebuilder.service import SemanticLabAuthoringService
+from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.lab.ui.interaction_modules.model import _behavior_content_refs
-from tools.providers.pnc.lab.ui.interaction_inspector import interaction_summary
+from tools.semantic_harness.ui.interaction_modules.model import _behavior_content_refs
+from tools.semantic_harness.ui.interaction_inspector import interaction_summary
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]

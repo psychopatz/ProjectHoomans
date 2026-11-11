@@ -8,7 +8,7 @@ import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
-from tools.providers.pnc.lab.testing.sweep_dimensions import (
+from tools.semantic_harness.testing.sweep_dimensions import (
     EXPLICIT_SCENARIO_ADAPTERS,
     DiscoveredSurface,
     InvalidDimensionValueError,
@@ -19,7 +19,7 @@ from tools.providers.pnc.lab.testing.sweep_dimensions import (
     discover_interaction_surfaces,
     extract_dimension_inventory,
 )
-from tools.providers.pnc.lab.testing.sweep_evidence import (
+from tools.semantic_harness.testing.sweep_evidence import (
     EVIDENCE_SCHEMA_V1,
     extract_evidence_rows_from_turn,
     resolve_trace_handle,

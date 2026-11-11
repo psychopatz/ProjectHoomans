@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from tools.providers.pnc.codebuilder.conversation_compiler import (
+from tools.semantic_harness.codebuilder.conversation_compiler import (
     CompileError,
     _validate_behavior_shard,
 )
