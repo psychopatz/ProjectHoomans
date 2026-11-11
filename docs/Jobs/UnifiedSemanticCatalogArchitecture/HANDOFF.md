@@ -5,11 +5,11 @@ target_repo: /home/psychopatz/Zomboid/Workshop/ProjectHoomans
 branch: main
 phase: Standardized self-contained Conversation recipes
 retrieval_tier: COMPLETE
-primary_phase_commit: pending
+primary_phase_commit: 3c926573
 participant_commits:
   psychopatzCore: 9f34a15
   DynamicTrading: 77d29f8a
-state: IMPLEMENTED_PENDING_PRIMARY_COMMIT
+state: COMMITTED_UNRELATED_DIRTY_PRESERVED
 updated_at: 2026-11-12T00:00:00+08:00
 ---
 

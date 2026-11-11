@@ -1,6 +1,6 @@
 # Unified Semantic Catalog Progress
 
-**Status:** implemented in participant repositories; primary handoff pending
+**Status:** committed locally; unrelated dirty work preserved
 
 **Primary repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`
 
