@@ -95,7 +95,7 @@ class CoherentConversationC10Tests(unittest.TestCase):
         )
         self.assertEqual(
             resolved["construction.en.social.mirror_retort"]["source"],
-            "realization/social/constructions_en.json",
+            "realization/social/constructions_followups.json",
         )
 
         social = view["socialEffect"]

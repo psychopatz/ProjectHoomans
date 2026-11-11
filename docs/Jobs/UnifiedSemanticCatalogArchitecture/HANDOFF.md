@@ -1,52 +1,50 @@
 ---
-handoff_schema: 2
+handoff_schema: 3
 checkpoint_mode: committed_handoff
 target_repo: /home/psychopatz/Zomboid/Workshop/ProjectHoomans
 branch: main
-phase: Self-contained CodeBuilder recipe migration
-chunk: source migration, compiler cleanup, runtime parity, and harness verification
+phase: Standardized self-contained Conversation recipes
 retrieval_tier: COMPLETE
-parent_status: COMPLETE
-phase_commit: self
-phase_commit_phase: Self-contained CodeBuilder recipe migration
-phase_commit_message: refactor: make conversation recipes self-contained
-phase_commit_vector: project-hoomans=self;psychopatz-core=10de3b1;dynamic-trading=45250e3e
-state: CLEAN_CHECKPOINT
+primary_phase_commit: pending
+participant_commits:
+  psychopatzCore: 9f34a15
+  DynamicTrading: 77d29f8a
+state: IMPLEMENTED_PENDING_PRIMARY_COMMIT
 updated_at: 2026-11-12T00:00:00+08:00
 ---
 
 # Unified Semantic Catalog Handoff
 
-## Current state
+## Contract delivered
 
-PsychopatzCore is the sole semantic CodeBuilder authority. Conversation source
-recipes use `psychopatz.semantic.shard.v3` and carry their own locale maps.
-Phrase IDs and runtime translation keys are derived during compilation from
-semantic template, style, and append-only slot order.
+PsychopatzCore is the only semantic harness and CodeBuilder authority. Core
+Conversation sources now use self-contained locale maps for content, UI
+suggestions, UI text records, and realization constructions. Generated runtime
+keys and locale-specific realization IDs remain compiler output. Dynamic Trading
+has a provider-local source manifest and optional UI shard mounted by the Core
+manifest; it does not carry a second harness.
 
-The Core authoring `translations/` directory and its catalog reader, generator,
-contract, and hydration tests are removed. `conversation_bundles.json` carries
-inline locale text and `conversation_bundle_catalog.py` writes the same
-package-owned runtime bundle files under each mod's `common/media/translation`
-tree. The DT external pack uses the same v3 Core schema.
+The PNC direct composition contains Core + Project Hoomans UI only. The
+all-enabled composition also emits Dynamic Trading UI under DTCommon. Deleted
+PNC `Conversation/Semantic/Suggestions.json` files and locale-split realization
+sources are intentional removals, not compatibility shims.
 
-The authoring service preserves its locale-facing editor view while writing
-source shards directly. Dataset provenance is resolved from manifest profiles
-in memory, so source recipes do not regain repeated metadata envelopes.
+## Verified gates
 
-## Verification
+- Core: 85/85 Python tests.
+- Dynamic Trading: 88/88 tests.
+- PNC focused semantic/ownership/realization tests: 28/28.
+- Core and DT source audits: no legacy authoring fields, no locale-split files,
+  and no hard-size violations.
+- Builds verified for PNC-only and all-enabled compositions.
 
-- Core CodeBuilder tests: 80/80.
-- Full PNC conversation suite: 48/48.
-- Dynamic Trading smoke suite: 88/88.
-- Real Core → PNC → DT build: 297 generated files, 505 phrase families, 56
-  patterns, 13 UI definitions.
-- Runtime EN/TL content and bundle wording parity verified against the
-  pre-migration catalogs.
-- Harness `--ping --no-gui` passes for `pnc`, `pnc-with-dthoomans`, and
-  `dtabstract`.
-- Source audit reports zero legacy identity fields and no authoring translation
-  directory; only three expected preferred-size advisories remain.
+The full PNC runner still reports two known unrelated runtime failures:
+`pnc_population_director_smoke.lua` and the custom translation-manager smoke
+assertion. They remain unmodified and are recorded in `PROGRESS.md`.
 
-Unrelated dirty work in all repositories remains preserved and unstaged. The
-existing Tkinter observatory teardown finding is outside this phase.
+## Next chunk
+
+Split the three preferred-size content shards by semantic domain, preserving
+record IDs, ownership, locale output, and runtime fingerprints where the
+contract permits. Then re-run the full PNC runner and update this handoff with
+the primary commit hash.

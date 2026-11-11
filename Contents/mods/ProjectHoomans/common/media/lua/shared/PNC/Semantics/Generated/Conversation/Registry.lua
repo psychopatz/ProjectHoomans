@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/Semantics/Generated/Conversation/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "c223241cb10e0286fe285007c9b7f5e989b2fe3b134b7952c293d3bd65b0e949"
-Registry.WHOLE_MODEL_FINGERPRINT = "aa4d28220453e514108a1abb5a4c1f7efa7ab05a524e077f681c69c8e3522234"
+Registry.WHOLE_MODEL_FINGERPRINT = "e51addcda212eae23c4254a8c790db63af383e406e959454c5fa7b5d40bc6af8"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -291,15 +291,14 @@ local loaded117 = require "PNC/Semantics/Generated/Conversation/Beats/Social/Rec
 appendBeats(loaded117)
 local loaded118 = require "PNC/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact"
 appendBeats(loaded118)
-local loaded119 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsEn"
-local loaded120 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsTl"
-local loaded121 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesEn"
-local loaded122 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualRepliesTl"
-local loaded123 = require "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes"
-local loaded124 = require "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions"
+local loaded119 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore"
+local loaded120 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups"
+local loaded121 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualReplies"
+local loaded122 = require "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes"
+local loaded123 = require "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions"
+appendUI(loaded123)
+local loaded124 = require "PsychopatzCore/Semantics/Generated/Conversation/UI/StaticSuggestionsCore"
 appendUI(loaded124)
-local loaded125 = require "PsychopatzCore/Semantics/Generated/Conversation/UI/StaticSuggestionsCore"
-appendUI(loaded125)
 for key, family in pairs(Registry.PHRASE_FAMILIES) do
     if type(family) == "table" and family.id then Registry.PHRASE_FAMILIES[key] = family end
 end

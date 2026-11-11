@@ -257,18 +257,18 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
         self.assertTrue(modules)
         self.assertEqual(
             index["construction.en.social.mirror_retort"]["source"],
-            "realization/social/constructions_en.json",
+            "realization/social/constructions_followups.json",
         )
         self.assertEqual(
             index["construction.en.social.mirror_retort"]["generated"],
             [
                 "PNC/Semantics/Generated/Conversation/"
-                "Realization/Social/ConstructionsEn"
+                "Realization/Social/ConstructionsFollowups"
             ],
         )
         self.assertEqual(
             index["construction.tl.social.mirror_retort"]["source"],
-            "realization/social/constructions_tl.json",
+            "realization/social/constructions_followups.json",
         )
         self.assertEqual(
             index["lexeme.social.profanity.fuck"]["source"],

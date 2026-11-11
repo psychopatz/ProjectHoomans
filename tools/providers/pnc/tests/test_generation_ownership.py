@@ -192,31 +192,32 @@ class GenerationOwnershipTests(unittest.TestCase):
             manifest_path = source_root / "manifest.json"
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             manifest["registryOwner"] = "DTCommon"
+            routed_paths = {
+                "patterns/common/greeting_whats_up.json",
+                "content/greeting.json",
+                "behaviors/social",
+            }
+            for entry in [*manifest["shards"], *manifest["sourceRoots"]]:
+                if entry["path"] not in routed_paths:
+                    continue
+                entry["owner"] = "DTCommon"
+                shard_paths = [source_root / entry["path"]]
+                if entry["path"] == "behaviors/social":
+                    shard_paths = sorted(
+                        (source_root / entry["path"]).glob("*.json")
+                    )
+                for shard_path in shard_paths:
+                    shard = json.loads(shard_path.read_text(encoding="utf-8"))
+                    shard["owner"] = "DTCommon"
+                    profile_id = shard.get("sourceProfile") or entry.get("sourceProfile")
+                    if profile_id in manifest["sourceProfiles"]:
+                        manifest["sourceProfiles"][profile_id]["owner"] = "DTCommon"
+                    shard_path.write_text(
+                        json.dumps(shard, indent=2) + "\n",
+                        encoding="utf-8",
+                    )
             manifest_path.write_text(
                 json.dumps(manifest, indent=2) + "\n",
-                encoding="utf-8",
-            )
-            pattern_path = source_root / "patterns/common/greeting_whats_up.json"
-            pattern = json.loads(pattern_path.read_text(encoding="utf-8"))
-            pattern["source"]["owner"] = "DTCommon"
-            pattern_path.write_text(
-                json.dumps(pattern, indent=2) + "\n",
-                encoding="utf-8",
-            )
-            greeting_path = source_root / "content/greeting.json"
-            greeting = json.loads(greeting_path.read_text(encoding="utf-8"))
-            greeting["source"]["owner"] = "DTCommon"
-            greeting_path.write_text(
-                json.dumps(greeting, indent=2) + "\n",
-                encoding="utf-8",
-            )
-            behavior_path = (
-                source_root / "behaviors/social/acknowledge_memory.json"
-            )
-            behavior = json.loads(behavior_path.read_text(encoding="utf-8"))
-            behavior["source"]["owner"] = "DTCommon"
-            behavior_path.write_text(
-                json.dumps(behavior, indent=2) + "\n",
                 encoding="utf-8",
             )
 
