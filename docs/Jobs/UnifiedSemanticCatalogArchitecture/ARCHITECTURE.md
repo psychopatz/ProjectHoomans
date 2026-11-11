@@ -4,17 +4,17 @@
 
 PsychopatzCore owns the harness, schemas, compiler, validators, and shared
 semantic catalogs. Project Hoomans owns Hoomans-specific dialogue policy and
-content. Dynamic Trading owns trading content and provider packs. Physical
-source hosting in Core does not imply Core gameplay ownership; each shard must
-declare its package owner explicitly.
+content. Dynamic Trading owns trading provider packs. Physical source hosting
+in Core does not imply gameplay ownership; every shard declares its package
+owner.
 
 External packs are mounted into the Core CodeBuilder input graph. They are not
-copied into adopter repositories and they do not create a second compiler.
+copied into adopter repositories and do not create a second compiler.
 
 ## Canonical source model
 
 ```text
-sources/conversation/
+tools/semantic_harness/codebuilder/sources/conversation/
 ├── manifest.json
 ├── content/ patterns/ flows/ behaviors/ beats/ realization/ ui/
 └── translations/
@@ -23,26 +23,39 @@ sources/conversation/
     └── <locale>.json
 ```
 
-Each shard uses a common envelope while retaining a typed payload:
+Each semantic shard has a common envelope and a typed payload. The envelope is
+identity and ownership; the payload is selected by `kind`.
 
 ```json
 {
   "schema": "psychopatz.semantic.shard.v2",
   "shardId": "conversation.content.social.reactions",
   "kind": "content",
-  "domain": "social.reactions",
-  "owner": "PsychopatzCore",
-  "records": []
+  "domain": "social",
+  "owner": "ProjectHoomans",
+  "sourceProfile": "conversation.source.project.hoomans.dialogue.1234567890",
+  "phraseFamilies": [],
+  "playerChoices": []
 }
 ```
 
-The manifest owns registry metadata, order, source roots, and package mounts.
-Repeated generator and license metadata is not copied into every record.
+Supported typed payloads are `phraseFamilies`/`playerChoices` for content,
+`patterns`, `responsePools`, `definitions`, `behaviors`, `beats`,
+`realizations`, `packs`, and `suggestions` for their respective kinds.
+
+The manifest owns ordering, source roots, external mounts, and the
+`sourceProfiles` provenance index. Profiles hold repeated generator/license
+metadata once; they are not embedded in every shard or record. Source roots
+declare their owner, while each file carries its own shard/profile identity.
+
+Record IDs and translation keys are semantic identities, not file paths.
+Moving a record between shards must not change either identity.
 
 ## Translation model
 
-Semantic records carry stable `translationKey` values. Locale catalogs contain
-the complete language-specific wording and optional authoring context:
+CodeBuilder authoring uses one complete, self-contained JSON catalog per
+locale. Runtime translation directories remain package-specific generated
+artifacts and are not the authoring source.
 
 ```json
 {
@@ -59,17 +72,13 @@ the complete language-specific wording and optional authoring context:
 }
 ```
 
-CodeBuilder may emit flat runtime maps from these catalogs, but the authoring
-source remains one self-contained file per locale. Runtime translation
-directories remain package-specific generated artifacts.
+Locale validation requires EN, exact key parity, valid placeholders, stable
+source-shard references, and deterministic duplicate-key rejection. Missing
+non-English wording falls back to EN according to the runtime contract.
 
-## Stability rules
+## Migration boundary
 
-- Record IDs and translation keys are semantic identities, not file paths.
-- Moving a record between shards must not change its identity.
-- Locale names are normalized and discovered from files; `EN` is mandatory.
-- Missing non-English wording falls back to `EN` according to the runtime
-  contract.
-- No runtime compatibility shim is part of the final architecture. A one-shot
-  offline converter may read the old shape during migration and is deleted
-  after conversion.
+`conversation_shard_migration.py` is an offline, one-shot converter for the
+legacy envelope. It is dry-run safe and is not loaded by runtime code. After
+all source and external mounts are converted, the old envelope and inline
+provenance shape have no supported runtime reader.
