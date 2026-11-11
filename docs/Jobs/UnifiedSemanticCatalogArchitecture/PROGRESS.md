@@ -3,9 +3,9 @@
 **Status:** IN_PROGRESS  
 **Primary repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`  
 **Participants:** PsychopatzCore, DynamicTrading  
-**Current phase:** P1 — Canonical locale catalogs  
-**Accepted slices:** P0A, P0B, P1A — Catalog materialization, P1B — Catalog-backed source migration  
-**Next chunk:** Make canonical source compilation catalog-only, remove remaining inline-translation acceptance paths, and add strict source-contract checks.
+**Current phase:** P2 — Semantic shard normalization  
+**Accepted slices:** P0A, P0B, P1A, P1B, P1C — Catalog-only source contract  
+**Next chunk:** Normalize shard envelopes, explicit ownership, naming, repeated metadata, and bounded domain splits without changing runtime identity.
 
 ## Verified baseline
 
@@ -15,18 +15,21 @@
 - Dynamic Trading contributes an external trading pack through the shared CodeBuilder graph.
 - Existing unrelated dirty work in all three repositories is preserved.
 
-## Accepted P1B
+## Accepted P1C
 
-- Added catalog-backed compiler hydration for content, player choices, UI suggestions, dialogue responses, and semantic-flow responses.
-- Added a one-shot migration tool and removed 6,946 inline locale fields from 91 Core semantic source files.
-- The canonical source tree now has zero inline `translations`, `labelTranslations`, or `choiceTranslations` fields outside the locale catalogs.
-- The Git-baseline parity check reports equal model fingerprints and byte-identical rendered runtime plans: 157 modules before and after migration.
+- The compiler rejects inline `translations`, `labelTranslations`, `choiceTranslations`, `fallback`, `labelFallback`, and `utteranceFallback` fields in canonical source shards.
+- Catalog hydration supplies the typed compiler with wording and EN fallbacks after source fields are removed.
+- The one-shot migration removed the remaining 74 fallback fields from six source files.
+- Canonical semantic source scans now find zero locale-specific wording fields outside `translations/*.json`.
+- Locale catalogs contain 7,033 entries each; 27 TL entries are explicitly marked `status: fallback` pending translation.
+- The committed-source parity check reports equal model fingerprints and byte-identical runtime plans after fallback removal.
 - Focused and full Core semantic-harness tests ran with 80 tests passing.
 - Current compilation resolves EN/TL, 123 shards, 157 rendered modules, and context health passes with 20 warnings and 0 errors.
 
 ## Not yet accepted
 
-- The compiler still contains transitional acceptance of inline wording for unconverted external/fixture sources.
+- Semantic shards still use the legacy `pnc.conversation.shard.v1` envelope and repeated `source` metadata.
+- Many shards still have implicit manifest ownership, duplicate filename stems, or broad domain scope.
+- Generated translation output is still split by owner/domain for runtime packaging; authoring catalogs are now correctly one file per locale.
 - The PNC legacy `common/media/conversation` tree has not yet been migrated or removed.
-- Shard ownership, repeated metadata, naming collisions, and oversized domain shards remain P2 work.
 - No compatibility shim is authorized for the final state.
