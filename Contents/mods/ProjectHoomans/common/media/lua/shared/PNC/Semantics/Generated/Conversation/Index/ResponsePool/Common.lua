@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.accept",
         ["kind"] = "responsePool",
-        ["source"] = "flows/common/social.json",
+        ["source"] = "responses/common/social.json",
     },
     ["semantic.compliment"] = {
         ["domain"] = "common",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "semantic.compliment",
         ["kind"] = "responsePool",
-        ["source"] = "flows/common/social.json",
+        ["source"] = "responses/common/social.json",
     },
     ["semantic.flow.weather.raining"] = {
         ["domain"] = "common",
@@ -28,7 +28,7 @@ return {
         ["related"] = {
             "pnc.dataset.question.weather.can_we_talk_about_the_weather",
         },
-        ["source"] = "flows/common/needs_weather.json",
+        ["source"] = "responses/common/needs_weather.json",
     },
     ["semantic.greeting"] = {
         ["domain"] = "common",
@@ -37,7 +37,7 @@ return {
         },
         ["id"] = "semantic.greeting",
         ["kind"] = "responsePool",
-        ["source"] = "flows/common/social.json",
+        ["source"] = "responses/common/social.json",
     },
     ["semantic.offer"] = {
         ["domain"] = "common",
@@ -46,7 +46,7 @@ return {
         },
         ["id"] = "semantic.offer",
         ["kind"] = "responsePool",
-        ["source"] = "flows/common/social.json",
+        ["source"] = "responses/common/social.json",
     },
     ["semantic.question.activity"] = {
         ["domain"] = "common",
@@ -55,7 +55,7 @@ return {
         },
         ["id"] = "semantic.question.activity",
         ["kind"] = "responsePool",
-        ["source"] = "flows/common/questions.json",
+        ["source"] = "responses/common/questions.json",
     },
     ["semantic.question.identity"] = {
         ["dependents"] = {
@@ -67,7 +67,7 @@ return {
         },
         ["id"] = "semantic.question.identity",
         ["kind"] = "responsePool",
-        ["source"] = "flows/common/questions.json",
+        ["source"] = "responses/common/questions.json",
     },
     ["semantic.question.needs.proposal"] = {
         ["domain"] = "common",
@@ -76,7 +76,7 @@ return {
         },
         ["id"] = "semantic.question.needs.proposal",
         ["kind"] = "responsePool",
-        ["source"] = "flows/common/needs_weather.json",
+        ["source"] = "responses/common/needs_weather.json",
     },
     ["semantic.question.needs.quantity"] = {
         ["domain"] = "common",
@@ -85,7 +85,7 @@ return {
         },
         ["id"] = "semantic.question.needs.quantity",
         ["kind"] = "responsePool",
-        ["source"] = "flows/common/needs_weather.json",
+        ["source"] = "responses/common/needs_weather.json",
     },
     ["semantic.question.wellbeing"] = {
         ["domain"] = "common",
@@ -94,7 +94,7 @@ return {
         },
         ["id"] = "semantic.question.wellbeing",
         ["kind"] = "responsePool",
-        ["source"] = "flows/common/questions.json",
+        ["source"] = "responses/common/questions.json",
     },
     ["semantic.question.wellbeing.unknown"] = {
         ["domain"] = "common",
@@ -106,7 +106,7 @@ return {
         ["related"] = {
             "pnc.dataset.question.wellbeing.what_is_going_on_with_you",
         },
-        ["source"] = "flows/common/questions.json",
+        ["source"] = "responses/common/questions.json",
     },
     ["semantic.refuse"] = {
         ["domain"] = "common",
@@ -115,7 +115,7 @@ return {
         },
         ["id"] = "semantic.refuse",
         ["kind"] = "responsePool",
-        ["source"] = "flows/common/social.json",
+        ["source"] = "responses/common/social.json",
     },
     ["semantic.thanks"] = {
         ["domain"] = "common",
@@ -124,6 +124,6 @@ return {
         },
         ["id"] = "semantic.thanks",
         ["kind"] = "responsePool",
-        ["source"] = "flows/common/social.json",
+        ["source"] = "responses/common/social.json",
     },
 }

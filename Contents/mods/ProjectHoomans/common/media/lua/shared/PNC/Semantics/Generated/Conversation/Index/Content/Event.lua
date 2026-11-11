@@ -102,11 +102,11 @@ return {
     ["phrase.semantic.combat.reaction.default"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.combat.reaction.default",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.combat.reaction.kill_killer_aggressive_01"] = {
         ["domain"] = "event",
@@ -489,155 +489,155 @@ return {
     ["phrase.semantic.combat.reaction.retreat"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.combat.reaction.retreat",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.combat.reaction.threat"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.combat.reaction.threat",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.companion.reaction.abandonment"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.companion.reaction.abandonment",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.companion.reaction.camp_rejected"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.companion.reaction.camp_rejected",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.companion.reaction.default"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.companion.reaction.default",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.conversation.safety.danger"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.conversation.safety.danger",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.conversation.safety.default"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.conversation.safety.default",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.corpse.reaction.default"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.corpse.reaction.default",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.corpse.reaction.revenge"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.corpse.reaction.revenge",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.flow.farewell.default"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.flow.farewell.default",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.flow.farewell.friendly"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.flow.farewell.friendly",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.leader_loss.close"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.leader_loss.close",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.leader_loss.colonist"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.leader_loss.colonist",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.leader_loss.default"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.leader_loss.default",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.leader_loss.devoted"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.leader_loss.devoted",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.leader_loss.dissent"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.leader_loss.dissent",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.leader_loss.distant"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.leader_loss.distant",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
     ["phrase.semantic.medical.distress.call.bandage"] = {
         ["domain"] = "event",
@@ -930,10 +930,10 @@ return {
     ["phrase.semantic.social.reaction.default"] = {
         ["domain"] = "event",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Event/Reactions",
+            "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions",
         },
         ["id"] = "phrase.semantic.social.reaction.default",
         ["kind"] = "content",
-        ["source"] = "content/event/reactions.json",
+        ["source"] = "content/event/event_reactions.json",
     },
 }

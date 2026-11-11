@@ -16,7 +16,7 @@ copied into adopter repositories and do not create a second compiler.
 ```text
 tools/semantic_harness/codebuilder/sources/conversation/
 ├── manifest.json
-├── content/ patterns/ flows/ behaviors/ beats/ realization/ ui/
+├── content/ responses/ patterns/ flows/ behaviors/ beats/ realization/ ui/
 └── translations/
     ├── EN.json
     ├── TL.json
@@ -50,6 +50,8 @@ declare their owner, while each file carries its own shard/profile identity.
 
 Record IDs and translation keys are semantic identities, not file paths.
 Moving a record between shards must not change either identity.
+Catalog `sourceShard` fields use the stable shard ID; physical source-path
+renames therefore do not invalidate locale metadata.
 
 ## Translation model
 

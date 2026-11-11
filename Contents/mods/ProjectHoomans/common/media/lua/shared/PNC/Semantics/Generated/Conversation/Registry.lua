@@ -8,8 +8,8 @@ Registry.REGISTRY_NAMESPACE = "PNC.Semantics.ConversationRegistry"
 Registry.REGISTRY_MODULE = "PNC/Semantics/Generated/Conversation/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
-Registry.CONTENT_FINGERPRINT = "f1b0eba0b168bd724c4fd5c971a2436fd910a0eddb7639601071f6dcf1e70c97"
-Registry.WHOLE_MODEL_FINGERPRINT = "3a74f8935b81e12cf4a36ee2ebece6bf44beebde57360a4b4ee8bafbffe25353"
+Registry.CONTENT_FINGERPRINT = "8d56783126cf634ab5992e16b9e18d7f2b728ecce6ce7df09705eae022ad6983"
+Registry.WHOLE_MODEL_FINGERPRINT = "c554112fdcf7248208547295d90b4bae3fbdfcafd5915aa2cc0e985b048d3baf"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -85,9 +85,9 @@ local loaded14 = require "PNC/Semantics/Generated/Conversation/Content/Event/Com
 appendContent(loaded14)
 local loaded15 = require "PNC/Semantics/Generated/Conversation/Content/Event/CombatKillWitnessReactions"
 appendContent(loaded15)
-local loaded16 = require "PNC/Semantics/Generated/Conversation/Content/Event/Medical"
+local loaded16 = require "PNC/Semantics/Generated/Conversation/Content/Event/EventReactions"
 appendContent(loaded16)
-local loaded17 = require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions"
+local loaded17 = require "PNC/Semantics/Generated/Conversation/Content/Event/Medical"
 appendContent(loaded17)
 local loaded18 = require "PNC/Semantics/Generated/Conversation/Content/Greeting"
 appendContent(loaded18)
@@ -101,9 +101,9 @@ local loaded22 = require "PNC/Semantics/Generated/Conversation/Content/Needs"
 appendContent(loaded22)
 local loaded23 = require "PNC/Semantics/Generated/Conversation/Content/Quest"
 appendContent(loaded23)
-local loaded24 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Conversation"
+local loaded24 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesConversation"
 appendContent(loaded24)
-local loaded25 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Player"
+local loaded25 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer"
 appendContent(loaded25)
 local loaded26 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply"
 appendContent(loaded26)
@@ -123,15 +123,15 @@ local loaded33 = require "PNC/Semantics/Generated/Conversation/Content/Social/In
 appendContent(loaded33)
 local loaded34 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/NewsAcknowledge"
 appendContent(loaded34)
-local loaded35 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeAdopters"
+local loaded35 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SceneRuntimeInteractions"
 appendContent(loaded35)
-local loaded36 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SocialConversationDirector"
+local loaded36 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/SocialConversationDire__013e5d58"
 appendContent(loaded36)
 local loaded37 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEventWarning"
 appendContent(loaded37)
 local loaded38 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEventWarningFlavor"
 appendContent(loaded38)
-local loaded39 = require "PNC/Semantics/Generated/Conversation/Content/Social/Reactions"
+local loaded39 = require "PNC/Semantics/Generated/Conversation/Content/Social/SocialReactions"
 appendContent(loaded39)
 local loaded40 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AcceptedGeneric"
 appendContent(loaded40)
@@ -241,15 +241,15 @@ local loaded92 = require "PsychopatzCore/Semantics/Generated/Conversation/Patter
 appendPatterns(loaded92)
 local loaded93 = require "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal"
 appendPatterns(loaded93)
-local loaded94 = require "PNC/Semantics/Generated/Conversation/Responses/Common/NeedsWeather"
+local loaded94 = require "PNC/Semantics/Generated/Conversation/Responses/SemanticFlows"
 appendResponses(loaded94)
-local loaded95 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Questions"
+local loaded95 = require "PNC/Semantics/Generated/Conversation/Responses/Common/NeedsWeather"
 appendResponses(loaded95)
-local loaded96 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Social"
+local loaded96 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Questions"
 appendResponses(loaded96)
-local loaded97 = require "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses"
+local loaded97 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Social"
 appendResponses(loaded97)
-local loaded98 = require "PNC/Semantics/Generated/Conversation/Responses/SemanticFlows"
+local loaded98 = require "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses"
 appendResponses(loaded98)
 local loaded99 = require "PNC/Semantics/Generated/Conversation/Flows/SemanticFlows"
 appendFlows(loaded99)
@@ -277,9 +277,9 @@ local loaded110 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social
 appendBehaviors(loaded110)
 local loaded111 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/RetaliateVerbally"
 appendBehaviors(loaded111)
-local loaded112 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters"
+local loaded112 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors"
 appendBehaviors(loaded112)
-local loaded113 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDirector"
+local loaded113 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDire__fa8f3cfb"
 appendBehaviors(loaded113)
 local loaded114 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Warn"
 appendBehaviors(loaded114)

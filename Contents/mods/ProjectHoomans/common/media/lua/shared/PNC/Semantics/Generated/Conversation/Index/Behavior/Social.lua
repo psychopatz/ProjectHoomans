@@ -128,146 +128,146 @@ return {
     ["behavior.scene_excursion_acknowledge"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_excursion_acknowledge",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/scene_runtime_adopters.json",
+        ["source"] = "behaviors/social/scene_runtime_behaviors.json",
     },
     ["behavior.scene_excursion_departing"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_excursion_departing",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/scene_runtime_adopters.json",
+        ["source"] = "behaviors/social/scene_runtime_behaviors.json",
     },
     ["behavior.scene_excursion_failed"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_excursion_failed",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/scene_runtime_adopters.json",
+        ["source"] = "behaviors/social/scene_runtime_behaviors.json",
     },
     ["behavior.scene_excursion_home"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_excursion_home",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/scene_runtime_adopters.json",
+        ["source"] = "behaviors/social/scene_runtime_behaviors.json",
     },
     ["behavior.scene_excursion_preparing"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_excursion_preparing",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/scene_runtime_adopters.json",
+        ["source"] = "behaviors/social/scene_runtime_behaviors.json",
     },
     ["behavior.scene_excursion_returning"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_excursion_returning",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/scene_runtime_adopters.json",
+        ["source"] = "behaviors/social/scene_runtime_behaviors.json",
     },
     ["behavior.scene_grounded_news_share"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_grounded_news_share",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/scene_runtime_adopters.json",
+        ["source"] = "behaviors/social/scene_runtime_behaviors.json",
     },
     ["behavior.scene_horde_prompt"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_horde_prompt",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/scene_runtime_adopters.json",
+        ["source"] = "behaviors/social/scene_runtime_behaviors.json",
     },
     ["behavior.scene_horde_reply_brave"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_horde_reply_brave",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/scene_runtime_adopters.json",
+        ["source"] = "behaviors/social/scene_runtime_behaviors.json",
     },
     ["behavior.scene_horde_reply_cautious"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_horde_reply_cautious",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/scene_runtime_adopters.json",
+        ["source"] = "behaviors/social/scene_runtime_behaviors.json",
     },
     ["behavior.scene_horde_reply_steady"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_horde_reply_steady",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/scene_runtime_adopters.json",
+        ["source"] = "behaviors/social/scene_runtime_behaviors.json",
     },
     ["behavior.scene_news_followup"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_news_followup",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/scene_runtime_adopters.json",
+        ["source"] = "behaviors/social/scene_runtime_behaviors.json",
     },
     ["behavior.scene_news_followup_answer"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeAdopters",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_news_followup_answer",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/scene_runtime_adopters.json",
+        ["source"] = "behaviors/social/scene_runtime_behaviors.json",
     },
     ["behavior.scene_post_combat_clear"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDirector",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDire__fa8f3cfb",
         },
         ["id"] = "behavior.scene_post_combat_clear",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/social_conversation_director.json",
+        ["source"] = "behaviors/social/social_conversation_director_behaviors.json",
     },
     ["behavior.scene_task_work_assigned"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDirector",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDire__fa8f3cfb",
         },
         ["id"] = "behavior.scene_task_work_assigned",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/social_conversation_director.json",
+        ["source"] = "behaviors/social/social_conversation_director_behaviors.json",
     },
     ["behavior.scene_task_work_completed"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDirector",
+            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDire__fa8f3cfb",
         },
         ["id"] = "behavior.scene_task_work_completed",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/social_conversation_director.json",
+        ["source"] = "behaviors/social/social_conversation_director_behaviors.json",
     },
     ["behavior.warn"] = {
         ["dependents"] = {
