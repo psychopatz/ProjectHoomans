@@ -15,7 +15,7 @@ from tools.semantic_harness.inspection.conversation_inspector import (
     build_conversation_inspector,
 )
 from tools.semantic_harness.inspection.conversation_inspector_support import bounded
-from tools.providers.pnc.runtime.save_import import SaveBackedImporter
+from tools.semantic_harness.runtime.save_import import SaveBackedImporter
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 

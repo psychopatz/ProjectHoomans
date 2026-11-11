@@ -196,7 +196,7 @@ class SaveBrowserTests(SemanticLabGuiTestCase):
             self.assertTrue(hasattr(app, "saved_world_import_button"))
             self.assertEqual(
                 app.main_tabs.tab(app.world_browser_tab, "text"),
-                "World Browser",
+                "World Sources",
             )
             self.assertTrue(hasattr(app, "provenance_inspector"))
             self.assertIn(

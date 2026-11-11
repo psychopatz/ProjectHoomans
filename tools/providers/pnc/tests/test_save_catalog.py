@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tools.providers.pnc.runtime.save_catalog import (
+from tools.semantic_harness.runtime.save_catalog import (
     SaveCatalog,
     SaveCatalogError,
 )
@@ -107,7 +107,7 @@ class SaveCatalogTests(unittest.TestCase):
             {"PNC_PlayerCharacters", "PNC_Core_Global", "PNC_npc42"},
         )
 
-    def test_unsupported_and_missing_saves_are_rejected(self) -> None:
+    def test_discovery_keeps_readable_non_pnc_saves_visible(self) -> None:
         self.write_save(world_version=248)
         missing_path = self.root / "Apocalypse" / "Missing" / "global_mod_data.bin"
         missing_path.parent.mkdir(parents=True)
@@ -117,11 +117,60 @@ class SaveCatalogTests(unittest.TestCase):
 
         result = self.catalog().discover()
 
-        self.assertEqual(result["saves"], [])
-        self.assertEqual(len(result["rejected"]), 2)
-        reasons = " ".join(item["reason"] for item in result["rejected"])
-        self.assertIn("unsupported save world version", reasons)
-        self.assertIn("missing required ModData tables", reasons)
+        self.assertEqual(len(result["saves"]), 2)
+        self.assertEqual(result["rejected"], [])
+        with self.assertRaisesRegex(SaveCatalogError, "unsupported save world version"):
+            self.catalog().inspect(self.save_path)
+        with self.assertRaisesRegex(SaveCatalogError, "missing required ModData tables"):
+            self.catalog().inspect(missing_path)
+
+    def test_discovery_reads_singleplayer_mods_file(self) -> None:
+        self.write_save()
+        mods_path = self.save_path.parent / "mods.txt"
+        mods_path.write_text(
+            'VERSION = 1,\n\nmods\n{\n  "PsychopatzCore",\n  "ProjectHoomans",\n}\n\nmaps\n{\n  "Riverside",\n}\n',
+            encoding="utf-8",
+        )
+
+        result = self.catalog().discover()
+
+        activation = result["saves"][0]["modActivation"]
+        self.assertEqual(activation["status"], "ready")
+        self.assertEqual(
+            activation["modIDs"],
+            ["PsychopatzCore", "ProjectHoomans"],
+        )
+        self.assertEqual(activation["maps"], ["Riverside"])
+
+    def test_discovery_reads_matching_multiplayer_server_profile(self) -> None:
+        self.write_save(
+            path=self.root / "Multiplayer" / "NPCEngine" / "global_mod_data.bin"
+        )
+        server_root = Path(self.directory.name) / "Server"
+        server_root.mkdir()
+        (server_root / "NPCEngine.ini").write_text(
+            "Mods=PsychopatzCore;ProjectHoomans;MarketSense\n"
+            "WorkshopItems=123;456\n",
+            encoding="utf-8",
+        )
+
+        result = SaveCatalog(
+            [self.root],
+            core_repository=Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore"),
+            server_root=server_root,
+        ).discover()
+
+        activation = next(
+            item["modActivation"]
+            for item in result["saves"]
+            if item["saveName"] == "NPCEngine"
+        )
+        self.assertEqual(activation["status"], "ready")
+        self.assertEqual(
+            activation["modIDs"],
+            ["PsychopatzCore", "ProjectHoomans", "MarketSense"],
+        )
+        self.assertEqual(activation["workshopItems"], ["123", "456"])
 
     def test_corrupt_save_fails_closed(self) -> None:
         self.save_path.write_bytes(b"not-a-global-mod-data-file")

@@ -7,6 +7,7 @@
       "providerID": "ProjectHoomans",
       "displayName": "Project Hoomans",
       "repositoryKind": "project_hoomans",
+      "activationIDs": ["ProjectHoomans"],
       "requires": ["PsychopatzCore"],
       "conflicts": ["DTAbstract"],
       "capabilities": [

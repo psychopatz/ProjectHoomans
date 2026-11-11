@@ -58,7 +58,14 @@ class SemanticLabUIOrganizationTests(unittest.TestCase):
             app.saved_world_discover_button.invoke()
             wait_until(lambda: not app.busy and bool(app.saved_world_entries))
 
-            save_label = str(app.saved_world_save_box["values"][0])
+            selected_entry = next(
+                entry for entry in app.saved_world_entries
+                if (entry.get("capabilities") or {}).get("projectHoomans")
+            )
+            save_label = next(
+                label for label in app.saved_world_save_box["values"]
+                if str(selected_entry["saveName"]) in str(label)
+            )
             app.saved_world_save_box.set(save_label)
             app.saved_world_save_box.event_generate("<<ComboboxSelected>>")
             wait_until(lambda: not app.busy and bool(app.saved_world_browser.get("saveName")))

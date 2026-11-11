@@ -174,7 +174,37 @@ class LuaSemanticWorker(SemanticWorker):
             isinstance(item_type_fixture, dict)
             and isinstance(item_type_fixture.get("types"), list)
         ):
-            self._request("INSTALL_ENGINE_ITEM_TYPES", item_type_fixture)
+            # The Core bridge deliberately bounds every request collection.
+            # Keep the complete installed-game registry, but transport it as
+            # bounded chunks; the production Lua owner installs it only after
+            # the final chunk arrives.
+            item_types = item_type_fixture["types"]
+            chunk_size = 96
+            chunks = [
+                item_types[offset : offset + chunk_size]
+                for offset in range(0, len(item_types), chunk_size)
+            ] or [[]]
+            chunk_count = len(chunks)
+            for chunk_index, chunk in enumerate(chunks, start=1):
+                self._request(
+                    "INSTALL_ENGINE_ITEM_TYPES",
+                    {
+                        "schema": item_type_fixture.get(
+                            "schema", "semantic.engine.item_type_registry.v1"
+                        ),
+                        "source": item_type_fixture.get("source"),
+                        "sourceAvailable": item_type_fixture.get(
+                            "sourceAvailable", False
+                        ),
+                        "idBase": item_type_fixture.get("idBase", 0),
+                        "typeCount": item_type_fixture.get(
+                            "typeCount", len(item_types)
+                        ),
+                        "chunkIndex": chunk_index,
+                        "chunkCount": chunk_count,
+                        "types": chunk,
+                    },
+                )
             if isinstance(project_zomboid, dict):
                 project_zomboid.pop("itemTypeRegistry", None)
 

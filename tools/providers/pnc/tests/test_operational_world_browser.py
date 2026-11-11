@@ -53,7 +53,10 @@ class OperationalWorldBrowserTests(unittest.TestCase):
                         self.assertGreater(app.saved_world_save_box.winfo_width(), 100)
                         self.assertGreater(app.saved_world_tree.winfo_width(), 400)
 
-                        selected_entry = app.saved_world_entries[1]
+                        selected_entry = next(
+                            entry for entry in app.saved_world_entries
+                            if (entry.get("capabilities") or {}).get("projectHoomans")
+                        )
                         source_path = Path(str(selected_entry["path"]))
                         before = sha256(source_path.read_bytes()).hexdigest()
                         app.saved_world_save_box.set(

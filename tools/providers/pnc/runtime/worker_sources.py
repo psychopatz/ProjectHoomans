@@ -8,9 +8,9 @@ from typing import Any, Protocol
 
 from tools.semantic_harness.core.fixture_provider import OfflineEngineFixtureProvider
 from .live_profiler_provider import LiveProfilerProvider
-from .save_browser import SavedWorldBrowser
-from .save_catalog import SaveCatalog
-from .save_import import SaveBackedImporter
+from tools.semantic_harness.runtime.save_browser import SavedWorldBrowser
+from tools.semantic_harness.runtime.save_catalog import SaveCatalog
+from tools.semantic_harness.runtime.save_import import SaveBackedImporter
 from tools.semantic_harness.core.state import ImportedSourceSnapshot, Provenance
 
 

@@ -8,8 +8,8 @@ from pathlib import Path
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.save_catalog import SaveCatalog
-from tools.providers.pnc.runtime.save_import import SaveBackedImporter
+from tools.semantic_harness.runtime.save_catalog import SaveCatalog
+from tools.semantic_harness.runtime.save_import import SaveBackedImporter
 from tools.semantic_harness.core.state import Provenance
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 

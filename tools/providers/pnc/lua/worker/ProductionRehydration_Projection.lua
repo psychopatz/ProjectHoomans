@@ -83,11 +83,45 @@ function ProductionRehydration.installEngineItemTypeFixture(context, fixture)
     local existingCount = tonumber(
         context.Runtime.engineItemTypeFixtureCount
     ) or 0
+    fixture = type(fixture) == "table" and fixture or nil
     if type(fixture) ~= "table" then
         local payloads = context.Runtime.sourceProviderPayloads or {}
         local projectZomboid = payloads.ProjectZomboid
         fixture = type(projectZomboid) == "table"
             and projectZomboid.itemTypeRegistry or nil
+    end
+    local chunkCount = fixture and tonumber(fixture.chunkCount) or nil
+    local chunkIndex = fixture and tonumber(fixture.chunkIndex) or nil
+    if chunkCount and chunkIndex then
+        if chunkCount < 1 or chunkIndex < 1 or chunkIndex > chunkCount
+            or type(fixture.types) ~= "table"
+        then
+            return existingCount
+        end
+        local chunks = context.Runtime.engineItemTypeFixtureChunks
+        if not chunks or chunks.expected ~= chunkCount then
+            chunks = { expected = chunkCount, values = {}, received = 0 }
+            context.Runtime.engineItemTypeFixtureChunks = chunks
+        end
+        if not chunks.values[chunkIndex] then
+            chunks.received = chunks.received + 1
+        end
+        chunks.values[chunkIndex] = fixture.types
+        if chunks.received < chunks.expected then
+            return existingCount
+        end
+        local assembled = {}
+        for index = 1, chunks.expected do
+            local chunk = chunks.values[index]
+            if type(chunk) ~= "table" then
+                return existingCount
+            end
+            for _, value in ipairs(chunk) do
+                assembled[#assembled + 1] = value
+            end
+        end
+        context.Runtime.engineItemTypeFixtureChunks = nil
+        fixture = { types = assembled }
     end
     local types = fixture and fixture.types or nil
     local coreInventory = PsychopatzCore and PsychopatzCore.Inventory or nil

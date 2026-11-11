@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from tools.providers.pnc.runtime.save_import import SaveBackedImporter
+from tools.semantic_harness.runtime.save_import import SaveBackedImporter
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 import tools.providers.pnc.tests.test_production_faction_rehydration as faction_fixture

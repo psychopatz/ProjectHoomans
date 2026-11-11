@@ -8,7 +8,7 @@ import tempfile
 import unittest
 
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO, merge
-from tools.providers.pnc.runtime.save_import import SaveBackedImporter
+from tools.semantic_harness.runtime.save_import import SaveBackedImporter
 from tools.providers.pnc.runtime.worker import LuaSemanticWorker
 from tools.providers.pnc.tests.test_save_catalog import pz_file
 
@@ -125,6 +125,72 @@ class SaveImportTests(unittest.TestCase):
             ],
             31,
         )
+
+    def test_knowledge_transport_is_scoped_to_selected_pair(self) -> None:
+        self.save_path.write_bytes(
+            pz_file(
+                [
+                    (
+                        "PNC_PlayerCharacters",
+                        [
+                            ("schemaVersion", 6),
+                            (
+                                "byUUID",
+                                {
+                                    "char_saved": {
+                                        "uuid": "char_saved",
+                                        "accountKey": "slot_0",
+                                        "status": "active",
+                                    }
+                                },
+                            ),
+                        ],
+                    ),
+                    ("PNC_Core_Global", [("schemaVersion", 16)]),
+                    (
+                        "PNC_npcMara",
+                        [("schemaVersion", 16), ("id", "npcMara")],
+                    ),
+                    (
+                        "PNC_NPCKnowledge",
+                        [
+                            ("schemaVersion", 1),
+                            ("revision", 12),
+                            (
+                                "byCharacter",
+                                {
+                                    "char_saved": {
+                                        "byNPC": {
+                                            "npcMara": {"revision": 2},
+                                            "npcOther": {"revision": 3},
+                                        }
+                                    },
+                                    "char_other": {
+                                        "byNPC": {
+                                            "npcMara": {"revision": 4},
+                                        }
+                                    },
+                                },
+                            ),
+                        ],
+                    ),
+                ]
+            )
+        )
+
+        selection = SaveBackedImporter(
+            core_repository=CORE_REPOSITORY,
+        ).load(self.save_path, player_uuid="char_saved", npc_id="npcMara")
+        knowledge = selection.provider_payloads["ProjectHoomans"][
+            "rawRegistries"
+        ]["npcKnowledge"]
+
+        self.assertEqual(
+            knowledge["byCharacter"],
+            {"char_saved": {"byNPC": {"npcMara": {"revision": 2}}}},
+        )
+        self.assertEqual(knowledge["schemaVersion"], 1)
+        self.assertEqual(knowledge["revision"], 12)
 
     def test_saved_relationship_mutates_only_detached_world(self) -> None:
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:

@@ -12,8 +12,8 @@ from tools.providers.pnc.runtime.player_engine_state import (
     OfflinePlayerEngineStateProvider,
     PLAYER_WORLD_VERSION,
 )
-from tools.providers.pnc.runtime.save_catalog import SaveCatalog
-from tools.providers.pnc.runtime.save_import import SaveBackedImporter
+from tools.semantic_harness.runtime.save_catalog import SaveCatalog
+from tools.semantic_harness.runtime.save_import import SaveBackedImporter
 
 
 CORE_REPOSITORY = Path("/home/psychopatz/Zomboid/Workshop/psychopatzCore")

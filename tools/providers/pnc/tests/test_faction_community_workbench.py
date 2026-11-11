@@ -35,7 +35,10 @@ class FactionCommunityWorkbenchTests(SemanticLabGuiTestCase):
             app.saved_world_discover_button.invoke()
             wait_until(lambda: not app.busy and app.saved_world_entries)
 
-            selected_entry = app.saved_world_entries[0]
+            selected_entry = next(
+                entry for entry in app.saved_world_entries
+                if (entry.get("capabilities") or {}).get("projectHoomans")
+            )
             source_path = Path(str(selected_entry["path"]))
             before = sha256(source_path.read_bytes()).hexdigest()
             save_label = next(
