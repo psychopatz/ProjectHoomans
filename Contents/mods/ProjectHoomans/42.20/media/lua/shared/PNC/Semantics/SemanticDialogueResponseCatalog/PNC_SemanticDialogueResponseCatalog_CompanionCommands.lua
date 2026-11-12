@@ -144,6 +144,24 @@ local REPLY = {
     { id = "generic" },
 }
 
+-- The social reaction selector still owns the horde event pool.  These
+-- semantic horde plans share the final companion-command PSDL source, so
+-- project their wording into the same existing phrase-family authority.
+local HORDE_REACTION_TEMPLATES = {
+    "semantic.combat.horde.default",
+    "semantic.combat.horde.deescalated",
+    "semantic.combat.horde.escalated",
+    "semantic.combat.horde.started",
+    "semantic.combat.horde.prompt.default",
+    "semantic.combat.horde.prompt.eager",
+    "semantic.combat.horde.prompt.reserved",
+    "semantic.combat.horde.prompt.shaken",
+}
+
+for _, templateID in ipairs(HORDE_REACTION_TEMPLATES) do
+    installPSDLFamily(templateID)
+end
+
 local function whenFor(row)
     local when = {}
     if row.commandID then when.commandID = row.commandID end

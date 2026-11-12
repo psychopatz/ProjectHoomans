@@ -38,7 +38,7 @@ local function installPSDLFamily(templateID)
             and localized[1] or localized
         if type(fallback) == "string" and fallback ~= "" then
             phrases[#phrases + 1] = {
-                id = templateID .. ".neutral."
+                id = "phrase." .. templateID .. ".neutral."
                     .. string.format("%02d", index),
                 key = "",
                 fallback = fallback,
@@ -54,6 +54,7 @@ local function installPSDLFamily(templateID)
         id = "phrase." .. templateID,
         semanticTemplateID = templateID,
         owner = "projecthoomans.dialogue_content.events",
+        contentOwner = "projecthoomans.dialogue_content.events",
         _psdl = true,
         styles = { neutral = phrases },
     }

@@ -1,6 +1,7 @@
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
+require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Medical_Core"
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_EventReactions_Core"
 
 local Catalog = PNC.Semantics.ResponseCatalog
