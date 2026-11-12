@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/Semantics/Generated/Conversation/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "5f004786fcd0b36eb18372fe179c59b7278f85fc871f04543b395c05e097a2c6"
-Registry.WHOLE_MODEL_FINGERPRINT = "96d7c6986bf4496ce07adf4de95fad841e67a95f7acf8024d7bdc05d3151d420"
+Registry.WHOLE_MODEL_FINGERPRINT = "c5237235aae9af98ce6c4442818887273ab6ea339f6784d0c752475880c3a792"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -231,6 +231,9 @@ appendBehaviors(require "PsychopatzCore/Semantics/Generated/Conversation/Behavio
 appendBeats(require "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation")
 appendBeats(require "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/Reconciliation")
 appendBeats(require "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/needs_member_support")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/needs_neutral_support")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/needs_special_support")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_ask_about_member")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_ask_about_neutral")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_ask_about_special")

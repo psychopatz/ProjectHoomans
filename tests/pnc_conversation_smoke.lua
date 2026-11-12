@@ -151,6 +151,20 @@ local migratedWorkOrders = Registry.GetBlock(
 T.equal(#migratedWorkOrders.nodes.opening.choices, 2,
     "PSDL work-orders topic preserves both offers")
 
+local migratedNeeds = Registry.GetBlock("projecthoomans:needs_member")
+T.equal(migratedNeeds.textSource.modID, "ProjectHoomans",
+    "PSDL needs routes adopter-owned text")
+T.equal(#migratedNeeds.nodes.opening.choices, 3,
+    "PSDL needs preserves its three opening offers")
+T.equal(migratedNeeds.nodes.opening.choices[3].outcomes[1].next,
+    "gift",
+    "PSDL needs preserves the gift continuation transition")
+T.equal(migratedNeeds.nodes.gift.textKey, "gift.opening",
+    "PSDL needs preserves the gift continuation turn")
+T.equal(migratedNeeds.nodes.gift.choices[1].outcomes[1].next,
+    "$root",
+    "PSDL needs preserves return to the conversation root")
+
 local migratedGreeting = Registry.GetBlock(
     "projecthoomans:greeting_firstmeet_dawn"
 )

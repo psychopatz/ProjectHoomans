@@ -133,6 +133,12 @@ return {
         ["recordCount"] = 1,
     },
     {
+        ["domain"] = "needs_support",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/NeedsSupport",
+        ["recordCount"] = 3,
+    },
+    {
         ["domain"] = "social_ask_about",
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialAskAbout",

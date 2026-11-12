@@ -235,10 +235,11 @@ local function registerPlan(plan)
     then
         return false
     end
-    local node = {
-        choices = {},
-    }
+    local nodes = {}
+    local entryNode = "opening"
+    local nodeCount = 0
     if type(response.variants) == "table" then
+        local node = { choices = {} }
         node.textKeys = {}
         for _, variant in ipairs(response.variants) do
             if type(variant) == "table" and variant.id then
@@ -249,19 +250,53 @@ local function registerPlan(plan)
                 )
             end
         end
+        if turnMetadata.portraitAnimation then
+            node.portraitAnimation = tostring(turnMetadata.portraitAnimation)
+        elseif values.portraitAnimation then
+            node.portraitAnimation = tostring(values.portraitAnimation)
+        end
+        if type(turn) == "table" then
+            for _, offer in ipairs(turn.offers or {}) do
+                if type(offer) == "table" and offer.id then
+                    addChoice(node, offer)
+                end
+            end
+        end
+        nodes[entryNode] = node
+        nodeCount = 1
     else
-        node.textKey = tostring(turnMetadata.textKey or "turn." .. tostring(turn.id))
-    end
-    if turnMetadata.portraitAnimation then
-        node.portraitAnimation = tostring(turnMetadata.portraitAnimation)
-    elseif values.portraitAnimation then
-        node.portraitAnimation = tostring(values.portraitAnimation)
-    end
-    if type(turn) == "table" then
-        for _, offer in ipairs(turn.offers or {}) do
-            if type(offer) == "table" and offer.id then addChoice(node, offer) end
+        for index, currentTurn in ipairs(turns or {}) do
+            if type(currentTurn) == "table" and currentTurn.id then
+                local turnID = tostring(currentTurn.id)
+                local currentMetadata = type(currentTurn.metadata) == "table"
+                    and currentTurn.metadata or {}
+                local currentNode = {
+                    choices = {},
+                    textKey = tostring(
+                        currentMetadata.textKey or "turn." .. turnID
+                    ),
+                }
+                if currentMetadata.portraitAnimation then
+                    currentNode.portraitAnimation = tostring(
+                        currentMetadata.portraitAnimation
+                    )
+                elseif values.portraitAnimation then
+                    currentNode.portraitAnimation = tostring(
+                        values.portraitAnimation
+                    )
+                end
+                for _, offer in ipairs(currentTurn.offers or {}) do
+                    if type(offer) == "table" and offer.id then
+                        addChoice(currentNode, offer)
+                    end
+                end
+                nodes[turnID] = currentNode
+                nodeCount = nodeCount + 1
+                if index == 1 then entryNode = turnID end
+            end
         end
     end
+    if nodeCount == 0 then return false end
     local definition = {
         schemaVersion = 1,
         ownerModID = OWNER,
@@ -270,15 +305,18 @@ local function registerPlan(plan)
         priority = tonumber(values.priority) or 0,
         weight = tonumber(values.weight) or 100,
         textSource = source,
-        entryNode = "opening",
+        entryNode = entryNode,
         gates = gatesForPredicate(plan.when),
-        nodes = { opening = node },
+        nodes = nodes,
     }
     local ok = Registry.RegisterBlock(blockID, definition)
     return ok == true
 end
 
 local IDS = {
+    "needs.member.support",
+    "needs.neutral.support",
+    "needs.special.support",
     "social.personal.special.trust",
     "social.relationship.special.affinity",
     "social.set_territory.member.claim",
