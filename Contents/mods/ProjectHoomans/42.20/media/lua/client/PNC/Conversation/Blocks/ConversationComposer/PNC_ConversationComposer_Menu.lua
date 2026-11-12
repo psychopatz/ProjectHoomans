@@ -2,7 +2,7 @@ local Conversation = PNC.Conversation
 local Composer = Conversation.Composer
 local Registry = Conversation.Registry
 local Selector = Conversation.Selector
-local Loader = Conversation.TextCatalog
+local Loader = PsychopatzCore.Conversation.TextCatalog
 local Internal = Composer.Internal
 
 local SYSTEM_SOURCE = Internal.SYSTEM_SOURCE
@@ -42,7 +42,7 @@ local RECRUIT_SYSTEM_KEYS = {
 }
 
 local GOODBYE_SOURCE = {
-    modID = "ProjectHoomans",
+    modID = "PsychopatzCore",
     pathPattern = "media/translation/{language}/Conversation/Text/social/goodbye/closing.json",
     domain = "pnc.social.goodbye.closing",
 }

@@ -185,6 +185,7 @@ function Test.addPackagePaths(specifications)
         { "ProjectHoomans", "client" },
         { "ProjectHoomans", "common_lua" },
         { "PsychopatzCore", "common" },
+        { "PsychopatzCore", "common_client" },
         { "PsychopatzCore", "shared" },
         { "PsychopatzCore", "server" },
         { "PsychopatzCore", "client" },

@@ -6,8 +6,8 @@ T.addPackagePaths({
 })
 
 local Loader = T.load(
-    "ProjectHoomans", "shared",
-    "PNC/Conversation/Blocks/PNC_ConversationTextCatalog.lua")
+    "PsychopatzCore", "common",
+    "PsychopatzCore/Conversation/PsychopatzConversationTextCatalog.lua")
 local Json = require "PsychopatzCore/Serialization/PsychopatzJson"
 
 local conversationManifest, manifestReason = Json.Decode(T.read(

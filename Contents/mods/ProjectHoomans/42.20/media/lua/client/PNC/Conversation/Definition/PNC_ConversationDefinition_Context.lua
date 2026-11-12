@@ -9,7 +9,7 @@ local IdentityPresentation = PNC.NPCIdentityPresentation
 local AddressResolver = PNC.Semantics
     and PNC.Semantics.AddressResolver
     or require "PNC/Semantics/PNC_SemanticAddressResolver"
-local Loader = Conversation.TextCatalog
+local Loader = PsychopatzCore.Conversation.TextCatalog
 
 if type(Addressing) ~= "table"
     or type(Addressing.ResolveForNPC) ~= "function"
@@ -26,7 +26,7 @@ then
 end
 
 local SYSTEM_SOURCE = {
-    modID = "ProjectHoomans",
+    modID = "PsychopatzCore",
         pathPattern = "media/translation/{language}/Conversation/Text/system/categories.json",
     domain = "pnc.system.categories",
 }

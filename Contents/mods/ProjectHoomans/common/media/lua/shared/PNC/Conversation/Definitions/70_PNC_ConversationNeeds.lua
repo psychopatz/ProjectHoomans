@@ -1,6 +1,7 @@
 local H = PNC.Conversation.DefinitionHelpers
 for _, audience in ipairs({ "neutral", "member", "special" }) do
     H.RegisterSimple("needs", audience, "needs/" .. audience .. "/support", {
+        textOwner = "PsychopatzCore",
         nodes = {
             opening = {
                 textKey = "opening",

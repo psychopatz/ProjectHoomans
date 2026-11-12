@@ -47,7 +47,7 @@ function Conversation.HandleCeasefireResult(args)
         pathPattern = "media/translation/{language}/Conversation/Text/social/greetings/hostile/parley.json",
         domain = "pnc.greetings.hostile.parley",
     }
-    Conversation.TextCatalog.EnsureSource(source, {
+    PsychopatzCore.Conversation.TextCatalog.EnsureSource(source, {
         "result.accepted", "result.rejected",
     })
     local value = PsychopatzCore.Conversation.Text.Resolve({

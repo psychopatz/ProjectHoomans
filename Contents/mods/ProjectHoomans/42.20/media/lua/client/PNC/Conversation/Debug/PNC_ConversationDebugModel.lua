@@ -6,7 +6,7 @@ local Model = PNC.ConversationDebugModel
 local Registry = PNC.Conversation.Registry
 local Selector = PNC.Conversation.Selector
 local Rules = PNC.Conversation.Rules
-local Loader = PNC.Conversation.TextCatalog
+local Loader = PsychopatzCore.Conversation.TextCatalog
 
 local DEBUG_SOURCE = {
     modID = "ProjectHoomans",

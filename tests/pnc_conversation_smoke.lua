@@ -63,7 +63,8 @@ T.load(CLIENT .. "PNC/Semantics/PNC_SemanticGiftLifecycle.lua")
 T.load(CLIENT .. "PNC/Semantics/PNC_SemanticGiftContext.lua")
 T.load(COMMON_SHARED
     .. "PNC/Conversation/Definitions/00_PNC_ConversationDefinitions.lua")
-T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationTextCatalog.lua")
+T.load("PsychopatzCore", "common",
+    "PsychopatzCore/Conversation/PsychopatzConversationTextCatalog.lua")
 T.load(CLIENT .. "PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
 T.load(CLIENT .. "PNC/Conversation/PNC_ConversationTime.lua")
 T.load(CLIENT .. "PNC/Conversation/PNC_ConversationBackgrounds.lua")
@@ -89,7 +90,7 @@ T.load(CLIENT .. "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation.lua"
 local Registry = PNC.Conversation.Registry
 local Rules = PNC.Conversation.Rules
 local Selector = PNC.Conversation.Selector
-local Loader = PNC.Conversation.TextCatalog
+local Loader = PsychopatzCore.Conversation.TextCatalog
 
 T.equal(#Registry.ListCategories(), 10, "built-in category count")
 T.equal(#Registry.ListBlocks(), 38, "expanded built-in block count")

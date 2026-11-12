@@ -1,4 +1,4 @@
-require "PNC/Conversation/Blocks/PNC_ConversationTextCatalog"
+require "PsychopatzCore/Conversation/PsychopatzConversationTextCatalog"
 local DialogueSession = require "PNC/Semantics/PNC_SemanticDialogueSession"
 
 PNC = PNC or {}
@@ -12,13 +12,13 @@ local Internal = Composer.Internal
 local Registry = Conversation.Registry
 local Selector = Conversation.Selector
 local Rules = Conversation.Rules
-local Loader = Conversation.TextCatalog
+local Loader = PsychopatzCore.Conversation.TextCatalog
 local Diary = Conversation.Diary
 Composer.requestSerial = tonumber(Composer.requestSerial) or 0
 Composer.localRequests = Composer.localRequests or {}
 
 local SYSTEM_SOURCE = {
-    modID = "ProjectHoomans",
+    modID = "PsychopatzCore",
     pathPattern = "media/translation/{language}/Conversation/Text/system/categories.json",
     domain = "pnc.system.categories",
 }

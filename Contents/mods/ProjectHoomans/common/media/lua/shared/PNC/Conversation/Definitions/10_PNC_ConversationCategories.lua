@@ -1,6 +1,6 @@
 local H = PNC.Conversation.DefinitionHelpers
 local Registry = PNC.Conversation.Registry
-local categorySource = H.Source("system/categories")
+local categorySource = H.Source("system/categories", "PsychopatzCore")
 
 local categories = {
     { "greetings", "category.greetings", -100, true },

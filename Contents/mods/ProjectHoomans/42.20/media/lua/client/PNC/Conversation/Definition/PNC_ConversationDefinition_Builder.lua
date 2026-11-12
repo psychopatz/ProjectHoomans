@@ -12,10 +12,10 @@ if type(Conversation.Time) ~= "table"
 then
     pcall(require, "PNC/Conversation/PNC_ConversationTime")
 end
-if type(Conversation.TextCatalog) ~= "table"
-    or type(Conversation.TextCatalog.EnsureSource) ~= "function"
+if type(PsychopatzCore.Conversation.TextCatalog) ~= "table"
+    or type(PsychopatzCore.Conversation.TextCatalog.EnsureSource) ~= "function"
 then
-    pcall(require, "PNC/Conversation/Blocks/PNC_ConversationTextCatalog")
+    pcall(require, "PsychopatzCore/Conversation/PsychopatzConversationTextCatalog")
 end
 if type(Conversation.Backgrounds) ~= "table"
     or type(Conversation.Backgrounds.Get) ~= "function"

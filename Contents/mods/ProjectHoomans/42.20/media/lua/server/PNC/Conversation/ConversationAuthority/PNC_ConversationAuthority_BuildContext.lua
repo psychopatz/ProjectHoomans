@@ -13,7 +13,7 @@ local ActorConversationContext = PNC.Semantics
 local Internal = Authority.Internal
 local Registry = PNC.Conversation.Registry
 local History = PNC.Conversation.History
-local TextCatalog = PNC.Conversation.TextCatalog
+local TextCatalog = PsychopatzCore.Conversation.TextCatalog
 local InteractionPersistence = PNC.Conversation
     and PNC.Conversation.InteractionLifecyclePersistence or nil
 local personalRelationshipQueries = Internal.PersonalRelationshipQueries

@@ -8,13 +8,14 @@ PNC.Conversation.DefinitionHelpers = Helpers
 Helpers.MOD_ID = "ProjectHoomans"
 Helpers.PREFIX = "projecthoomans:"
 
-function Helpers.Source(target)
+function Helpers.Source(target, textOwner)
     local domain = string.gsub(target, "/", ".")
-    return {
-        modID = Helpers.MOD_ID,
-        pathPattern = "media/translation/{language}/Conversation/Text/" .. target .. ".json",
+    local TextCatalog = PsychopatzCore.Conversation.TextCatalog
+    return TextCatalog.Source({
+        modID = textOwner or Helpers.MOD_ID,
+        target = target,
         domain = "pnc." .. domain,
-    }
+    })
 end
 
 function Helpers.Outcome(id, responseKey, options)
@@ -55,7 +56,7 @@ function Helpers.RegisterSimple(kind, audience, textTarget, options)
             audiences = { audience },
             priority = options.priority or 0,
             weight = options.weight or 100,
-            textSource = Helpers.Source(textTarget),
+            textSource = Helpers.Source(textTarget, options.textOwner),
             entryNode = "opening",
             gates = options.gates,
             ["repeat"] = options["repeat"],

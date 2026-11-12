@@ -13,7 +13,7 @@ local DEBUG_SOURCE = {
 }
 
 local function tr(key, args)
-    PNC.Conversation.TextCatalog.EnsureSource(DEBUG_SOURCE, { key })
+    PsychopatzCore.Conversation.TextCatalog.EnsureSource(DEBUG_SOURCE, { key })
     return PsychopatzCore.Conversation.Text.Resolve({
         key = key, domain = DEBUG_SOURCE.domain, args = args,
     })

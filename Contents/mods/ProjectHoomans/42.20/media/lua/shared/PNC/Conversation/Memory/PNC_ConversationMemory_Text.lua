@@ -4,7 +4,7 @@ PNC.Conversation = PNC.Conversation or {}
 
 local Memory = PNC.Conversation.Memory
 local Data = Memory._registry
-local Loader = PNC.Conversation.TextCatalog
+local Loader = PsychopatzCore.Conversation.TextCatalog
 
 local function sourceKey(source)
     return table.concat({

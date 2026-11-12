@@ -1,6 +1,6 @@
 local H = PNC.Conversation.DefinitionHelpers
 for _, audience in ipairs({ "neutral", "member", "special" }) do
-    H.RegisterSimple("wellbeing", audience, "social/wellbeing/" .. audience, { choices = {
+    H.RegisterSimple("wellbeing", audience, "social/wellbeing/" .. audience, { textOwner = "PsychopatzCore", choices = {
         H.ContinueChoice("condition", {
             { type = "pnc:relationship", approval = 1, familiarity = 1 },
         }),

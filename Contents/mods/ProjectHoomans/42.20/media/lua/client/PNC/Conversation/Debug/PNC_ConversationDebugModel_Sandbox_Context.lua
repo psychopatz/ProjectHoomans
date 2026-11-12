@@ -11,7 +11,7 @@ local H = PNC.ConversationDebugModelInternal
 local copy = H.Copy
 local Registry = PNC.Conversation.Registry
 local Selector = PNC.Conversation.Selector
-local Loader = PNC.Conversation.TextCatalog
+local Loader = PsychopatzCore.Conversation.TextCatalog
 local SandboxContext = {}
 
 if not copy then return Model end

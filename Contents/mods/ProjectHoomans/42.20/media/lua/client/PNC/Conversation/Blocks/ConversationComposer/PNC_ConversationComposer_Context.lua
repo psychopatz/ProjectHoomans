@@ -10,7 +10,7 @@ local ActorConversationContext = PNC.Semantics
     and PNC.Semantics.ActorConversationContext
     or require "PNC/Semantics/PNC_ActorConversationContext"
 local Registry = Conversation.Registry
-local Loader = Conversation.TextCatalog
+local Loader = PsychopatzCore.Conversation.TextCatalog
 local Audience = Conversation.Audience
 
 local function entryValue(entry, key)

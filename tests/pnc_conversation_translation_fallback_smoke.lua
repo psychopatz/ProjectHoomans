@@ -63,8 +63,8 @@ getModFileReader = function(modID, path)
 end
 
 local Loader = T.load(
-    "ProjectHoomans", "shared",
-    "PNC/Conversation/Blocks/PNC_ConversationTextCatalog.lua")
+    "PsychopatzCore", "common",
+    "PsychopatzCore/Conversation/PsychopatzConversationTextCatalog.lua")
 local source = {
     modID = "ProjectHoomans",
     pathPattern = "media/translation/{language}/Conversation/Text/test/catalog.json",

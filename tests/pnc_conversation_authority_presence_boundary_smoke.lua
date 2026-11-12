@@ -51,15 +51,16 @@ for i = 1, #providers do
 end
 
 PNC = { Conversation = {} }
+PsychopatzCore = { Conversation = {} }
 package.preload["PNC/Conversation/PNC_ConversationHistory"] = function()
     PNC.Conversation.History = {}
     return PNC.Conversation.History
 end
 package.preload[
-    "PNC/Conversation/Blocks/PNC_ConversationTextCatalog"
+    "PsychopatzCore/Conversation/PsychopatzConversationTextCatalog"
 ] = function()
-    PNC.Conversation.TextCatalog = {}
-    return PNC.Conversation.TextCatalog
+    PsychopatzCore.Conversation.TextCatalog = {}
+    return PsychopatzCore.Conversation.TextCatalog
 end
 T.load("ProjectHoomans", "server",
     "PNC/Conversation/PNC_ConversationAuthority.lua")
@@ -77,7 +78,7 @@ for i = 1, #providers do
 end
 package.preload["PNC/Conversation/PNC_ConversationHistory"] = nil
 package.preload[
-    "PNC/Conversation/Blocks/PNC_ConversationTextCatalog"
+    "PsychopatzCore/Conversation/PsychopatzConversationTextCatalog"
 ] = nil
 
 T.finish("pnc_conversation_authority_presence_boundary_smoke")

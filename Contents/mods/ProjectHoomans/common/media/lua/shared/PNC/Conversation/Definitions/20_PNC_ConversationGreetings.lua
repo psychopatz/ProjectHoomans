@@ -62,7 +62,7 @@ for relationshipID, audience in pairs(relationships) do
             audiences = { audience },
             priority = 10,
             weight = 100,
-            textSource = H.Source(textTarget),
+            textSource = H.Source(textTarget, "PsychopatzCore"),
             entryNode = "opening",
             gates = {
                 { type = "pnc:relationship_state", value = relationshipID },

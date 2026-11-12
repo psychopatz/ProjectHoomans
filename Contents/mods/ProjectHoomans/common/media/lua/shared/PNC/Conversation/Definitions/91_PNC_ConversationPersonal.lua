@@ -1,5 +1,6 @@
 local H = PNC.Conversation.DefinitionHelpers
 H.RegisterSimple("personal", "special", "social/personal/special/trust", {
+    textOwner = "PsychopatzCore",
     gates = {{
         type = "pnc:relationship", axis = "familiarity",
         operator = ">=", value = 10, reasonKey = "locked.familiarity",
