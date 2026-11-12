@@ -33,7 +33,7 @@ end
 local function label(key, fallback)
     return Text.Resolve({
         key = key,
-        domain = "pnc.system.shared.categories",
+        domain = "pnc.system.categories",
         fallback = fallback,
     }, fallback)
 end
@@ -94,7 +94,7 @@ function Integration.CreateInputPart(bounds, options)
     options.minimumHeight = options.minimumHeight or 82
     options.title = options.title or {
         key = "panel.llm_input",
-        domain = "pnc.system.shared.categories",
+        domain = "pnc.system.categories",
         fallback = "TYPE TO TALK",
     }
     options.submit = options.submit or submitHybrid

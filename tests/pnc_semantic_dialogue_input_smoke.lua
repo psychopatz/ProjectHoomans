@@ -202,7 +202,7 @@ PNC = {
                     local session = view.session
                     session:queueMessage("npc", {
                         key = result.decision.response.templateID,
-                        domain = "pnc.system.shared.categories",
+                        domain = "pnc.system.categories",
                         fallback = result.decision.response.fallback,
                     }, {
                         source = {

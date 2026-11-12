@@ -67,7 +67,7 @@ local function payloadForPlanTurn(response, rendered, fallbackRendered)
     return {
         key = key,
         semanticTemplateID = semanticKey,
-        domain = "pnc.system.shared.categories",
+        domain = "pnc.system.categories",
         -- Keep the authored English fallback on every live payload. Text
         -- resolution still gives a registered translation precedence, but a
         -- missing/late registration cannot leak a template ID into the UI.
@@ -156,7 +156,7 @@ local function payloadsForResponse(response)
             key = response.templateID,
             semanticTemplateID = response.semanticVariantID
                 or response.templateID,
-            domain = "pnc.system.shared.categories",
+            domain = "pnc.system.categories",
             text = text ~= "" and text or nil,
             fallback = fallback,
             args = response.args,

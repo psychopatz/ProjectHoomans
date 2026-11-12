@@ -1,5 +1,5 @@
 local H = PNC.Conversation.DefinitionHelpers
-H.RegisterSimple("relationship", "special", {
+H.RegisterSimple("relationship", "special", "social/relationship/special/affinity", {
     gates = {{
         type = "pnc:relationship", axis = "approval",
         operator = ">=", value = 20, reasonKey = "locked.approval",

@@ -116,7 +116,7 @@ function QuestResponses.ForResult(payload)
     return {
         key = response.key,
         translationKey = response.key,
-        domain = "pnc.system.shared.categories",
+        domain = "pnc.system.categories",
         text = text,
         fallback = fallback,
         args = {

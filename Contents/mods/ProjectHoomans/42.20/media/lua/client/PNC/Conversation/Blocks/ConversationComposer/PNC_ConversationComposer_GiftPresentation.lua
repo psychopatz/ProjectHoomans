@@ -8,7 +8,7 @@ local Internal = Composer.Internal
 -- a stale/reloaded conversation view no longer has its active block attached.
 local NEEDS_FALLBACK_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Text/needs/neutral/basic.json",
+    pathPattern = "media/translation/{language}/Conversation/Text/needs/neutral/support.json",
     domain = "pnc.needs.neutral.basic",
 }
 

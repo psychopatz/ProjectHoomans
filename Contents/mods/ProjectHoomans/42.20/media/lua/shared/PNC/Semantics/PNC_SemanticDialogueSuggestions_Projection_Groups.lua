@@ -159,7 +159,7 @@ local function groupPresentation(id, topic)
         if text and type(text.Resolve) == "function" then
             local ok, value = pcall(text.Resolve, {
                 key = key,
-                domain = "pnc.system.shared.categories",
+                domain = "pnc.system.categories",
                 fallback = categoryLabel,
             })
             if ok and type(value) == "string" and value ~= "" then

@@ -8,11 +8,7 @@ Registry.RegisterBlock(H.PREFIX .. "settlement_admission", {
     audiences = { "neutral", "member", "special" },
     priority = 1000,
     weight = 100,
-    textSource = H.Source(
-        "greetings",
-        "settlement_admission",
-        "arrival"
-    ),
+    textSource = H.Source("social/greetings/settlement_admission/arrival"),
     entryNode = "opening",
     gates = { { type = "pnc:settlement_visit" } },
     nodes = {

@@ -8,9 +8,9 @@ T.addPackagePaths({
 local language = "TL"
 local readersClosed = 0
 local files = {
-    ["ProjectHoomans|media/translation/EN/Conversation/Text/test/shared/catalog.json"] =
+    ["ProjectHoomans|media/translation/EN/Conversation/Text/test/catalog.json"] =
         '{"english.only":"English fallback","translated":"English"}',
-    ["ProjectHoomans|media/translation/TL/Conversation/Text/test/shared/catalog.json"] =
+    ["ProjectHoomans|media/translation/TL/Conversation/Text/test/catalog.json"] =
         '{"translated":"Tagalog"}',
 }
 
@@ -67,7 +67,7 @@ local Loader = T.load(
     "PNC/Conversation/Blocks/PNC_ConversationTextCatalog.lua")
 local source = {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Text/test/shared/catalog.json",
+    pathPattern = "media/translation/{language}/Conversation/Text/test/catalog.json",
     domain = "test.translation_fallback",
 }
 

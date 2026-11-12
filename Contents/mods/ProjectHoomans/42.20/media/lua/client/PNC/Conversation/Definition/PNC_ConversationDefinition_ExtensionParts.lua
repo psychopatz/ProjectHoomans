@@ -15,11 +15,11 @@ function ExtensionParts.Build(npcID, semanticFactory)
             visible = Relationship.IsPresentationVisible(),
             title = {
                 key = "panel.current_relation",
-                domain = "pnc.system.shared.categories",
+                domain = "pnc.system.categories",
             },
             editLabel = {
                 key = "panel.current_relation_edit",
-                domain = "pnc.system.shared.categories",
+                domain = "pnc.system.categories",
             },
         },
         {
@@ -30,7 +30,7 @@ function ExtensionParts.Build(npcID, semanticFactory)
             visible = semanticFactory ~= nil,
             title = {
                 key = "panel.llm_input",
-                domain = "pnc.system.shared.categories",
+                domain = "pnc.system.categories",
                 fallback = "TYPE TO TALK",
             },
         },

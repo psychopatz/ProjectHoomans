@@ -8,11 +8,12 @@ PNC.Conversation.DefinitionHelpers = Helpers
 Helpers.MOD_ID = "ProjectHoomans"
 Helpers.PREFIX = "projecthoomans:"
 
-function Helpers.Source(kind, audience, catalog)
+function Helpers.Source(target)
+    local domain = string.gsub(target, "/", ".")
     return {
         modID = Helpers.MOD_ID,
-        pathPattern = "media/translation/{language}/Conversation/Text/" .. kind .. "/" .. audience .. "/" .. catalog .. ".json",
-        domain = "pnc." .. kind .. "." .. audience .. "." .. catalog,
+        pathPattern = "media/translation/{language}/Conversation/Text/" .. target .. ".json",
+        domain = "pnc." .. domain,
     }
 end
 
@@ -43,10 +44,10 @@ function Helpers.ContinueChoice(id, effects)
     }
 end
 
-function Helpers.RegisterSimple(kind, audience, options)
+function Helpers.RegisterSimple(kind, audience, textTarget, options)
     options = options or {}
     return PNC.Conversation.Registry.RegisterBlock(
-        Helpers.PREFIX .. kind .. "_basic_" .. audience,
+        Helpers.PREFIX .. kind .. "_" .. audience,
         {
             schemaVersion = 1,
             ownerModID = Helpers.MOD_ID,
@@ -54,7 +55,7 @@ function Helpers.RegisterSimple(kind, audience, options)
             audiences = { audience },
             priority = options.priority or 0,
             weight = options.weight or 100,
-            textSource = Helpers.Source(kind, audience, options.catalog or "basic"),
+            textSource = Helpers.Source(textTarget),
             entryNode = "opening",
             gates = options.gates,
             ["repeat"] = options["repeat"],

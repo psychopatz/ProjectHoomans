@@ -43,8 +43,8 @@ local RECRUIT_SYSTEM_KEYS = {
 
 local GOODBYE_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Text/goodbye/shared/goodbye.json",
-    domain = "pnc.goodbye.shared.goodbye",
+    pathPattern = "media/translation/{language}/Conversation/Text/social/goodbye/closing.json",
+    domain = "pnc.social.goodbye.closing",
 }
 
 local function evaluateCategory(context, category)

@@ -8,7 +8,7 @@ Registry.RegisterBlock(H.PREFIX .. "hostile_parley", {
     audiences = { "hostile" },
     priority = 100,
     weight = 100,
-    textSource = H.Source("greetings", "hostile", "parley"),
+    textSource = H.Source("social/greetings/hostile/parley"),
     entryNode = "opening",
     nodes = {
         opening = {
@@ -39,10 +39,20 @@ local relationships = {
     FirstMeet = "neutral", Acquaintance = "neutral",
     Member = "member", Lover = "special",
 }
+local relationshipTextIDs = {
+    FirstMeet = "first_meet", Acquaintance = "acquaintance",
+    Member = "", Lover = "lover",
+}
 
 for relationshipID, audience in pairs(relationships) do
     for timeID, window in pairs(timeWindows) do
         local slug = string.lower(relationshipID) .. "_" .. timeID
+        local relationshipTextID = relationshipTextIDs[relationshipID]
+        local textTarget = "social/greetings/" .. audience
+        if relationshipTextID ~= "" then
+            textTarget = textTarget .. "/" .. relationshipTextID
+        end
+        textTarget = textTarget .. "/" .. timeID
         local keys = {}
         for index = 1, 5 do keys[index] = string.format("greeting.%03d", index) end
         Registry.RegisterBlock(H.PREFIX .. "greeting_" .. slug, {
@@ -52,7 +62,7 @@ for relationshipID, audience in pairs(relationships) do
             audiences = { audience },
             priority = 10,
             weight = 100,
-            textSource = H.Source("greetings", audience, slug),
+            textSource = H.Source(textTarget),
             entryNode = "opening",
             gates = {
                 { type = "pnc:relationship_state", value = relationshipID },

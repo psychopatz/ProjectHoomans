@@ -161,7 +161,7 @@ T.equal(categoryResult.command, PNC.Const.CMD_CONVERSATION_BLOCK,
     "block response command")
 T.equal(categoryResult.payload.success, true, "block response success")
 T.equal(categoryResult.payload.blockID,
-    "projecthoomans:wellbeing_basic_neutral",
+    "projecthoomans:wellbeing_neutral",
     "eligible neutral wellbeing block selected")
 
 T.truthy(Authority.HandleChoice(player, {

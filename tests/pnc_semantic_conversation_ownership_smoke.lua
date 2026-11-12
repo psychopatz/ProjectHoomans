@@ -53,12 +53,12 @@ for categoryID, topic in pairs(expected) do
 end
 
 local blockMetadata = Ownership.ForBlock({
-    id = "projecthoomans:wellbeing_basic_neutral",
+    id = "projecthoomans:wellbeing_neutral",
     category = "projecthoomans:wellbeing",
 })
 T.equal(
     blockMetadata.blockID,
-    "projecthoomans:wellbeing_basic_neutral",
+    "projecthoomans:wellbeing_neutral",
     "block ownership keeps the exact legacy block identity"
 )
 T.truthy(

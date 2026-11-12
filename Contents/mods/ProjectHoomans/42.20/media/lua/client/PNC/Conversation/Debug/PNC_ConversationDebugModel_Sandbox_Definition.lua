@@ -26,11 +26,11 @@ function SandboxDefinition.Build(state, graph)
             visible = true,
             title = {
                 key = "panel.current_relation",
-                domain = "pnc.system.shared.categories",
+                domain = "pnc.system.categories",
             },
             editLabel = {
                 key = "panel.current_relation_edit",
-                domain = "pnc.system.shared.categories",
+                domain = "pnc.system.categories",
             },
         }
     end

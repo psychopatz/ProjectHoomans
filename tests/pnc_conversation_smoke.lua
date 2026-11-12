@@ -203,7 +203,7 @@ local unsafeOK = Registry.RegisterBlock("testmod:unsafe", {
     audiences = { "neutral" },
     textSource = {
         modID = "ProjectHoomans",
-        pathPattern = "media/translation/{language}/Conversation/Text/wellbeing/neutral/basic.json",
+    pathPattern = "media/translation/{language}/Conversation/Text/social/wellbeing/neutral.json",
         domain = "test.unsafe",
     },
     entryNode = "opening",
@@ -688,7 +688,7 @@ PNC.Conversation.Authority = {
             success = true,
             npcID = args.npcID,
             categoryID = args.categoryID,
-            blockID = "projecthoomans:ask_about_basic_neutral",
+            blockID = "projecthoomans:ask_about_neutral",
             nodeID = "opening",
         })
     end,
@@ -704,7 +704,7 @@ T.truthy(PNC.Conversation.Composer.ReceiveOutcome({
     requestID = "choice:return-to-root",
     success = true,
     npcID = "npc-12",
-    blockID = "projecthoomans:ask_about_basic_neutral",
+    blockID = "projecthoomans:ask_about_neutral",
     nodeID = "opening",
     choiceID = "background",
     outcomeID = "reply",
@@ -725,7 +725,7 @@ T.equal(fakeSession.pendingClose, false,
 PsychopatzCore.Conversation.instance = nil
 
 local memberAskNode = PNC.Conversation.Composer.BuildBlockNode(
-    Registry.GetBlock("projecthoomans:ask_about_basic_member"),
+    Registry.GetBlock("projecthoomans:ask_about_member"),
     "opening",
     definition.context.conversationBlockContext
 )
@@ -745,7 +745,7 @@ fakeSession.append = function(_, speaker, value)
     }
 end
 definition.context.conversationBlockContext.activeConversationBlockID =
-    "projecthoomans:needs_basic_neutral"
+    "projecthoomans:needs_neutral"
 PNC.Client = {
     RequestConversationRelationship = function()
         relationshipRefreshes = relationshipRefreshes + 1
@@ -933,7 +933,7 @@ T.equal(preview.relationship.morale, nil, "morale is not a conversation axis")
 local debugContext = PNC.ConversationDebugModel.DefaultContext()
 local before = debugContext.relationship.familiarity
 local sandboxDefinition = T.truthy(PNC.ConversationDebugModel.BuildSandboxDefinition(
-    "projecthoomans:needs_basic_neutral",
+    "projecthoomans:needs_neutral",
     debugContext
 ))
 T.equal(sandboxDefinition.persistHistory, false,
@@ -956,7 +956,7 @@ end
 T.equal(browsedBlockCount, #Registry.ListBlocks(),
     "GUI sandbox lists every registered conversation block")
 local sandboxOpeningID =
-    "sandbox:block:projecthoomans:needs_basic_neutral:opening"
+    "sandbox:block:projecthoomans:needs_neutral:opening"
 T.equal(#sandboxDefinition.nodes[sandboxOpeningID].choices, 4,
     "GUI sandbox exposes authored choices plus browser navigation")
 local sandboxRelationshipUpdate
@@ -971,7 +971,7 @@ local sandboxChoice = sandboxDefinition.nodes[sandboxOpeningID].choices[3]
 sandboxChoice.action(nil, nil, sandboxSession)
 T.truthy(sandboxChoice.response(), "GUI sandbox resolves an NPC response")
 T.equal(sandboxChoice.next(),
-    "sandbox:block:projecthoomans:needs_basic_neutral:gift",
+    "sandbox:block:projecthoomans:needs_neutral:gift",
     "sandbox follows the authored multi-node branch")
 T.equal(sandboxDefinition.context.relationship.familiarity, before,
     "GUI sandbox keeps the cloned relationship unchanged without an effect")
@@ -980,7 +980,7 @@ T.equal(debugContext.relationship.familiarity, before,
 T.equal(sandboxRelationshipUpdate.familiarity, before,
     "GUI sandbox refreshes the real relationship panel")
 local sandboxView = T.truthy(PNC.ConversationDebugModel.OpenSandbox(
-    "projecthoomans:ask_about_basic_neutral",
+    "projecthoomans:ask_about_neutral",
     debugContext
 ))
 T.equal(sandboxView.start,
@@ -994,7 +994,7 @@ local relationshipPanelSummary
 definition.context.conversationLifecycleState = { token = "lease-persist" }
 definition.context.pendingConversationRequest = "category:pending"
 definition.context.activeConversationBlockID =
-    "projecthoomans:ask_about_basic_neutral"
+    "projecthoomans:ask_about_neutral"
 local activeConversationView = {
     spec = definition,
     extensionParts = {
@@ -1154,7 +1154,7 @@ T.equal(#hostileRouteCalls, 1,
 PNC.PBrainZ = nil
 
 local sandbox = T.truthy(PNC.ConversationDebugModel.ExecuteSandbox(
-        "projecthoomans:wellbeing_basic_neutral",
+        "projecthoomans:wellbeing_neutral",
         "opening", "condition", debugContext
 ))
 T.equal(sandbox.persisted, false, "sandbox does not persist")

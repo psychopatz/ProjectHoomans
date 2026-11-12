@@ -1,6 +1,6 @@
 local H = PNC.Conversation.DefinitionHelpers
 
-H.RegisterSimple("set_territory", "member", {
+H.RegisterSimple("set_territory", "member", "social/territory/member/claim", {
     priority = 1000,
     gates = {
         { type = "pnc:audience", value = "member" },

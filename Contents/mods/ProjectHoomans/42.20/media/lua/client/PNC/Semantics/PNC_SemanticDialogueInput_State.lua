@@ -31,7 +31,7 @@ end
 function Input.ResolveText(key, fallback)
     return Text.Resolve({
         key = key,
-        domain = "pnc.system.shared.categories",
+        domain = "pnc.system.categories",
         fallback = fallback,
     }, fallback)
 end

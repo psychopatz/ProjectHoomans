@@ -18,8 +18,8 @@ if not copy then return Model end
 
 local DEBUG_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Text/system/shared/debugger.json",
-    domain = "pnc.system.shared.debugger",
+    pathPattern = "media/translation/{language}/Conversation/Text/system/debugger.json",
+    domain = "pnc.system.debugger",
 }
 
 local function sandboxText(block, key, context)

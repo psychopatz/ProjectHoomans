@@ -258,7 +258,7 @@ local function buildConversationMenu(contextData, npcID)
         },
         text = {
             key = "choice.view_dossier",
-            domain = "pnc.system.shared.categories",
+            domain = "pnc.system.categories",
             args = identityArguments,
         },
         action = function() Relationship.OpenDossier(npcID) end,

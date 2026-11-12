@@ -8,8 +8,8 @@ local Layout = Internal.Layout
 
 local DEBUG_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Text/system/shared/debugger.json",
-    domain = "pnc.system.shared.debugger",
+    pathPattern = "media/translation/{language}/Conversation/Text/system/debugger.json",
+    domain = "pnc.system.debugger",
 }
 
 local function tr(key, args)

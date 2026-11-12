@@ -39,7 +39,7 @@ function IdentityChoice.Build(npcID, projection, identityArguments)
         },
         text = {
             key = "choice.ask_name",
-            domain = "pnc.system.shared.categories",
+            domain = "pnc.system.categories",
             args = identityArguments,
         },
         action = function()

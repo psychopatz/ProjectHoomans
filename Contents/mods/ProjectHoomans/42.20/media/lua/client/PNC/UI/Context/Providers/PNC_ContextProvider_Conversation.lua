@@ -14,8 +14,8 @@ local Provider = {
 
 local SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Text/system/shared/categories.json",
-    domain = "pnc.system.shared.categories",
+    pathPattern = "media/translation/{language}/Conversation/Text/system/categories.json",
+    domain = "pnc.system.categories",
 }
 
 local function auditTalk(eventName, data)

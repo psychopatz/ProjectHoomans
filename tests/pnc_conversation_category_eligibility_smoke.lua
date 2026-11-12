@@ -15,7 +15,7 @@ local categoryID = "test:caravan"
 local providerID = "test:caravan_roles"
 local textSource = {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Text/test/basic.json",
+        pathPattern = "media/translation/{language}/Conversation/Text/test/category.json",
     domain = "test.conversation.basic",
 }
 

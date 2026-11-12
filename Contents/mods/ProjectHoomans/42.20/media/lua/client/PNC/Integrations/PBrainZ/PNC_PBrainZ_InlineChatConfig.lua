@@ -26,7 +26,7 @@ Config.HIGHLIGHT_COLOR = {
 }
 Config.TITLE = {
     key = "panel.llm_inline_input",
-    domain = "pnc.system.shared.categories",
+    domain = "pnc.system.categories",
     fallback = "TALK TO",
 }
 Config.MODE_BUTTONS = {

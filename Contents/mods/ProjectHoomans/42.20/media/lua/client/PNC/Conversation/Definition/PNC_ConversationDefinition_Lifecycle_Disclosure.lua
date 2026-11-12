@@ -161,7 +161,7 @@ function Conversation.ReceiveDisclosureResult(result)
     then
         view.session:append("npc", {
             key = reaction.key,
-            domain = "pnc.system.shared.categories",
+            domain = "pnc.system.categories",
             text = reaction.text,
             fallback = reaction.text,
         })
@@ -176,7 +176,7 @@ function Conversation.ReceiveDisclosureResult(result)
         local unknown = GIFT_PREFERENCE_RESPONSES.unknown
         view.session:append("npc", {
             key = unknown.key,
-            domain = "pnc.system.shared.categories",
+            domain = "pnc.system.categories",
             text = unknown.text,
             fallback = unknown.text,
         })

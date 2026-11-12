@@ -1,5 +1,5 @@
 local H = PNC.Conversation.DefinitionHelpers
-H.RegisterSimple("personal", "special", {
+H.RegisterSimple("personal", "special", "social/personal/special/trust", {
     gates = {{
         type = "pnc:relationship", axis = "familiarity",
         operator = ">=", value = 10, reasonKey = "locked.familiarity",
