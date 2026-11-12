@@ -3,7 +3,7 @@ return {
     ["semantic.combat.reaction.default"] = {
         ["domain"] = "event_reactions_combat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_reaction_default",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsCombat/Catalog",
         },
         ["id"] = "semantic.combat.reaction.default",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.combat.reaction.retreat"] = {
         ["domain"] = "event_reactions_combat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_reaction_retreat",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsCombat/Catalog",
         },
         ["id"] = "semantic.combat.reaction.retreat",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.combat.reaction.threat"] = {
         ["domain"] = "event_reactions_combat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_reaction_threat",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsCombat/Catalog",
         },
         ["id"] = "semantic.combat.reaction.threat",
         ["kind"] = "dialogue",

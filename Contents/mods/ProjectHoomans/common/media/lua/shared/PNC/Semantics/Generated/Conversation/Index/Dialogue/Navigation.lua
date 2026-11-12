@@ -3,7 +3,7 @@ return {
     ["semantic.navigation.camp.guarded"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.camp.guarded",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.navigation.camp.neutral"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.camp.neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.navigation.camp.terse"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.camp.terse",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.navigation.camp.warm"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.camp.warm",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.navigation.camp_empty.guarded"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_empty_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.camp_empty.guarded",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.navigation.camp_empty.neutral"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_empty_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.camp_empty.neutral",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.navigation.camp_empty.terse"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_empty_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.camp_empty.terse",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.navigation.camp_empty.warm"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_empty_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.camp_empty.warm",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["semantic.navigation.default.guarded"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_default_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.default.guarded",
         ["kind"] = "dialogue",
@@ -84,7 +84,7 @@ return {
     ["semantic.navigation.default.neutral"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_default_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.default.neutral",
         ["kind"] = "dialogue",
@@ -93,7 +93,7 @@ return {
     ["semantic.navigation.default.terse"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_default_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.default.terse",
         ["kind"] = "dialogue",
@@ -102,7 +102,7 @@ return {
     ["semantic.navigation.default.warm"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_default_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.default.warm",
         ["kind"] = "dialogue",
@@ -111,7 +111,7 @@ return {
     ["semantic.navigation.orders.guarded"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_orders_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.orders.guarded",
         ["kind"] = "dialogue",
@@ -120,7 +120,7 @@ return {
     ["semantic.navigation.orders.neutral"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_orders_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.orders.neutral",
         ["kind"] = "dialogue",
@@ -129,7 +129,7 @@ return {
     ["semantic.navigation.orders.terse"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_orders_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.orders.terse",
         ["kind"] = "dialogue",
@@ -138,7 +138,7 @@ return {
     ["semantic.navigation.orders.warm"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_orders_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.orders.warm",
         ["kind"] = "dialogue",
@@ -147,7 +147,7 @@ return {
     ["semantic.navigation.subject_change.guarded"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_subject_change_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.subject_change.guarded",
         ["kind"] = "dialogue",
@@ -156,7 +156,7 @@ return {
     ["semantic.navigation.subject_change.neutral"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_subject_change_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.subject_change.neutral",
         ["kind"] = "dialogue",
@@ -165,7 +165,7 @@ return {
     ["semantic.navigation.subject_change.terse"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_subject_change_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.subject_change.terse",
         ["kind"] = "dialogue",
@@ -174,7 +174,7 @@ return {
     ["semantic.navigation.subject_change.warm"] = {
         ["domain"] = "navigation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_subject_change_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/Navigation/Catalog",
         },
         ["id"] = "semantic.navigation.subject_change.warm",
         ["kind"] = "dialogue",

@@ -3,7 +3,7 @@ return {
     ["semantic.conversation.safety.danger"] = {
         ["domain"] = "event_reactions_safety",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_conversation_safety_danger",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsSafety/Catalog",
         },
         ["id"] = "semantic.conversation.safety.danger",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.conversation.safety.default"] = {
         ["domain"] = "event_reactions_safety",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_conversation_safety_default",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsSafety/Catalog",
         },
         ["id"] = "semantic.conversation.safety.default",
         ["kind"] = "dialogue",

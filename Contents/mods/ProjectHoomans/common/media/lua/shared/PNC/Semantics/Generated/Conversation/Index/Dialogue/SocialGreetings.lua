@@ -3,7 +3,7 @@ return {
     ["social.greetings.acquaintance.dawn"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_acquaintance_dawn",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.acquaintance.dawn",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["social.greetings.acquaintance.dusk"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_acquaintance_dusk",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.acquaintance.dusk",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["social.greetings.acquaintance.sunrise"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_acquaintance_sunrise",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.acquaintance.sunrise",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["social.greetings.acquaintance.sunset"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_acquaintance_sunset",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.acquaintance.sunset",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["social.greetings.acquaintance.twilight"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_acquaintance_twilight",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.acquaintance.twilight",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["social.greetings.firstmeet.dawn"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_firstmeet_dawn",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.firstmeet.dawn",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["social.greetings.firstmeet.dusk"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_firstmeet_dusk",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.firstmeet.dusk",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["social.greetings.firstmeet.sunrise"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_firstmeet_sunrise",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.firstmeet.sunrise",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["social.greetings.firstmeet.sunset"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_firstmeet_sunset",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.firstmeet.sunset",
         ["kind"] = "dialogue",
@@ -84,7 +84,7 @@ return {
     ["social.greetings.firstmeet.twilight"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_firstmeet_twilight",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.firstmeet.twilight",
         ["kind"] = "dialogue",
@@ -93,7 +93,7 @@ return {
     ["social.greetings.hostile.parley"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_hostile_parley",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.hostile.parley",
         ["kind"] = "dialogue",
@@ -102,7 +102,7 @@ return {
     ["social.greetings.lover.dawn"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_lover_dawn",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.lover.dawn",
         ["kind"] = "dialogue",
@@ -111,7 +111,7 @@ return {
     ["social.greetings.lover.dusk"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_lover_dusk",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.lover.dusk",
         ["kind"] = "dialogue",
@@ -120,7 +120,7 @@ return {
     ["social.greetings.lover.sunrise"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_lover_sunrise",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.lover.sunrise",
         ["kind"] = "dialogue",
@@ -129,7 +129,7 @@ return {
     ["social.greetings.lover.sunset"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_lover_sunset",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.lover.sunset",
         ["kind"] = "dialogue",
@@ -138,7 +138,7 @@ return {
     ["social.greetings.lover.twilight"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_lover_twilight",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.lover.twilight",
         ["kind"] = "dialogue",
@@ -147,7 +147,7 @@ return {
     ["social.greetings.member.dawn"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_member_dawn",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.member.dawn",
         ["kind"] = "dialogue",
@@ -156,7 +156,7 @@ return {
     ["social.greetings.member.dusk"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_member_dusk",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.member.dusk",
         ["kind"] = "dialogue",
@@ -165,7 +165,7 @@ return {
     ["social.greetings.member.sunrise"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_member_sunrise",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.member.sunrise",
         ["kind"] = "dialogue",
@@ -174,7 +174,7 @@ return {
     ["social.greetings.member.sunset"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_member_sunset",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.member.sunset",
         ["kind"] = "dialogue",
@@ -183,7 +183,7 @@ return {
     ["social.greetings.member.twilight"] = {
         ["domain"] = "social_greetings",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_member_twilight",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialGreetings/Catalog",
         },
         ["id"] = "social.greetings.member.twilight",
         ["kind"] = "dialogue",

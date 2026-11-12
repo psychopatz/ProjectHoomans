@@ -3,7 +3,7 @@ return {
     ["semantic.companion.reaction.abandonment"] = {
         ["domain"] = "event_reactions_companion",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_companion_reaction_abandonment",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsCompanion/Catalog",
         },
         ["id"] = "semantic.companion.reaction.abandonment",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.companion.reaction.camp_rejected"] = {
         ["domain"] = "event_reactions_companion",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_companion_reaction_camp_rejected",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsCompanion/Catalog",
         },
         ["id"] = "semantic.companion.reaction.camp_rejected",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.companion.reaction.default"] = {
         ["domain"] = "event_reactions_companion",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_companion_reaction_default",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsCompanion/Catalog",
         },
         ["id"] = "semantic.companion.reaction.default",
         ["kind"] = "dialogue",

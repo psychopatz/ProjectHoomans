@@ -3,7 +3,7 @@ return {
     ["semantic.medical.distress.teammate.default"] = {
         ["domain"] = "medical_event_teammate",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_teammate_default",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventTeammate/Catalog",
         },
         ["id"] = "semantic.medical.distress.teammate.default",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.medical.distress.teammate.found"] = {
         ["domain"] = "medical_event_teammate",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_teammate_found",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventTeammate/Catalog",
         },
         ["id"] = "semantic.medical.distress.teammate.found",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.medical.distress.teammate.missing"] = {
         ["domain"] = "medical_event_teammate",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_teammate_missing",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventTeammate/Catalog",
         },
         ["id"] = "semantic.medical.distress.teammate.missing",
         ["kind"] = "dialogue",

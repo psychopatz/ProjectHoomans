@@ -72,6 +72,11 @@ local function hasContentTemplate(templateID)
     then
         return true
     end
+    if type(ConversationRegistry.PSDL_RESPONSE_TEMPLATES) == "table"
+        and ConversationRegistry.PSDL_RESPONSE_TEMPLATES[templateID] == true
+    then
+        return true
+    end
     local plans = ConversationRegistry.PSDL_PLANS
     if type(plans) ~= "table" then return false end
     local checked = 0

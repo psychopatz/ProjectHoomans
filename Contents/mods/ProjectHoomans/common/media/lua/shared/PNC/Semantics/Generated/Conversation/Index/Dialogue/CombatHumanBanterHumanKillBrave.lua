@@ -3,7 +3,7 @@ return {
     ["semantic.combat.human_kill.brave.line_01"] = {
         ["domain"] = "combat_human_banter_human_kill_brave",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_human_kill_brave_line_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatHumanBanterHumanKillBrave/Catalog",
         },
         ["id"] = "semantic.combat.human_kill.brave.line_01",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.combat.human_kill.brave.line_02"] = {
         ["domain"] = "combat_human_banter_human_kill_brave",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_human_kill_brave_line_02",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatHumanBanterHumanKillBrave/Catalog",
         },
         ["id"] = "semantic.combat.human_kill.brave.line_02",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.combat.human_kill.brave.line_03"] = {
         ["domain"] = "combat_human_banter_human_kill_brave",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_human_kill_brave_line_03",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatHumanBanterHumanKillBrave/Catalog",
         },
         ["id"] = "semantic.combat.human_kill.brave.line_03",
         ["kind"] = "dialogue",

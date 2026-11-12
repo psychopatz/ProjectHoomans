@@ -3,7 +3,7 @@ return {
     ["needs.member.support"] = {
         ["domain"] = "needs_support",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/needs_member_support",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/NeedsSupport/Catalog",
         },
         ["id"] = "needs.member.support",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["needs.neutral.support"] = {
         ["domain"] = "needs_support",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/needs_neutral_support",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/NeedsSupport/Catalog",
         },
         ["id"] = "needs.neutral.support",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["needs.special.support"] = {
         ["domain"] = "needs_support",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/needs_special_support",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/NeedsSupport/Catalog",
         },
         ["id"] = "needs.special.support",
         ["kind"] = "dialogue",

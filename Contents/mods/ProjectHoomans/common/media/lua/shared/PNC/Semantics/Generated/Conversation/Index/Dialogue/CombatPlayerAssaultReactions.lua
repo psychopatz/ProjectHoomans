@@ -3,7 +3,7 @@ return {
     ["semantic.combat.player_assaulted.aggressive"] = {
         ["domain"] = "combat_player_assault_reactions",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_player_assaulted_aggressive",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatPlayerAssaultReactions/Catalog",
         },
         ["id"] = "semantic.combat.player_assaulted.aggressive",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.combat.player_assaulted.brave"] = {
         ["domain"] = "combat_player_assault_reactions",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_player_assaulted_brave",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatPlayerAssaultReactions/Catalog",
         },
         ["id"] = "semantic.combat.player_assaulted.brave",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.combat.player_assaulted.default"] = {
         ["domain"] = "combat_player_assault_reactions",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_player_assaulted_default",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatPlayerAssaultReactions/Catalog",
         },
         ["id"] = "semantic.combat.player_assaulted.default",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.combat.player_assaulted.reserved"] = {
         ["domain"] = "combat_player_assault_reactions",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_player_assaulted_reserved",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatPlayerAssaultReactions/Catalog",
         },
         ["id"] = "semantic.combat.player_assaulted.reserved",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.combat.player_assaulted.shaken"] = {
         ["domain"] = "combat_player_assault_reactions",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_player_assaulted_shaken",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatPlayerAssaultReactions/Catalog",
         },
         ["id"] = "semantic.combat.player_assaulted.shaken",
         ["kind"] = "dialogue",

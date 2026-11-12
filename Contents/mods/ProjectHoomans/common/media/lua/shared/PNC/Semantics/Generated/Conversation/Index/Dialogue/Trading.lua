@@ -1,9 +1,27 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
+    ["trade.conversation.opening"] = {
+        ["domain"] = "trading",
+        ["generated"] = {
+            "DTCommon/Semantics/Generated/Conversation/PSDL/Dialogue/Trading/Catalog",
+        },
+        ["id"] = "trade.conversation.opening",
+        ["kind"] = "dialogue",
+        ["source"] = "psdl/dialogue/trading.json",
+    },
+    ["trade.conversation.referral"] = {
+        ["domain"] = "trading",
+        ["generated"] = {
+            "DTCommon/Semantics/Generated/Conversation/PSDL/Dialogue/Trading/Catalog",
+        },
+        ["id"] = "trade.conversation.referral",
+        ["kind"] = "dialogue",
+        ["source"] = "psdl/dialogue/trading.json",
+    },
     ["trade.conversation.suggestions"] = {
         ["domain"] = "trading",
         ["generated"] = {
-            "DTCommon/Semantics/Generated/Conversation/PSDL/Dialogue/trade_conversation_suggestions",
+            "DTCommon/Semantics/Generated/Conversation/PSDL/Dialogue/Trading/Catalog",
         },
         ["id"] = "trade.conversation.suggestions",
         ["kind"] = "dialogue",

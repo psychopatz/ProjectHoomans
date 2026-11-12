@@ -1268,20 +1268,19 @@ T.truthy(option, "Talk option created")
 option.callback()
 T.equal(opened.npcID, "npc-12", "Talk opens selected NPC")
 
-local commandContent = T.read(
-    "ProjectHoomans", "common_mod",
-    "media/translation/EN/Conversation/Command.json")
-T.truthy(string.find(
-    commandContent,
-    "conversation.content.semantic.command.player.attack_auto.neutral.01",
-    1, true), "command wording lives in generated Conversation domain content")
-local greetingContent = T.read(
-    "ProjectHoomans", "common_mod",
-    "media/translation/EN/Conversation/Greeting.json")
-T.truthy(string.find(
-    greetingContent,
-    "conversation.content.semantic.flow.greeting.opening.default.neutral.01",
-    1, true), "greeting wording lives in generated Conversation domain content")
+local GeneratedPSDL = require "PNC/Semantics/Generated/Conversation/Registry"
+local greetingPlan = GeneratedPSDL.PSDLPlan(
+    "semantic.flow.greeting.opening.default.neutral"
+)
+T.truthy(
+    greetingPlan and greetingPlan.payload and greetingPlan.payload.response,
+    "greeting wording comes from the Core-generated PSDL plan"
+)
+T.equal(
+    greetingPlan.sourceShard,
+    "psdl/dialogue/conversation_greeting.json",
+    "greeting keeps canonical PSDL source lineage"
+)
 T.finish("pnc_conversation_smoke")
 
 T.finish("pnc_conversation_smoke")

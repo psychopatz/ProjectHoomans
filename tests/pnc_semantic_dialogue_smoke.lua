@@ -132,6 +132,7 @@ T.equal(routedResult.sequence, 1, "router records a bounded state event")
 
 local malformed = routed:ProcessIR({
     schemaVersion = 1,
+    schema = "psychopatz.semantic.dialogue-ir.v1",
     kind = "utterance",
     rawText = "bad",
     normalizedText = "bad",

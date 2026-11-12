@@ -3,7 +3,7 @@ return {
     ["semantic.flow.farewell.default"] = {
         ["domain"] = "event_reactions_farewell",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_farewell_default",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsFarewell/Catalog",
         },
         ["id"] = "semantic.flow.farewell.default",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.flow.farewell.friendly"] = {
         ["domain"] = "event_reactions_farewell",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_farewell_friendly",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsFarewell/Catalog",
         },
         ["id"] = "semantic.flow.farewell.friendly",
         ["kind"] = "dialogue",

@@ -203,6 +203,30 @@ local predicate = Predicate.Evaluate({
 T.truthy(predicate.allowed,
     "common predicates evaluate third-party normalized state")
 
+local rejectedMembership = Predicate.Evaluate({
+    path = "actor.traits",
+    op = "contains",
+    value = "Brave",
+}, external)
+T.falsy(rejectedMembership.allowed,
+    "collection membership rejects an absent typed value")
+
+local absentMembership = Predicate.Evaluate({
+    path = "actor.traits",
+    op = "not_contains",
+    value = "Brave",
+}, external)
+T.truthy(absentMembership.allowed,
+    "negative collection membership accepts an absent typed value")
+
+local rejectedIn = Predicate.Evaluate({
+    path = "actor.id",
+    op = "in",
+    values = { "npc-b", "npc-c" },
+}, external)
+T.falsy(rejectedIn.allowed,
+    "in rejects a value absent from its typed collection")
+
 local privateResult = Predicate.Evaluate({
     path = "actor.secret.plan",
     op = "exists",

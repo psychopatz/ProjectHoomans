@@ -3,7 +3,7 @@ return {
     ["social.personal.special.trust"] = {
         ["domain"] = "social_companion_topics",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_personal_special_trust",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialCompanionTopics/Catalog",
         },
         ["id"] = "social.personal.special.trust",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["social.relationship.special.affinity"] = {
         ["domain"] = "social_companion_topics",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_relationship_special_affinity",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialCompanionTopics/Catalog",
         },
         ["id"] = "social.relationship.special.affinity",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["social.set_territory.member.claim"] = {
         ["domain"] = "social_companion_topics",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_set_territory_member_claim",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialCompanionTopics/Catalog",
         },
         ["id"] = "social.set_territory.member.claim",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["work_orders.member.status"] = {
         ["domain"] = "social_companion_topics",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/work_orders_member_status",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialCompanionTopics/Catalog",
         },
         ["id"] = "work_orders.member.status",
         ["kind"] = "dialogue",

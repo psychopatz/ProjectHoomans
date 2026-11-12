@@ -3,7 +3,7 @@ return {
     ["semantic.interaction.world_event.warning.guarded"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_guarded",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/Social/Catalog",
         },
         ["id"] = "semantic.interaction.world_event.warning.guarded",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.interaction.world_event.warning.neutral"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_neutral",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/Social/Catalog",
         },
         ["id"] = "semantic.interaction.world_event.warning.neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.interaction.world_event.warning.terse"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_terse",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/Social/Catalog",
         },
         ["id"] = "semantic.interaction.world_event.warning.terse",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.interaction.world_event.warning.warm"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_warm",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/Social/Catalog",
         },
         ["id"] = "semantic.interaction.world_event.warning.warm",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.interaction.world_event.warning_flavor.guarded"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_guarded",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/Social/Catalog",
         },
         ["id"] = "semantic.interaction.world_event.warning_flavor.guarded",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.interaction.world_event.warning_flavor.neutral"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_neutral",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/Social/Catalog",
         },
         ["id"] = "semantic.interaction.world_event.warning_flavor.neutral",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.interaction.world_event.warning_flavor.terse"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_terse",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/Social/Catalog",
         },
         ["id"] = "semantic.interaction.world_event.warning_flavor.terse",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.interaction.world_event.warning_flavor.warm"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_warm",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/Social/Catalog",
         },
         ["id"] = "semantic.interaction.world_event.warning_flavor.warm",
         ["kind"] = "dialogue",

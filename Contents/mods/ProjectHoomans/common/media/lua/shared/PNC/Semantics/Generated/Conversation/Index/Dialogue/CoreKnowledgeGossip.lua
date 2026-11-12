@@ -3,7 +3,7 @@ return {
     ["semantic.gossip.unknown.bond_guarded"] = {
         ["domain"] = "core_knowledge_gossip",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_bond_guarded",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeGossip/Catalog",
         },
         ["id"] = "semantic.gossip.unknown.bond_guarded",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.gossip.unknown.bond_neutral"] = {
         ["domain"] = "core_knowledge_gossip",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_bond_neutral",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeGossip/Catalog",
         },
         ["id"] = "semantic.gossip.unknown.bond_neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.gossip.unknown.bond_terse"] = {
         ["domain"] = "core_knowledge_gossip",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_bond_terse",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeGossip/Catalog",
         },
         ["id"] = "semantic.gossip.unknown.bond_terse",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.gossip.unknown.bond_warm"] = {
         ["domain"] = "core_knowledge_gossip",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_bond_warm",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeGossip/Catalog",
         },
         ["id"] = "semantic.gossip.unknown.bond_warm",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.gossip.unknown.guarded"] = {
         ["domain"] = "core_knowledge_gossip",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_guarded",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeGossip/Catalog",
         },
         ["id"] = "semantic.gossip.unknown.guarded",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.gossip.unknown.neutral"] = {
         ["domain"] = "core_knowledge_gossip",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_neutral",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeGossip/Catalog",
         },
         ["id"] = "semantic.gossip.unknown.neutral",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.gossip.unknown.terse"] = {
         ["domain"] = "core_knowledge_gossip",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_terse",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeGossip/Catalog",
         },
         ["id"] = "semantic.gossip.unknown.terse",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.gossip.unknown.warm"] = {
         ["domain"] = "core_knowledge_gossip",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_warm",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeGossip/Catalog",
         },
         ["id"] = "semantic.gossip.unknown.warm",
         ["kind"] = "dialogue",

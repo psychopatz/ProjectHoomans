@@ -3,7 +3,7 @@ return {
     ["social.small_talk.member"] = {
         ["domain"] = "social_check_in",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_small_talk_member",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialCheckIn/Catalog",
         },
         ["id"] = "social.small_talk.member",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["social.small_talk.neutral"] = {
         ["domain"] = "social_check_in",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_small_talk_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialCheckIn/Catalog",
         },
         ["id"] = "social.small_talk.neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["social.small_talk.special"] = {
         ["domain"] = "social_check_in",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_small_talk_special",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialCheckIn/Catalog",
         },
         ["id"] = "social.small_talk.special",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["social.wellbeing.member"] = {
         ["domain"] = "social_check_in",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_wellbeing_member",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialCheckIn/Catalog",
         },
         ["id"] = "social.wellbeing.member",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["social.wellbeing.neutral"] = {
         ["domain"] = "social_check_in",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_wellbeing_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialCheckIn/Catalog",
         },
         ["id"] = "social.wellbeing.neutral",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["social.wellbeing.special"] = {
         ["domain"] = "social_check_in",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_wellbeing_special",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialCheckIn/Catalog",
         },
         ["id"] = "social.wellbeing.special",
         ["kind"] = "dialogue",

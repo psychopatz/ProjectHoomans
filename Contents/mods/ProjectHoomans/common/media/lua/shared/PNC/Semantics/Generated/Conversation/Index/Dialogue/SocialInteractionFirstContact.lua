@@ -3,7 +3,7 @@ return {
     ["semantic.interaction.first_contact.challenge.guarded"] = {
         ["domain"] = "social_interaction_first_contact",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_first_contact_challenge_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionFirstContact/Catalog",
         },
         ["id"] = "semantic.interaction.first_contact.challenge.guarded",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.interaction.first_contact.challenge.neutral"] = {
         ["domain"] = "social_interaction_first_contact",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_first_contact_challenge_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionFirstContact/Catalog",
         },
         ["id"] = "semantic.interaction.first_contact.challenge.neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.interaction.first_contact.challenge.terse"] = {
         ["domain"] = "social_interaction_first_contact",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_first_contact_challenge_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionFirstContact/Catalog",
         },
         ["id"] = "semantic.interaction.first_contact.challenge.terse",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.interaction.first_contact.challenge.warm"] = {
         ["domain"] = "social_interaction_first_contact",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_first_contact_challenge_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionFirstContact/Catalog",
         },
         ["id"] = "semantic.interaction.first_contact.challenge.warm",
         ["kind"] = "dialogue",

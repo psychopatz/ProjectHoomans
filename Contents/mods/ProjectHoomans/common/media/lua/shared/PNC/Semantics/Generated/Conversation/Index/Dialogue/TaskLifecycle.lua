@@ -3,7 +3,7 @@ return {
     ["semantic.gift.completed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gift_completed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.gift.completed",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.gift.failed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gift_failed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.gift.failed",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.gift.pending"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gift_pending",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.gift.pending",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.gift.rejected"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gift_rejected",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.gift.rejected",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.gift.selection_required"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gift_selection_required",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.gift.selection_required",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.task.consume.active"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_consume_active",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.consume.active",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.task.consume.admitted"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_consume_admitted",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.consume.admitted",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.task.consume.completed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_consume_completed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.consume.completed",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["semantic.task.consume.failed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_consume_failed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.consume.failed",
         ["kind"] = "dialogue",
@@ -84,7 +84,7 @@ return {
     ["semantic.task.consume.rejected"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_consume_rejected",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.consume.rejected",
         ["kind"] = "dialogue",
@@ -93,7 +93,7 @@ return {
     ["semantic.task.drink.active"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_drink_active",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.drink.active",
         ["kind"] = "dialogue",
@@ -102,7 +102,7 @@ return {
     ["semantic.task.drink.admitted"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_drink_admitted",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.drink.admitted",
         ["kind"] = "dialogue",
@@ -111,7 +111,7 @@ return {
     ["semantic.task.drink.completed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_drink_completed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.drink.completed",
         ["kind"] = "dialogue",
@@ -120,7 +120,7 @@ return {
     ["semantic.task.drink.failed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_drink_failed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.drink.failed",
         ["kind"] = "dialogue",
@@ -129,7 +129,7 @@ return {
     ["semantic.task.drink.rejected"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_drink_rejected",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.drink.rejected",
         ["kind"] = "dialogue",
@@ -138,7 +138,7 @@ return {
     ["semantic.task.eat.active"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_eat_active",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.eat.active",
         ["kind"] = "dialogue",
@@ -147,7 +147,7 @@ return {
     ["semantic.task.eat.admitted"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_eat_admitted",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.eat.admitted",
         ["kind"] = "dialogue",
@@ -156,7 +156,7 @@ return {
     ["semantic.task.eat.completed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_eat_completed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.eat.completed",
         ["kind"] = "dialogue",
@@ -165,7 +165,7 @@ return {
     ["semantic.task.eat.failed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_eat_failed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.eat.failed",
         ["kind"] = "dialogue",
@@ -174,7 +174,7 @@ return {
     ["semantic.task.eat.rejected"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_eat_rejected",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.eat.rejected",
         ["kind"] = "dialogue",
@@ -183,7 +183,7 @@ return {
     ["semantic.task.fetch.active"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_fetch_active",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.fetch.active",
         ["kind"] = "dialogue",
@@ -192,7 +192,7 @@ return {
     ["semantic.task.fetch.admitted"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_fetch_admitted",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.fetch.admitted",
         ["kind"] = "dialogue",
@@ -201,7 +201,7 @@ return {
     ["semantic.task.fetch.completed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_fetch_completed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.fetch.completed",
         ["kind"] = "dialogue",
@@ -210,7 +210,7 @@ return {
     ["semantic.task.fetch.failed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_fetch_failed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.fetch.failed",
         ["kind"] = "dialogue",
@@ -219,7 +219,7 @@ return {
     ["semantic.task.fetch.rejected"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_fetch_rejected",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.fetch.rejected",
         ["kind"] = "dialogue",
@@ -228,7 +228,7 @@ return {
     ["semantic.task.give.active"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_give_active",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.give.active",
         ["kind"] = "dialogue",
@@ -237,7 +237,7 @@ return {
     ["semantic.task.give.admitted"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_give_admitted",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.give.admitted",
         ["kind"] = "dialogue",
@@ -246,7 +246,7 @@ return {
     ["semantic.task.give.completed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_give_completed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.give.completed",
         ["kind"] = "dialogue",
@@ -255,7 +255,7 @@ return {
     ["semantic.task.give.failed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_give_failed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.give.failed",
         ["kind"] = "dialogue",
@@ -264,7 +264,7 @@ return {
     ["semantic.task.give.rejected"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_give_rejected",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.give.rejected",
         ["kind"] = "dialogue",
@@ -273,7 +273,7 @@ return {
     ["semantic.task.refill.active"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_refill_active",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.refill.active",
         ["kind"] = "dialogue",
@@ -282,7 +282,7 @@ return {
     ["semantic.task.refill.admitted"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_refill_admitted",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog",
         },
         ["id"] = "semantic.task.refill.admitted",
         ["kind"] = "dialogue",
@@ -291,7 +291,7 @@ return {
     ["semantic.task.refill.completed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_refill_completed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog__ecb92fd8",
         },
         ["id"] = "semantic.task.refill.completed",
         ["kind"] = "dialogue",
@@ -300,7 +300,7 @@ return {
     ["semantic.task.refill.failed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_refill_failed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog__ecb92fd8",
         },
         ["id"] = "semantic.task.refill.failed",
         ["kind"] = "dialogue",
@@ -309,7 +309,7 @@ return {
     ["semantic.task.refill.rejected"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_refill_rejected",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog__ecb92fd8",
         },
         ["id"] = "semantic.task.refill.rejected",
         ["kind"] = "dialogue",
@@ -318,7 +318,7 @@ return {
     ["semantic.task.wait_at.active"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_wait_at_active",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog__ecb92fd8",
         },
         ["id"] = "semantic.task.wait_at.active",
         ["kind"] = "dialogue",
@@ -327,7 +327,7 @@ return {
     ["semantic.task.wait_at.admitted"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_wait_at_admitted",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog__ecb92fd8",
         },
         ["id"] = "semantic.task.wait_at.admitted",
         ["kind"] = "dialogue",
@@ -336,7 +336,7 @@ return {
     ["semantic.task.wait_at.completed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_wait_at_completed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog__ecb92fd8",
         },
         ["id"] = "semantic.task.wait_at.completed",
         ["kind"] = "dialogue",
@@ -345,7 +345,7 @@ return {
     ["semantic.task.wait_at.failed"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_wait_at_failed",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog__ecb92fd8",
         },
         ["id"] = "semantic.task.wait_at.failed",
         ["kind"] = "dialogue",
@@ -354,7 +354,7 @@ return {
     ["semantic.task.wait_at.rejected"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_wait_at_rejected",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/TaskLifecycle/Catalog__ecb92fd8",
         },
         ["id"] = "semantic.task.wait_at.rejected",
         ["kind"] = "dialogue",

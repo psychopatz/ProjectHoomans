@@ -3,7 +3,7 @@ return {
     ["semantic.corpse.reaction.default"] = {
         ["domain"] = "event_reactions_corpse",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_corpse_reaction_default",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsCorpse/Catalog",
         },
         ["id"] = "semantic.corpse.reaction.default",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.corpse.reaction.revenge"] = {
         ["domain"] = "event_reactions_corpse",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_corpse_reaction_revenge",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsCorpse/Catalog",
         },
         ["id"] = "semantic.corpse.reaction.revenge",
         ["kind"] = "dialogue",

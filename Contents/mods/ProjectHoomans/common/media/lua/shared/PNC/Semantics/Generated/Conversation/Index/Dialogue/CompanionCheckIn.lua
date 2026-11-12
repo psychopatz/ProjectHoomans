@@ -3,7 +3,7 @@ return {
     ["social.companion_check_in"] = {
         ["domain"] = "companion_check_in",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_companion_check_in",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CompanionCheckIn/Catalog",
         },
         ["id"] = "social.companion_check_in",
         ["kind"] = "dialogue",

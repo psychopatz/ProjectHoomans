@@ -3,7 +3,7 @@ return {
     ["semantic.interaction.argument.deescalate.guarded"] = {
         ["domain"] = "social_interaction_argument",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_argument_deescalate_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionArgument/Catalog",
         },
         ["id"] = "semantic.interaction.argument.deescalate.guarded",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.interaction.argument.deescalate.neutral"] = {
         ["domain"] = "social_interaction_argument",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_argument_deescalate_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionArgument/Catalog",
         },
         ["id"] = "semantic.interaction.argument.deescalate.neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.interaction.argument.deescalate.terse"] = {
         ["domain"] = "social_interaction_argument",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_argument_deescalate_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionArgument/Catalog",
         },
         ["id"] = "semantic.interaction.argument.deescalate.terse",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.interaction.argument.deescalate.warm"] = {
         ["domain"] = "social_interaction_argument",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_argument_deescalate_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionArgument/Catalog",
         },
         ["id"] = "semantic.interaction.argument.deescalate.warm",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.interaction.argument.retaliate.guarded"] = {
         ["domain"] = "social_interaction_argument",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_argument_retaliate_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionArgument/Catalog",
         },
         ["id"] = "semantic.interaction.argument.retaliate.guarded",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.interaction.argument.retaliate.neutral"] = {
         ["domain"] = "social_interaction_argument",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_argument_retaliate_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionArgument/Catalog",
         },
         ["id"] = "semantic.interaction.argument.retaliate.neutral",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.interaction.argument.retaliate.terse"] = {
         ["domain"] = "social_interaction_argument",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_argument_retaliate_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionArgument/Catalog",
         },
         ["id"] = "semantic.interaction.argument.retaliate.terse",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.interaction.argument.retaliate.warm"] = {
         ["domain"] = "social_interaction_argument",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_argument_retaliate_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionArgument/Catalog",
         },
         ["id"] = "semantic.interaction.argument.retaliate.warm",
         ["kind"] = "dialogue",

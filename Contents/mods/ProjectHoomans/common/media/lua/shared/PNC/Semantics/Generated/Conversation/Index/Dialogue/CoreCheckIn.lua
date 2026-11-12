@@ -3,7 +3,7 @@ return {
     ["social.core_check_in"] = {
         ["domain"] = "core_check_in",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/social_core_check_in",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreCheckIn/Catalog",
         },
         ["id"] = "social.core_check_in",
         ["kind"] = "dialogue",

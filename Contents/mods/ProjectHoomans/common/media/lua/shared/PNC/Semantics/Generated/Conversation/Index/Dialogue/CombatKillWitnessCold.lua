@@ -3,7 +3,7 @@ return {
     ["semantic.combat.reaction.kill_witness_cold_01"] = {
         ["domain"] = "combat_kill_witness_cold",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_reaction_kill_witness_cold_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatKillWitnessCold/Catalog",
         },
         ["id"] = "semantic.combat.reaction.kill_witness_cold_01",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.combat.reaction.kill_witness_cold_02"] = {
         ["domain"] = "combat_kill_witness_cold",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_reaction_kill_witness_cold_02",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatKillWitnessCold/Catalog",
         },
         ["id"] = "semantic.combat.reaction.kill_witness_cold_02",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.combat.reaction.kill_witness_cold_03"] = {
         ["domain"] = "combat_kill_witness_cold",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_reaction_kill_witness_cold_03",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatKillWitnessCold/Catalog",
         },
         ["id"] = "semantic.combat.reaction.kill_witness_cold_03",
         ["kind"] = "dialogue",

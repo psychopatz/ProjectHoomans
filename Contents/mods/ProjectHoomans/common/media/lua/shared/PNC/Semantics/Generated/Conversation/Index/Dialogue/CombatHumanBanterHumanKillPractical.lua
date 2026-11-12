@@ -3,7 +3,7 @@ return {
     ["semantic.combat.human_kill.practical.line_01"] = {
         ["domain"] = "combat_human_banter_human_kill_practical",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_human_kill_practical_line_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatHumanBanterHumanKillPractical/Catalog",
         },
         ["id"] = "semantic.combat.human_kill.practical.line_01",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.combat.human_kill.practical.line_02"] = {
         ["domain"] = "combat_human_banter_human_kill_practical",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_human_kill_practical_line_02",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatHumanBanterHumanKillPractical/Catalog",
         },
         ["id"] = "semantic.combat.human_kill.practical.line_02",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.combat.human_kill.practical.line_03"] = {
         ["domain"] = "combat_human_banter_human_kill_practical",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_human_kill_practical_line_03",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatHumanBanterHumanKillPractical/Catalog",
         },
         ["id"] = "semantic.combat.human_kill.practical.line_03",
         ["kind"] = "dialogue",

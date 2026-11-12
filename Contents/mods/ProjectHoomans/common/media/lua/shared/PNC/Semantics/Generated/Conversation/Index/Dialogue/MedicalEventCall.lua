@@ -3,7 +3,7 @@ return {
     ["semantic.medical.distress.call.bandage"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_bandage",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventCall/Catalog",
         },
         ["id"] = "semantic.medical.distress.call.bandage",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.medical.distress.call.bleedout"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_bleedout",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventCall/Catalog",
         },
         ["id"] = "semantic.medical.distress.call.bleedout",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.medical.distress.call.default"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_default",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventCall/Catalog",
         },
         ["id"] = "semantic.medical.distress.call.default",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.medical.distress.call.dehydration"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_dehydration",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventCall/Catalog",
         },
         ["id"] = "semantic.medical.distress.call.dehydration",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.medical.distress.call.exhaustion"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_exhaustion",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventCall/Catalog",
         },
         ["id"] = "semantic.medical.distress.call.exhaustion",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.medical.distress.call.mercy"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_mercy",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventCall/Catalog",
         },
         ["id"] = "semantic.medical.distress.call.mercy",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.medical.distress.call.rescue"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_rescue",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventCall/Catalog",
         },
         ["id"] = "semantic.medical.distress.call.rescue",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.medical.distress.call.starvation"] = {
         ["domain"] = "medical_event_call",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_starvation",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventCall/Catalog",
         },
         ["id"] = "semantic.medical.distress.call.starvation",
         ["kind"] = "dialogue",

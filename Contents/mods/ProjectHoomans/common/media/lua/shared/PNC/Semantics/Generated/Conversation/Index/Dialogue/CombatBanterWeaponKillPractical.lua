@@ -3,7 +3,7 @@ return {
     ["semantic.combat.kill.killer.practical.axe_spear_01"] = {
         ["domain"] = "combat_banter_weapon_kill_practical",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_kill_killer_practical_axe_spear_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatBanterWeaponKillPractical/Catalog",
         },
         ["id"] = "semantic.combat.kill.killer.practical.axe_spear_01",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.combat.kill.killer.practical.blade_01"] = {
         ["domain"] = "combat_banter_weapon_kill_practical",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_kill_killer_practical_blade_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatBanterWeaponKillPractical/Catalog",
         },
         ["id"] = "semantic.combat.kill.killer.practical.blade_01",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.combat.kill.killer.practical.blunt_01"] = {
         ["domain"] = "combat_banter_weapon_kill_practical",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_kill_killer_practical_blunt_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatBanterWeaponKillPractical/Catalog",
         },
         ["id"] = "semantic.combat.kill.killer.practical.blunt_01",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.combat.kill.killer.practical.firearm_high_01"] = {
         ["domain"] = "combat_banter_weapon_kill_practical",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_kill_killer_practical_firearm_high_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatBanterWeaponKillPractical/Catalog",
         },
         ["id"] = "semantic.combat.kill.killer.practical.firearm_high_01",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.combat.kill.killer.practical.firearm_low_01"] = {
         ["domain"] = "combat_banter_weapon_kill_practical",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_kill_killer_practical_firearm_low_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatBanterWeaponKillPractical/Catalog",
         },
         ["id"] = "semantic.combat.kill.killer.practical.firearm_low_01",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.combat.kill.killer.practical.unarmed_01"] = {
         ["domain"] = "combat_banter_weapon_kill_practical",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_kill_killer_practical_unarmed_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatBanterWeaponKillPractical/Catalog",
         },
         ["id"] = "semantic.combat.kill.killer.practical.unarmed_01",
         ["kind"] = "dialogue",

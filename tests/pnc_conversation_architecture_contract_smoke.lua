@@ -92,7 +92,7 @@ T.truthy(composition:find("PNC_Necroa_ZombieCaptionAdapter", 1, true),
 local coreRepository = assert(os.getenv("PZ_TEST_CORE_REPOSITORY"),
     "PZ_TEST_CORE_REPOSITORY is required")
 local sourceRoot = coreRepository
-    .. "/tools/semantic_harness/codebuilder/sources/conversation/content"
+    .. "/tools/semantic_harness/codebuilder/sources/conversation/psdl"
 local quotedRoot = "'" .. sourceRoot:gsub("'", "'\\''") .. "'"
 local contentFiles = {}
 local finder = assert(io.popen(
@@ -103,15 +103,14 @@ for fileName in finder:lines() do
     table.insert(contentFiles, fileName)
 end
 finder:close()
-T.truthy(#contentFiles >= 1, "Conversation content shards are discoverable")
+T.truthy(#contentFiles >= 1, "Core-owned PSDL conversation shards are discoverable")
 for _, fileName in ipairs(contentFiles) do
     local sourceHandle = assert(io.open(fileName, "rb"))
     local contentSource = sourceHandle:read("*a")
     sourceHandle:close()
     for _, marker in ipairs({
         ".migrated.", "MIGRATED_", "legacySource", "migrated_events",
-        "semanticAuthority", "responsePoolID", "semanticVariantID",
-        "generatedCompatibility",
+        "semanticAuthority", "generatedCompatibility",
     }) do
         T.falsy(contentSource:find(marker, 1, true),
             fileName .. " retains migration marker: " .. marker)

@@ -3,7 +3,7 @@ return {
     ["semantic.social.acknowledged.bond_guarded"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_acknowledged_bond_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.acknowledged.bond_guarded",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.social.acknowledged.bond_neutral"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_acknowledged_bond_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.acknowledged.bond_neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.social.acknowledged.bond_terse"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_acknowledged_bond_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.acknowledged.bond_terse",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.social.acknowledged.bond_warm"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_acknowledged_bond_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.acknowledged.bond_warm",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.social.acknowledged.guarded"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_acknowledged_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.acknowledged.guarded",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.social.acknowledged.neutral"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_acknowledged_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.acknowledged.neutral",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.social.acknowledged.terse"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_acknowledged_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.acknowledged.terse",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.social.acknowledged.warm"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_acknowledged_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.acknowledged.warm",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["semantic.social.dispute_friendly.guarded"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_friendly_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_friendly.guarded",
         ["kind"] = "dialogue",
@@ -84,7 +84,7 @@ return {
     ["semantic.social.dispute_friendly.neutral"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_friendly_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_friendly.neutral",
         ["kind"] = "dialogue",
@@ -93,7 +93,7 @@ return {
     ["semantic.social.dispute_friendly.terse"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_friendly_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_friendly.terse",
         ["kind"] = "dialogue",
@@ -102,7 +102,7 @@ return {
     ["semantic.social.dispute_friendly.warm"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_friendly_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_friendly.warm",
         ["kind"] = "dialogue",
@@ -111,7 +111,7 @@ return {
     ["semantic.social.dispute_stressed.guarded"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_stressed_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_stressed.guarded",
         ["kind"] = "dialogue",
@@ -120,7 +120,7 @@ return {
     ["semantic.social.dispute_stressed.neutral"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_stressed_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_stressed.neutral",
         ["kind"] = "dialogue",
@@ -129,7 +129,7 @@ return {
     ["semantic.social.dispute_stressed.terse"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_stressed_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_stressed.terse",
         ["kind"] = "dialogue",
@@ -138,7 +138,7 @@ return {
     ["semantic.social.dispute_stressed.warm"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_stressed_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_stressed.warm",
         ["kind"] = "dialogue",
@@ -147,7 +147,7 @@ return {
     ["semantic.social.dispute_trusted.guarded"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_trusted_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_trusted.guarded",
         ["kind"] = "dialogue",
@@ -156,7 +156,7 @@ return {
     ["semantic.social.dispute_trusted.neutral"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_trusted_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_trusted.neutral",
         ["kind"] = "dialogue",
@@ -165,7 +165,7 @@ return {
     ["semantic.social.dispute_trusted.terse"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_trusted_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_trusted.terse",
         ["kind"] = "dialogue",
@@ -174,7 +174,7 @@ return {
     ["semantic.social.dispute_trusted.warm"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_trusted_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_trusted.warm",
         ["kind"] = "dialogue",
@@ -183,7 +183,7 @@ return {
     ["semantic.social.dispute_withdrawn.guarded"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_withdrawn_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_withdrawn.guarded",
         ["kind"] = "dialogue",
@@ -192,7 +192,7 @@ return {
     ["semantic.social.dispute_withdrawn.neutral"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_withdrawn_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_withdrawn.neutral",
         ["kind"] = "dialogue",
@@ -201,7 +201,7 @@ return {
     ["semantic.social.dispute_withdrawn.terse"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_withdrawn_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_withdrawn.terse",
         ["kind"] = "dialogue",
@@ -210,7 +210,7 @@ return {
     ["semantic.social.dispute_withdrawn.warm"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_dispute_withdrawn_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.dispute_withdrawn.warm",
         ["kind"] = "dialogue",
@@ -219,7 +219,7 @@ return {
     ["semantic.social.hostile_boundary.guarded"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_boundary_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.hostile_boundary.guarded",
         ["kind"] = "dialogue",
@@ -228,7 +228,7 @@ return {
     ["semantic.social.hostile_boundary.neutral"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_boundary_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.hostile_boundary.neutral",
         ["kind"] = "dialogue",
@@ -237,7 +237,7 @@ return {
     ["semantic.social.hostile_boundary.terse"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_boundary_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.hostile_boundary.terse",
         ["kind"] = "dialogue",
@@ -246,7 +246,7 @@ return {
     ["semantic.social.hostile_boundary.warm"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_boundary_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsAckDispute/Catalog",
         },
         ["id"] = "semantic.social.hostile_boundary.warm",
         ["kind"] = "dialogue",

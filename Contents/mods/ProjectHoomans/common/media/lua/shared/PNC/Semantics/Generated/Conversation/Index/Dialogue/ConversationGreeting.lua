@@ -3,7 +3,7 @@ return {
     ["conversation.landing.whats_up"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/conversation_landing_whats_up",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "conversation.landing.whats_up",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.flow.greeting.followup.default.neutral"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_greeting_followup_default_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "semantic.flow.greeting.followup.default.neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.flow.greeting.followup.friendly.neutral"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_greeting_followup_friendly_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "semantic.flow.greeting.followup.friendly.neutral",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.flow.greeting.opening.default.guarded"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_greeting_opening_default_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "semantic.flow.greeting.opening.default.guarded",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.flow.greeting.opening.default.neutral"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_greeting_opening_default_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "semantic.flow.greeting.opening.default.neutral",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.flow.greeting.opening.default.terse"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_greeting_opening_default_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "semantic.flow.greeting.opening.default.terse",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.flow.greeting.opening.default.warm"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_greeting_opening_default_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "semantic.flow.greeting.opening.default.warm",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.flow.greeting.opening.friendly.guarded"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_greeting_opening_friendly_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "semantic.flow.greeting.opening.friendly.guarded",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["semantic.flow.greeting.opening.friendly.neutral"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_greeting_opening_friendly_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "semantic.flow.greeting.opening.friendly.neutral",
         ["kind"] = "dialogue",
@@ -84,7 +84,7 @@ return {
     ["semantic.flow.greeting.opening.friendly.terse"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_greeting_opening_friendly_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "semantic.flow.greeting.opening.friendly.terse",
         ["kind"] = "dialogue",
@@ -93,7 +93,7 @@ return {
     ["semantic.flow.greeting.opening.friendly.warm"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_greeting_opening_friendly_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "semantic.flow.greeting.opening.friendly.warm",
         ["kind"] = "dialogue",
@@ -102,7 +102,7 @@ return {
     ["semantic.flow.greeting.opening.question.default.neutral"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_greeting_opening_question_default_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "semantic.flow.greeting.opening.question.default.neutral",
         ["kind"] = "dialogue",
@@ -111,7 +111,7 @@ return {
     ["semantic.flow.greeting.opening.question.friendly.neutral"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_greeting_opening_question_friendly_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "semantic.flow.greeting.opening.question.friendly.neutral",
         ["kind"] = "dialogue",
@@ -120,7 +120,7 @@ return {
     ["semantic.flow.greeting.opening.rain.neutral"] = {
         ["domain"] = "conversation_greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_greeting_opening_rain_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
         },
         ["id"] = "semantic.flow.greeting.opening.rain.neutral",
         ["kind"] = "dialogue",

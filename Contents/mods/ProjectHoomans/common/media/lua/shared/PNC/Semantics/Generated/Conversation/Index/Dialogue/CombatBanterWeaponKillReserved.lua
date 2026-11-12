@@ -3,7 +3,7 @@ return {
     ["semantic.combat.kill.killer.reserved.blade_01"] = {
         ["domain"] = "combat_banter_weapon_kill_reserved",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_kill_killer_reserved_blade_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatBanterWeaponKillReserved/Catalog",
         },
         ["id"] = "semantic.combat.kill.killer.reserved.blade_01",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.combat.kill.killer.reserved.firearm_01"] = {
         ["domain"] = "combat_banter_weapon_kill_reserved",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_kill_killer_reserved_firearm_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatBanterWeaponKillReserved/Catalog",
         },
         ["id"] = "semantic.combat.kill.killer.reserved.firearm_01",
         ["kind"] = "dialogue",

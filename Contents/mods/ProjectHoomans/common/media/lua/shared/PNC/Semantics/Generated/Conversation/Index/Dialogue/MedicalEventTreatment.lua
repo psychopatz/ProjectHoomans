@@ -3,7 +3,7 @@ return {
     ["semantic.medical.distress.treatment.bandage"] = {
         ["domain"] = "medical_event_treatment",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_treatment_bandage",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventTreatment/Catalog",
         },
         ["id"] = "semantic.medical.distress.treatment.bandage",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.medical.distress.treatment.default"] = {
         ["domain"] = "medical_event_treatment",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_treatment_default",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventTreatment/Catalog",
         },
         ["id"] = "semantic.medical.distress.treatment.default",
         ["kind"] = "dialogue",

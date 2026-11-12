@@ -3,7 +3,7 @@ return {
     ["semantic.interaction.scene.excursion_departing.guarded"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_departing_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_departing.guarded",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.interaction.scene.excursion_departing.neutral"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_departing_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_departing.neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.interaction.scene.excursion_departing.terse"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_departing_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_departing.terse",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.interaction.scene.excursion_departing.warm"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_departing_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_departing.warm",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.interaction.scene.excursion_failed.guarded"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_failed_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_failed.guarded",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.interaction.scene.excursion_failed.neutral"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_failed_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_failed.neutral",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.interaction.scene.excursion_failed.terse"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_failed_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_failed.terse",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.interaction.scene.excursion_failed.warm"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_failed_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_failed.warm",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["semantic.interaction.scene.excursion_home.guarded"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_home_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_home.guarded",
         ["kind"] = "dialogue",
@@ -84,7 +84,7 @@ return {
     ["semantic.interaction.scene.excursion_home.neutral"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_home_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_home.neutral",
         ["kind"] = "dialogue",
@@ -93,7 +93,7 @@ return {
     ["semantic.interaction.scene.excursion_home.terse"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_home_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_home.terse",
         ["kind"] = "dialogue",
@@ -102,7 +102,7 @@ return {
     ["semantic.interaction.scene.excursion_home.warm"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_home_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_home.warm",
         ["kind"] = "dialogue",
@@ -111,7 +111,7 @@ return {
     ["semantic.interaction.scene.excursion_preparing.guarded"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_preparing_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_preparing.guarded",
         ["kind"] = "dialogue",
@@ -120,7 +120,7 @@ return {
     ["semantic.interaction.scene.excursion_preparing.neutral"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_preparing_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_preparing.neutral",
         ["kind"] = "dialogue",
@@ -129,7 +129,7 @@ return {
     ["semantic.interaction.scene.excursion_preparing.terse"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_preparing_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_preparing.terse",
         ["kind"] = "dialogue",
@@ -138,7 +138,7 @@ return {
     ["semantic.interaction.scene.excursion_preparing.warm"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_preparing_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_preparing.warm",
         ["kind"] = "dialogue",
@@ -147,7 +147,7 @@ return {
     ["semantic.interaction.scene.excursion_returning.guarded"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_returning_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_returning.guarded",
         ["kind"] = "dialogue",
@@ -156,7 +156,7 @@ return {
     ["semantic.interaction.scene.excursion_returning.neutral"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_returning_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_returning.neutral",
         ["kind"] = "dialogue",
@@ -165,7 +165,7 @@ return {
     ["semantic.interaction.scene.excursion_returning.terse"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_returning_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_returning.terse",
         ["kind"] = "dialogue",
@@ -174,7 +174,7 @@ return {
     ["semantic.interaction.scene.excursion_returning.warm"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_excursion_returning_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.excursion_returning.warm",
         ["kind"] = "dialogue",
@@ -183,7 +183,7 @@ return {
     ["semantic.interaction.scene.grounded_news_answer.guarded"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_grounded_news_answer_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.grounded_news_answer.guarded",
         ["kind"] = "dialogue",
@@ -192,7 +192,7 @@ return {
     ["semantic.interaction.scene.grounded_news_answer.neutral"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_grounded_news_answer_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.grounded_news_answer.neutral",
         ["kind"] = "dialogue",
@@ -201,7 +201,7 @@ return {
     ["semantic.interaction.scene.grounded_news_answer.terse"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_grounded_news_answer_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.grounded_news_answer.terse",
         ["kind"] = "dialogue",
@@ -210,7 +210,7 @@ return {
     ["semantic.interaction.scene.grounded_news_answer.warm"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_grounded_news_answer_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.grounded_news_answer.warm",
         ["kind"] = "dialogue",
@@ -219,7 +219,7 @@ return {
     ["semantic.interaction.scene.grounded_news_share.guarded"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_grounded_news_share_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.grounded_news_share.guarded",
         ["kind"] = "dialogue",
@@ -228,7 +228,7 @@ return {
     ["semantic.interaction.scene.grounded_news_share.neutral"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_grounded_news_share_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.grounded_news_share.neutral",
         ["kind"] = "dialogue",
@@ -237,7 +237,7 @@ return {
     ["semantic.interaction.scene.grounded_news_share.terse"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_grounded_news_share_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.grounded_news_share.terse",
         ["kind"] = "dialogue",
@@ -246,7 +246,7 @@ return {
     ["semantic.interaction.scene.grounded_news_share.warm"] = {
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_scene_grounded_news_share_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionSceneTravelNews/Catalog",
         },
         ["id"] = "semantic.interaction.scene.grounded_news_share.warm",
         ["kind"] = "dialogue",

@@ -1,3 +1,6 @@
+local T = require "tests/support/test"
+T.addPackagePaths()
+
 local Offers = require "PNC/Semantics/PNC_SemanticDialogueBranchOffers"
 local ResponsePlan = require "PNC/Semantics/PNC_SemanticDialogueResponsePlan"
 local TextBinding = require "PsychopatzCore/Semantics/PsychopatzSemanticTextBinding"

@@ -3,7 +3,7 @@ return {
     ["semantic.conversation.acknowledged.default.guarded"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_conversation_acknowledged_default_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.conversation.acknowledged.default.guarded",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.conversation.acknowledged.default.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_conversation_acknowledged_default_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.conversation.acknowledged.default.neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.conversation.acknowledged.default.terse"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_conversation_acknowledged_default_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.conversation.acknowledged.default.terse",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.conversation.acknowledged.default.warm"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_conversation_acknowledged_default_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.conversation.acknowledged.default.warm",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.emote.player.clap.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_player_clap_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.player.clap.neutral",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.emote.player.insult.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_player_insult_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.player.insult.neutral",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.emote.player.salute.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_player_salute_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.player.salute.neutral",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.emote.player.thankyou.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_player_thankyou_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.player.thankyou.neutral",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["semantic.emote.player.thumbsdown.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_player_thumbsdown_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.player.thumbsdown.neutral",
         ["kind"] = "dialogue",
@@ -84,7 +84,7 @@ return {
     ["semantic.emote.player.thumbsup.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_player_thumbsup_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.player.thumbsup.neutral",
         ["kind"] = "dialogue",
@@ -93,7 +93,7 @@ return {
     ["semantic.emote.player.wavebye.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_player_wavebye_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.player.wavebye.neutral",
         ["kind"] = "dialogue",
@@ -102,7 +102,7 @@ return {
     ["semantic.emote.player.wavehi.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_player_wavehi_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.player.wavehi.neutral",
         ["kind"] = "dialogue",
@@ -111,7 +111,7 @@ return {
     ["semantic.emote.reply.clap.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_clap_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.clap.neutral",
         ["kind"] = "dialogue",
@@ -120,7 +120,7 @@ return {
     ["semantic.emote.reply.clap.warm"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_clap_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.clap.warm",
         ["kind"] = "dialogue",
@@ -129,7 +129,7 @@ return {
     ["semantic.emote.reply.default.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_default_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.default.neutral",
         ["kind"] = "dialogue",
@@ -138,7 +138,7 @@ return {
     ["semantic.emote.reply.insult.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_insult_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.insult.neutral",
         ["kind"] = "dialogue",
@@ -147,7 +147,7 @@ return {
     ["semantic.emote.reply.insult.warm"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_insult_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.insult.warm",
         ["kind"] = "dialogue",
@@ -156,7 +156,7 @@ return {
     ["semantic.emote.reply.salute.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_salute_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.salute.neutral",
         ["kind"] = "dialogue",
@@ -165,7 +165,7 @@ return {
     ["semantic.emote.reply.salute.warm"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_salute_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.salute.warm",
         ["kind"] = "dialogue",
@@ -174,7 +174,7 @@ return {
     ["semantic.emote.reply.thankyou.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_thankyou_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.thankyou.neutral",
         ["kind"] = "dialogue",
@@ -183,7 +183,7 @@ return {
     ["semantic.emote.reply.thankyou.warm"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_thankyou_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.thankyou.warm",
         ["kind"] = "dialogue",
@@ -192,7 +192,7 @@ return {
     ["semantic.emote.reply.thumbsdown.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_thumbsdown_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.thumbsdown.neutral",
         ["kind"] = "dialogue",
@@ -201,7 +201,7 @@ return {
     ["semantic.emote.reply.thumbsup.active.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_thumbsup_active_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.thumbsup.active.neutral",
         ["kind"] = "dialogue",
@@ -210,7 +210,7 @@ return {
     ["semantic.emote.reply.thumbsup.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_thumbsup_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.thumbsup.neutral",
         ["kind"] = "dialogue",
@@ -219,7 +219,7 @@ return {
     ["semantic.emote.reply.thumbsup.warm"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_thumbsup_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.thumbsup.warm",
         ["kind"] = "dialogue",
@@ -228,7 +228,7 @@ return {
     ["semantic.emote.reply.wavebye.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_wavebye_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.wavebye.neutral",
         ["kind"] = "dialogue",
@@ -237,7 +237,7 @@ return {
     ["semantic.emote.reply.wavebye.warm"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_wavebye_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.wavebye.warm",
         ["kind"] = "dialogue",
@@ -246,7 +246,7 @@ return {
     ["semantic.emote.reply.wavehi.neutral"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_wavehi_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.wavehi.neutral",
         ["kind"] = "dialogue",
@@ -255,7 +255,7 @@ return {
     ["semantic.emote.reply.wavehi.terse"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_wavehi_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.wavehi.terse",
         ["kind"] = "dialogue",
@@ -264,7 +264,7 @@ return {
     ["semantic.emote.reply.wavehi.warm"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_emote_reply_wavehi_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialEmotes/Catalog",
         },
         ["id"] = "semantic.emote.reply.wavehi.warm",
         ["kind"] = "dialogue",

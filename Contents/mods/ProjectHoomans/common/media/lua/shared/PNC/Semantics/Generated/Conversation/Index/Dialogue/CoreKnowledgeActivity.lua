@@ -3,7 +3,7 @@ return {
     ["semantic.question.activity.dataset.keep_moving.guarded"] = {
         ["domain"] = "core_knowledge_activity",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_dataset_keep_moving_guarded",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeActivity/Catalog",
         },
         ["id"] = "semantic.question.activity.dataset.keep_moving.guarded",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.question.activity.dataset.keep_moving.neutral"] = {
         ["domain"] = "core_knowledge_activity",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_dataset_keep_moving_neutral",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeActivity/Catalog",
         },
         ["id"] = "semantic.question.activity.dataset.keep_moving.neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.question.activity.dataset.keep_moving.terse"] = {
         ["domain"] = "core_knowledge_activity",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_dataset_keep_moving_terse",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeActivity/Catalog",
         },
         ["id"] = "semantic.question.activity.dataset.keep_moving.terse",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.question.activity.dataset.keep_moving.warm"] = {
         ["domain"] = "core_knowledge_activity",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_dataset_keep_moving_warm",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeActivity/Catalog",
         },
         ["id"] = "semantic.question.activity.dataset.keep_moving.warm",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.question.activity.fishing.guarded"] = {
         ["domain"] = "core_knowledge_activity",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_fishing_guarded",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeActivity/Catalog",
         },
         ["id"] = "semantic.question.activity.fishing.guarded",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.question.activity.fishing.neutral"] = {
         ["domain"] = "core_knowledge_activity",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_fishing_neutral",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeActivity/Catalog",
         },
         ["id"] = "semantic.question.activity.fishing.neutral",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.question.activity.fishing.terse"] = {
         ["domain"] = "core_knowledge_activity",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_fishing_terse",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeActivity/Catalog",
         },
         ["id"] = "semantic.question.activity.fishing.terse",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.question.activity.fishing.warm"] = {
         ["domain"] = "core_knowledge_activity",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_fishing_warm",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeActivity/Catalog",
         },
         ["id"] = "semantic.question.activity.fishing.warm",
         ["kind"] = "dialogue",

@@ -3,7 +3,7 @@ return {
     ["semantic.command.player.attack_auto"] = {
         ["domain"] = "companion_commands_player",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_player_attack_auto",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CompanionCommandsPlayer/Catalog",
         },
         ["id"] = "semantic.command.player.attack_auto",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.command.player.attack_melee"] = {
         ["domain"] = "companion_commands_player",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_player_attack_melee",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CompanionCommandsPlayer/Catalog",
         },
         ["id"] = "semantic.command.player.attack_melee",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.command.player.attack_none"] = {
         ["domain"] = "companion_commands_player",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_player_attack_none",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CompanionCommandsPlayer/Catalog",
         },
         ["id"] = "semantic.command.player.attack_none",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.command.player.attack_ranged"] = {
         ["domain"] = "companion_commands_player",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_player_attack_ranged",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CompanionCommandsPlayer/Catalog",
         },
         ["id"] = "semantic.command.player.attack_ranged",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.command.player.camp"] = {
         ["domain"] = "companion_commands_player",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_player_camp",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CompanionCommandsPlayer/Catalog",
         },
         ["id"] = "semantic.command.player.camp",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.command.player.camp_none"] = {
         ["domain"] = "companion_commands_player",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_player_camp_none",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CompanionCommandsPlayer/Catalog",
         },
         ["id"] = "semantic.command.player.camp_none",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.command.player.camp_rejected"] = {
         ["domain"] = "companion_commands_player",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_player_camp_rejected",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CompanionCommandsPlayer/Catalog",
         },
         ["id"] = "semantic.command.player.camp_rejected",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.command.player.follow"] = {
         ["domain"] = "companion_commands_player",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_player_follow",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CompanionCommandsPlayer/Catalog",
         },
         ["id"] = "semantic.command.player.follow",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["semantic.command.player.generic"] = {
         ["domain"] = "companion_commands_player",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_player_generic",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CompanionCommandsPlayer/Catalog",
         },
         ["id"] = "semantic.command.player.generic",
         ["kind"] = "dialogue",
@@ -84,7 +84,7 @@ return {
     ["semantic.command.player.return_home"] = {
         ["domain"] = "companion_commands_player",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_player_return_home",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CompanionCommandsPlayer/Catalog",
         },
         ["id"] = "semantic.command.player.return_home",
         ["kind"] = "dialogue",
@@ -93,7 +93,7 @@ return {
     ["semantic.command.player.stay"] = {
         ["domain"] = "companion_commands_player",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_player_stay",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CompanionCommandsPlayer/Catalog",
         },
         ["id"] = "semantic.command.player.stay",
         ["kind"] = "dialogue",

@@ -3,7 +3,7 @@ return {
     ["semantic.social.hostile_short.guarded"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_short_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.hostile_short.guarded",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.social.hostile_short.neutral"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_short_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.hostile_short.neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.social.hostile_short.terse"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_short_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.hostile_short.terse",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.social.hostile_short.warm"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_short_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.hostile_short.warm",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.social.hostile_stressed.guarded"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_stressed_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.hostile_stressed.guarded",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.social.hostile_stressed.neutral"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_stressed_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.hostile_stressed.neutral",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.social.hostile_stressed.terse"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_stressed_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.hostile_stressed.terse",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.social.hostile_stressed.warm"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_stressed_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.hostile_stressed.warm",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["semantic.social.hostile_withdrawn.guarded"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_withdrawn_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.hostile_withdrawn.guarded",
         ["kind"] = "dialogue",
@@ -84,7 +84,7 @@ return {
     ["semantic.social.hostile_withdrawn.neutral"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_withdrawn_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.hostile_withdrawn.neutral",
         ["kind"] = "dialogue",
@@ -93,7 +93,7 @@ return {
     ["semantic.social.hostile_withdrawn.terse"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_withdrawn_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.hostile_withdrawn.terse",
         ["kind"] = "dialogue",
@@ -102,7 +102,7 @@ return {
     ["semantic.social.hostile_withdrawn.warm"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_hostile_withdrawn_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.hostile_withdrawn.warm",
         ["kind"] = "dialogue",
@@ -111,7 +111,7 @@ return {
     ["semantic.social.offer_friendly.bond_guarded"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_offer_friendly_bond_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.offer_friendly.bond_guarded",
         ["kind"] = "dialogue",
@@ -120,7 +120,7 @@ return {
     ["semantic.social.offer_friendly.bond_neutral"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_offer_friendly_bond_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.offer_friendly.bond_neutral",
         ["kind"] = "dialogue",
@@ -129,7 +129,7 @@ return {
     ["semantic.social.offer_friendly.bond_terse"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_offer_friendly_bond_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.offer_friendly.bond_terse",
         ["kind"] = "dialogue",
@@ -138,7 +138,7 @@ return {
     ["semantic.social.offer_friendly.bond_warm"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_offer_friendly_bond_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.offer_friendly.bond_warm",
         ["kind"] = "dialogue",
@@ -147,7 +147,7 @@ return {
     ["semantic.social.offer_friendly.guarded"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_offer_friendly_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.offer_friendly.guarded",
         ["kind"] = "dialogue",
@@ -156,7 +156,7 @@ return {
     ["semantic.social.offer_friendly.neutral"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_offer_friendly_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.offer_friendly.neutral",
         ["kind"] = "dialogue",
@@ -165,7 +165,7 @@ return {
     ["semantic.social.offer_friendly.terse"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_offer_friendly_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.offer_friendly.terse",
         ["kind"] = "dialogue",
@@ -174,7 +174,7 @@ return {
     ["semantic.social.offer_friendly.warm"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_offer_friendly_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.offer_friendly.warm",
         ["kind"] = "dialogue",
@@ -183,7 +183,7 @@ return {
     ["semantic.social.threat_boundary.guarded"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_threat_boundary_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.threat_boundary.guarded",
         ["kind"] = "dialogue",
@@ -192,7 +192,7 @@ return {
     ["semantic.social.threat_boundary.neutral"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_threat_boundary_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.threat_boundary.neutral",
         ["kind"] = "dialogue",
@@ -201,7 +201,7 @@ return {
     ["semantic.social.threat_boundary.terse"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_threat_boundary_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.threat_boundary.terse",
         ["kind"] = "dialogue",
@@ -210,7 +210,7 @@ return {
     ["semantic.social.threat_boundary.warm"] = {
         ["domain"] = "social_reactions_hostile_offer_threat",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_threat_boundary_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialReactionsHostileOfferThreat/Catalog",
         },
         ["id"] = "semantic.social.threat_boundary.warm",
         ["kind"] = "dialogue",

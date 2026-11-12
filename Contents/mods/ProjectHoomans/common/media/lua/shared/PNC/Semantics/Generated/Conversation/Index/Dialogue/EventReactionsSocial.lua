@@ -3,7 +3,7 @@ return {
     ["semantic.social.reaction.default"] = {
         ["domain"] = "event_reactions_social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_reaction_default",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsSocial/Catalog",
         },
         ["id"] = "semantic.social.reaction.default",
         ["kind"] = "dialogue",

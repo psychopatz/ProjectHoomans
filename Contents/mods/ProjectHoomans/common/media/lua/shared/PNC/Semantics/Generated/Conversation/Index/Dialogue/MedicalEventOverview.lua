@@ -3,7 +3,7 @@ return {
     ["semantic.medical.distress.default"] = {
         ["domain"] = "medical_event_overview",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_default",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventOverview/Catalog",
         },
         ["id"] = "semantic.medical.distress.default",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.medical.distress.mercy"] = {
         ["domain"] = "medical_event_overview",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_mercy",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventOverview/Catalog",
         },
         ["id"] = "semantic.medical.distress.mercy",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.medical.distress.urgent"] = {
         ["domain"] = "medical_event_overview",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_urgent",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/MedicalEventOverview/Catalog",
         },
         ["id"] = "semantic.medical.distress.urgent",
         ["kind"] = "dialogue",

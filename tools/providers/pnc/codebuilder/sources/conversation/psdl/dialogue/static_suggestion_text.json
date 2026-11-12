@@ -1,0 +1,1090 @@
+{
+  "metadata": {
+    "migration": "PSDL-owned text rows; UI suggestion projection remains downstream"
+  },
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "id": "ui.suggestion.identity.lie.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.identity.lie.label",
+        "textRows": [
+          {
+            "key": "suggestion.identity.lie.label",
+            "text": {
+              "EN": "Lie about your name",
+              "TL": "Magsinungaling tungkol sa pangalan"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Lie about your name",
+        "TL": "Magsinungaling tungkol sa pangalan"
+      }
+    },
+    {
+      "id": "ui.suggestion.identity.lie.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.identity.lie.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.identity.lie.utterance",
+            "text": {
+              "EN": "I'll go by a different name.",
+              "TL": "Ibang pangalan ang gagamitin ko."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "I'll go by a different name.",
+        "TL": "Ibang pangalan ang gagamitin ko."
+      }
+    },
+    {
+      "id": "ui.suggestion.identity.real.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.identity.real.label",
+        "textRows": [
+          {
+            "key": "suggestion.identity.real.label",
+            "text": {
+              "EN": "Say your real name",
+              "TL": "Sabihin ang tunay mong pangalan"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Say your real name",
+        "TL": "Sabihin ang tunay mong pangalan"
+      }
+    },
+    {
+      "id": "ui.suggestion.identity.real.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.identity.real.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.identity.real.utterance",
+            "text": {
+              "EN": "My real name.",
+              "TL": "Tunay kong pangalan."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "My real name.",
+        "TL": "Tunay kong pangalan."
+      }
+    },
+    {
+      "id": "ui.suggestion.identity.rude.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.identity.rude.label",
+        "textRows": [
+          {
+            "key": "suggestion.identity.rude.label",
+            "text": {
+              "EN": "Don't tell your name",
+              "TL": "Huwag sabihin ang pangalan"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Don't tell your name",
+        "TL": "Huwag sabihin ang pangalan"
+      }
+    },
+    {
+      "id": "ui.suggestion.identity.rude.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.identity.rude.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.identity.rude.utterance",
+            "text": {
+              "EN": "That's none of your business.",
+              "TL": "Wala ka nang pakialam."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "That's none of your business.",
+        "TL": "Wala ka nang pakialam."
+      }
+    },
+    {
+      "id": "ui.suggestion.needs_destination.tooltip",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.needs_destination.tooltip",
+        "textRows": [
+          {
+            "key": "suggestion.needs_destination.tooltip",
+            "text": {
+              "EN": "Choose a destination first.",
+              "TL": "Pumili muna ng pupuntahan."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Choose a destination first.",
+        "TL": "Pumili muna ng pupuntahan."
+      }
+    },
+    {
+      "id": "ui.suggestion.personal_check_in.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.personal_check_in.label",
+        "textRows": [
+          {
+            "key": "suggestion.personal_check_in.label",
+            "text": {
+              "EN": "Ask what's on their mind",
+              "TL": "Alamin kung may bumabagabag sa kanya"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Ask what's on their mind",
+        "TL": "Alamin kung may bumabagabag sa kanya"
+      }
+    },
+    {
+      "id": "ui.suggestion.personal_check_in.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.personal_check_in.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.personal_check_in.utterance",
+            "text": {
+              "EN": "Anything bothering you?",
+              "TL": "May bumabagabag ba sa'yo?"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Anything bothering you?",
+        "TL": "May bumabagabag ba sa'yo?"
+      }
+    },
+    {
+      "id": "ui.suggestion.stay.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.stay.label",
+        "textRows": [
+          {
+            "key": "suggestion.stay.label",
+            "text": {
+              "EN": "Wait here.",
+              "TL": "Dito ka maghintay."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Wait here.",
+        "TL": "Dito ka maghintay."
+      }
+    },
+    {
+      "id": "ui.suggestion.stay.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.stay.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.stay.utterance",
+            "text": {
+              "EN": "Wait here.",
+              "TL": "Dito ka maghintay."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Wait here.",
+        "TL": "Dito ka maghintay."
+      }
+    },
+    {
+      "id": "ui.suggestion.talk_again_about.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.talk_again_about.label",
+        "textRows": [
+          {
+            "key": "suggestion.talk_again_about.label",
+            "text": {
+              "EN": "Talk again about",
+              "TL": "Pag-usapan muli ang"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Talk again about",
+        "TL": "Pag-usapan muli ang"
+      }
+    },
+    {
+      "id": "ui.suggestion.talk_something_else.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.talk_something_else.label",
+        "textRows": [
+          {
+            "key": "suggestion.talk_something_else.label",
+            "text": {
+              "EN": "Let's talk something else",
+              "TL": "Iba naman ang pag-usapan natin"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Let's talk something else",
+        "TL": "Iba naman ang pag-usapan natin"
+      }
+    },
+    {
+      "id": "ui.suggestion.trade.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.trade.label",
+        "textRows": [
+          {
+            "key": "suggestion.trade.label",
+            "text": {
+              "EN": "Open trading",
+              "TL": "Buksan ang kalakalan"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Open trading",
+        "TL": "Buksan ang kalakalan"
+      }
+    },
+    {
+      "id": "ui.suggestion.trade.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.trade.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.trade.utterance",
+            "text": {
+              "EN": "Let's trade.",
+              "TL": "Magpalitan tayo."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Let's trade.",
+        "TL": "Magpalitan tayo."
+      }
+    },
+    {
+      "id": "ui.suggestion.unavailable.tooltip",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.unavailable.tooltip",
+        "textRows": [
+          {
+            "key": "suggestion.unavailable.tooltip",
+            "text": {
+              "EN": "Unavailable in the current situation.",
+              "TL": "Hindi magagamit sa kasalukuyang sitwasyon."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Unavailable in the current situation.",
+        "TL": "Hindi magagamit sa kasalukuyang sitwasyon."
+      }
+    },
+    {
+      "id": "ui.suggestion.wait_at.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.wait_at.label",
+        "textRows": [
+          {
+            "key": "suggestion.wait_at.label",
+            "text": {
+              "EN": "Ask them to wait there",
+              "TL": "Sabihing maghintay siya roon"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Ask them to wait there",
+        "TL": "Sabihing maghintay siya roon"
+      }
+    },
+    {
+      "id": "ui.suggestion.wait_at.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.wait_at.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.wait_at.utterance",
+            "text": {
+              "EN": "Wait there.",
+              "TL": "Maghintay ka roon."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Wait there.",
+        "TL": "Maghintay ka roon."
+      }
+    },
+    {
+      "id": "ui.suggestion.whats_up.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.whats_up.label",
+        "textRows": [
+          {
+            "key": "suggestion.whats_up.label",
+            "text": {
+              "EN": "What's up?",
+              "TL": "Ano ang balita?"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "What's up?",
+        "TL": "Ano ang balita?"
+      }
+    },
+    {
+      "id": "ui.semantic_suggestions.title",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "semantic_suggestions.title",
+        "textRows": [
+          {
+            "key": "semantic_suggestions.title",
+            "text": {
+              "EN": "CONTEXTUAL SUGGESTIONS",
+              "TL": "MGA MUNGKAHING PANG-USAP"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "CONTEXTUAL SUGGESTIONS",
+        "TL": "MGA MUNGKAHING PANG-USAP"
+      }
+    },
+    {
+      "id": "ui.suggestion.back.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.back.label",
+        "textRows": [
+          {
+            "key": "suggestion.back.label",
+            "text": {
+              "EN": "Back",
+              "TL": "Bumalik"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Back",
+        "TL": "Bumalik"
+      }
+    },
+    {
+      "id": "ui.suggestion.check_in.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.check_in.label",
+        "textRows": [
+          {
+            "key": "suggestion.check_in.label",
+            "text": {
+              "EN": "Check in with them",
+              "TL": "Kumusta tayo"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Check in with them",
+        "TL": "Kumusta tayo"
+      }
+    },
+    {
+      "id": "ui.suggestion.check_in.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.check_in.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.check_in.utterance",
+            "text": {
+              "EN": "How are we doing?",
+              "TL": "Kumusta tayo?"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "How are we doing?",
+        "TL": "Kumusta tayo?"
+      }
+    },
+    {
+      "id": "ui.suggestion.companion_camp_here.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.companion_camp_here.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.companion_camp_here.utterance",
+            "text": {
+              "EN": "Let's camp here.",
+              "TL": "Magkampo tayo rito."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Let's camp here.",
+        "TL": "Magkampo tayo rito."
+      }
+    },
+    {
+      "id": "ui.suggestion.companion_camp_room.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.companion_camp_room.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.companion_camp_room.utterance",
+            "text": {
+              "EN": "Let's camp in the %1.",
+              "TL": "Magkampo tayo sa %1."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Let's camp in the %1.",
+        "TL": "Magkampo tayo sa %1."
+      }
+    },
+    {
+      "id": "ui.suggestion.companion_camp.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.companion_camp.label",
+        "textRows": [
+          {
+            "key": "suggestion.companion_camp.label",
+            "text": {
+              "EN": "Let's camp...",
+              "TL": "Magkampo tayo..."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Let's camp...",
+        "TL": "Magkampo tayo..."
+      }
+    },
+    {
+      "id": "ui.suggestion.companion_campfire.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.companion_campfire.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.companion_campfire.utterance",
+            "text": {
+              "EN": "Let's camp by the campfire.",
+              "TL": "Magkampo tayo sa tabi ng apoy."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Let's camp by the campfire.",
+        "TL": "Magkampo tayo sa tabi ng apoy."
+      }
+    },
+    {
+      "id": "ui.suggestion.companion_orders.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.companion_orders.label",
+        "textRows": [
+          {
+            "key": "suggestion.companion_orders.label",
+            "text": {
+              "EN": "I need you to do something...",
+              "TL": "May ipapagawa ako sa iyo..."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "I need you to do something...",
+        "TL": "May ipapagawa ako sa iyo..."
+      }
+    },
+    {
+      "id": "ui.suggestion.follow.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.follow.label",
+        "textRows": [
+          {
+            "key": "suggestion.follow.label",
+            "text": {
+              "EN": "Follow me.",
+              "TL": "Sumunod ka sa akin."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Follow me.",
+        "TL": "Sumunod ka sa akin."
+      }
+    },
+    {
+      "id": "ui.suggestion.follow.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.follow.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.follow.utterance",
+            "text": {
+              "EN": "Follow me.",
+              "TL": "Sumunod ka sa akin."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Follow me.",
+        "TL": "Sumunod ka sa akin."
+      }
+    },
+    {
+      "id": "ui.suggestion.greeting_report_fine.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.greeting_report_fine.label",
+        "textRows": [
+          {
+            "key": "suggestion.greeting_report_fine.label",
+            "text": {
+              "EN": "Say you're doing fine",
+              "TL": "Sabihing ayos ka lang"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Say you're doing fine",
+        "TL": "Sabihing ayos ka lang"
+      }
+    },
+    {
+      "id": "ui.suggestion.greeting_report_fine.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.greeting_report_fine.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.greeting_report_fine.utterance",
+            "text": {
+              "EN": "I'm fine, thank you.",
+              "TL": "Ayos lang ako, salamat."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "I'm fine, thank you.",
+        "TL": "Ayos lang ako, salamat."
+      }
+    },
+    {
+      "id": "ui.suggestion.greeting_thank.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.greeting_thank.label",
+        "textRows": [
+          {
+            "key": "suggestion.greeting_thank.label",
+            "text": {
+              "EN": "Thank them",
+              "TL": "Pasalamatan siya"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Thank them",
+        "TL": "Pasalamatan siya"
+      }
+    },
+    {
+      "id": "ui.suggestion.greeting_thank.utterance",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.greeting_thank.utterance",
+        "textRows": [
+          {
+            "key": "suggestion.greeting_thank.utterance",
+            "text": {
+              "EN": "Thanks.",
+              "TL": "Salamat."
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Thanks.",
+        "TL": "Salamat."
+      }
+    },
+    {
+      "id": "ui.suggestion.group.actions.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.group.actions.label",
+        "textRows": [
+          {
+            "key": "suggestion.group.actions.label",
+            "text": {
+              "EN": "Conversation actions",
+              "TL": "Mga aksyon sa usapan"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Conversation actions",
+        "TL": "Mga aksyon sa usapan"
+      }
+    },
+    {
+      "id": "ui.suggestion.group.flow.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.group.flow.label",
+        "textRows": [
+          {
+            "key": "suggestion.group.flow.label",
+            "text": {
+              "EN": "Current conversation branch",
+              "TL": "Kasalukuyang sangay ng usapan"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Current conversation branch",
+        "TL": "Kasalukuyang sangay ng usapan"
+      }
+    },
+    {
+      "id": "ui.suggestion.group.identity.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.group.identity.label",
+        "textRows": [
+          {
+            "key": "suggestion.group.identity.label",
+            "text": {
+              "EN": "Identity",
+              "TL": "Pagkakakilanlan"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Identity",
+        "TL": "Pagkakakilanlan"
+      }
+    },
+    {
+      "id": "ui.suggestion.group.landing.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.group.landing.label",
+        "textRows": [
+          {
+            "key": "suggestion.group.landing.label",
+            "text": {
+              "EN": "Talk",
+              "TL": "Usapan"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Talk",
+        "TL": "Usapan"
+      }
+    },
+    {
+      "id": "ui.suggestion.group.medical.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.group.medical.label",
+        "textRows": [
+          {
+            "key": "suggestion.group.medical.label",
+            "text": {
+              "EN": "Medical",
+              "TL": "Medikal"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Medical",
+        "TL": "Medikal"
+      }
+    },
+    {
+      "id": "ui.suggestion.group.movement.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.group.movement.label",
+        "textRows": [
+          {
+            "key": "suggestion.group.movement.label",
+            "text": {
+              "EN": "Owned companion actions",
+              "TL": "Mga utos sa kasamang pag-aari"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Owned companion actions",
+        "TL": "Mga utos sa kasamang pag-aari"
+      }
+    },
+    {
+      "id": "ui.suggestion.group.needs.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.group.needs.label",
+        "textRows": [
+          {
+            "key": "suggestion.group.needs.label",
+            "text": {
+              "EN": "Needs",
+              "TL": "Pangangailangan"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Needs",
+        "TL": "Pangangailangan"
+      }
+    },
+    {
+      "id": "ui.suggestion.group.response.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.group.response.label",
+        "textRows": [
+          {
+            "key": "suggestion.group.response.label",
+            "text": {
+              "EN": "NPC reply",
+              "TL": "Sagot ng NPC"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "NPC reply",
+        "TL": "Sagot ng NPC"
+      }
+    },
+    {
+      "id": "ui.suggestion.group.time.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.group.time.label",
+        "textRows": [
+          {
+            "key": "suggestion.group.time.label",
+            "text": {
+              "EN": "Time and date",
+              "TL": "Oras at petsa"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Time and date",
+        "TL": "Oras at petsa"
+      }
+    },
+    {
+      "id": "ui.suggestion.group.utilities.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.group.utilities.label",
+        "textRows": [
+          {
+            "key": "suggestion.group.utilities.label",
+            "text": {
+              "EN": "Conversation utilities",
+              "TL": "Mga gamit sa usapan"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Conversation utilities",
+        "TL": "Mga gamit sa usapan"
+      }
+    },
+    {
+      "id": "ui.suggestion.group.weather.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.group.weather.label",
+        "textRows": [
+          {
+            "key": "suggestion.group.weather.label",
+            "text": {
+              "EN": "Weather",
+              "TL": "Panahon"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Weather",
+        "TL": "Panahon"
+      }
+    },
+    {
+      "id": "ui.suggestion.group.wellbeing.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.group.wellbeing.label",
+        "textRows": [
+          {
+            "key": "suggestion.group.wellbeing.label",
+            "text": {
+              "EN": "Wellbeing",
+              "TL": "Kalagayan"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "Wellbeing",
+        "TL": "Kalagayan"
+      }
+    },
+    {
+      "id": "ui.suggestion.group.whats_up.label",
+      "kind": "dialogue",
+      "metadata": {
+        "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+        "textKey": "suggestion.group.whats_up.label",
+        "textRows": [
+          {
+            "key": "suggestion.group.whats_up.label",
+            "text": {
+              "EN": "What's up",
+              "TL": "Ano ang balita"
+            }
+          }
+        ],
+        "textTarget": "UI_PNC_Conversation"
+      },
+      "owner": "ProjectHoomans",
+      "text": {
+        "EN": "What's up",
+        "TL": "Ano ang balita"
+      }
+    }
+  ],
+  "schema": "psychopatz.semantic.dialogue-language.v1"
+}

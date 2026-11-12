@@ -1,0 +1,2061 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "conversation.landing.whats_up",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "conversation.landing.whats_up",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[13]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "player",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["playerChoice"] = {
+                    ["choice"] = {
+                        ["EN"] = "What's up?",
+                        ["TL"] = "Ano ang balita?",
+                    },
+                    ["hubID"] = "whats_up",
+                    ["id"] = "conversation.landing:whats_up",
+                    ["kind"] = "player_landing_choice",
+                    ["label"] = {
+                        ["EN"] = "What's up",
+                        ["TL"] = "Ano ang balita",
+                    },
+                    ["route"] = "semantic_hub",
+                },
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+            },
+            ["response"] = {
+                ["act"] = "QUESTION",
+                ["variants"] = {
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "semantic.flow.greeting.followup.default.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.flow.greeting.followup.default.neutral",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[0]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["responseTemplateID"] = "semantic.flow.greeting.followup.default",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "You're welcome. Take care.",
+                            },
+                            ["TL"] = {
+                                "Walang anuman. Mag-iingat ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "No trouble. Stay safe.",
+                            },
+                            ["TL"] = {
+                                "Walang problema. Manatiling ligtas.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Anytime. Watch your back out there.",
+                            },
+                            ["TL"] = {
+                                "Kahit kailan. Mag-ingat ka sa labas.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't mention it. See you around.",
+                            },
+                            ["TL"] = {
+                                "Wala 'yon. Magkikita pa tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Glad to help. Take it easy.",
+                            },
+                            ["TL"] = {
+                                "Masayang nakatulong. Dahan-dahan lang.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "All right. Stay alert today.",
+                            },
+                            ["TL"] = {
+                                "Sige. Maging alerto ka ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "No problem at all. Be careful.",
+                            },
+                            ["TL"] = {
+                                "Walang anuman talaga. Mag-ingat ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Sure thing. Keep your eyes open.",
+                            },
+                            ["TL"] = {
+                                "Oo naman. Buksan mo ang mga mata mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Take care of yourself out there.",
+                            },
+                            ["TL"] = {
+                                "Alagaan mo ang sarili mo sa labas.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Until next time. Stay safe.",
+                            },
+                            ["TL"] = {
+                                "Hanggang sa muli. Manatiling ligtas.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "semantic.flow.greeting.followup.friendly.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.flow.greeting.followup.friendly.neutral",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[1]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["responseTemplateID"] = "semantic.flow.greeting.followup.friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "You're welcome. It's good to see you too.",
+                            },
+                            ["TL"] = {
+                                "Walang anuman. Mabuti at nakita rin kita.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Anytime. Glad you're here.",
+                            },
+                            ["TL"] = {
+                                "Kahit kailan. Masaya akong nandito ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Always glad to talk. Stay safe out there.",
+                            },
+                            ["TL"] = {
+                                "Palaging masayang makausap ka. Mag-ingat ka sa labas.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "No problem. Holler if you need a hand.",
+                            },
+                            ["TL"] = {
+                                "Walang problema. Tawagin mo ako kapag kailangan mo ng tulong.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Anytime, friend. Take care of yourself.",
+                            },
+                            ["TL"] = {
+                                "Kahit kailan, kaibigan. Alagaan mo ang sarili mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Glad we caught up. Catch you in a bit.",
+                            },
+                            ["TL"] = {
+                                "Mabuti at nagkausap tayo. Magkita tayo mamaya.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "No trouble at all. Good to have you around.",
+                            },
+                            ["TL"] = {
+                                "Walang problema talaga. Mabuti at nandito ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Sure thing. Watch yourself out there, alright?",
+                            },
+                            ["TL"] = {
+                                "Oo naman. Mag-ingat ka sa labas, ha?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Take care. We'll talk again soon.",
+                            },
+                            ["TL"] = {
+                                "Mag-iingat ka. Mag-usap tayo ulit mamaya.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Always. Glad to see you on your feet.",
+                            },
+                            ["TL"] = {
+                                "Palagi. Masaya akong maayos ang lagay mo.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "semantic.flow.greeting.opening.default.guarded",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.flow.greeting.opening.default.guarded",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[2]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["responseTemplateID"] = "semantic.flow.greeting.opening.default",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+                ["style"] = "guarded",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "guarded.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "State your business. Keep your distance.",
+                            },
+                            ["TL"] = {
+                                "Sabihin mo ang pakay mo. Lumayo ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hold it right there. What do you want?",
+                            },
+                            ["TL"] = {
+                                "Diyan ka lang. Anong gusto mo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hands where I can see them. Who are you?",
+                            },
+                            ["TL"] = {
+                                "Itaas ang mga kamay. Sino ka?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't come any closer until I know your business.",
+                            },
+                            ["TL"] = {
+                                "Huwag kang lalapit hangga't hindi ko alam ang pakay mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep your hands clear. Talk from there.",
+                            },
+                            ["TL"] = {
+                                "Ilayo mo ang mga kamay mo. Magsalita ka riyan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm watching you. What brings you here?",
+                            },
+                            ["TL"] = {
+                                "Binabantayan kita. Anong nagdala sa 'yo rito?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Easy now. Step back and speak your piece.",
+                            },
+                            ["TL"] = {
+                                "Dahan-dahan lang. Umatras ka at sabihin mo ang sasabihin mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep your distance. Times are too dangerous for strangers.",
+                            },
+                            ["TL"] = {
+                                "Lumayo ka. Masyadong mapanganib ang panahon para sa mga estranghero.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "That's close enough. What are you looking for?",
+                            },
+                            ["TL"] = {
+                                "Tama na ang lapit na 'yan. Anong hinahanap mo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Stay where you are. I don't know you yet.",
+                            },
+                            ["TL"] = {
+                                "Diyan ka lang. Hindi pa kita kilala.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "semantic.flow.greeting.opening.default.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.flow.greeting.opening.default.neutral",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[3]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["responseTemplateID"] = "semantic.flow.greeting.opening.default",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey there. Good to see you.",
+                            },
+                            ["TL"] = {
+                                "Uy, mabuti at nakita kita.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hello there. How are things?",
+                            },
+                            ["TL"] = {
+                                "Kumusta. Kumusta ang lagay?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good to see you.",
+                            },
+                            ["TL"] = {
+                                "Mabuti at nakita kita.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Morning. Hope the day treats you well.",
+                            },
+                            ["TL"] = {
+                                "Magandang umaga. Sana maayos ang araw mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey again. What's going on?",
+                            },
+                            ["TL"] = {
+                                "Uy ulit. Anong nangyayari?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "There you are. Everything quiet?",
+                            },
+                            ["TL"] = {
+                                "Nandiyan ka pala. Tahimik ba ang lahat?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Afternoon. Staying out of trouble?",
+                            },
+                            ["TL"] = {
+                                "Magandang hapon. Ligtas ka ba sa gulo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hello. Good to run into another living person.",
+                            },
+                            ["TL"] = {
+                                "Kumusta. Mabuti at may nakasalubong akong buhay pa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey. How's the perimeter looking?",
+                            },
+                            ["TL"] = {
+                                "Uy. Kumusta ang paligid?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Evening. Still on your feet, I see.",
+                            },
+                            ["TL"] = {
+                                "Magandang gabi. Nakatayo ka pa rin pala.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "semantic.flow.greeting.opening.default.terse",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.flow.greeting.opening.default.terse",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[4]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["responseTemplateID"] = "semantic.flow.greeting.opening.default",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+                ["style"] = "terse",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "terse.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hello.",
+                            },
+                            ["TL"] = {
+                                "Kumusta.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hi.",
+                            },
+                            ["TL"] = {
+                                "Hi.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey.",
+                            },
+                            ["TL"] = {
+                                "Uy.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Morning.",
+                            },
+                            ["TL"] = {
+                                "Magandang umaga.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "There you are.",
+                            },
+                            ["TL"] = {
+                                "Nandiyan ka pala.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Still here.",
+                            },
+                            ["TL"] = {
+                                "Nandito pa rin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Afternoon.",
+                            },
+                            ["TL"] = {
+                                "Magandang hapon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Quiet day.",
+                            },
+                            ["TL"] = {
+                                "Tahimik na araw.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "You good?",
+                            },
+                            ["TL"] = {
+                                "Maayos ka ba?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Evening.",
+                            },
+                            ["TL"] = {
+                                "Magandang gabi.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "semantic.flow.greeting.opening.default.warm",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.flow.greeting.opening.default.warm",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[5]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["responseTemplateID"] = "semantic.flow.greeting.opening.default",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+                ["style"] = "warm",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "warm.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey! It is good to see you.",
+                            },
+                            ["TL"] = {
+                                "Uy! Mabuti at nakita kita.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey, good to see you in one piece.",
+                            },
+                            ["TL"] = {
+                                "Uy, mabuti at buo ka pa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Glad to see you. How are you holding up?",
+                            },
+                            ["TL"] = {
+                                "Masaya akong nakita kita. Kumusta ang lagay mo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey. Really glad you made it back safe.",
+                            },
+                            ["TL"] = {
+                                "Uy. Masaya talaga akong nakabalik ka nang ligtas.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back already? Good to have you around.",
+                            },
+                            ["TL"] = {
+                                "Bumalik ka na agad? Mabuti at nandito ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "It's always a relief seeing you walk through.",
+                            },
+                            ["TL"] = {
+                                "Laging nakakagaan ng loob makita kang dumarating.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good to see you on your feet today.",
+                            },
+                            ["TL"] = {
+                                "Mabuti at nakatayo ka pa rin ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey there! How's your day been treating you?",
+                            },
+                            ["TL"] = {
+                                "Uy! Kumusta ang araw mo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Always good seeing a friendly face out here.",
+                            },
+                            ["TL"] = {
+                                "Laging magandang makakita ng pamilyar na mukha rito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Welcome back. Hope things were quiet out there.",
+                            },
+                            ["TL"] = {
+                                "Maligayang pagbabalik. Sana tahimik lang sa labas.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "semantic.flow.greeting.opening.friendly.guarded",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.flow.greeting.opening.friendly.guarded",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[6]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["responseTemplateID"] = "semantic.flow.greeting.opening.friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+                ["style"] = "guarded",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "guarded.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey. Everything holding together?",
+                            },
+                            ["TL"] = {
+                                "Uy. Maayos pa ba ang lahat?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good timing. We could use your help.",
+                            },
+                            ["TL"] = {
+                                "Tamang-tama ang dating mo. Kailangan namin ng tulong mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey again. Everything quiet around here?",
+                            },
+                            ["TL"] = {
+                                "Uy ulit. Tahimik ba ang paligid dito?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back again? Keep your weapon close.",
+                            },
+                            ["TL"] = {
+                                "Bumalik ka? Ilapit mo ang armas mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey. You notice anything strange out there?",
+                            },
+                            ["TL"] = {
+                                "Uy. May napansin ka bang kakaiba sa labas?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good to see you. Stay watchful though.",
+                            },
+                            ["TL"] = {
+                                "Mabuti at nakita kita. Magmatyag ka pa rin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "You made it back. Keep low and stay alert.",
+                            },
+                            ["TL"] = {
+                                "Nakabalik ka. Yumuko ka at maging alerto.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Glad you're safe. We've got to watch the treeline.",
+                            },
+                            ["TL"] = {
+                                "Mabuti at ligtas ka. Kailangan nating bantayan ang kagubatan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey. Hope nobody followed you in.",
+                            },
+                            ["TL"] = {
+                                "Uy. Sana walang sumunod sa 'yo papasok.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "There you are. Let's keep our eyes sharp.",
+                            },
+                            ["TL"] = {
+                                "Nandiyan ka pala. Maging matalas ang mga mata natin.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "semantic.flow.greeting.opening.friendly.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.flow.greeting.opening.friendly.neutral",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[7]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["responseTemplateID"] = "semantic.flow.greeting.opening.friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good to see you.",
+                            },
+                            ["TL"] = {
+                                "Mabuti at nakita kita.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I was hoping we'd cross paths today.",
+                            },
+                            ["TL"] = {
+                                "Inaasahan kong magkikita tayo ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good to see you. How's the camp holding?",
+                            },
+                            ["TL"] = {
+                                "Mabuti at nakita kita. Kumusta ang kampo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "There you are. Ready for another day?",
+                            },
+                            ["TL"] = {
+                                "Nandiyan ka pala. Handa na ba para sa isa pang araw?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back again. How's the scavenging going?",
+                            },
+                            ["TL"] = {
+                                "Bumalik ka ulit. Kumusta ang paghahanap?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good to see you again. Need a hand with anything?",
+                            },
+                            ["TL"] = {
+                                "Mabuti at nakita kita ulit. Kailangan mo ba ng tulong?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey there. Glad we ran into each other.",
+                            },
+                            ["TL"] = {
+                                "Kumusta. Masaya akong nagkasalubong tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Morning! How are things on your end?",
+                            },
+                            ["TL"] = {
+                                "Magandang umaga! Kumusta ang lagay sa parte mo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey! What's the plan for today?",
+                            },
+                            ["TL"] = {
+                                "Uy! Anong plano para sa araw na ito?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good to catch up. How are you doing?",
+                            },
+                            ["TL"] = {
+                                "Mabuti at nagkausap tayo. Kumusta ka?",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "semantic.flow.greeting.opening.friendly.terse",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.flow.greeting.opening.friendly.terse",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[8]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["responseTemplateID"] = "semantic.flow.greeting.opening.friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+                ["style"] = "terse",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "terse.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back again? You holding up?",
+                            },
+                            ["TL"] = {
+                                "Bumalik ka? Ayos ka pa ba?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good to see you again.",
+                            },
+                            ["TL"] = {
+                                "Mabuti at nakita kita ulit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey. How have you been?",
+                            },
+                            ["TL"] = {
+                                "Uy. Kumusta ka na?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Didn't expect to see you so soon.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko inasahang makikita kita agad.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey again. How's it going?",
+                            },
+                            ["TL"] = {
+                                "Uy ulit. Kumusta?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "There you are again.",
+                            },
+                            ["TL"] = {
+                                "Nandiyan ka na naman.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Holding steady?",
+                            },
+                            ["TL"] = {
+                                "Matatag pa ba?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good. You're here.",
+                            },
+                            ["TL"] = {
+                                "Mabuti. Nandito ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "All clear?",
+                            },
+                            ["TL"] = {
+                                "Ligtas ba?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey. Need something?",
+                            },
+                            ["TL"] = {
+                                "Uy. May kailangan ka?",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "semantic.flow.greeting.opening.friendly.warm",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.flow.greeting.opening.friendly.warm",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[9]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["responseTemplateID"] = "semantic.flow.greeting.opening.friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+                ["style"] = "warm",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "warm.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "There you are! Good to see you.",
+                            },
+                            ["TL"] = {
+                                "Nandiyan ka pala! Mabuti at nakita kita.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I was hoping I'd run into you today.",
+                            },
+                            ["TL"] = {
+                                "Umasa akong makakasalubong kita ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back so soon? Glad you're safe.",
+                            },
+                            ["TL"] = {
+                                "Bumalik ka agad? Mabuti at ligtas ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I was hoping you'd come back in one piece.",
+                            },
+                            ["TL"] = {
+                                "Umasa akong babalik ka nang buo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "There you are. You doing alright today?",
+                            },
+                            ["TL"] = {
+                                "Nandiyan ka pala. Maayos ka ba ngayon?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good to see you. Pull up a chair.",
+                            },
+                            ["TL"] = {
+                                "Mabuti at nakita kita. Umupo ka muna.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Always makes my day better seeing you back safe.",
+                            },
+                            ["TL"] = {
+                                "Palaging gumaganda ang araw ko kapag nakikita kitang ligtas.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey there! Really glad you're around today.",
+                            },
+                            ["TL"] = {
+                                "Uy! Masaya talaga akong nandito ka ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "It's good to see your face. How're you feeling?",
+                            },
+                            ["TL"] = {
+                                "Mabuting makita ang mukha mo. Kumusta ang pakiramdam mo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Welcome back, my friend. Good to see you.",
+                            },
+                            ["TL"] = {
+                                "Maligayang pagbabalik, kaibigan. Mabuti at nakita kita.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "semantic.flow.greeting.opening.question.default.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.flow.greeting.opening.question.default.neutral",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[10]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["responseTemplateID"] = "semantic.flow.greeting.opening.question.default",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "How have you been?",
+                            },
+                            ["TL"] = {
+                                "Kumusta ka na?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "How are you holding up?",
+                            },
+                            ["TL"] = {
+                                "Paano mo nakakayanan ang sitwasyon?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Everything all right with you?",
+                            },
+                            ["TL"] = {
+                                "Maayos ba ang lahat sa iyo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "How's your day going so far?",
+                            },
+                            ["TL"] = {
+                                "Kumusta ang araw mo hanggang ngayon?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Staying safe out there?",
+                            },
+                            ["TL"] = {
+                                "Ligtas ka ba sa labas?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "How are things treating you today?",
+                            },
+                            ["TL"] = {
+                                "Kumusta ang takbo ng mga bagay ngayon?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Feeling alright today?",
+                            },
+                            ["TL"] = {
+                                "Maayos ba ang pakiramdam mo ngayon?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Any trouble on the road?",
+                            },
+                            ["TL"] = {
+                                "May gulo ba sa daan?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "How are you managing out here?",
+                            },
+                            ["TL"] = {
+                                "Paano ka nakakaraos dito sa labas?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Everything quiet on your end?",
+                            },
+                            ["TL"] = {
+                                "Tahimik ba ang lahat sa parte mo?",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "semantic.flow.greeting.opening.question.friendly.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.flow.greeting.opening.question.friendly.neutral",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[11]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["responseTemplateID"] = "semantic.flow.greeting.opening.question.friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "How have you been holding up lately?",
+                            },
+                            ["TL"] = {
+                                "Kumusta ka naman nitong mga nakaraang araw?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "How's the camp holding together?",
+                            },
+                            ["TL"] = {
+                                "Kumusta ang lagay ng kampo natin?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Need anything while we're talking?",
+                            },
+                            ["TL"] = {
+                                "May kailangan ka ba habang nag-uusap tayo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "How's your supply situation looking?",
+                            },
+                            ["TL"] = {
+                                "Kumusta ang lagay ng mga gamit mo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Getting enough rest between runs?",
+                            },
+                            ["TL"] = {
+                                "Nakakapagpahinga ka ba nang maayos?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "How are you feeling about things around here?",
+                            },
+                            ["TL"] = {
+                                "Anong nararamdaman mo tungkol sa mga nangyayari rito?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "You managing to stay warm and dry?",
+                            },
+                            ["TL"] = {
+                                "Napananatili mo bang tuyo at maayos ang sarili mo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "How are the others treating you?",
+                            },
+                            ["TL"] = {
+                                "Kumusta ang pakikitungo ng iba sa iyo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Everything staying solid with you?",
+                            },
+                            ["TL"] = {
+                                "Maayos at matatag pa ba ang lahat sa iyo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good to see you. How have things been going?",
+                            },
+                            ["TL"] = {
+                                "Mabuti at nakita kita. Kumusta ang mga lakad mo?",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["id"] = "semantic.flow.greeting.opening.rain.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.flow.greeting.opening.rain.neutral",
+            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[12]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/ConversationGreeting/Catalog",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:conversation_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
+                ["responseTemplateID"] = "semantic.flow.greeting.opening.rain",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey there. Wet one today.",
+                            },
+                            ["TL"] = {
+                                "Uy, maulan ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Rain's not letting up anytime soon.",
+                            },
+                            ["TL"] = {
+                                "Mukhang hindi titigil ang ulan agad.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep dry if you can out there.",
+                            },
+                            ["TL"] = {
+                                "Magpatuyo ka kung kaya mo sa labas.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Miserable weather, but we're still kicking.",
+                            },
+                            ["TL"] = {
+                                "Masamang panahon, pero buhay pa rin tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Ground's completely soaked out there.",
+                            },
+                            ["TL"] = {
+                                "Babad na babad ang lupa sa labas.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Cold rain like this makes everything harder.",
+                            },
+                            ["TL"] = {
+                                "Ang malamig na ulan na ito ang nagpapahirap sa lahat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Watch your footing in this mud.",
+                            },
+                            ["TL"] = {
+                                "Mag-ingat sa paghakbang sa putikan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Rain makes it hard to hear them coming. Stay alert.",
+                            },
+                            ["TL"] = {
+                                "Mahirap silang marinig dahil sa ulan. Maging alerto ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good day to stay under a solid roof if you've got one.",
+                            },
+                            ["TL"] = {
+                                "Magandang araw para sumilong sa maayos na bubong.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "At least the rain washes away the tracks. Stay dry.",
+                            },
+                            ["TL"] = {
+                                "Kahit papaano nabubura ng ulan ang mga bakas. Manatiling tuyo.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

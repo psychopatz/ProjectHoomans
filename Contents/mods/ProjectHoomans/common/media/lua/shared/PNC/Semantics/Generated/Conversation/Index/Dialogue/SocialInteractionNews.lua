@@ -3,7 +3,7 @@ return {
     ["semantic.interaction.news.acknowledge.guarded"] = {
         ["domain"] = "social_interaction_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_news_acknowledge_guarded",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionNews/Catalog",
         },
         ["id"] = "semantic.interaction.news.acknowledge.guarded",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.interaction.news.acknowledge.neutral"] = {
         ["domain"] = "social_interaction_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_news_acknowledge_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionNews/Catalog",
         },
         ["id"] = "semantic.interaction.news.acknowledge.neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.interaction.news.acknowledge.terse"] = {
         ["domain"] = "social_interaction_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_news_acknowledge_terse",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionNews/Catalog",
         },
         ["id"] = "semantic.interaction.news.acknowledge.terse",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.interaction.news.acknowledge.warm"] = {
         ["domain"] = "social_interaction_news",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_news_acknowledge_warm",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionNews/Catalog",
         },
         ["id"] = "semantic.interaction.news.acknowledge.warm",
         ["kind"] = "dialogue",

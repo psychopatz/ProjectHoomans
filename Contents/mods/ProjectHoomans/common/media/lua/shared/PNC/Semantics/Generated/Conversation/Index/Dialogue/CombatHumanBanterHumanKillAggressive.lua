@@ -3,7 +3,7 @@ return {
     ["semantic.combat.human_kill.aggressive.line_01"] = {
         ["domain"] = "combat_human_banter_human_kill_aggressive",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_human_kill_aggressive_line_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatHumanBanterHumanKillAggressive/Catalog",
         },
         ["id"] = "semantic.combat.human_kill.aggressive.line_01",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.combat.human_kill.aggressive.line_02"] = {
         ["domain"] = "combat_human_banter_human_kill_aggressive",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_human_kill_aggressive_line_02",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatHumanBanterHumanKillAggressive/Catalog",
         },
         ["id"] = "semantic.combat.human_kill.aggressive.line_02",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.combat.human_kill.aggressive.line_03"] = {
         ["domain"] = "combat_human_banter_human_kill_aggressive",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_human_kill_aggressive_line_03",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatHumanBanterHumanKillAggressive/Catalog",
         },
         ["id"] = "semantic.combat.human_kill.aggressive.line_03",
         ["kind"] = "dialogue",

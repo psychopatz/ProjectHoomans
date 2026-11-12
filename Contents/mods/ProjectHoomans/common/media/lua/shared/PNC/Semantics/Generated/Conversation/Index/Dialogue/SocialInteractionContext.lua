@@ -3,7 +3,7 @@ return {
     ["semantic.interaction.context.clarify.neutral"] = {
         ["domain"] = "social_interaction_context",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_context_clarify_neutral",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/SocialInteractionContext/Catalog",
         },
         ["id"] = "semantic.interaction.context.clarify.neutral",
         ["kind"] = "dialogue",

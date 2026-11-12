@@ -3,7 +3,7 @@ return {
     ["semantic.combat.kill.killer.cold.blade_head_01"] = {
         ["domain"] = "combat_banter_weapon_kill_cold",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_kill_killer_cold_blade_head_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatBanterWeaponKillCold/Catalog",
         },
         ["id"] = "semantic.combat.kill.killer.cold.blade_head_01",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.combat.kill.killer.cold.firearm_high_01"] = {
         ["domain"] = "combat_banter_weapon_kill_cold",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_kill_killer_cold_firearm_high_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatBanterWeaponKillCold/Catalog",
         },
         ["id"] = "semantic.combat.kill.killer.cold.firearm_high_01",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.combat.kill.killer.cold.heavy_melee_01"] = {
         ["domain"] = "combat_banter_weapon_kill_cold",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_kill_killer_cold_heavy_melee_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatBanterWeaponKillCold/Catalog",
         },
         ["id"] = "semantic.combat.kill.killer.cold.heavy_melee_01",
         ["kind"] = "dialogue",

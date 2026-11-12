@@ -3,7 +3,7 @@ return {
     ["semantic.combat.kill.killer.supportive.firearm_01"] = {
         ["domain"] = "combat_banter_weapon_kill_supportive",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_kill_killer_supportive_firearm_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatBanterWeaponKillSupportive/Catalog",
         },
         ["id"] = "semantic.combat.kill.killer.supportive.firearm_01",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.combat.kill.killer.supportive.melee_01"] = {
         ["domain"] = "combat_banter_weapon_kill_supportive",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_kill_killer_supportive_melee_01",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/CombatBanterWeaponKillSupportive/Catalog",
         },
         ["id"] = "semantic.combat.kill.killer.supportive.melee_01",
         ["kind"] = "dialogue",

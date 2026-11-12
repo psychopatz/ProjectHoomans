@@ -3,7 +3,7 @@ return {
     ["semantic.leader_loss.close"] = {
         ["domain"] = "event_reactions_leader_loss",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_leader_loss_close",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsLeaderLoss/Catalog",
         },
         ["id"] = "semantic.leader_loss.close",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.leader_loss.colonist"] = {
         ["domain"] = "event_reactions_leader_loss",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_leader_loss_colonist",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsLeaderLoss/Catalog",
         },
         ["id"] = "semantic.leader_loss.colonist",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.leader_loss.default"] = {
         ["domain"] = "event_reactions_leader_loss",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_leader_loss_default",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsLeaderLoss/Catalog",
         },
         ["id"] = "semantic.leader_loss.default",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.leader_loss.devoted"] = {
         ["domain"] = "event_reactions_leader_loss",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_leader_loss_devoted",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsLeaderLoss/Catalog",
         },
         ["id"] = "semantic.leader_loss.devoted",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.leader_loss.dissent"] = {
         ["domain"] = "event_reactions_leader_loss",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_leader_loss_dissent",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsLeaderLoss/Catalog",
         },
         ["id"] = "semantic.leader_loss.dissent",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.leader_loss.distant"] = {
         ["domain"] = "event_reactions_leader_loss",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_leader_loss_distant",
+            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/EventReactionsLeaderLoss/Catalog",
         },
         ["id"] = "semantic.leader_loss.distant",
         ["kind"] = "dialogue",

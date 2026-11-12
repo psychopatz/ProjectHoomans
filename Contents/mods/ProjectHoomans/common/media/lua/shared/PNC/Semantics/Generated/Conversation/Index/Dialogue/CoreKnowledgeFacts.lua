@@ -3,7 +3,7 @@ return {
     ["semantic.question.knowledge.known.guarded"] = {
         ["domain"] = "core_knowledge_facts",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_known_guarded",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeFacts/Catalog",
         },
         ["id"] = "semantic.question.knowledge.known.guarded",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["semantic.question.knowledge.known.neutral"] = {
         ["domain"] = "core_knowledge_facts",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_known_neutral",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeFacts/Catalog",
         },
         ["id"] = "semantic.question.knowledge.known.neutral",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["semantic.question.knowledge.known.terse"] = {
         ["domain"] = "core_knowledge_facts",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_known_terse",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeFacts/Catalog",
         },
         ["id"] = "semantic.question.knowledge.known.terse",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["semantic.question.knowledge.known.warm"] = {
         ["domain"] = "core_knowledge_facts",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_known_warm",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeFacts/Catalog",
         },
         ["id"] = "semantic.question.knowledge.known.warm",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["semantic.question.knowledge.unknown.guarded"] = {
         ["domain"] = "core_knowledge_facts",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_unknown_guarded",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeFacts/Catalog",
         },
         ["id"] = "semantic.question.knowledge.unknown.guarded",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["semantic.question.knowledge.unknown.neutral"] = {
         ["domain"] = "core_knowledge_facts",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_unknown_neutral",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeFacts/Catalog",
         },
         ["id"] = "semantic.question.knowledge.unknown.neutral",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["semantic.question.knowledge.unknown.terse"] = {
         ["domain"] = "core_knowledge_facts",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_unknown_terse",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeFacts/Catalog",
         },
         ["id"] = "semantic.question.knowledge.unknown.terse",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["semantic.question.knowledge.unknown.warm"] = {
         ["domain"] = "core_knowledge_facts",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_unknown_warm",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/CoreKnowledgeFacts/Catalog",
         },
         ["id"] = "semantic.question.knowledge.unknown.warm",
         ["kind"] = "dialogue",
