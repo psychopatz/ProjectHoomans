@@ -115,6 +115,23 @@ T.equal(migratedWellbeing.nodes.opening.choices[1].outcomes[1].responseKey,
     "response.condition",
     "PSDL wellbeing preserves response routing")
 
+local migratedGreeting = Registry.GetBlock(
+    "projecthoomans:greeting_firstmeet_dawn"
+)
+T.equal(#migratedGreeting.nodes.opening.textKeys, 5,
+    "PSDL greeting preserves all randomized variants")
+T.equal(migratedGreeting.nodes.opening.portraitAnimation, "greeting.wavehi",
+    "PSDL greeting preserves portrait realization")
+T.equal(migratedGreeting.gates[1].type, "pnc:time",
+    "PSDL greeting preserves time gate")
+T.equal(migratedGreeting.gates[2].type, "pnc:relationship_state",
+    "PSDL greeting preserves relationship gate")
+local migratedParley = Registry.GetBlock("projecthoomans:hostile_parley")
+T.truthy(migratedParley.nodes.opening.choices[1].outcomes[1].close,
+    "PSDL parley preserves ceasefire close behavior")
+T.equal(migratedParley.nodes.opening.choices[1].outcomes[1].next, nil,
+    "PSDL parley does not navigate after close")
+
 local legacyWhatsUpID = "projecthoomans:" .. "whats_up"
 local legacyWhatsUpPrefix = legacyWhatsUpID .. "_"
 T.equal(Registry.GetCategory(legacyWhatsUpID), nil,

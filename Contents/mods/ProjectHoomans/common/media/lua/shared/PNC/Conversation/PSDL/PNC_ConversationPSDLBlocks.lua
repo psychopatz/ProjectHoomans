@@ -46,32 +46,100 @@ end
 local function relationshipGate(node)
     if type(node) ~= "table" then return nil end
     local path = tostring(node.path or node.field or "")
-    if string.sub(path, 1, #RELATIONSHIP_PREFIX) ~= RELATIONSHIP_PREFIX then
+    local operator = OPERATOR[tostring(node.op or "eq")]
+    if string.sub(path, 1, #RELATIONSHIP_PREFIX) == RELATIONSHIP_PREFIX then
+        local axis = string.sub(path, #RELATIONSHIP_PREFIX + 1)
+        if axis == "state" then
+            if operator ~= "==" or node.value == nil then return nil end
+            return {
+                type = "pnc:relationship_state",
+                value = node.value,
+            }
+        end
+        if axis == "" or not operator or node.value == nil then return nil end
+        return {
+            type = "pnc:relationship",
+            axis = axis,
+            operator = operator,
+            value = node.value,
+        }
+    end
+    return nil
+end
+
+local function timeGate(predicate)
+    local startHour
+    local endHour
+    local function visit(node)
+        if type(node) ~= "table" then return false end
+        if type(node.all) == "table" then
+            for _, child in ipairs(node.all) do
+                if not visit(child) then return false end
+            end
+            return true
+        end
+        if type(node.any) == "table" then
+            if #node.any ~= 2 then return false end
+            for _, child in ipairs(node.any) do
+                if type(child) ~= "table" then return false end
+                local path = tostring(child.path or child.field or "")
+                if path ~= "world.time.hour" then return false end
+                local op = tostring(child.op or "eq")
+                if op == "gte" or op == "gt" then
+                    startHour = child.value
+                elseif op == "lt" or op == "lte" then
+                    endHour = child.value
+                else
+                    return false
+                end
+            end
+            return true
+        end
+        local path = tostring(node.path or node.field or "")
+        if path ~= "world.time.hour" then return true end
+        local op = tostring(node.op or "eq")
+        if op == "gte" or op == "gt" then
+            startHour = node.value
+        elseif op == "lt" or op == "lte" then
+            endHour = node.value
+        else
+            return false
+        end
+        return true
+    end
+    if not visit(predicate) or startHour == nil or endHour == nil then
         return nil
     end
-    local axis = string.sub(path, #RELATIONSHIP_PREFIX + 1)
-    local operator = OPERATOR[tostring(node.op or "eq")]
-    if axis == "" or not operator or node.value == nil then return nil end
     return {
-        type = "pnc:relationship",
-        axis = axis,
-        operator = operator,
-        value = node.value,
+        type = "pnc:time",
+        startHour = startHour,
+        endHour = endHour,
     }
 end
 
 local function gatesForPredicate(predicate)
     if type(predicate) ~= "table" then return {} end
+    local output = {}
+    local clock = timeGate(predicate)
+    if clock then output[#output + 1] = clock end
+    local function append(node)
+        if type(node) ~= "table" then return end
+        if type(node.all) == "table" then
+            for _, child in ipairs(node.all) do append(child) end
+            return
+        end
+        if type(node.any) == "table" then return end
+        local gate = relationshipGate(node)
+        if gate then output[#output + 1] = gate end
+    end
     if type(predicate.all) == "table" then
-        local output = {}
         for _, child in ipairs(predicate.all) do
-            local gate = relationshipGate(child)
-            if gate then output[#output + 1] = gate end
+            append(child)
         end
         return output
     end
-    local gate = relationshipGate(predicate)
-    return gate and { gate } or {}
+    append(predicate)
+    return output
 end
 
 local function addChoice(node, offer)
@@ -83,16 +151,19 @@ local function addChoice(node, offer)
     local responseKey = tostring(
         offerMetadata.responseKey or "offer." .. tostring(offer.id) .. ".response"
     )
+    local close = offerMetadata.close == true
     local outcome = {
         id = "reply",
         weight = 1,
         responseKey = responseKey,
-        next = offerMetadata.next or "$root",
-        close = offerMetadata.close == true,
+        close = close,
         effects = type(offerMetadata.effects) == "table"
             and offerMetadata.effects or {},
         gates = gatesForPredicate(offer.when),
     }
+    if not close or offerMetadata.next then
+        outcome.next = offerMetadata.next or "$root"
+    end
     local choice = {
         id = tostring(offer.id),
         textKey = choiceKey,
@@ -109,9 +180,15 @@ local function registerPlan(plan)
         and plan.payload.response or nil
     local turns = response and response.turns or nil
     local turn = type(turns) == "table" and turns[1] or nil
+    local variants = response and response.variants or nil
     local turnMetadata = type(turn) == "table"
         and type(turn.metadata) == "table" and turn.metadata or {}
-    if type(turn) ~= "table" or type(turn.text) ~= "table" then return false end
+    if type(turn) ~= "table" and type(variants) ~= "table" then return false end
+    if type(turn) == "table" and type(turn.text) ~= "table"
+        and type(variants) ~= "table"
+    then
+        return false
+    end
     local blockID = tostring(values.runtimeBlockID or "")
     local category = tostring(values.category or "")
     local audience = tostring(values.audience or "")
@@ -120,11 +197,31 @@ local function registerPlan(plan)
         return false
     end
     local node = {
-        textKey = tostring(turnMetadata.textKey or "turn." .. tostring(turn.id)),
         choices = {},
     }
-    for _, offer in ipairs(turn.offers or {}) do
-        if type(offer) == "table" and offer.id then addChoice(node, offer) end
+    if type(response.variants) == "table" then
+        node.textKeys = {}
+        for _, variant in ipairs(response.variants) do
+            if type(variant) == "table" and variant.id then
+                local variantMetadata = type(variant.metadata) == "table"
+                    and variant.metadata or {}
+                node.textKeys[#node.textKeys + 1] = tostring(
+                    variantMetadata.textKey or variant.id
+                )
+            end
+        end
+    else
+        node.textKey = tostring(turnMetadata.textKey or "turn." .. tostring(turn.id))
+    end
+    if turnMetadata.portraitAnimation then
+        node.portraitAnimation = tostring(turnMetadata.portraitAnimation)
+    elseif values.portraitAnimation then
+        node.portraitAnimation = tostring(values.portraitAnimation)
+    end
+    if type(turn) == "table" then
+        for _, offer in ipairs(turn.offers or {}) do
+            if type(offer) == "table" and offer.id then addChoice(node, offer) end
+        end
     end
     local definition = {
         schemaVersion = 1,
@@ -135,6 +232,7 @@ local function registerPlan(plan)
         weight = tonumber(values.weight) or 100,
         textSource = source,
         entryNode = "opening",
+        gates = gatesForPredicate(plan.when),
         nodes = { opening = node },
     }
     local ok = Registry.RegisterBlock(blockID, definition)
@@ -142,6 +240,27 @@ local function registerPlan(plan)
 end
 
 local IDS = {
+    "social.greetings.acquaintance.dawn",
+    "social.greetings.acquaintance.dusk",
+    "social.greetings.acquaintance.sunrise",
+    "social.greetings.acquaintance.sunset",
+    "social.greetings.acquaintance.twilight",
+    "social.greetings.firstmeet.dawn",
+    "social.greetings.firstmeet.dusk",
+    "social.greetings.firstmeet.sunrise",
+    "social.greetings.firstmeet.sunset",
+    "social.greetings.firstmeet.twilight",
+    "social.greetings.hostile.parley",
+    "social.greetings.lover.dawn",
+    "social.greetings.lover.dusk",
+    "social.greetings.lover.sunrise",
+    "social.greetings.lover.sunset",
+    "social.greetings.lover.twilight",
+    "social.greetings.member.dawn",
+    "social.greetings.member.dusk",
+    "social.greetings.member.sunrise",
+    "social.greetings.member.sunset",
+    "social.greetings.member.twilight",
     "social.wellbeing.neutral",
     "social.wellbeing.member",
     "social.wellbeing.special",

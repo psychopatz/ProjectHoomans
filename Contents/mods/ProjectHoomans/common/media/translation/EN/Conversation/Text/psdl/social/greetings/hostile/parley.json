@@ -1,5 +1,6 @@
 {
   "choice.ceasefire": "Ceasefire. Stand down for now.",
+  "offer.ceasefire.utterance": "Ceasefire. Stand down for now.",
   "opening": "The survivor watches you carefully, ready to fight.",
   "response.ceasefire": "You ask for a short ceasefire.",
   "result.accepted": "Ceasefire accepted for one hour.",

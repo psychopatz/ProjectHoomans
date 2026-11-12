@@ -3,7 +3,6 @@
 -- existing authorities until their own parity/caller-zero migration gate.
 
 require "PNC/Conversation/PSDL/PNC_ConversationPSDLBlocks"
-require "PNC/Conversation/Definitions/20_PNC_ConversationGreetings"
 require "PNC/Conversation/Definitions/21_PNC_ConversationSettlementAdmission"
 require "PNC/Conversation/Definitions/60_PNC_ConversationAskAbout"
 require "PNC/Conversation/Definitions/70_PNC_ConversationNeeds"
