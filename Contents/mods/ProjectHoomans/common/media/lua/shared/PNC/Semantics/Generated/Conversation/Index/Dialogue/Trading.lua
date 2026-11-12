@@ -3,11 +3,20 @@ return {
     ["trade.conversation.suggestions"] = {
         ["domain"] = "trading",
         ["generated"] = {
-            "DTCommon/Semantics/Generated/Conversation/Packs/Psdl/Dialogue/Trading",
-            "DTCommon/Semantics/Generated/Conversation/UI/Psdl/Dialogue/Trading",
+            "DTCommon/Semantics/Generated/Conversation/PSDL/Dialogue/trade_conversation_suggestions",
         },
         ["id"] = "trade.conversation.suggestions",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "action.trade",
+            "pack.DT.trader_story",
+            "question.destination",
+            "question.origin",
+            "question.rumors",
+            "question.settlement",
+            "question.story",
+            "question.trader",
+        },
         ["source"] = "psdl/dialogue/trading.json",
     },
 }

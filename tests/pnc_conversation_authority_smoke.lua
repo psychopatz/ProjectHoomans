@@ -111,7 +111,7 @@ T.load("PsychopatzCore", "common",
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRules.lua")
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationSelector.lua")
 T.load(SHARED .. "PNC/Conversation/Memory/PNC_ConversationMemory.lua")
-T.load(COMMON .. "PNC/Conversation/Definitions/00_PNC_ConversationDefinitions.lua")
+T.load(COMMON .. "PNC/Conversation/Composition/PNC_ConversationAdopterDefinitions.lua")
 T.load(SHARED .. "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua")
 T.load(SERVER .. "PNC/Conversation/PNC_ConversationHistory.lua")
 T.load(SERVER .. "PNC/Conversation/PNC_ConversationAuthority.lua")

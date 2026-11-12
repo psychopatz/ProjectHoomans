@@ -1,11 +1,10 @@
--- Reusable built-in definition manifest. Each conversation family owns its
--- registration module so it can evolve without growing a monolithic file.
-require "PNC/Conversation/Definitions/01_PNC_ConversationDefinitionHelpers"
-require "PNC/Conversation/Definitions/10_PNC_ConversationCategories"
+-- Shared adopter composition for the current PNC conversation surface.
+-- PSDL owns migrated social check-in blocks; remaining domains stay on their
+-- existing authorities until their own parity/caller-zero migration gate.
+
+require "PNC/Conversation/PSDL/PNC_ConversationPSDLBlocks"
 require "PNC/Conversation/Definitions/20_PNC_ConversationGreetings"
 require "PNC/Conversation/Definitions/21_PNC_ConversationSettlementAdmission"
-require "PNC/Conversation/Definitions/40_PNC_ConversationWellbeing"
-require "PNC/Conversation/Definitions/50_PNC_ConversationSmallTalk"
 require "PNC/Conversation/Definitions/60_PNC_ConversationAskAbout"
 require "PNC/Conversation/Definitions/70_PNC_ConversationNeeds"
 require "PNC/Conversation/Definitions/90_PNC_ConversationWorkOrders"

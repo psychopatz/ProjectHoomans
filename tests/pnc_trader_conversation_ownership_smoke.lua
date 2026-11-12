@@ -4,7 +4,7 @@ T.addPackagePaths()
 local definitions = T.read(
     "ProjectHoomans",
     "common_lua",
-    "PNC/Conversation/Definitions/00_PNC_ConversationDefinitions.lua"
+    "PNC/Conversation/Composition/PNC_ConversationAdopterDefinitions.lua"
 )
 local categories = T.read(
     "ProjectHoomans",

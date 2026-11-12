@@ -1,0 +1,9 @@
+{
+  "choice.condition": "How are you really doing?",
+  "choice.offer_help": "Let me help.",
+  "offer.condition.utterance": "How are you really doing?",
+  "offer.offer_help.utterance": "Let me help.",
+  "opening": "I'll be honest with you, {addressee.name}. Ask.",
+  "response.condition": "Better now that you're here.",
+  "response.offer_help": "All right. Just stay close for a minute."
+}

@@ -1,6 +1,9 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
     ["question.identity"] = {
+        ["dependents"] = {
+            "social.core_identity",
+        },
         ["domain"] = "core_identity",
         ["generated"] = {
             "PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreIdentity",
@@ -10,6 +13,9 @@ return {
         ["source"] = "psdl/dialogue/core_identity.json",
     },
     ["question.identity_faction"] = {
+        ["dependents"] = {
+            "social.core_identity",
+        },
         ["domain"] = "core_identity",
         ["generated"] = {
             "PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreIdentity",
@@ -22,6 +28,9 @@ return {
         ["source"] = "psdl/dialogue/core_identity.json",
     },
     ["question.identity_nickname"] = {
+        ["dependents"] = {
+            "social.core_identity",
+        },
         ["domain"] = "core_identity",
         ["generated"] = {
             "PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreIdentity",
@@ -34,6 +43,9 @@ return {
         ["source"] = "psdl/dialogue/core_identity.json",
     },
     ["question.identity_surname"] = {
+        ["dependents"] = {
+            "social.core_identity",
+        },
         ["domain"] = "core_identity",
         ["generated"] = {
             "PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreIdentity",

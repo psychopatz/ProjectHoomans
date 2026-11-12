@@ -257,7 +257,7 @@ local expectedConversationShared = {
     "PNC/Conversation/PNC_ConversationScene",
     "PNC/Conversation/PNC_ConversationLLMTools",
     "PNC/Conversation/Memory/PNC_ConversationMemory",
-    "PNC/Conversation/Definitions/00_PNC_ConversationDefinitions",
+    "PNC/Conversation/Composition/PNC_ConversationAdopterDefinitions",
 }
 for index = 1, #expectedConversationShared do
     T.equal(

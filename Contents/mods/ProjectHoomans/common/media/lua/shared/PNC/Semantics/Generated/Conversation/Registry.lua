@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/Semantics/Generated/Conversation/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "5f004786fcd0b36eb18372fe179c59b7278f85fc871f04543b395c05e097a2c6"
-Registry.WHOLE_MODEL_FINGERPRINT = "5a92511cd96bda0b99a558fd298db15593209ef405503841c50245507c74c58a"
+Registry.WHOLE_MODEL_FINGERPRINT = "a338722a5323b446a2195ea8c121b803443cab96414034acd8f225a51c0709ca"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -18,6 +18,7 @@ Registry.FLOWS = {}
 Registry.BEHAVIORS = {}
 Registry.BEATS = {}
 Registry.PACKS = {}
+Registry.PSDL_PLANS = {}
 Registry.UI = {}
 local function appendContent(loaded)
     if type(loaded) ~= "table" then return end
@@ -50,6 +51,14 @@ end
 local function appendPacks(loaded)
     if type(loaded) ~= "table" then return end
     for _, value in ipairs(loaded) do Registry.PACKS[#Registry.PACKS + 1] = value end
+end
+local function appendPSDL(loaded)
+    if type(loaded) ~= "table" then return end
+    for _, value in ipairs(loaded) do
+        if type(value) == "table" and value.id then
+            Registry.PSDL_PLANS[tostring(value.id)] = value
+        end
+    end
 end
 local function appendUI(loaded)
     if type(loaded) ~= "table" then return end
@@ -393,12 +402,30 @@ local loaded168 = require "PsychopatzCore/Semantics/Generated/Conversation/Reali
 local loaded169 = require "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups"
 local loaded170 = require "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ContextualReplies"
 local loaded171 = require "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/Lexemes"
-local loaded172 = require "PNC/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CompanionCheckIn"
-appendUI(loaded172)
-local loaded173 = require "PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreCheckIn"
-appendUI(loaded173)
-local loaded174 = require "PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreIdentity"
-appendUI(loaded174)
+local loaded172 = require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_companion_check_in"
+appendPSDL(loaded172)
+local loaded173 = require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/social_core_check_in"
+appendPSDL(loaded173)
+local loaded174 = require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/social_core_identity"
+appendPSDL(loaded174)
+local loaded175 = require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_small_talk_member"
+appendPSDL(loaded175)
+local loaded176 = require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_small_talk_neutral"
+appendPSDL(loaded176)
+local loaded177 = require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_small_talk_special"
+appendPSDL(loaded177)
+local loaded178 = require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_wellbeing_member"
+appendPSDL(loaded178)
+local loaded179 = require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_wellbeing_neutral"
+appendPSDL(loaded179)
+local loaded180 = require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_wellbeing_special"
+appendPSDL(loaded180)
+local loaded181 = require "PNC/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CompanionCheckIn"
+appendUI(loaded181)
+local loaded182 = require "PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreCheckIn"
+appendUI(loaded182)
+local loaded183 = require "PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreIdentity"
+appendUI(loaded183)
 for key, family in pairs(Registry.PHRASE_FAMILIES) do
     if type(family) == "table" and family.id then Registry.PHRASE_FAMILIES[key] = family end
 end
@@ -415,5 +442,8 @@ function Registry.FamilyFor(templateID, style)
 end
 function Registry.PlayerChoice(contentID)
     return Registry.PLAYER_CHOICES[tostring(contentID or "")]
+end
+function Registry.PSDLPlan(planID)
+    return Registry.PSDL_PLANS[tostring(planID or "")]
 end
 return Registry

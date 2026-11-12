@@ -1,0 +1,9 @@
+{
+  "choice.condition": "Kamusta ka na talaga?",
+  "choice.offer_help": "Hayaan mo akong tumulong.",
+  "offer.condition.utterance": "Kamusta ka na talaga?",
+  "offer.offer_help.utterance": "Hayaan mo akong tumulong.",
+  "opening": "Magiging tapat ako sa iyo, {addressee.name}. Magtanong.",
+  "response.condition": "Mas mabuti na ngayong nandito ka na.",
+  "response.offer_help": "Sige. Manatiling malapit sa isang minuto."
+}

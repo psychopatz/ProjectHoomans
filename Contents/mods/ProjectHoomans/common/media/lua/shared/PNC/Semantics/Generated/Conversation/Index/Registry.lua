@@ -133,6 +133,12 @@ return {
         ["recordCount"] = 1,
     },
     {
+        ["domain"] = "social_check_in",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialCheckIn",
+        ["recordCount"] = 6,
+    },
+    {
         ["domain"] = "trading",
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/Trading",

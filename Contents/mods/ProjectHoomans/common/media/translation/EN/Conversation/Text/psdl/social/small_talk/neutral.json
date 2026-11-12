@@ -1,0 +1,9 @@
+{
+  "choice.quiet_day": "Quiet day so far.",
+  "choice.weather": "Some weather we're having.",
+  "offer.quiet_day.utterance": "Quiet day so far.",
+  "offer.weather.utterance": "Some weather we're having.",
+  "opening": "All right. We can talk for a minute.",
+  "response.quiet_day": "Do not tempt fate, but I'll take it.",
+  "response.weather": "At least the rain covers our footsteps."
+}

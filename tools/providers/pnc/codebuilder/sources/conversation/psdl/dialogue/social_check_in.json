@@ -1,0 +1,311 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "social.wellbeing.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {"speaker": ["participant"], "addressee": ["participant"]},
+      "metadata": {
+        "runtimeBlockID": "projecthoomans:wellbeing_neutral",
+        "category": "projecthoomans:wellbeing",
+        "audience": "neutral",
+        "textTarget": "psdl/social/wellbeing/neutral",
+        "textDomain": "pnc.psdl.social.wellbeing.neutral"
+      },
+      "response": {
+        "act": "CHECK_IN",
+        "turns": [{
+          "id": "opening",
+          "metadata": {"textKey": "opening"},
+          "text": {
+            "EN": "I'm managing. What did you want to ask?",
+            "TL": "pinamamahalaan ko. Ano ang gusto mong itanong?"
+          },
+          "offers": [
+            {
+              "id": "condition",
+              "label": {"EN": "How are you holding up?", "TL": "Kamusta ka na?"},
+              "utterance": {"EN": "How are you holding up?", "TL": "Kamusta ka na?"},
+              "frame": {"intent": "QUESTION", "speechAct": "QUESTION", "subject": "WELLBEING", "topic": "wellbeing"},
+              "when": {"all": [
+                {"path": "relationship.speakerToAddressee.approval", "op": ">=", "value": 1},
+                {"path": "relationship.speakerToAddressee.familiarity", "op": ">=", "value": 1}
+              ]},
+              "metadata": {
+                "choiceKey": "choice.condition",
+                "responseKey": "response.condition",
+                "effects": [{"type": "pnc:relationship", "approval": 1, "familiarity": 1}],
+                "responseText": {"EN": "I'm still breathing. That's enough for now.", "TL": "humihinga pa ako. Tama na sa ngayon."}
+              }
+            },
+            {
+              "id": "offer_help",
+              "label": {"EN": "Do you need any help?", "TL": "Kailangan mo ba ng anumang tulong?"},
+              "utterance": {"EN": "Do you need any help?", "TL": "Kailangan mo ba ng anumang tulong?"},
+              "frame": {"intent": "QUESTION", "speechAct": "QUESTION", "subject": "HELP", "topic": "wellbeing"},
+              "when": {"all": [
+                {"path": "relationship.speakerToAddressee.approval", "op": ">=", "value": 2},
+                {"path": "relationship.speakerToAddressee.respect", "op": ">=", "value": 1}
+              ]},
+              "metadata": {
+                "choiceKey": "choice.offer_help",
+                "responseKey": "response.offer_help",
+                "effects": [{"type": "pnc:relationship", "approval": 2, "respect": 1}],
+                "responseText": {"EN": "I'll manage, but thanks for asking.", "TL": "Aayusin ko, pero salamat sa pagtatanong."}
+              }
+            }
+          ]
+        }]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "social.wellbeing.member",
+      "owner": "ProjectHoomans",
+      "participants": {"speaker": ["participant"], "addressee": ["participant"]},
+      "metadata": {
+        "runtimeBlockID": "projecthoomans:wellbeing_member",
+        "category": "projecthoomans:wellbeing",
+        "audience": "member",
+        "textTarget": "psdl/social/wellbeing/member",
+        "textDomain": "pnc.psdl.social.wellbeing.member"
+      },
+      "response": {
+        "act": "CHECK_IN",
+        "turns": [{
+          "id": "opening",
+          "metadata": {"textKey": "opening"},
+          "text": {"EN": "Still standing. Go ahead.", "TL": "Nakatayo pa rin. Sige na."},
+          "offers": [
+            {
+              "id": "condition",
+              "label": {"EN": "How are you holding up?", "TL": "Kamusta ka na?"},
+              "utterance": {"EN": "How are you holding up?", "TL": "Kamusta ka na?"},
+              "frame": {"intent": "QUESTION", "speechAct": "QUESTION", "subject": "WELLBEING", "topic": "wellbeing"},
+              "when": {"all": [
+                {"path": "relationship.speakerToAddressee.approval", "op": ">=", "value": 1},
+                {"path": "relationship.speakerToAddressee.familiarity", "op": ">=", "value": 1}
+              ]},
+              "metadata": {
+                "choiceKey": "choice.condition",
+                "responseKey": "response.condition",
+                "effects": [{"type": "pnc:relationship", "approval": 1, "familiarity": 1}],
+                "responseText": {"EN": "Tired, but ready if the group needs me.", "TL": "Tired, but ready if the grupo needs me."}
+              }
+            },
+            {
+              "id": "offer_help",
+              "label": {"EN": "Do you need any help?", "TL": "Kailangan mo ba ng anumang tulong?"},
+              "utterance": {"EN": "Do you need any help?", "TL": "Kailangan mo ba ng anumang tulong?"},
+              "frame": {"intent": "QUESTION", "speechAct": "QUESTION", "subject": "HELP", "topic": "wellbeing"},
+              "when": {"all": [
+                {"path": "relationship.speakerToAddressee.approval", "op": ">=", "value": 2},
+                {"path": "relationship.speakerToAddressee.respect", "op": ">=", "value": 1}
+              ]},
+              "metadata": {
+                "choiceKey": "choice.offer_help",
+                "responseKey": "response.offer_help",
+                "effects": [{"type": "pnc:relationship", "approval": 2, "respect": 1}],
+                "responseText": {"EN": "A little rest would help. I appreciate you asking.", "TL": "Makakatulong ang kaunting pahinga. Pinahahalagahan ko ang pagtatanong mo."}
+              }
+            }
+          ]
+        }]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "social.wellbeing.special",
+      "owner": "ProjectHoomans",
+      "participants": {"speaker": ["participant"], "addressee": ["participant"]},
+      "metadata": {
+        "runtimeBlockID": "projecthoomans:wellbeing_special",
+        "category": "projecthoomans:wellbeing",
+        "audience": "special",
+        "textTarget": "psdl/social/wellbeing/special",
+        "textDomain": "pnc.psdl.social.wellbeing.special"
+      },
+      "response": {
+        "act": "CHECK_IN",
+        "turns": [{
+          "id": "opening",
+          "metadata": {"textKey": "opening"},
+          "text": {"EN": "I'll be honest with you, {addressee.name}. Ask.", "TL": "Magiging tapat ako sa iyo, {addressee.name}. Magtanong."},
+          "offers": [
+            {
+              "id": "condition",
+              "label": {"EN": "How are you really doing?", "TL": "Kamusta ka na talaga?"},
+              "utterance": {"EN": "How are you really doing?", "TL": "Kamusta ka na talaga?"},
+              "frame": {"intent": "QUESTION", "speechAct": "QUESTION", "subject": "WELLBEING", "topic": "wellbeing"},
+              "when": {"all": [
+                {"path": "relationship.speakerToAddressee.approval", "op": ">=", "value": 1},
+                {"path": "relationship.speakerToAddressee.familiarity", "op": ">=", "value": 1}
+              ]},
+              "metadata": {
+                "choiceKey": "choice.condition",
+                "responseKey": "response.condition",
+                "effects": [{"type": "pnc:relationship", "approval": 1, "familiarity": 1}],
+                "responseText": {"EN": "Better now that you're here.", "TL": "Mas mabuti na ngayong nandito ka na."}
+              }
+            },
+            {
+              "id": "offer_help",
+              "label": {"EN": "Let me help.", "TL": "Hayaan mo akong tumulong."},
+              "utterance": {"EN": "Let me help.", "TL": "Hayaan mo akong tumulong."},
+              "frame": {"intent": "QUESTION", "speechAct": "QUESTION", "subject": "HELP", "topic": "wellbeing"},
+              "when": {"all": [
+                {"path": "relationship.speakerToAddressee.approval", "op": ">=", "value": 2},
+                {"path": "relationship.speakerToAddressee.respect", "op": ">=", "value": 1}
+              ]},
+              "metadata": {
+                "choiceKey": "choice.offer_help",
+                "responseKey": "response.offer_help",
+                "effects": [{"type": "pnc:relationship", "approval": 2, "respect": 1}],
+                "responseText": {"EN": "All right. Just stay close for a minute.", "TL": "Sige. Manatiling malapit sa isang minuto."}
+              }
+            }
+          ]
+        }]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "social.small_talk.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {"speaker": ["participant"], "addressee": ["participant"]},
+      "metadata": {
+        "runtimeBlockID": "projecthoomans:small_talk_neutral",
+        "category": "projecthoomans:small_talk",
+        "audience": "neutral",
+        "textTarget": "psdl/social/small_talk/neutral",
+        "textDomain": "pnc.psdl.social.small_talk.neutral"
+      },
+      "response": {
+        "act": "SMALL_TALK",
+        "turns": [{
+          "id": "opening",
+          "metadata": {"textKey": "opening"},
+          "text": {"EN": "All right. We can talk for a minute.", "TL": "Sige. Maaari tayong mag-usap sandali."},
+          "offers": [
+            {
+              "id": "weather",
+              "label": {"EN": "Some weather we're having.", "TL": "Ilang panahon ang nararanasan natin."},
+              "utterance": {"EN": "Some weather we're having.", "TL": "Ilang panahon ang nararanasan natin."},
+              "frame": {"intent": "QUESTION", "speechAct": "QUESTION", "subject": "WEATHER", "topic": "small_talk"},
+              "metadata": {
+                "choiceKey": "choice.weather",
+                "responseKey": "response.weather",
+                "responseText": {"EN": "At least the rain covers our footsteps.", "TL": "At least natatakpan ng ulan ang mga yapak namin."}
+              }
+            },
+            {
+              "id": "quiet_day",
+              "label": {"EN": "Quiet day so far.", "TL": "Tahimik na araw hanggang ngayon."},
+              "utterance": {"EN": "Quiet day so far.", "TL": "Tahimik na araw hanggang ngayon."},
+              "frame": {"intent": "QUESTION", "speechAct": "QUESTION", "subject": "DAY", "topic": "small_talk"},
+              "when": {"path": "relationship.speakerToAddressee.familiarity", "op": ">=", "value": 1},
+              "metadata": {
+                "choiceKey": "choice.quiet_day",
+                "responseKey": "response.quiet_day",
+                "responseText": {"EN": "Do not tempt fate, but I'll take it.", "TL": "Huwag tuksuhin ang kapalaran, ngunit kukunin ko ito."}
+              }
+            }
+          ]
+        }]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "social.small_talk.member",
+      "owner": "ProjectHoomans",
+      "participants": {"speaker": ["participant"], "addressee": ["participant"]},
+      "metadata": {
+        "runtimeBlockID": "projecthoomans:small_talk_member",
+        "category": "projecthoomans:small_talk",
+        "audience": "member",
+        "textTarget": "psdl/social/small_talk/member",
+        "textDomain": "pnc.psdl.social.small_talk.member"
+      },
+      "response": {
+        "act": "SMALL_TALK",
+        "turns": [{
+          "id": "opening",
+          "metadata": {"textKey": "opening"},
+          "text": {"EN": "A quiet conversation sounds good right now.", "TL": "Ang isang tahimik na pag-uusap ay pakinggan ngayon."},
+          "offers": [
+            {
+              "id": "weather",
+              "label": {"EN": "Some weather we're having.", "TL": "Ilang panahon ang nararanasan natin."},
+              "utterance": {"EN": "Some weather we're having.", "TL": "Ilang panahon ang nararanasan natin."},
+              "frame": {"intent": "QUESTION", "speechAct": "QUESTION", "subject": "WEATHER", "topic": "small_talk"},
+              "metadata": {
+                "choiceKey": "choice.weather",
+                "responseKey": "response.weather",
+                "responseText": {"EN": "Could be worse. We've worked through worse.", "TL": "Maaaring mas masahol pa. Mas malala ang pinagdaanan namin."}
+              }
+            },
+            {
+              "id": "quiet_day",
+              "label": {"EN": "Quiet day so far.", "TL": "Tahimik na araw hanggang ngayon."},
+              "utterance": {"EN": "Quiet day so far.", "TL": "Tahimik na araw hanggang ngayon."},
+              "frame": {"intent": "QUESTION", "speechAct": "QUESTION", "subject": "DAY", "topic": "small_talk"},
+              "when": {"path": "relationship.speakerToAddressee.familiarity", "op": ">=", "value": 1},
+              "metadata": {
+                "choiceKey": "choice.quiet_day",
+                "responseKey": "response.quiet_day",
+                "responseText": {"EN": "The crew earned one.", "TL": "Karapat-dapat iyon ng grupo."}
+              }
+            }
+          ]
+        }]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "social.small_talk.special",
+      "owner": "ProjectHoomans",
+      "participants": {"speaker": ["participant"], "addressee": ["participant"]},
+      "metadata": {
+        "runtimeBlockID": "projecthoomans:small_talk_special",
+        "category": "projecthoomans:small_talk",
+        "audience": "special",
+        "textTarget": "psdl/social/small_talk/special",
+        "textDomain": "pnc.psdl.social.small_talk.special"
+      },
+      "response": {
+        "act": "SMALL_TALK",
+        "turns": [{
+          "id": "opening",
+          "metadata": {"textKey": "opening"},
+          "text": {"EN": "I always have time for you, {addressee.name}.", "TL": "Palagi akong may oras para sa iyo, {addressee.name}."},
+          "offers": [
+            {
+              "id": "weather",
+              "label": {"EN": "Some weather we're having.", "TL": "Ilang panahon ang nararanasan natin."},
+              "utterance": {"EN": "Some weather we're having.", "TL": "Ilang panahon ang nararanasan natin."},
+              "frame": {"intent": "QUESTION", "speechAct": "QUESTION", "subject": "WEATHER", "topic": "small_talk"},
+              "metadata": {
+                "choiceKey": "choice.weather",
+                "responseKey": "response.weather",
+                "responseText": {"EN": "I barely noticed. I was watching you.", "TL": "bahagya kong napansin. pinapanood kita."}
+              }
+            },
+            {
+              "id": "quiet_day",
+              "label": {"EN": "Quiet day so far.", "TL": "Tahimik na araw hanggang ngayon."},
+              "utterance": {"EN": "Quiet day so far.", "TL": "Tahimik na araw hanggang ngayon."},
+              "frame": {"intent": "QUESTION", "speechAct": "QUESTION", "subject": "DAY", "topic": "small_talk"},
+              "when": {"path": "relationship.speakerToAddressee.familiarity", "op": ">=", "value": 1},
+              "metadata": {
+                "choiceKey": "choice.quiet_day",
+                "responseKey": "response.quiet_day",
+                "responseText": {"EN": "Then spend part of it with me.", "TL": "Kung gayon, gugulin mo ang bahagi nito kasama ako."}
+              }
+            }
+          ]
+        }]
+      }
+    }
+  ]
+}

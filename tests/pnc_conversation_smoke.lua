@@ -63,7 +63,7 @@ T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueContextState.lua")
 T.load(CLIENT .. "PNC/Semantics/PNC_SemanticGiftLifecycle.lua")
 T.load(CLIENT .. "PNC/Semantics/PNC_SemanticGiftContext.lua")
 T.load(COMMON_SHARED
-    .. "PNC/Conversation/Definitions/00_PNC_ConversationDefinitions.lua")
+    .. "PNC/Conversation/Composition/PNC_ConversationAdopterDefinitions.lua")
 T.load("PsychopatzCore", "common",
     "PsychopatzCore/Conversation/PsychopatzConversationTextCatalog.lua")
 T.load(CLIENT .. "PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
@@ -99,6 +99,21 @@ T.equal(Registry.GetFingerprint(), Registry.GetFingerprint(),
     "registry fingerprint stable")
 T.equal(#Registry.ListBlocks({ includeInvalid = true }), 38,
     "built-ins all validate")
+
+local migratedWellbeing = Registry.GetBlock("projecthoomans:wellbeing_neutral")
+T.equal(migratedWellbeing.textSource.modID, "ProjectHoomans",
+    "PSDL wellbeing keeps adopter-owned text routing")
+T.equal(migratedWellbeing.textSource.domain,
+    "pnc.psdl.social.wellbeing.neutral",
+    "PSDL wellbeing keeps its declared text domain")
+T.equal(migratedWellbeing.nodes.opening.textKey, "opening",
+    "PSDL wellbeing preserves the opening turn")
+T.equal(migratedWellbeing.nodes.opening.choices[1].textKey,
+    "choice.condition",
+    "PSDL wellbeing preserves semantic choice text")
+T.equal(migratedWellbeing.nodes.opening.choices[1].outcomes[1].responseKey,
+    "response.condition",
+    "PSDL wellbeing preserves response routing")
 
 local legacyWhatsUpID = "projecthoomans:" .. "whats_up"
 local legacyWhatsUpPrefix = legacyWhatsUpID .. "_"
@@ -167,12 +182,12 @@ T.truthy(Rules.CheckRepeat({ oncePerDay = true }, {
     lastUsedWorldHour = 26,
 }, 48), "once-per-day resets at the next world day")
 
-local categoriesManifest = T.read(
+local psdlAdapter = T.read(
     "ProjectHoomans", "common_lua",
-    "PNC/Conversation/Definitions/00_PNC_ConversationDefinitions.lua"
+    "PNC/Conversation/PSDL/PNC_ConversationPSDLBlocks.lua"
 )
-T.equal(string.find(categoriesManifest, "RegisterBlock", 1, true), nil,
-    "definition manifest remains require-only rather than monolithic")
+T.truthy(string.find(psdlAdapter, "Generated.PSDLPlan", 1, true),
+    "PNC blocks are projected from Core-generated PSDL plans")
 
 T.truthy(Rules.EvaluateGate({
     type = "pnc:skill", actor = "player", skill = "Aiming",
