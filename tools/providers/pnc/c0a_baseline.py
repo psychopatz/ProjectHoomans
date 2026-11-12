@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 from copy import deepcopy
 from pathlib import Path
@@ -18,9 +19,11 @@ from typing import Any, Iterable
 from tools.semantic_harness.codebuilder.conversation_compiler import (
     CONVERSATION_MANIFEST_RELATIVE,
     CONVERSATION_RUNTIME_RELATIVE,
-    CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
     render_conversation_runtime_plan,
+)
+from tools.semantic_harness.codebuilder.generation_ownership import (
+    resolve_core_repository,
 )
 from tools.semantic_harness.runtime.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.runtime.worker import LuaSemanticWorker
@@ -675,7 +678,22 @@ def _source_records(document: dict[str, Any], source_path: str) -> list[dict[str
 
 
 def capture_storage(repository: Path = REPOSITORY) -> dict[str, Any]:
-    model = compile_conversation_sources(repository)
+    core_repository = resolve_core_repository(repository)
+    dynamic_trading_value = os.environ.get(
+        "PZ_TEST_DYNAMIC_TRADING_REPOSITORY"
+    )
+    dynamic_trading_repository = (
+        Path(dynamic_trading_value).expanduser().resolve()
+        if dynamic_trading_value
+        else repository.parent / "DynamicTrading"
+    )
+    package_repositories = {}
+    if dynamic_trading_repository.is_dir():
+        package_repositories["DTCommon"] = dynamic_trading_repository
+    model = compile_conversation_sources(
+        repository,
+        package_repositories=package_repositories,
+    )
     _, reports = render_conversation_runtime_plan(model)
     runtime_root = repository / CONVERSATION_RUNTIME_RELATIVE
     generated = []
@@ -750,12 +768,18 @@ def capture_storage(repository: Path = REPOSITORY) -> dict[str, Any]:
     ]
 
     manifest_path = repository / CONVERSATION_MANIFEST_RELATIVE
+    if not manifest_path.is_file():
+        manifest_path = core_repository / CONVERSATION_MANIFEST_RELATIVE
+    try:
+        manifest_label = str(manifest_path.relative_to(repository))
+    except ValueError:
+        manifest_label = str(manifest_path)
     runtime_manifest = runtime_root / "Manifest.lua"
     registry = runtime_root / "Registry.lua"
-    static_suggestions = runtime_root / "UI/StaticSuggestions.lua"
+    companion_check_in = runtime_root / "UI/Psdl/Dialogue/CompanionCheckIn.lua"
     source_missing = [
         key for key, location in model["locations"].items()
-        if not (repository / CONVERSATION_SOURCE_RELATIVE / location["sourceShard"]).is_file()
+        if location.get("sourceShard") not in model["_source_documents"]
     ]
     generated_missing = sorted(key for key, paths in id_to_generated.items() if not paths)
     generated_aliases = {
@@ -781,7 +805,6 @@ def capture_storage(repository: Path = REPOSITORY) -> dict[str, Any]:
         str(path.relative_to(runtime_root))[:-4]
         for path in runtime_root.rglob("*.lua")
         if path.name not in {"Manifest.lua", "Registry.lua"}
-        and path.name != "StaticSuggestions.lua"
     }
     actual_modules = {
         "PNC/Semantics/Generated/Conversation/" + item for item in actual_modules
@@ -812,9 +835,9 @@ def capture_storage(repository: Path = REPOSITORY) -> dict[str, Any]:
         "schema": SCHEMA_VERSION,
         "concern": "storage_topology",
         "source": {
-            "manifest": str(manifest_path.relative_to(repository)),
+            "manifest": manifest_label,
             "manifestBytes": manifest_path.stat().st_size,
-            "sourceRoot": str((repository / CONVERSATION_SOURCE_RELATIVE).relative_to(repository)),
+            "sourceRoot": str(manifest_path.parent),
             "sourceFileCount": len(model["_source_documents"]),
             "locationCount": len(model["locations"]),
             "largestCanonicalRecords": sorted(source_records, key=lambda item: (-item["bytes"], item["sourceShard"], item["id"]))[:20],
@@ -829,7 +852,7 @@ def capture_storage(repository: Path = REPOSITORY) -> dict[str, Any]:
             "indexSizes": {
                 "Manifest.lua": runtime_manifest.stat().st_size,
                 "Registry.lua": registry.stat().st_size,
-                "UI/StaticSuggestions.lua": static_suggestions.stat().st_size,
+                "UI/Psdl/Dialogue/CompanionCheckIn.lua": companion_check_in.stat().st_size,
             },
         },
         "discoverability": {

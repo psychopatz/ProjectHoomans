@@ -115,6 +115,18 @@ return {
         ["recordCount"] = 11,
     },
     {
+        ["domain"] = "companion_check_in",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CompanionCheckIn",
+        ["recordCount"] = 1,
+    },
+    {
+        ["domain"] = "trading",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/Trading",
+        ["recordCount"] = 1,
+    },
+    {
         ["domain"] = "semantic",
         ["kind"] = "flow",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Flow/Semantic",
@@ -127,9 +139,9 @@ return {
         ["recordCount"] = 2,
     },
     {
-        ["domain"] = "dynamic_trading",
+        ["domain"] = "trading",
         ["kind"] = "pack",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Pack/DynamicTrading",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Pack/Trading",
         ["recordCount"] = 1,
     },
     {
@@ -175,15 +187,21 @@ return {
         ["recordCount"] = 2,
     },
     {
+        ["domain"] = "companion_check_in",
+        ["kind"] = "ui",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Ui/CompanionCheckIn",
+        ["recordCount"] = 3,
+    },
+    {
         ["domain"] = "static_suggestions",
         ["kind"] = "ui",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Ui/StaticSuggestions",
-        ["recordCount"] = 13,
+        ["recordCount"] = 10,
     },
     {
-        ["domain"] = "trading_suggestions",
+        ["domain"] = "trading",
         ["kind"] = "ui",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Ui/TradingSuggestions",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Ui/Trading",
         ["recordCount"] = 8,
     },
     {

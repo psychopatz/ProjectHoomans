@@ -20,7 +20,7 @@ Provider.id = "projecthoomans.static_questions"
 Provider.sourceKind = "typed_input"
 Provider.order = 50
 Provider.Definitions = require
-    "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions"
+    "PNC/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CompanionCheckIn"
 Provider.CoreDefinitions = SemanticFoundation.Registry.UI or {}
 
 local function foundationContext(context)

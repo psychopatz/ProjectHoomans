@@ -18,24 +18,6 @@ return {
         ["kind"] = "ui",
         ["source"] = "ui/static_suggestions_core.json",
     },
-    ["question.gossip"] = {
-        ["domain"] = "static_suggestions",
-        ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions",
-        },
-        ["id"] = "question.gossip",
-        ["kind"] = "ui",
-        ["source"] = "ui/static_suggestions.json",
-    },
-    ["question.health"] = {
-        ["domain"] = "static_suggestions",
-        ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions",
-        },
-        ["id"] = "question.health",
-        ["kind"] = "ui",
-        ["source"] = "ui/static_suggestions.json",
-    },
     ["question.identity"] = {
         ["domain"] = "static_suggestions",
         ["generated"] = {
@@ -80,15 +62,6 @@ return {
             "pnc.question.identity.surname",
         },
         ["source"] = "ui/static_suggestions_core.json",
-    },
-    ["question.needs"] = {
-        ["domain"] = "static_suggestions",
-        ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions",
-        },
-        ["id"] = "question.needs",
-        ["kind"] = "ui",
-        ["source"] = "ui/static_suggestions.json",
     },
     ["question.time"] = {
         ["domain"] = "static_suggestions",
