@@ -76,7 +76,7 @@ return {
         ["domain"] = "social",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Social",
-        ["recordCount"] = 104,
+        ["recordCount"] = 102,
     },
     {
         ["domain"] = "task",
@@ -167,6 +167,12 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/NeedsSupport",
         ["recordCount"] = 3,
+    },
+    {
+        ["domain"] = "social",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/Social",
+        ["recordCount"] = 8,
     },
     {
         ["domain"] = "social_apology",

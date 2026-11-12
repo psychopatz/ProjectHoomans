@@ -286,10 +286,10 @@ return {
     ["behavior.world_event_warn"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/WorldEventWarn",
+            "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Behavior/behavior_world_event_warn",
         },
         ["id"] = "behavior.world_event_warn",
         ["kind"] = "behavior",
-        ["source"] = "behaviors/social/world_event_warn.json",
+        ["source"] = "psdl/behavior/core_world_event_warn.json",
     },
 }

@@ -8,8 +8,8 @@ Registry.REGISTRY_NAMESPACE = "PNC.Semantics.ConversationRegistry"
 Registry.REGISTRY_MODULE = "PNC/Semantics/Generated/Conversation/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
-Registry.CONTENT_FINGERPRINT = "8426fc84db0c75c535897f2ff40d62169908937f1f8f3470abd8270071188302"
-Registry.WHOLE_MODEL_FINGERPRINT = "cc27f8da7df220b252edf29064c5173b6496028a22355b0a70ae4af2f311bcbf"
+Registry.CONTENT_FINGERPRINT = "8efad83122f2100780fe6673d90c80c34cd3cb4a6c55c9d9578760b9bfc636f1"
+Registry.WHOLE_MODEL_FINGERPRINT = "bb66935280bfaa0d2ed8f4873883c5a1f1de20214db6d97be54450425ff648fa"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -130,8 +130,6 @@ appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/S
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Horde")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/PostCombat")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Work")
-appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEvent/Warning")
-appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEvent/WarningFlavor")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Acknowledgement")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Disputes")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Hostile")
@@ -213,10 +211,11 @@ appendBehaviors(require "PsychopatzCore/Semantics/Generated/Conversation/Behavio
 appendBehaviors(require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors")
 appendBehaviors(require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDire__fa8f3cfb")
 appendBehaviors(require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/Warn")
-appendBehaviors(require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/WorldEventWarn")
+appendBehaviors(require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Psdl/Behavior/CoreWorldEventWarn")
 appendBeats(require "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation")
 appendBeats(require "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/Reconciliation")
 appendBeats(require "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Behavior/behavior_world_event_warn")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/needs_member_support")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/needs_neutral_support")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/needs_special_support")
@@ -304,6 +303,14 @@ appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogu
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_neutral")
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_terse")
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_warm")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_guarded")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_neutral")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_terse")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_warm")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_guarded")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_neutral")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_terse")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_warm")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_guarded")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_neutral")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_terse")

@@ -405,24 +405,6 @@ return {
         ["kind"] = "content",
         ["source"] = "content/social/interaction/scene/work.json",
     },
-    ["phrase.semantic.interaction.world_event.warning"] = {
-        ["domain"] = "social",
-        ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEvent/Warning",
-        },
-        ["id"] = "phrase.semantic.interaction.world_event.warning",
-        ["kind"] = "content",
-        ["source"] = "content/social/interaction/world_event/warning.json",
-    },
-    ["phrase.semantic.interaction.world_event.warning_flavor"] = {
-        ["domain"] = "social",
-        ["generated"] = {
-            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEvent/WarningFlavor",
-        },
-        ["id"] = "phrase.semantic.interaction.world_event.warning_flavor",
-        ["kind"] = "content",
-        ["source"] = "content/social/interaction/world_event/warning_flavor.json",
-    },
     ["phrase.semantic.social.acknowledged"] = {
         ["domain"] = "social",
         ["generated"] = {
