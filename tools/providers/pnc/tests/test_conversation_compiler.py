@@ -13,7 +13,7 @@ from tools.semantic_harness.codebuilder.conversation_compiler import (
     CONVERSATION_MAX_SHARD_BYTES,
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
-    conversation_translation_bundles,
+    conversation_translation_catalogs_by_owner,
     render_conversation_runtime_plan,
 )
 from tools.semantic_harness.codebuilder.build import _write_conversation_translation_manifest
@@ -170,7 +170,8 @@ class ConversationCompilerTests(unittest.TestCase):
             )
             service = SemanticLabAuthoringService(
                 repository=repository,
-                runtime_root=REPOSITORY,
+                runtime_root=repository,
+                core_repository=repository,
             )
             item = service.load_dialogue_content(
                 "phrase.semantic.flow.greeting.opening.default"
@@ -247,9 +248,20 @@ class ConversationCompilerTests(unittest.TestCase):
                 repository,
                 runtime_root=REPOSITORY,
             )
-            bundles = conversation_translation_bundles(model)
-            self.assertIn("XX", bundles)
-            self.assertTrue(any(bundles["XX"].values()))
+            catalogs = conversation_translation_catalogs_by_owner(model)
+            locale_catalogs = [
+                owner_catalogs["XX"]
+                for owner_catalogs in catalogs.values()
+                if "XX" in owner_catalogs
+            ]
+            self.assertTrue(locale_catalogs)
+            self.assertTrue(
+                any(
+                    domain_values
+                    for owner_catalogs in locale_catalogs
+                    for domain_values in owner_catalogs.values()
+                )
+            )
 
             translation_root = repository / "translation"
             for language in ("EN", "XX"):

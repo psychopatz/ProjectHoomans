@@ -25,21 +25,20 @@ Config.HIGHLIGHT_COLOR = {
     r = 0.0, g = 1.0, b = 1.0, a = 0.85,
 }
 Config.TITLE = {
-    key = "panel.llm_inline_input",
-    domain = "pnc.system.categories",
+    key = "UI_PsychopatzConversation_Panel_LLMInlineInput",
     fallback = "TALK TO",
 }
 Config.MODE_BUTTONS = {
     {
         id = Config.MODE_NEAREST,
         mode = Config.MODE_NEAREST,
-        title = { key = "llm.mode.nearest", fallback = "SINGLE NPC" },
+        title = { key = "UI_PsychopatzConversation_LLM_ModeNearest", fallback = "SINGLE NPC" },
         image = "media/ui/MP/mp_ui_emptyServer.png",
     },
     {
         id = Config.MODE_NEARBY,
         mode = Config.MODE_NEARBY,
-        title = { key = "llm.mode.nearby", fallback = "NEARBY NPCS" },
+        title = { key = "UI_PsychopatzConversation_LLM_ModeNearby", fallback = "NEARBY NPCS" },
         image = "media/ui/MP/mp_ui_playerCount.png",
     },
 }

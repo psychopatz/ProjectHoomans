@@ -33,21 +33,21 @@ function ISPNCConversationDebugWindow:createChildren()
     })
     self.controls = {}
     local actions = {
-        { id = "refresh", title = Internal.tr("button.refresh") },
-        { id = "audience", title = Internal.tr("button.audience", {
+        { id = "refresh", title = Internal.tr("UI_PsychopatzConversation_Debugger_Button_Refresh") },
+        { id = "audience", title = Internal.tr("UI_PsychopatzConversation_Debugger_Button_Audience", {
             audience = "neutral",
         }) },
-        { id = "time", title = Internal.tr("button.hour", { hour = 12 }) },
-        { id = "approval_down", title = Internal.tr("button.approval_down") },
-        { id = "approval_up", title = Internal.tr("button.approval_up") },
-        { id = "respect_down", title = Internal.tr("button.respect_down") },
-        { id = "respect_up", title = Internal.tr("button.respect_up") },
-        { id = "familiarity_down", title = Internal.tr("button.familiarity_down") },
-        { id = "familiarity_up", title = Internal.tr("button.familiarity_up") },
-        { id = "skill", title = Internal.tr("button.skill") },
-        { id = "personality", title = Internal.tr("button.personality") },
-        { id = "history", title = Internal.tr("button.history", { uses = 0 }) },
-        { id = "simulate", title = Internal.tr("button.simulate"), variant = "success" },
+        { id = "time", title = Internal.tr("UI_PsychopatzConversation_Debugger_Button_Hour", { hour = 12 }) },
+        { id = "approval_down", title = Internal.tr("UI_PsychopatzConversation_Debugger_Button_ApprovalDown") },
+        { id = "approval_up", title = Internal.tr("UI_PsychopatzConversation_Debugger_Button_ApprovalUp") },
+        { id = "respect_down", title = Internal.tr("UI_PsychopatzConversation_Debugger_Button_RespectDown") },
+        { id = "respect_up", title = Internal.tr("UI_PsychopatzConversation_Debugger_Button_RespectUp") },
+        { id = "familiarity_down", title = Internal.tr("UI_PsychopatzConversation_Debugger_Button_FamiliarityDown") },
+        { id = "familiarity_up", title = Internal.tr("UI_PsychopatzConversation_Debugger_Button_FamiliarityUp") },
+        { id = "skill", title = Internal.tr("UI_PsychopatzConversation_Debugger_Button_Skill") },
+        { id = "personality", title = Internal.tr("UI_PsychopatzConversation_Debugger_Button_Personality") },
+        { id = "history", title = Internal.tr("UI_PsychopatzConversation_Debugger_Button_History", { uses = 0 }) },
+        { id = "simulate", title = Internal.tr("UI_PsychopatzConversation_Debugger_Button_Simulate"), variant = "success" },
     }
     for _, action in ipairs(actions) do
         self.controls[#self.controls + 1] = UI.CreateButton(self, {

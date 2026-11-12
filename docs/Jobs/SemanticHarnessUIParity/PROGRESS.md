@@ -2,6 +2,28 @@
 
 Status: implementation complete for the developer-side harness boundary.
 
+## P5 source migration completed
+
+- Moved shared conversation categories, choices, identity/context labels, LLM
+  labels, lock reasons, panels, request statuses, and debugger text into
+  Core's EN/TL `Conversation/UI.json` catalogs.
+- Deleted the obsolete Core `text/system/categories` authoring shards and
+  generated catalogs, plus the PNC debugger text catalogs. Real dialogue from
+  the old response bucket is now split into focused identity, recruitment,
+  departure, and gift-preference shards.
+- Updated Project Hoomans validators, composer/runtime consumers, semantic
+  suggestion projections, identity display, debugger, and PBrainZ surfaces to
+  use Core UI keys or focused dialogue sources directly.
+- Updated DTCommon's trader conversation input to the canonical Core panel
+  key. CodeBuilder UI catalog generation now merges generated entries with
+  existing package-owned UI translations instead of deleting shared Core text.
+
+Validation for this phase: CodeBuilder build passed; Core semantic tests 93/93;
+Core translation smoke passed; PNC migration/ownership tests 42/42; PNC/Core
+cross-adopter Lua smoke tests passed; Core and PNC PZ verification reported
+zero Kahlua errors; DTCommon changed Lua parsed successfully; legacy runtime
+reference scan was clean.
+
 ## Recovered and migrated
 
 - Restored the full Core-owned Semantic Lab composition from the old working

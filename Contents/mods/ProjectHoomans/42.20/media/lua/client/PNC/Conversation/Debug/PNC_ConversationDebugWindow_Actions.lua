@@ -68,11 +68,11 @@ function ISPNCConversationDebugWindow:onAction(button)
         self.context.relationshipState = nextValue == "member" and "Member"
             or nextValue == "special" and "Lover"
             or nextValue == "neutral" and "Acquaintance" or "FirstMeet"
-        button:setTitle(tr("button.audience", { audience = nextValue }))
+        button:setTitle(tr("UI_PsychopatzConversation_Debugger_Button_Audience", { audience = nextValue }))
     elseif id == "time" then
         self.context.hour = (tonumber(self.context.hour) or 0) + 3
         if self.context.hour >= 24 then self.context.hour = 0 end
-        button:setTitle(tr("button.hour", { hour = self.context.hour }))
+        button:setTitle(tr("UI_PsychopatzConversation_Debugger_Button_Hour", { hour = self.context.hour }))
     elseif id == "approval_down" or id == "approval_up" then
         self.context.relationship.approval = self.context.relationship.approval
             + (id == "approval_down" and -5 or 5)
@@ -96,13 +96,13 @@ function ISPNCConversationDebugWindow:onAction(button)
         self.context.historyEntry.lastUsedWorldHour = uses > 0
             and self.context.worldAgeHours or nil
         self.context.historySlot = uses
-        button:setTitle(tr("button.history", { uses = uses }))
+        button:setTitle(tr("UI_PsychopatzConversation_Debugger_Button_History", { uses = uses }))
     elseif id == "simulate" then
         local item = Internal.selected(self.blocks)
         if not item then return end
         local view, reason = Model.OpenSandbox(item.id, self.context)
         if not view then
-            self:addField(tr("detail.label.error"), tr("sandbox.open_failed", {
+            self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Error"), tr("UI_PsychopatzConversation_Debugger_Sandbox_OpenFailed", {
                 reason = tostring(reason or "unavailable"),
             }), { tone = "danger" })
         end

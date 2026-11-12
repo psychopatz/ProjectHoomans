@@ -24,14 +24,13 @@ function Input.GetState(view)
         visible = true,
         enabled = Internal.Interactive(view),
         statusText = "",
-        sendKey = "llm.send",
+        sendKey = "UI_PsychopatzConversation_LLM_Send",
     }
 end
 
 function Input.ResolveText(key, fallback)
     return Text.Resolve({
         key = key,
-        domain = "pnc.system.categories",
         fallback = fallback,
     }, fallback)
 end
@@ -58,8 +57,10 @@ function Input.CreatePart(bounds, options)
     options.resolveText = options.resolveText or Input.ResolveText
     options.maxInputLength = options.maxInputLength or Input.MAX_INPUT_LENGTH
     options.submitOnEnter = options.submitOnEnter ~= false
-    options.tooltipKey = options.tooltipKey or "llm.input_tooltip"
-    options.sendKey = options.sendKey or "llm.send"
+    options.tooltipKey = options.tooltipKey
+        or "UI_PsychopatzConversation_LLM_InputTooltip"
+    options.sendKey = options.sendKey
+        or "UI_PsychopatzConversation_LLM_Send"
     options.sendTitle = options.sendTitle or "SEND"
     return PsychopatzConversationLLMInput:new(
         bounds.x, bounds.y, bounds.width, bounds.height, options

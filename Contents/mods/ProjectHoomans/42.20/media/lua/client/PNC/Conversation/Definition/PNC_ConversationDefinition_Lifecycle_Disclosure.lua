@@ -2,21 +2,27 @@
 
 local Conversation = PNC.Conversation
 local Internal = Conversation.DefinitionLifecycleInternal
+local Loader = PsychopatzCore.Conversation.TextCatalog
+local GIFT_SOURCE = {
+    modID = "PsychopatzCore",
+    pathPattern = "media/translation/{language}/Conversation/Text/needs/gifts/preference.json",
+    domain = "pnc.needs.gifts.preference",
+}
 local GIFT_PREFERENCE_RESPONSES = {
     like = {
-        key = "semantic.gift.preference.like",
+        key = "gift.preference.like",
         text = "I like that.",
     },
     dislike = {
-        key = "semantic.gift.preference.dislike",
+        key = "gift.preference.dislike",
         text = "I don't like that.",
     },
     neutral = {
-        key = "semantic.gift.preference.neutral",
+        key = "gift.preference.neutral",
         text = "I don't have a strong preference.",
     },
     unknown = {
-        key = "semantic.gift.preference.unknown",
+        key = "gift.preference.unknown",
         text = "I'm not sure which item you mean.",
     },
 }
@@ -117,6 +123,9 @@ function Conversation.ReceiveDisclosureResult(result)
     local reaction = preference and GIFT_PREFERENCE_RESPONSES[
         tostring(preference.disposition or "")
     ] or nil
+    if reaction then
+        Loader.EnsureSource(GIFT_SOURCE, { reaction.key })
+    end
     local function recordBackstoryResponse(text)
         local topicID = tostring(result and result.topicID or "")
         local session = view and view.session or nil
@@ -161,7 +170,7 @@ function Conversation.ReceiveDisclosureResult(result)
     then
         view.session:append("npc", {
             key = reaction.key,
-            domain = "pnc.system.categories",
+            domain = GIFT_SOURCE.domain,
             text = reaction.text,
             fallback = reaction.text,
         })
@@ -176,7 +185,7 @@ function Conversation.ReceiveDisclosureResult(result)
         local unknown = GIFT_PREFERENCE_RESPONSES.unknown
         view.session:append("npc", {
             key = unknown.key,
-            domain = "pnc.system.categories",
+            domain = GIFT_SOURCE.domain,
             text = unknown.text,
             fallback = unknown.text,
         })

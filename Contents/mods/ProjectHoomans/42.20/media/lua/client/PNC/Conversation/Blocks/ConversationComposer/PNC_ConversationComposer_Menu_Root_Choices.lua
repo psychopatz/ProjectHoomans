@@ -8,11 +8,11 @@ local Internal = Composer.Internal
 local Choices = {}
 local CompanionChoices = Internal.MenuRootCompanionChoices
 
-local SYSTEM_SOURCE = Internal.MenuSystemSource
 local conversationDebugEnabled = Internal.MenuConversationDebugEnabled
 local dialoguePayload = Internal.MenuDialoguePayload
 local payload = Internal.MenuPayload
-local RECRUIT_SYSTEM_KEYS = Internal.MenuRecruitSystemKeys or {}
+local RECRUIT_RESPONSE_KEYS = Internal.MenuRecruitResponseKeys or {}
+local RECRUITMENT_SOURCE = Internal.MenuRecruitmentSource
 local GOODBYE_SOURCE = Internal.MenuGoodbyeSource
 
 local function categoryChoices(context)
@@ -73,7 +73,7 @@ local function addDebugChoice(choices, context)
     choices[#choices + 1] = {
         id = "show_debug_text",
         text = dialoguePayload(
-            SYSTEM_SOURCE, "choice.show_debug_text", context
+            nil, "UI_PsychopatzConversation_Choice_ShowDebugText", context
         ),
         semantic = {
             route = "conversation_root_choice",
@@ -95,8 +95,10 @@ function Choices.Build(context, options, greetingBlock)
     options = type(options) == "table" and options or {}
     local choices = {}
     if context.audiences.hostile then
-        local choice = greetingBlock and greetingBlock.nodes.opening
-            and greetingBlock.nodes.opening.choices[1] or nil
+        local opening = greetingBlock and greetingBlock.nodes
+            and greetingBlock.nodes.opening or nil
+        local choice = opening and opening.choices
+            and opening.choices[1] or nil
         if choice then
             choices[#choices + 1] = {
                 id = "ceasefire",
@@ -130,15 +132,7 @@ function Choices.Build(context, options, greetingBlock)
         end
     end
 
-    local requiredSystemKeys = {
-        "status.block_unavailable", "status.choice_rejected",
-        "choice.show_debug_text", "choice.settlement_admission",
-        "choice.ambient_visit",
-    }
-    for _, key in ipairs(RECRUIT_SYSTEM_KEYS) do
-        requiredSystemKeys[#requiredSystemKeys + 1] = key
-    end
-    Loader.EnsureSource(SYSTEM_SOURCE, requiredSystemKeys)
+    Loader.EnsureSource(RECRUITMENT_SOURCE, RECRUIT_RESPONSE_KEYS)
     local goodbyeValid = Loader.EnsureSource(GOODBYE_SOURCE, {
         "choice.goodbye", "response.goodbye",
     })

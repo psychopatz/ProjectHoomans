@@ -257,8 +257,7 @@ local function buildConversationMenu(contextData, npcID)
             groupID = "conversation_utilities",
         },
         text = {
-            key = "choice.view_dossier",
-            domain = "pnc.system.categories",
+            key = "UI_PsychopatzConversation_Choice_ViewDossier",
             args = identityArguments,
         },
         action = function() Relationship.OpenDossier(npcID) end,

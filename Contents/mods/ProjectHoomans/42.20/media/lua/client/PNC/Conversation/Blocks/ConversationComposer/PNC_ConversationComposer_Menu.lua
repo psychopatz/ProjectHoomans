@@ -5,40 +5,43 @@ local Selector = Conversation.Selector
 local Loader = PsychopatzCore.Conversation.TextCatalog
 local Internal = Composer.Internal
 
-local SYSTEM_SOURCE = Internal.SYSTEM_SOURCE
+local RECRUITMENT_SOURCE = Internal.RecruitmentSource
 local conversationDebugEnabled = Internal.ConversationDebugEnabled
 local dialoguePayload = Internal.DialoguePayload
 local ensureBlockText = Internal.EnsureBlockText
 local payload = Internal.Payload
 local selectedTextKey = Internal.SelectedTextKey
 
-local RECRUIT_SYSTEM_KEYS = {
-    "choice.recruit",
-    "choice.disband", "choice.disband_confirm", "choice.disband_cancel",
-    "response.recruit.admire.1",
-    "response.recruit.admire.2",
-    "response.recruit.admire.3",
-    "response.recruit.fear.1",
-    "response.recruit.fear.2",
-    "response.recruit.fear.3",
-    "response.recruit.reject.relationship.1",
-    "response.recruit.reject.relationship.2",
-    "response.recruit.reject.relationship.3",
-    "response.recruit.reject.leader.1",
-    "response.recruit.reject.leader.2",
-    "response.recruit.reject.cooldown.1",
-    "response.recruit.reject.cooldown.2",
-    "response.recruit.reject.member.1",
-    "response.recruit.reject.member.2",
-    "response.recruit.reject.hostile.1",
-    "response.recruit.reject.hostile.2",
-    "response.recruit.reject.unavailable.1",
-    "response.recruit.reject.unavailable.2",
-    "response.recruit.reject.general.1",
-    "response.recruit.reject.general.2",
-    "response.recruit.reject.general.3",
-    "response.departure.warning", "response.departure.confirmed",
-    "response.departure.rejected",
+local RECRUIT_RESPONSE_KEYS = {
+    "recruitment.admire.1",
+    "recruitment.admire.2",
+    "recruitment.admire.3",
+    "recruitment.fear.1",
+    "recruitment.fear.2",
+    "recruitment.fear.3",
+    "recruitment.reject.relationship.1",
+    "recruitment.reject.relationship.2",
+    "recruitment.reject.relationship.3",
+    "recruitment.reject.relationship.4",
+    "recruitment.reject.relationship.5",
+    "recruitment.reject.relationship.6",
+    "recruitment.reject.relationship.7",
+    "recruitment.reject.relationship.8",
+    "recruitment.reject.relationship.9",
+    "recruitment.reject.relationship.10",
+    "recruitment.reject.leader.1",
+    "recruitment.reject.leader.2",
+    "recruitment.reject.cooldown.1",
+    "recruitment.reject.cooldown.2",
+    "recruitment.reject.member.1",
+    "recruitment.reject.member.2",
+    "recruitment.reject.hostile.1",
+    "recruitment.reject.hostile.2",
+    "recruitment.reject.unavailable.1",
+    "recruitment.reject.unavailable.2",
+    "recruitment.reject.general.1",
+    "recruitment.reject.general.2",
+    "recruitment.reject.general.3",
 }
 
 local GOODBYE_SOURCE = {
@@ -51,7 +54,7 @@ local function evaluateCategory(context, category)
     local categoryEligible, categoryReason = Selector.IsCategoryEligible(
         category.id, context, false
     )
-    local categoryTextValid, categoryTextReason = Loader.EnsureSource(
+    local categoryTextValid, categoryTextReason = Loader.ValidateSource(
         category.textSource,
         { category.labelKey }
     )
@@ -160,11 +163,11 @@ function Composer.BuildGreeting(context)
 end
 
 
-Internal.MenuSystemSource = SYSTEM_SOURCE
 Internal.MenuConversationDebugEnabled = conversationDebugEnabled
 Internal.MenuDialoguePayload = dialoguePayload
 Internal.MenuPayload = payload
-Internal.MenuRecruitSystemKeys = RECRUIT_SYSTEM_KEYS
+Internal.MenuRecruitmentSource = RECRUITMENT_SOURCE
+Internal.MenuRecruitResponseKeys = RECRUIT_RESPONSE_KEYS
 Internal.MenuGoodbyeSource = GOODBYE_SOURCE
 
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Menu_Root_Choices_Companion"

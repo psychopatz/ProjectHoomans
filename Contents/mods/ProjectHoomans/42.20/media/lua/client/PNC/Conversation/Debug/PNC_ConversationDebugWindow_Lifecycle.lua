@@ -38,7 +38,7 @@ function DebugUI.Open(context)
     local window = DebugUI.instance
     if not window then
         window = UI.NewWindow(ISPNCConversationDebugWindow, {
-            title = Internal.tr("title"),
+            title = Internal.tr("UI_PsychopatzConversation_Debugger_Title"),
             resizable = true,
             responsiveSpec = {
                 width = 1120, height = 720,

@@ -8,12 +8,6 @@ local Selector = PNC.Conversation.Selector
 local Rules = PNC.Conversation.Rules
 local Loader = PsychopatzCore.Conversation.TextCatalog
 
-local DEBUG_SOURCE = {
-    modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Text/system/debugger.json",
-    domain = "pnc.system.debugger",
-}
-
 local function copy(value, seen)
     if type(value) ~= "table" then return value end
     seen = seen or {}

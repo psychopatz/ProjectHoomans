@@ -57,12 +57,12 @@ function Composer.RequestSettlementAdmission(npcID)
     local lifecycle = lifecycleState(view)
     if not view then return false, "conversation_not_ready" end
     if not lifecycle then
-        notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", "conversation_not_ready")
         return false, "conversation_not_ready"
     end
     local leaseReady, leaseReason = ensureLease(view)
     if not leaseReady then
-        notifyFailure(view, "status.choice_rejected", leaseReason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", leaseReason)
         return false, leaseReason
     end
     local id = requestID("settlement_admission")
@@ -81,7 +81,7 @@ function Composer.RequestSettlementAdmission(npcID)
     )
     if not sent then
         view.spec.context.pendingConversationRequest = nil
-        notifyFailure(view, "status.choice_rejected", reason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", reason)
     end
     return sent, reason
 end
@@ -91,12 +91,12 @@ function Composer.RequestAmbientVisit(npcID)
     local lifecycle = lifecycleState(view)
     if not view then return false, "conversation_not_ready" end
     if not lifecycle then
-        notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", "conversation_not_ready")
         return false, "conversation_not_ready"
     end
     local leaseReady, leaseReason = ensureLease(view)
     if not leaseReady then
-        notifyFailure(view, "status.choice_rejected", leaseReason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", leaseReason)
         return false, leaseReason
     end
     local id = requestID("ambient_visit")
@@ -112,7 +112,7 @@ function Composer.RequestAmbientVisit(npcID)
     )
     if not sent then
         view.spec.context.pendingConversationRequest = nil
-        notifyFailure(view, "status.choice_rejected", reason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", reason)
     end
     return sent, reason
 end
@@ -122,12 +122,12 @@ function Composer.RequestCategory(npcID, categoryID, autoChoiceID)
     local lifecycle = lifecycleState(view)
     if not view then return false, "conversation_not_ready" end
     if not lifecycle then
-        notifyFailure(view, "status.block_unavailable", "conversation_not_ready")
+        notifyFailure(view, "UI_PsychopatzConversation_Status_BlockUnavailable", "conversation_not_ready")
         return false, "conversation_not_ready"
     end
     local leaseReady, leaseReason = ensureLease(view)
     if not leaseReady then
-        notifyFailure(view, "status.block_unavailable", leaseReason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_BlockUnavailable", leaseReason)
         return false, leaseReason
     end
     local id = requestID("category")
@@ -146,7 +146,7 @@ function Composer.RequestCategory(npcID, categoryID, autoChoiceID)
     if not sent then
         view.spec.context.pendingConversationRequest = nil
         view.spec.context.pendingConversationAutoChoice = nil
-        notifyFailure(view, "status.block_unavailable", reason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_BlockUnavailable", reason)
     end
     return sent, reason
 end
@@ -156,12 +156,12 @@ function Composer.RequestChoice(npcID, blockID, nodeID, choiceID)
     local lifecycle = lifecycleState(view)
     if not view then return false, "conversation_not_ready" end
     if not lifecycle then
-        notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", "conversation_not_ready")
         return false, "conversation_not_ready"
     end
     local leaseReady, leaseReason = ensureLease(view)
     if not leaseReady then
-        notifyFailure(view, "status.choice_rejected", leaseReason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", leaseReason)
         return false, leaseReason
     end
     local id = requestID("choice")
@@ -177,7 +177,7 @@ function Composer.RequestChoice(npcID, blockID, nodeID, choiceID)
     })
     if not sent then
         view.spec.context.pendingConversationRequest = nil
-        notifyFailure(view, "status.choice_rejected", reason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", reason)
     end
     return sent, reason
 end
@@ -187,12 +187,12 @@ function Composer.RequestRecruit(npcID)
     local lifecycle = lifecycleState(view)
     if not view then return false, "conversation_not_ready" end
     if not lifecycle then
-        notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", "conversation_not_ready")
         return false, "conversation_not_ready"
     end
     local leaseReady, leaseReason = ensureLease(view)
     if not leaseReady then
-        notifyFailure(view, "status.choice_rejected", leaseReason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", leaseReason)
         return false, leaseReason
     end
     local id = requestID("recruit")
@@ -208,7 +208,7 @@ function Composer.RequestRecruit(npcID)
     )
     if not sent then
         view.spec.context.pendingConversationRequest = nil
-        notifyFailure(view, "status.choice_rejected", reason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", reason)
     end
     return sent, reason
 end
@@ -218,12 +218,12 @@ function Composer.RequestDeparture(npcID, confirm)
     local lifecycle = lifecycleState(view)
     if not view then return false, "conversation_not_ready" end
     if not lifecycle then
-        notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", "conversation_not_ready")
         return false, "conversation_not_ready"
     end
     local leaseReady, leaseReason = ensureLease(view)
     if not leaseReady then
-        notifyFailure(view, "status.choice_rejected", leaseReason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", leaseReason)
         return false, leaseReason
     end
     local id = requestID("departure")
@@ -240,7 +240,7 @@ function Composer.RequestDeparture(npcID, confirm)
     )
     if not sent then
         view.spec.context.pendingConversationRequest = nil
-        notifyFailure(view, "status.choice_rejected", reason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", reason)
     end
     return sent, reason
 end

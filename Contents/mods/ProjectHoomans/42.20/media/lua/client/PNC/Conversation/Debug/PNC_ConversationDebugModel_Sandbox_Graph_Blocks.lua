@@ -49,7 +49,7 @@ function SandboxBlocks.Build(context)
                 end
                 choices[#choices + 1] = {
                     id = "sandbox_back_to_blocks",
-                    text = SandboxContext.DebugText("sandbox.back_to_blocks"),
+                    text = SandboxContext.DebugText("UI_PsychopatzConversation_Debugger_Sandbox_BackToBlocks"),
                     log = false,
                     next = categoryNodeID,
                 }

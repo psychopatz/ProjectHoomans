@@ -15,7 +15,7 @@ PsychopatzCore = {
     Conversation = {
         Text = {
             Resolve = function(payload)
-                return payload and payload.key or "identity.stranger"
+                return payload and payload.key
             end,
         },
     },
@@ -87,7 +87,7 @@ ClientState.npcPresentations[npcID] = {
 local state, name = projection(entry)
 T.equal(state, "unknown",
     "placeholder projection stays unknown before any disclosure")
-T.equal(name, "identity.stranger",
+T.equal(name, "UI_PsychopatzConversation_Identity_Stranger",
     "placeholder projection renders the stranger label, not the placeholder")
 
 -- 2. Learned fact present: the real fact wins over the stale placeholder.
@@ -129,7 +129,7 @@ ClientState.npcKnowledge[npcID] = {
 state, name = projection(entry)
 T.equal(state, "unknown",
     "a descriptor without a usable value stays unknown")
-T.equal(name, "identity.stranger",
+T.equal(name, "UI_PsychopatzConversation_Identity_Stranger",
     "a valueless descriptor cannot surface a name")
 
 T.finish("pnc_identity_placeholder_projection_smoke")

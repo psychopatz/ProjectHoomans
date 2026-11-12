@@ -2,7 +2,6 @@ local Conversation = PNC.Conversation
 local Composer = Conversation.Composer
 local Internal = Composer.Internal
 
-local SYSTEM_SOURCE = Internal.SYSTEM_SOURCE
 local ADMISSION_SOURCE = {
     modID = "ProjectHoomans",
     pathPattern = "media/translation/{language}/Conversation/Text/social/greetings/settlement_admission/arrival.json",
@@ -59,7 +58,7 @@ function Composer.ReceiveSettlementAdmissionOutcome(args)
         if PNC.Client and PNC.Client.RequestConversationRelationship then
             PNC.Client.RequestConversationRelationship(args.npcID)
         end
-        notifyFailure(view, "status.choice_rejected", args.reason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", args.reason)
         return false, args.reason
     end
     local context = view.spec.context.conversationBlockContext
@@ -67,8 +66,8 @@ function Composer.ReceiveSettlementAdmissionOutcome(args)
         kind = "settlement_admission",
         choiceID = "settlement_admission",
         playerText = resolvedDialogue(dialoguePayload(
-            SYSTEM_SOURCE,
-            "choice.settlement_admission",
+            nil,
+            "UI_PsychopatzConversation_Choice_SettlementAdmission",
             context
         )),
         npcText = resolvedDialogue(dialoguePayload(

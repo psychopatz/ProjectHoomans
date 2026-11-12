@@ -19,6 +19,7 @@ from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringServi
 
 
 REPOSITORY = Path(__file__).resolve().parents[4]
+CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 
 
 class CodeBuilderConsolidationTests(unittest.TestCase):
@@ -68,10 +69,10 @@ class CodeBuilderConsolidationTests(unittest.TestCase):
 
     def test_authoring_service_uses_manifest_backed_datasets(self) -> None:
         service = SemanticLabAuthoringService(
-            repository=REPOSITORY,
-            runtime_root=REPOSITORY,
+            repository=CORE_REPOSITORY,
+            runtime_root=CORE_REPOSITORY,
         )
-        self.assertEqual(service.repository, REPOSITORY.resolve())
+        self.assertEqual(service.repository, CORE_REPOSITORY.resolve())
         report = service.preview_dataset_generation("semantic_flows")
         self.assertTrue(report["ok"], report)
         self.assertTrue(report["previewOnly"])
@@ -89,8 +90,8 @@ class CodeBuilderConsolidationTests(unittest.TestCase):
 
     def test_dataset_library_catalog_search_and_validation_use_canonical_sources(self) -> None:
         service = SemanticLabAuthoringService(
-            repository=REPOSITORY,
-            runtime_root=REPOSITORY,
+            repository=CORE_REPOSITORY,
+            runtime_root=CORE_REPOSITORY,
         )
         sources = service.list_dataset_sources()
         self.assertEqual(

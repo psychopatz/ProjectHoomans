@@ -14,12 +14,10 @@ function ExtensionParts.Build(npcID, semanticFactory)
             relationship = Relationship.GetPresentation(npcID),
             visible = Relationship.IsPresentationVisible(),
             title = {
-                key = "panel.current_relation",
-                domain = "pnc.system.categories",
+                key = "UI_PsychopatzConversation_Panel_CurrentRelation",
             },
             editLabel = {
-                key = "panel.current_relation_edit",
-                domain = "pnc.system.categories",
+                key = "UI_PsychopatzConversation_Panel_CurrentRelationEdit",
             },
         },
         {
@@ -29,8 +27,7 @@ function ExtensionParts.Build(npcID, semanticFactory)
             -- factory is passed to the extension presenter.
             visible = semanticFactory ~= nil,
             title = {
-                key = "panel.llm_input",
-                domain = "pnc.system.categories",
+                key = "UI_PsychopatzConversation_Panel_LLMInput",
                 fallback = "TYPE TO TALK",
             },
         },

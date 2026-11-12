@@ -5,7 +5,7 @@ local Composer = Conversation.Composer
 local Internal = Composer.Internal
 local Presentation = {}
 
-local SYSTEM_SOURCE = Internal.SYSTEM_SOURCE
+local RECRUITMENT_SOURCE = Internal.RecruitmentSource
 local appendDiary = Internal.AppendDiary
 local dialoguePayload = Internal.DialoguePayload
 local notifyFailure = Internal.NotifyFailure
@@ -14,7 +14,7 @@ local resolvedDialogue = Internal.ResolvedDialogue
 
 local function rejectedReplyPayload(args, context)
     return dialoguePayload(
-        SYSTEM_SOURCE,
+        RECRUITMENT_SOURCE,
         args.responseKey,
         context,
         { route = args.route or "none" }
@@ -23,8 +23,8 @@ end
 
 local function acceptedReplyPayload(args, context)
     return dialoguePayload(
-        SYSTEM_SOURCE,
-        args.responseKey or "response.recruit.admire.1",
+        RECRUITMENT_SOURCE,
+        args.responseKey or "recruitment.admire.1",
         context,
         { route = args.route or "admire" }
     )
@@ -38,8 +38,8 @@ function Presentation.AppendRejected(state)
         kind = "recruitment",
         choiceID = "recruit",
         playerText = resolvedDialogue(dialoguePayload(
-            SYSTEM_SOURCE,
-            "choice.recruit",
+            nil,
+            "UI_PsychopatzConversation_Choice_Recruit",
             context
         )),
         npcText = resolvedDialogue(rejectedReplyPayload(args, context)),
@@ -68,10 +68,10 @@ function Presentation.AppendRejected(state)
             session.pendingNext = "menu"
             if #session.queue == 0 then session:finishPending() end
         else
-            notifyFailure(state.view, "status.choice_rejected", args.reason)
+            notifyFailure(state.view, "UI_PsychopatzConversation_Status_ChoiceRejected", args.reason)
         end
     else
-        notifyFailure(state.view, "status.choice_rejected", args.reason)
+        notifyFailure(state.view, "UI_PsychopatzConversation_Status_ChoiceRejected", args.reason)
     end
 end
 
@@ -82,7 +82,7 @@ function Presentation.AppendAccepted(state)
         kind = "recruitment",
         choiceID = "recruit",
         playerText = resolvedDialogue(dialoguePayload(
-            SYSTEM_SOURCE, "choice.recruit", context
+            nil, "UI_PsychopatzConversation_Choice_Recruit", context
         )),
         npcText = resolvedDialogue(acceptedReplyPayload(args, context)),
         delta = args.relationshipDelta,

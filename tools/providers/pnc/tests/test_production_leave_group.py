@@ -254,7 +254,7 @@ class ProductionLeaveGroupTests(unittest.TestCase):
             response = worker.suggestion_click(disband["frame"])
             payload = self._departure_payload(response)
             self.assertTrue(response["accepted"], response)
-            self.assertEqual(payload["responseKey"], "response.departure.rejected")
+            self.assertEqual(payload["responseKey"], "departure.rejected")
             self.assertFalse(payload["success"])
             self.assertEqual(payload["reason"], expected_reason)
 
@@ -317,7 +317,7 @@ class ProductionLeaveGroupTests(unittest.TestCase):
             self.assertTrue(warning["accepted"], warning)
             warning_payload = self._departure_payload(warning)
             self.assertEqual(
-                warning_payload["responseKey"], "response.departure.warning"
+                warning_payload["responseKey"], "departure.warning"
             )
             self.assertTrue(warning_payload["warning"])
             self.assertEqual(
@@ -347,7 +347,7 @@ class ProductionLeaveGroupTests(unittest.TestCase):
             confirmed_payload = self._departure_payload(confirmed)
             self.assertEqual(
                 confirmed_payload["responseKey"],
-                "response.departure.confirmed",
+                "departure.confirmed",
             )
             self.assertTrue(confirmed_payload["success"])
             self.assertEqual(
@@ -366,7 +366,7 @@ class ProductionLeaveGroupTests(unittest.TestCase):
                 message
                 for message in post.get("transcript", [])
                 if message.get("payload", {}).get("key")
-                == "response.departure.confirmed"
+                == "departure.confirmed"
             ]
             self.assertEqual(len(confirmed_transcript), 1, post["transcript"])
 
@@ -502,9 +502,9 @@ class ProductionLeaveGroupTests(unittest.TestCase):
                 warning = worker.suggestion_click(disband["frame"])
                 warning_payload = self._departure_payload(warning)
                 self.assertEqual(
-                    warning_payload["responseKey"], "response.departure.warning"
+                    warning_payload["responseKey"], "departure.warning"
                 )
-                self._message_text(warning, "response.departure.warning")
+                self._message_text(warning, "departure.warning")
                 self.assertEqual(worker.snapshot()["translation"]["language"], language)
 
                 confirm = self._candidate(worker.snapshot(), "disband_confirm")
@@ -513,9 +513,9 @@ class ProductionLeaveGroupTests(unittest.TestCase):
                 confirmed_payload = self._departure_payload(confirmed)
                 self.assertEqual(
                     confirmed_payload["responseKey"],
-                    "response.departure.confirmed",
+                    "departure.confirmed",
                 )
-                self._message_text(confirmed, "response.departure.confirmed")
+                self._message_text(confirmed, "departure.confirmed")
                 self.assertEqual(worker.snapshot()["translation"]["language"], language)
 
 

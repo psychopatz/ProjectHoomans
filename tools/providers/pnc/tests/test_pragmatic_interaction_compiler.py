@@ -11,7 +11,7 @@ from pathlib import Path
 from tools.semantic_harness.codebuilder.conversation_compiler import (
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
-    conversation_translation_bundles,
+    conversation_translation_catalogs_by_owner,
     render_conversation_runtime_plan,
 )
 
@@ -80,9 +80,15 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
             self.assertNotIn("labelKey", record)
             self.assertNotIn("descriptionKey", record)
 
-        bundles = conversation_translation_bundles(model)
         for language in ("EN", "TL"):
-            self.assertNotIn("Director", bundles[language])
+            self.assertTrue(
+                all(
+                    "Director" not in owner_catalogs.get(language, {})
+                    for owner_catalogs in conversation_translation_catalogs_by_owner(
+                        model
+                    ).values()
+                )
+            )
 
         _modules, reports = render_conversation_runtime_plan(model)
         self.assertTrue(
@@ -176,12 +182,22 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
                 repository,
                 runtime_root=REPOSITORY,
             )
-            bundles = conversation_translation_bundles(model)
-            self.assertIn("XX", bundles)
-            self.assertIn("Social", bundles["XX"])
-            self.assertIn(
-                "conversation.content.semantic.interaction.argument.retaliate.neutral.01",
-                bundles["XX"]["Social"],
+            catalogs = conversation_translation_catalogs_by_owner(model)
+            self.assertTrue(
+                any("XX" in owner_catalogs for owner_catalogs in catalogs.values())
+            )
+            self.assertTrue(
+                any(
+                    "Social" in owner_catalogs.get("XX", {})
+                    for owner_catalogs in catalogs.values()
+                )
+            )
+            self.assertTrue(
+                any(
+                    "conversation.content.semantic.interaction.argument.retaliate.neutral.01"
+                    in owner_catalogs.get("XX", {}).get("Social", {})
+                    for owner_catalogs in catalogs.values()
+                )
             )
 
 

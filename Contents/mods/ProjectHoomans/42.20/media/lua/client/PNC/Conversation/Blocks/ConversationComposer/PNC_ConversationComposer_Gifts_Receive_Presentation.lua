@@ -41,7 +41,7 @@ local function giftReplyPayload(giftEffect, source, key, context, args)
     if reaction then
         return {
             key = reaction.key,
-            domain = "pnc.system.categories",
+            domain = "pnc.needs.gifts",
             fallback = reaction.fallback,
             args = args,
         }
@@ -67,7 +67,7 @@ local function giftFailurePayload(reason)
     end
     return {
         key = "semantic.gift.failed",
-        domain = "pnc.system.categories",
+        domain = "pnc.needs.gifts",
         fallback = fallback,
         args = { reason = tostring(reason or "gift_failed") },
     }

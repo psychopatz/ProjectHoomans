@@ -678,13 +678,13 @@ class ContextualTalkParityTests(unittest.TestCase):
         self.assertTrue(clicked_npc[-1]["payload"].get("text"))
         self.assertTrue(
             clicked_npc[-1]["payload"]["key"].startswith(
-                "response.recruit.reject.relationship."
+                "recruitment.reject.relationship."
             )
         )
 
         expected_replies = {
-            "companion": "response.recruit.reject.member.",
-            "enemy": "response.recruit.reject.hostile.",
+            "companion": "recruitment.reject.member.",
+            "enemy": "recruitment.reject.hostile.",
         }
         for profile, response_prefix in expected_replies.items():
             scenario = apply_npc_profile(deepcopy(DEFAULT_SCENARIO), profile)
@@ -721,7 +721,7 @@ class ContextualTalkParityTests(unittest.TestCase):
         ]
         self.assertTrue(npc_messages)
         self.assertTrue(
-            npc_messages[-1]["payload"]["key"].startswith("response.recruit.")
+            npc_messages[-1]["payload"]["key"].startswith("recruitment.")
         )
         recruit_results = [
             item

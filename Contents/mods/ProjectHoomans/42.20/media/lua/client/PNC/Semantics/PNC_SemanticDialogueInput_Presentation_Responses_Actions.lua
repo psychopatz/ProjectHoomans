@@ -63,7 +63,7 @@ function ResponseAdapter.CampAcknowledgement(result, actionResult)
     if not text then return nil end
     return {
         key = "semantic.camp.requested",
-        domain = "pnc.system.categories",
+        domain = "pnc.semantic.dialogue",
         text = text,
         fallback = text,
     }

@@ -21,7 +21,7 @@ function SandboxCategories.Append(graph, context)
     for _, category in ipairs(Registry.ListCategories()) do
         local entries = graph.blocksByCategory[category.id] or {}
         if #entries > 0 then
-            Loader.EnsureSource(category.textSource, { category.labelKey })
+            Loader.ValidateSource(category.textSource, { category.labelKey })
             local categoryLabel = Loader.Payload(
                 category.textSource,
                 category.labelKey
@@ -40,7 +40,7 @@ function SandboxCategories.Append(graph, context)
                 )
                 blockChoices[#blockChoices + 1] = {
                     id = entry.block.id,
-                    text = SandboxContext.DebugText("sandbox.block_choice", {
+                    text = SandboxContext.DebugText("UI_PsychopatzConversation_Debugger_Sandbox_BlockChoice", {
                         id = entry.block.id,
                         audiences = table.concat(
                             entry.block.audiences or {},
@@ -62,13 +62,13 @@ function SandboxCategories.Append(graph, context)
             blockChoices[#blockChoices + 1] = {
                 id = "sandbox_back_to_categories",
                 text = SandboxContext.DebugText(
-                    "sandbox.back_to_categories"
+                    "UI_PsychopatzConversation_Debugger_Sandbox_BackToCategories"
                 ),
                 log = false,
                 next = "sandbox:categories",
             }
             graph.nodes[SandboxContext.CategoryNodeID(category.id)] = {
-                npc = SandboxContext.DebugText("sandbox.category_prompt", {
+                npc = SandboxContext.DebugText("UI_PsychopatzConversation_Debugger_Sandbox_CategoryPrompt", {
                     category = PsychopatzCore.Conversation.Text.Resolve(
                         categoryLabel
                     ),
@@ -79,7 +79,7 @@ function SandboxCategories.Append(graph, context)
         end
     end
     graph.nodes["sandbox:categories"] = {
-        npc = SandboxContext.DebugText("sandbox.categories_prompt", {
+        npc = SandboxContext.DebugText("UI_PsychopatzConversation_Debugger_Sandbox_CategoriesPrompt", {
             count = graph.runnableBlocks,
         }),
         choices = categoryChoices,

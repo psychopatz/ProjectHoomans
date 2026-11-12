@@ -54,6 +54,16 @@ Developer-side acceptance is complete. Core tests, focused migrated provider
 tests, headless matrix checks, and fresh GUI launches pass. Native Project
 Zomboid live validation remains user-owned and is not part of this change.
 
+### P5 — Semantic source ownership and UI catalog separation
+
+Complete. Shared conversation UI/static strings now live in Core's common
+Conversation UI catalogs, while real dialogue remains in focused CodeBuilder
+text shards. The obsolete `system/categories` recipes and generated catalogs
+were removed, Core/PNC consumers were updated without compatibility shims,
+and DTCommon's shared conversation input uses the canonical Core UI key.
+CodeBuilder now preserves package-owned UI translations when regenerating
+generated suggestion entries.
+
 ## Commit gate
 
 Review and commit only goal-owned paths: Core first, then Project Hoomans.

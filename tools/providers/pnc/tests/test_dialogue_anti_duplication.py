@@ -36,20 +36,21 @@ class DialogueAntiDuplicationTests(unittest.TestCase):
         self.assertGreater(len(selected_phrases), 1)
 
     def test_recruitment_rejection_expanded_pool(self) -> None:
-        """Prove that recruitment rejection supports 10 variants in categories.json."""
+        """Prove that recruitment rejection supports 10 focused variants."""
         import json
         from pathlib import Path
 
         repo_root = Path(__file__).resolve().parents[4]
+        core_root = repo_root.parent / "psychopatzCore"
         en_cat = json.loads(
-            (repo_root / "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Text/system/shared/categories.json").read_text(encoding="utf-8")
+            (core_root / "Contents/mods/PsychopatzCore/common/media/translation/EN/Conversation/Text/social/recruitment/response.json").read_text(encoding="utf-8")
         )
         tl_cat = json.loads(
-            (repo_root / "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Text/system/shared/categories.json").read_text(encoding="utf-8")
+            (core_root / "Contents/mods/PsychopatzCore/common/media/translation/TL/Conversation/Text/social/recruitment/response.json").read_text(encoding="utf-8")
         )
 
         for i in range(1, 11):
-            key = f"response.recruit.reject.relationship.{i}"
+            key = f"recruitment.reject.relationship.{i}"
             self.assertIn(key, en_cat, f"Missing EN key {key}")
             self.assertIn(key, tl_cat, f"Missing TL key {key}")
             self.assertTrue(len(en_cat[key]) > 10)

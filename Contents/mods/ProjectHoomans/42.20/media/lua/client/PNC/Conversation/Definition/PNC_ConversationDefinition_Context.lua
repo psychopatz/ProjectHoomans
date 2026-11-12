@@ -9,7 +9,6 @@ local IdentityPresentation = PNC.NPCIdentityPresentation
 local AddressResolver = PNC.Semantics
     and PNC.Semantics.AddressResolver
     or require "PNC/Semantics/PNC_SemanticAddressResolver"
-local Loader = PsychopatzCore.Conversation.TextCatalog
 
 if type(Addressing) ~= "table"
     or type(Addressing.ResolveForNPC) ~= "function"
@@ -25,17 +24,9 @@ then
     IdentityPresentation = PNC.NPCIdentityPresentation
 end
 
-local SYSTEM_SOURCE = {
-    modID = "PsychopatzCore",
-        pathPattern = "media/translation/{language}/Conversation/Text/system/categories.json",
-    domain = "pnc.system.categories",
-}
-
 local function systemText(key)
-    Loader.EnsureSource(SYSTEM_SOURCE, { key })
     return PsychopatzCore.Conversation.Text.Resolve({
         key = key,
-        domain = SYSTEM_SOURCE.domain,
     })
 end
 
@@ -96,7 +87,7 @@ local function visibleIdentityArguments(
     npcKnown,
     npcID
 )
-    local stranger = systemText("identity.stranger")
+    local stranger = systemText("UI_PsychopatzConversation_Identity_Stranger")
     local playerContext = clientState and clientState.playerContext or {}
     local playerAddress = Addressing.ResolveForNPC({
         npcID = npcID,
@@ -321,7 +312,7 @@ local function identityProjection(entry)
     end
     local name = state == "known"
         and tostring(knownName)
-        or systemText("identity.stranger")
+        or systemText("UI_PsychopatzConversation_Identity_Stranger")
     return state, name, projection, clientState, identityClaimVerified
 end
 

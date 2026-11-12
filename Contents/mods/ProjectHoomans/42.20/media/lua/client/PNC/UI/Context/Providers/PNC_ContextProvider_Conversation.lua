@@ -12,12 +12,6 @@ local Provider = {
     id = "conversation",
 }
 
-local SOURCE = {
-    modID = "PsychopatzCore",
-    pathPattern = "media/translation/{language}/Conversation/Text/system/categories.json",
-    domain = "pnc.system.categories",
-}
-
 local function auditTalk(eventName, data)
     local diagnostics = PNC.Semantics
         and PNC.Semantics.SemanticDiagnostics or nil
@@ -28,12 +22,9 @@ local function auditTalk(eventName, data)
 end
 
 local function tr(key)
-    if PsychopatzCore.Conversation.TextCatalog then
-        PsychopatzCore.Conversation.TextCatalog.EnsureSource(SOURCE, { key })
-    end
     local text = PsychopatzCore and PsychopatzCore.Conversation
         and PsychopatzCore.Conversation.Text
-    return text and text.Resolve({ key = key, domain = SOURCE.domain }) or key
+    return text and text.Resolve({ key = key }) or key
 end
 
 function Provider.isEnabled(entry)
@@ -42,7 +33,7 @@ end
 
 function Provider.addOptions(menu, entry, player)
     local option = menu:addOption(
-        tr("context.talk"),
+        tr("UI_PsychopatzConversation_Context_Talk"),
         nil,
         function()
             if PNC.Conversation and PNC.Conversation.Open then

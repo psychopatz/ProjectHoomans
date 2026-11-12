@@ -36,7 +36,7 @@ function TaskResultPresentation.QueueResult(view, payload, pending, action)
     end
     outputSession:queueMessage("npc", {
         key = "semantic.task.result",
-        domain = "pnc.system.categories",
+        domain = "pnc.semantic.dialogue",
         fallback = text,
         text = text,
     }, {

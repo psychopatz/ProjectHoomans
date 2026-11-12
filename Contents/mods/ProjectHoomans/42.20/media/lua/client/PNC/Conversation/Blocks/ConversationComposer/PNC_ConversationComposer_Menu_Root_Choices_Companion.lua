@@ -5,7 +5,6 @@ local Composer = Conversation.Composer
 local Internal = Composer.Internal
 local Companion = {}
 
-local SYSTEM_SOURCE = Internal.MenuSystemSource
 local dialoguePayload = Internal.MenuDialoguePayload
 
 local function setPreviewRequirement(context, highlighted, requirement)
@@ -38,8 +37,8 @@ local function appendUnrecruitedChoices(choices, context)
                 groupID = "conversation_actions",
             },
             text = dialoguePayload(
-                SYSTEM_SOURCE,
-                "choice.settlement_admission",
+                nil,
+                "UI_PsychopatzConversation_Choice_SettlementAdmission",
                 context
             ),
             action = function()
@@ -60,8 +59,8 @@ local function appendUnrecruitedChoices(choices, context)
                 groupID = "conversation_actions",
             },
             text = dialoguePayload(
-                SYSTEM_SOURCE,
-                "choice.ambient_visit",
+                nil,
+                "UI_PsychopatzConversation_Choice_AmbientVisit",
                 context
             ),
             action = function()
@@ -78,7 +77,7 @@ local function appendUnrecruitedChoices(choices, context)
             groupID = "conversation_actions",
         },
         text = dialoguePayload(
-            SYSTEM_SOURCE, "choice.recruit", context
+            nil, "UI_PsychopatzConversation_Choice_Recruit", context
         ),
         onHighlightChanged = function(_, highlighted)
             setPreviewRequirement(context, highlighted, "recruit")
@@ -103,7 +102,7 @@ local function appendRecruitedChoices(choices, context)
                 groupID = "conversation_actions",
             },
             text = dialoguePayload(
-                SYSTEM_SOURCE, "choice.disband_confirm", context
+                nil, "UI_PsychopatzConversation_Choice_DisbandConfirm", context
             ),
             onHighlightChanged = function(_, highlighted)
                 departurePreview(highlighted)
@@ -121,7 +120,7 @@ local function appendRecruitedChoices(choices, context)
                 groupID = "conversation_actions",
             },
             text = dialoguePayload(
-                SYSTEM_SOURCE, "choice.disband_cancel", context
+                nil, "UI_PsychopatzConversation_Choice_DisbandCancel", context
             ),
             next = "menu",
             action = function()
@@ -143,7 +142,7 @@ local function appendRecruitedChoices(choices, context)
             groupID = "conversation_actions",
         },
         text = dialoguePayload(
-            SYSTEM_SOURCE, "choice.disband", context
+            nil, "UI_PsychopatzConversation_Choice_Disband", context
         ),
         onHighlightChanged = function(_, highlighted)
             departurePreview(highlighted)

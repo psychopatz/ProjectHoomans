@@ -7,6 +7,19 @@ local Internal = Suggestions.Internal
 local normalized = Internal.normalized
 local resolvedText = Internal.resolvedText
 
+local CATEGORY_UI_KEYS = {
+    ask_about = "UI_PsychopatzConversation_Category_AskAbout",
+    goodbye = "UI_PsychopatzConversation_Category_Goodbye",
+    greetings = "UI_PsychopatzConversation_Category_Greetings",
+    needs = "UI_PsychopatzConversation_Category_Needs",
+    personal = "UI_PsychopatzConversation_Category_Personal",
+    relationship = "UI_PsychopatzConversation_Category_Relationship",
+    set_territory = "UI_PsychopatzConversation_Category_SetTerritory",
+    small_talk = "UI_PsychopatzConversation_Category_SmallTalk",
+    wellbeing = "UI_PsychopatzConversation_Category_Wellbeing",
+    work_orders = "UI_PsychopatzConversation_Category_WorkOrders",
+}
+
 local function identityTopic(value)
     value = string.lower(tostring(value or ""))
     if string.find(value, "nickname", 1, true) then
@@ -235,9 +248,12 @@ function Suggestions.BuildConversationCategoryFrame(ir, revision)
         intent = "QUESTION",
         speechAct = "QUESTION",
         subject = "CONVERSATION_TOPIC",
-        textKey = "category." .. topic,
-        textFallback = resolvedText("category." .. topic, "What's up?"),
-        labelKey = "category." .. topic,
+        textKey = CATEGORY_UI_KEYS[topic] or topic,
+        textFallback = resolvedText(
+            CATEGORY_UI_KEYS[topic] or topic,
+            "What's up?"
+        ),
+        labelKey = CATEGORY_UI_KEYS[topic] or topic,
         requestRevision = tonumber(revision) or 0,
         extensions = {
             route = "conversation_category",

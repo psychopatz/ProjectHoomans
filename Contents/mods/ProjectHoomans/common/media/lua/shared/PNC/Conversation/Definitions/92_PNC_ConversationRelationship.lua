@@ -3,7 +3,8 @@ H.RegisterSimple("relationship", "special", "social/relationship/special/affinit
     textOwner = "PsychopatzCore",
     gates = {{
         type = "pnc:relationship", axis = "approval",
-        operator = ">=", value = 20, reasonKey = "locked.approval",
+        operator = ">=", value = 20,
+        reasonKey = "UI_PsychopatzConversation_Locked_Approval",
     }},
     choices = {
         H.ContinueChoice("us", {

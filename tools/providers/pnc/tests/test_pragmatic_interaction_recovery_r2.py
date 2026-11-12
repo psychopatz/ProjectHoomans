@@ -12,7 +12,7 @@ import unittest
 from tools.semantic_harness.codebuilder.conversation_compiler import (
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
-    conversation_translation_bundles,
+    conversation_translation_catalogs_by_owner,
 )
 from tools.semantic_harness.codebuilder.service import SemanticLabAuthoringService
 from tools.providers.pnc.runtime.scenario import DEFAULT_SCENARIO
@@ -66,15 +66,15 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
         ):
             self.assertIn(template, templates)
 
-        bundles = conversation_translation_bundles(model)
-        self.assertIn(
-            "conversation.content.semantic.interaction.argument.retaliate.neutral.01",
-            bundles["EN"]["Social"],
-        )
-        self.assertIn(
-            "conversation.content.semantic.interaction.argument.retaliate.neutral.01",
-            bundles["TL"]["Social"],
-        )
+        catalogs = conversation_translation_catalogs_by_owner(model)
+        for language in ("EN", "TL"):
+            self.assertTrue(
+                any(
+                    "conversation.content.semantic.interaction.argument.retaliate.neutral.01"
+                    in owner_catalogs.get(language, {}).get("Social", {})
+                    for owner_catalogs in catalogs.values()
+                )
+            )
 
     def test_existing_dialogue_content_authoring_edits_interaction_wording(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -85,7 +85,8 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
             )
             service = SemanticLabAuthoringService(
                 repository,
-                runtime_root=REPOSITORY,
+                runtime_root=repository,
+                core_repository=repository,
             )
             content_id = "phrase.semantic.interaction.argument.retaliate"
             current = service.load_dialogue_content(content_id)
@@ -149,12 +150,12 @@ class PragmaticInteractionRecoveryR2Tests(unittest.TestCase):
             )
             en = (
                 repository
-                / "Contents/mods/ProjectHoomans/common/media/translation"
+                / "Contents/mods/PsychopatzCore/common/media/translation"
                 / "EN/Conversation/Social.json"
             ).read_text(encoding="utf-8")
             tl = (
                 repository
-                / "Contents/mods/ProjectHoomans/common/media/translation"
+                / "Contents/mods/PsychopatzCore/common/media/translation"
                 / "TL/Conversation/Social.json"
             ).read_text(encoding="utf-8")
             self.assertIn("You are really pushing me now.", en)

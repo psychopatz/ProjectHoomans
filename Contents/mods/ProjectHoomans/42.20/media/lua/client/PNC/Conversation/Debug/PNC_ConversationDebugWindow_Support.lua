@@ -6,16 +6,9 @@ local UI = Internal.UI
 local Theme = Internal.Theme
 local Layout = Internal.Layout
 
-local DEBUG_SOURCE = {
-    modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Text/system/debugger.json",
-    domain = "pnc.system.debugger",
-}
-
 local function tr(key, args)
-    PsychopatzCore.Conversation.TextCatalog.EnsureSource(DEBUG_SOURCE, { key })
     return PsychopatzCore.Conversation.Text.Resolve({
-        key = key, domain = DEBUG_SOURCE.domain, args = args,
+        key = key, args = args,
     })
 end
 
@@ -35,11 +28,11 @@ local function drawBlock(list, y, entry, alternate)
     local detail = table.concat({
         item.block.category or "?",
         table.concat(item.block.audiences or {}, ","),
-        item.translationFallback and tr("status.text_fallback")
-            or item.translationValid and tr("status.text_ok")
-            or tr("status.text_missing"),
-        item.eligible and tr("status.eligible")
-            or tostring(item.eligibilityReason or tr("status.unknown")),
+        item.translationFallback and tr("UI_PsychopatzConversation_Debugger_Status_TextFallback")
+            or item.translationValid and tr("UI_PsychopatzConversation_Debugger_Status_TextOk")
+            or tr("UI_PsychopatzConversation_Debugger_Status_TextMissing"),
+        item.eligible and tr("UI_PsychopatzConversation_Debugger_Status_Eligible")
+            or tostring(item.eligibilityReason or tr("UI_PsychopatzConversation_Debugger_Status_Unknown")),
     }, " | ")
     list:drawText(Layout.Ellipsize(detail, UIFont.Small,
         list:getWidth() - 16), 8, y + 24,
@@ -49,9 +42,9 @@ local function drawBlock(list, y, entry, alternate)
 end
 
 local function booleanText(value)
-    if value == true then return tr("status.yes") end
-    if value == false then return tr("status.no") end
-    return tr("status.unknown")
+    if value == true then return tr("UI_PsychopatzConversation_Debugger_Status_Yes") end
+    if value == false then return tr("UI_PsychopatzConversation_Debugger_Status_No") end
+    return tr("UI_PsychopatzConversation_Debugger_Status_Unknown")
 end
 
 local function statusTone(value)

@@ -2,7 +2,6 @@ local Conversation = PNC.Conversation
 local Composer = Conversation.Composer
 local Internal = Composer.Internal
 
-local SYSTEM_SOURCE = Internal.SYSTEM_SOURCE
 local VISIT_SOURCE = {
     modID = "ProjectHoomans",
     pathPattern = "media/translation/{language}/Conversation/Text/social/greetings/ambient_visit/arrival.json",
@@ -27,7 +26,7 @@ function Composer.ReceiveAmbientVisitOutcome(args)
         view.spec.context.lastConversationError = tostring(
             args.reason or "ambient_visit_rejected"
         )
-        notifyFailure(view, "status.choice_rejected", args.reason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", args.reason)
         return false, args.reason
     end
     local context = view.spec.context.conversationBlockContext
@@ -35,8 +34,8 @@ function Composer.ReceiveAmbientVisitOutcome(args)
         kind = "ambient_visit",
         choiceID = "ambient_visit",
         playerText = resolvedDialogue(dialoguePayload(
-            SYSTEM_SOURCE,
-            "choice.ambient_visit",
+            nil,
+            "UI_PsychopatzConversation_Choice_AmbientVisit",
             context
         )),
         npcText = resolvedDialogue(dialoguePayload(

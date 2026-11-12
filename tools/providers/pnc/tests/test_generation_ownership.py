@@ -17,7 +17,7 @@ from tools.semantic_harness.codebuilder.build import (
 from tools.semantic_harness.codebuilder.conversation_compiler import (
     CONVERSATION_SOURCE_RELATIVE,
     compile_conversation_sources,
-    conversation_translation_bundles_by_owner,
+    conversation_translation_catalogs_by_owner,
     render_conversation_runtime_plan,
 )
 from tools.semantic_harness.codebuilder.generation_ownership import (
@@ -234,15 +234,15 @@ class GenerationOwnershipTests(unittest.TestCase):
                 if item["id"] == "behavior.acknowledge_memory"
             )
             self.assertEqual(behavior_record["owner"], "DTCommon")
-            bundles = conversation_translation_bundles_by_owner(
+            catalogs = conversation_translation_catalogs_by_owner(
                 model,
                 package_repositories={"DTCommon": dynamic_trading},
             )
-            self.assertIn("DTCommon", bundles)
+            self.assertIn("DTCommon", catalogs)
             self.assertTrue(
                 any(
                     values
-                    for domains in bundles["DTCommon"].values()
+                    for domains in catalogs["DTCommon"].values()
                     for values in domains.values()
                 )
             )

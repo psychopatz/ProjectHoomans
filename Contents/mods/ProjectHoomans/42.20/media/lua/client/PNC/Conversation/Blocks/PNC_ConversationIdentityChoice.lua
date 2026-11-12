@@ -38,8 +38,7 @@ function IdentityChoice.Build(npcID, projection, identityArguments)
             groupID = "conversation_utilities",
         },
         text = {
-            key = "choice.ask_name",
-            domain = "pnc.system.categories",
+            key = "UI_PsychopatzConversation_Choice_AskName",
             args = identityArguments,
         },
         action = function()

@@ -1,18 +1,17 @@
 local H = PNC.Conversation.DefinitionHelpers
 local Registry = PsychopatzCore.Conversation.Registry
-local categorySource = H.Source("system/categories", "PsychopatzCore")
 
 local categories = {
-    { "greetings", "category.greetings", -100, true },
-    { "wellbeing", "category.wellbeing", 200 },
-    { "small_talk", "category.small_talk", 300 },
-    { "ask_about", "category.ask_about", 400 },
-    { "needs", "category.needs", 500 },
-    { "work_orders", "category.work_orders", 600 },
-    { "personal", "category.personal", 800 },
-    { "relationship", "category.relationship", 900 },
-    { "set_territory", "category.set_territory", 950 },
-    { "goodbye", "category.goodbye", 10000, true },
+    { "greetings", "UI_PsychopatzConversation_Category_Greetings", -100, true },
+    { "wellbeing", "UI_PsychopatzConversation_Category_Wellbeing", 200 },
+    { "small_talk", "UI_PsychopatzConversation_Category_SmallTalk", 300 },
+    { "ask_about", "UI_PsychopatzConversation_Category_AskAbout", 400 },
+    { "needs", "UI_PsychopatzConversation_Category_Needs", 500 },
+    { "work_orders", "UI_PsychopatzConversation_Category_WorkOrders", 600 },
+    { "personal", "UI_PsychopatzConversation_Category_Personal", 800 },
+    { "relationship", "UI_PsychopatzConversation_Category_Relationship", 900 },
+    { "set_territory", "UI_PsychopatzConversation_Category_SetTerritory", 950 },
+    { "goodbye", "UI_PsychopatzConversation_Category_Goodbye", 10000, true },
 }
 
 for _, value in ipairs(categories) do
@@ -22,7 +21,6 @@ for _, value in ipairs(categories) do
         order = value[3],
         system = value[4] == true,
         ["repeat"] = value[5],
-        textSource = categorySource,
     }
     for key, extra in pairs(value[6] or {}) do
         spec[key] = extra

@@ -17,10 +17,20 @@ local Diary = Conversation.Diary
 Composer.requestSerial = tonumber(Composer.requestSerial) or 0
 Composer.localRequests = Composer.localRequests or {}
 
-local SYSTEM_SOURCE = {
+local RECRUITMENT_SOURCE = {
     modID = "PsychopatzCore",
-    pathPattern = "media/translation/{language}/Conversation/Text/system/categories.json",
-    domain = "pnc.system.categories",
+    pathPattern = "media/translation/{language}/Conversation/Text/social/recruitment/response.json",
+    domain = "pnc.social.recruitment.response",
+}
+local DEPARTURE_SOURCE = {
+    modID = "PsychopatzCore",
+    pathPattern = "media/translation/{language}/Conversation/Text/social/departure/response.json",
+    domain = "pnc.social.departure.response",
+}
+local IDENTITY_SOURCE = {
+    modID = "PsychopatzCore",
+    pathPattern = "media/translation/{language}/Conversation/Text/social/identity/response.json",
+    domain = "pnc.social.identity.response",
 }
 local function activeView(npcID)
     local semantic = DialogueSession.GetActiveView()
@@ -195,7 +205,7 @@ local function notifyFailure(view, key, reason)
         view.spec.context.lastConversationError = tostring(reason or "unavailable")
     end
     local value = PsychopatzCore.Conversation.Text.Resolve(payload(
-        SYSTEM_SOURCE,
+        nil,
         key,
         { reason = tostring(reason or "unavailable") }
     ))
@@ -205,7 +215,7 @@ local function notifyFailure(view, key, reason)
     local session = view and view.session
     if session and session.append then
         session:append("npc", payload(
-            SYSTEM_SOURCE,
+            nil,
             key,
             { reason = tostring(reason or "unavailable") }
         ))
@@ -239,7 +249,9 @@ local function rememberCategoryUse(context, categoryID, outcomeID)
 end
 
 
-Internal.SYSTEM_SOURCE = SYSTEM_SOURCE
+Internal.RecruitmentSource = RECRUITMENT_SOURCE
+Internal.DepartureSource = DEPARTURE_SOURCE
+Internal.IdentitySource = IDENTITY_SOURCE
 Internal.ActiveView = activeView
 Internal.Payload = payload
 Internal.DialoguePayload = dialoguePayload

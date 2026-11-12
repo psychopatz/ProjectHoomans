@@ -38,13 +38,13 @@ function Composer.ReceiveBlock(args)
             restoreCurrentChoices(view)
             return false, args.reason
         end
-        notifyFailure(view, "status.block_unavailable", args.reason)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_BlockUnavailable", args.reason)
         return false, args.reason
     end
     local block = Registry.GetBlock(args.blockID)
     local context = view.spec.context.conversationBlockContext
     if not block or not context then
-        notifyFailure(view, "status.block_unavailable", "block_unavailable")
+        notifyFailure(view, "UI_PsychopatzConversation_Status_BlockUnavailable", "block_unavailable")
         return false, "block_unavailable"
     end
     if type(args.interactionLifecycle) == "table" then
@@ -63,7 +63,7 @@ function Composer.ReceiveBlock(args)
     end
     local attached, nodeID = Composer.AttachBlock(view.spec, block, context)
     if not attached then
-        notifyFailure(view, "status.block_unavailable", nodeID)
+        notifyFailure(view, "UI_PsychopatzConversation_Status_BlockUnavailable", nodeID)
         return false, nodeID
     end
     local automatic = view.spec.context.pendingConversationAutoChoice

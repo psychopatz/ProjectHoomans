@@ -33,7 +33,6 @@ end
 local function label(key, fallback)
     return Text.Resolve({
         key = key,
-        domain = "pnc.system.categories",
         fallback = fallback,
     }, fallback)
 end
@@ -54,16 +53,16 @@ local function stateFor(view)
     local enabled = false
     local visible = true
     if not view or not view.session then
-        status = label("llm.status.open", "OPEN A CONVERSATION")
+        status = label("UI_PsychopatzConversation_LLM_StatusOpen", "OPEN A CONVERSATION")
     elseif view.session.llmPending
         or view.session.semanticDialoguePending
         or Integration.GetPending and Integration.GetPending()
     then
-        status = label("llm.status.waiting", "WAITING FOR NPC RESPONSE...")
+        status = label("UI_PsychopatzConversation_LLM_StatusWaiting", "WAITING FOR NPC RESPONSE...")
     elseif type(view.isConversationInteractive) ~= "function"
         or not view:isConversationInteractive()
     then
-        status = label("llm.status.speaking", "NPC IS SPEAKING...")
+        status = label("UI_PsychopatzConversation_LLM_StatusSpeaking", "NPC IS SPEAKING...")
     else
         enabled = true
     end
@@ -71,7 +70,7 @@ local function stateFor(view)
         visible = visible,
         enabled = enabled,
         statusText = status,
-        sendKey = "llm.send",
+        sendKey = "UI_PsychopatzConversation_LLM_Send",
     }
 end
 
@@ -93,8 +92,7 @@ function Integration.CreateInputPart(bounds, options)
     options.minimumWidth = options.minimumWidth or 280
     options.minimumHeight = options.minimumHeight or 82
     options.title = options.title or {
-        key = "panel.llm_input",
-        domain = "pnc.system.categories",
+        key = "UI_PsychopatzConversation_Panel_LLMInput",
         fallback = "TYPE TO TALK",
     }
     options.submit = options.submit or submitHybrid
@@ -103,9 +101,12 @@ function Integration.CreateInputPart(bounds, options)
     options.maxInputLength = options.maxInputLength
         or State.MAX_INPUT_LENGTH
     options.submitOnEnter = options.submitOnEnter ~= false
-    options.tooltipKey = options.tooltipKey or "llm.input_tooltip"
-    options.sendKey = options.sendKey or "llm.send"
-    options.sendTitle = options.sendTitle or "SEND"
+    options.tooltipKey = options.tooltipKey
+        or "UI_PsychopatzConversation_LLM_InputTooltip"
+    options.sendKey = options.sendKey
+        or "UI_PsychopatzConversation_LLM_Send"
+    options.sendTitle = options.sendTitle
+        or "UI_PsychopatzConversation_LLM_Send"
     return LLMInput:new(
         bounds.x, bounds.y, bounds.width, bounds.height, options
     )

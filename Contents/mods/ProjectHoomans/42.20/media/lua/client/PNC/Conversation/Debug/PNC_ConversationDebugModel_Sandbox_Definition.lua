@@ -25,12 +25,10 @@ function SandboxDefinition.Build(state, graph)
             relationship = copy(context.relationship),
             visible = true,
             title = {
-                key = "panel.current_relation",
-                domain = "pnc.system.categories",
+                key = "UI_PsychopatzConversation_Panel_CurrentRelation",
             },
             editLabel = {
-                key = "panel.current_relation_edit",
-                domain = "pnc.system.categories",
+                key = "UI_PsychopatzConversation_Panel_CurrentRelationEdit",
             },
         }
     end

@@ -16,19 +16,12 @@ local SandboxContext = {}
 
 if not copy then return Model end
 
-local DEBUG_SOURCE = {
-    modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Text/system/debugger.json",
-    domain = "pnc.system.debugger",
-}
-
 local function sandboxText(block, key, context)
     return Loader.Payload(block.textSource, key, context.textArgs)
 end
 
 local function debugText(key, args)
-    Loader.EnsureSource(DEBUG_SOURCE, { key })
-    return Loader.Payload(DEBUG_SOURCE, key, args)
+    return PsychopatzCore.Conversation.Text.Resolve({ key = key, args = args })
 end
 
 local function sandboxCategoryNodeID(categoryID)

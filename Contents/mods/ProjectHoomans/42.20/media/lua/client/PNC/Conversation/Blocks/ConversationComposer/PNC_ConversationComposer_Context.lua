@@ -227,7 +227,7 @@ function Composer.BuildContext(
         )
     end
     context.categoryValidator = function(category)
-        return Loader.EnsureSource(
+        return Loader.ValidateSource(
             category.textSource,
             { category.labelKey }
         )

@@ -144,7 +144,7 @@ function Authority.BuildContext(player, record, token)
         )
     end
     context.categoryValidator = function(categoryDefinition)
-        return TextCatalog.EnsureSource(
+        return TextCatalog.ValidateSource(
             categoryDefinition.textSource,
             { categoryDefinition.labelKey }
         )

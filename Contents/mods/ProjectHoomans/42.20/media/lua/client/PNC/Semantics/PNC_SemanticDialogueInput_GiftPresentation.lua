@@ -11,7 +11,7 @@ local audit = Internal.Audit or function() return false end
 function Internal.GiftResponse(templateID, fallback, args)
     return {
         key = templateID,
-        domain = "pnc.system.categories",
+        domain = "pnc.needs.gifts",
         text = fallback,
         fallback = fallback,
         args = args,

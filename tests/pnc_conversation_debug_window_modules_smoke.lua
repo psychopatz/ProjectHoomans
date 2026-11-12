@@ -72,7 +72,7 @@ local item = {
     block = {
         ownerModID = "ProjectHoomans",
         category = "greeting",
-        textSource = { pathPattern = "debugger.json" },
+        textSource = { pathPattern = "conversation.json" },
         audiences = { "neutral" },
         nodes = {},
     },
@@ -109,7 +109,6 @@ PsychopatzCore = {
     UI = UI,
     Conversation = {
         Text = { Resolve = function(spec) return spec.key end },
-        TextCatalog = { EnsureSource = function() end },
     },
 }
 UIFont = { Small = 1 }
@@ -169,5 +168,9 @@ T.equal(#window.controls, 13, "debug window controls changed during split")
 T.equal(#window.blocks.items, 1, "debug window block projection changed")
 T.equal(window.blocks.items[1].item.id, "debug:block",
     "debug window selected item changed")
+T.equal(PNC.ConversationDebugUI.Text(
+    "UI_PsychopatzConversation_Debugger_Title"
+), "UI_PsychopatzConversation_Debugger_Title",
+    "debugger UI resolves through the Core translation key namespace")
 
 T.finish("pnc_conversation_debug_window_modules_smoke")

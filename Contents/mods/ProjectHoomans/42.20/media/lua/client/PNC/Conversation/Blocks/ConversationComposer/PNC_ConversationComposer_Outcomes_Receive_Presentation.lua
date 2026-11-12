@@ -13,7 +13,7 @@ local portraitAnimationForReaction = Internal.PortraitAnimationForReaction
 local resolvedDialogue = Internal.ResolvedDialogue
 
 function Presentation.Reject(state, reason)
-    notifyFailure(state.view, "status.choice_rejected", reason)
+    notifyFailure(state.view, "UI_PsychopatzConversation_Status_ChoiceRejected", reason)
 end
 
 function Presentation.AppendDiary(state)

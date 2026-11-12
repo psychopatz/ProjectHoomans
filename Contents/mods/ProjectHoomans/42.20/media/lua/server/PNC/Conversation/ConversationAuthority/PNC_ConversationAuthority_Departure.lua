@@ -23,7 +23,7 @@ local function reject(player, requestID, npcID, reason, details)
         success = false,
         reason = reason or "departure_rejected",
         npcID = tostring(npcID or ""),
-        responseKey = "response.departure.rejected",
+        responseKey = "departure.rejected",
     }
     for key, value in pairs(type(details) == "table" and details or {}) do
         payload[key] = value
@@ -74,7 +74,7 @@ function Authority.HandleDeparture(player, args)
             warning = true,
             reason = "departure_confirmation_required",
             npcID = npcID,
-            responseKey = "response.departure.warning",
+            responseKey = "departure.warning",
             departure = preview,
         })
         return false, "departure_confirmation_required"
@@ -95,7 +95,7 @@ function Authority.HandleDeparture(player, args)
         success = true,
         reason = reason or "colonist_departed",
         npcID = npcID,
-        responseKey = "response.departure.confirmed",
+        responseKey = "departure.confirmed",
         sourceFactionID = result and result.sourceFactionID,
         factionID = result and result.factionID,
         relationshipBefore = penalty and penalty.before or nil,

@@ -33,76 +33,76 @@ function ISPNCConversationDebugWindow:refreshDetails(sandbox)
     local tr = Internal.tr
     local booleanText = Internal.booleanText
     local statusTone = Internal.statusTone
-    self:addField(tr("detail.label.id"), item.id)
-    self:addField(tr("detail.label.owner"), item.block.ownerModID)
-    self:addField(tr("detail.label.category"), item.block.category)
-    self:addField(tr("detail.label.source"), item.block.textSource.pathPattern)
-    self:addField(tr("detail.label.registry"), booleanText(item.valid), {
+    self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Id"), item.id)
+    self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Owner"), item.block.ownerModID)
+    self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Category"), item.block.category)
+    self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Source"), item.block.textSource.pathPattern)
+    self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Registry"), booleanText(item.valid), {
         tone = statusTone(item.valid),
     })
-    self:addField(tr("detail.label.translation"), booleanText(item.translationValid), {
+    self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Translation"), booleanText(item.translationValid), {
         tone = statusTone(item.translationValid),
     })
-    self:addField(tr("detail.label.fallback"), booleanText(item.translationFallback), {
+    self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Fallback"), booleanText(item.translationFallback), {
         tone = item.translationFallback and "warning" or "text",
     })
     local eligible = inspection and inspection.eligible == true
-    self:addField(tr("detail.label.eligibility"), booleanText(eligible), {
+    self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Eligibility"), booleanText(eligible), {
         tone = statusTone(eligible),
     })
     if inspection and inspection.reason then
-        self:addField(tr("detail.label.reason"), inspection.reason, {
+        self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Reason"), inspection.reason, {
             tone = "warning",
         })
     end
-    self:addField(tr("detail.label.seed"), inspection and inspection.seed)
+    self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Seed"), inspection and inspection.seed)
     for _, errorValue in ipairs(item.errors or {}) do
-        self:addField(tr("detail.label.error"), errorValue, { tone = "danger" })
+        self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Error"), errorValue, { tone = "danger" })
     end
     for _, errorValue in ipairs(item.translationErrors or {}) do
-        self:addField(tr("detail.label.text_error"), errorValue, { tone = "danger" })
+        self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_TextError"), errorValue, { tone = "danger" })
     end
     local nodes = inspection and inspection.nodes or {}
     table.sort(nodes, function(left, right)
         return tostring(left.id) < tostring(right.id)
     end)
     for _, node in ipairs(nodes) do
-        self:addField(tr("detail.label.node"), node.id, { tone = "accent" })
-        self:addField(tr("detail.label.node_text"),
+        self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Node"), node.id, { tone = "accent" })
+        self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_NodeText"),
             node.textKey or table.concat(node.textKeys or {}, ","))
         for _, choice in ipairs(node.choices or {}) do
             local choiceEligible = choice.eligible == true
-            self:addField(tr("detail.label.choice"), choice.id, {
+            self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Choice"), choice.id, {
                 tone = "accent",
             })
-            self:addField(tr("detail.label.choice_status"), booleanText(choiceEligible), {
+            self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_ChoiceStatus"), booleanText(choiceEligible), {
                 tone = statusTone(choiceEligible),
             })
             if choice.reason then
-                self:addField(tr("detail.label.reason"), choice.reason, {
+                self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Reason"), choice.reason, {
                     tone = "warning",
                 })
             end
             for _, outcome in ipairs(choice.outcomes or {}) do
                 local outcomeEligible = outcome.eligible == true
-                self:addField(tr("detail.label.outcome"), outcome.id, {
+                self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Outcome"), outcome.id, {
                     tone = "accent",
                 })
-                self:addField(tr("detail.label.outcome_status"),
+                self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_OutcomeStatus"),
                     booleanText(outcomeEligible), {
                         tone = statusTone(outcomeEligible),
                     })
-                self:addField(tr("detail.label.weight"), outcome.weight)
-                self:addField(tr("detail.label.next"),
+                self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Weight"), outcome.weight)
+                self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Next"),
                     outcome.next or outcome.close and "close" or "none")
-                self:addField(tr("detail.label.response"), outcome.responseKey)
+                self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Response"), outcome.responseKey)
                 if outcome.reason then
-                    self:addField(tr("detail.label.reason"), outcome.reason, {
+                    self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Reason"), outcome.reason, {
                         tone = "warning",
                     })
                 end
                 for _, effect in ipairs(outcome.effects or {}) do
-                    self:addField(tr("detail.label.effect"), effect.type, {
+                    self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Effect"), effect.type, {
                         tone = "success",
                     })
                 end
@@ -110,10 +110,10 @@ function ISPNCConversationDebugWindow:refreshDetails(sandbox)
         end
     end
     if sandbox then
-        self:addField(tr("detail.label.sandbox_outcome"), sandbox.outcomeID, {
+            self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_SandboxOutcome"), sandbox.outcomeID, {
             tone = "success",
         })
-        self:addField(tr("detail.label.sandbox_roll"), table.concat({
+        self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_SandboxRoll"), table.concat({
             Internal.textValue(sandbox.roll), Internal.textValue(sandbox.totalWeight),
         }, " / "))
         local axes = {}
@@ -122,16 +122,16 @@ function ISPNCConversationDebugWindow:refreshDetails(sandbox)
         end
         table.sort(axes)
         for _, key in ipairs(axes) do
-            self:addField(tr("detail.label.relationship"), key)
-            self:addField(tr("detail.label.before_after"), table.concat({
+            self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Relationship"), key)
+            self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_BeforeAfter"), table.concat({
                 Internal.textValue(sandbox.before.relationship[key]),
                 Internal.textValue(sandbox.after.relationship[key]),
             }, " -> "))
         end
-        self:addField(tr("detail.label.persistence"), tr("status.no"), {
+        self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Persistence"), tr("UI_PsychopatzConversation_Debugger_Status_No"), {
             tone = "success",
         })
-        self:addField(tr("detail.label.networked"), tr("status.no"), {
+        self:addField(tr("UI_PsychopatzConversation_Debugger_Detail_Label_Networked"), tr("UI_PsychopatzConversation_Debugger_Status_No"), {
             tone = "success",
         })
     end

@@ -4,7 +4,7 @@ local Conversation = PNC.Conversation
 local Composer = Conversation.Composer
 local Internal = Composer.Internal
 
-local SYSTEM_SOURCE = Internal.SYSTEM_SOURCE
+local DEPARTURE_SOURCE = Internal.DepartureSource
 local activeView = Internal.ActiveView
 local appendDiary = Internal.AppendDiary
 local dialoguePayload = Internal.DialoguePayload
@@ -55,8 +55,8 @@ function Composer.ReceiveDepartureOutcome(args)
                 kind = "colonist_departure",
                 choiceID = "disband",
                 npcText = resolvedDialogue(dialoguePayload(
-                    SYSTEM_SOURCE,
-                    args.responseKey or "response.departure.warning",
+                    DEPARTURE_SOURCE,
+                    args.responseKey or "departure.warning",
                     context
                 )),
                 departure = args.departure,
@@ -65,8 +65,8 @@ function Composer.ReceiveDepartureOutcome(args)
         end
         if session then
             session:queueMessage("npc", dialoguePayload(
-                SYSTEM_SOURCE,
-                args.responseKey or "response.departure.warning",
+                DEPARTURE_SOURCE,
+                args.responseKey or "departure.warning",
                 context
             ))
             returnToMenu(view, context)
@@ -81,12 +81,12 @@ function Composer.ReceiveDepartureOutcome(args)
         )
         if session and args.responseKey then
             session:queueMessage("npc", dialoguePayload(
-                SYSTEM_SOURCE, args.responseKey, context,
+                DEPARTURE_SOURCE, args.responseKey, context,
                 { reason = args.reason or "departure_rejected" }
             ))
             returnToMenu(view, context)
         else
-            notifyFailure(view, "status.choice_rejected", args.reason)
+            notifyFailure(view, "UI_PsychopatzConversation_Status_ChoiceRejected", args.reason)
         end
         return false, args.reason
     end
@@ -95,8 +95,8 @@ function Composer.ReceiveDepartureOutcome(args)
             kind = "colonist_departure",
             choiceID = "disband_confirm",
             npcText = resolvedDialogue(dialoguePayload(
-                SYSTEM_SOURCE,
-                args.responseKey or "response.departure.confirmed",
+                DEPARTURE_SOURCE,
+                args.responseKey or "departure.confirmed",
                 context
             )),
             delta = args.relationshipDelta,
@@ -107,8 +107,8 @@ function Composer.ReceiveDepartureOutcome(args)
     end
     if session then
         session:queueMessage("npc", dialoguePayload(
-            SYSTEM_SOURCE,
-            args.responseKey or "response.departure.confirmed",
+            DEPARTURE_SOURCE,
+            args.responseKey or "departure.confirmed",
             context
         ))
         session.pendingClose = true
