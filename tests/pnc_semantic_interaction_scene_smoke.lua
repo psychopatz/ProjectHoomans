@@ -4,6 +4,7 @@ T.addPackagePaths()
 PNC = {}
 
 local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
+require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
 local Scene = require "PNC/Semantics/PNC_SemanticInteractionScene"
 
 local registered, reason = Providers.RegisterActorAdapter({
