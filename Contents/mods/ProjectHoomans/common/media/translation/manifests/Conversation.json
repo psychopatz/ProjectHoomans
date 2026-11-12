@@ -6,7 +6,6 @@
       "EN/Conversation/Conversation.json",
       "EN/Conversation/Flows.json",
       "EN/Conversation/Greeting.json",
-      "EN/Conversation/Health.json",
       "EN/Conversation/Identity/Responses.json",
       "EN/Conversation/Journal/Events.json",
       "EN/Conversation/Needs.json",
@@ -17,10 +16,8 @@
       "EN/Conversation/Semantic/Availability.json",
       "EN/Conversation/Semantic/Realizations.json",
       "EN/Conversation/Semantic/Responses.json",
-      "EN/Conversation/Social.json",
       "EN/Conversation/Telemetry/Diagnostics.json",
       "EN/Conversation/UI.json",
-      "EN/Conversation/Wellbeing.json",
       "EN/Conversation/WorldEvents/Events.json"
     ],
     "TL": [
@@ -29,7 +26,6 @@
       "TL/Conversation/Conversation.json",
       "TL/Conversation/Flows.json",
       "TL/Conversation/Greeting.json",
-      "TL/Conversation/Health.json",
       "TL/Conversation/Identity/Responses.json",
       "TL/Conversation/Journal/Events.json",
       "TL/Conversation/Needs.json",
@@ -40,10 +36,8 @@
       "TL/Conversation/Semantic/Availability.json",
       "TL/Conversation/Semantic/Realizations.json",
       "TL/Conversation/Semantic/Responses.json",
-      "TL/Conversation/Social.json",
       "TL/Conversation/Telemetry/Diagnostics.json",
       "TL/Conversation/UI.json",
-      "TL/Conversation/Wellbeing.json",
       "TL/Conversation/WorldEvents/Events.json"
     ]
   },

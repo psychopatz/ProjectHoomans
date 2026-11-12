@@ -31,12 +31,6 @@ return {
         ["recordCount"] = 8,
     },
     {
-        ["domain"] = "health",
-        ["kind"] = "content",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Health",
-        ["recordCount"] = 6,
-    },
-    {
         ["domain"] = "needs",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Needs",
@@ -47,18 +41,6 @@ return {
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Quest",
         ["recordCount"] = 12,
-    },
-    {
-        ["domain"] = "social",
-        ["kind"] = "content",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Social",
-        ["recordCount"] = 102,
-    },
-    {
-        ["domain"] = "wellbeing",
-        ["kind"] = "content",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Wellbeing",
-        ["recordCount"] = 11,
     },
     {
         ["domain"] = "combat_banter_weapon_kill_aggressive",
@@ -343,6 +325,12 @@ return {
         ["recordCount"] = 1,
     },
     {
+        ["domain"] = "health_content",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/HealthContent",
+        ["recordCount"] = 24,
+    },
+    {
         ["domain"] = "medical_event_call",
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/MedicalEventCall",
@@ -421,16 +409,94 @@ return {
         ["recordCount"] = 4,
     },
     {
+        ["domain"] = "social_emotes",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialEmotes",
+        ["recordCount"] = 30,
+    },
+    {
         ["domain"] = "social_greetings",
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialGreetings",
         ["recordCount"] = 21,
     },
     {
+        ["domain"] = "social_interaction_argument",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialInteractionArgument",
+        ["recordCount"] = 8,
+    },
+    {
+        ["domain"] = "social_interaction_context",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialInteractionContext",
+        ["recordCount"] = 1,
+    },
+    {
+        ["domain"] = "social_interaction_first_contact",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialInteractionFirstContact",
+        ["recordCount"] = 4,
+    },
+    {
+        ["domain"] = "social_interaction_memory",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialInteractionMemory",
+        ["recordCount"] = 12,
+    },
+    {
+        ["domain"] = "social_interaction_news",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialInteractionNews",
+        ["recordCount"] = 4,
+    },
+    {
+        ["domain"] = "social_interaction_scene_combat",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialInteractionSceneCombat",
+        ["recordCount"] = 4,
+    },
+    {
+        ["domain"] = "social_interaction_scene_horde_work",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialInteractionSceneHordeWork",
+        ["recordCount"] = 28,
+    },
+    {
+        ["domain"] = "social_interaction_scene_travel_news",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialInteractionSceneTravelNews",
+        ["recordCount"] = 28,
+    },
+    {
+        ["domain"] = "social_reactions_ack_dispute",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialReactionsAckDispute",
+        ["recordCount"] = 28,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialReactionsHostileOfferThreat",
+        ["recordCount"] = 24,
+    },
+    {
         ["domain"] = "social_settlement_admission",
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialSettlementAdmission",
         ["recordCount"] = 1,
+    },
+    {
+        ["domain"] = "social_tool_replies_affirmation",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialToolRepliesAffirmation",
+        ["recordCount"] = 25,
+    },
+    {
+        ["domain"] = "social_tool_replies_boundary_identity",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialToolRepliesBoundaryIdentity",
+        ["recordCount"] = 21,
     },
     {
         ["domain"] = "task_lifecycle",
@@ -449,6 +515,12 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/Trading",
         ["recordCount"] = 1,
+    },
+    {
+        ["domain"] = "wellbeing_content",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/WellbeingContent",
+        ["recordCount"] = 20,
     },
     {
         ["domain"] = "semantic",
