@@ -8,7 +8,10 @@ local Registry = require
 
 local OWNED_CATEGORIES = {
     ["projecthoomans:core_social_content"] = true,
+    ["projecthoomans:conversation_content"] = true,
+    ["projecthoomans:compatibility_content"] = true,
     ["projecthoomans:health_content"] = true,
+    ["projecthoomans:quest_content"] = true,
     ["projecthoomans:wellbeing_content"] = true,
 }
 
@@ -31,6 +34,33 @@ local function addPlan(families, plan)
     then
         return
     end
+    local playerChoice = metadata.playerChoice
+    if type(playerChoice) == "table"
+        and type(playerChoice.id) == "string"
+        and playerChoice.id ~= ""
+    then
+        local choiceID = playerChoice.id
+        local canonical = string.upper(
+            string.gsub(choiceID, "[^%w]+", "_")
+        )
+        Registry.PLAYER_CHOICES[choiceID] = {
+            canonicalConcept = canonical,
+            choiceKey = "conversation.content.choice."
+                .. choiceID .. ".choice",
+            hubID = playerChoice.hubID or "whats_up",
+            id = choiceID,
+            kind = playerChoice.kind or "player_landing_choice",
+            labelKey = "conversation.content.choice."
+                .. choiceID .. ".label",
+            route = playerChoice.route or "semantic_hub",
+            labelFallback = type(playerChoice.label) == "table"
+                and (playerChoice.label.EN or playerChoice.label.TL)
+                or playerChoice.label,
+            utteranceFallback = type(playerChoice.choice) == "table"
+                and (playerChoice.choice.EN or playerChoice.choice.TL)
+                or playerChoice.choice,
+        }
+    end
     local templateID = metadata.responseTemplateID
     local style = metadata.style or "neutral"
     if type(templateID) ~= "string" or templateID == ""
@@ -40,7 +70,7 @@ local function addPlan(families, plan)
     end
     local response = payload.response
     local authored = type(response) == "table" and response.variants or nil
-    if type(authored) ~= "table" then return end
+    if type(authored) ~= "table" or #authored == 0 then return end
 
     local family = families[templateID]
     if not family then

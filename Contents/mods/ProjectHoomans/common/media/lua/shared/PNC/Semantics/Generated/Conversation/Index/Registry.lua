@@ -13,36 +13,6 @@ return {
         ["recordCount"] = 30,
     },
     {
-        ["domain"] = "compatibility",
-        ["kind"] = "content",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Compatibility",
-        ["recordCount"] = 27,
-    },
-    {
-        ["domain"] = "conversation",
-        ["kind"] = "content",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Conversation",
-        ["recordCount"] = 5,
-    },
-    {
-        ["domain"] = "greeting",
-        ["kind"] = "content",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Greeting",
-        ["recordCount"] = 8,
-    },
-    {
-        ["domain"] = "needs",
-        ["kind"] = "content",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Needs",
-        ["recordCount"] = 10,
-    },
-    {
-        ["domain"] = "quest",
-        ["kind"] = "content",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Quest",
-        ["recordCount"] = 12,
-    },
-    {
         ["domain"] = "combat_banter_weapon_kill_aggressive",
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CombatBanterWeaponKillAggressive",
@@ -247,6 +217,30 @@ return {
         ["recordCount"] = 19,
     },
     {
+        ["domain"] = "compatibility_content",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CompatibilityContent",
+        ["recordCount"] = 27,
+    },
+    {
+        ["domain"] = "conversation_greeting",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/ConversationGreeting",
+        ["recordCount"] = 14,
+    },
+    {
+        ["domain"] = "conversation_needs",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/ConversationNeeds",
+        ["recordCount"] = 13,
+    },
+    {
+        ["domain"] = "conversation_whats_up",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/ConversationWhatsUp",
+        ["recordCount"] = 20,
+    },
+    {
         ["domain"] = "core_check_in",
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CoreCheckIn",
@@ -377,6 +371,12 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/NeedsSupport",
         ["recordCount"] = 3,
+    },
+    {
+        ["domain"] = "quest_content",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/QuestContent",
+        ["recordCount"] = 12,
     },
     {
         ["domain"] = "social",

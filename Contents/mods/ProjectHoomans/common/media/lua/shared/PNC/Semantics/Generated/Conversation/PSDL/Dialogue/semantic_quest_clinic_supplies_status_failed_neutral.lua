@@ -1,0 +1,157 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "quest_content",
+        ["id"] = "semantic.quest.clinic_supplies.status.failed.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.quest.clinic_supplies.status.failed.neutral",
+            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[6]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_quest_clinic_supplies_status_failed_neutral",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:quest_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.quest",
+                ["responseTemplateID"] = "semantic.quest.clinic_supplies.status.failed",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I couldn't check that request.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko masuri ang kahilingang iyon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Unable to verify the status of the clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko makumpirma ang katayuan ng mga suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Status check on the medical supplies failed.",
+                            },
+                            ["TL"] = {
+                                "Bigo ang pagsusuri sa katayuan ng mga suplay.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Couldn't retrieve the clinic quest details.",
+                            },
+                            ["TL"] = {
+                                "Hindi makuha ang mga detalye ng misyon sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I wasn't able to inspect the request status.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko nasuri ang katayuan ng kahilingan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Failed to look up where we stand on clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Bigo sa pagtingin sa katayuan ng suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Couldn't confirm progress on that task.",
+                            },
+                            ["TL"] = {
+                                "Hindi makumpirma ang progreso sa gawaing 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Unable to check our clinic supplies progress.",
+                            },
+                            ["TL"] = {
+                                "Hindi masuri ang progreso natin sa suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Checking that request didn't go through.",
+                            },
+                            ["TL"] = {
+                                "Hindi natuloy ang pagsusuri sa kahilingang 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Couldn't get a status read on the medical run.",
+                            },
+                            ["TL"] = {
+                                "Hindi makakuha ng ulat sa medikal na lakad.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

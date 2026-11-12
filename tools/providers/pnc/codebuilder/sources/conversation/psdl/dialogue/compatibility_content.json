@@ -1,0 +1,874 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:compatibility_content",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json"
+  },
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.bandits.hooman_hurt.colonist.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.bandits.hooman_hurt.colonist",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Bandit fire! Pull back and cover the wounded colonist.",
+              "TL": "Bandit fire! Pull back and cover the wounded colonist."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.bandits.hooman_hurt.default.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.bandits.hooman_hurt.default",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Bandit fire! Stay with the wounded survivor and watch the flank.",
+              "TL": "Bandit fire! Stay with the wounded survivor and watch the flank."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.bandits.hooman_hurt.family.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.bandits.hooman_hurt.family",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Bandit fire! Stay together and cover the wounded family member.",
+              "TL": "Bandit fire! Stay together and cover the wounded family member."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.bandits.hooman_hurt.lover.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.bandits.hooman_hurt.lover",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Bandit fire. Stay close; I have got you.",
+              "TL": "Bandit fire. Stay close; I have got you."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.companion_dogs.feed.female.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.companion_dogs.feed.female",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Here you go, good girl.",
+              "TL": "Here you go, good girl."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.companion_dogs.feed.male.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.companion_dogs.feed.male",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Here you go, good boy.",
+              "TL": "Here you go, good boy."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.companion_dogs.feed.unknown.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.companion_dogs.feed.unknown",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Here you go, good dog.",
+              "TL": "Here you go, good dog."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.companion_dogs.greeting.female.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.companion_dogs.greeting.female",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Who is a good girl?",
+              "TL": "Who is a good girl?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.companion_dogs.greeting.male.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.companion_dogs.greeting.male",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Who is a good boy?",
+              "TL": "Who is a good boy?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.companion_dogs.greeting.unknown.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.companion_dogs.greeting.unknown",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Who is a good dog?",
+              "TL": "Who is a good dog?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.necroa.mask_warning.colonist.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.necroa.mask_warning.colonist",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Mask up. We keep the camp safe together.",
+              "TL": "Mask up. We keep the camp safe together."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.necroa.mask_warning.default.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.necroa.mask_warning.default",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Put your mask back on. Knox is airborne.",
+              "TL": "Put your mask back on. Knox is airborne."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.necroa.mask_warning.family.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.necroa.mask_warning.family",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Put your mask on, family. I am not losing you to the air.",
+              "TL": "Put your mask on, family. I am not losing you to the air."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.necroa.player_mask_removed.default.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.necroa.player_mask_removed.default",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Put your mask back on. The air is not safe.",
+              "TL": "Put your mask back on. The air is not safe."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.necroa.player_mask_removed.hostile.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.necroa.player_mask_removed.hostile",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Put your mask back on before you become a problem.",
+              "TL": "Put your mask back on before you become a problem."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.necroa.player_mask_removed.lover.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.necroa.player_mask_removed.lover",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Please put your mask back on, love. This air is not safe.",
+              "TL": "Please put your mask back on, love. This air is not safe."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.projectalife.encounter.friendly.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.projectalife.encounter.friendly",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Those survivors seem friendly. Keep your hands visible.",
+              "TL": "Those survivors seem friendly. Keep your hands visible."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.projectalife.encounter.hostile.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.projectalife.encounter.hostile",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That group looks hostile. Keep cover between us and them.",
+              "TL": "That group looks hostile. Keep cover between us and them."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.projectalife.encounter.unknown.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.projectalife.encounter.unknown",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Someone is out there. Let us watch before we approach.",
+              "TL": "Someone is out there. Let us watch before we approach."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.projectalife.faction.hostile.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.projectalife.faction.hostile",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That faction may be hostile toward us now. Stay alert.",
+              "TL": "That faction may be hostile toward us now. Stay alert."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.projectalife.faction.incoming.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.projectalife.faction.incoming",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "They just opened fire on us. Stay close.",
+              "TL": "They just opened fire on us. Stay close."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.projectalife.faction.outgoing.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.projectalife.faction.outgoing",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "We hit them. They may retaliate soon.",
+              "TL": "We hit them. They may retaliate soon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.projectalife.meta.aircraft.heli.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.projectalife.meta.aircraft.heli",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Something is flying over us. Keep listening.",
+              "TL": "Something is flying over us. Keep listening."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.projectalife.meta.aircraft.military.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.projectalife.meta.aircraft.military",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That aircraft sounds close. Stay sharp.",
+              "TL": "That aircraft sounds close. Stay sharp."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.projectalife.meta.ambience.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.projectalife.meta.ambience",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I do not like that sound. Stay close.",
+              "TL": "I do not like that sound. Stay close."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.projectalife.meta.crash.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.projectalife.meta.crash",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That crash sounded close. Keep your eyes open.",
+              "TL": "That crash sounded close. Keep your eyes open."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.integration.projectalife.meta.gunfire.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:compatibility_content",
+        "contentOwner": "projecthoomans.dialogue_content.compatibility",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+        "responseTemplateID": "semantic.compat.projectalife.meta.gunfire",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Someone is shooting nearby. Keep your head down.",
+              "TL": "Someone is shooting nearby. Keep your head down."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
