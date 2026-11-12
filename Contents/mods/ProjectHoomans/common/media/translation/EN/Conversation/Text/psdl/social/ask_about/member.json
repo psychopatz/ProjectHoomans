@@ -1,0 +1,9 @@
+{
+  "choice.background": "Tell me about your old life.",
+  "choice.skills": "What can you teach the group?",
+  "offer.background.utterance": "Tell me about your old life.",
+  "offer.skills.utterance": "What can you teach the group?",
+  "opening": "Go ahead, {addressee.name}. What do you want to ask about?",
+  "response.background": "It feels like someone else's life now.",
+  "response.skills": "Give me a job and I'll show you."
+}

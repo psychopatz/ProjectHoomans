@@ -1,0 +1,266 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "social.ask_about.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "runtimeBlockID": "projecthoomans:ask_about_neutral",
+        "category": "projecthoomans:ask_about",
+        "audience": "neutral",
+        "textTarget": "psdl/social/ask_about/neutral",
+        "textDomain": "pnc.psdl.social.ask_about.neutral"
+      },
+      "response": {
+        "act": "ASK_ABOUT",
+        "turns": [
+          {
+            "id": "opening",
+            "metadata": {
+              "textKey": "opening"
+            },
+            "text": {
+              "EN": "What do you want to know?",
+              "TL": "Ano ang gusto mong malaman?"
+            },
+            "offers": [
+              {
+                "id": "background",
+                "label": {
+                  "EN": "What did you do before all this?",
+                  "TL": "Ano ang ginawa mo bago ang lahat ng ito?"
+                },
+                "utterance": {
+                  "EN": "What did you do before all this?",
+                  "TL": "Ano ang ginawa mo bago ang lahat ng ito?"
+                },
+                "frame": {
+                  "intent": "QUESTION",
+                  "speechAct": "QUESTION",
+                  "subject": "BACKGROUND",
+                  "topic": "ask_about"
+                },
+                "metadata": {
+                  "choiceKey": "choice.background",
+                  "responseKey": "response.background",
+                  "responseText": {
+                    "EN": "That's a long story. Maybe one worth telling.",
+                    "TL": "mahabang kwento yan. Siguro isa na dapat sabihin."
+                  }
+                }
+              },
+              {
+                "id": "skills",
+                "label": {
+                  "EN": "What are you good at?",
+                  "TL": "Ano ang kaya mong gawin?"
+                },
+                "utterance": {
+                  "EN": "What are you good at?",
+                  "TL": "Ano ang kaya mong gawin?"
+                },
+                "frame": {
+                  "intent": "QUESTION",
+                  "speechAct": "QUESTION",
+                  "subject": "SKILLS",
+                  "topic": "ask_about"
+                },
+                "metadata": {
+                  "choiceKey": "choice.skills",
+                  "responseKey": "response.skills",
+                  "responseText": {
+                    "EN": "Enough things to have survived this long.",
+                    "TL": "Sapat na ang mga bagay para mabuhay ng ganito katagal."
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "social.ask_about.member",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "runtimeBlockID": "projecthoomans:ask_about_member",
+        "category": "projecthoomans:ask_about",
+        "audience": "member",
+        "textTarget": "psdl/social/ask_about/member",
+        "textDomain": "pnc.psdl.social.ask_about.member"
+      },
+      "response": {
+        "act": "ASK_ABOUT",
+        "turns": [
+          {
+            "id": "opening",
+            "metadata": {
+              "textKey": "opening"
+            },
+            "text": {
+              "EN": "Go ahead, {addressee.name}. What do you want to ask about?",
+              "TL": "Sige, {addressee.name}. Ano ang gusto mong itanong?"
+            },
+            "offers": [
+              {
+                "id": "background",
+                "label": {
+                  "EN": "Tell me about your old life.",
+                  "TL": "Sabihin mo sa akin ang tungkol sa iyong lumang buhay."
+                },
+                "utterance": {
+                  "EN": "Tell me about your old life.",
+                  "TL": "Sabihin mo sa akin ang tungkol sa iyong lumang buhay."
+                },
+                "frame": {
+                  "intent": "QUESTION",
+                  "speechAct": "QUESTION",
+                  "subject": "BACKGROUND",
+                  "topic": "ask_about"
+                },
+                "metadata": {
+                  "choiceKey": "choice.background",
+                  "responseKey": "response.background",
+                  "responseText": {
+                    "EN": "It feels like someone else's life now.",
+                    "TL": "Parang may buhay ng iba ngayon."
+                  }
+                }
+              },
+              {
+                "id": "skills",
+                "label": {
+                  "EN": "What can you teach the group?",
+                  "TL": "What can you teach the grupo?"
+                },
+                "utterance": {
+                  "EN": "What can you teach the group?",
+                  "TL": "What can you teach the grupo?"
+                },
+                "frame": {
+                  "intent": "QUESTION",
+                  "speechAct": "QUESTION",
+                  "subject": "SKILLS",
+                  "topic": "ask_about"
+                },
+                "metadata": {
+                  "choiceKey": "choice.skills",
+                  "responseKey": "response.skills",
+                  "responseText": {
+                    "EN": "Give me a job and I'll show you.",
+                    "TL": "Bigyan mo ako ng trabaho at ipapakita ko sa iyo."
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "social.ask_about.special",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "runtimeBlockID": "projecthoomans:ask_about_special",
+        "category": "projecthoomans:ask_about",
+        "audience": "special",
+        "textTarget": "psdl/social/ask_about/special",
+        "textDomain": "pnc.psdl.social.ask_about.special"
+      },
+      "response": {
+        "act": "ASK_ABOUT",
+        "turns": [
+          {
+            "id": "opening",
+            "metadata": {
+              "textKey": "opening"
+            },
+            "text": {
+              "EN": "You can ask me anything, {addressee.name}.",
+              "TL": "Maaari mo akong tanungin tungkol sa kahit ano, {addressee.name}."
+            },
+            "offers": [
+              {
+                "id": "background",
+                "label": {
+                  "EN": "Tell me something about your old life.",
+                  "TL": "Sabihin mo sa akin ang tungkol sa iyong dating buhay."
+                },
+                "utterance": {
+                  "EN": "Tell me something about your old life.",
+                  "TL": "Sabihin mo sa akin ang tungkol sa iyong dating buhay."
+                },
+                "frame": {
+                  "intent": "QUESTION",
+                  "speechAct": "QUESTION",
+                  "subject": "BACKGROUND",
+                  "topic": "ask_about"
+                },
+                "metadata": {
+                  "choiceKey": "choice.background",
+                  "responseKey": "response.background",
+                  "responseText": {
+                    "EN": "Only if you tell me something about yours afterward.",
+                    "TL": "Kung sasabihin mo lang sa akin ang tungkol sa iyo pagkatapos."
+                  }
+                }
+              },
+              {
+                "id": "skills",
+                "label": {
+                  "EN": "What are you proud of?",
+                  "TL": "Ano ang ipinagmamalaki mo?"
+                },
+                "utterance": {
+                  "EN": "What are you proud of?",
+                  "TL": "Ano ang ipinagmamalaki mo?"
+                },
+                "frame": {
+                  "intent": "QUESTION",
+                  "speechAct": "QUESTION",
+                  "subject": "SKILLS",
+                  "topic": "ask_about"
+                },
+                "metadata": {
+                  "choiceKey": "choice.skills",
+                  "responseKey": "response.skills",
+                  "responseText": {
+                    "EN": "Surviving long enough to meet you.",
+                    "TL": "Nakaligtas nang sapat upang makilala ka."
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

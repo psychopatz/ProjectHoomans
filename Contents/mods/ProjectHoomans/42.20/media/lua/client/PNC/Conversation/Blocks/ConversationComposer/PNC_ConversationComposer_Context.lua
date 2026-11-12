@@ -243,8 +243,27 @@ end
 
 function Composer.SetIdentityArguments(context, values)
     if type(context) ~= "table" then return false end
+    values = type(values) == "table" and values or {}
+    -- Project Hoomans owns this projection from its native identity model to
+    -- Core's actor-neutral PSDL text-binding contract.  Keep the historical
+    -- flat fields for existing adopter-owned catalogs, while every new PSDL
+    -- record resolves through speaker/addressee/reference paths.
+    values.speaker = values.speaker or {
+        id = context.npcID,
+        name = values.npcName,
+        fullName = values.npcFullName,
+        firstName = values.npcFirstName,
+        lastName = values.npcLastName,
+    }
+    values.addressee = values.addressee or {
+        id = context.characterUUID,
+        name = values.playerName,
+        fullName = values.playerFullName,
+        firstName = values.playerFirstName,
+        lastName = values.playerLastName,
+    }
     context.textArgs = {}
-    for name, value in pairs(type(values) == "table" and values or {}) do
+    for name, value in pairs(values) do
         context.textArgs[name] = value
         context[name] = value
     end

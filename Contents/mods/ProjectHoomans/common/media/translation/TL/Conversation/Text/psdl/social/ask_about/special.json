@@ -1,0 +1,9 @@
+{
+  "choice.background": "Sabihin mo sa akin ang tungkol sa iyong dating buhay.",
+  "choice.skills": "Ano ang ipinagmamalaki mo?",
+  "offer.background.utterance": "Sabihin mo sa akin ang tungkol sa iyong dating buhay.",
+  "offer.skills.utterance": "Ano ang ipinagmamalaki mo?",
+  "opening": "Maaari mo akong tanungin tungkol sa kahit ano, {addressee.name}.",
+  "response.background": "Kung sasabihin mo lang sa akin ang tungkol sa iyo pagkatapos.",
+  "response.skills": "Nakaligtas nang sapat upang makilala ka."
+}

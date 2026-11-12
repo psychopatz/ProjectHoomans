@@ -240,6 +240,9 @@ local function registerPlan(plan)
 end
 
 local IDS = {
+    "social.ask_about.member",
+    "social.ask_about.neutral",
+    "social.ask_about.special",
     "social.greetings.acquaintance.dawn",
     "social.greetings.acquaintance.dusk",
     "social.greetings.acquaintance.sunrise",

@@ -4,7 +4,6 @@
 
 require "PNC/Conversation/PSDL/PNC_ConversationPSDLBlocks"
 require "PNC/Conversation/Definitions/21_PNC_ConversationSettlementAdmission"
-require "PNC/Conversation/Definitions/60_PNC_ConversationAskAbout"
 require "PNC/Conversation/Definitions/70_PNC_ConversationNeeds"
 require "PNC/Conversation/Definitions/90_PNC_ConversationWorkOrders"
 require "PNC/Conversation/Definitions/91_PNC_ConversationPersonal"

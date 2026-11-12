@@ -1,0 +1,9 @@
+{
+  "choice.background": "What did you do before all this?",
+  "choice.skills": "What are you good at?",
+  "offer.background.utterance": "What did you do before all this?",
+  "offer.skills.utterance": "What are you good at?",
+  "opening": "What do you want to know?",
+  "response.background": "That's a long story. Maybe one worth telling.",
+  "response.skills": "Enough things to have survived this long."
+}
