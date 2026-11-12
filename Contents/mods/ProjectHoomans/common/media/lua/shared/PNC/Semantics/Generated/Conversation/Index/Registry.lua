@@ -67,12 +67,6 @@ return {
         ["recordCount"] = 7,
     },
     {
-        ["domain"] = "navigation",
-        ["kind"] = "content",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Navigation",
-        ["recordCount"] = 5,
-    },
-    {
         ["domain"] = "needs",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Needs",
@@ -143,6 +137,12 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CoreIdentity",
         ["recordCount"] = 1,
+    },
+    {
+        ["domain"] = "navigation",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/Navigation",
+        ["recordCount"] = 20,
     },
     {
         ["domain"] = "needs_support",

@@ -8,8 +8,8 @@ Registry.REGISTRY_NAMESPACE = "PNC.Semantics.ConversationRegistry"
 Registry.REGISTRY_MODULE = "PNC/Semantics/Generated/Conversation/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
-Registry.CONTENT_FINGERPRINT = "bca0ee8aea508a91dcc0ea08c025f4e1175c158a861b7bbdb51ce3ca9678536d"
-Registry.WHOLE_MODEL_FINGERPRINT = "4ed37fa18eee39f16e9bc5053bb0404a2c109ac7f378d55955386904ec29a386"
+Registry.CONTENT_FINGERPRINT = "3a95bbf8edff55839d0a81fadfba077cf29b37dba8f3540ebdaa7cd23fcc212d"
+Registry.WHOLE_MODEL_FINGERPRINT = "1dc4cb1829dcf5596e7ab2c4d9ab209364eac83282ea0e5a8586ca94e6ac910c"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -115,7 +115,6 @@ appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/K
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Gossip")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Identity")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Knowledge")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Navigation")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Needs")
 appendContent(require "PNC/Semantics/Generated/Conversation/Content/Quest")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesConversation")
@@ -301,6 +300,26 @@ appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_stop_following_queued_trusted")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_stop_following_queued_withdrawn")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_stop_following_rejected")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_guarded")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_neutral")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_terse")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_warm")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_empty_guarded")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_empty_neutral")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_empty_terse")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_empty_warm")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_default_guarded")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_default_neutral")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_default_terse")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_default_warm")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_orders_guarded")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_orders_neutral")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_orders_terse")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_orders_warm")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_subject_change_guarded")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_subject_change_neutral")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_subject_change_terse")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_subject_change_warm")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_apology_default_guarded")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_apology_default_neutral")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_apology_default_terse")
