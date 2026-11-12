@@ -216,6 +216,92 @@ referral, rumors, roster, identity, and route responses) outside Core. Core
 only composes registered semantic actions and dialogue blocks into its native
 conversation contract.
 
+### Phase 1 implementation slice — Core interaction foundation
+
+The first package-neutral foundation slice is now implemented and generated
+through the semantic CodeBuilder:
+
+- Core owns the generated generic conversation patterns and static suggestions
+  for wellbeing, activity, time/date, weather, and identity facets.
+- Identity is represented as separate semantic subjects for nickname, surname,
+  and faction. The deterministic nickname resolver uses the actor identity seed
+  and authored name aliases (for example, Patrick → Pat), while disclosure
+  remains knowledge-gated.
+- The builder writes a Core-only `FoundationRegistry.lua` and Core static
+  suggestion module. Hoomans retains its combined compatibility registry, but
+  Core no longer needs to load Hoomans to obtain generic interaction content.
+- DTCommon consumes the Core foundation suggestions for its landing. Its
+  trader/guard-specific actions and effects remain DT-owned, and the DTAbstract
+  path remains independent of Project Hoomans.
+- Unknown GUI identity presentation is normalized to `Stranger`; transport
+  placeholders remain separate from learned identity values.
+
+This slice is developer-verified with DT **88/88**, Core identity/foundation
+smokes, Hoomans identity/semantic focused smokes, CodeBuilder ownership tests,
+Kahlua checks, and clean diffs. The full Hoomans sweep still has the two
+recorded baseline failures: `pnc_population_director_smoke.lua` and the
+translation fallback audit.
+
+The DTCommon-owned static semantic pack/registry slice is now also implemented:
+the canonical source shard generates `DTCommon/Semantics/Generated/Conversation/`
+pack data, while the runtime pack keeps only DT-owned callback binding and
+relationship-aware dialogue policy. Hoomans/Core-only generation skips DT
+artifacts unless a DynamicTrading repository is explicitly configured.
+
+### Phase 1 implementation slice — Core source ownership
+
+The shared identity patterns, identity-facet patterns, and generic static
+suggestions now live under Core's CodeBuilder source tree. The Hoomans
+composition manifest references them as explicit Core-owned external shards;
+the compiler resolves their source repository and routes generated modules to
+Core. PNC-specific shards remain Hoomans-owned. This is the first source
+authority migration; the remaining Semantic Lab authoring application is still
+scheduled for the later harness relocation slice.
+
+### Phase 1 implementation slice — Core Conversation model mechanics
+
+The provider-neutral model mechanics are now Core-owned in
+`tools/semantic_harness/codebuilder/conversation_model.py`: deterministic JSON
+fingerprints, defensive copies, provenance merging, global record-location
+registration, and runtime-record projection. Hoomans keeps the PNC-specific
+validators, merge policy, translation paths, package routing, and registry
+rendering. Its compiler reaches the Core implementation through a private
+compatibility bridge, so DTCommon can consume the same mechanics without
+loading Hoomans runtime policy.
+
+The next assembler slice is now also implemented: Core's callback-driven
+`conversation_assembler.py` owns shard loading, override validation,
+fingerprinting, source reports, and source-document indexing. Hoomans supplies
+only the PNC-specific shard compiler, record-ID extraction, and owner resolver.
+
+The next bounded slice is to connect the Core radio delivery contract to a
+shared knowledge-acquisition policy while preserving one Core knowledge ledger
+and one radio delivery path for DTAbstract, DTHoomans, and Project Hoomans.
+
+### Phase 1 implementation slice — Core radio/discovery convergence
+
+The Core delivery infrastructure and Hoomans provider slice are implemented:
+
+- PsychopatzCore owns `RadioBroadcasts.Air`, provider registration, bounded
+  post-air hooks, and the shared `RadioBroadcastChannel` open band.
+- Project Hoomans keeps world-discovery context, message-pack wording, and
+  disclosure policy, but routes discovery and ambient broadcasts through the
+  Core service. Its former channel module is now a compatibility alias.
+- DTCommon deliberately does **not** register a second market-news narration
+  pack here. Market facts remain DT-owned knowledge until the neutral radio
+  payload contract is finalized; this prevents DTAbstract from growing a
+  second verbose conversation surface.
+
+The ownership boundary is deliberate: Core owns delivery and lifecycle;
+providers own domain facts, semantic context, and localized narrative. The
+existing Hoomans rule that a spoken radio name is presentation-only remains
+unchanged: radio disclosure persists faction knowledge, not `identity.name`.
+
+The next bounded slice is to connect Core broadcast delivery to a shared
+knowledge-acquisition policy for radio facts, then add the server-authoritative
+DT/Hoomans request path that can trigger ambient market/world news without
+duplicating message selection or ledger state.
+
 ### Phase 0 — Freeze contracts and baseline the current failure
 
 1. Define the shared actor conversation projection:

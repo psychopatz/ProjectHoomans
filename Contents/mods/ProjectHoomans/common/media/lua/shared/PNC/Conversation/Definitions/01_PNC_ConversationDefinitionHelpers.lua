@@ -8,11 +8,11 @@ PNC.Conversation.DefinitionHelpers = Helpers
 Helpers.MOD_ID = "ProjectHoomans"
 Helpers.PREFIX = "projecthoomans:"
 
-function Helpers.Source(kind, audience, bundle)
+function Helpers.Source(kind, audience, catalog)
     return {
         modID = Helpers.MOD_ID,
-        pathPattern = "media/translation/{language}/Conversation/Bundles/" .. kind .. "/" .. audience .. "/" .. bundle .. ".json",
-        domain = "pnc." .. kind .. "." .. audience .. "." .. bundle,
+        pathPattern = "media/translation/{language}/Conversation/Text/" .. kind .. "/" .. audience .. "/" .. catalog .. ".json",
+        domain = "pnc." .. kind .. "." .. audience .. "." .. catalog,
     }
 end
 
@@ -54,7 +54,7 @@ function Helpers.RegisterSimple(kind, audience, options)
             audiences = { audience },
             priority = options.priority or 0,
             weight = options.weight or 100,
-            textSource = Helpers.Source(kind, audience, options.bundle or "basic"),
+            textSource = Helpers.Source(kind, audience, options.catalog or "basic"),
             entryNode = "opening",
             gates = options.gates,
             ["repeat"] = options["repeat"],

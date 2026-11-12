@@ -28,7 +28,7 @@ def marker_inventory() -> dict[str, object]:
     lines = run(
         "rg", "-n", "-i",
         "deprecated|obsolete|legacy|retired|removed|migration|compat",
-        "tests", "tools/semantic_harness/tests",
+        "tests", "tools/providers/pnc/tests",
     )
     by_file: Counter[str] = Counter()
     for line in lines:
@@ -56,7 +56,7 @@ def case(path: str, classification: str, subject: str, boundary: str,
 
 
 def build() -> dict[str, object]:
-    retired_trade = "tools/semantic_harness/tests/test_contextual_dynamic_trading.py"
+    retired_trade = "tools/providers/pnc/tests/test_contextual_dynamic_trading.py"
     return {
         "schemaVersion": 1,
         "phase": "R3",
@@ -65,13 +65,13 @@ def build() -> dict[str, object]:
         "currentPathChecks": {
             "retiredTradeProviderAbsentFromProduction": run(
                 "rg", "-n", "-i", "projecthoomans:trade",
-                "Contents/mods/ProjectHoomans", "tools/semantic_harness/lua",
-                "tools/semantic_harness/runtime",
+                "Contents/mods/ProjectHoomans", "tools/providers/pnc/lua",
+                "tools/providers/pnc/runtime",
             ),
             "currentTradeOwnersPresent": run(
                 "rg", "-l", "DTHoomans|DTCommon",
-                "Contents/mods/ProjectHoomans", "tools/semantic_harness/lua",
-                "tools/semantic_harness/runtime",
+                "Contents/mods/ProjectHoomans", "tools/providers/pnc/lua",
+                "tools/providers/pnc/runtime",
             )[:40],
             "supportedPersistencePathsPresent": [
                 path for path in (
@@ -137,7 +137,7 @@ def build() -> dict[str, object]:
                 "retain identity and lifecycle regression",
             ),
             case(
-                "tools/semantic_harness/tests/test_semantic_authority_boundaries.py",
+                "tools/providers/pnc/tests/test_semantic_authority_boundaries.py",
                 "KEEP_BOUNDARY_SPECIFIC",
                 "current semantic production callers and retired helper absence",
                 "production-Lua authority and static caller boundary",
@@ -146,7 +146,7 @@ def build() -> dict[str, object]:
                 "retain static authority/refactor check",
             ),
             case(
-                "tools/semantic_harness/tests/test_semantic_category_ownership.py",
+                "tools/providers/pnc/tests/test_semantic_category_ownership.py",
                 "KEEP_BOUNDARY_SPECIFIC",
                 "current category ownership and removal of legacy extensions/migration fields",
                 "semantic registry ownership and compatibility/removal boundary",

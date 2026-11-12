@@ -66,7 +66,7 @@ separate monolithic translation catalog is part of the contract.
 ## Runtime bundle rendering
 
 ```text
-<mod>/common/media/translation/<LANG>/Conversation/Bundles/
+<mod>/common/media/translation/<LANG>/Conversation/Text/
 └── <domain>/<audience>/<bundle>.json
 ```
 

@@ -42,10 +42,10 @@ class DialogueAntiDuplicationTests(unittest.TestCase):
 
         repo_root = Path(__file__).resolve().parents[4]
         en_cat = json.loads(
-            (repo_root / "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Bundles/system/shared/categories.json").read_text(encoding="utf-8")
+            (repo_root / "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Text/system/shared/categories.json").read_text(encoding="utf-8")
         )
         tl_cat = json.loads(
-            (repo_root / "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Bundles/system/shared/categories.json").read_text(encoding="utf-8")
+            (repo_root / "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Text/system/shared/categories.json").read_text(encoding="utf-8")
         )
 
         for i in range(1, 11):

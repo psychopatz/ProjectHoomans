@@ -27,7 +27,7 @@ end
 
 local SYSTEM_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Bundles/system/shared/categories.json",
+    pathPattern = "media/translation/{language}/Conversation/Text/system/shared/categories.json",
     domain = "pnc.system.shared.categories",
 }
 

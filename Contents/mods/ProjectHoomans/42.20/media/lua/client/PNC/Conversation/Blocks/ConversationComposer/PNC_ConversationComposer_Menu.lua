@@ -43,7 +43,7 @@ local RECRUIT_SYSTEM_KEYS = {
 
 local GOODBYE_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Bundles/goodbye/shared/goodbye.json",
+    pathPattern = "media/translation/{language}/Conversation/Text/goodbye/shared/goodbye.json",
     domain = "pnc.goodbye.shared.goodbye",
 }
 

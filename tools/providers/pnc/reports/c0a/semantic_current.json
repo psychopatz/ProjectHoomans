@@ -347,7 +347,7 @@
               "neutralFallbackCount": 0,
               "variant": "neutral"
             },
-            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral01",
+            "renderTemplateID": "conversation.content.semantic.social.hostile_boundary.neutral.01",
             "semanticTemplateID": "semantic.social.hostile_boundary",
             "text": "Don't talk to me like that."
           }
@@ -1605,7 +1605,7 @@
               "neutralFallbackCount": 0,
               "variant": "neutral"
             },
-            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral01",
+            "renderTemplateID": "conversation.content.semantic.social.hostile_boundary.neutral.01",
             "semanticTemplateID": "semantic.social.hostile_boundary",
             "text": "Don't talk to me like that."
           }
@@ -1921,7 +1921,7 @@
               "neutralFallbackCount": 0,
               "variant": "neutral"
             },
-            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral01",
+            "renderTemplateID": "conversation.content.semantic.social.hostile_boundary.neutral.01",
             "semanticTemplateID": "semantic.social.hostile_boundary",
             "text": "Don't talk to me like that."
           }
@@ -2275,7 +2275,7 @@
               "neutralFallbackCount": 0,
               "variant": "neutral"
             },
-            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral01",
+            "renderTemplateID": "conversation.content.semantic.social.hostile_boundary.neutral.01",
             "semanticTemplateID": "semantic.social.hostile_boundary",
             "text": "Don't talk to me like that."
           }
@@ -2906,7 +2906,7 @@
               "neutralFallbackCount": 0,
               "variant": "neutral"
             },
-            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticSocialHostileBoundaryNeutral01",
+            "renderTemplateID": "conversation.content.semantic.social.hostile_boundary.neutral.01",
             "semanticTemplateID": "semantic.social.hostile_boundary",
             "text": "Don't talk to me like that."
           }
@@ -4395,7 +4395,7 @@
               "neutralFallbackCount": 0,
               "variant": "neutral"
             },
-            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
+            "renderTemplateID": "conversation.content.semantic.flow.greeting.opening.default.neutral.01",
             "semanticTemplateID": "semantic.flow.greeting.opening.default",
             "text": "Hey there. Good to see you."
           },
@@ -4414,7 +4414,7 @@
               "neutralFallbackCount": 0,
               "variant": "neutral"
             },
-            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticFlowGreetingOpeningDefaultNeutral01",
+            "renderTemplateID": "conversation.content.semantic.flow.greeting.opening.default.neutral.01",
             "semanticTemplateID": "semantic.flow.greeting.opening.question.default",
             "text": "How have you been?"
           }
@@ -5235,7 +5235,7 @@
               "neutralFallbackCount": 0,
               "variant": "neutral"
             },
-            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral01",
+            "renderTemplateID": "conversation.content.semantic.task.give.admitted.neutral.01",
             "semanticTemplateID": "default",
             "text": "Okay, I'll give that to you."
           }
@@ -6031,7 +6031,7 @@
               "neutralFallbackCount": 0,
               "variant": "neutral"
             },
-            "renderTemplateID": "UI_PNC_Conversation_Content_SemanticTaskGiveAdmittedNeutral01",
+            "renderTemplateID": "conversation.content.semantic.task.give.admitted.neutral.01",
             "semanticTemplateID": "default",
             "text": "Okay, I'll give that to you."
           }

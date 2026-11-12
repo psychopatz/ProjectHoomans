@@ -2,7 +2,7 @@
 
 These are definitions, not schematics: they describe reusable NPC facts,
 gossip lines, and current-day conversation topics. Runtime registration lives
-under the versioned 42.20 Lua tree; content modules and their text bundles
+under the versioned 42.20 Lua tree; content modules and their text catalogs
 live under common.
 
 ## Backstories
@@ -33,11 +33,11 @@ Each Lua module registers one template with Memory.RegisterGossipTemplate.
 Every code is a stable 16-bit wire ID: do not reuse or renumber a published
 code. The arguments field defines the positional order used by
 Memory.BuildGossipPacket, whose payload contains the numeric code and only
-the argument array. Keep placeholders identical in both language bundles.
+the argument array. Keep placeholders identical in both language catalogs.
 
 Add new modules to GossipTemplates/00_PNC_ConversationGossipTemplates.lua.
-Text keys are declared by the generated legacy bundle manifest and materialized
-under `media/translation/<LANG>/Conversation/Bundles/`.
+Text keys are declared by the generated text catalog manifest and materialized
+under `media/translation/<LANG>/Conversation/Text/`.
 
 ## Event memory
 
@@ -57,7 +57,7 @@ identity seed and the player's character UUID. No transcript text, topic
 strings, or player UUIDs are copied into this store. Current-day references
 and topic masks expire when the packed world date changes. Gossip transport
 sends at most 4 template codes plus one shared subject name; clients render
-those codes through their local language bundle.
+those codes through their local language catalog.
 
 The prompt projection is also bounded to 14 dialogue facts total, including
 backstory facts and any rendered gossip statements.

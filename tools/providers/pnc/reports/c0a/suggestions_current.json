@@ -694,7 +694,7 @@
             "display": {
               "label": "What's up?",
               "labelFallback": "What's up?",
-              "labelKey": "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+              "labelKey": "conversation.content.choice.conversation.landing:whats_up.choice",
               "utterance": "What's up?",
               "utteranceFallback": "What's up?"
             },
@@ -706,7 +706,7 @@
               },
               "intent": "QUESTION",
               "kind": "semantic_shortcut_frame",
-              "labelKey": "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+              "labelKey": "conversation.content.choice.conversation.landing:whats_up.choice",
               "origin": {},
               "speechAct": "QUESTION",
               "subject": "CONVERSATION_TOPIC",
@@ -1657,7 +1657,7 @@
             "display": {
               "label": "What's up?",
               "labelFallback": "What's up?",
-              "labelKey": "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+              "labelKey": "conversation.content.choice.conversation.landing:whats_up.choice",
               "utterance": "What's up?",
               "utteranceFallback": "What's up?"
             },
@@ -1669,7 +1669,7 @@
               },
               "intent": "QUESTION",
               "kind": "semantic_shortcut_frame",
-              "labelKey": "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+              "labelKey": "conversation.content.choice.conversation.landing:whats_up.choice",
               "origin": {},
               "speechAct": "QUESTION",
               "subject": "CONVERSATION_TOPIC",
@@ -2540,7 +2540,7 @@
             "display": {
               "label": "What's up?",
               "labelFallback": "What's up?",
-              "labelKey": "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+              "labelKey": "conversation.content.choice.conversation.landing:whats_up.choice",
               "utterance": "What's up?",
               "utteranceFallback": "What's up?"
             },
@@ -2552,7 +2552,7 @@
               },
               "intent": "QUESTION",
               "kind": "semantic_shortcut_frame",
-              "labelKey": "UI_PNC_Conversation_Content_ConversationLandingWhatsUpChoice",
+              "labelKey": "conversation.content.choice.conversation.landing:whats_up.choice",
               "origin": {},
               "speechAct": "QUESTION",
               "subject": "CONVERSATION_TOPIC",

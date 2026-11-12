@@ -5,7 +5,7 @@ local Internal = Composer.Internal
 local SYSTEM_SOURCE = Internal.SYSTEM_SOURCE
 local VISIT_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Bundles/greetings/ambient_visit/arrival.json",
+    pathPattern = "media/translation/{language}/Conversation/Text/greetings/ambient_visit/arrival.json",
     domain = "pnc.greetings.ambient_visit.arrival",
 }
 local activeView = Internal.ActiveView

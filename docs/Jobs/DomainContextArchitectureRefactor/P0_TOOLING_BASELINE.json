@@ -861,7 +861,7 @@
         "AssertionError: Lists differ: [{'payload': {'token': 'harness-lease', 'r[512 chars]er'}] != []",
         "AssertionError: Lists differ: [{'command': 'SemanticInteractionLifecycle[512 chars]1}}}] != []",
         "AssertionError: Lists differ: [{'payload': {'token': 'harness-lease', 'i[512 chars]er'}] != []",
-        "AssertionError: 'UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral01' != 'UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative'",
+        "AssertionError: 'conversation.content.semantic.question.medical_bite.negative.neutral.01' != 'UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative'",
         "AssertionError: Lists differ: [{'module': 'ProjectHoomans', 'command': '[512 chars]er'}] != []"
       ],
       "fact_transport_present": true,

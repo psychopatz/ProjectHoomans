@@ -44,7 +44,7 @@ function Conversation.HandleCeasefireResult(args)
     Conversation.lastCeasefireResult = args
     local source = {
         modID = "ProjectHoomans",
-        pathPattern = "media/translation/{language}/Conversation/Bundles/greetings/hostile/parley.json",
+        pathPattern = "media/translation/{language}/Conversation/Text/greetings/hostile/parley.json",
         domain = "pnc.greetings.hostile.parley",
     }
     Conversation.TextCatalog.EnsureSource(source, {

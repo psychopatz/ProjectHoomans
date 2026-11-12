@@ -46,7 +46,7 @@ PY_ASSERTION_RE = re.compile(
 SUBJECT_RE = re.compile(
     r"(?:T\.(?:load|read|path)|dofile|require)\s*\(\s*['\"]([^'\"]+)['\"]"
 )
-MEDIA_PATH_RE = re.compile(r"(?:media/lua|tools/semantic_harness)[^'\"\s)]+")
+MEDIA_PATH_RE = re.compile(r"(?:media/lua|tools/providers/pnc)[^'\"\s)]+")
 BOUNDARY_TOKENS = (
     "authority",
     "client",
@@ -145,7 +145,7 @@ CANONICAL_BOUNDARY_ENTRIES = {
 }
 
 SUPERSEDED_ENTRIES = {
-    "tools/semantic_harness/tests/test_contextual_dynamic_trading.py": {
+    "tools/providers/pnc/tests/test_contextual_dynamic_trading.py": {
         "evidence": [
             "ProjectHoomans commit 8f4ca4a4 removed the Hoomans trade graph and routes trader Talk through the shared opener",
             "DynamicTrading commit 246df5b5 moved shared trader ownership to DTCommon and retained only DTHoomans caravan referral content",
@@ -281,7 +281,7 @@ def role_runner_tier(path: Path) -> tuple[str, str, str, bool]:
     if parts[:2] == ("tools", "semantic_harness"):
         area = parts[2] if len(parts) > 2 else ""
         if area == "tests" and name.startswith("test_"):
-            return "semantic Python acceptance test", "tools/semantic_harness/testing/python_runner.py", "ACCEPTANCE", True
+            return "semantic Python acceptance test", "psychopatzCore/tools/semantic_harness/testing/python_runner.py", "ACCEPTANCE", True
         if area in {"fixtures", "scenarios"} or path.suffix == ".json":
             return "declarative semantic fixture", "existing semantic harness callers", "ACCEPTANCE", False
         if area == "lua" and len(parts) > 3 and parts[3] == "worker":
@@ -656,7 +656,7 @@ def build_manifest(lua_reports: Iterable[Path]) -> dict[str, Any]:
         "repository": repo_state(ROOT),
         "inventoryScope": [
             "tracked tests/** files, including isolated Lua, native fixtures, Python tests, support, and runners",
-            "tracked tools/semantic_harness/** files, including Python tests, fixtures, scenarios, Lua workers, runners, and support",
+            "tracked tools/providers/pnc/** files, including Python tests, fixtures, scenarios, Lua workers, runners, and support",
             "tracked tools/unique_npc_manager/tests/** files",
         ],
         "runners": [

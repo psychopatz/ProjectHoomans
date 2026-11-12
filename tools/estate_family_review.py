@@ -31,12 +31,12 @@ HISTORY_TIPS: dict[str, str] = {}
 
 DOMAIN_NOTES = {
     "semantic_python:semantic": {
-        "owners": "tools/semantic_harness/tests and runtime/UI modules owning Semantic Lab, contextual parity, acceptance, and evidence contracts",
-        "callers": "tools/semantic_harness/testing/python_runner.py plus the imported runtime, fixture, GUI, or worker subject named by each test",
+        "owners": "tools/providers/pnc/tests and runtime/UI modules owning Semantic Lab, contextual parity, acceptance, and evidence contracts",
+        "callers": "psychopatzCore/tools/semantic_harness/testing/python_runner.py plus the imported runtime, fixture, GUI, or worker subject named by each test",
         "boundary": "Python-facing semantic contract, production-Lua worker authority, fixture parity, GUI/save boundary, or acceptance-only integration boundary as recorded per path",
     },
     "semantic_harness:semantic": {
-        "owners": "tools/semantic_harness worker, runner, fixture, UI, codebuilder, and declarative catalog layers",
+        "owners": "tools/providers/pnc worker, runner, fixture, UI, codebuilder, and declarative catalog layers",
         "callers": "existing worker.lua/python_runner.py/CLI entry points and the semantic Python tests or Lua worker modules that import the path",
         "boundary": "worker process isolation, production Lua loading, declarative fixture ownership, runner routing, or Semantic Lab UI boundary",
     },
@@ -178,19 +178,19 @@ def boundary_for(entry: dict[str, object], path: str, role: str, domain: str) ->
         return ["isolated Lua test process, version-resilient path resolution, and translation/UI fallback boundary"]
     if path in {"tests/run_tests.py", "tests/new_test.py", "tests/test_config.lua"}:
         return ["root Lua runner/configuration and version-resilient test path boundary"]
-    if path.startswith("tools/semantic_harness/lua/worker/"):
+    if path.startswith("tools/providers/pnc/lua/worker/"):
         return ["Semantic Harness worker process and production-Lua module loading boundary"]
-    if path.startswith("tools/semantic_harness/testing/"):
+    if path.startswith("tools/providers/pnc/testing/"):
         return ["Semantic Harness doctor/runner/process-routing boundary"]
-    if path.startswith("tools/semantic_harness/ui/"):
+    if path.startswith("tools/providers/pnc/ui/"):
         return ["Semantic Lab UI state/rendering and worker/session boundary"]
-    if path.startswith("tools/semantic_harness/codebuilder/"):
+    if path.startswith("tools/providers/pnc/codebuilder/"):
         return ["declarative semantic fixture/codebuilder ownership boundary"]
-    if path.startswith("tools/semantic_harness/fixtures/") or path.startswith("tools/semantic_harness/scenarios/"):
+    if path.startswith("tools/providers/pnc/fixtures/") or path.startswith("tools/providers/pnc/scenarios/"):
         return ["declarative semantic fixture input and production-Lua parity boundary"]
     if path.startswith("tools/unique_npc_manager/"):
         return ["Unique NPC definition normalization, generated catalog, and storage boundary"]
-    if path.startswith("tools/semantic_harness/tests/"):
+    if path.startswith("tools/providers/pnc/tests/"):
         return ["Semantic Python acceptance, fixture/runtime parity, and worker isolation boundary"]
     return list(entry.get("boundaries") or [DOMAIN_NOTES.get(domain, DOMAIN_NOTES["root_lua:other"])["boundary"]])
 

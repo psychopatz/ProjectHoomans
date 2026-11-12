@@ -65,7 +65,7 @@ OVERLAP_REVIEWS = {
 
 
 def source_details(module: str) -> dict[str, object]:
-    path = ROOT / "tools/semantic_harness/tests" / f"{module}.py"
+    path = ROOT / "tools/providers/pnc/tests" / f"{module}.py"
     source = path.read_text(encoding="utf-8", errors="ignore")
     return {
         "path": str(path.relative_to(ROOT)),
@@ -97,7 +97,7 @@ def build() -> dict[str, object]:
             "exclusiveModules": prior_baseline.get("exclusiveModules", []),
             "modules": [
                 {
-                    "module": f"tools.semantic_harness.tests.{item['module']}",
+        "module": f"tools.providers.pnc.tests.{item['module']}",
                     "classification": item.get("classificationBefore"),
                     "status": item.get("status"),
                     "elapsed": item.get("elapsedSeconds"),
@@ -156,7 +156,7 @@ def build() -> dict[str, object]:
             "sourceDetails": details,
         }
         reviews.append(review)
-        path = str(ROOT / "tools/semantic_harness/tests" / f"{module}.py")
+        path = str(ROOT / "tools/providers/pnc/tests" / f"{module}.py")
         path_reviews[path.removeprefix(str(ROOT) + "/")] = {
             "classification": "KEEP_CANONICAL",
             "finalDisposition": "retained_acceptance_slow_reviewed",

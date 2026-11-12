@@ -203,7 +203,7 @@ local unsafeOK = Registry.RegisterBlock("testmod:unsafe", {
     audiences = { "neutral" },
     textSource = {
         modID = "ProjectHoomans",
-        pathPattern = "media/translation/{language}/Conversation/Bundles/wellbeing/neutral/basic.json",
+        pathPattern = "media/translation/{language}/Conversation/Text/wellbeing/neutral/basic.json",
         domain = "test.unsafe",
     },
     entryNode = "opening",

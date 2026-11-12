@@ -617,7 +617,7 @@
       "preexisting_at_p0": true,
       "failure_summary": [
         "FAIL: test_preview_and_tl_response_are_effect_free_and_localized (tools.semantic_harness.tests.test_conversational_competence_c7a.ConversationalCompetenceC7ATests.test_preview_and_tl_response_are_effect_free_and_localized)",
-        "AssertionError: 'UI_PNC_Conversation_Content_SemanticQuestionMedicalBiteNegativeNeutral01' != 'UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative'"
+        "AssertionError: 'conversation.content.semantic.question.medical_bite.negative.neutral.01' != 'UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative'"
       ]
     },
     {
