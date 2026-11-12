@@ -46,8 +46,9 @@ PNC_PSDL_DIALOGUE_RELATIVE = Path(
 def copy_pnc_psdl_sources(repository: Path) -> None:
     target = repository / PNC_PSDL_DIALOGUE_RELATIVE
     target.mkdir(parents=True, exist_ok=True)
-    source = REPOSITORY / PNC_PSDL_DIALOGUE_RELATIVE / "companion_check_in.json"
-    shutil.copy2(source, target / source.name)
+    source_root = REPOSITORY / PNC_PSDL_DIALOGUE_RELATIVE
+    for source in source_root.glob("*.json"):
+        shutil.copy2(source, target / source.name)
 
 
 class GenerationOwnershipTests(unittest.TestCase):
@@ -186,7 +187,9 @@ class GenerationOwnershipTests(unittest.TestCase):
             pack_module,
         )
 
-        module, report = by_source[("content/command/player.json", "Content")]
+        module, report = by_source[
+            ("psdl/dialogue/companion_commands_player.json", "PSDL")
+        ]
         self.assertEqual(report["owner"], "ProjectHoomans")
         self.assertTrue(module.startswith("PNC/Semantics/Generated/Conversation/"), module)
 
@@ -373,10 +376,11 @@ class GenerationOwnershipTests(unittest.TestCase):
                 / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
                 / "PNC/Semantics/Generated/Conversation/Patterns/Common/Identity.lua"
             )
-            hoomans_content = (
+            hoomans_psdl = (
                 hoomans
                 / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
-                / "PNC/Semantics/Generated/Conversation/Content/Command/Player.lua"
+                / "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/"
+                "semantic_command_player_follow.lua"
             )
             registry = (
                 hoomans
@@ -389,7 +393,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             self.assertTrue(core_check_in.is_file())
             self.assertTrue(core_identity_dialogue.is_file())
             self.assertFalse(stale_hoomans_identity.exists())
-            self.assertTrue(hoomans_content.is_file())
+            self.assertTrue(hoomans_psdl.is_file())
             self.assertIn(core_identity, paths)
             self.assertIn(core_foundation_registry, paths)
             self.assertIn(core_check_in, paths)
@@ -412,6 +416,11 @@ class GenerationOwnershipTests(unittest.TestCase):
             self.assertIn(
                 'require "PsychopatzCore/Semantics/Generated/Conversation/'
                 'Patterns/Common/Identity"',
+                registry_text,
+            )
+            self.assertIn(
+                'appendPSDL(require "PNC/Semantics/Generated/Conversation/'
+                'PSDL/Dialogue/semantic_command_player_follow")',
                 registry_text,
             )
 

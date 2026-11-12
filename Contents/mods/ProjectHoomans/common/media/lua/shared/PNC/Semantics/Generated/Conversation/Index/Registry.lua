@@ -37,12 +37,6 @@ return {
         ["recordCount"] = 21,
     },
     {
-        ["domain"] = "command",
-        ["kind"] = "content",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Command",
-        ["recordCount"] = 65,
-    },
-    {
         ["domain"] = "compatibility",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Compatibility",
@@ -58,7 +52,7 @@ return {
         ["domain"] = "event",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Event",
-        ["recordCount"] = 104,
+        ["recordCount"] = 93,
     },
     {
         ["domain"] = "greeting",
@@ -119,6 +113,30 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CompanionCheckIn",
         ["recordCount"] = 1,
+    },
+    {
+        ["domain"] = "companion_commands_combat",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CompanionCommandsCombat",
+        ["recordCount"] = 11,
+    },
+    {
+        ["domain"] = "companion_commands_lifecycle",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CompanionCommandsLifecycle",
+        ["recordCount"] = 35,
+    },
+    {
+        ["domain"] = "companion_commands_player",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CompanionCommandsPlayer",
+        ["recordCount"] = 11,
+    },
+    {
+        ["domain"] = "companion_commands_replies",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CompanionCommandsReplies",
+        ["recordCount"] = 19,
     },
     {
         ["domain"] = "core_check_in",

@@ -69,6 +69,16 @@ local function formatTokens(text, context)
                 function() return tostring(value) end)
         end
     end
+    -- Command wording is authored with the actor-neutral PSDL binding. The
+    -- established command callers still provide the bounded group display
+    -- value as `name`/`names`; project it into addressee.name at this one
+    -- adopter boundary without creating a new semantic variable.
+    local addresseeName = values["addressee.name"]
+        or values.names or values.name
+    if type(addresseeName) == "string" or type(addresseeName) == "number" then
+        output = string.gsub(output, "{addressee.name}",
+            function() return tostring(addresseeName) end)
+    end
     return output
 end
 
@@ -138,11 +148,20 @@ end
 function Speech.ResolvePlayerCommand(commandID, outcome, context)
     context = copied(context or {})
     commandID = tostring(commandID or "")
-    context.commandID = commandID
-    context.commandOutcome = outcome
-    context.action = commandID
+    local semanticCommandID = commandID
+    local semanticOutcome = outcome
+    if commandID == "camp_none" then
+        semanticCommandID = "camp"
+        semanticOutcome = "none"
+    elseif commandID == "camp_rejected" then
+        semanticCommandID = "camp"
+        semanticOutcome = "invalid"
+    end
+    context.commandID = semanticCommandID
+    context.commandOutcome = semanticOutcome
+    context.action = semanticCommandID
     return resolve("semantic.command.player", {
-        act = COMMAND_ACTS[commandID] or "DIRECTIVE",
+        act = COMMAND_ACTS[semanticCommandID] or "DIRECTIVE",
         topic = "companion_command",
         realizationFamily = "companion_command_player",
     }, context)
