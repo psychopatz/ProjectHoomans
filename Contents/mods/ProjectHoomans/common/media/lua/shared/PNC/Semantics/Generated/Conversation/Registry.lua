@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/Semantics/Generated/Conversation/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "5f004786fcd0b36eb18372fe179c59b7278f85fc871f04543b395c05e097a2c6"
-Registry.WHOLE_MODEL_FINGERPRINT = "0056774a62ab92cb873e5548d7911781006d467ad376202a18d144bd38f287bc"
+Registry.WHOLE_MODEL_FINGERPRINT = "96d7c6986bf4496ce07adf4de95fad841e67a95f7acf8024d7bdc05d3151d420"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -231,6 +231,9 @@ appendBehaviors(require "PsychopatzCore/Semantics/Generated/Conversation/Behavio
 appendBeats(require "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation")
 appendBeats(require "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/Reconciliation")
 appendBeats(require "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_ask_about_member")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_ask_about_neutral")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_ask_about_special")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_companion_check_in")
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/social_core_check_in")
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/social_core_identity")
@@ -255,12 +258,17 @@ appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_gr
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_member_sunrise")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_member_sunset")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_greetings_member_twilight")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_personal_special_trust")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_relationship_special_affinity")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_set_territory_member_claim")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_settlement_admission")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_small_talk_member")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_small_talk_neutral")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_small_talk_special")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_wellbeing_member")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_wellbeing_neutral")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_wellbeing_special")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/work_orders_member_status")
 appendUI(require "PNC/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CompanionCheckIn")
 appendUI(require "PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreCheckIn")
 appendUI(require "PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreIdentity")

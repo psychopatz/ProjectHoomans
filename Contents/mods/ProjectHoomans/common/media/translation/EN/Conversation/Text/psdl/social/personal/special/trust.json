@@ -1,0 +1,6 @@
+{
+  "choice.trust": "You can trust me.",
+  "offer.trust.utterance": "You can trust me.",
+  "opening": "All right, {addressee.name}. We can talk about us.",
+  "response.trust": "I know. That still means more than I can say."
+}

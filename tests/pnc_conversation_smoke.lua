@@ -115,6 +115,42 @@ T.equal(migratedWellbeing.nodes.opening.choices[1].outcomes[1].responseKey,
     "response.condition",
     "PSDL wellbeing preserves response routing")
 
+local migratedPersonal = Registry.GetBlock("projecthoomans:personal_special")
+T.equal(migratedPersonal.textSource.domain,
+    "pnc.psdl.social.personal.special.trust",
+    "PSDL personal topic keeps its declared text domain")
+T.equal(migratedPersonal.nodes.opening.choices[1].textKey,
+    "choice.trust",
+    "PSDL personal topic preserves semantic choice text")
+T.equal(migratedPersonal.gates[1].type,
+    "pnc:relationship",
+    "PSDL personal topic preserves relationship eligibility")
+
+local migratedRelationship = Registry.GetBlock(
+    "projecthoomans:relationship_special"
+)
+T.equal(migratedRelationship.nodes.opening.choices[1].outcomes[1].responseKey,
+    "response.us",
+    "PSDL relationship topic preserves response routing")
+
+local migratedTerritory = Registry.GetBlock(
+    "projecthoomans:set_territory_member"
+)
+T.equal(migratedTerritory.priority, 1000,
+    "PSDL territory topic preserves priority")
+T.equal(migratedTerritory.gates[2].reasonKey,
+    "locked.base_established",
+    "PSDL territory topic preserves base lock diagnostics")
+T.equal(migratedTerritory.nodes.opening.choices[1].outcomes[1].effects[1].type,
+    "pnc:open_territory_claim",
+    "PSDL territory topic preserves gameplay effect")
+
+local migratedWorkOrders = Registry.GetBlock(
+    "projecthoomans:work_orders_member"
+)
+T.equal(#migratedWorkOrders.nodes.opening.choices, 2,
+    "PSDL work-orders topic preserves both offers")
+
 local migratedGreeting = Registry.GetBlock(
     "projecthoomans:greeting_firstmeet_dawn"
 )

@@ -79,6 +79,26 @@ local function settlementVisitGate(node)
     return { type = "pnc:settlement_visit" }
 end
 
+local function adopterGate(node)
+    if type(node) ~= "table" then return nil end
+    local path = tostring(node.path or node.field or "")
+    local operator = tostring(node.op or "eq")
+    if path == "conversation.audience"
+        and operator == "eq" and node.value ~= nil
+    then
+        return { type = "pnc:audience", value = node.value }
+    end
+    if path == "scene.baseEstablished"
+        and operator == "eq" and node.value == false
+    then
+        return {
+            type = "pnc:base_not_established",
+            reasonKey = "locked.base_established",
+        }
+    end
+    return nil
+end
+
 local function timeGate(predicate)
     local startHour
     local endHour
@@ -143,6 +163,7 @@ local function gatesForPredicate(predicate)
         if type(node.any) == "table" then return end
         local gate = relationshipGate(node)
         if not gate then gate = settlementVisitGate(node) end
+        if not gate then gate = adopterGate(node) end
         if gate then output[#output + 1] = gate end
     end
     if type(predicate.all) == "table" then
@@ -258,6 +279,10 @@ local function registerPlan(plan)
 end
 
 local IDS = {
+    "social.personal.special.trust",
+    "social.relationship.special.affinity",
+    "social.set_territory.member.claim",
+    "work_orders.member.status",
     "social.settlement_admission",
     "social.ask_about.member",
     "social.ask_about.neutral",

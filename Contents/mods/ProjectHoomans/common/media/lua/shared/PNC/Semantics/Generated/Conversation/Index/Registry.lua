@@ -145,6 +145,12 @@ return {
         ["recordCount"] = 6,
     },
     {
+        ["domain"] = "social_companion_topics",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialCompanionTopics",
+        ["recordCount"] = 4,
+    },
+    {
         ["domain"] = "social_greetings",
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialGreetings",

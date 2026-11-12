@@ -1,0 +1,6 @@
+{
+  "choice.us": "Can we talk about us?",
+  "offer.us.utterance": "Can we talk about us?",
+  "opening": "I'm listening, {addressee.name}. Say what you need to say.",
+  "response.us": "Yes. We probably should."
+}

@@ -1,19 +1,21 @@
 # Conversation Block Extension API
 
 Project Hoomans conversations separate reusable content from the Project
-Zomboid Build 42.20 implementation:
+Zomboid Build 42.20 implementation. The reusable PSDL mechanism remains in
+PsychopatzCore; this repository owns adopter records, generated package output,
+and gameplay-specific projection only.
 
-- `common/media/lua/shared/PNC/Conversation/Definitions/` contains data-only
-  registration modules shared by client and server.
-- `common/media/conversation/<type>/<audience>/<language>/<bundle>.json`
-  contains flat, modular text maps.
-- `42.20/media/lua/` contains the registry, validation, selection, authority,
-  persistence, UI, networking, text loader, and debugger implementations.
-
-`EN` is mandatory. Other languages fall back to the matching English bundle.
-Paths are explicit: the runtime does not recursively scan folders or generate a
-Project Hoomans modular conversation catalogs under
-`common/media/translation/EN/Conversation/Conversation.json`.
+PSDL authoring lives under
+`tools/providers/pnc/codebuilder/sources/conversation/psdl/dialogue/`, the
+adopter projection is
+`PNC/Conversation/PSDL/PNC_ConversationPSDLBlocks.lua`, and generated plans
+and text live under
+`common/media/lua/shared/PNC/Semantics/Generated/Conversation/` and
+`common/media/translation/{EN,TL}/Conversation/Text/psdl/`. `EN` is mandatory
+and additional languages are data-driven with English fallback. The Build
+42 runtime continues to own registry, validation, selection, authority,
+persistence, UI, networking, text loading, and debugging; the PSDL projection
+feeds those existing authorities.
 
 ## Runtime composition and authority
 
@@ -36,38 +38,23 @@ compatibility.
 
 ## Built-in module layout
 
-Built-in conversation families are intentionally separate modules:
+Migrated conversation families are authored as PSDL records and must not
+receive new legacy registration modules:
 
 ```text
-common/media/lua/shared/PNC/Conversation/Definitions/
-├── 00_PNC_ConversationDefinitions.lua       # require-only manifest
-├── 01_PNC_ConversationDefinitionHelpers.lua # internal constructors
-├── 10_PNC_ConversationCategories.lua
-├── 20_PNC_ConversationGreetings.lua
-├── 30_PNC_ConversationWhatsUp.lua
-├── 40_PNC_ConversationWellbeing.lua
-├── 50_PNC_ConversationSmallTalk.lua
-├── 60_PNC_ConversationAskAbout.lua
-├── 70_PNC_ConversationNeeds.lua
-├── 80_PNC_ConversationTrade.lua
-├── 90_PNC_ConversationWorkOrders.lua
-├── 91_PNC_ConversationPersonal.lua
-└── 92_PNC_ConversationRelationship.lua
+tools/providers/pnc/codebuilder/sources/conversation/psdl/dialogue/
+├── social_ask_about.json
+├── social_companion_topics.json
+├── social_greetings.json
+├── social_settlement_admission.json
+└── ...
 ```
 
-Do not put a new family back into the manifest. Create one registration module
-for that family and add one `require` line to the manifest. The special
-`What's your name?` action is isolated in the Build 42.20
-`PNC_ConversationIdentityChoice.lua` adapter because it calls the authoritative
-knowledge service; it is not serializable block data.
-
-The built-in `What's up?` family demonstrates the intended scalable pattern.
-Its module declares a weighted topic pool, while each topic/audience pair owns
-one JSON bundle such as
-`common/media/conversation/whats_up/neutral/EN/local_activity.json`. The chosen
-topic and its weighted outcomes are stable for the current world day. The
-category has `oncePerDay = true`, so the same player-character/NPC pair can
-commit only one `What's up?` conversation per world day.
+Do not put a migrated family back into the legacy manifest or create a second
+compiler/runtime. The special `What's your name?` action remains isolated in
+its Build 42.20 adapter because it calls the authoritative knowledge service.
+New adopter content must be authored as PSDL and routed through the Core
+compiler.
 
 ## Add a conversation from another mod
 
