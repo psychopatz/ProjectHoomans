@@ -3,7 +3,7 @@ PNC.Conversation = PNC.Conversation or {}
 PNC.ConversationDebugModel = PNC.ConversationDebugModel or {}
 
 local Model = PNC.ConversationDebugModel
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local Selector = PNC.Conversation.Selector
 local Rules = PNC.Conversation.Rules
 local Loader = PsychopatzCore.Conversation.TextCatalog

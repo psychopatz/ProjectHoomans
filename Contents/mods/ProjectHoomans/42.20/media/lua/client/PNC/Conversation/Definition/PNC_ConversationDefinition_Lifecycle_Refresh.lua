@@ -3,7 +3,7 @@
 local Conversation = PNC.Conversation
 local Relationship = Conversation.Relationship
 local Composer = Conversation.Composer
-local Registry = Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 
 local Internal = Conversation.DefinitionLifecycleInternal
     or {}

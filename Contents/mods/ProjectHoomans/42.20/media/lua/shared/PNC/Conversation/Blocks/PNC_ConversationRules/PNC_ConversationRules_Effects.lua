@@ -1,5 +1,5 @@
 local Rules = PNC.Conversation.Rules
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 
 local function validateEffect(handler, context, effect)
     local called

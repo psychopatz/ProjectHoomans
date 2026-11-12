@@ -47,7 +47,7 @@ end
 
 function Helpers.RegisterSimple(kind, audience, textTarget, options)
     options = options or {}
-    return PNC.Conversation.Registry.RegisterBlock(
+    return PsychopatzCore.Conversation.Registry.RegisterBlock(
         Helpers.PREFIX .. kind .. "_" .. audience,
         {
             schemaVersion = 1,

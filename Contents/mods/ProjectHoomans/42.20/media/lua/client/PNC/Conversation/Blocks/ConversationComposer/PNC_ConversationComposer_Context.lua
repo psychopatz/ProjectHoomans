@@ -9,7 +9,7 @@ local Composer = Conversation.Composer
 local ActorConversationContext = PNC.Semantics
     and PNC.Semantics.ActorConversationContext
     or require "PNC/Semantics/PNC_ActorConversationContext"
-local Registry = Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local Loader = PsychopatzCore.Conversation.TextCatalog
 local Audience = Conversation.Audience
 

@@ -54,7 +54,8 @@ end
 
 T.load(SHARED .. "PNC/Translation/PNC_TranslationBootstrap.lua")
 T.load(CORE_TEXT)
-T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRegistry.lua")
+T.load("PsychopatzCore", "common",
+    "PsychopatzCore/Conversation/Registry/PsychopatzConversationRegistry.lua")
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRules.lua")
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationSelector.lua")
 T.load(SHARED .. "PNC/Conversation/Memory/PNC_ConversationMemory.lua")
@@ -87,7 +88,7 @@ T.load(CLIENT .. "PNC/Conversation/PNC_ConversationDefinition.lua")
 T.load(CLIENT .. "PNC/Conversation/Debug/PNC_ConversationDebugModel.lua")
 T.load(CLIENT .. "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation.lua")
 
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local Rules = PNC.Conversation.Rules
 local Selector = PNC.Conversation.Selector
 local Loader = PsychopatzCore.Conversation.TextCatalog

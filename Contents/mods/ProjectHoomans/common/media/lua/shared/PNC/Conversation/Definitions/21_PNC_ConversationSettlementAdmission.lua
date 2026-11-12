@@ -1,5 +1,5 @@
 local H = PNC.Conversation.DefinitionHelpers
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 
 Registry.RegisterBlock(H.PREFIX .. "settlement_admission", {
     schemaVersion = 1,

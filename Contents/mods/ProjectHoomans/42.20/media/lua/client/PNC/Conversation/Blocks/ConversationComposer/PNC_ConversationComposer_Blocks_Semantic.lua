@@ -124,7 +124,7 @@ function Composer.BuildSemanticBlockProjection(view)
     local context = spec and spec.context or nil
     local session = view and view.session or nil
     local blockID = context and context.activeConversationBlockID or nil
-    local registry = PNC.Conversation and PNC.Conversation.Registry
+    local registry = PNC.Conversation and PsychopatzCore.Conversation.Registry
         or Registry
     local block = blockID
         and registry

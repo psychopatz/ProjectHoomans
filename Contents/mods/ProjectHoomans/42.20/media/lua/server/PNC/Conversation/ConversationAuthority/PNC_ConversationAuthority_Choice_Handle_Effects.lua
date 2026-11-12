@@ -179,7 +179,7 @@ function ChoiceEffects.Commit(state)
             relationshipAfter
         ),
         effectResults = effectResults,
-        registryFingerprint = PNC.Conversation.Registry.GetFingerprint(),
+        registryFingerprint = PsychopatzCore.Conversation.Registry.GetFingerprint(),
     }
     if InteractionPersistence
         and type(InteractionPersistence.Project) == "function"

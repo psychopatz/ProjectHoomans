@@ -1,18 +1,18 @@
 local T = require "tests/support/test"
 
 local source = T.read(
-    "ProjectHoomans",
-    "shared",
-    "PNC/Conversation/Blocks/PNC_ConversationRegistry.lua"
+    "PsychopatzCore",
+    "common",
+    "PsychopatzCore/Conversation/Registry/PsychopatzConversationRegistry.lua"
 )
 local providers = {
-    "PNC_ConversationRegistry_Utilities",
-    "PNC_ConversationRegistry_NodeValidation",
-    "PNC_ConversationRegistry_Validation",
-    "PNC_ConversationRegistry_Mutations",
-    "PNC_ConversationRegistry_Queries",
-    "PNC_ConversationRegistry_Handlers",
-    "PNC_ConversationRegistry_Fingerprint",
+    "Utilities",
+    "NodeValidation",
+    "Validation",
+    "Mutations",
+    "Queries",
+    "Handlers",
+    "Fingerprint",
 }
 local publicFunctions = {
     "ValidateCategory",
@@ -41,7 +41,7 @@ local i
 for i = 1, #providers do
     local provider = providers[i]
     local needle =
-        'require "PNC/Conversation/Blocks/PNC_ConversationRegistry/'
+        'require "PsychopatzCore/Conversation/Registry/PsychopatzConversationRegistry/'
             .. provider .. '"'
     local position = assert(source:find(needle, 1, true), needle)
     T.truthy(position > previous, provider .. " load order")
@@ -50,14 +50,14 @@ end
 
 PNC = {}
 T.load(
-    "ProjectHoomans",
-    "shared",
-    "PNC/Conversation/Blocks/PNC_ConversationRegistry.lua"
+    "PsychopatzCore",
+    "common",
+    "PsychopatzCore/Conversation/Registry/PsychopatzConversationRegistry.lua"
 )
 for i = 1, #publicFunctions do
     local functionName = publicFunctions[i]
     T.equal(
-        type(PNC.Conversation.Registry[functionName]),
+        type(PsychopatzCore.Conversation.Registry[functionName]),
         "function",
         "entry point should preserve Registry." .. functionName
     )

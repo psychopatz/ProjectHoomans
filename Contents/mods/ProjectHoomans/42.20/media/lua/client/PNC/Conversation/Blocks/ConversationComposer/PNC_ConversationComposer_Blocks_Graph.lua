@@ -2,7 +2,7 @@ local Conversation = PNC.Conversation
 local Composer = Conversation.Composer
 local Selector = Conversation.Selector
 local Internal = Composer.Internal
-local Registry = Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local TopicCatalog = Internal.TopicCatalog
 
 local dialoguePayload = Internal.DialoguePayload
@@ -333,7 +333,7 @@ function Composer.BuildSemanticConversationGraphProjection(view)
     local context = spec and spec.context or nil
     local session = view and view.session or nil
     local blockID = context and context.activeConversationBlockID or nil
-    local registry = PNC.Conversation and PNC.Conversation.Registry or Registry
+    local registry = PNC.Conversation and PsychopatzCore.Conversation.Registry or Registry
     local block = blockID and registry
         and type(registry.GetBlock) == "function"
         and registry.GetBlock(blockID) or nil

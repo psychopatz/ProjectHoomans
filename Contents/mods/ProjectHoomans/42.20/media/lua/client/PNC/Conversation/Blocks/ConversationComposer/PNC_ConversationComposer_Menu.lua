@@ -1,6 +1,6 @@
 local Conversation = PNC.Conversation
 local Composer = Conversation.Composer
-local Registry = Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local Selector = Conversation.Selector
 local Loader = PsychopatzCore.Conversation.TextCatalog
 local Internal = Composer.Internal

@@ -14,7 +14,7 @@ PNC.Conversation.Authority = PNC.Conversation.Authority or {}
 
 local Authority = PNC.Conversation.Authority
 local Internal = Authority.Internal
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local validateLease = Internal.ValidateLease
 local requestIsCurrent = Internal.RequestIsCurrent
 local send = Internal.Send

@@ -1,4 +1,4 @@
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 
 local function registerCeasefireEffect()
     if Registry.effectHandlers["pnc:ceasefire"] then return end

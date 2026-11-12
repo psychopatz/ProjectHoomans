@@ -1,6 +1,6 @@
 -- Stable entry point for conversation gate and effect rules.
 
-require "PNC/Conversation/Blocks/PNC_ConversationRegistry"
+require "PsychopatzCore/Conversation/Registry/PsychopatzConversationRegistry"
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}

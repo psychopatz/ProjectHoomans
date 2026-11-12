@@ -4,11 +4,12 @@ local SHARED = T.path("ProjectHoomans", "shared", "")
 T.addPackagePaths()
 
 PNC = {}
-T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRegistry.lua")
+T.load("PsychopatzCore", "common",
+    "PsychopatzCore/Conversation/Registry/PsychopatzConversationRegistry.lua")
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRules.lua")
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationSelector.lua")
 
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local Selector = PNC.Conversation.Selector
 
 local categoryID = "test:caravan"

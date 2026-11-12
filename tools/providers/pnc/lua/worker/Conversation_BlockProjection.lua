@@ -21,9 +21,9 @@ function Block.project(view)
     if nodeID == "" then return nil end
     local node = nodes["block:" .. tostring(nodeID)]
     if type(node) ~= "table" then return nil end
-    local block = PNC.Conversation and PNC.Conversation.Registry
-        and PNC.Conversation.Registry.GetBlock
-        and PNC.Conversation.Registry.GetBlock(blockID) or nil
+    local block = PNC.Conversation and PsychopatzCore.Conversation.Registry
+        and PsychopatzCore.Conversation.Registry.GetBlock
+        and PsychopatzCore.Conversation.Registry.GetBlock(blockID) or nil
     local ownership = PNC.Semantics
         and PNC.Semantics.ConversationCategoryOwnership
     if type(ownership) ~= "table" then

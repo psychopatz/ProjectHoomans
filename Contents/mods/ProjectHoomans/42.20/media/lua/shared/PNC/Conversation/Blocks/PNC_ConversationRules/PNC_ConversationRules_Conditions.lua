@@ -1,6 +1,6 @@
 local Rules = PNC.Conversation.Rules
 local Internal = Rules.Internal
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local EngineFacts = PNC.Semantics and PNC.Semantics.EngineFacts
 if type(EngineFacts) ~= "table" then
     EngineFacts = require "PNC/Semantics/PNC_SemanticEngineFacts"

@@ -3,7 +3,7 @@
 local Conversation = PNC.Conversation
 local Composer = Conversation.Composer
 local Internal = Composer.Internal
-local Registry = Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local Selector = Conversation.Selector
 local ReceiveContext = {}
 

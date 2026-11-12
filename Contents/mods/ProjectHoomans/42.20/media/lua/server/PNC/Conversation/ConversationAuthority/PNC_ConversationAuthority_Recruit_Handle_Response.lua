@@ -8,7 +8,7 @@ PNC.Conversation = PNC.Conversation or {}
 PNC.Conversation.Authority = PNC.Conversation.Authority or {}
 local Authority = PNC.Conversation.Authority
 local Internal = Authority.Internal
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local RecruitmentResponse = {}
 
 local recruitReplyKey = Internal.RecruitReplyKey

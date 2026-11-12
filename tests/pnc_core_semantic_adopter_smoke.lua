@@ -30,7 +30,9 @@ require "DTCommon/DTCommon_SemanticPack"
 -- Load Hoomans Conversation Selector and Pack
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
-PNC.Conversation.Registry = {
+PsychopatzCore = PsychopatzCore or {}
+PsychopatzCore.Conversation = PsychopatzCore.Conversation or {}
+PsychopatzCore.Conversation.Registry = {
     SCHEMA_VERSION = 1,
     ListBlocks = function(filter) return {} end,
     GetCategory = function(id) return nil end,

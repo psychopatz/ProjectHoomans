@@ -1,4 +1,4 @@
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 
 local DERIVED_FIELDS = {
     admire = true,

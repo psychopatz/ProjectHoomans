@@ -106,7 +106,8 @@ PNC = {
 }
 
 T.load(SHARED .. "PNC/Core/Base/PNC_Constants.lua")
-T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRegistry.lua")
+T.load("PsychopatzCore", "common",
+    "PsychopatzCore/Conversation/Registry/PsychopatzConversationRegistry.lua")
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRules.lua")
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationSelector.lua")
 T.load(SHARED .. "PNC/Conversation/Memory/PNC_ConversationMemory.lua")
@@ -115,7 +116,7 @@ T.load(SHARED .. "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua
 T.load(SERVER .. "PNC/Conversation/PNC_ConversationHistory.lua")
 T.load(SERVER .. "PNC/Conversation/PNC_ConversationAuthority.lua")
 
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local History = PNC.Conversation.History
 local Authority = PNC.Conversation.Authority
 

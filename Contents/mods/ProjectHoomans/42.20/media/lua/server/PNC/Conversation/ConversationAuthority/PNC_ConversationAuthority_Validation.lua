@@ -7,7 +7,7 @@ PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 PNC.Conversation.Authority = PNC.Conversation.Authority or {}
 local Internal = PNC.Conversation.Authority.Internal
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local Scene = PNC.ConversationScene
 
 local function validateLease(player, record, token)

@@ -98,7 +98,7 @@ local function configureContext(state)
     PNC.Network.Internal = PNC.Network.Internal or {}
     PNC.Semantics = PNC.Semantics or {}
     PNC.Conversation = PNC.Conversation or {}
-    PNC.Conversation.Registry = PNC.Conversation.Registry or {}
+    PsychopatzCore.Conversation.Registry = PsychopatzCore.Conversation.Registry or {}
     PNC.Conversation.Audience = PNC.Conversation.Audience or {
         IsPlayerHostile = function() return false end,
     }

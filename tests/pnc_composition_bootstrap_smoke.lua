@@ -251,7 +251,7 @@ local conversationSharedCalls = capture(
         .. "PNC_ConversationSharedComposition.lua"
 )
 local expectedConversationShared = {
-    "PNC/Conversation/Blocks/PNC_ConversationRegistry",
+    "PsychopatzCore/Conversation/Registry/PsychopatzConversationRegistry",
     "PNC/Conversation/Blocks/PNC_ConversationRules",
     "PNC/Conversation/Blocks/PNC_ConversationSelector",
     "PNC/Conversation/PNC_ConversationScene",

@@ -25,7 +25,7 @@ local publicFunctions = {
 }
 
 local registryNeedle =
-    'require "PNC/Conversation/Blocks/PNC_ConversationRegistry"'
+    'require "PsychopatzCore/Conversation/Registry/PsychopatzConversationRegistry"'
 local previous = assert(source:find(registryNeedle, 1, true))
 local i
 for i = 1, #providers do

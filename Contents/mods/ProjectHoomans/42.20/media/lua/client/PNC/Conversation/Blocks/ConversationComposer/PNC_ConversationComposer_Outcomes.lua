@@ -2,7 +2,7 @@ local Conversation = PNC.Conversation
 local Composer = Conversation.Composer
 local Internal = Composer.Internal
 
-local Registry = Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local activeView = Internal.ActiveView
 local conversationDebugEnabled = Internal.ConversationDebugEnabled
 local notifyFailure = Internal.NotifyFailure

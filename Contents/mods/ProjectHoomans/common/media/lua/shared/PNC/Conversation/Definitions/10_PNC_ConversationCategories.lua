@@ -1,5 +1,5 @@
 local H = PNC.Conversation.DefinitionHelpers
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local categorySource = H.Source("system/categories", "PsychopatzCore")
 
 local categories = {

@@ -8,7 +8,7 @@ PNC.ConversationDebugModelInternal =
 
 local Model = PNC.ConversationDebugModel
 local H = PNC.ConversationDebugModelInternal
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local Loader = PsychopatzCore.Conversation.TextCatalog
 local SandboxContext = H.SandboxContext
 local SandboxChoices = H.SandboxChoices

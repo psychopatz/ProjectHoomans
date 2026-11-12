@@ -11,7 +11,7 @@ local ActorConversationContext = PNC.Semantics
     and PNC.Semantics.ActorConversationContext
     or require "PNC/Semantics/PNC_ActorConversationContext"
 local Internal = Authority.Internal
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local History = PNC.Conversation.History
 local TextCatalog = PsychopatzCore.Conversation.TextCatalog
 local InteractionPersistence = PNC.Conversation

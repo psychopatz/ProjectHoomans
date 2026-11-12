@@ -2,7 +2,7 @@
 
 local Conversation = PNC.Conversation
 local Composer = Conversation.Composer
-local Registry = Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local Loader = PsychopatzCore.Conversation.TextCatalog
 local Internal = Composer.Internal
 local Presentation = {}

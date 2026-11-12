@@ -3,7 +3,7 @@ require "PNC/Conversation/Blocks/PNC_ConversationRules"
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 
-local Registry = PNC.Conversation.Registry
+local Registry = PsychopatzCore.Conversation.Registry
 local Rules = PNC.Conversation.Rules
 local Selector = PNC.Conversation.Selector or {}
 PNC.Conversation.Selector = Selector

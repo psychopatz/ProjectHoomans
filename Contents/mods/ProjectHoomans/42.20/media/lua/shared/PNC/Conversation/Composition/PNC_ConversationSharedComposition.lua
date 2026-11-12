@@ -1,5 +1,5 @@
 -- Deterministic shared Conversation composition root.
-require "PNC/Conversation/Blocks/PNC_ConversationRegistry"
+require "PsychopatzCore/Conversation/Registry/PsychopatzConversationRegistry"
 require "PNC/Conversation/Blocks/PNC_ConversationRules"
 require "PNC/Conversation/Blocks/PNC_ConversationSelector"
 require "PNC/Conversation/PNC_ConversationScene"

@@ -10,7 +10,7 @@ PNC.Conversation.Authority = PNC.Conversation.Authority or {}
 
 local Authority = PNC.Conversation.Authority
 local Internal = Authority.Internal
-local ConversationRegistry = PNC.Conversation.Registry
+local ConversationRegistry = PsychopatzCore.Conversation.Registry
 local NPCRegistry = PNC.Registry
 local validateLease = Internal.ValidateLease
 local requestIsCurrent = Internal.RequestIsCurrent
