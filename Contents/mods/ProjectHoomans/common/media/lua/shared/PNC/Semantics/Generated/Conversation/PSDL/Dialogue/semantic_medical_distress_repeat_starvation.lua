@@ -1,0 +1,196 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "medical_event_repeat",
+        ["id"] = "semantic.medical.distress.repeat.starvation",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.medical.distress.repeat.starvation",
+            ["sourcePath"] = "psdl/dialogue/medical_event_repeat.json#records[7]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_repeat_starvation",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:medical_event",
+                ["responseTemplateID"] = "semantic.medical.distress.repeat.starvation",
+                ["sourceSurface"] = "content/event/medical/repeat.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "MEDICAL_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.medical.distress.repeat.starvation.neutral.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I still need something to eat. I'm fading fast.",
+                            },
+                            ["TL"] = {
+                                "Kailangan ko pa rin ng makakain. Mabilis akong nanghihina.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.medical.distress.repeat.starvation.neutral.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Still starving... any canned food, anything?",
+                            },
+                            ["TL"] = {
+                                "Gutom na gutom pa rin... kahit anong de-lata, kahit ano?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.medical.distress.repeat.starvation.neutral.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Can't recover without calories. Bring food, please.",
+                            },
+                            ["TL"] = {
+                                "Hindi makakabawi nang walang laman ang tiyan. Magdala ka ng pagkain.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.medical.distress.repeat.starvation.neutral.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Stomach pains won't stop. I need nourishment.",
+                            },
+                            ["TL"] = {
+                                "Ayaw tumigil ng sakit ng tiyan ko. Kailangan ko ng pagkain.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.medical.distress.repeat.starvation.neutral.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Still starving to the bone. Did you find a ration?",
+                            },
+                            ["TL"] = {
+                                "Gutom na gutom pa rin hanggang buto. May nahanap ka bang rasyon?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.medical.distress.repeat.starvation.neutral.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Please hurry with some food. I'm too dizzy to stand.",
+                            },
+                            ["TL"] = {
+                                "Pakiusap bilisan ang pagkain. Nahihilo na ako para makatayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.medical.distress.repeat.starvation.neutral.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hunger is unbearable now. Help me.",
+                            },
+                            ["TL"] = {
+                                "Hindi na makayanan ang gutom. Tulungan mo ako.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.medical.distress.repeat.starvation.neutral.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Still haven't eaten. Don't let me starve on this floor.",
+                            },
+                            ["TL"] = {
+                                "Wala pa ring kinakain. Huwag mo akong hayaang magutom sa sahig.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.medical.distress.repeat.starvation.neutral.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Need a meal to get back on my feet.",
+                            },
+                            ["TL"] = {
+                                "Kailangan ko ng makakain para makatayo ulit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.medical.distress.repeat.starvation.neutral.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Still empty... please, just a cracker or some beans.",
+                            },
+                            ["TL"] = {
+                                "Walang laman pa rin... kahit biskwit o kaunting beans lang.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/medical_event_repeat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

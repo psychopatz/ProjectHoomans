@@ -46,7 +46,7 @@ return {
         ["domain"] = "event",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Event",
-        ["recordCount"] = 93,
+        ["recordCount"] = 61,
     },
     {
         ["domain"] = "greeting",
@@ -154,6 +154,42 @@ return {
         ["domain"] = "core_knowledge_identity",
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CoreKnowledgeIdentity",
+        ["recordCount"] = 8,
+    },
+    {
+        ["domain"] = "medical_event_call",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/MedicalEventCall",
+        ["recordCount"] = 8,
+    },
+    {
+        ["domain"] = "medical_event_overview",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/MedicalEventOverview",
+        ["recordCount"] = 3,
+    },
+    {
+        ["domain"] = "medical_event_repeat",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/MedicalEventRepeat",
+        ["recordCount"] = 8,
+    },
+    {
+        ["domain"] = "medical_event_teammate",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/MedicalEventTeammate",
+        ["recordCount"] = 3,
+    },
+    {
+        ["domain"] = "medical_event_treatment",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/MedicalEventTreatment",
+        ["recordCount"] = 2,
+    },
+    {
+        ["domain"] = "medical_event_update",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/MedicalEventUpdate",
         ["recordCount"] = 8,
     },
     {

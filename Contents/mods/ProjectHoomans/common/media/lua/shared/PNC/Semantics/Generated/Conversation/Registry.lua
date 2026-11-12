@@ -8,8 +8,8 @@ Registry.REGISTRY_NAMESPACE = "PNC.Semantics.ConversationRegistry"
 Registry.REGISTRY_MODULE = "PNC/Semantics/Generated/Conversation/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
-Registry.CONTENT_FINGERPRINT = "8efad83122f2100780fe6673d90c80c34cd3cb4a6c55c9d9578760b9bfc636f1"
-Registry.WHOLE_MODEL_FINGERPRINT = "bb66935280bfaa0d2ed8f4873883c5a1f1de20214db6d97be54450425ff648fa"
+Registry.CONTENT_FINGERPRINT = "f544843c2e002e576ddcd5dae1a067c0c0d0db24bcb3af348b48b155c75007d1"
+Registry.WHOLE_MODEL_FINGERPRINT = "50fc4e0dca4d81bc15afd47884e82a8ade6ebe0537cc6803499a0c9662734c97"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -95,12 +95,6 @@ appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Combat
 appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/CombatKill/Witness/Reserved")
 appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/CombatKill/Witness/Shaken")
 appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/CombatKill/Witness/Supportive")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Medical/Call")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Medical/Overview")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Medical/Repeat")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Medical/Teammate")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Medical/Treatment")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Medical/Update")
 appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions/Combat")
 appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions/Companion")
 appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions/Corpse")
@@ -311,6 +305,38 @@ appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogu
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_neutral")
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_terse")
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_warm")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_bandage")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_bleedout")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_default")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_dehydration")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_exhaustion")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_mercy")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_rescue")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_starvation")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_default")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_mercy")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_repeat_bandage")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_repeat_bleedout")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_repeat_default")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_repeat_dehydration")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_repeat_exhaustion")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_repeat_mercy")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_repeat_rescue")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_repeat_starvation")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_teammate_default")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_teammate_found")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_teammate_missing")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_treatment_bandage")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_treatment_default")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_update_bandage")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_update_bleedout")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_update_default")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_update_dehydration")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_update_exhaustion")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_update_mercy")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_update_rescue")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_update_starvation")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_urgent")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_guarded")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_neutral")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_terse")
