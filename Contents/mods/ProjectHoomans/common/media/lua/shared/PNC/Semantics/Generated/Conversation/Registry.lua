@@ -8,8 +8,8 @@ Registry.REGISTRY_NAMESPACE = "PNC.Semantics.ConversationRegistry"
 Registry.REGISTRY_MODULE = "PNC/Semantics/Generated/Conversation/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
-Registry.CONTENT_FINGERPRINT = "f544843c2e002e576ddcd5dae1a067c0c0d0db24bcb3af348b48b155c75007d1"
-Registry.WHOLE_MODEL_FINGERPRINT = "50fc4e0dca4d81bc15afd47884e82a8ade6ebe0537cc6803499a0c9662734c97"
+Registry.CONTENT_FINGERPRINT = "859e2c7aac33af6a81370abb63231dd5de221c751942704c56f00894fbbefcec"
+Registry.WHOLE_MODEL_FINGERPRINT = "1802631b0163dcf6bb24e0d2156c6380626add12bf9a09785730e1bc138e1c34"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -95,13 +95,6 @@ appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Combat
 appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/CombatKill/Witness/Reserved")
 appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/CombatKill/Witness/Shaken")
 appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/CombatKill/Witness/Supportive")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions/Combat")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions/Companion")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions/Corpse")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions/Farewell")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions/LeaderLoss")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions/Safety")
-appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions/Social")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Greeting")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Health/HealthState")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Health/MedicalBite")
@@ -233,6 +226,9 @@ appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_horde_prompt_reserved")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_horde_prompt_shaken")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_horde_started")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_reaction_default")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_reaction_retreat")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_reaction_threat")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_camp_failed")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_camp_queued")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_camp_queued_friendly")
@@ -289,6 +285,15 @@ appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_stop_following_queued_trusted")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_stop_following_queued_withdrawn")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_stop_following_rejected")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_companion_reaction_abandonment")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_companion_reaction_camp_rejected")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_companion_reaction_default")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_conversation_safety_danger")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_conversation_safety_default")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_corpse_reaction_default")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_corpse_reaction_revenge")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_farewell_default")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_flow_farewell_friendly")
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_bond_guarded")
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_bond_neutral")
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_bond_terse")
@@ -305,6 +310,12 @@ appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogu
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_neutral")
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_terse")
 appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_interaction_world_event_warning_flavor_warm")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_leader_loss_close")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_leader_loss_colonist")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_leader_loss_default")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_leader_loss_devoted")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_leader_loss_dissent")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_leader_loss_distant")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_bandage")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_bleedout")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_medical_distress_call_default")
@@ -397,6 +408,7 @@ appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_apology_withdrawn_neutral")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_apology_withdrawn_terse")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_apology_withdrawn_warm")
+appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_reaction_default")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_ask_about_member")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_ask_about_neutral")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_ask_about_special")

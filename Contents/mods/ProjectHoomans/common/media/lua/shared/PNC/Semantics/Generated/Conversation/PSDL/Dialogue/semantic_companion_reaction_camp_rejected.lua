@@ -1,0 +1,157 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "event_reactions_companion",
+        ["id"] = "semantic.companion.reaction.camp_rejected",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.companion.reaction.camp_rejected",
+            ["sourcePath"] = "psdl/dialogue/event_reactions_companion.json#records[1]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_companion_reaction_camp_rejected",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:event_reactions",
+                ["contentOwner"] = "projecthoomans.dialogue_content.events",
+                ["responseTemplateID"] = "semantic.companion.reaction.camp_rejected",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/companion.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can't find a safe room or campfire nearby.",
+                            },
+                            ["TL"] = {
+                                "Wala akong makitang ligtas na kwarto o campfire sa malapit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Nowhere safe to rest around here. We need better cover.",
+                            },
+                            ["TL"] = {
+                                "Walang ligtas na pahingahan dito. Kailangan natin ng mas maayos na silungan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Can't camp in the open like this. Too dangerous.",
+                            },
+                            ["TL"] = {
+                                "Hindi pwedeng magkampo sa lantad nang ganito. Masyadong delikado.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "We need walls or a fire before we settle down.",
+                            },
+                            ["TL"] = {
+                                "Kailangan natin ng pader o apoy bago huminto.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "This spot isn't secure enough for camp. Keep walking.",
+                            },
+                            ["TL"] = {
+                                "Hindi sapat ang kaligtasan ng pwestong 'to para sa kampo. Lakad pa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "No shelter here. Let's find four walls first.",
+                            },
+                            ["TL"] = {
+                                "Walang masisilungan dito. Maghanap muna tayo ng apat na pader.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Can't sleep here. Infected could walk right in.",
+                            },
+                            ["TL"] = {
+                                "Hindi pwedeng matulog dito. Madaling makakapasok ang mga infected.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "We need a barricaded room or a campfire before resting.",
+                            },
+                            ["TL"] = {
+                                "Kailangan natin ng may barikadang kwarto o campfire bago magpahinga.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Not pitching camp here. Let's find a secure building.",
+                            },
+                            ["TL"] = {
+                                "Hindi ako magkakampo rito. Maghanap tayo ng ligtas na gusali.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Too exposed. Find us a real camp spot.",
+                            },
+                            ["TL"] = {
+                                "Masyadong lantad. Hanapan mo tayo ng tunay na matutuluyan.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/event_reactions_companion.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

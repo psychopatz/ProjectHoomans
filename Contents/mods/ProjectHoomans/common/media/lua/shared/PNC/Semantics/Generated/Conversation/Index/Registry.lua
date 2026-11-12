@@ -46,7 +46,7 @@ return {
         ["domain"] = "event",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Event",
-        ["recordCount"] = 61,
+        ["recordCount"] = 42,
     },
     {
         ["domain"] = "greeting",
@@ -155,6 +155,48 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CoreKnowledgeIdentity",
         ["recordCount"] = 8,
+    },
+    {
+        ["domain"] = "event_reactions_combat",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/EventReactionsCombat",
+        ["recordCount"] = 3,
+    },
+    {
+        ["domain"] = "event_reactions_companion",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/EventReactionsCompanion",
+        ["recordCount"] = 3,
+    },
+    {
+        ["domain"] = "event_reactions_corpse",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/EventReactionsCorpse",
+        ["recordCount"] = 2,
+    },
+    {
+        ["domain"] = "event_reactions_farewell",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/EventReactionsFarewell",
+        ["recordCount"] = 2,
+    },
+    {
+        ["domain"] = "event_reactions_leader_loss",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/EventReactionsLeaderLoss",
+        ["recordCount"] = 6,
+    },
+    {
+        ["domain"] = "event_reactions_safety",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/EventReactionsSafety",
+        ["recordCount"] = 2,
+    },
+    {
+        ["domain"] = "event_reactions_social",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/EventReactionsSocial",
+        ["recordCount"] = 1,
     },
     {
         ["domain"] = "medical_event_call",
