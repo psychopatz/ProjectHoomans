@@ -8,8 +8,8 @@ Registry.REGISTRY_NAMESPACE = "PNC.Semantics.ConversationRegistry"
 Registry.REGISTRY_MODULE = "PNC/Semantics/Generated/Conversation/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
-Registry.CONTENT_FINGERPRINT = "c223241cb10e0286fe285007c9b7f5e989b2fe3b134b7952c293d3bd65b0e949"
-Registry.WHOLE_MODEL_FINGERPRINT = "706054ca3a6942ca9aedd00fbdc713118e415ec2004bf5e04daee9781d766b22"
+Registry.CONTENT_FINGERPRINT = "5f004786fcd0b36eb18372fe179c59b7278f85fc871f04543b395c05e097a2c6"
+Registry.WHOLE_MODEL_FINGERPRINT = "cbb1ca1c6783a5c8880c278121d580ceb24efd09f5f86634ba78d79c22bd515c"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -101,7 +101,7 @@ local loaded22 = require "PNC/Semantics/Generated/Conversation/Content/Command/R
 appendContent(loaded22)
 local loaded23 = require "PNC/Semantics/Generated/Conversation/Content/Compatibility"
 appendContent(loaded23)
-local loaded24 = require "PNC/Semantics/Generated/Conversation/Content/Conversation"
+local loaded24 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Conversation"
 appendContent(loaded24)
 local loaded25 = require "PNC/Semantics/Generated/Conversation/Content/Event/CombatHordeReactions"
 appendContent(loaded25)
@@ -159,105 +159,105 @@ local loaded51 = require "PNC/Semantics/Generated/Conversation/Content/Event/Rea
 appendContent(loaded51)
 local loaded52 = require "PNC/Semantics/Generated/Conversation/Content/Event/Reactions/Social"
 appendContent(loaded52)
-local loaded53 = require "PNC/Semantics/Generated/Conversation/Content/Greeting"
+local loaded53 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Greeting"
 appendContent(loaded53)
-local loaded54 = require "PNC/Semantics/Generated/Conversation/Content/Health/HealthState"
+local loaded54 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Health/HealthState"
 appendContent(loaded54)
-local loaded55 = require "PNC/Semantics/Generated/Conversation/Content/Health/MedicalBite"
+local loaded55 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Health/MedicalBite"
 appendContent(loaded55)
-local loaded56 = require "PNC/Semantics/Generated/Conversation/Content/Knowledge/Activity"
+local loaded56 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Activity"
 appendContent(loaded56)
-local loaded57 = require "PNC/Semantics/Generated/Conversation/Content/Knowledge/Gossip"
+local loaded57 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Gossip"
 appendContent(loaded57)
-local loaded58 = require "PNC/Semantics/Generated/Conversation/Content/Knowledge/Identity"
+local loaded58 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Identity"
 appendContent(loaded58)
-local loaded59 = require "PNC/Semantics/Generated/Conversation/Content/Knowledge/Knowledge"
+local loaded59 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Knowledge"
 appendContent(loaded59)
 local loaded60 = require "PNC/Semantics/Generated/Conversation/Content/Navigation"
 appendContent(loaded60)
-local loaded61 = require "PNC/Semantics/Generated/Conversation/Content/Needs"
+local loaded61 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Needs"
 appendContent(loaded61)
 local loaded62 = require "PNC/Semantics/Generated/Conversation/Content/Quest"
 appendContent(loaded62)
-local loaded63 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesConversation"
+local loaded63 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesConversation"
 appendContent(loaded63)
-local loaded64 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer"
+local loaded64 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer"
 appendContent(loaded64)
-local loaded65 = require "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply"
+local loaded65 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/Reply"
 appendContent(loaded65)
-local loaded66 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Argument/Deescalate"
+local loaded66 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Argument/Deescalate"
 appendContent(loaded66)
-local loaded67 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Argument/Retaliate"
+local loaded67 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Argument/Retaliate"
 appendContent(loaded67)
-local loaded68 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Context/Clarify"
+local loaded68 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Context/Clarify"
 appendContent(loaded68)
-local loaded69 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/FirstContact/Challenge"
+local loaded69 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/FirstContact/Challenge"
 appendContent(loaded69)
-local loaded70 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Memory/Acknowledge"
+local loaded70 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Memory/Acknowledge"
 appendContent(loaded70)
-local loaded71 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Memory/AcknowledgeFlavor"
+local loaded71 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Memory/AcknowledgeFlavor"
 appendContent(loaded71)
-local loaded72 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Memory/Followup"
+local loaded72 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Memory/Followup"
 appendContent(loaded72)
-local loaded73 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/News/Acknowledge"
+local loaded73 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/News/Acknowledge"
 appendContent(loaded73)
-local loaded74 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Combat/TacticalSpatial"
+local loaded74 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Combat/TacticalSpatial"
 appendContent(loaded74)
-local loaded75 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Excursion"
+local loaded75 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Excursion"
 appendContent(loaded75)
-local loaded76 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/GroundedNews"
+local loaded76 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/GroundedNews"
 appendContent(loaded76)
-local loaded77 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Horde"
+local loaded77 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Horde"
 appendContent(loaded77)
-local loaded78 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/PostCombat"
+local loaded78 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/PostCombat"
 appendContent(loaded78)
-local loaded79 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Work"
+local loaded79 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Work"
 appendContent(loaded79)
-local loaded80 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEvent/Warning"
+local loaded80 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEvent/Warning"
 appendContent(loaded80)
-local loaded81 = require "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEvent/WarningFlavor"
+local loaded81 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEvent/WarningFlavor"
 appendContent(loaded81)
-local loaded82 = require "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Acknowledgement"
+local loaded82 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Acknowledgement"
 appendContent(loaded82)
-local loaded83 = require "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Disputes"
+local loaded83 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Disputes"
 appendContent(loaded83)
-local loaded84 = require "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Hostile"
+local loaded84 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Hostile"
 appendContent(loaded84)
-local loaded85 = require "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Offers"
+local loaded85 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Offers"
 appendContent(loaded85)
-local loaded86 = require "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Threats"
+local loaded86 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Threats"
 appendContent(loaded86)
-local loaded87 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AcceptedGeneric"
+local loaded87 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/AcceptedGeneric"
 appendContent(loaded87)
-local loaded88 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Admire"
+local loaded88 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Admire"
 appendContent(loaded88)
-local loaded89 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Apology"
+local loaded89 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Apology"
 appendContent(loaded89)
-local loaded90 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName"
+local loaded90 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName"
 appendContent(loaded90)
-local loaded91 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Comfort"
+local loaded91 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Comfort"
 appendContent(loaded91)
-local loaded92 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Compliment"
+local loaded92 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Compliment"
 appendContent(loaded92)
-local loaded93 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Flirt"
+local loaded93 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Flirt"
 appendContent(loaded93)
-local loaded94 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Hostile"
+local loaded94 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Hostile"
 appendContent(loaded94)
-local loaded95 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Insult"
+local loaded95 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Insult"
 appendContent(loaded95)
-local loaded96 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Orientation"
+local loaded96 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Orientation"
 appendContent(loaded96)
-local loaded97 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Personality"
+local loaded97 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Personality"
 appendContent(loaded97)
-local loaded98 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Praise"
+local loaded98 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Praise"
 appendContent(loaded98)
-local loaded99 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Relationship"
+local loaded99 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Relationship"
 appendContent(loaded99)
-local loaded100 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Romantic"
+local loaded100 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Romantic"
 appendContent(loaded100)
-local loaded101 = require "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Sexual"
+local loaded101 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Sexual"
 appendContent(loaded101)
-local loaded102 = require "PNC/Semantics/Generated/Conversation/Content/SocialApology"
+local loaded102 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/SocialApology"
 appendContent(loaded102)
 local loaded103 = require "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Consume"
 appendContent(loaded103)
@@ -317,13 +317,13 @@ local loaded130 = require "PNC/Semantics/Generated/Conversation/Content/Task/Too
 appendContent(loaded130)
 local loaded131 = require "PNC/Semantics/Generated/Conversation/Content/Task/ToolReplies/RejectedSexual"
 appendContent(loaded131)
-local loaded132 = require "PNC/Semantics/Generated/Conversation/Content/Wellbeing/Emotional"
+local loaded132 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Wellbeing/Emotional"
 appendContent(loaded132)
-local loaded133 = require "PNC/Semantics/Generated/Conversation/Content/Wellbeing/General"
+local loaded133 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Wellbeing/General"
 appendContent(loaded133)
-local loaded134 = require "PNC/Semantics/Generated/Conversation/Content/Wellbeing/Needs"
+local loaded134 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/Wellbeing/Needs"
 appendContent(loaded134)
-local loaded135 = require "PNC/Semantics/Generated/Conversation/Content/PlayerChoices"
+local loaded135 = require "PsychopatzCore/Semantics/Generated/Conversation/Content/PlayerChoices"
 appendContentChoices(loaded135)
 local loaded136 = require "PNC/Semantics/Generated/Conversation/Patterns/SemanticFlows"
 appendPatterns(loaded136)
@@ -337,62 +337,62 @@ local loaded140 = require "PsychopatzCore/Semantics/Generated/Conversation/Patte
 appendPatterns(loaded140)
 local loaded141 = require "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/WellbeingActivity"
 appendPatterns(loaded141)
-local loaded142 = require "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal"
+local loaded142 = require "PsychopatzCore/Semantics/Generated/Conversation/Patterns/GroundedPersonal"
 appendPatterns(loaded142)
 local loaded143 = require "PNC/Semantics/Generated/Conversation/Responses/SemanticFlows"
 appendResponses(loaded143)
-local loaded144 = require "PNC/Semantics/Generated/Conversation/Responses/Common/NeedsWeather"
+local loaded144 = require "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/NeedsWeather"
 appendResponses(loaded144)
-local loaded145 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Questions"
+local loaded145 = require "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/Questions"
 appendResponses(loaded145)
-local loaded146 = require "PNC/Semantics/Generated/Conversation/Responses/Common/Social"
+local loaded146 = require "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/Social"
 appendResponses(loaded146)
-local loaded147 = require "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses"
+local loaded147 = require "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses"
 appendResponses(loaded147)
 local loaded148 = require "PNC/Semantics/Generated/Conversation/Flows/SemanticFlows"
 appendFlows(loaded148)
-local loaded149 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeMemory"
+local loaded149 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeMemory"
 appendBehaviors(loaded149)
-local loaded150 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeNews"
+local loaded150 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeNews"
 appendBehaviors(loaded150)
-local loaded151 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeRepair"
+local loaded151 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeRepair"
 appendBehaviors(loaded151)
-local loaded152 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeReply"
+local loaded152 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeReply"
 appendBehaviors(loaded152)
-local loaded153 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeThanks"
+local loaded153 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeThanks"
 appendBehaviors(loaded153)
-local loaded154 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/AskMemoryFollowup"
+local loaded154 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/AskMemoryFollowup"
 appendBehaviors(loaded154)
-local loaded155 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Challenge"
+local loaded155 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/Challenge"
 appendBehaviors(loaded155)
-local loaded156 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/ClarifyContext"
+local loaded156 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/ClarifyContext"
 appendBehaviors(loaded156)
-local loaded157 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Deescalate"
+local loaded157 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/Deescalate"
 appendBehaviors(loaded157)
-local loaded158 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/EndConversation"
+local loaded158 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/EndConversation"
 appendBehaviors(loaded158)
-local loaded159 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Reconcile"
+local loaded159 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/Reconcile"
 appendBehaviors(loaded159)
-local loaded160 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/RetaliateVerbally"
+local loaded160 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/RetaliateVerbally"
 appendBehaviors(loaded160)
-local loaded161 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors"
+local loaded161 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors"
 appendBehaviors(loaded161)
-local loaded162 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDire__fa8f3cfb"
+local loaded162 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDire__fa8f3cfb"
 appendBehaviors(loaded162)
-local loaded163 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/Warn"
+local loaded163 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/Warn"
 appendBehaviors(loaded163)
-local loaded164 = require "PNC/Semantics/Generated/Conversation/Behaviors/Social/WorldEventWarn"
+local loaded164 = require "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/WorldEventWarn"
 appendBehaviors(loaded164)
-local loaded165 = require "PNC/Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation"
+local loaded165 = require "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation"
 appendBeats(loaded165)
-local loaded166 = require "PNC/Semantics/Generated/Conversation/Beats/Social/Reconciliation"
+local loaded166 = require "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/Reconciliation"
 appendBeats(loaded166)
-local loaded167 = require "PNC/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact"
+local loaded167 = require "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact"
 appendBeats(loaded167)
-local loaded168 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore"
-local loaded169 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups"
-local loaded170 = require "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualReplies"
-local loaded171 = require "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes"
+local loaded168 = require "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore"
+local loaded169 = require "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups"
+local loaded170 = require "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ContextualReplies"
+local loaded171 = require "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/Lexemes"
 local loaded172 = require "PNC/Semantics/Generated/Conversation/UI/StaticSuggestions"
 appendUI(loaded172)
 local loaded173 = require "PsychopatzCore/Semantics/Generated/Conversation/UI/StaticSuggestionsCore"

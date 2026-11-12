@@ -3,7 +3,7 @@ return {
     ["behavior.acknowledge_memory"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeMemory",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeMemory",
         },
         ["id"] = "behavior.acknowledge_memory",
         ["kind"] = "behavior",
@@ -12,7 +12,7 @@ return {
     ["behavior.acknowledge_news"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeNews",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeNews",
         },
         ["id"] = "behavior.acknowledge_news",
         ["kind"] = "behavior",
@@ -21,7 +21,7 @@ return {
     ["behavior.acknowledge_repair"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeRepair",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeRepair",
         },
         ["id"] = "behavior.acknowledge_repair",
         ["kind"] = "behavior",
@@ -30,7 +30,7 @@ return {
     ["behavior.acknowledge_reply"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeReply",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeReply",
         },
         ["id"] = "behavior.acknowledge_reply",
         ["kind"] = "behavior",
@@ -39,7 +39,7 @@ return {
     ["behavior.acknowledge_thanks"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeThanks",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/AcknowledgeThanks",
         },
         ["id"] = "behavior.acknowledge_thanks",
         ["kind"] = "behavior",
@@ -48,7 +48,7 @@ return {
     ["behavior.ask_memory_followup"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/AskMemoryFollowup",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/AskMemoryFollowup",
         },
         ["id"] = "behavior.ask_memory_followup",
         ["kind"] = "behavior",
@@ -60,7 +60,7 @@ return {
         },
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/Challenge",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/Challenge",
         },
         ["id"] = "behavior.challenge",
         ["kind"] = "behavior",
@@ -69,7 +69,7 @@ return {
     ["behavior.clarify_context"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/ClarifyContext",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/ClarifyContext",
         },
         ["id"] = "behavior.clarify_context",
         ["kind"] = "behavior",
@@ -82,7 +82,7 @@ return {
         },
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/Deescalate",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/Deescalate",
         },
         ["id"] = "behavior.deescalate",
         ["kind"] = "behavior",
@@ -95,7 +95,7 @@ return {
         },
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/EndConversation",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/EndConversation",
         },
         ["id"] = "behavior.end_conversation",
         ["kind"] = "behavior",
@@ -107,7 +107,7 @@ return {
         },
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/Reconcile",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/Reconcile",
         },
         ["id"] = "behavior.reconcile",
         ["kind"] = "behavior",
@@ -119,7 +119,7 @@ return {
         },
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/RetaliateVerbally",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/RetaliateVerbally",
         },
         ["id"] = "behavior.retaliate_verbally",
         ["kind"] = "behavior",
@@ -128,7 +128,7 @@ return {
     ["behavior.scene_excursion_acknowledge"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_excursion_acknowledge",
         ["kind"] = "behavior",
@@ -137,7 +137,7 @@ return {
     ["behavior.scene_excursion_departing"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_excursion_departing",
         ["kind"] = "behavior",
@@ -146,7 +146,7 @@ return {
     ["behavior.scene_excursion_failed"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_excursion_failed",
         ["kind"] = "behavior",
@@ -155,7 +155,7 @@ return {
     ["behavior.scene_excursion_home"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_excursion_home",
         ["kind"] = "behavior",
@@ -164,7 +164,7 @@ return {
     ["behavior.scene_excursion_preparing"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_excursion_preparing",
         ["kind"] = "behavior",
@@ -173,7 +173,7 @@ return {
     ["behavior.scene_excursion_returning"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_excursion_returning",
         ["kind"] = "behavior",
@@ -182,7 +182,7 @@ return {
     ["behavior.scene_grounded_news_share"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_grounded_news_share",
         ["kind"] = "behavior",
@@ -191,7 +191,7 @@ return {
     ["behavior.scene_horde_prompt"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_horde_prompt",
         ["kind"] = "behavior",
@@ -200,7 +200,7 @@ return {
     ["behavior.scene_horde_reply_brave"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_horde_reply_brave",
         ["kind"] = "behavior",
@@ -209,7 +209,7 @@ return {
     ["behavior.scene_horde_reply_cautious"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_horde_reply_cautious",
         ["kind"] = "behavior",
@@ -218,7 +218,7 @@ return {
     ["behavior.scene_horde_reply_steady"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_horde_reply_steady",
         ["kind"] = "behavior",
@@ -227,7 +227,7 @@ return {
     ["behavior.scene_news_followup"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_news_followup",
         ["kind"] = "behavior",
@@ -236,7 +236,7 @@ return {
     ["behavior.scene_news_followup_answer"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SceneRuntimeBehaviors",
         },
         ["id"] = "behavior.scene_news_followup_answer",
         ["kind"] = "behavior",
@@ -245,7 +245,7 @@ return {
     ["behavior.scene_post_combat_clear"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDire__fa8f3cfb",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDire__fa8f3cfb",
         },
         ["id"] = "behavior.scene_post_combat_clear",
         ["kind"] = "behavior",
@@ -254,7 +254,7 @@ return {
     ["behavior.scene_task_work_assigned"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDire__fa8f3cfb",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDire__fa8f3cfb",
         },
         ["id"] = "behavior.scene_task_work_assigned",
         ["kind"] = "behavior",
@@ -263,7 +263,7 @@ return {
     ["behavior.scene_task_work_completed"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDire__fa8f3cfb",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/SocialConversationDire__fa8f3cfb",
         },
         ["id"] = "behavior.scene_task_work_completed",
         ["kind"] = "behavior",
@@ -277,7 +277,7 @@ return {
         },
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/Warn",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/Warn",
         },
         ["id"] = "behavior.warn",
         ["kind"] = "behavior",
@@ -286,7 +286,7 @@ return {
     ["behavior.world_event_warn"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/WorldEventWarn",
+            "PsychopatzCore/Semantics/Generated/Conversation/Behaviors/Social/WorldEventWarn",
         },
         ["id"] = "behavior.world_event_warn",
         ["kind"] = "behavior",

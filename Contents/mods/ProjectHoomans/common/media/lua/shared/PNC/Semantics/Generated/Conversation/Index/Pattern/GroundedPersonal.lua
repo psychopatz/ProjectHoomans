@@ -3,7 +3,7 @@ return {
     ["pnc.backstory.follow_up.do_you_miss_it"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
+            "PsychopatzCore/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
         },
         ["id"] = "pnc.backstory.follow_up.do_you_miss_it",
         ["kind"] = "pattern",
@@ -12,7 +12,7 @@ return {
     ["pnc.backstory.follow_up.where"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
+            "PsychopatzCore/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
         },
         ["id"] = "pnc.backstory.follow_up.where",
         ["kind"] = "pattern",
@@ -21,7 +21,7 @@ return {
     ["pnc.backstory.question.fear.private"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
+            "PsychopatzCore/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
         },
         ["id"] = "pnc.backstory.question.fear.private",
         ["kind"] = "pattern",
@@ -30,7 +30,7 @@ return {
     ["pnc.backstory.question.former_job.before_all_this"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
+            "PsychopatzCore/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
         },
         ["id"] = "pnc.backstory.question.former_job.before_all_this",
         ["kind"] = "pattern",
@@ -39,7 +39,7 @@ return {
     ["pnc.backstory.question.former_job.old_job"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
+            "PsychopatzCore/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
         },
         ["id"] = "pnc.backstory.question.former_job.old_job",
         ["kind"] = "pattern",
@@ -48,7 +48,7 @@ return {
     ["pnc.backstory.question.hobby.interest"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
+            "PsychopatzCore/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
         },
         ["id"] = "pnc.backstory.question.hobby.interest",
         ["kind"] = "pattern",
@@ -57,7 +57,7 @@ return {
     ["pnc.backstory.question.hometown.grew_up"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
+            "PsychopatzCore/Semantics/Generated/Conversation/Patterns/GroundedPersonal",
         },
         ["id"] = "pnc.backstory.question.hometown.grew_up",
         ["kind"] = "pattern",

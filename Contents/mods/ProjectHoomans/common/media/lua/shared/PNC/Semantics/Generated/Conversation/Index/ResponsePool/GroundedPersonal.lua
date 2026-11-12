@@ -3,7 +3,7 @@ return {
     ["semantic.question.backstory.ambiguous"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
         },
         ["id"] = "semantic.question.backstory.ambiguous",
         ["kind"] = "responsePool",
@@ -12,7 +12,7 @@ return {
     ["semantic.question.backstory.follow_up.location"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
         },
         ["id"] = "semantic.question.backstory.follow_up.location",
         ["kind"] = "responsePool",
@@ -21,7 +21,7 @@ return {
     ["semantic.question.backstory.follow_up.miss"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
         },
         ["id"] = "semantic.question.backstory.follow_up.miss",
         ["kind"] = "responsePool",
@@ -30,7 +30,7 @@ return {
     ["semantic.question.backstory.known"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
         },
         ["id"] = "semantic.question.backstory.known",
         ["kind"] = "responsePool",
@@ -39,7 +39,7 @@ return {
     ["semantic.question.backstory.known.education"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
         },
         ["id"] = "semantic.question.backstory.known.education",
         ["kind"] = "responsePool",
@@ -48,7 +48,7 @@ return {
     ["semantic.question.backstory.known.family_background"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
         },
         ["id"] = "semantic.question.backstory.known.family_background",
         ["kind"] = "responsePool",
@@ -57,7 +57,7 @@ return {
     ["semantic.question.backstory.known.fear"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
         },
         ["id"] = "semantic.question.backstory.known.fear",
         ["kind"] = "responsePool",
@@ -66,7 +66,7 @@ return {
     ["semantic.question.backstory.known.former_job"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
         },
         ["id"] = "semantic.question.backstory.known.former_job",
         ["kind"] = "responsePool",
@@ -75,7 +75,7 @@ return {
     ["semantic.question.backstory.known.hobby"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
         },
         ["id"] = "semantic.question.backstory.known.hobby",
         ["kind"] = "responsePool",
@@ -84,7 +84,7 @@ return {
     ["semantic.question.backstory.known.hometown"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
         },
         ["id"] = "semantic.question.backstory.known.hometown",
         ["kind"] = "responsePool",
@@ -93,7 +93,7 @@ return {
     ["semantic.question.backstory.known.tragedy"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
         },
         ["id"] = "semantic.question.backstory.known.tragedy",
         ["kind"] = "responsePool",
@@ -102,7 +102,7 @@ return {
     ["semantic.question.backstory.refusal"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
         },
         ["id"] = "semantic.question.backstory.refusal",
         ["kind"] = "responsePool",
@@ -111,7 +111,7 @@ return {
     ["semantic.question.backstory.suspected"] = {
         ["domain"] = "grounded_personal",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/GroundedPersonalResponses",
         },
         ["id"] = "semantic.question.backstory.suspected",
         ["kind"] = "responsePool",

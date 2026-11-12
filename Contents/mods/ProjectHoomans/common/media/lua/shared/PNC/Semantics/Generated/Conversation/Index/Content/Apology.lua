@@ -3,7 +3,7 @@ return {
     ["phrase.semantic.social.apology.default"] = {
         ["domain"] = "apology",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/SocialApology",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/SocialApology",
         },
         ["id"] = "phrase.semantic.social.apology.default",
         ["kind"] = "content",
@@ -12,7 +12,7 @@ return {
     ["phrase.semantic.social.apology.friendly"] = {
         ["domain"] = "apology",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/SocialApology",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/SocialApology",
         },
         ["id"] = "phrase.semantic.social.apology.friendly",
         ["kind"] = "content",
@@ -21,7 +21,7 @@ return {
     ["phrase.semantic.social.apology.stressed"] = {
         ["domain"] = "apology",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/SocialApology",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/SocialApology",
         },
         ["id"] = "phrase.semantic.social.apology.stressed",
         ["kind"] = "content",
@@ -30,7 +30,7 @@ return {
     ["phrase.semantic.social.apology.withdrawn"] = {
         ["domain"] = "apology",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/SocialApology",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/SocialApology",
         },
         ["id"] = "phrase.semantic.social.apology.withdrawn",
         ["kind"] = "content",

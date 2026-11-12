@@ -3,7 +3,7 @@ return {
     ["phrase.semantic.question.whats_up.busy"] = {
         ["domain"] = "conversation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Conversation",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Conversation",
         },
         ["id"] = "phrase.semantic.question.whats_up.busy",
         ["kind"] = "content",
@@ -12,7 +12,7 @@ return {
     ["phrase.semantic.question.whats_up.default"] = {
         ["domain"] = "conversation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Conversation",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Conversation",
         },
         ["id"] = "phrase.semantic.question.whats_up.default",
         ["kind"] = "content",
@@ -21,7 +21,7 @@ return {
     ["phrase.semantic.question.whats_up.default_alt"] = {
         ["domain"] = "conversation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Conversation",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Conversation",
         },
         ["id"] = "phrase.semantic.question.whats_up.default_alt",
         ["kind"] = "content",
@@ -30,7 +30,7 @@ return {
     ["phrase.semantic.question.whats_up.traveling"] = {
         ["domain"] = "conversation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Conversation",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Conversation",
         },
         ["id"] = "phrase.semantic.question.whats_up.traveling",
         ["kind"] = "content",
@@ -39,7 +39,7 @@ return {
     ["phrase.semantic.question.whats_up.weather"] = {
         ["domain"] = "conversation",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Conversation",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Conversation",
         },
         ["id"] = "phrase.semantic.question.whats_up.weather",
         ["kind"] = "content",

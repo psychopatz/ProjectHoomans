@@ -3,7 +3,7 @@ return {
     ["conversation.landing:whats_up"] = {
         ["domain"] = "greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/PlayerChoices",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/PlayerChoices",
         },
         ["id"] = "conversation.landing:whats_up",
         ["kind"] = "content",
@@ -12,7 +12,7 @@ return {
     ["phrase.semantic.flow.greeting.followup.default"] = {
         ["domain"] = "greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Greeting",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Greeting",
         },
         ["id"] = "phrase.semantic.flow.greeting.followup.default",
         ["kind"] = "content",
@@ -21,7 +21,7 @@ return {
     ["phrase.semantic.flow.greeting.followup.friendly"] = {
         ["domain"] = "greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Greeting",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Greeting",
         },
         ["id"] = "phrase.semantic.flow.greeting.followup.friendly",
         ["kind"] = "content",
@@ -30,7 +30,7 @@ return {
     ["phrase.semantic.flow.greeting.opening.default"] = {
         ["domain"] = "greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Greeting",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Greeting",
         },
         ["id"] = "phrase.semantic.flow.greeting.opening.default",
         ["kind"] = "content",
@@ -39,7 +39,7 @@ return {
     ["phrase.semantic.flow.greeting.opening.friendly"] = {
         ["domain"] = "greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Greeting",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Greeting",
         },
         ["id"] = "phrase.semantic.flow.greeting.opening.friendly",
         ["kind"] = "content",
@@ -48,7 +48,7 @@ return {
     ["phrase.semantic.flow.greeting.opening.question.default"] = {
         ["domain"] = "greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Greeting",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Greeting",
         },
         ["id"] = "phrase.semantic.flow.greeting.opening.question.default",
         ["kind"] = "content",
@@ -57,7 +57,7 @@ return {
     ["phrase.semantic.flow.greeting.opening.question.friendly"] = {
         ["domain"] = "greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Greeting",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Greeting",
         },
         ["id"] = "phrase.semantic.flow.greeting.opening.question.friendly",
         ["kind"] = "content",
@@ -66,7 +66,7 @@ return {
     ["phrase.semantic.flow.greeting.opening.rain"] = {
         ["domain"] = "greeting",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Greeting",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Greeting",
         },
         ["id"] = "phrase.semantic.flow.greeting.opening.rain",
         ["kind"] = "content",

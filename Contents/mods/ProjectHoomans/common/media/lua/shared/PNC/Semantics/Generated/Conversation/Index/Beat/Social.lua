@@ -3,7 +3,7 @@ return {
     ["beat.argument_escalation"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation",
+            "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation",
         },
         ["id"] = "beat.argument_escalation",
         ["kind"] = "beat",
@@ -18,7 +18,7 @@ return {
     ["beat.reconciliation"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Beats/Social/Reconciliation",
+            "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/Reconciliation",
         },
         ["id"] = "beat.reconciliation",
         ["kind"] = "beat",
@@ -32,7 +32,7 @@ return {
     ["beat.suspicious_first_contact"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact",
+            "PsychopatzCore/Semantics/Generated/Conversation/Beats/Social/SuspiciousFirstContact",
         },
         ["id"] = "beat.suspicious_first_contact",
         ["kind"] = "beat",

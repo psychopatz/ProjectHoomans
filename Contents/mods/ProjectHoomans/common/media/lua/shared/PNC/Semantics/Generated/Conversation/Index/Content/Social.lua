@@ -3,7 +3,7 @@ return {
     ["phrase.semantic.combat.tactical_spatial.hostile.clock"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Combat/TacticalSpatial",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Combat/TacticalSpatial",
         },
         ["id"] = "phrase.semantic.combat.tactical_spatial.hostile.clock",
         ["kind"] = "content",
@@ -12,7 +12,7 @@ return {
     ["phrase.semantic.combat.tactical_spatial.hostile.coarse"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Combat/TacticalSpatial",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Combat/TacticalSpatial",
         },
         ["id"] = "phrase.semantic.combat.tactical_spatial.hostile.coarse",
         ["kind"] = "content",
@@ -21,7 +21,7 @@ return {
     ["phrase.semantic.combat.tactical_spatial.zombie.clock"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Combat/TacticalSpatial",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Combat/TacticalSpatial",
         },
         ["id"] = "phrase.semantic.combat.tactical_spatial.zombie.clock",
         ["kind"] = "content",
@@ -30,7 +30,7 @@ return {
     ["phrase.semantic.combat.tactical_spatial.zombie.coarse"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Combat/TacticalSpatial",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Combat/TacticalSpatial",
         },
         ["id"] = "phrase.semantic.combat.tactical_spatial.zombie.coarse",
         ["kind"] = "content",
@@ -39,7 +39,7 @@ return {
     ["phrase.semantic.conversation.acknowledged.default"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesConversation",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesConversation",
         },
         ["id"] = "phrase.semantic.conversation.acknowledged.default",
         ["kind"] = "content",
@@ -48,7 +48,7 @@ return {
     ["phrase.semantic.emote.player.clap"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
         },
         ["id"] = "phrase.semantic.emote.player.clap",
         ["kind"] = "content",
@@ -57,7 +57,7 @@ return {
     ["phrase.semantic.emote.player.insult"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
         },
         ["id"] = "phrase.semantic.emote.player.insult",
         ["kind"] = "content",
@@ -66,7 +66,7 @@ return {
     ["phrase.semantic.emote.player.salute"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
         },
         ["id"] = "phrase.semantic.emote.player.salute",
         ["kind"] = "content",
@@ -75,7 +75,7 @@ return {
     ["phrase.semantic.emote.player.thankyou"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
         },
         ["id"] = "phrase.semantic.emote.player.thankyou",
         ["kind"] = "content",
@@ -84,7 +84,7 @@ return {
     ["phrase.semantic.emote.player.thumbsdown"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
         },
         ["id"] = "phrase.semantic.emote.player.thumbsdown",
         ["kind"] = "content",
@@ -93,7 +93,7 @@ return {
     ["phrase.semantic.emote.player.thumbsup"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
         },
         ["id"] = "phrase.semantic.emote.player.thumbsup",
         ["kind"] = "content",
@@ -102,7 +102,7 @@ return {
     ["phrase.semantic.emote.player.wavebye"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
         },
         ["id"] = "phrase.semantic.emote.player.wavebye",
         ["kind"] = "content",
@@ -111,7 +111,7 @@ return {
     ["phrase.semantic.emote.player.wavehi"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesPlayer",
         },
         ["id"] = "phrase.semantic.emote.player.wavehi",
         ["kind"] = "content",
@@ -120,7 +120,7 @@ return {
     ["phrase.semantic.emote.reply.clap"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
         },
         ["id"] = "phrase.semantic.emote.reply.clap",
         ["kind"] = "content",
@@ -129,7 +129,7 @@ return {
     ["phrase.semantic.emote.reply.default"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
         },
         ["id"] = "phrase.semantic.emote.reply.default",
         ["kind"] = "content",
@@ -138,7 +138,7 @@ return {
     ["phrase.semantic.emote.reply.insult"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
         },
         ["id"] = "phrase.semantic.emote.reply.insult",
         ["kind"] = "content",
@@ -147,7 +147,7 @@ return {
     ["phrase.semantic.emote.reply.salute"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
         },
         ["id"] = "phrase.semantic.emote.reply.salute",
         ["kind"] = "content",
@@ -156,7 +156,7 @@ return {
     ["phrase.semantic.emote.reply.thankyou"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
         },
         ["id"] = "phrase.semantic.emote.reply.thankyou",
         ["kind"] = "content",
@@ -165,7 +165,7 @@ return {
     ["phrase.semantic.emote.reply.thumbsdown"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
         },
         ["id"] = "phrase.semantic.emote.reply.thumbsdown",
         ["kind"] = "content",
@@ -174,7 +174,7 @@ return {
     ["phrase.semantic.emote.reply.thumbsup"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
         },
         ["id"] = "phrase.semantic.emote.reply.thumbsup",
         ["kind"] = "content",
@@ -183,7 +183,7 @@ return {
     ["phrase.semantic.emote.reply.thumbsup.active"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
         },
         ["id"] = "phrase.semantic.emote.reply.thumbsup.active",
         ["kind"] = "content",
@@ -192,7 +192,7 @@ return {
     ["phrase.semantic.emote.reply.wavebye"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
         },
         ["id"] = "phrase.semantic.emote.reply.wavebye",
         ["kind"] = "content",
@@ -201,7 +201,7 @@ return {
     ["phrase.semantic.emote.reply.wavehi"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/Reply",
         },
         ["id"] = "phrase.semantic.emote.reply.wavehi",
         ["kind"] = "content",
@@ -210,7 +210,7 @@ return {
     ["phrase.semantic.interaction.argument.deescalate"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Argument/Deescalate",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Argument/Deescalate",
         },
         ["id"] = "phrase.semantic.interaction.argument.deescalate",
         ["kind"] = "content",
@@ -219,7 +219,7 @@ return {
     ["phrase.semantic.interaction.argument.retaliate"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Argument/Retaliate",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Argument/Retaliate",
         },
         ["id"] = "phrase.semantic.interaction.argument.retaliate",
         ["kind"] = "content",
@@ -228,7 +228,7 @@ return {
     ["phrase.semantic.interaction.context.clarify"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Context/Clarify",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Context/Clarify",
         },
         ["id"] = "phrase.semantic.interaction.context.clarify",
         ["kind"] = "content",
@@ -237,7 +237,7 @@ return {
     ["phrase.semantic.interaction.first_contact.challenge"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/FirstContact/Challenge",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/FirstContact/Challenge",
         },
         ["id"] = "phrase.semantic.interaction.first_contact.challenge",
         ["kind"] = "content",
@@ -246,7 +246,7 @@ return {
     ["phrase.semantic.interaction.memory.acknowledge"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Memory/Acknowledge",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Memory/Acknowledge",
         },
         ["id"] = "phrase.semantic.interaction.memory.acknowledge",
         ["kind"] = "content",
@@ -255,7 +255,7 @@ return {
     ["phrase.semantic.interaction.memory.acknowledge_flavor"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Memory/AcknowledgeFlavor",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Memory/AcknowledgeFlavor",
         },
         ["id"] = "phrase.semantic.interaction.memory.acknowledge_flavor",
         ["kind"] = "content",
@@ -264,7 +264,7 @@ return {
     ["phrase.semantic.interaction.memory.followup"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Memory/Followup",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Memory/Followup",
         },
         ["id"] = "phrase.semantic.interaction.memory.followup",
         ["kind"] = "content",
@@ -273,7 +273,7 @@ return {
     ["phrase.semantic.interaction.news.acknowledge"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/News/Acknowledge",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/News/Acknowledge",
         },
         ["id"] = "phrase.semantic.interaction.news.acknowledge",
         ["kind"] = "content",
@@ -282,7 +282,7 @@ return {
     ["phrase.semantic.interaction.scene.excursion_departing"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Excursion",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Excursion",
         },
         ["id"] = "phrase.semantic.interaction.scene.excursion_departing",
         ["kind"] = "content",
@@ -291,7 +291,7 @@ return {
     ["phrase.semantic.interaction.scene.excursion_failed"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Excursion",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Excursion",
         },
         ["id"] = "phrase.semantic.interaction.scene.excursion_failed",
         ["kind"] = "content",
@@ -300,7 +300,7 @@ return {
     ["phrase.semantic.interaction.scene.excursion_home"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Excursion",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Excursion",
         },
         ["id"] = "phrase.semantic.interaction.scene.excursion_home",
         ["kind"] = "content",
@@ -309,7 +309,7 @@ return {
     ["phrase.semantic.interaction.scene.excursion_preparing"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Excursion",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Excursion",
         },
         ["id"] = "phrase.semantic.interaction.scene.excursion_preparing",
         ["kind"] = "content",
@@ -318,7 +318,7 @@ return {
     ["phrase.semantic.interaction.scene.excursion_returning"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Excursion",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Excursion",
         },
         ["id"] = "phrase.semantic.interaction.scene.excursion_returning",
         ["kind"] = "content",
@@ -327,7 +327,7 @@ return {
     ["phrase.semantic.interaction.scene.grounded_news_answer"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/GroundedNews",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/GroundedNews",
         },
         ["id"] = "phrase.semantic.interaction.scene.grounded_news_answer",
         ["kind"] = "content",
@@ -336,7 +336,7 @@ return {
     ["phrase.semantic.interaction.scene.grounded_news_share"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/GroundedNews",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/GroundedNews",
         },
         ["id"] = "phrase.semantic.interaction.scene.grounded_news_share",
         ["kind"] = "content",
@@ -345,7 +345,7 @@ return {
     ["phrase.semantic.interaction.scene.horde_prompt"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Horde",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Horde",
         },
         ["id"] = "phrase.semantic.interaction.scene.horde_prompt",
         ["kind"] = "content",
@@ -354,7 +354,7 @@ return {
     ["phrase.semantic.interaction.scene.horde_reply_brave"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Horde",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Horde",
         },
         ["id"] = "phrase.semantic.interaction.scene.horde_reply_brave",
         ["kind"] = "content",
@@ -363,7 +363,7 @@ return {
     ["phrase.semantic.interaction.scene.horde_reply_cautious"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Horde",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Horde",
         },
         ["id"] = "phrase.semantic.interaction.scene.horde_reply_cautious",
         ["kind"] = "content",
@@ -372,7 +372,7 @@ return {
     ["phrase.semantic.interaction.scene.horde_reply_steady"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Horde",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Horde",
         },
         ["id"] = "phrase.semantic.interaction.scene.horde_reply_steady",
         ["kind"] = "content",
@@ -381,7 +381,7 @@ return {
     ["phrase.semantic.interaction.scene.post_combat_clear"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/PostCombat",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/PostCombat",
         },
         ["id"] = "phrase.semantic.interaction.scene.post_combat_clear",
         ["kind"] = "content",
@@ -390,7 +390,7 @@ return {
     ["phrase.semantic.interaction.scene.task_work_assigned"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Work",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Work",
         },
         ["id"] = "phrase.semantic.interaction.scene.task_work_assigned",
         ["kind"] = "content",
@@ -399,7 +399,7 @@ return {
     ["phrase.semantic.interaction.scene.task_work_completed"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Work",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/Scene/Work",
         },
         ["id"] = "phrase.semantic.interaction.scene.task_work_completed",
         ["kind"] = "content",
@@ -408,7 +408,7 @@ return {
     ["phrase.semantic.interaction.world_event.warning"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEvent/Warning",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEvent/Warning",
         },
         ["id"] = "phrase.semantic.interaction.world_event.warning",
         ["kind"] = "content",
@@ -417,7 +417,7 @@ return {
     ["phrase.semantic.interaction.world_event.warning_flavor"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEvent/WarningFlavor",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Interaction/WorldEvent/WarningFlavor",
         },
         ["id"] = "phrase.semantic.interaction.world_event.warning_flavor",
         ["kind"] = "content",
@@ -426,7 +426,7 @@ return {
     ["phrase.semantic.social.acknowledged"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Acknowledgement",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Acknowledgement",
         },
         ["id"] = "phrase.semantic.social.acknowledged",
         ["kind"] = "content",
@@ -435,7 +435,7 @@ return {
     ["phrase.semantic.social.dispute_friendly"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Disputes",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Disputes",
         },
         ["id"] = "phrase.semantic.social.dispute_friendly",
         ["kind"] = "content",
@@ -444,7 +444,7 @@ return {
     ["phrase.semantic.social.dispute_stressed"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Disputes",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Disputes",
         },
         ["id"] = "phrase.semantic.social.dispute_stressed",
         ["kind"] = "content",
@@ -453,7 +453,7 @@ return {
     ["phrase.semantic.social.dispute_trusted"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Disputes",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Disputes",
         },
         ["id"] = "phrase.semantic.social.dispute_trusted",
         ["kind"] = "content",
@@ -462,7 +462,7 @@ return {
     ["phrase.semantic.social.dispute_withdrawn"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Disputes",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Disputes",
         },
         ["id"] = "phrase.semantic.social.dispute_withdrawn",
         ["kind"] = "content",
@@ -471,7 +471,7 @@ return {
     ["phrase.semantic.social.hostile_boundary"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Hostile",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Hostile",
         },
         ["id"] = "phrase.semantic.social.hostile_boundary",
         ["kind"] = "content",
@@ -480,7 +480,7 @@ return {
     ["phrase.semantic.social.hostile_short"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Hostile",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Hostile",
         },
         ["id"] = "phrase.semantic.social.hostile_short",
         ["kind"] = "content",
@@ -489,7 +489,7 @@ return {
     ["phrase.semantic.social.hostile_stressed"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Hostile",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Hostile",
         },
         ["id"] = "phrase.semantic.social.hostile_stressed",
         ["kind"] = "content",
@@ -498,7 +498,7 @@ return {
     ["phrase.semantic.social.hostile_withdrawn"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Hostile",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Hostile",
         },
         ["id"] = "phrase.semantic.social.hostile_withdrawn",
         ["kind"] = "content",
@@ -507,7 +507,7 @@ return {
     ["phrase.semantic.social.offer_friendly"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Offers",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Offers",
         },
         ["id"] = "phrase.semantic.social.offer_friendly",
         ["kind"] = "content",
@@ -516,7 +516,7 @@ return {
     ["phrase.semantic.social.threat_boundary"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/Reactions/Threats",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Reactions/Threats",
         },
         ["id"] = "phrase.semantic.social.threat_boundary",
         ["kind"] = "content",
@@ -525,7 +525,7 @@ return {
     ["phrase.semantic.tool_reply.accepted_generic.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AcceptedGeneric",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/AcceptedGeneric",
         },
         ["id"] = "phrase.semantic.tool_reply.accepted_generic.1",
         ["kind"] = "content",
@@ -534,7 +534,7 @@ return {
     ["phrase.semantic.tool_reply.accepted_generic.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AcceptedGeneric",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/AcceptedGeneric",
         },
         ["id"] = "phrase.semantic.tool_reply.accepted_generic.2",
         ["kind"] = "content",
@@ -543,7 +543,7 @@ return {
     ["phrase.semantic.tool_reply.admire.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Admire",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Admire",
         },
         ["id"] = "phrase.semantic.tool_reply.admire.1",
         ["kind"] = "content",
@@ -552,7 +552,7 @@ return {
     ["phrase.semantic.tool_reply.admire.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Admire",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Admire",
         },
         ["id"] = "phrase.semantic.tool_reply.admire.2",
         ["kind"] = "content",
@@ -561,7 +561,7 @@ return {
     ["phrase.semantic.tool_reply.admire.3"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Admire",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Admire",
         },
         ["id"] = "phrase.semantic.tool_reply.admire.3",
         ["kind"] = "content",
@@ -570,7 +570,7 @@ return {
     ["phrase.semantic.tool_reply.apology.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Apology",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Apology",
         },
         ["id"] = "phrase.semantic.tool_reply.apology.1",
         ["kind"] = "content",
@@ -579,7 +579,7 @@ return {
     ["phrase.semantic.tool_reply.apology.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Apology",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Apology",
         },
         ["id"] = "phrase.semantic.tool_reply.apology.2",
         ["kind"] = "content",
@@ -588,7 +588,7 @@ return {
     ["phrase.semantic.tool_reply.apology.3"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Apology",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Apology",
         },
         ["id"] = "phrase.semantic.tool_reply.apology.3",
         ["kind"] = "content",
@@ -597,7 +597,7 @@ return {
     ["phrase.semantic.tool_reply.ask_name.named.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
         },
         ["id"] = "phrase.semantic.tool_reply.ask_name.named.1",
         ["kind"] = "content",
@@ -606,7 +606,7 @@ return {
     ["phrase.semantic.tool_reply.ask_name.named.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
         },
         ["id"] = "phrase.semantic.tool_reply.ask_name.named.2",
         ["kind"] = "content",
@@ -615,7 +615,7 @@ return {
     ["phrase.semantic.tool_reply.ask_name.named.3"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
         },
         ["id"] = "phrase.semantic.tool_reply.ask_name.named.3",
         ["kind"] = "content",
@@ -624,7 +624,7 @@ return {
     ["phrase.semantic.tool_reply.ask_name.prompt"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
         },
         ["id"] = "phrase.semantic.tool_reply.ask_name.prompt",
         ["kind"] = "content",
@@ -633,7 +633,7 @@ return {
     ["phrase.semantic.tool_reply.ask_name.rejected.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
         },
         ["id"] = "phrase.semantic.tool_reply.ask_name.rejected.1",
         ["kind"] = "content",
@@ -642,7 +642,7 @@ return {
     ["phrase.semantic.tool_reply.ask_name.rejected.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
         },
         ["id"] = "phrase.semantic.tool_reply.ask_name.rejected.2",
         ["kind"] = "content",
@@ -651,7 +651,7 @@ return {
     ["phrase.semantic.tool_reply.ask_name.unnamed.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
         },
         ["id"] = "phrase.semantic.tool_reply.ask_name.unnamed.1",
         ["kind"] = "content",
@@ -660,7 +660,7 @@ return {
     ["phrase.semantic.tool_reply.ask_name.unnamed.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/AskName",
         },
         ["id"] = "phrase.semantic.tool_reply.ask_name.unnamed.2",
         ["kind"] = "content",
@@ -669,7 +669,7 @@ return {
     ["phrase.semantic.tool_reply.comfort.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Comfort",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Comfort",
         },
         ["id"] = "phrase.semantic.tool_reply.comfort.1",
         ["kind"] = "content",
@@ -678,7 +678,7 @@ return {
     ["phrase.semantic.tool_reply.comfort.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Comfort",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Comfort",
         },
         ["id"] = "phrase.semantic.tool_reply.comfort.2",
         ["kind"] = "content",
@@ -687,7 +687,7 @@ return {
     ["phrase.semantic.tool_reply.comfort.3"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Comfort",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Comfort",
         },
         ["id"] = "phrase.semantic.tool_reply.comfort.3",
         ["kind"] = "content",
@@ -696,7 +696,7 @@ return {
     ["phrase.semantic.tool_reply.compliment.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Compliment",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Compliment",
         },
         ["id"] = "phrase.semantic.tool_reply.compliment.1",
         ["kind"] = "content",
@@ -705,7 +705,7 @@ return {
     ["phrase.semantic.tool_reply.compliment.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Compliment",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Compliment",
         },
         ["id"] = "phrase.semantic.tool_reply.compliment.2",
         ["kind"] = "content",
@@ -714,7 +714,7 @@ return {
     ["phrase.semantic.tool_reply.compliment.3"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Compliment",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Compliment",
         },
         ["id"] = "phrase.semantic.tool_reply.compliment.3",
         ["kind"] = "content",
@@ -723,7 +723,7 @@ return {
     ["phrase.semantic.tool_reply.flirt.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Flirt",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Flirt",
         },
         ["id"] = "phrase.semantic.tool_reply.flirt.1",
         ["kind"] = "content",
@@ -732,7 +732,7 @@ return {
     ["phrase.semantic.tool_reply.flirt.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Flirt",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Flirt",
         },
         ["id"] = "phrase.semantic.tool_reply.flirt.2",
         ["kind"] = "content",
@@ -741,7 +741,7 @@ return {
     ["phrase.semantic.tool_reply.flirt.3"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Flirt",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Flirt",
         },
         ["id"] = "phrase.semantic.tool_reply.flirt.3",
         ["kind"] = "content",
@@ -750,7 +750,7 @@ return {
     ["phrase.semantic.tool_reply.hostile.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Hostile",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Hostile",
         },
         ["id"] = "phrase.semantic.tool_reply.hostile.1",
         ["kind"] = "content",
@@ -759,7 +759,7 @@ return {
     ["phrase.semantic.tool_reply.hostile.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Hostile",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Hostile",
         },
         ["id"] = "phrase.semantic.tool_reply.hostile.2",
         ["kind"] = "content",
@@ -768,7 +768,7 @@ return {
     ["phrase.semantic.tool_reply.hostile.3"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Hostile",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Hostile",
         },
         ["id"] = "phrase.semantic.tool_reply.hostile.3",
         ["kind"] = "content",
@@ -777,7 +777,7 @@ return {
     ["phrase.semantic.tool_reply.insult.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Insult",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Insult",
         },
         ["id"] = "phrase.semantic.tool_reply.insult.1",
         ["kind"] = "content",
@@ -786,7 +786,7 @@ return {
     ["phrase.semantic.tool_reply.insult.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Insult",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Insult",
         },
         ["id"] = "phrase.semantic.tool_reply.insult.2",
         ["kind"] = "content",
@@ -795,7 +795,7 @@ return {
     ["phrase.semantic.tool_reply.insult.3"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Insult",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Insult",
         },
         ["id"] = "phrase.semantic.tool_reply.insult.3",
         ["kind"] = "content",
@@ -804,7 +804,7 @@ return {
     ["phrase.semantic.tool_reply.orientation.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Orientation",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Orientation",
         },
         ["id"] = "phrase.semantic.tool_reply.orientation.1",
         ["kind"] = "content",
@@ -813,7 +813,7 @@ return {
     ["phrase.semantic.tool_reply.orientation.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Orientation",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Orientation",
         },
         ["id"] = "phrase.semantic.tool_reply.orientation.2",
         ["kind"] = "content",
@@ -822,7 +822,7 @@ return {
     ["phrase.semantic.tool_reply.personality.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Personality",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Personality",
         },
         ["id"] = "phrase.semantic.tool_reply.personality.1",
         ["kind"] = "content",
@@ -831,7 +831,7 @@ return {
     ["phrase.semantic.tool_reply.personality.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Personality",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Personality",
         },
         ["id"] = "phrase.semantic.tool_reply.personality.2",
         ["kind"] = "content",
@@ -840,7 +840,7 @@ return {
     ["phrase.semantic.tool_reply.praise.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Praise",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Praise",
         },
         ["id"] = "phrase.semantic.tool_reply.praise.1",
         ["kind"] = "content",
@@ -849,7 +849,7 @@ return {
     ["phrase.semantic.tool_reply.praise.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Praise",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Praise",
         },
         ["id"] = "phrase.semantic.tool_reply.praise.2",
         ["kind"] = "content",
@@ -858,7 +858,7 @@ return {
     ["phrase.semantic.tool_reply.praise.3"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Praise",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Praise",
         },
         ["id"] = "phrase.semantic.tool_reply.praise.3",
         ["kind"] = "content",
@@ -867,7 +867,7 @@ return {
     ["phrase.semantic.tool_reply.relationship.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Relationship",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Relationship",
         },
         ["id"] = "phrase.semantic.tool_reply.relationship.1",
         ["kind"] = "content",
@@ -876,7 +876,7 @@ return {
     ["phrase.semantic.tool_reply.relationship.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Relationship",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Relationship",
         },
         ["id"] = "phrase.semantic.tool_reply.relationship.2",
         ["kind"] = "content",
@@ -885,7 +885,7 @@ return {
     ["phrase.semantic.tool_reply.romantic.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Romantic",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Romantic",
         },
         ["id"] = "phrase.semantic.tool_reply.romantic.1",
         ["kind"] = "content",
@@ -894,7 +894,7 @@ return {
     ["phrase.semantic.tool_reply.romantic.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Romantic",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Romantic",
         },
         ["id"] = "phrase.semantic.tool_reply.romantic.2",
         ["kind"] = "content",
@@ -903,7 +903,7 @@ return {
     ["phrase.semantic.tool_reply.romantic.3"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Romantic",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Romantic",
         },
         ["id"] = "phrase.semantic.tool_reply.romantic.3",
         ["kind"] = "content",
@@ -912,7 +912,7 @@ return {
     ["phrase.semantic.tool_reply.sexual.1"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Sexual",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Sexual",
         },
         ["id"] = "phrase.semantic.tool_reply.sexual.1",
         ["kind"] = "content",
@@ -921,7 +921,7 @@ return {
     ["phrase.semantic.tool_reply.sexual.2"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Sexual",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Sexual",
         },
         ["id"] = "phrase.semantic.tool_reply.sexual.2",
         ["kind"] = "content",
@@ -930,7 +930,7 @@ return {
     ["phrase.semantic.tool_reply.sexual.3"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Sexual",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/ToolReplies/Sexual",
         },
         ["id"] = "phrase.semantic.tool_reply.sexual.3",
         ["kind"] = "content",

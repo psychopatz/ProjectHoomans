@@ -3,7 +3,7 @@ return {
     ["phrase.semantic.gossip.unknown"] = {
         ["domain"] = "knowledge",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Knowledge/Gossip",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Gossip",
         },
         ["id"] = "phrase.semantic.gossip.unknown",
         ["kind"] = "content",
@@ -12,7 +12,7 @@ return {
     ["phrase.semantic.question.activity.dataset.keep_moving"] = {
         ["domain"] = "knowledge",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Knowledge/Activity",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Activity",
         },
         ["id"] = "phrase.semantic.question.activity.dataset.keep_moving",
         ["kind"] = "content",
@@ -21,7 +21,7 @@ return {
     ["phrase.semantic.question.activity.fishing"] = {
         ["domain"] = "knowledge",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Knowledge/Activity",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Activity",
         },
         ["id"] = "phrase.semantic.question.activity.fishing",
         ["kind"] = "content",
@@ -30,7 +30,7 @@ return {
     ["phrase.semantic.question.identity"] = {
         ["domain"] = "knowledge",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Knowledge/Identity",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Identity",
         },
         ["id"] = "phrase.semantic.question.identity",
         ["kind"] = "content",
@@ -42,7 +42,7 @@ return {
     ["phrase.semantic.question.identity.known"] = {
         ["domain"] = "knowledge",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Knowledge/Identity",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Identity",
         },
         ["id"] = "phrase.semantic.question.identity.known",
         ["kind"] = "content",
@@ -51,7 +51,7 @@ return {
     ["phrase.semantic.question.knowledge.known"] = {
         ["domain"] = "knowledge",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Knowledge/Knowledge",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Knowledge",
         },
         ["id"] = "phrase.semantic.question.knowledge.known",
         ["kind"] = "content",
@@ -60,7 +60,7 @@ return {
     ["phrase.semantic.question.knowledge.unknown"] = {
         ["domain"] = "knowledge",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Content/Knowledge/Knowledge",
+            "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Knowledge",
         },
         ["id"] = "phrase.semantic.question.knowledge.unknown",
         ["kind"] = "content",

@@ -3,7 +3,7 @@ return {
     ["semantic.accept"] = {
         ["domain"] = "common",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/Common/Social",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/Social",
         },
         ["id"] = "semantic.accept",
         ["kind"] = "responsePool",
@@ -12,7 +12,7 @@ return {
     ["semantic.compliment"] = {
         ["domain"] = "common",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/Common/Social",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/Social",
         },
         ["id"] = "semantic.compliment",
         ["kind"] = "responsePool",
@@ -21,7 +21,7 @@ return {
     ["semantic.flow.weather.raining"] = {
         ["domain"] = "common",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/Common/NeedsWeather",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/NeedsWeather",
         },
         ["id"] = "semantic.flow.weather.raining",
         ["kind"] = "responsePool",
@@ -33,7 +33,7 @@ return {
     ["semantic.greeting"] = {
         ["domain"] = "common",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/Common/Social",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/Social",
         },
         ["id"] = "semantic.greeting",
         ["kind"] = "responsePool",
@@ -42,7 +42,7 @@ return {
     ["semantic.offer"] = {
         ["domain"] = "common",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/Common/Social",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/Social",
         },
         ["id"] = "semantic.offer",
         ["kind"] = "responsePool",
@@ -51,7 +51,7 @@ return {
     ["semantic.question.activity"] = {
         ["domain"] = "common",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/Common/Questions",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/Questions",
         },
         ["id"] = "semantic.question.activity",
         ["kind"] = "responsePool",
@@ -63,7 +63,7 @@ return {
         },
         ["domain"] = "common",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/Common/Questions",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/Questions",
         },
         ["id"] = "semantic.question.identity",
         ["kind"] = "responsePool",
@@ -72,7 +72,7 @@ return {
     ["semantic.question.needs.proposal"] = {
         ["domain"] = "common",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/Common/NeedsWeather",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/NeedsWeather",
         },
         ["id"] = "semantic.question.needs.proposal",
         ["kind"] = "responsePool",
@@ -81,7 +81,7 @@ return {
     ["semantic.question.needs.quantity"] = {
         ["domain"] = "common",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/Common/NeedsWeather",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/NeedsWeather",
         },
         ["id"] = "semantic.question.needs.quantity",
         ["kind"] = "responsePool",
@@ -90,7 +90,7 @@ return {
     ["semantic.question.wellbeing"] = {
         ["domain"] = "common",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/Common/Questions",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/Questions",
         },
         ["id"] = "semantic.question.wellbeing",
         ["kind"] = "responsePool",
@@ -99,7 +99,7 @@ return {
     ["semantic.question.wellbeing.unknown"] = {
         ["domain"] = "common",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/Common/Questions",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/Questions",
         },
         ["id"] = "semantic.question.wellbeing.unknown",
         ["kind"] = "responsePool",
@@ -111,7 +111,7 @@ return {
     ["semantic.refuse"] = {
         ["domain"] = "common",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/Common/Social",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/Social",
         },
         ["id"] = "semantic.refuse",
         ["kind"] = "responsePool",
@@ -120,7 +120,7 @@ return {
     ["semantic.thanks"] = {
         ["domain"] = "common",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Responses/Common/Social",
+            "PsychopatzCore/Semantics/Generated/Conversation/Responses/Common/Social",
         },
         ["id"] = "semantic.thanks",
         ["kind"] = "responsePool",

@@ -3,7 +3,7 @@ return {
     ["construction.en.social.acknowledge"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.acknowledge",
         ["kind"] = "realization",
@@ -12,7 +12,7 @@ return {
     ["construction.en.social.agree"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.agree",
         ["kind"] = "realization",
@@ -21,7 +21,7 @@ return {
     ["construction.en.social.apologize"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.apologize",
         ["kind"] = "realization",
@@ -30,7 +30,7 @@ return {
     ["construction.en.social.ask_followup"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.ask_followup",
         ["kind"] = "realization",
@@ -39,7 +39,7 @@ return {
     ["construction.en.social.ask_why"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.ask_why",
         ["kind"] = "realization",
@@ -48,7 +48,7 @@ return {
     ["construction.en.social.call_bluff"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.call_bluff",
         ["kind"] = "realization",
@@ -57,7 +57,7 @@ return {
     ["construction.en.social.challenge"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.challenge",
         ["kind"] = "realization",
@@ -66,7 +66,7 @@ return {
     ["construction.en.social.claim_joke"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.claim_joke",
         ["kind"] = "realization",
@@ -75,7 +75,7 @@ return {
     ["construction.en.social.comfort"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.comfort",
         ["kind"] = "realization",
@@ -84,7 +84,7 @@ return {
     ["construction.en.social.contextual_accept"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualReplies",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ContextualReplies",
         },
         ["id"] = "construction.en.social.contextual_accept",
         ["kind"] = "realization",
@@ -93,7 +93,7 @@ return {
     ["construction.en.social.contextual_refuse"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualReplies",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ContextualReplies",
         },
         ["id"] = "construction.en.social.contextual_refuse",
         ["kind"] = "realization",
@@ -102,7 +102,7 @@ return {
     ["construction.en.social.contextual_thank"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualReplies",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ContextualReplies",
         },
         ["id"] = "construction.en.social.contextual_thank",
         ["kind"] = "realization",
@@ -111,7 +111,7 @@ return {
     ["construction.en.social.deescalate"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.deescalate",
         ["kind"] = "realization",
@@ -120,7 +120,7 @@ return {
     ["construction.en.social.disagree"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.disagree",
         ["kind"] = "realization",
@@ -129,7 +129,7 @@ return {
     ["construction.en.social.disclose_name"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.disclose_name",
         ["kind"] = "realization",
@@ -138,7 +138,7 @@ return {
     ["construction.en.social.dismiss"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.dismiss",
         ["kind"] = "realization",
@@ -147,7 +147,7 @@ return {
     ["construction.en.social.double_down"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.en.social.double_down",
         ["kind"] = "realization",
@@ -156,7 +156,7 @@ return {
     ["construction.en.social.double_down_direct"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.double_down_direct",
         ["kind"] = "realization",
@@ -165,7 +165,7 @@ return {
     ["construction.en.social.double_down_stand"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.double_down_stand",
         ["kind"] = "realization",
@@ -174,7 +174,7 @@ return {
     ["construction.en.social.end_conversation_done"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.end_conversation_done",
         ["kind"] = "realization",
@@ -183,7 +183,7 @@ return {
     ["construction.en.social.end_conversation_withdraw"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.end_conversation_withdraw",
         ["kind"] = "realization",
@@ -192,7 +192,7 @@ return {
     ["construction.en.social.mirror_retort"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.mirror_retort",
         ["kind"] = "realization",
@@ -201,7 +201,7 @@ return {
     ["construction.en.social.mirror_retort_challenge"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.mirror_retort_challenge",
         ["kind"] = "realization",
@@ -210,7 +210,7 @@ return {
     ["construction.en.social.refuse_identity"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.refuse_identity",
         ["kind"] = "realization",
@@ -219,7 +219,7 @@ return {
     ["construction.en.social.warn_consequence"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.warn_consequence",
         ["kind"] = "realization",
@@ -228,7 +228,7 @@ return {
     ["construction.en.social.warn_direct"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.warn_direct",
         ["kind"] = "realization",
@@ -237,7 +237,7 @@ return {
     ["construction.en.social.warn_mouth"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.warn_mouth",
         ["kind"] = "realization",
@@ -246,7 +246,7 @@ return {
     ["construction.en.social.warn_stop"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.warn_stop",
         ["kind"] = "realization",
@@ -255,7 +255,7 @@ return {
     ["construction.en.social.wellbeing_negative"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.wellbeing_negative",
         ["kind"] = "realization",
@@ -264,7 +264,7 @@ return {
     ["construction.en.social.wellbeing_neutral"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.wellbeing_neutral",
         ["kind"] = "realization",
@@ -273,7 +273,7 @@ return {
     ["construction.en.social.wellbeing_positive"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.en.social.wellbeing_positive",
         ["kind"] = "realization",
@@ -282,7 +282,7 @@ return {
     ["construction.tl.social.acknowledge"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.acknowledge",
         ["kind"] = "realization",
@@ -291,7 +291,7 @@ return {
     ["construction.tl.social.agree"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.agree",
         ["kind"] = "realization",
@@ -300,7 +300,7 @@ return {
     ["construction.tl.social.apologize"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.apologize",
         ["kind"] = "realization",
@@ -309,7 +309,7 @@ return {
     ["construction.tl.social.ask_followup"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.ask_followup",
         ["kind"] = "realization",
@@ -318,7 +318,7 @@ return {
     ["construction.tl.social.ask_why"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.ask_why",
         ["kind"] = "realization",
@@ -327,7 +327,7 @@ return {
     ["construction.tl.social.call_bluff"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.call_bluff",
         ["kind"] = "realization",
@@ -336,7 +336,7 @@ return {
     ["construction.tl.social.challenge"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.challenge",
         ["kind"] = "realization",
@@ -345,7 +345,7 @@ return {
     ["construction.tl.social.claim_joke"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.claim_joke",
         ["kind"] = "realization",
@@ -354,7 +354,7 @@ return {
     ["construction.tl.social.comfort"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.comfort",
         ["kind"] = "realization",
@@ -363,7 +363,7 @@ return {
     ["construction.tl.social.contextual_accept"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualReplies",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ContextualReplies",
         },
         ["id"] = "construction.tl.social.contextual_accept",
         ["kind"] = "realization",
@@ -372,7 +372,7 @@ return {
     ["construction.tl.social.contextual_refuse"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualReplies",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ContextualReplies",
         },
         ["id"] = "construction.tl.social.contextual_refuse",
         ["kind"] = "realization",
@@ -381,7 +381,7 @@ return {
     ["construction.tl.social.contextual_thank"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ContextualReplies",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ContextualReplies",
         },
         ["id"] = "construction.tl.social.contextual_thank",
         ["kind"] = "realization",
@@ -390,7 +390,7 @@ return {
     ["construction.tl.social.deescalate"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.deescalate",
         ["kind"] = "realization",
@@ -399,7 +399,7 @@ return {
     ["construction.tl.social.disagree"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.disagree",
         ["kind"] = "realization",
@@ -408,7 +408,7 @@ return {
     ["construction.tl.social.disclose_name"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.disclose_name",
         ["kind"] = "realization",
@@ -417,7 +417,7 @@ return {
     ["construction.tl.social.dismiss"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.dismiss",
         ["kind"] = "realization",
@@ -426,7 +426,7 @@ return {
     ["construction.tl.social.double_down"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsCore",
         },
         ["id"] = "construction.tl.social.double_down",
         ["kind"] = "realization",
@@ -435,7 +435,7 @@ return {
     ["construction.tl.social.double_down_direct"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.double_down_direct",
         ["kind"] = "realization",
@@ -444,7 +444,7 @@ return {
     ["construction.tl.social.double_down_stand"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.double_down_stand",
         ["kind"] = "realization",
@@ -453,7 +453,7 @@ return {
     ["construction.tl.social.end_conversation_done"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.end_conversation_done",
         ["kind"] = "realization",
@@ -462,7 +462,7 @@ return {
     ["construction.tl.social.end_conversation_withdraw"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.end_conversation_withdraw",
         ["kind"] = "realization",
@@ -471,7 +471,7 @@ return {
     ["construction.tl.social.mirror_retort"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.mirror_retort",
         ["kind"] = "realization",
@@ -480,7 +480,7 @@ return {
     ["construction.tl.social.mirror_retort_challenge"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.mirror_retort_challenge",
         ["kind"] = "realization",
@@ -489,7 +489,7 @@ return {
     ["construction.tl.social.refuse_identity"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.refuse_identity",
         ["kind"] = "realization",
@@ -498,7 +498,7 @@ return {
     ["construction.tl.social.warn_consequence"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.warn_consequence",
         ["kind"] = "realization",
@@ -507,7 +507,7 @@ return {
     ["construction.tl.social.warn_direct"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.warn_direct",
         ["kind"] = "realization",
@@ -516,7 +516,7 @@ return {
     ["construction.tl.social.warn_mouth"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.warn_mouth",
         ["kind"] = "realization",
@@ -525,7 +525,7 @@ return {
     ["construction.tl.social.warn_stop"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.warn_stop",
         ["kind"] = "realization",
@@ -534,7 +534,7 @@ return {
     ["construction.tl.social.wellbeing_negative"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.wellbeing_negative",
         ["kind"] = "realization",
@@ -543,7 +543,7 @@ return {
     ["construction.tl.social.wellbeing_neutral"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.wellbeing_neutral",
         ["kind"] = "realization",
@@ -552,7 +552,7 @@ return {
     ["construction.tl.social.wellbeing_positive"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/ConstructionsFollowups",
         },
         ["id"] = "construction.tl.social.wellbeing_positive",
         ["kind"] = "realization",
@@ -561,7 +561,7 @@ return {
     ["lexeme.social.agreement.yes"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/Lexemes",
         },
         ["id"] = "lexeme.social.agreement.yes",
         ["kind"] = "realization",
@@ -570,7 +570,7 @@ return {
     ["lexeme.social.apology.sorry"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/Lexemes",
         },
         ["id"] = "lexeme.social.apology.sorry",
         ["kind"] = "realization",
@@ -579,7 +579,7 @@ return {
     ["lexeme.social.disagreement.no"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/Lexemes",
         },
         ["id"] = "lexeme.social.disagreement.no",
         ["kind"] = "realization",
@@ -588,7 +588,7 @@ return {
     ["lexeme.social.profanity.fuck"] = {
         ["domain"] = "social",
         ["generated"] = {
-            "PNC/Semantics/Generated/Conversation/Realization/Social/Lexemes",
+            "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/Lexemes",
         },
         ["id"] = "lexeme.social.profanity.fuck",
         ["kind"] = "realization",
