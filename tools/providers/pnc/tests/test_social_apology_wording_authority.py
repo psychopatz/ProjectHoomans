@@ -111,37 +111,53 @@ class SocialApologyWordingShardTests(unittest.TestCase):
             REPOSITORY,
             manifest_path=MANIFEST,
         )
-        owned = {
-            item["semanticTemplateID"]: item
-            for item in model["content"]["phraseFamilies"]
-            if item["semanticTemplateID"] in APOLOGY_IDS
-        }
-        self.assertEqual(set(owned), set(APOLOGY_IDS))
-        for item in owned.values():
-            self.assertEqual(item["conversationDomain"], "apology")
-            self.assertEqual(item["sourceShard"], "content/social_apology.json")
-            self.assertEqual(item["group"], "social")
-            self.assertEqual(set(item["styles"]), set(STYLES))
-            self.assertTrue(all(10 <= len(item["styles"][style]) <= 16 for style in STYLES))
+        plans = [
+            item
+            for item in model["psdlRuntimePlans"]
+            if item.get("payload", {})
+            .get("metadata", {})
+            .get("responseTemplateID") in APOLOGY_IDS
+        ]
+        self.assertEqual(len(plans), len(APOLOGY_IDS) * len(STYLES))
+        for plan in plans:
+            payload = plan["payload"]
+            metadata = payload["metadata"]
+            self.assertEqual(plan["domain"], "social_apology")
+            self.assertEqual(plan["sourceShard"], "psdl/dialogue/social_apology.json")
+            self.assertIn(metadata["responseTemplateID"], APOLOGY_IDS)
+            self.assertIn(metadata["style"], STYLES)
+            variants = payload["response"]["variants"]
+            self.assertEqual(len(variants), 10)
+            self.assertTrue(all(set(item["text"]) == {"EN", "TL"} for item in variants))
 
-    def test_generated_apology_translation_is_complete_and_legacy_fixed_keys_retired(
+    def test_generated_apology_psdl_source_is_complete_and_legacy_fixed_keys_retired(
         self,
     ) -> None:
-        for language, families in TRANSLATIONS.items():
-            expected = {
-                f"conversation.content.semantic.social.apology.{family}.{style}.01": value
-                for family, styles in families.items()
-                for style, value in styles.items()
-            }
-            generated = json.loads(
+        source = json.loads(
+            (
+                REPOSITORY
+                / "tools/providers/pnc/codebuilder/sources/conversation/psdl/dialogue/"
+                "social_apology.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(len(source["records"]), len(APOLOGY_IDS) * len(STYLES))
+        for record in source["records"]:
+            self.assertEqual(record["owner"], "ProjectHoomans")
+            self.assertEqual(record["metadata"]["sourceSurface"], "content/social_apology.json")
+            self.assertEqual(record["metadata"]["responseTemplateID"] in APOLOGY_IDS, True)
+            self.assertIn(record["metadata"]["style"], STYLES)
+            self.assertEqual(len(record["response"]["variants"]), 10)
+            for variant in record["response"]["variants"]:
+                self.assertEqual(set(variant["text"]), {"EN", "TL"})
+                self.assertTrue(all(variant["text"][language] for language in ("EN", "TL")))
+        for language in ("EN", "TL"):
+            self.assertFalse(
                 (
                     REPOSITORY
                     / "Contents/mods/ProjectHoomans/common/media/translation/"
                     f"{language}/Conversation/Apology.json"
-                ).read_text(encoding="utf-8")
+                ).exists()
             )
-            for key, val in expected.items():
-                self.assertEqual(generated.get(key), val)
             for catalog_name in ("Responses", "Realizations"):
                 catalog = json.loads(
                     (

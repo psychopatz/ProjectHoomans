@@ -66,6 +66,29 @@ local function copy(value, depth)
     return output
 end
 
+local function hasContentTemplate(templateID)
+    if type(ConversationRegistry.PHRASE_FAMILIES) == "table"
+        and type(ConversationRegistry.PHRASE_FAMILIES[templateID]) == "table"
+    then
+        return true
+    end
+    local plans = ConversationRegistry.PSDL_PLANS
+    if type(plans) ~= "table" then return false end
+    local checked = 0
+    for _, plan in pairs(plans) do
+        if checked >= 512 then break end
+        checked = checked + 1
+        local payload = type(plan) == "table" and plan.payload or nil
+        local metadata = type(payload) == "table" and payload.metadata or nil
+        if type(metadata) == "table"
+            and metadata.responseTemplateID == templateID
+        then
+            return true
+        end
+    end
+    return false
+end
+
 local function getBehavior(id)
     id = tostring(id or "")
     return behaviorOverlay[id] or canonicalBehaviors[id]
@@ -204,13 +227,7 @@ local function validateBehavior(definition)
         then
             return false, "behavior_speech_output_invalid"
         end
-        if type(ConversationRegistry.PHRASE_FAMILIES) ~= "table"
-            or type(
-                ConversationRegistry.PHRASE_FAMILIES[
-                    speech.contentTemplateID
-                ]
-            ) ~= "table"
-        then
+        if not hasContentTemplate(speech.contentTemplateID) then
             return false,
                 "behavior_content_template_unknown:"
                     .. tostring(speech.contentTemplateID)
@@ -238,13 +255,7 @@ local function validateBehavior(definition)
         then
             return false, "behavior_flavor_output_invalid"
         end
-        if type(ConversationRegistry.PHRASE_FAMILIES) ~= "table"
-            or type(
-                ConversationRegistry.PHRASE_FAMILIES[
-                    flavor.contentTemplateID
-                ]
-            ) ~= "table"
-        then
+        if not hasContentTemplate(flavor.contentTemplateID) then
             return false,
                 "behavior_flavor_content_unknown:"
                     .. tostring(flavor.contentTemplateID)

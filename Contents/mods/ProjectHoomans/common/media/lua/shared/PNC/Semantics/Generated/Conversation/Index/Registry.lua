@@ -13,12 +13,6 @@ return {
         ["recordCount"] = 30,
     },
     {
-        ["domain"] = "apology",
-        ["kind"] = "content",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Apology",
-        ["recordCount"] = 4,
-    },
-    {
         ["domain"] = "combat",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Combat",
@@ -155,6 +149,12 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/NeedsSupport",
         ["recordCount"] = 3,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialApology",
+        ["recordCount"] = 16,
     },
     {
         ["domain"] = "social_ask_about",
