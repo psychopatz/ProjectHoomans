@@ -283,6 +283,7 @@ local function applySegment(segment, style, blocked, context, salt, localSelecti
     output.phraseStyle = phrase.style
     if tostring(phrase.style or ""):sub(1, 5) == "bond_" then
         output.args.familyAddress = relationshipArgument(style, "familyAddress")
+        output.args["addressee.name"] = output.args.familyAddress
     end
 
     return output, {

@@ -133,6 +133,9 @@ local function resolveKnowledgeQuestion(ir, state, context)
             topic = answer ~= ""
                 and (topic .. ". " .. string.gsub(answer, "[%s%.!?]+$", ""))
                 or topic,
+            ["target.name"] = answer ~= ""
+                and (topic .. ". " .. string.gsub(answer, "[%s%.!?]+$", ""))
+                or topic,
         })
         response.referenceTopic = topic
         return response
@@ -144,7 +147,10 @@ local function resolveKnowledgeQuestion(ir, state, context)
         fact,
         "KNOWLEDGE"
     )
-    response.args = copyArgs({ topic = topic })
+    response.args = copyArgs({
+        topic = topic,
+        ["target.name"] = topic,
+    })
     return response
 end
 

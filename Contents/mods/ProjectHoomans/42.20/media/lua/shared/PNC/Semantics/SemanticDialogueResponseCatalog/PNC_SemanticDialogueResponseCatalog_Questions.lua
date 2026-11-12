@@ -10,6 +10,7 @@ if type(Catalog) ~= "table" or type(Catalog.Register) ~= "function" then
     return false
 end
 
+require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Questions_Knowledge_Core"
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Questions_IdentityActivity"
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Questions_WellbeingMedical"
 require "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Questions_Needs"

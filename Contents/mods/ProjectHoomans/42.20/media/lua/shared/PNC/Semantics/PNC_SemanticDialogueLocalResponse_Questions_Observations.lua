@@ -77,6 +77,7 @@ local function resolveIdentityQuestion(ir, state, context)
             fallback = identityText(context) .. " We already know each other.",
             args = copyArgs({
                 npcName = context.npcFullName or context.npcName,
+                ["speaker.name"] = context.npcFullName or context.npcName,
             }),
         }
     else

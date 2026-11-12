@@ -59,7 +59,10 @@ return {
     },
     ["semantic.question.identity"] = {
         ["dependents"] = {
-            "phrase.semantic.question.identity",
+            "semantic.question.identity.guarded",
+            "semantic.question.identity.neutral",
+            "semantic.question.identity.terse",
+            "semantic.question.identity.warm",
         },
         ["domain"] = "common",
         ["generated"] = {

@@ -8,8 +8,8 @@ Registry.REGISTRY_NAMESPACE = "PNC.Semantics.ConversationRegistry"
 Registry.REGISTRY_MODULE = "PNC/Semantics/Generated/Conversation/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
-Registry.CONTENT_FINGERPRINT = "3a95bbf8edff55839d0a81fadfba077cf29b37dba8f3540ebdaa7cd23fcc212d"
-Registry.WHOLE_MODEL_FINGERPRINT = "1dc4cb1829dcf5596e7ab2c4d9ab209364eac83282ea0e5a8586ca94e6ac910c"
+Registry.CONTENT_FINGERPRINT = "8426fc84db0c75c535897f2ff40d62169908937f1f8f3470abd8270071188302"
+Registry.WHOLE_MODEL_FINGERPRINT = "cc27f8da7df220b252edf29064c5173b6496028a22355b0a70ae4af2f311bcbf"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -111,10 +111,6 @@ appendContent(require "PNC/Semantics/Generated/Conversation/Content/Event/Reacti
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Greeting")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Health/HealthState")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Health/MedicalBite")
-appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Activity")
-appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Gossip")
-appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Identity")
-appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Knowledge/Knowledge")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Needs")
 appendContent(require "PNC/Semantics/Generated/Conversation/Content/Quest")
 appendContent(require "PsychopatzCore/Semantics/Generated/Conversation/Content/Social/Emotes/EmotesConversation")
@@ -300,6 +296,14 @@ appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_stop_following_queued_trusted")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_stop_following_queued_withdrawn")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_stop_following_rejected")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_bond_guarded")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_bond_neutral")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_bond_terse")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_bond_warm")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_guarded")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_neutral")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_terse")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gossip_unknown_warm")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_guarded")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_neutral")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_camp_terse")
@@ -320,6 +324,30 @@ appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_subject_change_neutral")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_subject_change_terse")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_navigation_subject_change_warm")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_dataset_keep_moving_guarded")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_dataset_keep_moving_neutral")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_dataset_keep_moving_terse")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_dataset_keep_moving_warm")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_fishing_guarded")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_fishing_neutral")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_fishing_terse")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_activity_fishing_warm")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_identity_guarded")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_identity_known_guarded")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_identity_known_neutral")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_identity_known_terse")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_identity_known_warm")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_identity_neutral")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_identity_terse")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_identity_warm")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_known_guarded")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_known_neutral")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_known_terse")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_known_warm")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_unknown_guarded")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_unknown_neutral")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_unknown_terse")
+appendPSDL(require "PsychopatzCore/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_question_knowledge_unknown_warm")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_apology_default_guarded")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_apology_default_neutral")
 appendPSDL(require "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_social_apology_default_terse")

@@ -61,12 +61,6 @@ return {
         ["recordCount"] = 6,
     },
     {
-        ["domain"] = "knowledge",
-        ["kind"] = "content",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Knowledge",
-        ["recordCount"] = 7,
-    },
-    {
         ["domain"] = "needs",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Needs",
@@ -137,6 +131,30 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CoreIdentity",
         ["recordCount"] = 1,
+    },
+    {
+        ["domain"] = "core_knowledge_activity",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CoreKnowledgeActivity",
+        ["recordCount"] = 8,
+    },
+    {
+        ["domain"] = "core_knowledge_facts",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CoreKnowledgeFacts",
+        ["recordCount"] = 8,
+    },
+    {
+        ["domain"] = "core_knowledge_gossip",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CoreKnowledgeGossip",
+        ["recordCount"] = 8,
+    },
+    {
+        ["domain"] = "core_knowledge_identity",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CoreKnowledgeIdentity",
+        ["recordCount"] = 8,
     },
     {
         ["domain"] = "navigation",
