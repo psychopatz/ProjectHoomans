@@ -1,0 +1,157 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "task_lifecycle",
+        ["id"] = "semantic.task.drink.failed",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.task.drink.failed",
+            ["sourcePath"] = "psdl/dialogue/task_lifecycle.json#records[8]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_task_drink_failed",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:task_lifecycle",
+                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
+                ["responseTemplateID"] = "semantic.task.drink.failed",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/drink.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I couldn't get a drink.",
+                            },
+                            ["TL"] = {
+                                "Hindi ako nakainom.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Failed to drink. Container was empty or tainted.",
+                            },
+                            ["TL"] = {
+                                "Bigo sa pag-inom. Walang laman o marumi ang lalagyan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Couldn't drink that. It wasn't clean water.",
+                            },
+                            ["TL"] = {
+                                "Di mainom 'yon. Di malinis na tubig.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I was interrupted before I could drink.",
+                            },
+                            ["TL"] = {
+                                "Naabala ako bago ako nakainom.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Unable to have a drink right now.",
+                            },
+                            ["TL"] = {
+                                "Di makainom sa ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Spilled it or couldn't reach it. Drinking failed.",
+                            },
+                            ["TL"] = {
+                                "Natapon o di naabot. Pumalpak ang pag-inom.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Water container is dry.",
+                            },
+                            ["TL"] = {
+                                "Tuyot ang lalagyan ng tubig.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Couldn't drink. Threat forced me to stop.",
+                            },
+                            ["TL"] = {
+                                "Di nakainom. Napilitang huminto dahil sa banta.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Action failed. Still thirsty.",
+                            },
+                            ["TL"] = {
+                                "Bigo ang kilos. Nauuhaw pa rin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Failed to take a drink.",
+                            },
+                            ["TL"] = {
+                                "Bigo sa pag-inom.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/task_lifecycle.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

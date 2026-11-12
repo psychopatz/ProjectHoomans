@@ -1,0 +1,157 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "task_lifecycle",
+        ["id"] = "semantic.gift.failed",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.gift.failed",
+            ["sourcePath"] = "psdl/dialogue/task_lifecycle.json#records[21]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gift_failed",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:task_lifecycle",
+                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
+                ["responseTemplateID"] = "semantic.gift.failed",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/gift.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I couldn't accept that gift.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko matanggap ang regalong iyan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Something went wrong while transferring the gift.",
+                            },
+                            ["TL"] = {
+                                "May nangyaring mali habang ipinapasa ang regalo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Gift transfer failed. My hands were full.",
+                            },
+                            ["TL"] = {
+                                "Bigo ang paglipat ng regalo. Puno ang kamay ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Couldn't receive that right now.",
+                            },
+                            ["TL"] = {
+                                "Di matanggap 'yan sa ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Unable to take the gift into my inventory.",
+                            },
+                            ["TL"] = {
+                                "Di mailagay ang regalo sa lalagyan ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Transaction interrupted. Gift not taken.",
+                            },
+                            ["TL"] = {
+                                "Naabala ang pagbibigay. Di nakuha ang regalo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Failed to receive the offering.",
+                            },
+                            ["TL"] = {
+                                "Bigo sa pagtanggap ng alay.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I dropped it or couldn't hold it.",
+                            },
+                            ["TL"] = {
+                                "Nahulog ko o di nahawakan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Gift transfer could not be completed.",
+                            },
+                            ["TL"] = {
+                                "Di natapos ang paglipat ng regalo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Couldn't take that from you.",
+                            },
+                            ["TL"] = {
+                                "Di ko nakuha 'yan mula sa 'yo.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/task_lifecycle.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

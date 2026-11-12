@@ -1,0 +1,157 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "task_lifecycle",
+        ["id"] = "semantic.gift.selection_required",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.gift.selection_required",
+            ["sourcePath"] = "psdl/dialogue/task_lifecycle.json#records[24]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_gift_selection_required",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:task_lifecycle",
+                ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
+                ["responseTemplateID"] = "semantic.gift.selection_required",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/gift.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I need to see what you brought me first.",
+                            },
+                            ["TL"] = {
+                                "Kailangan ko munang makita ang dala mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "What exactly are you offering me?",
+                            },
+                            ["TL"] = {
+                                "Ano nga ba ang iniaalok mo sa akin?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Select an item to gift before I decide.",
+                            },
+                            ["TL"] = {
+                                "Pumili ng bagay na ireregalo bago ako magpasya.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Show me what you want to give.",
+                            },
+                            ["TL"] = {
+                                "Ipakita mo kung ano ang nais mong ibigay.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Which item are you trying to hand over?",
+                            },
+                            ["TL"] = {
+                                "Aling gamit ba ang sinusubukan mong iabot?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Pick the specific item first.",
+                            },
+                            ["TL"] = {
+                                "Piliin muna ang partikular na gamit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can't take anything until you select it.",
+                            },
+                            ["TL"] = {
+                                "Wala akong matatanggap hangga't di mo pinipili.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Show me what's in your hands.",
+                            },
+                            ["TL"] = {
+                                "Ipakita mo ang nasa mga kamay mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "What gift are we talking about? Choose one.",
+                            },
+                            ["TL"] = {
+                                "Anong regalo ba ang pinag-uusapan natin? Pumili ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Specify the gift from your inventory.",
+                            },
+                            ["TL"] = {
+                                "Tukuyin ang regalo mula sa bag mo.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/task_lifecycle.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

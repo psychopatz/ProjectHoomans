@@ -55,12 +55,6 @@ return {
         ["recordCount"] = 102,
     },
     {
-        ["domain"] = "task",
-        ["kind"] = "content",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Task",
-        ["recordCount"] = 86,
-    },
-    {
         ["domain"] = "wellbeing",
         ["kind"] = "content",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Content/Wellbeing",
@@ -437,6 +431,18 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialSettlementAdmission",
         ["recordCount"] = 1,
+    },
+    {
+        ["domain"] = "task_lifecycle",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/TaskLifecycle",
+        ["recordCount"] = 40,
+    },
+    {
+        ["domain"] = "task_tool_replies",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/TaskToolReplies",
+        ["recordCount"] = 46,
     },
     {
         ["domain"] = "trading",

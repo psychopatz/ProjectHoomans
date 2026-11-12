@@ -1,0 +1,4380 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:tool_replies",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies"
+  },
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.cooldown.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/cooldown.json",
+        "responseTemplateID": "semantic.tool_reply.cooldown.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "You have had your turn with the compliments today.",
+              "TL": "Nakaubos ka na ng papuri para sa araw na ito."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Save some of those kind words for tomorrow.",
+              "TL": "Itabi mo ang ilan sa magagandang salita para bukas."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "You already flattered me enough for one day.",
+              "TL": "Sobra-sobra na ang pambobola mo para sa isang araw."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Praise limit reached. Let's get back to surviving.",
+              "TL": "Sapat na ang papuri. Balik na tayo sa pagligtas."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I heard you the first few times. Let it rest.",
+              "TL": "Narinig na kita kanina pa. Ipahinga mo muna."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "We've traded enough compliments for today.",
+              "TL": "Sapat na ang palitan natin ng papuri ngayong araw."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Easy on the flattery. Don't overdo it.",
+              "TL": "Dahan-dahan sa pambobola. Huwag mong sobrahan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Give it a rest until tomorrow.",
+              "TL": "Ipahinga mo muna hanggang bukas."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "One compliment per day is plenty out here.",
+              "TL": "Ang isang papuri kada araw ay marami na rito."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Save your breath. You've hit the limit for now.",
+              "TL": "Itabi mo ang laway mo. Naabot mo na ang hangganan sa ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.cooldown.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/cooldown.json",
+        "responseTemplateID": "semantic.tool_reply.cooldown.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Save the sweet talk for tomorrow.",
+              "TL": "Itabi mo ang matatamis na salita para bukas."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Hold your charm for another time.",
+              "TL": "Itago mo muna ang diskarte mo sa ibang araw."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Too much sweet talk for one afternoon.",
+              "TL": "Masyadong maraming pambobola para sa isang hapon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "We've got work to do. Charm me later.",
+              "TL": "May trabaho pa tayo. Paamuhin mo ako mamaya."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Save the smooth lines. Focus on survival.",
+              "TL": "Itabi ang magagandang linya. Magpokus sa kaligtasan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "You're pouring on the charm too thick right now.",
+              "TL": "Masyadong makapal ang pambobola mo ngayon."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Let's take a break from the flirting.",
+              "TL": "Magpahinga muna tayo sa paglalandian."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Charm cooldown. Let's get back to reality.",
+              "TL": "Palamig muna sa pambobola. Balik tayo sa realidad."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I've had my fill of sweet words for today.",
+              "TL": "Busog na ako sa matatamis na salita para sa araw na ito."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Hold that thought until tomorrow morning.",
+              "TL": "Hawakan mo ang linyang 'yan hanggang bukas ng umaga."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_camp.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_camp.json",
+        "responseTemplateID": "semantic.tool_reply.order_camp.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "All right. We will make camp here.",
+              "TL": "Sige. Magkakampo tayo rito."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Setting up camp right in this spot.",
+              "TL": "Magtatayo ng kampo sa mismong pwestong ito."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Understood. Establishing camp.",
+              "TL": "Naintindihan. Itatayo ang kampo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Camp order received. Pitching shelter.",
+              "TL": "Natanggap ang utos magkampo. Maglalatag ng silong."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Good place to bed down. Making camp.",
+              "TL": "Magandang tulugan ito. Magkakampo."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Understood. Securing the campsite.",
+              "TL": "Naiintindihan ko. Seselyuhan ang kampo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Right. Making camp here.",
+              "TL": "Sige. Magtatayo ng kampo rito."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "On it. Setting up our camp.",
+              "TL": "Inaasikaso na. Itatayo ang kampo natin."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Camp routine initiated.",
+              "TL": "Sinisimulan na ang pagtatayo ng kampo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Copy that. We camp here.",
+              "TL": "Kopyado. Dito tayo magkakampo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_camp.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_camp.json",
+        "responseTemplateID": "semantic.tool_reply.order_camp.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I will settle in here for now.",
+              "TL": "Aayos muna ako ng pwesto rito sa ngayon."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Dropping my pack and settling down.",
+              "TL": "Ibababa ang bag at magpapahinga."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Settling in. Let me know if anything changes.",
+              "TL": "Nakaayos na. Sabihan ako kapag may nagbago."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Finding a comfortable corner right here.",
+              "TL": "Naghahanap ng komportableng sulok dito."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I'll rest my legs and settle in.",
+              "TL": "Ipapahinga ang mga binti at mananatili rito."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Settling into position. Feels decent.",
+              "TL": "Pumupwesto na. Mukhang maayos naman."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Unpacking light gear and settling here.",
+              "TL": "Maglalapag ng gamit at aayos ng higaan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Settling in for the watch.",
+              "TL": "Nakaayos na para sa pagbabantay."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "All right, I'll make myself at home here.",
+              "TL": "Sige, magpapahinga ako na parang nasa bahay."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Settling down. Staying alert.",
+              "TL": "Nagpapahinga na. Mananatiling alisto."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_camp.3",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_camp.json",
+        "responseTemplateID": "semantic.tool_reply.order_camp.3",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Understood. I will stay here and take care of my needs.",
+              "TL": "Naintindihan. Mananatili ako rito at aasikasuhin ang mga pangangailangan ko."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I'll tend to my wounds and rest up here.",
+              "TL": "Gagamutin ko ang mga sugat at magpapahinga rito."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Taking care of hunger and thirst in camp.",
+              "TL": "Aasikasuhin ang gutom at uhaw sa kampo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I'll patch up my gear and eat a meal here.",
+              "TL": "Aayusin ko ang gamit at kakain dito."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Good. I needed time to sort myself out.",
+              "TL": "Mabuti. Kailangan ko ng oras para ayusin ang sarili ko."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Handling my personal upkeep while we camp.",
+              "TL": "Aasikasuhin ang pansariling kalagayan habang nagkakampo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Resting, eating, and recovering strength.",
+              "TL": "Nagpapahinga, kumakain, at nagpapalakas muli."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I'll use this camp time to recover.",
+              "TL": "Gagamitin ko ang oras sa kampo para magpagaling."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Taking care of myself while holding camp.",
+              "TL": "Aalagaan ang sarili habang nagbabantay sa kampo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Understood. Time for self-maintenance.",
+              "TL": "Naiintindihan ko. Oras na para mag-ayos ng katawan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_follow.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_follow.json",
+        "responseTemplateID": "semantic.tool_reply.order_follow.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "All right. I am with you.",
+              "TL": "Sige. Sasama ako sa iyo."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I'm right behind you.",
+              "TL": "Nasa likod mo lang ako."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Following your lead.",
+              "TL": "Sumusunod sa pangunguna mo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Understood. Moving out together.",
+              "TL": "Naintindihan. Sabay tayong lalakad."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "With you all the way.",
+              "TL": "Kasama mo sa buong daan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Sticking close behind.",
+              "TL": "Didikit ako sa likod mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "On your heels. Let's move.",
+              "TL": "Nasa likod mo lang. Kilos na."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Right with you, partner.",
+              "TL": "Kasabay mo na ako, kasama."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Following as ordered.",
+              "TL": "Sumusunod ayon sa utos."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Moving in lockstep with you.",
+              "TL": "Kasabay sa bawat hakbang mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_follow.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_follow.json",
+        "responseTemplateID": "semantic.tool_reply.order_follow.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Lead the way.",
+              "TL": "Ituro ang daan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "You lead, I follow.",
+              "TL": "Ikaw ang mauna, susunod ako."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "After you. Watch our front.",
+              "TL": "Kasunod mo ako. Bantayan ang unahan natin."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Take point. I've got your rear.",
+              "TL": "Mauna ka sa harap. Hawak ko ang likod mo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Lead on. I'm ready.",
+              "TL": "Mauna na. Handa na ako."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Show the path. I'm right behind.",
+              "TL": "Ipakita ang daan. Nasa likod mo lang ako."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Lead the way. Eyes sharp.",
+              "TL": "Ituro ang daan. Matalas ang paningin."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "You take the front, partner.",
+              "TL": "Ikaw ang mauna sa harap, kasama."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Point the direction and walk.",
+              "TL": "Ituro ang direksyon at lumakad."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Lead the way out.",
+              "TL": "Ituro ang daan palabas."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_follow.3",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_follow.json",
+        "responseTemplateID": "semantic.tool_reply.order_follow.3",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I will stay close.",
+              "TL": "Mananatili akong malapit."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Won't let you out of my sight.",
+              "TL": "Di kita iwawala sa paningin ko."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Sticking right by your side.",
+              "TL": "Didikit ako sa tabi mo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Keeping tight formation with you.",
+              "TL": "Didikit sa pormasyon kasama mo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Close proximity confirmed.",
+              "TL": "Kumpirmadong malapit lang."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I'll match your pace and stay near.",
+              "TL": "Sasabayan ko ang bilis mo at mananatiling malapit."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Right beside you. Don't worry.",
+              "TL": "Nasa tabi mo lang. Huwag mag-alala."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Staying within arm's reach.",
+              "TL": "Nasa abot-kamay lang ako."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I won't lag behind.",
+              "TL": "Hindi ako magpapahuli."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Staying close behind you.",
+              "TL": "Mananatiling malapit sa likod mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_generic.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_generic.json",
+        "responseTemplateID": "semantic.tool_reply.order_generic.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "All right.",
+              "TL": "Sige."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Understood.",
+              "TL": "Naintindihan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Got it.",
+              "TL": "Nakuha ko."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Right.",
+              "TL": "Tama."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Copy that.",
+              "TL": "Kopyado."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "On it.",
+              "TL": "Inaasikaso na."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Will do.",
+              "TL": "Gagawin ko."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Heard.",
+              "TL": "Narinig ko."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Acknowledged.",
+              "TL": "Kinikilala ko."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Sure.",
+              "TL": "Sige ba."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_generic.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_generic.json",
+        "responseTemplateID": "semantic.tool_reply.order_generic.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Understood.",
+              "TL": "Naiintindihan ko."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Order received loud and clear.",
+              "TL": "Natanggap ang utos nang malakas at malinaw."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Understood. Moving on that now.",
+              "TL": "Naintindihan. Kikilos na roon ngayon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Clear as crystal. Executing.",
+              "TL": "Kasing-linaw ng kristal. Isasakatuparan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Message understood.",
+              "TL": "Naiintindihan ang mensahe."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Understood. I will comply.",
+              "TL": "Naintindihan. Susunod ako."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Orders clear. Starting now.",
+              "TL": "Malinaw ang mga utos. Simulan na ngayon."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Understood. No problem.",
+              "TL": "Naiintindihan ko. Walang problema."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Clear. On my way to do it.",
+              "TL": "Malinaw. Papunta na para gawin."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Understood completely.",
+              "TL": "Lubos na naiintindihan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_generic.3",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_generic.json",
+        "responseTemplateID": "semantic.tool_reply.order_generic.3",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I will handle it.",
+              "TL": "Ako na ang bahala."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Consider it done.",
+              "TL": "Ituring mo nang tapos na."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I'll take care of this.",
+              "TL": "Aasikasuhin ko ito."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Leave it to me.",
+              "TL": "Ipaubaya mo sa akin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I'm on the job.",
+              "TL": "Nasa trabaho na ako."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I'll see to it right away.",
+              "TL": "Titiyakin kong magagawa agad."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Handling that now.",
+              "TL": "Hinahawakan na 'yan ngayon."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I've got this covered.",
+              "TL": "Hawak ko na ito."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Taking care of business.",
+              "TL": "Inaasikaso ang kailangan."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I'll get it sorted out.",
+              "TL": "Aayusin ko iyan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_rejected.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_rejected.json",
+        "responseTemplateID": "semantic.tool_reply.order_rejected.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I cannot do that right now.",
+              "TL": "Hindi ko magagawa iyon ngayon."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "That's not something I can pull off here.",
+              "TL": "Hindi ko magagawa 'yan dito."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Unable to execute that request at this time.",
+              "TL": "Di maisakatuparan ang hiling na 'yan sa ngayon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I have to decline that order.",
+              "TL": "Kailangan kong tanggihan ang utos na 'yan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Not possible under current circumstances.",
+              "TL": "Hindi posible sa kasalukuyang kalagayan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I can't carry that out right now.",
+              "TL": "Di ko kayang isakatuparan 'yan ngayon."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Unable to comply with that command.",
+              "TL": "Di makasusunod sa utos na 'yan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I can't do that. Find another solution.",
+              "TL": "Di ko magagawa 'yan. Humanap ng ibang solusyon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Order declined. Conditions won't allow it.",
+              "TL": "Tinatanggihan ang utos. Di pinapayagan ng sitwasyon."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I cannot perform that action right now.",
+              "TL": "Hindi ko maisasagawa ang kilos na 'yan sa ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_rejected.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_rejected.json",
+        "responseTemplateID": "semantic.tool_reply.order_rejected.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That order is not going to work.",
+              "TL": "Hindi uubra ang utos na iyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "That's a bad plan and it won't succeed.",
+              "TL": "Masamang plano 'yan at hindi magtatagumpay."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "That order makes no sense in this situation.",
+              "TL": "Walang saysay ang utos na 'yan sa sitwasyong ito."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "That won't work. We need a different approach.",
+              "TL": "Hindi uubra 'yan. Kailangan natin ng ibang diskarte."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I'm not following an order that leads to failure.",
+              "TL": "Di ako susunod sa utos na papunta sa kapahamakan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "That command will only get us killed.",
+              "TL": "Ipapahamak lang tayo ng utos na 'yan."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Not going to work out. Try another idea.",
+              "TL": "Hindi magiging maayos 'yan. Sumubok ng ibang ideya."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Flawed order. I won't execute it.",
+              "TL": "May depekto ang utos. Di ko isasakatuparan."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "That plan is dead in the water.",
+              "TL": "Patay ang planong 'yan sa simula pa lang."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "That won't work out here. Give a better order.",
+              "TL": "Di uubra 'yan dito. Magbigay ka ng mas maayos na utos."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_stay.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_stay.json",
+        "responseTemplateID": "semantic.tool_reply.order_stay.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "All right. I will hold here.",
+              "TL": "Sige. Hahawakan ko ang pwesto rito."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Holding position right here.",
+              "TL": "Hawak ko ang pwestong ito."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Understood. Guarding this spot.",
+              "TL": "Naintindihan. Babantayan ang pwestong ito."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I will remain right where I am.",
+              "TL": "Mananatili ako kung nasaan ako."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Holding ground as ordered.",
+              "TL": "Hawak ang lupa ayon sa utos."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Understood. I won't move an inch.",
+              "TL": "Naiintindihan ko. Di ako aalis kahit isang pulgada."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Standing watch right here.",
+              "TL": "Nakatayong bantay dito mismo."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I'll keep this position secure.",
+              "TL": "Pananatilihing ligtas ang posisyong ito."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Holding here. Watch yourself out there.",
+              "TL": "Dito lang ako. Mag-ingat ka sa labas."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Stay order confirmed. Holding ground.",
+              "TL": "Kumpirmadong utos na manatili. Hawak ang lupa."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_stay.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_stay.json",
+        "responseTemplateID": "semantic.tool_reply.order_stay.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I will stay put.",
+              "TL": "Dito lang ako."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Staying put until you return.",
+              "TL": "Mananatili rito hanggang sa makabalik ka."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Not moving from this spot.",
+              "TL": "Hindi aalis sa pwestong ito."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I'll keep my boots planted right here.",
+              "TL": "Nakatuntong ang bota ko rito mismo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Staying put. Hurry back.",
+              "TL": "Dito lang ako. Bumalik ka agad."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Understood. I will wait right here.",
+              "TL": "Naintindihan. Maghihintay ako rito."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Rooted to this spot. Go ahead.",
+              "TL": "Nakatigil sa pwestong ito. Sige na."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Staying put and watching the area.",
+              "TL": "Nananatili rito at nagmamasid sa lugar."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I'll stay right where you left me.",
+              "TL": "Dito lang ako kung saan mo ako iniwan."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Holding still in this position.",
+              "TL": "Nakahinto sa posisyong ito."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_admire.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_admire.json",
+        "responseTemplateID": "semantic.tool_reply.queued_admire.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I hear you.",
+              "TL": "Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Message received.",
+              "TL": "Natanggap ang mensahe."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I hear what you're saying.",
+              "TL": "Naririnig ko ang sinasabi mo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Understood. I heard that.",
+              "TL": "Naintindihan. Narinig ko 'yon."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Got your words.",
+              "TL": "Nakuha ko ang sinabi mo."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Heard and acknowledged.",
+              "TL": "Narinig at kinilala."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I hear you, loud and clear.",
+              "TL": "Naririnig kita, malakas at malinaw."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Fair enough. I heard that.",
+              "TL": "Makatwiran. Narinig ko 'yon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Noted. I hear you.",
+              "TL": "Tala ko na. Naririnig kita."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I'm listening. Heard.",
+              "TL": "Nakikinig ako. Narinig."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_admire.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_admire.json",
+        "responseTemplateID": "semantic.tool_reply.queued_admire.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That got through.",
+              "TL": "Nakarating iyon sa akin."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "That reached me. Thank you.",
+              "TL": "Tumagos iyon sa akin. Salamat."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I took that in.",
+              "TL": "Inintindi ko iyon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Your message made its mark.",
+              "TL": "Nag-iwan ng marka ang mensahe mo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I felt that. Thanks.",
+              "TL": "Naramdaman ko iyon. Salamat."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "That registered with me.",
+              "TL": "Tumatak iyon sa akin."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "That got through to me.",
+              "TL": "Nakarating iyon sa loob ko."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I received that clearly.",
+              "TL": "Malinaw kong natanggap iyon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "That landed well. Thank you.",
+              "TL": "Maganda ang naging dating niyan. Salamat."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Understood. That made an impression.",
+              "TL": "Naintindihan. Nag-iwan 'yan ng magandang impresyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_apology.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_apology.json",
+        "responseTemplateID": "semantic.tool_reply.queued_apology.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I hear you.",
+              "TL": "Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I hear your apology.",
+              "TL": "Naririnig ko ang paumanhin mo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Message heard.",
+              "TL": "Narinig ang mensahe."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I heard what you had to say.",
+              "TL": "Narinig ko ang kailangan mong sabihin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Got it. I hear you.",
+              "TL": "Nakuha ko. Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I hear you owning up.",
+              "TL": "Naririnig kong inaamin mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Understood. Heard.",
+              "TL": "Naintindihan. Narinig."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I heard your words on that.",
+              "TL": "Narinig ko ang mga salita mo riyan."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Noted. I'm listening.",
+              "TL": "Tala ko na. Nakikinig ako."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Heard your statement.",
+              "TL": "Narinig ang pahayag mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_apology.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_apology.json",
+        "responseTemplateID": "semantic.tool_reply.queued_apology.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "We will talk about it.",
+              "TL": "Pag-uusapan natin iyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "We'll discuss it once things calm down.",
+              "TL": "Pag-uusapan natin kapag kumalma na ang lahat."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "We will hash this out later.",
+              "TL": "Aayusin natin ito mamaya."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "We'll revisit that when we have a quiet moment.",
+              "TL": "Babalikan natin 'yan kapag may tahimik na oras."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "We will talk through that soon.",
+              "TL": "Pag-uusapan natin 'yan sa lalong madaling panahon."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I'll talk to you about it later.",
+              "TL": "Kakausapin kita tungkol diyan mamaya."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "We'll sort that out when we're safe.",
+              "TL": "Aayusin natin 'yan kapag ligtas na tayo."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "We will clear the air later.",
+              "TL": "Lilinawin natin ang lahat mamaya."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "We'll have a proper conversation about it.",
+              "TL": "Mag-uusap tayo nang masinsinan tungkol diyan."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Talk about it when we reach camp.",
+              "TL": "Pag-usapan natin kapag nakarating sa kampo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_comfort.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_comfort.json",
+        "responseTemplateID": "semantic.tool_reply.queued_comfort.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I hear you.",
+              "TL": "Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I hear your comfort.",
+              "TL": "Naririnig ko ang pampalubag-loob mo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Got the message. Thanks.",
+              "TL": "Nakuha ko ang mensahe. Salamat."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I hear what you're trying to do.",
+              "TL": "Naririnig ko ang sinusubukan mong gawin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Heard and appreciated.",
+              "TL": "Narinig at pinahahalagahan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I hear your reassurance.",
+              "TL": "Naririnig ko ang pampanatag mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Got it. Taking it to heart.",
+              "TL": "Nakuha ko. Isinasapuso ko."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I hear you. It helps a bit.",
+              "TL": "Naririnig kita. Nakakatulong nang kaunti."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Understood. I hear your voice.",
+              "TL": "Naintindihan. Naririnig ko ang boses mo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Heard clearly.",
+              "TL": "Narinig nang malinaw."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_comfort.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_comfort.json",
+        "responseTemplateID": "semantic.tool_reply.queued_comfort.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Thanks for saying that.",
+              "TL": "Salamat sa pagsabi niyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I appreciate you saying that to me.",
+              "TL": "Salamat at sinabi mo 'yan sa akin."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Thank you. That takes some edge off.",
+              "TL": "Maraming salamat. Nabawasan ang kaba ko."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I needed to hear that. Thank you.",
+              "TL": "Kailangan kong marinig 'yan. Salamat."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Appreciate the soothing words.",
+              "TL": "Salamat sa nakapagpapatahang mga salita."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Thanks for taking the time to say that.",
+              "TL": "Salamat sa paglalaan ng oras para sabihin 'yan."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Good of you to speak up. Thanks.",
+              "TL": "Mabuti sa 'yo ang magsalita. Salamat."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Thank you for the comfort.",
+              "TL": "Salamat sa pampalubag-loob."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Thanks. That means something out here.",
+              "TL": "Salamat. May halaga 'yan dito."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Appreciate your kindness today.",
+              "TL": "Salamat sa kabaitan mo ngayong araw."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_compliment.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_compliment.json",
+        "responseTemplateID": "semantic.tool_reply.queued_compliment.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I heard the compliment.",
+              "TL": "Narinig ko ang papuri."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Got the compliment. Thanks.",
+              "TL": "Nakuha ko ang papuri. Salamat."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I heard what you said about me.",
+              "TL": "Narinig ko ang sinabi mo tungkol sa akin."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Compliment registered.",
+              "TL": "Naitala ang papuri."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I heard the kind remark.",
+              "TL": "Narinig ko ang magandang puna."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Heard your compliment loud and clear.",
+              "TL": "Narinig ang papuri mo nang malakas at malinaw."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I caught that praise. Thanks.",
+              "TL": "Nakuha ko ang papuring 'yon. Salamat."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Compliment received.",
+              "TL": "Natanggap ang papuri."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I heard that. Appreciate it.",
+              "TL": "Narinig ko 'yon. Salamat."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Heard your good words.",
+              "TL": "Narinig ang mabubuti mong salita."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_compliment.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_compliment.json",
+        "responseTemplateID": "semantic.tool_reply.queued_compliment.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That is kind of you to say.",
+              "TL": "Mabait sa 'yo ang magsabi niyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Thank you for the kind thought.",
+              "TL": "Salamat sa magandang kaisipan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Appreciate the polite compliment.",
+              "TL": "Salamat sa magalang na papuri."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "That's generous of you to mention.",
+              "TL": "Mabuti sa 'yo ang banggitin 'yan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I'm grateful for the compliment.",
+              "TL": "Nagpapasalamat ako sa papuri."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Good of you to say so.",
+              "TL": "Mabuti at sinabi mo 'yon."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Thanks. I try my best.",
+              "TL": "Salamat. Ginagawa ko ang buong makakaya ko."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Thank you for noticing.",
+              "TL": "Salamat sa pagpansin."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Kind words are always welcome.",
+              "TL": "Laging malugod na tinatanggap ang magagandang salita."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "That's very nice of you.",
+              "TL": "Napakabait mo naman."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_flirt.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_flirt.json",
+        "responseTemplateID": "semantic.tool_reply.queued_flirt.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I heard you.",
+              "TL": "Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I heard that little remark.",
+              "TL": "Narinig ko ang maikling linyang 'yon."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Caught that.",
+              "TL": "Nahuli ko 'yon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I heard what you whispered.",
+              "TL": "Narinig ko ang ibinulong mo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Message heard.",
+              "TL": "Narinig ang mensahe."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I hear where your head is at.",
+              "TL": "Naririnig ko kung ano ang iniisip mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Got that loud and clear.",
+              "TL": "Nakuha 'yon nang malakas at malinaw."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I heard you just fine.",
+              "TL": "Narinig kita nang maayos."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Heard you. Don't think I missed it.",
+              "TL": "Narinig kita. Huwag mong isiping pinalampas ko."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I caught that flirt.",
+              "TL": "Nakuha ko ang pambobolang 'yon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_flirt.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_flirt.json",
+        "responseTemplateID": "semantic.tool_reply.queued_flirt.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "You are bold, I will give you that.",
+              "TL": "Matapang ka, aaminin ko iyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "You certainly don't lack nerve.",
+              "TL": "Talagang hindi ka kulang sa lakas ng loob."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Bold move talking like that out here.",
+              "TL": "Matapang na hakbang ang magsalita nang ganyan dito."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "You have plenty of confidence, I'll say that.",
+              "TL": "Marami kang tiwala sa sarili, aaminin ko."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "That's quite a forward thing to say.",
+              "TL": "Medyo mapangahas ang linyang 'yan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "You certainly know how to shoot your shot.",
+              "TL": "Marunong ka talagang sumubok ng diskarte mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Bold words for someone in danger.",
+              "TL": "Matatapang na salita para sa taong nasa panganib."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I admire the guts, if nothing else.",
+              "TL": "Hanga ako sa tapang mo, kahit 'yon man lang."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "You're definitely not shy.",
+              "TL": "Talagang hindi ka mahiyain."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "You like living dangerously, don't you?",
+              "TL": "Gusto mo talagang sumugal sa delikado, 'no?"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_generic.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_generic.json",
+        "responseTemplateID": "semantic.tool_reply.queued_generic.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I hear you.",
+              "TL": "Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Understood.",
+              "TL": "Naiintindihan ko."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Message received.",
+              "TL": "Natanggap ang mensahe."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Got it.",
+              "TL": "Nakuha ko."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I hear what you said.",
+              "TL": "Narinig ko ang sinabi mo."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Heard.",
+              "TL": "Narinig."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Fair enough. I hear you.",
+              "TL": "Makatwiran. Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Point noted.",
+              "TL": "Tala ang punto."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I'm listening.",
+              "TL": "Nakikinig ako."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Acknowledged.",
+              "TL": "Kinikilala ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_generic.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_generic.json",
+        "responseTemplateID": "semantic.tool_reply.queued_generic.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Give me a moment.",
+              "TL": "Bigyan mo ako ng sandali."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Hold on just a second.",
+              "TL": "Teka sandali lang."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Let me finish what I'm doing first.",
+              "TL": "Hayaan mong tapusin ko muna ang ginagawa ko."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Just a minute.",
+              "TL": "Sandali lang."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Give me a bit of time.",
+              "TL": "Bigyan mo ako ng kaunting oras."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Hang on a second.",
+              "TL": "Teka lang saglit."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I need a moment to process that.",
+              "TL": "Kailangan ko ng sandali para pag-isipan 'yan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Hold your horses for a minute.",
+              "TL": "Dahan-dahan lang sandali."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Give me a brief moment.",
+              "TL": "Bigyan mo ako ng maikling sandali."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "One second. I'm wrapped up right now.",
+              "TL": "Isang segundo. May inaasikaso pa ako ngayon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_hostile.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_hostile.json",
+        "responseTemplateID": "semantic.tool_reply.queued_hostile.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I heard you. Watch yourself.",
+              "TL": "Narinig kita. Mag-ingat ka sa sarili mo."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Heard that tone. Mind your step.",
+              "TL": "Narinig ko ang tonong 'yan. Mag-ingat sa hakbang."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I heard the anger. Keep it in check.",
+              "TL": "Narinig ko ang galit. Kontrolin mo 'yan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I hear you, but don't cross the line.",
+              "TL": "Narinig kita, pero huwag mong tawirin ang hangganan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Message heard. Control yourself.",
+              "TL": "Narinig ang mensahe. Magpigil ka."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Heard that loud and clear. Back off.",
+              "TL": "Narinig nang malakas at malinaw. Umatras ka."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I heard you. Don't make a mistake you can't undo.",
+              "TL": "Narinig kita. Huwag kang gumawa ng pagkakamaling di mo mababawi."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I heard the threat. Tread lightly.",
+              "TL": "Narinig ko ang banta. Mag-ingat sa pagtapak."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Noted. Don't let your temper get you killed.",
+              "TL": "Tala ko na. Huwag mong hayaang mapatay ka ng galit mo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I hear you. Watch your back.",
+              "TL": "Narinig kita. Bantayan mo ang likod mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_hostile.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_hostile.json",
+        "responseTemplateID": "semantic.tool_reply.queued_hostile.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Noted. Choose your next words carefully.",
+              "TL": "Tala ko na. Piliin mong mabuti ang susunod mong sasabihin."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Be very careful what comes out of your mouth next.",
+              "TL": "Maging maingat sa susunod na lalabas sa bibig mo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "You're walking on thin ice with that talk.",
+              "TL": "Nasa manipis kang yelo sa salitang 'yan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Think twice before repeating that.",
+              "TL": "Mag-isip ka nang dalawang beses bago ulitin 'yan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Choose your next move with extreme caution.",
+              "TL": "Piliin ang susunod mong hakbang nang buong pag-iingat."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "You're testing boundaries that have teeth.",
+              "TL": "Sinusubukan mo ang mga hangganang may bangil."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Careful now. Words have consequences out here.",
+              "TL": "Mag-ingat ka. May kapalit ang salita dito."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Watch what you say next.",
+              "TL": "Bantayan mo ang susunod mong sasabihin."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "One wrong word and this conversation ends badly.",
+              "TL": "Isang maling salita at magtatapos sa masama ang usapang ito."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Noted. Mind your tongue.",
+              "TL": "Tala ko na. Ingatan ang dila mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_insult.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_insult.json",
+        "responseTemplateID": "semantic.tool_reply.queued_insult.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I heard you.",
+              "TL": "Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I heard that insult.",
+              "TL": "Narinig ko ang pambabastos na 'yon."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Caught that remark.",
+              "TL": "Narinig ang patutsadang 'yon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I hear the childish jab.",
+              "TL": "Naririnig ko ang pambatang sundot."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Message heard. Doesn't bother me.",
+              "TL": "Narinig ang mensahe. Di ako apektado."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Heard you. Weak effort.",
+              "TL": "Narinig kita. Mahinang banat."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I heard the slander.",
+              "TL": "Narinig ko ang paninira."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Heard it. Moving on.",
+              "TL": "Narinig ko. Lumilipas na."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I heard that petty comment.",
+              "TL": "Narinig ko ang mababaw na komentong 'yon."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I hear your barking.",
+              "TL": "Naririnig ko ang tahol mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_insult.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_insult.json",
+        "responseTemplateID": "semantic.tool_reply.queued_insult.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Noted.",
+              "TL": "Tala ko na."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Noted, and dismissed.",
+              "TL": "Tala ko na, at binalewala."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Noted. You're wasting your breath.",
+              "TL": "Tala ko na. Sinasayang mo lang ang laway mo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Noted. Doesn't mean a thing to me.",
+              "TL": "Tala ko na. Walang halaga sa akin 'yan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Duly noted. Try harder next time.",
+              "TL": "Tala ko na. Galingan mo sa susunod."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Noted. I've heard worse from strangers.",
+              "TL": "Tala ko na. Nakarining na ako ng mas masahol pa sa iba."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Noted. Water off a duck's back.",
+              "TL": "Tala ko na. Para lang tubig sa dahon ng gabi."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Noted. Don't expect a reaction.",
+              "TL": "Tala ko na. Huwag kang umasa ng reaksyon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Noted. Moving along.",
+              "TL": "Tala ko na. Tuloy ang lakad."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Noted and ignored.",
+              "TL": "Tala ko na at kinalimutan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_praise.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_praise.json",
+        "responseTemplateID": "semantic.tool_reply.queued_praise.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I hear you.",
+              "TL": "Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I hear your praise.",
+              "TL": "Naririnig ko ang papuri mo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Heard and appreciated.",
+              "TL": "Narinig at pinahahalagahan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I hear what you said about my work.",
+              "TL": "Narinig ko ang sinabi mo sa trabaho ko."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Got that positive feedback.",
+              "TL": "Nakuha ko ang magandang puna."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I hear you clearly. Thanks.",
+              "TL": "Naririnig kita nang malinaw. Salamat."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Praise heard. Good to know.",
+              "TL": "Narinig ang papuri. Mabuting malaman."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I hear the support.",
+              "TL": "Naririnig ko ang suporta."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Heard. Glad to help.",
+              "TL": "Narinig. Masayang tumulong."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I hear you. We did good.",
+              "TL": "Narinig kita. Maganda ang nagawa natin."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_praise.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_praise.json",
+        "responseTemplateID": "semantic.tool_reply.queued_praise.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I will remember that.",
+              "TL": "Tandaan ko iyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I'll keep that positive note in mind.",
+              "TL": "Isasaisip ko ang magandang sinabi mo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I won't forget that you recognized my effort.",
+              "TL": "Di ko malilimutan na kinilala mo ang pagod ko."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "That will stay with me. Thanks.",
+              "TL": "Mananatili sa akin 'yan. Salamat."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I'll remember you said that when times get tough.",
+              "TL": "Tandaan ko 'yan kapag naging mahirap ang panahon."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Remembered and valued.",
+              "TL": "Tanda ko at pinahahalagahan."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I will hold onto that praise.",
+              "TL": "Iingatan ko ang papuring 'yan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "That sticks in my memory. Thank you.",
+              "TL": "Tumatatak 'yan sa alaala ko. Salamat."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I'll remember your good words.",
+              "TL": "Tatandaan ko ang mabubuti mong salita."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Noted in my heart. Thanks.",
+              "TL": "Nakatatak sa puso ko. Salamat."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_romantic.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_romantic.json",
+        "responseTemplateID": "semantic.tool_reply.queued_romantic.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I heard you. You are bold, I will give you that.",
+              "TL": "Narinig kita. Matapang ka, aaminin ko iyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I heard that romantic whisper. You have nerve.",
+              "TL": "Narinig ko ang pahiwatig na 'yon. May lakas ka ng loob."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Heard loud and clear. That was daring of you.",
+              "TL": "Narinig nang malinaw. Matapang ang ginawa mong 'yan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I caught your words. You certainly don't hold back.",
+              "TL": "Nakuha ko ang sinabi mo. Talagang di ka nagpipigil."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Heard you. That took some real courage to say.",
+              "TL": "Narinig kita. Nangailangan ng tunay na tapang para sabihin 'yan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I heard every word. You're bolder than most.",
+              "TL": "Narinig ko ang bawat salita. Mas matapang ka kaysa karamihan."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I hear what you're hinting at. Quite bold.",
+              "TL": "Naririnig ko ang pahiwatig mo. Tunay na matapang."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Message heard. You definitely have guts.",
+              "TL": "Narinig ang mensahe. May tapang ka talaga."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I caught that soft line. Bold of you.",
+              "TL": "Nakuha ko ang malambing na linyang 'yon. Matapang ka."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Heard you. You know how to make an impression.",
+              "TL": "Narinig kita. Marunong kang mag-iwan ng impresyon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_romantic.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_romantic.json",
+        "responseTemplateID": "semantic.tool_reply.queued_romantic.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "You certainly know how to get my attention.",
+              "TL": "Alam mo talaga kung paano kukunin ang pansin ko."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "You definitely have my full focus after that.",
+              "TL": "Nasa sa 'yo na ang buong atensyon ko pagkatapos niyan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "You know just what strings to pull.",
+              "TL": "Alam mo kung anong kwerdas ang gagalawin."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "You have a knack for turning my head your way.",
+              "TL": "May galing ka sa pagpihit ng tingin ko papunta sa 'yo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "You certainly know how to make me listen.",
+              "TL": "Marunong ka talagang magparinig sa akin."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "That definitely caught my eye and ear.",
+              "TL": "Talagang nakuha niyan ang paningin at tainga ko."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "You always find a way to make me look at you.",
+              "TL": "Lagi kang nakakahanap ng paraan para mapatingin ako sa 'yo."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Well, you have my complete attention now.",
+              "TL": "Nasa sa 'yo na ang buo kong atensyon ngayon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "You have a gift for captivating an audience.",
+              "TL": "May talento ka sa pang-aakit ng atensyon."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "You know exactly what you're doing with those words.",
+              "TL": "Alam na alam mo ang ginagawa mo sa mga salitang 'yan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_sexual.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_sexual.json",
+        "responseTemplateID": "semantic.tool_reply.queued_sexual.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I heard you. Give me a second.",
+              "TL": "Narinig kita. Bigyan mo ako ng sandali."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Heard that proposition. Let me catch my breath.",
+              "TL": "Narinig ang alok na 'yan. Huminga muna ako."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I heard you clearly. Hold on for a moment.",
+              "TL": "Narinig kita nang malinaw. Maghintay nang sandali."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Message received loud and clear. Give me a minute.",
+              "TL": "Nakuha ang mensahe nang malinaw. Bigyan mo ako ng sandali."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I heard that. Give me a beat to think.",
+              "TL": "Narinig ko 'yon. Bigyan mo ako ng oras para mag-isip."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Heard. That's a lot to process right now.",
+              "TL": "Narinig. Napakabigat iproseso niyan sa ngayon."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I heard what you just proposed. Just hold up.",
+              "TL": "Narinig ko ang inalok mo. Teka lang muna."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Got that. Let me gather my thoughts.",
+              "TL": "Nakuha 'yon. Tipunin ko muna ang isip ko."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I heard you. Don't rush me.",
+              "TL": "Narinig kita. Huwag mo akong madaliin."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Heard every word. Give me some room.",
+              "TL": "Narinig ang bawat salita. Bigyan mo ako ng puwang."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_sexual.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_sexual.json",
+        "responseTemplateID": "semantic.tool_reply.queued_sexual.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That is a bold thing to say.",
+              "TL": "Matapang na bagay ang sabihin iyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "You don't waste time with subtlety, do you?",
+              "TL": "Di ka nagsasayang ng oras sa pahiwatig, 'no?"
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "That's about as blunt as it gets out here.",
+              "TL": "Kasing-prangka na 'yan ng kahit ano rito."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "You're taking quite a gamble saying that.",
+              "TL": "Malaking sugal ang pagsasabi niyan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "That's an audacious thing to drop on me.",
+              "TL": "Napakapangahas na bagay ang ibagsak sa akin."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "You definitely speak your mind without filters.",
+              "TL": "Nagsasalita ka talaga nang walang preno."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Bold proposition. Let's see what happens.",
+              "TL": "Matapang na alok. Tingnan natin ang mangyayari."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "That takes some serious nerve to put out there.",
+              "TL": "Nangangailangan ng tunay na tapang para ilatag 'yan."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "You're playing with high stakes with that talk.",
+              "TL": "Naglalaro ka sa mataas na pustahan sa salitang 'yan."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Direct and daring. Noted.",
+              "TL": "Diretso at mapangahas. Tala ko na."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.rejected_game.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_game.json",
+        "responseTemplateID": "semantic.tool_reply.rejected_game.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Not now.",
+              "TL": "Hindi ngayon."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Now is not the time for games.",
+              "TL": "Hindi ngayon ang oras para sa laro."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "We have real survival to worry about. Not now.",
+              "TL": "May tunay na kaligtasan tayong iniisip. Hindi ngayon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I'm busy staying alive. Not playing games.",
+              "TL": "Abala ako sa pananatiling buhay. Di ako maglalaro."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Not in the mood for games right now.",
+              "TL": "Wala ako sa mood para maglaro ngayon."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Save the distractions for later.",
+              "TL": "Itabi ang pampalipas-oras mamaya."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Not now. Stay focused on our safety.",
+              "TL": "Hindi ngayon. Magpokus sa kaligtasan natin."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Too much danger around for games.",
+              "TL": "Masyadong maraming panganib sa paligid para maglaro."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I have to pass on that right now.",
+              "TL": "Lalampasan ko muna 'yan ngayon."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Not happening today. Focus.",
+              "TL": "Di mangyayari ngayon. Magpokus."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.rejected_game.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_game.json",
+        "responseTemplateID": "semantic.tool_reply.rejected_game.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That did not land well.",
+              "TL": "Hindi naging maganda ang dating niyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "That was poorly timed.",
+              "TL": "Maling-mali ang tiyempo niyan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Bad moment for that attempt.",
+              "TL": "Masamang sandali para sa pagtatangkang 'yan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "That fell completely flat.",
+              "TL": "Bumagsak lang nang walang saysay 'yon."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Wrong audience, wrong time.",
+              "TL": "Maling kausap, maling oras."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "That missed the mark entirely.",
+              "TL": "Lumihis nang buo sa dapat patunguhan."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "That did not go over the way you hoped.",
+              "TL": "Di naging ayon sa inasahan mo ang takbo niyan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Poor execution on that one.",
+              "TL": "Mahina ang pagkagawa sa isang 'yon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "That landed terribly. Try focusing instead.",
+              "TL": "Napakasama ng dating niyan. Magpokus ka na lang."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "That didn't work at all.",
+              "TL": "Hindi talaga umubra 'yan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.rejected_generic.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_generic.json",
+        "responseTemplateID": "semantic.tool_reply.rejected_generic.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That did not land well.",
+              "TL": "Hindi naging maganda ang dating niyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "That went over poorly.",
+              "TL": "Pangit ang naging dating niyan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "That didn't work out.",
+              "TL": "Hindi naging maayos 'yan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "That was not well received.",
+              "TL": "Hindi maganda ang pagtanggap diyan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "You miscalculated that one.",
+              "TL": "Nagkamali ka sa kalkulasyon doon."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "That completely backfired.",
+              "TL": "Bumalik sa 'yo ang epekto niyan."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Not a good approach.",
+              "TL": "Hindi magandang paraan 'yan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "That fell flat on its face.",
+              "TL": "Bumagsak lang 'yan nang kusa."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "That missed completely.",
+              "TL": "Sumablay nang buo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "That was a mistake.",
+              "TL": "Isang pagkakamali 'yon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.rejected_generic.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_generic.json",
+        "responseTemplateID": "semantic.tool_reply.rejected_generic.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I am not taking that from you right now.",
+              "TL": "Hindi ko tatanggapin iyan mula sa iyo ngayon."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I'm not in the mood for that kind of talk.",
+              "TL": "Wala ako sa mood para sa ganyang usapan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I'm rejecting that completely.",
+              "TL": "Tinatanggihan ko 'yan nang buo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "You can keep that nonsense to yourself.",
+              "TL": "Itago mo sa sarili mo ang kalokohang 'yan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I'm not putting up with that today.",
+              "TL": "Di ko pagtitiisan 'yan ngayong araw."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Not taking that. Walk it back.",
+              "TL": "Di tatanggapin 'yan. Bawiin mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I refuse to engage with that.",
+              "TL": "Tumatanggi akong makipag-usap tungkol diyan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I'm shutting that down immediately.",
+              "TL": "Papatayin ko agad ang usapang 'yan."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Not tolerating that right now.",
+              "TL": "Di ko palalampasin 'yan ngayon."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I'm not accepting that from you.",
+              "TL": "Hindi ko tatanggapin 'yan galing sa 'yo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.rejected_hostile.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_hostile.json",
+        "responseTemplateID": "semantic.tool_reply.rejected_hostile.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Back off.",
+              "TL": "Umatras ka."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Step back right now.",
+              "TL": "Lumayo ka ngayon din."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Get out of my face.",
+              "TL": "Umalis ka sa harap ko."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Give me space before I lose my temper.",
+              "TL": "Bigyan mo ako ng puwang bago ako magalit."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Back away from me immediately.",
+              "TL": "Lumayo ka sa akin agad-agad."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I said back off.",
+              "TL": "Sabi ko umatras ka."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Keep your distance.",
+              "TL": "Panatilihin ang distansya."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Step back and cool down.",
+              "TL": "Umatras ka at palamigin ang ulo."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Back off while you still have the chance.",
+              "TL": "Umatras ka habang may pagkakataon ka pa."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Last warning: back off.",
+              "TL": "Huling babala: umatras ka."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.rejected_hostile.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_hostile.json",
+        "responseTemplateID": "semantic.tool_reply.rejected_hostile.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "You do not get to speak to me that way.",
+              "TL": "Wala kang karapatang kausapin ako nang ganyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Mind your mouth before someone breaks it for you.",
+              "TL": "Bantayan ang bibig mo bago may bumasag niyan para sa 'yo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "You don't talk to me with that disrespect.",
+              "TL": "Huwag mo akong kausapin nang may pambabastos."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Check your tone right now.",
+              "TL": "Ayusin mo ang tono mo ngayon din."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I won't tolerate that disrespect from anyone.",
+              "TL": "Di ko palalampasin ang pambabastos na 'yan kahit kanino."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Who do you think you're talking to?",
+              "TL": "Sino sa tingin mo ang kinakausap mo?"
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "You have crossed a serious line with that mouth.",
+              "TL": "Tumawid ka sa seryosong linya sa bibig mong 'yan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Watch how you address me.",
+              "TL": "Bantayan mo kung paano mo ako kausapin."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Lower your tone and show some basic respect.",
+              "TL": "Hinaan ang tono at magpakita ng simpleng galang."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "You don't get to address me like that.",
+              "TL": "Hindi mo ako pwedeng kausapin nang ganyan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.rejected_sexual.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_sexual.json",
+        "responseTemplateID": "semantic.tool_reply.rejected_sexual.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That is not happening.",
+              "TL": "Hindi iyan mangyayari."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Not a chance. Forget about it.",
+              "TL": "Walang pag-asa. Kalimutan mo na."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I am not interested in that at all.",
+              "TL": "Hindi talaga ako interesado riyan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "That is completely off the table.",
+              "TL": "Wala sa pagpipilian 'yan kailanman."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "No. Never going to happen.",
+              "TL": "Hindi. Di kailanman mangyayari."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Absolutely not.",
+              "TL": "Hinding-hindi."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I'm shutting that down right now. No.",
+              "TL": "Papatayin ko ang paksang 'yan ngayon. Hindi."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "That won't be happening between us.",
+              "TL": "Hindi 'yan mangyayari sa pagitan natin."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Drop that idea entirely. Not happening.",
+              "TL": "Iwan mo nang buo ang ideyang 'yan. Di mangyayari."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "No means no. It's not happening.",
+              "TL": "Ang hindi ay hindi. Di mangyayari 'yan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.rejected_sexual.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_sexual.json",
+        "responseTemplateID": "semantic.tool_reply.rejected_sexual.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Do not talk to me like that.",
+              "TL": "Huwag mo akong kausapin nang ganyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Keep those inappropriate remarks to yourself.",
+              "TL": "Itago mo sa sarili mo ang di-angkop na mga salitang 'yan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "You're crossing serious personal boundaries.",
+              "TL": "Tumatawid ka sa seryosong personal na hangganan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "That's completely uncalled for. Stop.",
+              "TL": "Wala sa lugar 'yan. Tigil."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I don't appreciate that kind of talk.",
+              "TL": "Hindi ko gusto ang ganyang uri ng pananalita."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Keep your indecent propositions away from me.",
+              "TL": "Ilayo mo sa akin ang malaswang alok mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Watch how you speak to me. That's out of line.",
+              "TL": "Bantayan mo ang pagsasalita mo sa akin. Sobra na 'yan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "You need to show respect and stop talking like that.",
+              "TL": "Kailangan mong magpakita ng respeto at tumigil sa ganyang pananalita."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I won't be objectified out here. Back off.",
+              "TL": "Di ako magpapakababa rito. Umatras ka."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Shut your mouth. Don't speak to me that way.",
+              "TL": "Itikom mo ang bibig mo. Huwag mo akong kakausapin nang ganyan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.rejected_sexual.3",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_sexual.json",
+        "responseTemplateID": "semantic.tool_reply.rejected_sexual.3",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "You are moving far too fast.",
+              "TL": "Masyadong mabilis ang takbo mo."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Slow down. We are nowhere near that point.",
+              "TL": "Dahan-dahan. Malayo pa tayo sa puntong iyan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "You need to hit the brakes. That's way too fast.",
+              "TL": "Kailangan mong magpreno. Masyadong mabilis 'yan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Pace yourself. We barely know each other.",
+              "TL": "Huwag kang magmadali. Halos di pa nga tayo magkakilala."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "You're rushing into territory we haven't earned.",
+              "TL": "Nagmamadali ka sa lugar na di pa natin nararating."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Slow your roll. That's moving way too fast for me.",
+              "TL": "Dahan-dahan lang. Masyadong mabilis 'yan para sa akin."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Pull back. We have not built that kind of closeness.",
+              "TL": "Umatras ka. Wala pa tayong ganyang kalapit na ugnayan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "You're getting way ahead of where we stand.",
+              "TL": "Nauuna ka nang malayo sa kung ano lang tayo."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Take a massive step back. Way too fast.",
+              "TL": "Humakbang ka paatras nang malaki. Masyadong mabilis."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Slow down before you ruin whatever trust we have.",
+              "TL": "Magdahan-dahan ka bago mo sirain ang anumang tiwalang mayroon tayo."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
