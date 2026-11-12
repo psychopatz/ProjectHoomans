@@ -38,6 +38,16 @@ from tools.semantic_harness.codebuilder.generation_ownership import (
 
 REPOSITORY = Path(__file__).resolve().parents[4]
 CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
+PNC_PSDL_DIALOGUE_RELATIVE = Path(
+    "tools/providers/pnc/codebuilder/sources/conversation/psdl/dialogue"
+)
+
+
+def copy_pnc_psdl_sources(repository: Path) -> None:
+    target = repository / PNC_PSDL_DIALOGUE_RELATIVE
+    target.mkdir(parents=True, exist_ok=True)
+    source = REPOSITORY / PNC_PSDL_DIALOGUE_RELATIVE / "companion_check_in.json"
+    shutil.copy2(source, target / source.name)
 
 
 class GenerationOwnershipTests(unittest.TestCase):
@@ -135,12 +145,12 @@ class GenerationOwnershipTests(unittest.TestCase):
         )
         modules, reports = render_conversation_runtime_plan(model)
         by_source = {
-            report.get("sourceShard"): (module, report)
+            (report.get("sourceShard"), report.get("kind")): (module, report)
             for (module, _source), report in zip(modules, reports)
             if report.get("sourceShard")
         }
 
-        module, report = by_source["patterns/common/identity.json"]
+        module, report = by_source[("patterns/common/identity.json", "Patterns")]
         self.assertEqual(report["owner"], CORE_OWNER)
         self.assertEqual(report["shardOwner"], CORE_OWNER)
         self.assertEqual(report["registryOwner"], "ProjectHoomans")
@@ -161,22 +171,22 @@ class GenerationOwnershipTests(unittest.TestCase):
             module,
         )
 
-        _, facet_report = by_source["patterns/common/identity_facets.json"]
+        _, facet_report = by_source[("patterns/common/identity_facets.json", "Patterns")]
         self.assertEqual(facet_report["owner"], CORE_OWNER)
         self.assertEqual(facet_report["registryOwner"], "ProjectHoomans")
         self.assertEqual(facet_report["sourceOwner"], CORE_OWNER)
 
-        pack_module, pack_report = by_source["packs/dynamic_trading.json"]
+        pack_module, pack_report = by_source[("psdl/dialogue/trading.json", "Packs")]
         self.assertEqual(pack_report["owner"], "DTCommon")
         self.assertEqual(pack_report["kind"], "Packs")
         self.assertTrue(
             pack_module.startswith(
-                "DTCommon/Semantics/Generated/Conversation/Packs/"
+                "DTCommon/Semantics/Generated/Conversation/Packs/Psdl/Dialogue/"
             ),
             pack_module,
         )
 
-        module, report = by_source["content/command/player.json"]
+        module, report = by_source[("content/command/player.json", "Content")]
         self.assertEqual(report["owner"], "ProjectHoomans")
         self.assertTrue(module.startswith("PNC/Semantics/Generated/Conversation/"), module)
 
@@ -188,6 +198,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             dynamic_trading = root / "DynamicTrading"
             source_root = hoomans / CONVERSATION_SOURCE_RELATIVE
             shutil.copytree(CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE, source_root)
+            copy_pnc_psdl_sources(hoomans)
 
             manifest_path = source_root / "manifest.json"
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -279,7 +290,7 @@ class GenerationOwnershipTests(unittest.TestCase):
                 dynamic_trading
                 / "Contents/mods/DTCommon/common/media/lua/shared/"
                 / "DTCommon/Semantics/Generated/Conversation/Packs/"
-                "DynamicTrading.lua"
+                "Psdl/Dialogue/Trading.lua"
             )
             manifest_lua = registry.with_name("Manifest.lua")
             self.assertTrue(registry.is_file())
@@ -297,7 +308,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             registry_text = registry.read_text(encoding="utf-8")
             self.assertIn("Registry.PACKS = {}", registry_text)
             self.assertIn(
-                'DTCommon/Semantics/Generated/Conversation/Packs/DynamicTrading',
+                'DTCommon/Semantics/Generated/Conversation/Packs/Psdl/Dialogue/Trading',
                 registry_text,
             )
             self.assertIn(
@@ -322,6 +333,7 @@ class GenerationOwnershipTests(unittest.TestCase):
                 CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
                 hoomans / CONVERSATION_SOURCE_RELATIVE,
             )
+            copy_pnc_psdl_sources(hoomans)
             model = compile_conversation_sources(
                 hoomans,
                 runtime_root=REPOSITORY,
@@ -344,11 +356,17 @@ class GenerationOwnershipTests(unittest.TestCase):
                 / "PsychopatzCore/Semantics/Generated/Conversation/"
                 "FoundationRegistry.lua"
             )
-            core_static_suggestions = (
+            core_check_in = (
                 core
                 / "Contents/mods/PsychopatzCore/common/media/lua/shared/"
                 / "PsychopatzCore/Semantics/Generated/Conversation/UI/"
-                "StaticSuggestionsCore.lua"
+                "Psdl/Dialogue/CoreCheckIn.lua"
+            )
+            core_identity_dialogue = (
+                core
+                / "Contents/mods/PsychopatzCore/common/media/lua/shared/"
+                / "PsychopatzCore/Semantics/Generated/Conversation/UI/"
+                "Psdl/Dialogue/CoreIdentity.lua"
             )
             stale_hoomans_identity = (
                 hoomans
@@ -368,12 +386,14 @@ class GenerationOwnershipTests(unittest.TestCase):
 
             self.assertTrue(core_identity.is_file())
             self.assertTrue(core_foundation_registry.is_file())
-            self.assertTrue(core_static_suggestions.is_file())
+            self.assertTrue(core_check_in.is_file())
+            self.assertTrue(core_identity_dialogue.is_file())
             self.assertFalse(stale_hoomans_identity.exists())
             self.assertTrue(hoomans_content.is_file())
             self.assertIn(core_identity, paths)
             self.assertIn(core_foundation_registry, paths)
-            self.assertIn(core_static_suggestions, paths)
+            self.assertIn(core_check_in, paths)
+            self.assertIn(core_identity_dialogue, paths)
             foundation_text = core_foundation_registry.read_text(encoding="utf-8")
             self.assertIn(
                 'Registry.REGISTRY_MODULE = '
@@ -381,7 +401,11 @@ class GenerationOwnershipTests(unittest.TestCase):
                 foundation_text,
             )
             self.assertIn(
-                '"PsychopatzCore/Semantics/Generated/Conversation/UI/StaticSuggestionsCore"',
+                '"PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreCheckIn"',
+                foundation_text,
+            )
+            self.assertIn(
+                '"PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreIdentity"',
                 foundation_text,
             )
             registry_text = registry.read_text(encoding="utf-8")

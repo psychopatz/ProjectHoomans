@@ -121,6 +121,18 @@ return {
         ["recordCount"] = 1,
     },
     {
+        ["domain"] = "core_check_in",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CoreCheckIn",
+        ["recordCount"] = 1,
+    },
+    {
+        ["domain"] = "core_identity",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/CoreIdentity",
+        ["recordCount"] = 1,
+    },
+    {
         ["domain"] = "trading",
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/Trading",
@@ -193,10 +205,16 @@ return {
         ["recordCount"] = 3,
     },
     {
-        ["domain"] = "static_suggestions",
+        ["domain"] = "core_check_in",
         ["kind"] = "ui",
-        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Ui/StaticSuggestions",
-        ["recordCount"] = 10,
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Ui/CoreCheckIn",
+        ["recordCount"] = 6,
+    },
+    {
+        ["domain"] = "core_identity",
+        ["kind"] = "ui",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Ui/CoreIdentity",
+        ["recordCount"] = 4,
     },
     {
         ["domain"] = "trading",

@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/Semantics/Generated/Conversation/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "5f004786fcd0b36eb18372fe179c59b7278f85fc871f04543b395c05e097a2c6"
-Registry.WHOLE_MODEL_FINGERPRINT = "ebd41a8376419780332afcaa4420f65ac22e901d898af06f9d7396a6af0d051d"
+Registry.WHOLE_MODEL_FINGERPRINT = "5a92511cd96bda0b99a558fd298db15593209ef405503841c50245507c74c58a"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -395,8 +395,10 @@ local loaded170 = require "PsychopatzCore/Semantics/Generated/Conversation/Reali
 local loaded171 = require "PsychopatzCore/Semantics/Generated/Conversation/Realization/Social/Lexemes"
 local loaded172 = require "PNC/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CompanionCheckIn"
 appendUI(loaded172)
-local loaded173 = require "PsychopatzCore/Semantics/Generated/Conversation/UI/StaticSuggestionsCore"
+local loaded173 = require "PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreCheckIn"
 appendUI(loaded173)
+local loaded174 = require "PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreIdentity"
+appendUI(loaded174)
 for key, family in pairs(Registry.PHRASE_FAMILIES) do
     if type(family) == "table" and family.id then Registry.PHRASE_FAMILIES[key] = family end
 end
