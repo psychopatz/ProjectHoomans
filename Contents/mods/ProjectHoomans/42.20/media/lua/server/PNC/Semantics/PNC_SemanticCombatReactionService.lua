@@ -198,11 +198,19 @@ local function ambientPayload(
         or context.presentationClass or "BARK"
     context.presentationClass = presentationClass
     if context.combatWeaponDisplayName then
-        realization.fallback = string.gsub(
-            realization.fallback,
+        -- ProjectHoomans projects the Core-owned typed weapon slot into the
+        -- existing combat moment authority at the final realization seam.
+        local weaponPlaceholders = {
+            "{slot.weapon.name}",
             "{combatWeaponDisplayName}",
-            function() return context.combatWeaponDisplayName end
-        )
+        }
+        for _, placeholder in ipairs(weaponPlaceholders) do
+            realization.fallback = string.gsub(
+                realization.fallback,
+                placeholder,
+                function() return context.combatWeaponDisplayName end
+            )
+        end
     end
     context.responsePlanID = realization.responsePlanID
     context.realizationFamily = realization.realizationFamily

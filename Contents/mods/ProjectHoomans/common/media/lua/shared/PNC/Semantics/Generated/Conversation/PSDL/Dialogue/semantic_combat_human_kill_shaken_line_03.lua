@@ -1,0 +1,157 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "combat_human_banter_human_kill_shaken",
+        ["id"] = "semantic.combat.human_kill.shaken.line_03",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.combat.human_kill.shaken.line_03",
+            ["sourcePath"] = "psdl/dialogue/combat_human_banter_human_kill_shaken.json#records[2]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_human_kill_shaken_line_03",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:combat_kill",
+                ["contentOwner"] = "projecthoomans.dialogue_content.combat_human",
+                ["responseTemplateID"] = "semantic.combat.human_kill.shaken.line_03",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/shaken.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "He's down... let's just get out of here.",
+                            },
+                            ["TL"] = {
+                                "Bagsak na siya... umalis na tayo rito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Please... can we just leave this place?",
+                            },
+                            ["TL"] = {
+                                "Pakiusap... pwede bang lumayo na tayo rito?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't search him. Let's just go.",
+                            },
+                            ["TL"] = {
+                                "Huwag mo na siyang kapkapan. Umalis na lang tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I don't want to be here anymore.",
+                            },
+                            ["TL"] = {
+                                "Ayoko nang manatili rito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "He's dead. We need to leave before others show up.",
+                            },
+                            ["TL"] = {
+                                "Patay na siya. Kailangan nating umalis bago may dumating pang iba.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Let's grab what we need and run.",
+                            },
+                            ["TL"] = {
+                                "Kuhanin ang kailangan at tumakbo na tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can't stay near his body. Come on.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko kayang tumayo malapit sa bangkay niya. Halika na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "He's dead... let's just move away.",
+                            },
+                            ["TL"] = {
+                                "Patay na siya... lumayo na tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Get me out of here. Please.",
+                            },
+                            ["TL"] = {
+                                "Ilayo mo ako rito. Pakiusap.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "It's done. Don't look back. Walk.",
+                            },
+                            ["TL"] = {
+                                "Tapos na. Huwag kang lilingon. Lakad.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/combat_human_banter_human_kill_shaken.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

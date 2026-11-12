@@ -1,0 +1,157 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "combat_kill_killer_cold",
+        ["id"] = "semantic.combat.reaction.kill_killer_cold_01",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["sourceId"] = "semantic.combat.reaction.kill_killer_cold_01",
+            ["sourcePath"] = "psdl/dialogue/combat_kill_killer_cold.json#records[0]",
+        },
+        ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_combat_reaction_kill_killer_cold_01",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:combat_kill",
+                ["contentOwner"] = "projecthoomans.dialogue_content.events",
+                ["responseTemplateID"] = "semantic.combat.reaction.kill_killer_cold_01",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/cold.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Done. Keep up.",
+                            },
+                            ["TL"] = {
+                                "Tapos. Sumabay ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Target neutralized. Walk.",
+                            },
+                            ["TL"] = {
+                                "Naalis ang target. Lakad.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Dead. Step across.",
+                            },
+                            ["TL"] = {
+                                "Patay na. Hakbangan mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Finished. Maintain speed.",
+                            },
+                            ["TL"] = {
+                                "Tapos na. Panatilihin ang bilis.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Threat ceased. Move.",
+                            },
+                            ["TL"] = {
+                                "Tumigil ang banta. Kilos.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Casualty verified. March.",
+                            },
+                            ["TL"] = {
+                                "Biktima kumpirmado. Magmartsa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Handled without delay. Keep up.",
+                            },
+                            ["TL"] = {
+                                "Naasikaso nang walang antala. Sumabay ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Neutralized. Continue the route.",
+                            },
+                            ["TL"] = {
+                                "Naitumba. Ipagpatuloy ang ruta.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Down. Walk past it.",
+                            },
+                            ["TL"] = {
+                                "Bagsak na. Lagpasan mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Dead. Move forward.",
+                            },
+                            ["TL"] = {
+                                "Patay. Pasulong.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/combat_kill_killer_cold.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

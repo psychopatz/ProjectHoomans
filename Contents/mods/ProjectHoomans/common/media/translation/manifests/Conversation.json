@@ -1,13 +1,9 @@
 {
   "languages": {
     "EN": [
-      "EN/Conversation/Combat.json",
-      "EN/Conversation/Combat_Banter.json",
-      "EN/Conversation/Combat_Human_Banter.json",
       "EN/Conversation/Command.json",
       "EN/Conversation/Compatibility.json",
       "EN/Conversation/Conversation.json",
-      "EN/Conversation/Event.json",
       "EN/Conversation/Flows.json",
       "EN/Conversation/Greeting.json",
       "EN/Conversation/Health.json",
@@ -29,13 +25,9 @@
       "EN/Conversation/WorldEvents/Events.json"
     ],
     "TL": [
-      "TL/Conversation/Combat.json",
-      "TL/Conversation/Combat_Banter.json",
-      "TL/Conversation/Combat_Human_Banter.json",
       "TL/Conversation/Command.json",
       "TL/Conversation/Compatibility.json",
       "TL/Conversation/Conversation.json",
-      "TL/Conversation/Event.json",
       "TL/Conversation/Flows.json",
       "TL/Conversation/Greeting.json",
       "TL/Conversation/Health.json",
