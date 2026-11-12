@@ -4,8 +4,8 @@ local Internal = Composer.Internal
 
 local ADMISSION_SOURCE = {
     modID = "ProjectHoomans",
-    pathPattern = "media/translation/{language}/Conversation/Text/social/greetings/settlement_admission/arrival.json",
-    domain = "pnc.greetings.settlement_admission.arrival",
+    pathPattern = "media/translation/{language}/Conversation/Text/psdl/social/greetings/settlement_admission/arrival.json",
+    domain = "pnc.psdl.social.greetings.settlement_admission.arrival",
 }
 local activeView = Internal.ActiveView
 local appendDiary = Internal.AppendDiary

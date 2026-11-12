@@ -151,6 +151,12 @@ return {
         ["recordCount"] = 21,
     },
     {
+        ["domain"] = "social_settlement_admission",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialSettlementAdmission",
+        ["recordCount"] = 1,
+    },
+    {
         ["domain"] = "trading",
         ["kind"] = "dialogue",
         ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/Trading",

@@ -67,6 +67,18 @@ local function relationshipGate(node)
     return nil
 end
 
+local function settlementVisitGate(node)
+    if type(node) ~= "table" then return nil end
+    local path = tostring(node.path or node.field or "")
+    if path ~= "relationship.settlementVisit.active"
+        or tostring(node.op or "eq") ~= "eq"
+        or node.value ~= true
+    then
+        return nil
+    end
+    return { type = "pnc:settlement_visit" }
+end
+
 local function timeGate(predicate)
     local startHour
     local endHour
@@ -130,6 +142,7 @@ local function gatesForPredicate(predicate)
         end
         if type(node.any) == "table" then return end
         local gate = relationshipGate(node)
+        if not gate then gate = settlementVisitGate(node) end
         if gate then output[#output + 1] = gate end
     end
     if type(predicate.all) == "table" then
@@ -192,8 +205,13 @@ local function registerPlan(plan)
     local blockID = tostring(values.runtimeBlockID or "")
     local category = tostring(values.category or "")
     local audience = tostring(values.audience or "")
+    local audiences = type(values.audiences) == "table"
+        and values.audiences or nil
+    if not audiences and audience ~= "" then audiences = { audience } end
     local source = textSource(plan)
-    if blockID == "" or category == "" or audience == "" or not source then
+    if blockID == "" or category == "" or not audiences
+        or #audiences == 0 or not source
+    then
         return false
     end
     local node = {
@@ -227,7 +245,7 @@ local function registerPlan(plan)
         schemaVersion = 1,
         ownerModID = OWNER,
         category = category,
-        audiences = { audience },
+        audiences = audiences,
         priority = tonumber(values.priority) or 0,
         weight = tonumber(values.weight) or 100,
         textSource = source,
@@ -240,6 +258,7 @@ local function registerPlan(plan)
 end
 
 local IDS = {
+    "social.settlement_admission",
     "social.ask_about.member",
     "social.ask_about.neutral",
     "social.ask_about.special",

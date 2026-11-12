@@ -371,6 +371,13 @@ local visitGreeting = Selector.SelectBlock(
 T.equal(visitGreeting.id,
     "projecthoomans:settlement_admission",
     "active settlement visit selects the dedicated desperate greeting")
+T.equal(visitGreeting.textSource.domain,
+    "pnc.psdl.social.greetings.settlement_admission.arrival",
+    "settlement admission uses adopter-owned PSDL text routing")
+T.equal(#visitGreeting.nodes.opening.textKeys, 3,
+    "settlement admission preserves all authored PSDL variants")
+T.equal(visitGreeting.gates[1].type, "pnc:settlement_visit",
+    "settlement admission preserves its semantic eligibility gate")
 local admissionChoice
 for _, choice in ipairs(visitingDefinition.nodes.menu.choices or {}) do
     if choice.id == "settlement_admission" then admissionChoice = choice end

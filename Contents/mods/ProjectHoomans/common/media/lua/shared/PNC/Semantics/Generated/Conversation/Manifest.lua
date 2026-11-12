@@ -3388,6 +3388,23 @@ return {
             ["sourceShard"] = "psdl/dialogue/social_greetings.json",
         },
         {
+            ["bytes"] = 4558,
+            ["domain"] = "social_settlement_admission",
+            ["kind"] = "PSDL",
+            ["module"] = "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/social_settlement_admission",
+            ["owner"] = "ProjectHoomans",
+            ["recordCount"] = 1,
+            ["recordIDs"] = {
+                "social.settlement_admission",
+            },
+            ["registryOwner"] = "ProjectHoomans",
+            ["shardOwner"] = "ProjectHoomans",
+            ["sourceOwner"] = "ProjectHoomans",
+            ["sourcePath"] = "tools/providers/pnc/codebuilder/sources/conversation/psdl/dialogue/social_settlement_admission.json",
+            ["sourceRepository"] = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans",
+            ["sourceShard"] = "psdl/dialogue/social_settlement_admission.json",
+        },
+        {
             ["bytes"] = 9064,
             ["domain"] = "social_check_in",
             ["kind"] = "PSDL",
@@ -4473,6 +4490,21 @@ return {
             ["sourceShard"] = "@index/dialogue/social_greetings",
         },
         {
+            ["bytes"] = 455,
+            ["domain"] = "social_settlement_admission",
+            ["indexKind"] = "dialogue",
+            ["kind"] = "Index",
+            ["module"] = "PNC/Semantics/Generated/Conversation/Index/Dialogue/SocialSettlementAdmission",
+            ["owner"] = "ProjectHoomans",
+            ["recordCount"] = 1,
+            ["recordIDs"] = {
+                "social.settlement_admission",
+            },
+            ["registryOwner"] = "ProjectHoomans",
+            ["shardOwner"] = "ProjectHoomans",
+            ["sourceShard"] = "@index/dialogue/social_settlement_admission",
+        },
+        {
             ["bytes"] = 722,
             ["domain"] = "trading",
             ["indexKind"] = "dialogue",
@@ -4924,12 +4956,12 @@ return {
             ["sourceShard"] = "@index/uiText/static_suggestions",
         },
         {
-            ["bytes"] = 8011,
+            ["bytes"] = 8238,
             ["domain"] = "index",
             ["kind"] = "IndexRegistry",
             ["module"] = "PNC/Semantics/Generated/Conversation/Index/Registry",
             ["owner"] = "ProjectHoomans",
-            ["recordCount"] = 41,
+            ["recordCount"] = 42,
             ["recordIDs"] = {
             },
             ["registryOwner"] = "ProjectHoomans",
@@ -4937,5 +4969,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "fdfedbe0384146f02f6b536bb113746a3fd622d5e9ab48907b6f54fdb126e6ca",
+    ["wholeModelFingerprint"] = "a12c9d07c1ae66f9649baf65e13a71686b787484b349fe8b8f62f4ec5f6510ff",
 }
