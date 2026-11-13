@@ -10,7 +10,7 @@ return {
         ["related"] = {
             "semantic.question.identity",
         },
-        ["source"] = "psdl/dialogue/core_knowledge_identity.json",
+        ["source"] = "dialogue/core_knowledge_identity/question_identity.json",
     },
     ["semantic.question.identity.known.guarded"] = {
         ["domain"] = "core_knowledge_identity",
@@ -19,7 +19,7 @@ return {
         },
         ["id"] = "semantic.question.identity.known.guarded",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/core_knowledge_identity.json",
+        ["source"] = "dialogue/core_knowledge_identity/question_identity_known.json",
     },
     ["semantic.question.identity.known.neutral"] = {
         ["domain"] = "core_knowledge_identity",
@@ -28,7 +28,7 @@ return {
         },
         ["id"] = "semantic.question.identity.known.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/core_knowledge_identity.json",
+        ["source"] = "dialogue/core_knowledge_identity/question_identity_known.json",
     },
     ["semantic.question.identity.known.terse"] = {
         ["domain"] = "core_knowledge_identity",
@@ -37,7 +37,7 @@ return {
         },
         ["id"] = "semantic.question.identity.known.terse",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/core_knowledge_identity.json",
+        ["source"] = "dialogue/core_knowledge_identity/question_identity_known.json",
     },
     ["semantic.question.identity.known.warm"] = {
         ["domain"] = "core_knowledge_identity",
@@ -46,7 +46,7 @@ return {
         },
         ["id"] = "semantic.question.identity.known.warm",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/core_knowledge_identity.json",
+        ["source"] = "dialogue/core_knowledge_identity/question_identity_known.json",
     },
     ["semantic.question.identity.neutral"] = {
         ["domain"] = "core_knowledge_identity",
@@ -58,7 +58,7 @@ return {
         ["related"] = {
             "semantic.question.identity",
         },
-        ["source"] = "psdl/dialogue/core_knowledge_identity.json",
+        ["source"] = "dialogue/core_knowledge_identity/question_identity.json",
     },
     ["semantic.question.identity.terse"] = {
         ["domain"] = "core_knowledge_identity",
@@ -70,7 +70,7 @@ return {
         ["related"] = {
             "semantic.question.identity",
         },
-        ["source"] = "psdl/dialogue/core_knowledge_identity.json",
+        ["source"] = "dialogue/core_knowledge_identity/question_identity.json",
     },
     ["semantic.question.identity.warm"] = {
         ["domain"] = "core_knowledge_identity",
@@ -82,6 +82,6 @@ return {
         ["related"] = {
             "semantic.question.identity",
         },
-        ["source"] = "psdl/dialogue/core_knowledge_identity.json",
+        ["source"] = "dialogue/core_knowledge_identity/question_identity.json",
     },
 }

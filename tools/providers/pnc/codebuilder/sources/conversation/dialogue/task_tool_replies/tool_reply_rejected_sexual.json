@@ -1,0 +1,291 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.rejected_sexual.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_sexual.json",
+        "responseTemplateID": "semantic.tool_reply.rejected_sexual.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That is not happening.",
+              "TL": "Hindi iyan mangyayari."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Not a chance. Forget about it.",
+              "TL": "Walang pag-asa. Kalimutan mo na."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I am not interested in that at all.",
+              "TL": "Hindi talaga ako interesado riyan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "That is completely off the table.",
+              "TL": "Wala sa pagpipilian 'yan kailanman."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "No. Never going to happen.",
+              "TL": "Hindi. Di kailanman mangyayari."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Absolutely not.",
+              "TL": "Hinding-hindi."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I'm shutting that down right now. No.",
+              "TL": "Papatayin ko ang paksang 'yan ngayon. Hindi."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "That won't be happening between us.",
+              "TL": "Hindi 'yan mangyayari sa pagitan natin."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Drop that idea entirely. Not happening.",
+              "TL": "Iwan mo nang buo ang ideyang 'yan. Di mangyayari."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "No means no. It's not happening.",
+              "TL": "Ang hindi ay hindi. Di mangyayari 'yan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.rejected_sexual.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_sexual.json",
+        "responseTemplateID": "semantic.tool_reply.rejected_sexual.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Do not talk to me like that.",
+              "TL": "Huwag mo akong kausapin nang ganyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Keep those inappropriate remarks to yourself.",
+              "TL": "Itago mo sa sarili mo ang di-angkop na mga salitang 'yan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "You're crossing serious personal boundaries.",
+              "TL": "Tumatawid ka sa seryosong personal na hangganan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "That's completely uncalled for. Stop.",
+              "TL": "Wala sa lugar 'yan. Tigil."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I don't appreciate that kind of talk.",
+              "TL": "Hindi ko gusto ang ganyang uri ng pananalita."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Keep your indecent propositions away from me.",
+              "TL": "Ilayo mo sa akin ang malaswang alok mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Watch how you speak to me. That's out of line.",
+              "TL": "Bantayan mo ang pagsasalita mo sa akin. Sobra na 'yan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "You need to show respect and stop talking like that.",
+              "TL": "Kailangan mong magpakita ng respeto at tumigil sa ganyang pananalita."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I won't be objectified out here. Back off.",
+              "TL": "Di ako magpapakababa rito. Umatras ka."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Shut your mouth. Don't speak to me that way.",
+              "TL": "Itikom mo ang bibig mo. Huwag mo akong kakausapin nang ganyan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.rejected_sexual.3",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_sexual.json",
+        "responseTemplateID": "semantic.tool_reply.rejected_sexual.3",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "You are moving far too fast.",
+              "TL": "Masyadong mabilis ang takbo mo."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Slow down. We are nowhere near that point.",
+              "TL": "Dahan-dahan. Malayo pa tayo sa puntong iyan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "You need to hit the brakes. That's way too fast.",
+              "TL": "Kailangan mong magpreno. Masyadong mabilis 'yan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Pace yourself. We barely know each other.",
+              "TL": "Huwag kang magmadali. Halos di pa nga tayo magkakilala."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "You're rushing into territory we haven't earned.",
+              "TL": "Nagmamadali ka sa lugar na di pa natin nararating."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Slow your roll. That's moving way too fast for me.",
+              "TL": "Dahan-dahan lang. Masyadong mabilis 'yan para sa akin."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Pull back. We have not built that kind of closeness.",
+              "TL": "Umatras ka. Wala pa tayong ganyang kalapit na ugnayan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "You're getting way ahead of where we stand.",
+              "TL": "Nauuna ka nang malayo sa kung ano lang tayo."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Take a massive step back. Way too fast.",
+              "TL": "Humakbang ka paatras nang malaki. Masyadong mabilis."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Slow down before you ruin whatever trust we have.",
+              "TL": "Magdahan-dahan ka bago mo sirain ang anumang tiwalang mayroon tayo."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

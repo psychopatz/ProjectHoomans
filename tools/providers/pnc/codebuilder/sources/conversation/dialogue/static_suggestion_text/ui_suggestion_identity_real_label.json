@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.identity.real.label",
+    "textRows": [
+      {
+        "key": "suggestion.identity.real.label",
+        "text": {
+          "EN": "Say your real name",
+          "TL": "Sabihin ang tunay mong pangalan"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Say your real name",
+    "TL": "Sabihin ang tunay mong pangalan"
+  },
+  "namespace": "ui.suggestion.identity.real",
+  "schema": "psychopatz.convo-engine.v1"
+}

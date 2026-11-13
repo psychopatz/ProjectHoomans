@@ -1,22 +1,16 @@
 -- Generated Conversation discovery index registry; do not edit by hand.
 return {
     {
-        ["domain"] = "social_director",
+        ["domain"] = "social",
         ["kind"] = "beat",
-        ["module"] = "PNC/ConvoEngine/Index/Beat/SocialDirector",
+        ["module"] = "PNC/ConvoEngine/Index/Beat/Social",
         ["recordCount"] = 3,
     },
     {
         ["domain"] = "social",
         ["kind"] = "behavior",
         ["module"] = "PNC/ConvoEngine/Index/Behavior/Social",
-        ["recordCount"] = 1,
-    },
-    {
-        ["domain"] = "social_director",
-        ["kind"] = "behavior",
-        ["module"] = "PNC/ConvoEngine/Index/Behavior/SocialDirector",
-        ["recordCount"] = 29,
+        ["recordCount"] = 30,
     },
     {
         ["domain"] = "combat_banter_weapon_kill_aggressive",

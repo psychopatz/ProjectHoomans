@@ -1,0 +1,96 @@
+{
+  "kind": "dialogue",
+  "id": "withdrawn",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/follow.json",
+    "responseTemplateID": "semantic.command.follow.queued.withdrawn"
+  },
+  "response": {
+    "act": "REPLY",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "I'll follow.",
+          "TL": "Susunod ako."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Fine. Walking behind you.",
+          "TL": "Sige. Lalakad sa likod mo."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Following. Whatever.",
+          "TL": "Sumusunod. Kahit ano pa."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Understood. Moving.",
+          "TL": "Naintindihan. Kumikilos."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Right behind. Don't stop suddenly.",
+          "TL": "Nasa likod lang. Huwag hihinto nang bigla."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "I'll keep up.",
+          "TL": "Sasabay ako."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Following. Keep going.",
+          "TL": "Sumusunod. Tuloy lang."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "All right. Let's go.",
+          "TL": "Sige. Tara na."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Behind you.",
+          "TL": "Nasa likod mo."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Moving along.",
+          "TL": "Sumasabay."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.command.follow.queued",
+  "schema": "psychopatz.convo-engine.v1"
+}

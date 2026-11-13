@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/disputes.json",
+        "responseTemplateID": "semantic.social.dispute_trusted",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "I still don't agree. Leave it there.",
+              "TL": "Hindi pa rin ako sang-ayon. Tama na."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "Even between us, I draw the line here.",
+              "TL": "Kahit sa ating dalawa, may hangganan ako rito."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "I trust you, but I won't back this decision.",
+              "TL": "Tiwala ako sa 'yo, pero di ko susuportahan ang desisyong ito."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "We've been through a lot, but I disagree on this.",
+              "TL": "Marami na tayong pinagdaanan, pero di ako sang-ayon dito."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Don't lean on our history to push a bad idea.",
+              "TL": "Huwag mong gamitin ang samahan natin para ipilit ang maling plano."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "I trust your survival skills, not this specific take.",
+              "TL": "Tiwala ako sa galing mo, pero hindi sa opinyong ito."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Stand down on this. I won't follow blindly.",
+              "TL": "Bumitiw ka rito. Hindi ako susunod nang pikit-mata."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Trust goes both ways. Hear my disagreement.",
+              "TL": "May dalawang panig ang tiwala. Pakinggan mo ang pagtutol ko."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "I won't let friendship blind me to a bad risk.",
+              "TL": "Hindi ko hahayaang bulagin ng samahan ang maling sugal."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "We're close, but on this, you're dead wrong.",
+              "TL": "Malapit tayo, pero rito, maling-mali ka."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.dispute_trusted"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/disputes.json",
+        "responseTemplateID": "semantic.social.dispute_trusted",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I trust your judgment usually, but not on this.",
+              "TL": "Kadalasan may tiwala ako sa desisyon mo, pero hindi ngayon."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "We've earned the right to speak plainly: I disagree.",
+              "TL": "Karapatan nating maging tapat: hindi ako sang-ayon."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Because I trust you, I'm telling you this is a mistake.",
+              "TL": "Dahil may tiwala ako sa 'yo, sasabihin kong pagkakamali ito."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I value our track record, but I have to push back here.",
+              "TL": "Mahalaga ang pinagsamahan natin, pero kailangan kong tumutol."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "You're one of the best survivors I know, but I disagree.",
+              "TL": "Isa ka sa pinakamagaling na nakilala ko, pero di ako sang-ayon."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Let's examine the facts together. Something doesn't add up.",
+              "TL": "Suriin nating mabuti ang katotohanan. May hindi tama."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I respect you too much to nod along when you're wrong.",
+              "TL": "Masyado kitang iginagalang para tumango kapag mali ka."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "We see this from two different angles.",
+              "TL": "Nakikita natin ito mula sa dalawang magkaibang anggulo."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Hear me out before you lock in your stance.",
+              "TL": "Pakinggan mo muna ako bago mo isara ang isip mo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "We have solid trust, so let's weigh the risks properly.",
+              "TL": "Matibay ang tiwala natin, kaya timbangin natin ang panganib."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.dispute_trusted"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/disputes.json",
+        "responseTemplateID": "semantic.social.dispute_trusted",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Not this time.",
+              "TL": "Hindi sa pagkakataong ito."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Trust you, but no.",
+              "TL": "Tiwala ako sa 'yo, pero hindi."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Bad call.",
+              "TL": "Maling pasya."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Disagree, partner.",
+              "TL": "Di ako sang-ayon, kasama."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Can't back it.",
+              "TL": "Di ko masusuportahan."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Wrong move.",
+              "TL": "Maling galaw."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Reconsider.",
+              "TL": "Pag-isipan mo ulit."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "I'm out on that.",
+              "TL": "Labas ako riyan."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "No dice.",
+              "TL": "Hindi uubra."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Think again.",
+              "TL": "Mag-isip ka ulit."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.dispute_trusted"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/disputes.json",
+        "responseTemplateID": "semantic.social.dispute_trusted",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "You know I'd follow you through hell, but not into this.",
+              "TL": "Alam mong sasamahan kita kahit saan, pero hindi sa bagay na ito."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "I love how bold you are, but this risk is too steep.",
+              "TL": "Hanga ako sa tapang mo, pero masyadong mataas ang sugal na ito."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Because I care about you, I have to say no to this.",
+              "TL": "Dahil nagmamalasakit ako sa 'yo, kailangan kong tumanggi rito."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "We've kept each other alive this long. Trust me on this disagreement.",
+              "TL": "Matagal na nating binubuhay ang isa't isa. Magtiwala ka sa pagtutol ko."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "You're my closest ally, so listen to my gut on this one.",
+              "TL": "Pinakamalapit kitang kasama, kaya pakinggan mo ang kutob ko."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "I'm telling you this because I want us both to live to see tomorrow.",
+              "TL": "Sinasabi ko ito dahil gusto kong mabuhay tayong pareho bukas."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "No matter what happens, we're solid. But I disagree here.",
+              "TL": "Kahit anong mangyari, matibay tayo. Pero di ako sang-ayon dito."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Let's find a compromise that keeps both of us safe.",
+              "TL": "Humanap tayo ng paraan na magpapanatiling ligtas sa ating dalawa."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "I value our bond above any single disagreement.",
+              "TL": "Mas mahalaga ang samahan natin kaysa sa anumang pagtatalo."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "We'll work it out together like we always do.",
+              "TL": "Aayusin natin ito nang magkasama gaya ng dati."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.dispute_trusted"
+    }
+  ]
+}

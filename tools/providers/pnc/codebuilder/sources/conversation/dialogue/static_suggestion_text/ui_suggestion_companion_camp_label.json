@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.companion_camp.label",
+    "textRows": [
+      {
+        "key": "suggestion.companion_camp.label",
+        "text": {
+          "EN": "Let's camp...",
+          "TL": "Magkampo tayo..."
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Let's camp...",
+    "TL": "Magkampo tayo..."
+  },
+  "namespace": "ui.suggestion.companion_camp",
+  "schema": "psychopatz.convo-engine.v1"
+}

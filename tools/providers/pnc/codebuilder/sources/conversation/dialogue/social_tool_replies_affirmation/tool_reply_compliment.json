@@ -1,0 +1,291 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.compliment.1.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/compliment.json",
+        "responseTemplateID": "semantic.tool_reply.compliment.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That is kind of you to say.",
+              "TL": "Mabait sa 'yo ang magsabi niyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Thank you. That is very nice of you.",
+              "TL": "Salamat. Napakabait mo naman."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I appreciate the kind words.",
+              "TL": "Salamat sa magagandang salita."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "That is generous of you. Thanks.",
+              "TL": "Mabuti ang puso mo. Salamat."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Thanks. It is rare to get compliments out here.",
+              "TL": "Salamat. Bihira ang papuri sa panahong ito."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "That puts a smile on my face. Thank you.",
+              "TL": "Napangiti mo ako roon. Salamat."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "You are too kind.",
+              "TL": "Napakabait mo talaga."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I appreciate that. Truly.",
+              "TL": "Pinahahalagahan ko talaga 'yan."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Thanks. I will take all the good words I can get.",
+              "TL": "Salamat. Tatanggapin ko ang anumang magandang salita ngayon."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Thank you. That brightens things up a bit.",
+              "TL": "Salamat. Nabigyan mo ng kaunting liwanag ang araw ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.compliment.2.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/compliment.json",
+        "responseTemplateID": "semantic.tool_reply.compliment.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I appreciate the compliment.",
+              "TL": "Salamat sa papuri."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Thanks for the compliment.",
+              "TL": "Salamat sa magandang sinabi mo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I will take the compliment. Thank you.",
+              "TL": "Tatanggapin ko ang papuri. Maraming salamat."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Much obliged for the kind thought.",
+              "TL": "Maraming salamat sa magandang kaisipan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Thanks. I work hard at what I do.",
+              "TL": "Salamat. Pinagsisikapan ko talaga ang ginagawa ko."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "That is good feedback to hear.",
+              "TL": "Magandang marinig ang ganitong puna."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Appreciated. I try to stay sharp.",
+              "TL": "Salamat. Sinisikap kong manatiling alerto."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Thank you. It means something coming from you.",
+              "TL": "Salamat. May halaga 'yan galing sa 'yo."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I am flattered. Thank you.",
+              "TL": "Natutuwa ako sa sinabi mo. Salamat."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Thanks. That boost is welcome.",
+              "TL": "Salamat. Nakakapagpalakas ng loob 'yan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.compliment.3.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/compliment.json",
+        "responseTemplateID": "semantic.tool_reply.compliment.3",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "You noticed. Thank you.",
+              "TL": "Napansin mo pala. Salamat."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Glad somebody noticed.",
+              "TL": "Mabuti naman at may nakapansin."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I was wondering if anyone would catch that. Thanks.",
+              "TL": "Iniisip ko nga kung may makakapansin niyan. Salamat."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Good eye. Thanks for noticing.",
+              "TL": "Matalas ang paningin mo. Salamat sa pagpansin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I put some effort into that. Good to see it showed.",
+              "TL": "Pinaghirapan ko 'yon. Mabuti at lumitaw."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Thanks. Nice to know it did not go unseen.",
+              "TL": "Salamat. Masarap malaman na hindi 'yon nabalewala."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "You have sharp observation skills. Thank you.",
+              "TL": "Alesto ka magmasid. Salamat."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Appreciate you noticing that detail.",
+              "TL": "Salamat at napansin mo ang detalyeng 'yon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I try my best. Thank you for noticing.",
+              "TL": "Ginagawa ko ang buong makakaya ko. Salamat sa pagpansin."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Thanks. That was worth the effort then.",
+              "TL": "Salamat. Naging sulit ang pagod ko dahil diyan."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.interaction.argument.deescalate.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.argument.deescalate.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_argument.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
+        ["namespace"] = "semantic.interaction.argument.deescalate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_argument.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.interaction.argument.deescalate.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.argument.deescalate.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_argument.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
+        ["namespace"] = "semantic.interaction.argument.deescalate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_argument.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.interaction.argument.deescalate.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.argument.deescalate.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_argument.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
+        ["namespace"] = "semantic.interaction.argument.deescalate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_argument.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.interaction.argument.deescalate.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.argument.deescalate.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_argument.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
+        ["namespace"] = "semantic.interaction.argument.deescalate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_argument.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_deescalate.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -629,12 +633,13 @@ return {
         ["id"] = "semantic.interaction.argument.retaliate.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.argument.retaliate.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_argument.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
+        ["namespace"] = "semantic.interaction.argument.retaliate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +777,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_argument.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,12 +790,13 @@ return {
         ["id"] = "semantic.interaction.argument.retaliate.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.argument.retaliate.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_argument.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
+        ["namespace"] = "semantic.interaction.argument.retaliate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -928,7 +934,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_argument.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -941,12 +947,13 @@ return {
         ["id"] = "semantic.interaction.argument.retaliate.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.argument.retaliate.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_argument.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
+        ["namespace"] = "semantic.interaction.argument.retaliate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1084,7 +1091,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_argument.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1097,12 +1104,13 @@ return {
         ["id"] = "semantic.interaction.argument.retaliate.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.argument.retaliate.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_argument.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionArgument",
+        ["namespace"] = "semantic.interaction.argument.retaliate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1240,7 +1248,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_argument.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_argument/interaction_argument_retaliate.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

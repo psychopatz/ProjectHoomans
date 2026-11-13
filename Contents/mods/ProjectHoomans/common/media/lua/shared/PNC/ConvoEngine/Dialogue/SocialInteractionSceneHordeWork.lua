@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_prompt.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.horde_prompt.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_prompt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_prompt.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.horde_prompt.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_prompt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_prompt.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.horde_prompt.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_prompt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_prompt.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.horde_prompt.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_prompt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_prompt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -629,12 +633,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_reply_brave.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.horde_reply_brave.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_brave.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_reply_brave",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +777,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_brave.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,12 +790,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_reply_brave.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.horde_reply_brave.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_brave.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_reply_brave",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -928,7 +934,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_brave.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -941,12 +947,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_reply_brave.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.horde_reply_brave.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_brave.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_reply_brave",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1084,7 +1091,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_brave.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1097,12 +1104,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_reply_brave.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.horde_reply_brave.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_brave.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_reply_brave",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1240,7 +1248,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_brave.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1253,12 +1261,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_reply_cautious.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.horde_reply_cautious.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_cautious.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_reply_cautious",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1396,7 +1405,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_cautious.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1409,12 +1418,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_reply_cautious.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.horde_reply_cautious.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_cautious.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_reply_cautious",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1552,7 +1562,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_cautious.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1565,12 +1575,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_reply_cautious.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.horde_reply_cautious.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_cautious.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_reply_cautious",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1708,7 +1719,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_cautious.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1721,12 +1732,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_reply_cautious.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.horde_reply_cautious.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_cautious.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_reply_cautious",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1864,7 +1876,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_cautious.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1877,12 +1889,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_reply_steady.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.horde_reply_steady.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[15]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_steady.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_reply_steady",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2020,7 +2033,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_steady.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2033,12 +2046,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_reply_steady.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.horde_reply_steady.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[12]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_steady.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_reply_steady",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2176,7 +2190,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_steady.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2189,12 +2203,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_reply_steady.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.horde_reply_steady.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[14]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_steady.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_reply_steady",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2332,7 +2347,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_steady.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2345,12 +2360,13 @@ return {
         ["id"] = "semantic.interaction.scene.horde_reply_steady.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.horde_reply_steady.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[13]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_steady.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.horde_reply_steady",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2488,7 +2504,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_horde_reply_steady.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2501,12 +2517,13 @@ return {
         ["id"] = "semantic.interaction.scene.post_combat_clear.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.post_combat_clear.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[19]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_post_combat_clear.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.post_combat_clear",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2644,7 +2661,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_post_combat_clear.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2657,12 +2674,13 @@ return {
         ["id"] = "semantic.interaction.scene.post_combat_clear.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.post_combat_clear.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[16]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_post_combat_clear.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.post_combat_clear",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2800,7 +2818,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_post_combat_clear.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2813,12 +2831,13 @@ return {
         ["id"] = "semantic.interaction.scene.post_combat_clear.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.post_combat_clear.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[18]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_post_combat_clear.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.post_combat_clear",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2956,7 +2975,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_post_combat_clear.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2969,12 +2988,13 @@ return {
         ["id"] = "semantic.interaction.scene.post_combat_clear.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.post_combat_clear.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[17]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_post_combat_clear.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.post_combat_clear",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3112,7 +3132,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_post_combat_clear.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3125,12 +3145,13 @@ return {
         ["id"] = "semantic.interaction.scene.task_work_assigned.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.task_work_assigned.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[23]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.task_work_assigned",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3268,7 +3289,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3281,12 +3302,13 @@ return {
         ["id"] = "semantic.interaction.scene.task_work_assigned.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.task_work_assigned.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[20]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.task_work_assigned",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3424,7 +3446,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3437,12 +3459,13 @@ return {
         ["id"] = "semantic.interaction.scene.task_work_assigned.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.task_work_assigned.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[22]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.task_work_assigned",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3580,7 +3603,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3593,12 +3616,13 @@ return {
         ["id"] = "semantic.interaction.scene.task_work_assigned.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.task_work_assigned.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[21]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.task_work_assigned",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3736,7 +3760,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_assigned.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3749,12 +3773,13 @@ return {
         ["id"] = "semantic.interaction.scene.task_work_completed.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.task_work_completed.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[27]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_completed.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.task_work_completed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3892,7 +3917,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_completed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3905,12 +3930,13 @@ return {
         ["id"] = "semantic.interaction.scene.task_work_completed.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.task_work_completed.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[24]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_completed.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.task_work_completed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4048,7 +4074,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_completed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4061,12 +4087,13 @@ return {
         ["id"] = "semantic.interaction.scene.task_work_completed.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.task_work_completed.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[26]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_completed.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.task_work_completed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4204,7 +4231,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_completed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4217,12 +4244,13 @@ return {
         ["id"] = "semantic.interaction.scene.task_work_completed.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.task_work_completed.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_horde_work.json#records[25]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_completed.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
+        ["namespace"] = "semantic.interaction.scene.task_work_completed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4360,7 +4388,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_horde_work.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_horde_work/interaction_scene_task_work_completed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

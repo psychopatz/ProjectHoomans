@@ -5,12 +5,13 @@ return {
         ["id"] = "social.greetings.acquaintance.dawn",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "dawn",
             ["sourceId"] = "social.greetings.acquaintance.dawn",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_acquaintance_dawn.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.acquaintance",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -111,7 +112,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_acquaintance_dawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -146,12 +147,13 @@ return {
         ["id"] = "social.greetings.acquaintance.dusk",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "dusk",
             ["sourceId"] = "social.greetings.acquaintance.dusk",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_acquaintance_dusk.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.acquaintance",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -252,7 +254,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_acquaintance_dusk.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -287,12 +289,13 @@ return {
         ["id"] = "social.greetings.acquaintance.sunrise",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "sunrise",
             ["sourceId"] = "social.greetings.acquaintance.sunrise",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_acquaintance_sunrise.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.acquaintance",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -393,7 +396,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_acquaintance_sunrise.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -428,12 +431,13 @@ return {
         ["id"] = "social.greetings.acquaintance.sunset",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "sunset",
             ["sourceId"] = "social.greetings.acquaintance.sunset",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_acquaintance_sunset.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.acquaintance",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -534,7 +538,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_acquaintance_sunset.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -569,12 +573,13 @@ return {
         ["id"] = "social.greetings.acquaintance.twilight",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "twilight",
             ["sourceId"] = "social.greetings.acquaintance.twilight",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_acquaintance_twilight.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.acquaintance",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -675,7 +680,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_acquaintance_twilight.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -710,12 +715,13 @@ return {
         ["id"] = "social.greetings.firstmeet.dawn",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "dawn",
             ["sourceId"] = "social.greetings.firstmeet.dawn",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_firstmeet_dawn.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.firstmeet",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -816,7 +822,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_firstmeet_dawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -851,12 +857,13 @@ return {
         ["id"] = "social.greetings.firstmeet.dusk",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "dusk",
             ["sourceId"] = "social.greetings.firstmeet.dusk",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[14]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_firstmeet_dusk.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.firstmeet",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -957,7 +964,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_firstmeet_dusk.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -992,12 +999,13 @@ return {
         ["id"] = "social.greetings.firstmeet.sunrise",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "sunrise",
             ["sourceId"] = "social.greetings.firstmeet.sunrise",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[12]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_firstmeet_sunrise.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.firstmeet",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1098,7 +1106,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_firstmeet_sunrise.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1133,12 +1141,13 @@ return {
         ["id"] = "social.greetings.firstmeet.sunset",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "sunset",
             ["sourceId"] = "social.greetings.firstmeet.sunset",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[13]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_firstmeet_sunset.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.firstmeet",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1239,7 +1248,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_firstmeet_sunset.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1274,12 +1283,13 @@ return {
         ["id"] = "social.greetings.firstmeet.twilight",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "twilight",
             ["sourceId"] = "social.greetings.firstmeet.twilight",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[15]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_firstmeet_twilight.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.firstmeet",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1380,7 +1390,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_firstmeet_twilight.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1415,12 +1425,13 @@ return {
         ["id"] = "social.greetings.hostile.parley",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "parley",
             ["sourceId"] = "social.greetings.hostile.parley",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_hostile_parley.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.hostile",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1563,7 +1574,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_hostile_parley.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1576,12 +1587,13 @@ return {
         ["id"] = "social.greetings.lover.dawn",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "dawn",
             ["sourceId"] = "social.greetings.lover.dawn",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[16]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_lover_dawn.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.lover",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1682,7 +1694,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_lover_dawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1717,12 +1729,13 @@ return {
         ["id"] = "social.greetings.lover.dusk",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "dusk",
             ["sourceId"] = "social.greetings.lover.dusk",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[19]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_lover_dusk.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.lover",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1823,7 +1836,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_lover_dusk.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1858,12 +1871,13 @@ return {
         ["id"] = "social.greetings.lover.sunrise",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "sunrise",
             ["sourceId"] = "social.greetings.lover.sunrise",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[17]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_lover_sunrise.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.lover",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1964,7 +1978,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_lover_sunrise.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1999,12 +2013,13 @@ return {
         ["id"] = "social.greetings.lover.sunset",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "sunset",
             ["sourceId"] = "social.greetings.lover.sunset",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[18]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_lover_sunset.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.lover",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2105,7 +2120,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_lover_sunset.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2140,12 +2155,13 @@ return {
         ["id"] = "social.greetings.lover.twilight",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "twilight",
             ["sourceId"] = "social.greetings.lover.twilight",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[20]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_lover_twilight.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.lover",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2246,7 +2262,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_lover_twilight.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2281,12 +2297,13 @@ return {
         ["id"] = "social.greetings.member.dawn",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "dawn",
             ["sourceId"] = "social.greetings.member.dawn",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_member_dawn.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.member",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2387,7 +2404,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_member_dawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2422,12 +2439,13 @@ return {
         ["id"] = "social.greetings.member.dusk",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "dusk",
             ["sourceId"] = "social.greetings.member.dusk",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_member_dusk.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.member",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2528,7 +2546,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_member_dusk.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2563,12 +2581,13 @@ return {
         ["id"] = "social.greetings.member.sunrise",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "sunrise",
             ["sourceId"] = "social.greetings.member.sunrise",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_member_sunrise.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.member",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2669,7 +2688,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_member_sunrise.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2704,12 +2723,13 @@ return {
         ["id"] = "social.greetings.member.sunset",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "sunset",
             ["sourceId"] = "social.greetings.member.sunset",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_member_sunset.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.member",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2810,7 +2830,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_member_sunset.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2845,12 +2865,13 @@ return {
         ["id"] = "social.greetings.member.twilight",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "twilight",
             ["sourceId"] = "social.greetings.member.twilight",
-            ["sourcePath"] = "psdl/dialogue/social_greetings.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_member_twilight.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialGreetings",
+        ["namespace"] = "social.greetings.member",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2951,7 +2972,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_greetings.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_greetings/social_greetings_member_twilight.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

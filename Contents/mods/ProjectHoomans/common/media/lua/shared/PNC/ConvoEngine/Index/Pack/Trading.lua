@@ -10,6 +10,6 @@ return {
         },
         ["id"] = "pack.DT.trader_story",
         ["kind"] = "pack",
-        ["source"] = "psdl/dialogue/trading.json",
+        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_suggestions.json",
     },
 }

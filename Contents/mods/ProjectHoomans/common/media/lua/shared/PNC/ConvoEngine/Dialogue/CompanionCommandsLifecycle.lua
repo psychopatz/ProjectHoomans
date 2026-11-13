@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.command.camp.failed",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "failed",
             ["sourceId"] = "semantic.command.camp.failed",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_failed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.camp",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -147,7 +148,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -160,12 +161,13 @@ return {
         ["id"] = "semantic.command.camp.queued",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "queued",
             ["sourceId"] = "semantic.command.camp.queued",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_queued.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.camp",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -302,7 +304,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -315,12 +317,13 @@ return {
         ["id"] = "semantic.command.camp.queued.friendly",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "friendly",
             ["sourceId"] = "semantic.command.camp.queued.friendly",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_queued.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.camp.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -457,7 +460,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -470,12 +473,13 @@ return {
         ["id"] = "semantic.command.camp.queued.repeated",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "repeated",
             ["sourceId"] = "semantic.command.camp.queued.repeated",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_queued_repeated.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.camp.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -612,7 +616,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_queued_repeated.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -625,12 +629,13 @@ return {
         ["id"] = "semantic.command.camp.queued.trusted",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "trusted",
             ["sourceId"] = "semantic.command.camp.queued.trusted",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_queued_trusted.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.camp.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -767,7 +772,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_queued_trusted.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -780,12 +785,13 @@ return {
         ["id"] = "semantic.command.camp.queued.withdrawn",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "withdrawn",
             ["sourceId"] = "semantic.command.camp.queued.withdrawn",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_queued_withdrawn.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.camp.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -922,7 +928,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_queued_withdrawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -935,12 +941,13 @@ return {
         ["id"] = "semantic.command.camp.rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "rejected",
             ["sourceId"] = "semantic.command.camp.rejected",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_rejected.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.camp",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1077,7 +1084,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_rejected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1090,12 +1097,13 @@ return {
         ["id"] = "semantic.command.follow.failed",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "failed",
             ["sourceId"] = "semantic.command.follow.failed",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_failed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.follow",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1232,7 +1240,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1245,12 +1253,13 @@ return {
         ["id"] = "semantic.command.follow.queued",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "queued",
             ["sourceId"] = "semantic.command.follow.queued",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_queued.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.follow",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1387,7 +1396,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1400,12 +1409,13 @@ return {
         ["id"] = "semantic.command.follow.queued.friendly",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "friendly",
             ["sourceId"] = "semantic.command.follow.queued.friendly",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_queued.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.follow.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1542,7 +1552,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1555,12 +1565,13 @@ return {
         ["id"] = "semantic.command.follow.queued.repeated",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "repeated",
             ["sourceId"] = "semantic.command.follow.queued.repeated",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_queued_repeated.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.follow.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1697,7 +1708,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_queued_repeated.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1710,12 +1721,13 @@ return {
         ["id"] = "semantic.command.follow.queued.trusted",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "trusted",
             ["sourceId"] = "semantic.command.follow.queued.trusted",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_queued_trusted.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.follow.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1852,7 +1864,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_queued_trusted.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1865,12 +1877,13 @@ return {
         ["id"] = "semantic.command.follow.queued.withdrawn",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "withdrawn",
             ["sourceId"] = "semantic.command.follow.queued.withdrawn",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[12]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_queued_withdrawn.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.follow.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2007,7 +2020,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_queued_withdrawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2020,12 +2033,13 @@ return {
         ["id"] = "semantic.command.follow.rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "rejected",
             ["sourceId"] = "semantic.command.follow.rejected",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[13]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_rejected.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.follow",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2162,7 +2176,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_follow_rejected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2175,12 +2189,13 @@ return {
         ["id"] = "semantic.command.return_home.failed",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "failed",
             ["sourceId"] = "semantic.command.return_home.failed",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[14]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_failed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.return_home",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2317,7 +2332,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2330,12 +2345,13 @@ return {
         ["id"] = "semantic.command.return_home.queued",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "queued",
             ["sourceId"] = "semantic.command.return_home.queued",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[15]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_queued.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.return_home",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2472,7 +2488,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2485,12 +2501,13 @@ return {
         ["id"] = "semantic.command.return_home.queued.friendly",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "friendly",
             ["sourceId"] = "semantic.command.return_home.queued.friendly",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[16]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_queued.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.return_home.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2627,7 +2644,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2640,12 +2657,13 @@ return {
         ["id"] = "semantic.command.return_home.queued.repeated",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "repeated",
             ["sourceId"] = "semantic.command.return_home.queued.repeated",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[17]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_queued_repeated.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.return_home.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2782,7 +2800,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_queued_repeated.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2795,12 +2813,13 @@ return {
         ["id"] = "semantic.command.return_home.queued.trusted",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "trusted",
             ["sourceId"] = "semantic.command.return_home.queued.trusted",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[18]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_queued_trusted.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.return_home.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2937,7 +2956,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_queued_trusted.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2950,12 +2969,13 @@ return {
         ["id"] = "semantic.command.return_home.queued.withdrawn",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "withdrawn",
             ["sourceId"] = "semantic.command.return_home.queued.withdrawn",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[19]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_queued_withdrawn.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.return_home.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3092,7 +3112,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_queued_withdrawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3105,12 +3125,13 @@ return {
         ["id"] = "semantic.command.return_home.rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "rejected",
             ["sourceId"] = "semantic.command.return_home.rejected",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[20]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_rejected.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.return_home",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3247,7 +3268,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_return_home_rejected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3260,12 +3281,13 @@ return {
         ["id"] = "semantic.command.stay.failed",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "failed",
             ["sourceId"] = "semantic.command.stay.failed",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[21]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_failed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.stay",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3402,7 +3424,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3415,12 +3437,13 @@ return {
         ["id"] = "semantic.command.stay.queued",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "queued",
             ["sourceId"] = "semantic.command.stay.queued",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[22]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_queued.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.stay",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3557,7 +3580,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3570,12 +3593,13 @@ return {
         ["id"] = "semantic.command.stay.queued.friendly",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "friendly",
             ["sourceId"] = "semantic.command.stay.queued.friendly",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[23]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_queued.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.stay.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3712,7 +3736,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3725,12 +3749,13 @@ return {
         ["id"] = "semantic.command.stay.queued.repeated",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "repeated",
             ["sourceId"] = "semantic.command.stay.queued.repeated",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[24]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_queued_repeated.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.stay.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3867,7 +3892,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_queued_repeated.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3880,12 +3905,13 @@ return {
         ["id"] = "semantic.command.stay.queued.trusted",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "trusted",
             ["sourceId"] = "semantic.command.stay.queued.trusted",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[25]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_queued_trusted.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.stay.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4022,7 +4048,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_queued_trusted.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4035,12 +4061,13 @@ return {
         ["id"] = "semantic.command.stay.queued.withdrawn",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "withdrawn",
             ["sourceId"] = "semantic.command.stay.queued.withdrawn",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[26]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_queued_withdrawn.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.stay.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4177,7 +4204,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_queued_withdrawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4190,12 +4217,13 @@ return {
         ["id"] = "semantic.command.stay.rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "rejected",
             ["sourceId"] = "semantic.command.stay.rejected",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[27]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_rejected.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.stay",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4332,7 +4360,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stay_rejected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4345,12 +4373,13 @@ return {
         ["id"] = "semantic.command.stop_following.failed",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "failed",
             ["sourceId"] = "semantic.command.stop_following.failed",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[28]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stop_following_failed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.stop_following",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4487,7 +4516,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stop_following_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4500,12 +4529,13 @@ return {
         ["id"] = "semantic.command.stop_following.queued",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "queued",
             ["sourceId"] = "semantic.command.stop_following.queued",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[29]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stop_following_queued.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.stop_following",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4642,7 +4672,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stop_following_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4655,12 +4685,13 @@ return {
         ["id"] = "semantic.command.stop_following.queued.friendly",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "friendly",
             ["sourceId"] = "semantic.command.stop_following.queued.friendly",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[30]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stop_following_queued.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
+        ["namespace"] = "semantic.command.stop_following.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4797,162 +4828,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "companion_commands_lifecycle",
-        ["id"] = "semantic.command.stop_following.queued.repeated",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["migrationReadOnly"] = true,
-            ["sourceId"] = "semantic.command.stop_following.queued.repeated",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_lifecycle.json#records[31]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["category"] = "projecthoomans:companion_commands",
-                ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
-                ["responseTemplateID"] = "semantic.command.stop_following.queued.repeated",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/stop_following.json",
-            },
-            ["response"] = {
-                ["act"] = "REPLY",
-                ["variants"] = {
-                    {
-                        ["id"] = "neutral.01",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I've already stopped following.",
-                            },
-                            ["TL"] = {
-                                "Tumigil na ako sa pagsunod.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.02",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm already standing still. Not following you.",
-                            },
-                            ["TL"] = {
-                                "Nakatayo na nga ako. Di na kita sinusundan.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.03",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Already halted. Look, I'm not moving.",
-                            },
-                            ["TL"] = {
-                                "Huminto na. Tingnan mo, di ako gumagalaw.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.04",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I stopped following after the first command.",
-                            },
-                            ["TL"] = {
-                                "Huminto na ako sa pagsunod pagkatapos ng unang utos.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.05",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Still not following you. I'm right here.",
-                            },
-                            ["TL"] = {
-                                "Di pa rin kita sinusundan. Narito lang ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.06",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Already stopped. Go ahead without me.",
-                            },
-                            ["TL"] = {
-                                "Huminto na. Sige na, mauna ka nang wala ako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.07",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm not following anymore, I promise.",
-                            },
-                            ["TL"] = {
-                                "Di na kita sinusundan, pangako.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.08",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Already stationary. No need to tell me again.",
-                            },
-                            ["TL"] = {
-                                "Nakatigil na ako. Di na kailangang sabihin ulit.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.09",
-                        ["text"] = {
-                            ["EN"] = {
-                                "I've been stopped for a while now.",
-                            },
-                            ["TL"] = {
-                                "Kanina pa ako huminto.",
-                            },
-                        },
-                    },
-                    {
-                        ["id"] = "neutral.10",
-                        ["text"] = {
-                            ["EN"] = {
-                                "Still halted. Move along freely.",
-                            },
-                            ["TL"] = {
-                                "Nakatigil pa rin. Lumakad ka na nang malaya.",
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_stop_following_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

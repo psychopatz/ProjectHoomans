@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.trade.label",
+    "textRows": [
+      {
+        "key": "suggestion.trade.label",
+        "text": {
+          "EN": "Open trading",
+          "TL": "Buksan ang kalakalan"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Open trading",
+    "TL": "Buksan ang kalakalan"
+  },
+  "namespace": "ui.suggestion.trade",
+  "schema": "psychopatz.convo-engine.v1"
+}

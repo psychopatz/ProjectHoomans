@@ -78,8 +78,8 @@ class ConversationContextHealthC5Tests(unittest.TestCase):
     def test_generated_paths_explain_canonical_ownership(self) -> None:
         modules = {row["module"]: row for row in self.reports}
         expected = {
-            "PNC/ConvoEngine/Dialogue/semantic_command_player_follow":
-                "psdl/dialogue/companion_commands_player.json",
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer":
+                "adopters/hoomans/dialogue/companion_commands_player/command_player_attack_auto.json",
             "PNC/ConvoEngine/Content/Social/ToolReplies/Hostile":
                 "content/social/tool_replies/hostile.json",
             "PNC/ConvoEngine/Content/Task/Lifecycle/Eat":
@@ -106,7 +106,7 @@ class ConversationContextHealthC5Tests(unittest.TestCase):
             explicit_paths,
         )
         self.assertIn(
-            "psdl/dialogue/companion_commands_lifecycle.json",
+            "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp_failed.json",
             self.model["_source_documents"],
         )
         roots = {row["path"] for row in manifest["sourceRoots"]}

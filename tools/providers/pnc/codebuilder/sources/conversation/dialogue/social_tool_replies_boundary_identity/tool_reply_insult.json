@@ -1,0 +1,291 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.insult.1.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/insult.json",
+        "responseTemplateID": "semantic.tool_reply.insult.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Is that supposed to bother me?",
+              "TL": "Iniisip mo bang maaapektuhan ako riyan?"
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "You will have to do better than that.",
+              "TL": "Kailangan mong galingan kaysa riyan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I have heard worse from better people.",
+              "TL": "Nakarining na ako ng mas masakit sa mas matitinong tao."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "That did not even scratch me.",
+              "TL": "Ni hindi ako nagasgasan sa sinabi mo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Save your breath. It does not work.",
+              "TL": "Huwag mong sayangin ang laway mo. Walang talab 'yan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Is that the best you can come up with?",
+              "TL": "Iyan na ba ang pinakamagaling na kaya mong sabihin?"
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Weak. Try harder next time.",
+              "TL": "Mahina. Pagbutihin mo sa susunod."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Words do not hurt out here. Bullets do.",
+              "TL": "Hindi nakakasakit ang salita rito. Ang bala ang nakakamatay."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "You think that gets under my skin? Think again.",
+              "TL": "Akala mo ba tatablan ako niyan? Mag-isip ka ulit."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Not impressed.",
+              "TL": "Hindi ako humanga."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.insult.2.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/insult.json",
+        "responseTemplateID": "semantic.tool_reply.insult.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "You are barking up the wrong tree.",
+              "TL": "Maling tao ang binabangga mo."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "You are picking a fight you cannot win.",
+              "TL": "Naghahanap ka ng away na hindi mo kayang ipanalo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "You really picked the wrong person to cross.",
+              "TL": "Maling-mali ang taong napili mong galitin."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Careful. You are playing with someone who will bite back.",
+              "TL": "Mag-ingat ka. Lalaban ang binabangga mo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "You do not know who you are dealing with.",
+              "TL": "Hindi mo alam kung sino ang kaharap mo."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Wrong move, friend.",
+              "TL": "Maling diskarte 'yan, kaibigan."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "You are treading on thin ice.",
+              "TL": "Nasa napakanipis kang yelo ngayon."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Pick on someone else. I am not the one.",
+              "TL": "Humanap ka ng iba. Hindi ako ang papayag sa ganyan."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "You made a very bad choice just now.",
+              "TL": "Napakasama ng naging desisyon mo ngayon lang."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "You are pushing someone who does not back down.",
+              "TL": "Itinutulak mo ang taong hindi umaatras."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.insult.3.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/insult.json",
+        "responseTemplateID": "semantic.tool_reply.insult.3",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Save your breath.",
+              "TL": "Huwag mong sayangin ang laway mo."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Not worth my time.",
+              "TL": "Hindi sulit ang oras ko sa 'yo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Done talking to you.",
+              "TL": "Tapos na akong makipag-usap sa 'yo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "You are wasting both our time.",
+              "TL": "Sinasayang mo lang ang oras nating dalawa."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I am not wasting oxygen on you.",
+              "TL": "Hindi ako magsasayang ng hangin para sa 'yo."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Walk away before you say something worse.",
+              "TL": "Umalis ka na bago ka pa makapagsalita ng mas masama."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I do not have time for childish games.",
+              "TL": "Wala akong panahon sa pambatang laro."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Keep it to yourself.",
+              "TL": "Itago mo na lang sa sarili mo 'yan."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Whatever. Get lost.",
+              "TL": "Bahala ka. Lumayas ka na."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I have real survival to worry about. Shut up.",
+              "TL": "May tunay akong kaligtasan na dapat asikasuhin. Manahimik ka."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

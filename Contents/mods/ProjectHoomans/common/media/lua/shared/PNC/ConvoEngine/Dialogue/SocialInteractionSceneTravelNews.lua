@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_departing.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.excursion_departing.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_departing.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_departing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_departing.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_departing.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.excursion_departing.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_departing.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_departing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_departing.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_departing.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.excursion_departing.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_departing.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_departing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_departing.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_departing.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.excursion_departing.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_departing.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_departing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_departing.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -629,12 +633,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_failed.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.excursion_failed.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[19]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_failed.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_failed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +777,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,12 +790,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_failed.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.excursion_failed.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[16]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_failed.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_failed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -928,7 +934,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -941,12 +947,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_failed.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.excursion_failed.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[18]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_failed.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_failed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1084,7 +1091,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1097,12 +1104,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_failed.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.excursion_failed.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[17]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_failed.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_failed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1240,7 +1248,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1253,12 +1261,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_home.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.excursion_home.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[15]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_home.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_home",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1396,7 +1405,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_home.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1409,12 +1418,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_home.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.excursion_home.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[12]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_home.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_home",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1552,7 +1562,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_home.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1565,12 +1575,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_home.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.excursion_home.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[14]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_home.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_home",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1708,7 +1719,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_home.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1721,12 +1732,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_home.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.excursion_home.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[13]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_home.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_home",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1864,7 +1876,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_home.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1877,12 +1889,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_preparing.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.excursion_preparing.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_preparing.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_preparing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2020,7 +2033,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_preparing.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2033,12 +2046,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_preparing.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.excursion_preparing.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_preparing.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_preparing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2176,7 +2190,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_preparing.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2189,12 +2203,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_preparing.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.excursion_preparing.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_preparing.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_preparing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2332,7 +2347,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_preparing.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2345,12 +2360,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_preparing.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.excursion_preparing.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_preparing.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_preparing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2488,7 +2504,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_preparing.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2501,12 +2517,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_returning.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.excursion_returning.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_returning.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_returning",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2644,7 +2661,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_returning.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2657,12 +2674,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_returning.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.excursion_returning.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_returning.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_returning",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2800,7 +2818,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_returning.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2813,12 +2831,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_returning.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.excursion_returning.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_returning.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_returning",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2956,7 +2975,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_returning.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2969,12 +2988,13 @@ return {
         ["id"] = "semantic.interaction.scene.excursion_returning.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.excursion_returning.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_returning.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.excursion_returning",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3112,7 +3132,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_excursion_returning.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3125,12 +3145,13 @@ return {
         ["id"] = "semantic.interaction.scene.grounded_news_answer.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.grounded_news_answer.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[27]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_answer.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.grounded_news_answer",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3268,7 +3289,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_answer.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3281,12 +3302,13 @@ return {
         ["id"] = "semantic.interaction.scene.grounded_news_answer.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.grounded_news_answer.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[24]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_answer.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.grounded_news_answer",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3424,7 +3446,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_answer.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3437,12 +3459,13 @@ return {
         ["id"] = "semantic.interaction.scene.grounded_news_answer.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.grounded_news_answer.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[26]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_answer.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.grounded_news_answer",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3580,7 +3603,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_answer.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3593,12 +3616,13 @@ return {
         ["id"] = "semantic.interaction.scene.grounded_news_answer.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.grounded_news_answer.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[25]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_answer.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.grounded_news_answer",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3736,7 +3760,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_answer.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3749,12 +3773,13 @@ return {
         ["id"] = "semantic.interaction.scene.grounded_news_share.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.scene.grounded_news_share.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[23]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_share.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.grounded_news_share",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3892,7 +3917,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_share.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3905,12 +3930,13 @@ return {
         ["id"] = "semantic.interaction.scene.grounded_news_share.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.scene.grounded_news_share.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[20]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_share.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.grounded_news_share",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4048,7 +4074,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_share.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4061,12 +4087,13 @@ return {
         ["id"] = "semantic.interaction.scene.grounded_news_share.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.scene.grounded_news_share.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[22]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_share.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.grounded_news_share",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4204,7 +4231,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_share.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4217,12 +4244,13 @@ return {
         ["id"] = "semantic.interaction.scene.grounded_news_share.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.scene.grounded_news_share.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_travel_news.json#records[21]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_share.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
+        ["namespace"] = "semantic.interaction.scene.grounded_news_share",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4360,7 +4388,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_travel_news.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_travel_news/interaction_scene_grounded_news_share.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

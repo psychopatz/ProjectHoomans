@@ -1,0 +1,291 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.comfort.1.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/comfort.json",
+        "responseTemplateID": "semantic.tool_reply.comfort.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Thanks. I needed that.",
+              "TL": "Salamat. Kailangan ko talaga 'yon."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I appreciate that. It has been a rough stretch.",
+              "TL": "Salamat. Napakahirap ng mga nakaraang araw."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Thanks. Sometimes you just need to hear that.",
+              "TL": "Salamat. Minsan kailangan mo lang marinig ang ganoon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "That helps steady my nerves. Thank you.",
+              "TL": "Nakakatulong 'yan para kumalma ako. Salamat."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I did not know how much I needed to hear that. Thanks.",
+              "TL": "Hindi ko alam na kailangan ko palang marinig 'yan. Salamat."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Thank you. That takes some of the weight off.",
+              "TL": "Maraming salamat. Nabawasan ang bigat sa dibdib ko."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I am glad you said that. Thanks.",
+              "TL": "Mabuti at sinabi mo 'yan. Salamat."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Much appreciated. Really.",
+              "TL": "Talagang pinahahalagahan ko. Salamat."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Thanks for checking in on me.",
+              "TL": "Salamat sa pangungumusta sa akin."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "That makes a difference. Thank you.",
+              "TL": "Malaki ang nagagawa niyan. Salamat."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.comfort.2.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/comfort.json",
+        "responseTemplateID": "semantic.tool_reply.comfort.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I appreciate you being here.",
+              "TL": "Salamat at narito ka."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Having you nearby makes this easier.",
+              "TL": "Mas madali ang lahat kapag kasama kita rito."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Good to know I am not facing this alone.",
+              "TL": "Mabuting malaman na hindi ako nag-iisa sa laban na 'to."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Thanks for sticking with me.",
+              "TL": "Salamat sa pananatili sa tabi ko."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "It is easier having someone reliable around. Thank you.",
+              "TL": "Mas magaan kapag may mapagkakatiwalaan kang kasama. Salamat."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I am glad you are on my side.",
+              "TL": "Mabuti at kakampi kita."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Thanks for being here. It counts for a lot.",
+              "TL": "Salamat sa presensya mo. Malaking bagay ito."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "You being around keeps me grounded.",
+              "TL": "Ang pananatili mo rito ay nagpapahinahon sa akin."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I am thankful we crossed paths.",
+              "TL": "Nagpapasalamat ako at nagkasama tayo rito."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Thanks. Do not go wandering off too far.",
+              "TL": "Salamat. Huwag kang lalayo masyado."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.comfort.3.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/comfort.json",
+        "responseTemplateID": "semantic.tool_reply.comfort.3",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That helps more than I expected.",
+              "TL": "Mas nakakatulong 'yan kaysa sa inasahan ko."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I feel a bit better hearing that.",
+              "TL": "Medyo gumaan ang pakiramdam ko nang marinig 'yan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "That took some edge off the stress.",
+              "TL": "Nabawasan ang kaba ko sa sinabi mo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Honestly, that clears my head a little.",
+              "TL": "Sa totoo lang, luminaw nang kaunti ang isip ko."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "That actually helped. Thank you.",
+              "TL": "Talagang nakatulong 'yon. Salamat."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I can breathe a little easier now.",
+              "TL": "Medyo nakakahinga na ako nang maluwag."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Thanks. That takes the bite out of things.",
+              "TL": "Salamat. Nabawasan ang tindi ng sitwasyon."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I needed a reminder that we can handle this.",
+              "TL": "Kailangan ko ng paalala na kaya natin 'to."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "You have a calming effect. Thanks.",
+              "TL": "Nakakapagpakalma ka. Salamat."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "That put things back into perspective for me.",
+              "TL": "Nailagay muli niyan sa tamang ayos ang pananaw ko."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

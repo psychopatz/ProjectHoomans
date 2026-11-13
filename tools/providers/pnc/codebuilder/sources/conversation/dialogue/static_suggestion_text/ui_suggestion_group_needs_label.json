@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.group.needs.label",
+    "textRows": [
+      {
+        "key": "suggestion.group.needs.label",
+        "text": {
+          "EN": "Needs",
+          "TL": "Pangangailangan"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Needs",
+    "TL": "Pangangailangan"
+  },
+  "namespace": "ui.suggestion.group.needs",
+  "schema": "psychopatz.convo-engine.v1"
+}

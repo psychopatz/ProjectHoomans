@@ -1,0 +1,96 @@
+{
+  "kind": "dialogue",
+  "id": "stay",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
+    "responseTemplateID": "semantic.command.reply.stay"
+  },
+  "response": {
+    "act": "REPLY",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "I'll stay here.",
+          "TL": "Mananatili ako rito."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Holding position right here.",
+          "TL": "Hawak ko ang pwestong ito."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "I'll keep watch in this spot.",
+          "TL": "Magbabantay ako sa lugar na 'to."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Understood. Standing firm.",
+          "TL": "Naiintindihan ko. Nakatayo rito nang matatag."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "I won't budge from this area.",
+          "TL": "Hindi ako aalis sa lugar na ito."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Holding ground until you return.",
+          "TL": "Bantay dito hanggang sa bumalik ka."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Staying put. Keep safe.",
+          "TL": "Dito lang ako. Mag-ingat ka."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Understood. Guarding this position.",
+          "TL": "Naintindihan. Babantayan ang pwestong ito."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "I'll stay right here.",
+          "TL": "Dito lang ako."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Holding this spot. Don't take too long.",
+          "TL": "Hawak ko ang pwesto. Huwag kang magtatagal."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.command.reply",
+  "schema": "psychopatz.convo-engine.v1"
+}

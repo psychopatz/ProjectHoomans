@@ -1,0 +1,89 @@
+{
+  "kind": "dialogue",
+  "id": "member",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:ask_about_member",
+    "category": "projecthoomans:ask_about",
+    "audience": "member",
+    "textTarget": "psdl/social/ask_about/member",
+    "textDomain": "pnc.psdl.social.ask_about.member"
+  },
+  "response": {
+    "act": "ASK_ABOUT",
+    "turns": [
+      {
+        "id": "opening",
+        "metadata": {
+          "textKey": "opening"
+        },
+        "text": {
+          "EN": "Go ahead, {addressee.name}. What do you want to ask about?",
+          "TL": "Sige, {addressee.name}. Ano ang gusto mong itanong?"
+        },
+        "offers": [
+          {
+            "id": "background",
+            "label": {
+              "EN": "Tell me about your old life.",
+              "TL": "Sabihin mo sa akin ang tungkol sa iyong lumang buhay."
+            },
+            "utterance": {
+              "EN": "Tell me about your old life.",
+              "TL": "Sabihin mo sa akin ang tungkol sa iyong lumang buhay."
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "BACKGROUND",
+              "topic": "ask_about"
+            },
+            "metadata": {
+              "choiceKey": "choice.background",
+              "responseKey": "response.background",
+              "responseText": {
+                "EN": "It feels like someone else's life now.",
+                "TL": "Parang may buhay ng iba ngayon."
+              }
+            }
+          },
+          {
+            "id": "skills",
+            "label": {
+              "EN": "What can you teach the group?",
+              "TL": "What can you teach the grupo?"
+            },
+            "utterance": {
+              "EN": "What can you teach the group?",
+              "TL": "What can you teach the grupo?"
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "SKILLS",
+              "topic": "ask_about"
+            },
+            "metadata": {
+              "choiceKey": "choice.skills",
+              "responseKey": "response.skills",
+              "responseText": {
+                "EN": "Give me a job and I'll show you.",
+                "TL": "Bigyan mo ako ng trabaho at ipapakita ko sa iyo."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "namespace": "social.ask_about",
+  "schema": "psychopatz.convo-engine.v1"
+}

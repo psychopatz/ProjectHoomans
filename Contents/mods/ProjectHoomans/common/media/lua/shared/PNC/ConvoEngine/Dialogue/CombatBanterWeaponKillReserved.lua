@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.reserved.blade_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "blade_01",
             ["sourceId"] = "semantic.combat.kill.killer.reserved.blade_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_reserved.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillReserved",
+        ["namespace"] = "semantic.combat.kill.killer.reserved",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_reserved.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.reserved.firearm_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "firearm_01",
             ["sourceId"] = "semantic.combat.kill.killer.reserved.firearm_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_reserved.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_firearm_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillReserved",
+        ["namespace"] = "semantic.combat.kill.killer.reserved",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_reserved.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_firearm_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

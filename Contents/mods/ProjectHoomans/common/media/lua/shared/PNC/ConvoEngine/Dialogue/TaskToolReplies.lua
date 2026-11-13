@@ -7,7 +7,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.cooldown.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[0]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_cooldown.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -148,7 +148,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_cooldown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -163,7 +163,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.cooldown.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[1]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_cooldown.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -304,7 +304,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_cooldown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -319,7 +319,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.order_camp.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[2]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_camp.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -460,7 +460,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_camp.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -475,7 +475,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.order_camp.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[3]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_camp.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -616,7 +616,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_camp.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -631,7 +631,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.order_camp.3",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[4]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_camp.json#records[2]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -772,7 +772,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_camp.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -787,7 +787,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.order_follow.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[5]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_follow.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -928,7 +928,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_follow.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -943,7 +943,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.order_follow.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[6]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_follow.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -1084,7 +1084,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_follow.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1099,7 +1099,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.order_follow.3",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[7]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_follow.json#records[2]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -1240,7 +1240,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_follow.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1255,7 +1255,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.order_generic.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[8]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_generic.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -1396,7 +1396,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_generic.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1411,7 +1411,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.order_generic.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[9]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_generic.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -1552,7 +1552,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_generic.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1567,7 +1567,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.order_generic.3",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[10]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_generic.json#records[2]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -1708,7 +1708,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_generic.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1723,7 +1723,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.order_rejected.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[11]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_rejected.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -1864,7 +1864,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_rejected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1879,7 +1879,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.order_rejected.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[12]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_rejected.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -2020,7 +2020,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_rejected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2035,7 +2035,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.order_stay.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[13]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_stay.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -2176,7 +2176,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_stay.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2191,7 +2191,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.order_stay.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[14]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_stay.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -2332,7 +2332,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_order_stay.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2347,7 +2347,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_admire.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[15]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_admire.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -2488,7 +2488,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_admire.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2503,7 +2503,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_admire.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[16]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_admire.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -2644,7 +2644,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_admire.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2659,7 +2659,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_apology.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[17]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_apology.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -2800,7 +2800,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_apology.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2815,7 +2815,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_apology.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[18]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_apology.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -2956,7 +2956,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_apology.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2971,7 +2971,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_comfort.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[19]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_comfort.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -3112,7 +3112,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_comfort.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3127,7 +3127,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_comfort.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[20]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_comfort.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -3268,7 +3268,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_comfort.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3283,7 +3283,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_compliment.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[21]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_compliment.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -3424,7 +3424,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_compliment.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3439,7 +3439,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_compliment.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[22]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_compliment.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -3580,7 +3580,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_compliment.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3595,7 +3595,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_flirt.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[23]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_flirt.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -3736,7 +3736,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_flirt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3751,7 +3751,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_flirt.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[24]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_flirt.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -3892,7 +3892,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_flirt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3907,7 +3907,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_generic.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[25]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_generic.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -4048,7 +4048,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_generic.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4063,7 +4063,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_generic.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[26]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_generic.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -4204,7 +4204,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_generic.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4219,7 +4219,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_hostile.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[27]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_hostile.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -4360,7 +4360,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_hostile.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4375,7 +4375,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_hostile.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[28]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_hostile.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -4516,7 +4516,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_hostile.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4531,7 +4531,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_insult.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[29]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_insult.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -4672,7 +4672,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_insult.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4687,7 +4687,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_insult.2",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[30]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_insult.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -4828,7 +4828,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_insult.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4843,7 +4843,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.queued_praise.1",
-            ["sourcePath"] = "psdl/dialogue/task_tool_replies.json#records[31]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_praise.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskToolReplies",
@@ -4984,7 +4984,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_tool_replies.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_tool_replies/tool_reply_queued_praise.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

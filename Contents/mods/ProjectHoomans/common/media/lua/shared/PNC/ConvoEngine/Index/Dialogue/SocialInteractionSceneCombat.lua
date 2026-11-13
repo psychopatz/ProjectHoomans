@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.combat.tactical_spatial.hostile.clock.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_interaction_scene_combat.json",
+        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_clock.json",
     },
     ["semantic.combat.tactical_spatial.hostile.coarse.neutral"] = {
         ["domain"] = "social_interaction_scene_combat",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "semantic.combat.tactical_spatial.hostile.coarse.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_interaction_scene_combat.json",
+        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_coarse.json",
     },
     ["semantic.combat.tactical_spatial.zombie.clock.neutral"] = {
         ["domain"] = "social_interaction_scene_combat",
@@ -25,7 +25,7 @@ return {
         },
         ["id"] = "semantic.combat.tactical_spatial.zombie.clock.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_interaction_scene_combat.json",
+        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_clock.json",
     },
     ["semantic.combat.tactical_spatial.zombie.coarse.neutral"] = {
         ["domain"] = "social_interaction_scene_combat",
@@ -34,6 +34,6 @@ return {
         },
         ["id"] = "semantic.combat.tactical_spatial.zombie.coarse.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_interaction_scene_combat.json",
+        ["source"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_coarse.json",
     },
 }

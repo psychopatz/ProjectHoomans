@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/medical_bite.json",
+        "responseTemplateID": "semantic.question.medical_bite.unknown",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "I can't confirm that. Don't press me.",
+              "TL": "Hindi ko makumpirma. Huwag mo nang ipilit."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "Haven't checked yet. Keep your distance until I do.",
+              "TL": "Hindi pa ako nakakatingin. Lumayo ka muna hangga't hindi pa."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "I don't know for sure. Back off and let me look.",
+              "TL": "Hindi ako sigurado. Umatras ka at hayaan mo akong tingnan."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Can't tell through this armor. Don't jump to conclusions.",
+              "TL": "Hindi masabi dahil sa suot ko. Huwag kang magbintang."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Too much blood to tell whose it is. Back away.",
+              "TL": "Masyadong maraming dugo para malaman kung kanino. Umatras ka."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "I need a mirror first. Stop staring at me.",
+              "TL": "Kailangan ko ng salamin muna. Huwag mo akong titigan."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Unsure. I'll inspect myself in private.",
+              "TL": "Hindi sigurado. Magsusuri ako nang mag-isa."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Can't confirm. Keep your weapon holstered.",
+              "TL": "Hindi makumpirma. Huwag mong ilabas ang armas mo."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "I don't know yet. Don't treat me like an infected.",
+              "TL": "Hindi ko pa alam. Huwag mo akong itrato na parang infected."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Unknown. Stay where you are until I know.",
+              "TL": "Hindi alam. Diyan ka lang hangga't hindi ko nasisiguro."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.medical_bite.unknown"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/medical_bite.json",
+        "responseTemplateID": "semantic.question.medical_bite.unknown",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I can't confirm whether I've been bitten.",
+              "TL": "Hindi ko makumpirma kung nakagat ako."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Haven't had a chance to strip down and check properly.",
+              "TL": "Hindi pa ako nagkakaroon ng oras para maghubad at suriin."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "There were too many hands grabbing at me to be certain.",
+              "TL": "Masyadong maraming humawak sa akin para makasiguro."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Felt teeth scrape, but can't see if it broke the skin.",
+              "TL": "Naramdaman ko ang ngipin, pero hindi kita kung bumaon."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Need someone with good light to inspect my back.",
+              "TL": "Kailangan ng may maayos na ilaw para tingnan ang likod ko."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Not sure yet. The wound is covered in dirt and blood.",
+              "TL": "Hindi pa sigurado. Balot ng dumi at dugo ang sugat."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Could be a scratch, could be teeth. Can't tell yet.",
+              "TL": "Pwedeng gasgas, pwedeng ngipin. Hindi pa masabi."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I haven't checked every spot yet. Need a minute.",
+              "TL": "Hindi ko pa nasusuri ang bawat parte. Bigyan mo ako ng sandali."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Cloth is torn, but not sure if the skin is punctured.",
+              "TL": "Punit ang damit, pero hindi sigurado kung bumaon sa balat."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Bite status is unknown right now. Waiting to check.",
+              "TL": "Hindi pa alam kung nakagat. Naghihintay masuri."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.medical_bite.unknown"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/medical_bite.json",
+        "responseTemplateID": "semantic.question.medical_bite.unknown",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Can't confirm.",
+              "TL": "Hindi makumpirma."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Not sure.",
+              "TL": "Hindi sigurado."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Haven't checked.",
+              "TL": "Hindi pa nasusuri."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Unknown.",
+              "TL": "Hindi alam."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Need to look.",
+              "TL": "Kailangang tingnan."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Hard to tell.",
+              "TL": "Mahirap sabihin."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Torn cloth.",
+              "TL": "Punit na damit."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Uncertain.",
+              "TL": "Hindi tiyak."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Can't see it.",
+              "TL": "Hindi ko makita."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Waiting to check.",
+              "TL": "Titingnan pa."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.medical_bite.unknown"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/medical_bite.json",
+        "responseTemplateID": "semantic.question.medical_bite.unknown",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "I can't confirm it, but thanks for checking.",
+              "TL": "Hindi ko makumpirma, pero salamat sa pagsuri."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "I'm not sure yet, friend. I'll check carefully in a safe spot.",
+              "TL": "Hindi pa ako sigurado, kaibigan. Titingnan ko nang maayos sa ligtas na lugar."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Haven't had a proper look, but thank you for looking out for me.",
+              "TL": "Hindi ko pa natingnan nang maigi, pero salamat sa pagbabantay sa akin."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Hard to see back there. Mind helping me take a look soon?",
+              "TL": "Mahirap makita sa likod. Pwede mo ba akong tulungang tingnan mamaya?"
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Unsure right now, but I promise I'll be honest with you.",
+              "TL": "Hindi sigurado ngayon, pero nangangako akong magiging tapat ako sa 'yo."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "I pray it's just a tear in my jacket. Thanks for asking gently.",
+              "TL": "Sana punit lang sa jacket. Salamat sa maingat na pagtatanong."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Not certain yet, but let's find shelter before we inspect.",
+              "TL": "Hindi pa tiyak, pero maghanap muna tayo ng masisilungan bago sumuri."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Could be nothing, could be bad. Thank you for staying calm.",
+              "TL": "Pwedeng wala lang, pwedeng masama. Salamat sa pananatiling kalmado."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "I haven't checked every scratch, but your concern warms my heart.",
+              "TL": "Hindi ko pa nasusuri ang bawat gasgas, pero nagpapasalamat ako sa pag-alala mo."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "I'll let you know the moment I check. Thank you for your care.",
+              "TL": "Sasabihin ko agad pagkatapos kong masuri. Salamat sa malasakit mo."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.medical_bite.unknown"
+    }
+  ]
+}

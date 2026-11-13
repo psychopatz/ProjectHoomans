@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.practical.axe_spear_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "axe_spear_01",
             ["sourceId"] = "semantic.combat.kill.killer.practical.axe_spear_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_practical.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_axe_spear_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
+        ["namespace"] = "semantic.combat.kill.killer.practical",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_practical.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_axe_spear_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.practical.blade_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "blade_01",
             ["sourceId"] = "semantic.combat.kill.killer.practical.blade_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_practical.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blade_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
+        ["namespace"] = "semantic.combat.kill.killer.practical",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_practical.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blade_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.practical.blunt_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "blunt_01",
             ["sourceId"] = "semantic.combat.kill.killer.practical.blunt_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_practical.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blunt_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
+        ["namespace"] = "semantic.combat.kill.killer.practical",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_practical.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_blunt_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.practical.firearm_high_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "firearm_high_01",
             ["sourceId"] = "semantic.combat.kill.killer.practical.firearm_high_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_practical.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_high_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
+        ["namespace"] = "semantic.combat.kill.killer.practical",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_practical.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_high_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -629,12 +633,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.practical.firearm_low_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "firearm_low_01",
             ["sourceId"] = "semantic.combat.kill.killer.practical.firearm_low_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_practical.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_low_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
+        ["namespace"] = "semantic.combat.kill.killer.practical",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +777,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_practical.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_firearm_low_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,12 +790,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.practical.unarmed_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "unarmed_01",
             ["sourceId"] = "semantic.combat.kill.killer.practical.unarmed_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_practical.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_unarmed_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillPractical",
+        ["namespace"] = "semantic.combat.kill.killer.practical",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -928,7 +934,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_practical.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_practical/combat_kill_killer_practical_unarmed_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

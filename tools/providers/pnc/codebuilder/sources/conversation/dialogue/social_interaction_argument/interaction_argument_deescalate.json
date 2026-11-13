@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/argument/deescalate.json",
+        "responseTemplateID": "semantic.interaction.argument.deescalate",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "Fine. Just lower your voice.",
+              "TL": "Sige. Hinaan mo lang ang boses mo."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "Lower your tone before you draw attention.",
+              "TL": "Hinaan mo ang tono mo bago ka makahatak ng pansin."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Stop yelling. You want every dead head hearing this?",
+              "TL": "Huwag kang sumigaw. Gusto mo bang marinig tayo ng mga patay?"
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "All right. Keep it down and back off.",
+              "TL": "Sige. Hinaan ang boses at umatras."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Enough. Lower the volume right now.",
+              "TL": "Sapat na. Hinaan mo ang boses mo ngayon din."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "I heard you. Now drop the shouting.",
+              "TL": "Narinig kita. Ngayon tigilan mo ang pagsigaw."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Shh! Keep your voice down.",
+              "TL": "Shh! Hinaan mo ang boses mo."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Keep it civil and quiet. We're in danger.",
+              "TL": "Maging maayos at tahimik. Nasa panganib tayo."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "Lower your voice. I'm not deaf.",
+              "TL": "Hinaan mo ang boses. Hindi ako bingi."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Fine. Just tone it down.",
+              "TL": "Sige. Hinaan mo lang."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.argument.deescalate"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/argument/deescalate.json",
+        "responseTemplateID": "semantic.interaction.argument.deescalate",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Easy. We don't need to make this worse.",
+              "TL": "Dahan-dahan. Hindi natin kailangang palalain pa ito."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Let's calm down and talk this through reasonably.",
+              "TL": "Kumalma tayo at pag-usapan ito nang maayos."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Take a breath. Bickering won't fix anything.",
+              "TL": "Huminga ka nang malalim. Walang maaayos ang bangayan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "No need for tempers to flare. Let's settle it.",
+              "TL": "Di kailangang mag-init ang ulo. Ayusin natin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Easy does it. We're on the same side here.",
+              "TL": "Dahan-dahan lang. Magkasama tayo rito."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Let's step back and look at the situation calmly.",
+              "TL": "Umatras muna tayo at tingnan ang sitwasyon nang mahinahon."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "We can resolve this without shouting.",
+              "TL": "Maaayos natin ito nang hindi sumisigaw."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Keep cool. Let's find a workable solution.",
+              "TL": "Kumalma ka lang. Maghanap tayo ng maayos na solusyon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Easy now. Don't lose your head over this.",
+              "TL": "Dahan-dahan lang. Huwag mawalan ng katinuan dahil dito."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Hold on. Let's de-escalate before someone gets hurt.",
+              "TL": "Teka muna. Huminahon tayo bago may masaktan."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.argument.deescalate"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/argument/deescalate.json",
+        "responseTemplateID": "semantic.interaction.argument.deescalate",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Easy.",
+              "TL": "Dahan-dahan."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Calm down.",
+              "TL": "Kumalma ka."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Drop it.",
+              "TL": "Tama na."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Quiet.",
+              "TL": "Tahimik."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Breathe.",
+              "TL": "Huminga ka."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Cool off.",
+              "TL": "Palamig ka muna."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Steady.",
+              "TL": "Magpakatatag."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Enough.",
+              "TL": "Sapat na."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Hold up.",
+              "TL": "Teka lang."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Stop.",
+              "TL": "Tigil."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.argument.deescalate"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/argument/deescalate.json",
+        "responseTemplateID": "semantic.interaction.argument.deescalate",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "Calm down. This isn't helping either of us.",
+              "TL": "Kumalma ka. Walang naitutulong ito sa atin."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Hey, look at me. We're friends, remember?",
+              "TL": "Huy, tingnan mo ako. Magkaibigan tayo, tandaan mo."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Take a breath. I'm right here with you. Let's work it out.",
+              "TL": "Huminga ka muna. Narito lang ako kasama mo. Aayusin natin 'to."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "I know you're stressed. Let's pause and decompress.",
+              "TL": "Alam kong pagod ka. Huminto muna tayo at magpahinga."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Don't let the anger take over. We care about each other.",
+              "TL": "Huwag mong hayaang lamunin ka ng galit. May malasakit tayo sa isa't isa."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "We're going to get through this, I promise. Calm down.",
+              "TL": "Malalampasan natin ito, pangako. Kumalma ka na."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "I hear your pain. Let's talk gently.",
+              "TL": "Naririnig ko ang hirap mo. Mag-usap tayo nang mahinahon."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "It's all right. I'm listening. Just bring the energy down.",
+              "TL": "Ayos lang. Nakikinig ako. Ibaba mo lang ang init ng ulo."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "We've survived too much together to fight like this.",
+              "TL": "Masyado na tayong maraming pinagdaanan para mag-away nang ganito."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Peace, friend. We are stronger together.",
+              "TL": "Kapayapaan, kaibigan. Mas malakas tayo kapag magkasama."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.argument.deescalate"
+    }
+  ]
+}

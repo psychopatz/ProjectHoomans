@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "neutral",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/combat/tactical_spatial.json",
+    "responseTemplateID": "semantic.combat.tactical_spatial.zombie.coarse",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Zombies {scene.relative}!",
+          "TL": "Mga zombie {scene.relative}!"
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Watch out, dead heads {scene.relative}!",
+          "TL": "Mag-ingat, may mga patay {scene.relative}!"
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Walkers approaching {scene.relative}!",
+          "TL": "May mga walker na papalapit {scene.relative}!"
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Look {scene.relative}! Zombies!",
+          "TL": "Tumingin {scene.relative}! Mga zombie!"
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Incoming dead {scene.relative}!",
+          "TL": "Paparating na mga patay {scene.relative}!"
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Zombies closing in {scene.relative}!",
+          "TL": "Lumalapit ang mga zombie {scene.relative}!"
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Eyes {scene.relative}, we've got walkers!",
+          "TL": "Tumingin {scene.relative}, may mga walker tayo!"
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Dead heads spotted {scene.relative}!",
+          "TL": "May nakitang mga zombie {scene.relative}!"
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Check {scene.relative}! Swarm incoming!",
+          "TL": "Suriin {scene.relative}! May paparating na kawan!"
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Danger {scene.relative}! Zombies!",
+          "TL": "Panganib {scene.relative}! Mga zombie!"
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.combat.tactical_spatial.zombie.coarse",
+  "schema": "psychopatz.convo-engine.v1"
+}

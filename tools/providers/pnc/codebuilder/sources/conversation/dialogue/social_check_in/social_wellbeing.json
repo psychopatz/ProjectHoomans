@@ -1,0 +1,131 @@
+{
+  "kind": "dialogue",
+  "id": "neutral",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:wellbeing_neutral",
+    "category": "projecthoomans:wellbeing",
+    "audience": "neutral",
+    "textTarget": "psdl/social/wellbeing/neutral",
+    "textDomain": "pnc.psdl.social.wellbeing.neutral"
+  },
+  "response": {
+    "act": "CHECK_IN",
+    "turns": [
+      {
+        "id": "opening",
+        "metadata": {
+          "textKey": "opening"
+        },
+        "text": {
+          "EN": "I'm managing. What did you want to ask?",
+          "TL": "pinamamahalaan ko. Ano ang gusto mong itanong?"
+        },
+        "offers": [
+          {
+            "id": "condition",
+            "label": {
+              "EN": "How are you holding up?",
+              "TL": "Kamusta ka na?"
+            },
+            "utterance": {
+              "EN": "How are you holding up?",
+              "TL": "Kamusta ka na?"
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "WELLBEING",
+              "topic": "wellbeing"
+            },
+            "when": {
+              "all": [
+                {
+                  "path": "relationship.speakerToAddressee.approval",
+                  "op": ">=",
+                  "value": 1
+                },
+                {
+                  "path": "relationship.speakerToAddressee.familiarity",
+                  "op": ">=",
+                  "value": 1
+                }
+              ]
+            },
+            "metadata": {
+              "choiceKey": "choice.condition",
+              "responseKey": "response.condition",
+              "effects": [
+                {
+                  "type": "pnc:relationship",
+                  "approval": 1,
+                  "familiarity": 1
+                }
+              ],
+              "responseText": {
+                "EN": "I'm still breathing. That's enough for now.",
+                "TL": "humihinga pa ako. Tama na sa ngayon."
+              }
+            }
+          },
+          {
+            "id": "offer_help",
+            "label": {
+              "EN": "Do you need any help?",
+              "TL": "Kailangan mo ba ng anumang tulong?"
+            },
+            "utterance": {
+              "EN": "Do you need any help?",
+              "TL": "Kailangan mo ba ng anumang tulong?"
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "HELP",
+              "topic": "wellbeing"
+            },
+            "when": {
+              "all": [
+                {
+                  "path": "relationship.speakerToAddressee.approval",
+                  "op": ">=",
+                  "value": 2
+                },
+                {
+                  "path": "relationship.speakerToAddressee.respect",
+                  "op": ">=",
+                  "value": 1
+                }
+              ]
+            },
+            "metadata": {
+              "choiceKey": "choice.offer_help",
+              "responseKey": "response.offer_help",
+              "effects": [
+                {
+                  "type": "pnc:relationship",
+                  "approval": 2,
+                  "respect": 1
+                }
+              ],
+              "responseText": {
+                "EN": "I'll manage, but thanks for asking.",
+                "TL": "Aayusin ko, pero salamat sa pagtatanong."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "namespace": "social.wellbeing",
+  "schema": "psychopatz.convo-engine.v1"
+}

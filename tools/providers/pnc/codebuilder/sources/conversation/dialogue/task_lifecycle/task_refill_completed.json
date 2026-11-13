@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "completed",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/refill.json",
+    "responseTemplateID": "semantic.task.refill.completed",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "All topped off. Container is full.",
+          "TL": "Puno na lahat. Punong-puno ang lalagyan."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Refill complete. Ready for the road.",
+          "TL": "Tapos na ang pagpuno. Handa na sa paglakad."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Finished refilling with clean water.",
+          "TL": "Tapos nang lagyan ng malinis na tubig."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Bottles are full again.",
+          "TL": "Puno na muli ang mga bote."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Task done. Plenty of water now.",
+          "TL": "Tapos na ang gawain. Marami nang tubig ngayon."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Refilled and secured.",
+          "TL": "Napuno na at naselyuhan."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Canteens are full. Good work.",
+          "TL": "Puno na ang mga sisidlan. Magaling."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "All filled up.",
+          "TL": "Puno na ang lahat."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Water refilled successfully.",
+          "TL": "Matagumpay na nalagyan ng tubig."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Completed refilling the supply.",
+          "TL": "Natapos ang pagpuno sa supply."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.task.refill",
+  "schema": "psychopatz.convo-engine.v1"
+}

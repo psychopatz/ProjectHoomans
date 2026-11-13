@@ -1,0 +1,78 @@
+{
+  "kind": "dialogue",
+  "id": "affinity",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "when": {
+    "path": "relationship.speakerToAddressee.approval",
+    "op": "gte",
+    "value": 20
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:relationship_special",
+    "category": "projecthoomans:relationship",
+    "audiences": [
+      "special"
+    ],
+    "textTarget": "psdl/social/relationship/special/affinity",
+    "textDomain": "pnc.psdl.social.relationship.special.affinity"
+  },
+  "response": {
+    "act": "RELATIONSHIP_TOPIC",
+    "turns": [
+      {
+        "id": "opening",
+        "metadata": {
+          "textKey": "opening"
+        },
+        "text": {
+          "EN": "I'm listening, {addressee.name}. Say what you need to say.",
+          "TL": "Nakikinig ako, {addressee.name}. Sabihin ang kailangan mong sabihin."
+        },
+        "offers": [
+          {
+            "id": "us",
+            "label": {
+              "EN": "Can we talk about us?",
+              "TL": "Maaari ba nating pag-usapan ang tungkol sa atin?"
+            },
+            "utterance": {
+              "EN": "Can we talk about us?",
+              "TL": "Maaari ba nating pag-usapan ang tungkol sa atin?"
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "RELATIONSHIP",
+              "topic": "relationship"
+            },
+            "metadata": {
+              "choiceKey": "choice.us",
+              "responseKey": "response.us",
+              "responseText": {
+                "EN": "Yes. We probably should.",
+                "TL": "Oo. Malamang dapat nga."
+              },
+              "effects": [
+                {
+                  "type": "pnc:relationship",
+                  "approval": 2,
+                  "familiarity": 2
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "namespace": "social.relationship.special",
+  "schema": "psychopatz.convo-engine.v1"
+}

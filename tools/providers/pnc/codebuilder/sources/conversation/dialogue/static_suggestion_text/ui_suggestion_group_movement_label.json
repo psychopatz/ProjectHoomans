@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.group.movement.label",
+    "textRows": [
+      {
+        "key": "suggestion.group.movement.label",
+        "text": {
+          "EN": "Owned companion actions",
+          "TL": "Mga utos sa kasamang pag-aari"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Owned companion actions",
+    "TL": "Mga utos sa kasamang pag-aari"
+  },
+  "namespace": "ui.suggestion.group.movement",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.conversation.safety.danger",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/event_reactions_safety.json",
+        ["source"] = "adopters/hoomans/dialogue/event_reactions_safety/conversation_safety_danger.json",
     },
     ["semantic.conversation.safety.default"] = {
         ["domain"] = "event_reactions_safety",
@@ -16,6 +16,6 @@ return {
         },
         ["id"] = "semantic.conversation.safety.default",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/event_reactions_safety.json",
+        ["source"] = "adopters/hoomans/dialogue/event_reactions_safety/conversation_safety_default.json",
     },
 }

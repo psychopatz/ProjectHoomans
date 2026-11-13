@@ -1,0 +1,196 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.accepted_generic.1.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/accepted_generic.json",
+        "responseTemplateID": "semantic.tool_reply.accepted_generic.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I hear you.",
+              "TL": "Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Got it.",
+              "TL": "Nakuha ko."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Fair enough.",
+              "TL": "May punto ka."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Understood.",
+              "TL": "Naiintindihan ko."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I hear what you are saying.",
+              "TL": "Naririnig ko ang sinasabi mo."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Message received.",
+              "TL": "Malinaw, nakuha ko."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Makes sense to me.",
+              "TL": "May katuturan 'yan para sa akin."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Point taken.",
+              "TL": "Nakuha ko ang punto mo."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I am listening.",
+              "TL": "Nakikinig ako sa 'yo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "All right. I hear you.",
+              "TL": "Sige. Naririnig kita."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.accepted_generic.2.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/accepted_generic.json",
+        "responseTemplateID": "semantic.tool_reply.accepted_generic.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I will keep that in mind.",
+              "TL": "Isasaisip ko iyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I will remember that.",
+              "TL": "Tandaan ko iyan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Good to know. I will think about it.",
+              "TL": "Mabuting malaman. Pag-iisipan ko."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I will note that down in my head.",
+              "TL": "Itatatak ko 'yan sa isip ko."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Thanks for telling me. I will keep it in mind.",
+              "TL": "Salamat sa pagsabi. Tatandaan ko."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I will hold onto that thought.",
+              "TL": "Isasapuso at isasaisip ko iyan."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I will factor that in.",
+              "TL": "Isasaalang-alang ko 'yan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Duly noted.",
+              "TL": "Tala ko na 'yan."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I will be mindful of that.",
+              "TL": "Magiging maingat ako tungkol diyan."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Right. I will keep that in mind moving forward.",
+              "TL": "Sige. Tatandaan ko 'yan sa mga susunod."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

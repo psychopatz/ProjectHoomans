@@ -1,0 +1,196 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.ask_name.unnamed.1.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
+        "responseTemplateID": "semantic.tool_reply.ask_name.unnamed.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "You want to know my name? Give me a second.",
+              "TL": "Gusto mong malaman ang pangalan ko? Bigyan mo ako ng sandali."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Haven't heard anyone call me by name in months.",
+              "TL": "Ilang buwan na mula noong may tumawag sa pangalan ko."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "A name? Almost forgot people still used them.",
+              "TL": "Pangalan? Halos nakalimutan ko nang may gumagamit pa niyan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Takes a moment to remember what folks used to call me.",
+              "TL": "Inaalala ko pa kung ano ang tawag sa akin ng mga tao noon."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Funny question. Been so long since I introduced myself.",
+              "TL": "Nakakatuwang tanong. Matagal na mula noong huling nagpakilala ako."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Hold on, let me think back to what I was called before this.",
+              "TL": "Teka lang, inaalala ko kung ano ang tawag sa akin bago ang lahat ng ito."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "My name... feels like another person owned it.",
+              "TL": "Ang pangalan ko... parang ibang tao ang nagmamay-ari noon."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Just a survivor out here. But give me a second to recall.",
+              "TL": "Isa lang akong nakaligtas dito. Pero bigyan mo ako ng sandali para alalahanin."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Doesn't come to mind as fast as it used to.",
+              "TL": "Hindi na agad pumapasok sa isip ko gaya ng dati."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "A name... give me a moment to dust off the cobwebs.",
+              "TL": "Pangalan... bigyan mo ako ng sandali para alalahanin."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.ask_name.unnamed.2.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/ask_name.json",
+        "responseTemplateID": "semantic.tool_reply.ask_name.unnamed.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "My name is a longer story than you might expect.",
+              "TL": "Mas mahabang kuwento ang pangalan ko kaysa sa inaasahan mo."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Left my old name behind when the world fell apart.",
+              "TL": "Iniwan ko ang dati kong pangalan noong gumuho ang mundo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Names belong to the world before Knox. Now we're just survivors.",
+              "TL": "Para sa lumang mundo ang mga pangalan bago ang Knox. Ngayon, mga nakaligtas na lang tayo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I don't use the name I was born with anymore.",
+              "TL": "Hindi ko na ginagamit ang pangalang ibinigay sa akin noong ipinanganak ako."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "There's a lot of baggage attached to my real name.",
+              "TL": "Maraming mabigat na alaala ang nakakabit sa tunay kong pangalan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I gave up that name when I lost everyone I loved.",
+              "TL": "Binitiwan ko ang pangalang 'yon noong mawala ang lahat ng mahal ko."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Too much history behind that name to bring it up lightly.",
+              "TL": "Masyadong masalimuot ang kasaysayan ng pangalang 'yan para basta banggitin."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Call me whatever you want. Old names don't matter much now.",
+              "TL": "Tawagin mo ako kahit ano. Wala nang masyadong halaga ang lumang pangalan."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "That name died with the old life. I haven't picked a new one.",
+              "TL": "Namatay ang pangalang 'yon kasama ng dating buhay. Hindi pa ako pumipili ng bago."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "It's complicated. Maybe I'll tell you the story around a campfire someday.",
+              "TL": "Medyo magulo. Baka ikuwento ko sa 'yo sa tabi ng apoy balang-araw."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

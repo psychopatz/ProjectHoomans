@@ -1,0 +1,103 @@
+{
+  "kind": "dialogue",
+  "id": "sunrise",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "when": {
+    "all": [
+      {
+        "path": "relationship.speakerToAddressee.state",
+        "op": "eq",
+        "value": "FirstMeet"
+      },
+      {
+        "all": [
+          {
+            "path": "world.time.hour",
+            "op": "gte",
+            "value": 6.5
+          },
+          {
+            "path": "world.time.hour",
+            "op": "lt",
+            "value": 12
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:greeting_firstmeet_sunrise",
+    "category": "projecthoomans:greetings",
+    "audience": "neutral",
+    "priority": 10,
+    "weight": 100,
+    "portraitAnimation": "greeting.wavehi",
+    "textTarget": "psdl/social/greetings/neutral/first_meet/sunrise",
+    "textDomain": "pnc.psdl.social.greetings.neutral.first_meet.sunrise"
+  },
+  "response": {
+    "act": "GREETING",
+    "variants": [
+      {
+        "id": "greeting.001",
+        "metadata": {
+          "textKey": "greeting.001"
+        },
+        "text": {
+          "EN": "Morning. I haven't seen you around before.",
+          "TL": "Umaga. Hindi pa kita nakikita kanina."
+        }
+      },
+      {
+        "id": "greeting.002",
+        "metadata": {
+          "textKey": "greeting.002"
+        },
+        "text": {
+          "EN": "That's close enough. Start with your name.",
+          "TL": "Malapit na yun. Magsimula sa iyong pangalan."
+        }
+      },
+      {
+        "id": "greeting.003",
+        "metadata": {
+          "textKey": "greeting.003"
+        },
+        "text": {
+          "EN": "New face. Are you passing through or looking for something?",
+          "TL": "Bagong mukha. Ikaw ba ay dumadaan o may hinahanap?"
+        }
+      },
+      {
+        "id": "greeting.004",
+        "metadata": {
+          "textKey": "greeting.004"
+        },
+        "text": {
+          "EN": "Daylight makes this easier. Who are you?",
+          "TL": "Pinapadali ito ng liwanag ng araw. sino ka ba"
+        }
+      },
+      {
+        "id": "greeting.005",
+        "metadata": {
+          "textKey": "greeting.005"
+        },
+        "text": {
+          "EN": "I don't recognize you. Talk, and keep it calm.",
+          "TL": "hindi kita kilala. Mag-usap, at panatilihin itong kalmado."
+        }
+      }
+    ]
+  },
+  "namespace": "social.greetings.firstmeet",
+  "schema": "psychopatz.convo-engine.v1"
+}

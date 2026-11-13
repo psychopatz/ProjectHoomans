@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.group.wellbeing.label",
+    "textRows": [
+      {
+        "key": "suggestion.group.wellbeing.label",
+        "text": {
+          "EN": "Wellbeing",
+          "TL": "Kalagayan"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Wellbeing",
+    "TL": "Kalagayan"
+  },
+  "namespace": "ui.suggestion.group.wellbeing",
+  "schema": "psychopatz.convo-engine.v1"
+}

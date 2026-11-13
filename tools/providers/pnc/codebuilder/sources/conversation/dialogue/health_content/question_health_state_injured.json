@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/health_state.json",
+        "responseTemplateID": "semantic.question.health_state.injured",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "I'm hurt. Give me space.",
+              "TL": "Nasaktan ako. Bigyan mo ako ng espasyo."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "Took some damage. I don't need your pity.",
+              "TL": "May tama ako. Hindi ko kailangan ang awa mo."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Got injured, but I'm still dangerous. Step back.",
+              "TL": "Nasugatan ako, pero mapanganib pa rin ako. Umatras ka."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Bleeding, but it's under control. Don't hover.",
+              "TL": "Dumudugo, pero kontrolado ko. Huwag kang mag-aligid."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "I'm wounded. That doesn't mean I'm helpless.",
+              "TL": "Sugatan ako. Hindi ibig sabihing wala na akong magagawa."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "I can bandage my own wounds, thank you.",
+              "TL": "Kaya kong bendahan ang sarili kong sugat, salamat."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "It hurts, but you don't need to pry into it.",
+              "TL": "Masakit, pero hindi mo kailangang mag-usisa."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Just a bad cut. Keep your hands where I can see them.",
+              "TL": "Malalim na sugat lang. Ipakita mo ang mga kamay mo."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "I'm dealing with the pain. Leave me be.",
+              "TL": "Inaayos ko ang iniinda ko. Hayaan mo muna ako."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Injured, yes. Vulnerable, no. Back off.",
+              "TL": "Sugatan, oo. Mahina, hindi. Lumayo ka."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.health_state.injured"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/health_state.json",
+        "responseTemplateID": "semantic.question.health_state.injured",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I'm hurt, but I'm managing.",
+              "TL": "Nasaktan ako, pero kinakaya ko."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Took a beating earlier. Bandages are holding for now.",
+              "TL": "Medyo napuruhan kanina. Hawak pa naman ng benda sa ngayon."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Nursing a wound here. Trying not to reopen it.",
+              "TL": "Inaalagaan ko ang sugat na ito. Iniiwasang bumuka ulit."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I've been injured, but nothing that'll take me down.",
+              "TL": "Nasugatan ako, pero hindi 'to makakapagpatumba sa akin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Got caught in a bad spot. Dealing with the damage.",
+              "TL": "Naipit sa masamang sitwasyon. Tinitiis ang tinamong sugat."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Bleeding is mostly stopped, but movement is painful.",
+              "TL": "Karamihan sa dugo tumigil na, pero masakit kumilos."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Stung pretty bad by an attack earlier.",
+              "TL": "Kumikirot pa rin mula sa pag-atake kanina."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Injuries are slowing me down, but I can keep moving.",
+              "TL": "Pinapabagal ako ng mga sugat, pero kaya pang lumakad."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Could use some medical supplies when we find them.",
+              "TL": "Kailangan ko ng gamot kapag nakahanap tayo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I'm hurting right now, but taking it step by step.",
+              "TL": "Masakit ang katawan ko ngayon, pero dahan-dahan lang."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.health_state.injured"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/health_state.json",
+        "responseTemplateID": "semantic.question.health_state.injured",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "I'm hurt.",
+              "TL": "Nasaktan ako."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Wounded.",
+              "TL": "Sugatan."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Need stitches.",
+              "TL": "Kailangan ng tahi."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Bleeding.",
+              "TL": "Dumudugo."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Hurts bad.",
+              "TL": "Sobrang sakit."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Bandaged up.",
+              "TL": "May benda."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Still bleeding.",
+              "TL": "Dumudugo pa."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Took damage.",
+              "TL": "Tinamaan."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Slowed down.",
+              "TL": "Bumagal."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Managing pain.",
+              "TL": "Tinitiis."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.health_state.injured"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/health_state.json",
+        "responseTemplateID": "semantic.question.health_state.injured",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "I'm hurt, but I'm managing. Thanks for asking.",
+              "TL": "Nasaktan ako, pero kinakaya ko. Salamat sa pagtatanong."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Took a hit out there, but knowing you're here helps a lot.",
+              "TL": "Tinamaan ako sa labas, pero malaking tulong na nandito ka."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "It hurts, friend, but I promise I'm holding together.",
+              "TL": "Masakit, kaibigan, pero nangangako akong kakayanin ko."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Got banged up a little. Thank you for your care and concern.",
+              "TL": "Medyo napuruhan ako. Salamat sa malasakit mo."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Nursing a wound, but seeing you safe gives me strength.",
+              "TL": "May sugat ako, pero nagbibigay ng lakas na ligtas ka."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "I'll pull through with some rest. Thanks for checking on me.",
+              "TL": "Makakaraos din ako kapag nakapagpahinga. Salamat sa pangangamusta."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "It's painful, but we'll patch it up together, right?",
+              "TL": "Masakit, pero gagamutin natin ito nang magkasama, di ba?"
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Appreciate the check-in. Don't worry too much about me.",
+              "TL": "Salamat sa pagsuri. Huwag kang masyadong mag-alala sa akin."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Got scratched up bad, but I'm glad you're by my side.",
+              "TL": "Malala ang gasgas ko, pero masaya akong nasa tabi kita."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Hurts like hell, but having good folks around keeps me going.",
+              "TL": "Napakasakit, pero ang mabubuting kasama ang nagpapatuloy sa akin."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.health_state.injured"
+    }
+  ]
+}

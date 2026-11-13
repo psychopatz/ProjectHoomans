@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "trade.conversation.opening",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/trading.json",
+        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_opening.json",
     },
     ["trade.conversation.referral"] = {
         ["domain"] = "trading",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "trade.conversation.referral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/trading.json",
+        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_referral.json",
     },
     ["trade.conversation.suggestions"] = {
         ["domain"] = "trading",
@@ -35,6 +35,6 @@ return {
             "question.story",
             "question.trader",
         },
-        ["source"] = "psdl/dialogue/trading.json",
+        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_suggestions.json",
     },
 }

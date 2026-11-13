@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.group.identity.label",
+    "textRows": [
+      {
+        "key": "suggestion.group.identity.label",
+        "text": {
+          "EN": "Identity",
+          "TL": "Pagkakakilanlan"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Identity",
+    "TL": "Pagkakakilanlan"
+  },
+  "namespace": "ui.suggestion.group.identity",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -12,6 +12,6 @@ return {
             "question.health",
             "question.needs",
         },
-        ["source"] = "psdl/dialogue/companion_check_in.json",
+        ["source"] = "adopters/hoomans/dialogue/companion_check_in/social_companion_check_in.json",
     },
 }

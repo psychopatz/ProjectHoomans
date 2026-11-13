@@ -5,12 +5,13 @@ return {
         ["id"] = "needs.member.support",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "support",
             ["sourceId"] = "needs.member.support",
-            ["sourcePath"] = "psdl/dialogue/needs_support.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/needs_support/needs_member_support.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/NeedsSupport",
+        ["namespace"] = "needs.member",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -377,7 +378,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/needs_support.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/needs_support/needs_member_support.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -390,12 +391,13 @@ return {
         ["id"] = "needs.neutral.support",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "support",
             ["sourceId"] = "needs.neutral.support",
-            ["sourcePath"] = "psdl/dialogue/needs_support.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/needs_support/needs_neutral_support.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/NeedsSupport",
+        ["namespace"] = "needs.neutral",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -762,7 +764,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/needs_support.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/needs_support/needs_neutral_support.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -775,12 +777,13 @@ return {
         ["id"] = "needs.special.support",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "support",
             ["sourceId"] = "needs.special.support",
-            ["sourcePath"] = "psdl/dialogue/needs_support.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/needs_support/needs_special_support.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/NeedsSupport",
+        ["namespace"] = "needs.special",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1147,7 +1150,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/needs_support.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/needs_support/needs_special_support.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

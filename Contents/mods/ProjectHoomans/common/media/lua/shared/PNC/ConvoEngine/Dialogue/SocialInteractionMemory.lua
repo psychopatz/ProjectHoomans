@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.interaction.memory.acknowledge.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.memory.acknowledge.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_memory.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
+        ["namespace"] = "semantic.interaction.memory.acknowledge",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_memory.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.interaction.memory.acknowledge.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.memory.acknowledge.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_memory.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
+        ["namespace"] = "semantic.interaction.memory.acknowledge",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_memory.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.interaction.memory.acknowledge.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.memory.acknowledge.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_memory.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
+        ["namespace"] = "semantic.interaction.memory.acknowledge",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_memory.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.interaction.memory.acknowledge.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.memory.acknowledge.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_memory.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
+        ["namespace"] = "semantic.interaction.memory.acknowledge",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_memory.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -629,12 +633,13 @@ return {
         ["id"] = "semantic.interaction.memory.acknowledge_flavor.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.memory.acknowledge_flavor.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_memory.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
+        ["namespace"] = "semantic.interaction.memory.acknowledge_flavor",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +777,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_memory.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,12 +790,13 @@ return {
         ["id"] = "semantic.interaction.memory.acknowledge_flavor.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.memory.acknowledge_flavor.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_memory.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
+        ["namespace"] = "semantic.interaction.memory.acknowledge_flavor",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -928,7 +934,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_memory.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -941,12 +947,13 @@ return {
         ["id"] = "semantic.interaction.memory.acknowledge_flavor.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.memory.acknowledge_flavor.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_memory.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
+        ["namespace"] = "semantic.interaction.memory.acknowledge_flavor",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1084,7 +1091,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_memory.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1097,12 +1104,13 @@ return {
         ["id"] = "semantic.interaction.memory.acknowledge_flavor.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.memory.acknowledge_flavor.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_memory.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
+        ["namespace"] = "semantic.interaction.memory.acknowledge_flavor",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1240,7 +1248,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_memory.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_acknowledge_flavor.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1253,12 +1261,13 @@ return {
         ["id"] = "semantic.interaction.memory.followup.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.interaction.memory.followup.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_memory.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
+        ["namespace"] = "semantic.interaction.memory.followup",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1396,7 +1405,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_memory.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1409,12 +1418,13 @@ return {
         ["id"] = "semantic.interaction.memory.followup.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.memory.followup.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_memory.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
+        ["namespace"] = "semantic.interaction.memory.followup",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1552,7 +1562,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_memory.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1565,12 +1575,13 @@ return {
         ["id"] = "semantic.interaction.memory.followup.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.interaction.memory.followup.terse",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_memory.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
+        ["namespace"] = "semantic.interaction.memory.followup",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1708,7 +1719,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_memory.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1721,12 +1732,13 @@ return {
         ["id"] = "semantic.interaction.memory.followup.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.interaction.memory.followup.warm",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_memory.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionMemory",
+        ["namespace"] = "semantic.interaction.memory.followup",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1864,7 +1876,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_memory.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_memory/interaction_memory_followup.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

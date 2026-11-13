@@ -1,0 +1,103 @@
+{
+  "kind": "dialogue",
+  "id": "dusk",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "when": {
+    "all": [
+      {
+        "path": "relationship.speakerToAddressee.state",
+        "op": "eq",
+        "value": "Lover"
+      },
+      {
+        "all": [
+          {
+            "path": "world.time.hour",
+            "op": "gte",
+            "value": 18
+          },
+          {
+            "path": "world.time.hour",
+            "op": "lt",
+            "value": 21
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:greeting_lover_dusk",
+    "category": "projecthoomans:greetings",
+    "audience": "special",
+    "priority": 10,
+    "weight": 100,
+    "portraitAnimation": "greeting.wavehi",
+    "textTarget": "psdl/social/greetings/special/lover/dusk",
+    "textDomain": "pnc.psdl.social.greetings.special.lover.dusk"
+  },
+  "response": {
+    "act": "GREETING",
+    "variants": [
+      {
+        "id": "greeting.001",
+        "metadata": {
+          "textKey": "greeting.001"
+        },
+        "text": {
+          "EN": "Stay with me a minute before night watch.",
+          "TL": "Manatili sa akin ng isang minuto bago manood ng gabi."
+        }
+      },
+      {
+        "id": "greeting.002",
+        "metadata": {
+          "textKey": "greeting.002"
+        },
+        "text": {
+          "EN": "Evening, love. You look exhausted.",
+          "TL": "Gabi, mahal. Mukha kang pagod."
+        }
+      },
+      {
+        "id": "greeting.003",
+        "metadata": {
+          "textKey": "greeting.003"
+        },
+        "text": {
+          "EN": "You're safe. I can breathe again.",
+          "TL": "Ligtas ka. Muli na akong makahihinga."
+        }
+      },
+      {
+        "id": "greeting.004",
+        "metadata": {
+          "textKey": "greeting.004"
+        },
+        "text": {
+          "EN": "Come closer. We don't get many quiet moments.",
+          "TL": "Lumapit ka. Hindi kami nakakakuha ng maraming tahimik na sandali."
+        }
+      },
+      {
+        "id": "greeting.005",
+        "metadata": {
+          "textKey": "greeting.005"
+        },
+        "text": {
+          "EN": "I saved you a place by me.",
+          "TL": "Iniligtas kita ng isang lugar sa tabi ko."
+        }
+      }
+    ]
+  },
+  "namespace": "social.greetings.lover",
+  "schema": "psychopatz.convo-engine.v1"
+}

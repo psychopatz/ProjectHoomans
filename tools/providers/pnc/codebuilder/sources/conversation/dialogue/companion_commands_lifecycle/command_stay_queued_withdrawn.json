@@ -1,0 +1,96 @@
+{
+  "kind": "dialogue",
+  "id": "withdrawn",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/stay.json",
+    "responseTemplateID": "semantic.command.stay.queued.withdrawn"
+  },
+  "response": {
+    "act": "REPLY",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Okay, I'll stay.",
+          "TL": "Sige, mananatili ako."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Fine. Staying here.",
+          "TL": "Sige. Dito lang."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Holding ground.",
+          "TL": "Hawak ang lupa."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Understood. Staying.",
+          "TL": "Naintindihan. Mananatili."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "I'll stay put.",
+          "TL": "Dito lang ako."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Not moving.",
+          "TL": "Di gagalaw."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Fine by me. Go.",
+          "TL": "Ayos sa akin. Alis na."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Staying right here.",
+          "TL": "Dito lang mismo."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Understood. Waiting.",
+          "TL": "Naiintindihan. Naghihintay."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Holding position.",
+          "TL": "Hawak ang posisyon."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.command.stay.queued",
+  "schema": "psychopatz.convo-engine.v1"
+}

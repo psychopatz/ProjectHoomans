@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.social.apology.default.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.social.apology.default.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -187,7 +188,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -200,12 +201,13 @@ return {
         ["id"] = "semantic.social.apology.default.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.social.apology.default.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -382,7 +384,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -395,12 +397,13 @@ return {
         ["id"] = "semantic.social.apology.default.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.social.apology.default.terse",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -577,7 +580,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -590,12 +593,13 @@ return {
         ["id"] = "semantic.social.apology.default.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.social.apology.default.warm",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +776,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,12 +789,13 @@ return {
         ["id"] = "semantic.social.apology.friendly.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.social.apology.friendly.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -967,7 +972,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -980,12 +985,13 @@ return {
         ["id"] = "semantic.social.apology.friendly.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.social.apology.friendly.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1162,7 +1168,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1175,12 +1181,13 @@ return {
         ["id"] = "semantic.social.apology.friendly.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.social.apology.friendly.terse",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1357,7 +1364,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1370,12 +1377,13 @@ return {
         ["id"] = "semantic.social.apology.friendly.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.social.apology.friendly.warm",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1552,7 +1560,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1565,12 +1573,13 @@ return {
         ["id"] = "semantic.social.apology.stressed.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.social.apology.stressed.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.stressed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1747,7 +1756,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1760,12 +1769,13 @@ return {
         ["id"] = "semantic.social.apology.stressed.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.social.apology.stressed.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.stressed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1942,7 +1952,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1955,12 +1965,13 @@ return {
         ["id"] = "semantic.social.apology.stressed.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.social.apology.stressed.terse",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.stressed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2137,7 +2148,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2150,12 +2161,13 @@ return {
         ["id"] = "semantic.social.apology.stressed.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.social.apology.stressed.warm",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.stressed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2332,7 +2344,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_stressed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2345,12 +2357,13 @@ return {
         ["id"] = "semantic.social.apology.withdrawn.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.social.apology.withdrawn.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[15]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.withdrawn",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2527,7 +2540,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2540,12 +2553,13 @@ return {
         ["id"] = "semantic.social.apology.withdrawn.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.social.apology.withdrawn.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[12]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.withdrawn",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2722,7 +2736,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2735,12 +2749,13 @@ return {
         ["id"] = "semantic.social.apology.withdrawn.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.social.apology.withdrawn.terse",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[14]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.withdrawn",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2917,7 +2932,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2930,12 +2945,13 @@ return {
         ["id"] = "semantic.social.apology.withdrawn.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.social.apology.withdrawn.warm",
-            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[13]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["namespace"] = "semantic.social.apology.withdrawn",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3112,7 +3128,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_apology/social_apology_withdrawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

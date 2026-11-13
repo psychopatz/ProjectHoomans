@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.personal_check_in.label",
+    "textRows": [
+      {
+        "key": "suggestion.personal_check_in.label",
+        "text": {
+          "EN": "Ask what's on their mind",
+          "TL": "Alamin kung may bumabagabag sa kanya"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Ask what's on their mind",
+    "TL": "Alamin kung may bumabagabag sa kanya"
+  },
+  "namespace": "ui.suggestion.personal_check_in",
+  "schema": "psychopatz.convo-engine.v1"
+}

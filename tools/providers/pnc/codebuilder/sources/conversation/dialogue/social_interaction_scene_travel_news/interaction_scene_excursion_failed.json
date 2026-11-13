@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/excursion.json",
+        "responseTemplateID": "semantic.interaction.scene.excursion_failed",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Trip's off. Something went wrong.",
+              "TL": "Kanselado ang biyahe. May nangyaring mali."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "We have to cancel the run. It's not safe.",
+              "TL": "Kailangang kanselahin ang lakad. Hindi ligtas."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Plan fell apart. We're aborting the trip.",
+              "TL": "Pumalpak ang plano. Ititigil natin ang paglabas."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Call it off. Conditions are too hazardous.",
+              "TL": "Kanselahin na. Masyadong mapanganib ang kalagayan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "We're aborting the mission. Regroup back inside.",
+              "TL": "Ititigil ang misyon. Magtipon pabalik sa loob."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Trip canceled. Something compromised our route.",
+              "TL": "Kanselado ang biyahe. May sumira sa ruta natin."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Not happening today. Pull back to base.",
+              "TL": "Hindi matutuloy ngayon. Umatras pabalik sa base."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Mission failed. Better to abort than lose lives.",
+              "TL": "Bigo ang misyon. Mas mabuting ihinto kaysa may mamatay."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "The run is scrubbed. Head back inside.",
+              "TL": "Kanselado ang paglabas. Bumalik sa loob."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Aborting the excursion. We'll rethink the plan.",
+              "TL": "Ititigil ang lakad. Pag-iisipan natin muli ang plano."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.excursion_failed"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/excursion.json",
+        "responseTemplateID": "semantic.interaction.scene.excursion_failed",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "We're calling it off. Better safe than forcing it.",
+              "TL": "Ititigil muna natin. Mas mabuting ligtas kaysa pilitin."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Don't be discouraged, friend. We'll try again another day.",
+              "TL": "Huwag kang panghinaan ng loob, kaibigan. Susubukan natin ulit sa ibang araw."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "I'd rather have you alive than whatever supplies are out there.",
+              "TL": "Mas gusto kitang buhay kaysa sa anumang gamit sa labas."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "It's okay, partner. We made the right call to abort.",
+              "TL": "Ayos lang, kasama. Tama ang desisyon nating huminto."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Safety comes first. Come on, let's head back together.",
+              "TL": "Kaligtasan ang una sa lahat. Halika, sabay tayong bumalik."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Don't beat yourself up over this. We did what we could.",
+              "TL": "Huwag mong sisihin sarili mo. Ginawa natin ang makakaya."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "We live to fight another day. That's the real victory, friend.",
+              "TL": "Mabubuhay tayo para lumaban muli. Iyon ang tunay na panalo, kaibigan."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Calling it off was smart. I'm glad you're safe beside me.",
+              "TL": "Matalinong desisyon ang huminto. Masaya akong ligtas ka sa tabi ko."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Take a breath. We'll rest up and plan better next time.",
+              "TL": "Huminga ka muna. Magpapahinga tayo at magpaplano nang mas maayos."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "We'll get 'em next time, partner. Let's head inside.",
+              "TL": "Makakabawi tayo sa susunod, kasama. Pumasok na tayo."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.excursion_failed"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/excursion.json",
+        "responseTemplateID": "semantic.interaction.scene.excursion_failed",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Trip's off.",
+              "TL": "Kanselado ang biyahe."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Aborted.",
+              "TL": "Ihinto."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Scrubbed.",
+              "TL": "Kanselado."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Back inside.",
+              "TL": "Balik sa loob."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Cancel it.",
+              "TL": "Kanselahin."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Failed. Fall back.",
+              "TL": "Bigo. Umatras."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Not today.",
+              "TL": "Hindi ngayon."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Abort.",
+              "TL": "Tigil."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Off.",
+              "TL": "Wala na."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Regroup.",
+              "TL": "Magtipon ulit."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.excursion_failed"
+    },
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/excursion.json",
+        "responseTemplateID": "semantic.interaction.scene.excursion_failed",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "Excursion failed. We regroup here.",
+              "TL": "Bigo ang paglalakbay. Magtipon ulit tayo rito."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "Something compromised the operation. Pull back immediately.",
+              "TL": "May sumira sa operasyon. Umatras agad-agad."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Forcing this run will get us slaughtered. Abort.",
+              "TL": "Kamatayan kapag pinilit ang lakad na 'to. Ihinto."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Fall back and figure out what went wrong behind closed doors.",
+              "TL": "Umatras at alamin kung anong pumalpak sa loob ng pinto."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "The route is burned. We're retreating right now.",
+              "TL": "Nasira ang ruta. Aatras tayo ngayon din."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "Trip canceled. Watch your back as we return to the gates.",
+              "TL": "Kanselado ang lakad. Bantayan ang likod habang bumabalik."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Bad intel or bad luck. Either way, we pull the plug.",
+              "TL": "Maling balita o malas. Alinman doon, itigil na."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Do not push forward into an ambush. Abort the mission.",
+              "TL": "Huwag lumusob sa tambang. Itigil ang misyon."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "Abort. Secure the entrance and debrief.",
+              "TL": "Tigil. I-secure ang lagusan at mag-usap."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Failed attempt. Fall back and secure your weapons.",
+              "TL": "Bigong pagtatangka. Umatras at i-secure ang armas."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.excursion_failed"
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "kind": "dialogue",
+  "id": "default",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:medical_event",
+    "sourceSurface": "content/event/medical/update.json",
+    "responseTemplateID": "semantic.medical.distress.update.default",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "MEDICAL_RESPONSE",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.update.default.neutral.01"
+        },
+        "text": {
+          "EN": "I am still down. I still need help.",
+          "TL": "Bagsak pa rin ako. Kailangan ko pa rin ng tulong."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.update.default.neutral.02"
+        },
+        "text": {
+          "EN": "Still incapacitated on the ground. Please assist.",
+          "TL": "Hindi pa rin makakilos sa lupa. Pakiusap tulungan mo ako."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.update.default.neutral.03"
+        },
+        "text": {
+          "EN": "Haven't recovered yet. Still need a hand.",
+          "TL": "Hindi pa nakakabawi. Kailangan pa rin ng saklolo."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.update.default.neutral.04"
+        },
+        "text": {
+          "EN": "Still down here. Don't leave me alone.",
+          "TL": "Nandito pa rin sa sahig. Huwag mo akong iwang mag-isa."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.update.default.neutral.05"
+        },
+        "text": {
+          "EN": "Status unchanged: still injured and waiting.",
+          "TL": "Walang pagbabago: sugatan pa rin at naghihintay."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.update.default.neutral.06"
+        },
+        "text": {
+          "EN": "Still grounded. I need someone to help me up.",
+          "TL": "Bagsak pa rin. Kailangan ko ng tutulong sa akin makatayo."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.update.default.neutral.07"
+        },
+        "text": {
+          "EN": "Can't move on my own yet. Still need aid.",
+          "TL": "Hindi pa makagalaw mag-isa. Kailangan pa rin ng lunas."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.update.default.neutral.08"
+        },
+        "text": {
+          "EN": "Still unable to stand. Waiting for help.",
+          "TL": "Hindi pa rin makatayo. Naghihintay ng tulong."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.update.default.neutral.09"
+        },
+        "text": {
+          "EN": "I'm still down in the dirt. Please assist me.",
+          "TL": "Nasa lupa pa rin ako. Pakiusap saklolohan mo ako."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.update.default.neutral.10"
+        },
+        "text": {
+          "EN": "Still waiting for support. Don't forget me.",
+          "TL": "Naghihintay pa rin ng suporta. Huwag mo akong kalimutan."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.medical.distress.update",
+  "schema": "psychopatz.convo-engine.v1"
+}

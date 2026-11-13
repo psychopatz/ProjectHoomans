@@ -1,0 +1,48 @@
+{
+  "kind": "dialogue",
+  "id": "neutral",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
+    "responseTemplateID": "semantic.emote.player.thumbsup",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Good work, {addressee.name}.",
+          "TL": "Mahusay, {addressee.name}."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "That's what I like to see, {addressee.name}.",
+          "TL": "Iyan ang gusto kong makita, {addressee.name}."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Keep it up, {addressee.name}.",
+          "TL": "Ipagpatuloy mo, {addressee.name}."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.emote.player.thumbsup",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "firearm_high_01",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/brave.json",
+    "responseTemplateID": "semantic.combat.kill.killer.brave.firearm_high_01",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Dead center. Keep moving.",
+          "TL": "Gitnang-gitna. Tuloy lang."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Clean hit. Advance.",
+          "TL": "Malinis na tama. Sulong."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Downed. Scanning the next sector.",
+          "TL": "Bagsak. Sinusuri ang susunod na parte."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "One shot, one down. Keep pace.",
+          "TL": "Isang putok, isang bagsak. Panatilihin ang bilis."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Target eliminated. Form up.",
+          "TL": "Target naalis. Ayusin ang pwesto."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Precise shot. Push through.",
+          "TL": "Eksaktong putok. Lusot tayo."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Threat neutralized. Eyes ahead.",
+          "TL": "Banta nawala na. Tumingin sa unahan."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Confirmed kill. Move forward.",
+          "TL": "Kumpirmadong patay. Abante."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Handled. Watch your spacing.",
+          "TL": "Naasikaso na. Bantayan ang agwat."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Center mass then head. Done.",
+          "TL": "Gitna muna bago ulo. Tapos."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.combat.kill.killer.brave",
+  "schema": "psychopatz.convo-engine.v1"
+}

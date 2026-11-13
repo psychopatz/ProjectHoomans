@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.question.wellbeing.dataset.getting_by.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.question.wellbeing.dataset.getting_by.guarded",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.dataset.getting_by",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.question.wellbeing.dataset.getting_by.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.wellbeing.dataset.getting_by.neutral",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.dataset.getting_by",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.question.wellbeing.dataset.getting_by.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.question.wellbeing.dataset.getting_by.terse",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.dataset.getting_by",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.question.wellbeing.dataset.getting_by.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.question.wellbeing.dataset.getting_by.warm",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.dataset.getting_by",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_dataset_getting_by.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -629,12 +633,13 @@ return {
         ["id"] = "semantic.question.wellbeing.default.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.question.wellbeing.default.guarded",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_default.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +777,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,12 +790,13 @@ return {
         ["id"] = "semantic.question.wellbeing.default.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.wellbeing.default.neutral",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_default.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -928,7 +934,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -941,12 +947,13 @@ return {
         ["id"] = "semantic.question.wellbeing.default.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.question.wellbeing.default.terse",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[12]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_default.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1084,7 +1091,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1097,12 +1104,13 @@ return {
         ["id"] = "semantic.question.wellbeing.default.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.question.wellbeing.default.warm",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[13]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_default.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1240,7 +1248,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1253,12 +1261,13 @@ return {
         ["id"] = "semantic.question.wellbeing.fatigue.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.wellbeing.fatigue.neutral",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[14]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_fatigue.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.fatigue",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1396,7 +1405,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_fatigue.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1409,12 +1418,13 @@ return {
         ["id"] = "semantic.question.wellbeing.fatigue_alt.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.wellbeing.fatigue_alt.neutral",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[15]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_fatigue_alt.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.fatigue_alt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1552,7 +1562,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_fatigue_alt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1565,12 +1575,13 @@ return {
         ["id"] = "semantic.question.wellbeing.hunger.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.wellbeing.hunger.neutral",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[16]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_hunger.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.hunger",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1708,7 +1719,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_hunger.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1721,12 +1732,13 @@ return {
         ["id"] = "semantic.question.wellbeing.hunger_alt.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.wellbeing.hunger_alt.neutral",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[17]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_hunger_alt.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.hunger_alt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1864,7 +1876,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_hunger_alt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1877,12 +1889,13 @@ return {
         ["id"] = "semantic.question.wellbeing.injured.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.question.wellbeing.injured.guarded",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_injured.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.injured",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2020,7 +2033,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_injured.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2033,12 +2046,13 @@ return {
         ["id"] = "semantic.question.wellbeing.injured.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.wellbeing.injured.neutral",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_injured.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.injured",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2176,7 +2190,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_injured.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2189,12 +2203,13 @@ return {
         ["id"] = "semantic.question.wellbeing.injured.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.question.wellbeing.injured.terse",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_injured.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.injured",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2332,7 +2347,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_injured.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2345,12 +2360,13 @@ return {
         ["id"] = "semantic.question.wellbeing.injured.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.question.wellbeing.injured.warm",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_injured.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.injured",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2488,7 +2504,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_injured.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2501,12 +2517,13 @@ return {
         ["id"] = "semantic.question.wellbeing.panic.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.wellbeing.panic.neutral",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_panic.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.panic",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2644,7 +2661,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_panic.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2657,12 +2674,13 @@ return {
         ["id"] = "semantic.question.wellbeing.stress.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.wellbeing.stress.neutral",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_stress.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.stress",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2800,7 +2818,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_stress.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2813,12 +2831,13 @@ return {
         ["id"] = "semantic.question.wellbeing.thirst.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.wellbeing.thirst.neutral",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[18]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_thirst.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.thirst",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2956,7 +2975,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_thirst.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2969,12 +2988,13 @@ return {
         ["id"] = "semantic.question.wellbeing.thirst_alt.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.wellbeing.thirst_alt.neutral",
-            ["sourcePath"] = "psdl/dialogue/wellbeing_content.json#records[19]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_thirst_alt.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/WellbeingContent",
+        ["namespace"] = "semantic.question.wellbeing.thirst_alt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3112,7 +3132,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/wellbeing_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/wellbeing_content/question_wellbeing_thirst_alt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

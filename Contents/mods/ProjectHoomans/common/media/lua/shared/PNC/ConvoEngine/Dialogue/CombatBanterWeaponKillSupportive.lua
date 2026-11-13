@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.supportive.firearm_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "firearm_01",
             ["sourceId"] = "semantic.combat.kill.killer.supportive.firearm_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_supportive.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_firearm_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillSupportive",
+        ["namespace"] = "semantic.combat.kill.killer.supportive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_supportive.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_firearm_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.supportive.melee_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "melee_01",
             ["sourceId"] = "semantic.combat.kill.killer.supportive.melee_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_supportive.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_melee_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillSupportive",
+        ["namespace"] = "semantic.combat.kill.killer.supportive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_supportive.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_supportive/combat_kill_killer_supportive_melee_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.medical.distress.treatment.bandage",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/medical_event_treatment.json",
+        ["source"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
     },
     ["semantic.medical.distress.treatment.default"] = {
         ["domain"] = "medical_event_treatment",
@@ -16,6 +16,6 @@ return {
         },
         ["id"] = "semantic.medical.distress.treatment.default",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/medical_event_treatment.json",
+        ["source"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_default.json",
     },
 }

@@ -15,6 +15,6 @@ return {
             "question.wellbeing",
             "question.wellbeing_detail",
         },
-        ["source"] = "psdl/dialogue/core_check_in.json",
+        ["source"] = "dialogue/core_check_in/social_core_check_in.json",
     },
 }

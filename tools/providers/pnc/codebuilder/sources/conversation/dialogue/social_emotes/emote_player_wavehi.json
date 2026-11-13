@@ -1,0 +1,48 @@
+{
+  "kind": "dialogue",
+  "id": "neutral",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
+    "responseTemplateID": "semantic.emote.player.wavehi",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Hey, {addressee.name}.",
+          "TL": "Uy, {addressee.name}."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Good to see you, {addressee.name}.",
+          "TL": "Mabuti at nakita kita, {addressee.name}."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Morning, {addressee.name}.",
+          "TL": "Magandang umaga, {addressee.name}."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.emote.player.wavehi",
+  "schema": "psychopatz.convo-engine.v1"
+}

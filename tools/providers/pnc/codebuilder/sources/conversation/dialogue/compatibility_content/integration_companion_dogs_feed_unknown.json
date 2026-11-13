@@ -1,0 +1,34 @@
+{
+  "kind": "dialogue",
+  "id": "neutral",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:compatibility_content",
+    "contentOwner": "projecthoomans.dialogue_content.compatibility",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+    "responseTemplateID": "semantic.compat.companion_dogs.feed.unknown",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Here you go, good dog.",
+          "TL": "Here you go, good dog."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.integration.companion_dogs.feed.unknown",
+  "schema": "psychopatz.convo-engine.v1"
+}

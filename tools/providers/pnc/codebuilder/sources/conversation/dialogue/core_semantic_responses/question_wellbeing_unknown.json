@@ -1,0 +1,73 @@
+{
+  "id": "unknown",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.question.wellbeing.unknown",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "UNKNOWN",
+    "variants": [
+      {
+        "id": "semantic.question.wellbeing.unknown.dataset.causal_followup",
+        "metadata": {
+          "fallback": "I can tell something is off, but I do not know what caused it yet.",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "groundedFactRefs": [],
+            "personalityStyle": "truthful",
+            "sourcePoolID": "semantic.question.wellbeing.unknown",
+            "tone": "clarifying",
+            "topic": "WELLBEING",
+            "turns": [
+              {
+                "continuation": "continue",
+                "id": "dataset_causal_wellbeing_unknown",
+                "segments": [
+                  {
+                    "fallback": "I can tell something is off, but I do not know what caused it yet.",
+                    "kind": "translation",
+                    "templateID": "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown",
+                    "translations": {
+                      "EN": "I can tell something is off, but I do not know what caused it yet.",
+                      "TL": "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito."
+                    }
+                  }
+                ]
+              }
+            ],
+            "uncertainty": "unknown"
+          },
+          "priority": 4,
+          "reviewed": true,
+          "sourceRefs": [
+            "MASSIVE",
+            "SGD"
+          ],
+          "templateID": "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown"
+        },
+        "text": {
+          "EN": "I can tell something is off, but I do not know what caused it yet.",
+          "TL": "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito."
+        },
+        "when": {
+          "all": [
+            {
+              "op": "eq",
+              "path": "conversation.healthState",
+              "value": "unknown"
+            },
+            {
+              "op": "eq",
+              "path": "conversation.pattern",
+              "value": "pnc.dataset.question.wellbeing.what_is_going_on_with_you"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.question.wellbeing",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "completed",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/eat.json",
+    "responseTemplateID": "semantic.task.eat.completed",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Finished eating. Feeling much better.",
+          "TL": "Tapos nang kumain. Mas maayos na ang pakiramdam."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "That food helped a lot. Done.",
+          "TL": "Nakatulong nang malaki ang pagkain. Tapos na."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Done eating. Energy restored.",
+          "TL": "Tapos nang kumain. Bumalik na ang lakas."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Stomach is full. Ready to move.",
+          "TL": "Busog na ang tiyan. Handa nang kumilos."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Finished that meal.",
+          "TL": "Natapos na ang pagkain."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "All eaten. Good to keep going.",
+          "TL": "Naubos na. Maayos na para magpatuloy."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Done. That tasted better than expected.",
+          "TL": "Tapos na. Mas masarap kaysa inasahan ko."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Meal completed.",
+          "TL": "Kumpleto na ang pagkain."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Finished eating. Back on task.",
+          "TL": "Tapos nang kumain. Balik sa trabaho."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Rations finished. Strength is back.",
+          "TL": "Naubos ang rasyon. Nagbalik ang lakas."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.task.eat",
+  "schema": "psychopatz.convo-engine.v1"
+}

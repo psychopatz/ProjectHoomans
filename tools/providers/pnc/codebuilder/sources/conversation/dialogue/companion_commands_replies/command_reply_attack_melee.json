@@ -1,0 +1,96 @@
+{
+  "kind": "dialogue",
+  "id": "attack_melee",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
+    "responseTemplateID": "semantic.command.reply.attack_melee"
+  },
+  "response": {
+    "act": "REPLY",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Going in close.",
+          "TL": "Lalapit ako."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Melee ready. Closing the distance.",
+          "TL": "Handa ang pambugbog. Lalapit na ako."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "I'll take them hand-to-hand.",
+          "TL": "Lalabanan ko sila nang malapitan."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Blade and blunt ready.",
+          "TL": "Handa ang talim at pamalo."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Saving ammo. Taking them up close.",
+          "TL": "Magtitipid ng bala. Lalapitan ko sila."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Going in with melee.",
+          "TL": "Lulusob nang malapitan."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "I'll crack some skulls up front.",
+          "TL": "Babaliin ko ang bungo nila sa unahan."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Melee weapon drawn.",
+          "TL": "Nakahugot na ang panlaban nang malapitan."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Moving into striking range.",
+          "TL": "Pumupwesto na sa abot ng hampas."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Understood. Close-quarters combat.",
+          "TL": "Naintindihan. Malapitang bakbakan."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.command.reply",
+  "schema": "psychopatz.convo-engine.v1"
+}

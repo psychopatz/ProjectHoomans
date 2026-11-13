@@ -1,0 +1,25 @@
+{
+  "id": "title",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "semantic_suggestions.title",
+    "textRows": [
+      {
+        "key": "semantic_suggestions.title",
+        "text": {
+          "EN": "CONTEXTUAL SUGGESTIONS",
+          "TL": "MGA MUNGKAHING PANG-USAP"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "CONTEXTUAL SUGGESTIONS",
+    "TL": "MGA MUNGKAHING PANG-USAP"
+  },
+  "namespace": "ui.semantic_suggestions",
+  "schema": "psychopatz.convo-engine.v1"
+}

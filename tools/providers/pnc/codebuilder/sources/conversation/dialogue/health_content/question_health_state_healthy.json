@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/health_state.json",
+        "responseTemplateID": "semantic.question.health_state.healthy",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "I'm fine. Don't make a thing of it.",
+              "TL": "Mabuti ako. Huwag mo nang palakihin."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "Nothing wrong with me. Keep your eyes on the road.",
+              "TL": "Walang mali sa akin. Tumutok ka sa daan."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "No injuries to report. Step back.",
+              "TL": "Walang sugat na dapat sabihin. Umatras ka."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "I'm in fighting shape. Don't worry about me.",
+              "TL": "Kaya ko pang lumaban. Huwag mo akong alalahanin."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Not a scratch on me. That's all you get.",
+              "TL": "Kahit gasgas wala ako. Iyon lang ang masasabi ko."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "I'm completely healthy. Leave it alone.",
+              "TL": "Malusog ako. Huwag mo nang usisain."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Body's holding up just fine. Mind your own health.",
+              "TL": "Maayos ang katawan ko. Asikasuhin mo ang sarili mong kalusugan."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Clean bill of health. You don't need to inspect me.",
+              "TL": "Ligtas ako sa anumang sakit. Hindi mo kailangang siyasatin ako."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "I'm intact and able-bodied. Let's move on.",
+              "TL": "Buo ako at maayos ang katawan. Magpatuloy na tayo."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "No wounds, no sickness. Keep your distance.",
+              "TL": "Walang sugat, walang sakit. Lumayo ka."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.health_state.healthy"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/health_state.json",
+        "responseTemplateID": "semantic.question.health_state.healthy",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I'm doing okay.",
+              "TL": "Ayos lang ako."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Healthy as can be expected out here.",
+              "TL": "Malusog naman ayon sa inaasahan dito."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "No wounds or sickness bothering me right now.",
+              "TL": "Walang sugat o sakit na gumugulo sa akin ngayon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Feeling solid. No injuries to speak of.",
+              "TL": "Maayos ang pakiramdam ko. Walang iniindang sugat."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I'm in good health today, all things considered.",
+              "TL": "Mabuti ang kalusugan ko ngayon, sa kabila ng lahat."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Everything's working the way it should.",
+              "TL": "Gumagana ang lahat nang maayos sa katawan ko."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "No complaints on the physical side today.",
+              "TL": "Walang reklamo sa pisikal kong kalagayan ngayon."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Feeling intact and steady. No wounds on me.",
+              "TL": "Buo at matatag ang pakiramdam ko. Walang sugat sa akin."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Health is holding up fine. Ready for work.",
+              "TL": "Maayos ang kalusugan ko. Handa na para sa gawain."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Not carrying any injuries right now.",
+              "TL": "Wala akong iniindang anumang sugat ngayon."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.health_state.healthy"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/health_state.json",
+        "responseTemplateID": "semantic.question.health_state.healthy",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "I'm okay.",
+              "TL": "Ayos lang."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Healthy.",
+              "TL": "Malusog."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "No injuries.",
+              "TL": "Walang sugat."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "All clear.",
+              "TL": "Ligtas."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Fine.",
+              "TL": "Ayos."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Uninjured.",
+              "TL": "Walang tama."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Doing fine.",
+              "TL": "Maayos."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "No wounds.",
+              "TL": "Walang sugat."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Good shape.",
+              "TL": "Magandang kondisyon."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Solid.",
+              "TL": "Matatag."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.health_state.healthy"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/health_state.json",
+        "responseTemplateID": "semantic.question.health_state.healthy",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "I'm doing okay. Thanks for checking in.",
+              "TL": "Ayos lang ako. Salamat sa pagsuri."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Healthy and feeling good today. Truly appreciate you asking.",
+              "TL": "Malusog at maganda ang pakiramdam ko ngayon. Salamat sa pagtatanong."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Not a scratch on me. Glad you're keeping an eye out.",
+              "TL": "Kahit gasgas wala ako. Salamat sa pagbabantay."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Feeling strong and healthy, friend. Hope you are too.",
+              "TL": "Malakas at malusog ang pakiramdam ko, kaibigan. Sana ikaw rin."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "All intact on my side. Thank you for looking after me.",
+              "TL": "Buo ang lahat sa akin. Salamat sa pag-aalaga mo."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Doing wonderfully, thank you. It's comforting that you asked.",
+              "TL": "Napakaganda ng kalagayan ko, salamat. Nakakapanatag na nagtanong ka."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "In great health today. Ready to face whatever comes our way.",
+              "TL": "Napakalusog ko ngayon. Handa harapin ang anumang dumating."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Feeling well rested and sound. Appreciate the kind check-in.",
+              "TL": "Mabuti ang pahinga at kalagayan ko. Salamat sa magandang pangangamusta."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "No bumps or scrapes today. Thank you for caring.",
+              "TL": "Walang pasa o gasgas ngayon. Salamat sa pagmamalasakit."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "I'm doing great, honestly. Let's make sure we both stay that way.",
+              "TL": "Maayos talaga ako. Siguraduhin nating manatili tayong parehong ganito."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.health_state.healthy"
+    }
+  ]
+}

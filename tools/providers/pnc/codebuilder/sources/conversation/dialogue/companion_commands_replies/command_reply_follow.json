@@ -1,0 +1,96 @@
+{
+  "kind": "dialogue",
+  "id": "follow",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
+    "responseTemplateID": "semantic.command.reply.follow"
+  },
+  "response": {
+    "act": "REPLY",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Right behind you.",
+          "TL": "Susunod ako sa iyo."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Following your lead.",
+          "TL": "Sumusunod sa pangunguna mo."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "I'm with you. Lead on.",
+          "TL": "Kasama mo ako. Mauna ka na."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Right on your heels.",
+          "TL": "Nasa likod mo lang ako."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Understood. Sticking close.",
+          "TL": "Naintindihan. Didikit ako."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Following. Watch our front.",
+          "TL": "Sumusunod na. Bantayan ang unahan natin."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "I'll follow your pace.",
+          "TL": "Sasabay ako sa bilis mo."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Right with you.",
+          "TL": "Kasabay mo na ako."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Moving with you now.",
+          "TL": "Kumikilos na kasabay mo ngayon."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Lead the way. I'm right behind.",
+          "TL": "Ituro ang daan. Kasunod mo lang ako."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.command.reply",
+  "schema": "psychopatz.convo-engine.v1"
+}

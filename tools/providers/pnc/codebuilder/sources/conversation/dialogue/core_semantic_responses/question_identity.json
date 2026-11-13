@@ -1,0 +1,72 @@
+{
+  "id": "identity",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.question.identity",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "IDENTITY",
+    "variants": [
+      {
+        "id": "semantic.question.identity.dataset.stranger_alt_1",
+        "metadata": {
+          "fallback": "I keep my name to myself until I know someone better. What should I call you?",
+          "templateID": "semantic.question.identity.stranger_alt_1"
+        },
+        "text": {
+          "EN": "I keep my name to myself until I know someone better. What should I call you?",
+          "TL": "I keep my name to myself until I know someone better. What should I call you?"
+        }
+      },
+      {
+        "id": "semantic.question.identity.dataset.stranger_alt_2",
+        "metadata": {
+          "fallback": "Let's get to know each other first. What do people call you?",
+          "templateID": "semantic.question.identity.stranger_alt_2"
+        },
+        "text": {
+          "EN": "Let's get to know each other first. What do people call you?",
+          "TL": "Let's get to know each other first. What do people call you?"
+        }
+      },
+      {
+        "id": "semantic.question.identity.dataset.wary_alt_1",
+        "metadata": {
+          "fallback": "I don't trust you enough to share my name. Who are you, really?",
+          "priority": 2,
+          "templateID": "semantic.question.identity.wary_alt_1"
+        },
+        "text": {
+          "EN": "I don't trust you enough to share my name. Who are you, really?",
+          "TL": "I don't trust you enough to share my name. Who are you, really?"
+        },
+        "when": {
+          "op": "eq",
+          "path": "conversation.identityTrust",
+          "value": "untrustworthy"
+        }
+      },
+      {
+        "id": "semantic.question.identity.dataset.wary_alt_2",
+        "metadata": {
+          "fallback": "After that lie, I'm not telling you my name. Tell me the truth about yours.",
+          "priority": 2,
+          "templateID": "semantic.question.identity.wary_alt_2"
+        },
+        "text": {
+          "EN": "After that lie, I'm not telling you my name. Tell me the truth about yours.",
+          "TL": "After that lie, I'm not telling you my name. Tell me the truth about yours."
+        },
+        "when": {
+          "op": "eq",
+          "path": "conversation.identityTrust",
+          "value": "untrustworthy"
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.question",
+  "schema": "psychopatz.convo-engine.v1"
+}

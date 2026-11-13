@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.identity.lie.label",
+    "textRows": [
+      {
+        "key": "suggestion.identity.lie.label",
+        "text": {
+          "EN": "Lie about your name",
+          "TL": "Magsinungaling tungkol sa pangalan"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Lie about your name",
+    "TL": "Magsinungaling tungkol sa pangalan"
+  },
+  "namespace": "ui.suggestion.identity.lie",
+  "schema": "psychopatz.convo-engine.v1"
+}

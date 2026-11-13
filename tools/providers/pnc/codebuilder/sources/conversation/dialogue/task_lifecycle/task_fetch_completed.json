@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "completed",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/fetch.json",
+    "responseTemplateID": "semantic.task.fetch.completed",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Here you go.",
+          "TL": "Heto na."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Retrieved the item. Here it is.",
+          "TL": "Nakuha na ang gamit. Heto na."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Got what you asked for.",
+          "TL": "Nakuha ko ang hiningi mo."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Fetched and delivered.",
+          "TL": "Nakuha at naihatid na."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Here are the goods.",
+          "TL": "Heto ang mga kagamitan."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Task completed. Item secured.",
+          "TL": "Tapos na ang gawain. Nakuha ang gamit."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "All fetched. Safe in hand.",
+          "TL": "Nakuha na lahat. Hawak ko na nang ligtas."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Here it is. One piece.",
+          "TL": "Heto na. Buo pa."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Delivery made. What's next?",
+          "TL": "Naihatid na. Ano ang susunod?"
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Retrieved as requested.",
+          "TL": "Nakuha ayon sa hiling."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.task.fetch",
+  "schema": "psychopatz.convo-engine.v1"
+}

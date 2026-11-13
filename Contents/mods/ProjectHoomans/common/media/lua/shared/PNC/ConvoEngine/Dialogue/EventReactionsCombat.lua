@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.combat.reaction.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "default",
             ["sourceId"] = "semantic.combat.reaction.default",
-            ["sourcePath"] = "psdl/dialogue/event_reactions_combat.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
+        ["namespace"] = "semantic.combat.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/event_reactions_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.combat.reaction.retreat",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "retreat",
             ["sourceId"] = "semantic.combat.reaction.retreat",
-            ["sourcePath"] = "psdl/dialogue/event_reactions_combat.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_retreat.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
+        ["namespace"] = "semantic.combat.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/event_reactions_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_retreat.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.combat.reaction.threat",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "threat",
             ["sourceId"] = "semantic.combat.reaction.threat",
-            ["sourcePath"] = "psdl/dialogue/event_reactions_combat.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_threat.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
+        ["namespace"] = "semantic.combat.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/event_reactions_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_threat.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

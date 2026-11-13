@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.companion.reaction.abandonment",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/event_reactions_companion.json",
+        ["source"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_abandonment.json",
     },
     ["semantic.companion.reaction.camp_rejected"] = {
         ["domain"] = "event_reactions_companion",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "semantic.companion.reaction.camp_rejected",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/event_reactions_companion.json",
+        ["source"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_camp_rejected.json",
     },
     ["semantic.companion.reaction.default"] = {
         ["domain"] = "event_reactions_companion",
@@ -25,6 +25,6 @@ return {
         },
         ["id"] = "semantic.companion.reaction.default",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/event_reactions_companion.json",
+        ["source"] = "adopters/hoomans/dialogue/event_reactions_companion/companion_reaction_default.json",
     },
 }

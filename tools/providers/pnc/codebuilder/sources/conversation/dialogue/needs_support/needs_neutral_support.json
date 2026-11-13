@@ -1,0 +1,217 @@
+{
+  "kind": "dialogue",
+  "id": "support",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "target": {
+    "type": "entity.any",
+    "required": false,
+    "multiple": false
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:needs_neutral",
+    "category": "projecthoomans:needs",
+    "audiences": [
+      "neutral"
+    ],
+    "textTarget": "psdl/needs/neutral/support",
+    "textDomain": "pnc.psdl.needs.neutral.support",
+    "textRows": [
+      {
+        "key": "gift.offer.multiple",
+        "text": {
+          "EN": "I have {giftItemSummary} for you.",
+          "TL": "Mayroon akong {giftItemSummary} para sa iyo."
+        }
+      },
+      {
+        "key": "gift.offer.multiple.alt",
+        "text": {
+          "EN": "Take these if you can use them: {giftItemSummary}.",
+          "TL": "Kunin ang mga ito kung magagamit mo ang mga ito: {giftItemSummary}."
+        }
+      },
+      {
+        "key": "gift.offer.single",
+        "text": {
+          "EN": "Here's {giftItemName}.",
+          "TL": "Narito ang {giftItemName}."
+        }
+      },
+      {
+        "key": "gift.offer.single.alt",
+        "text": {
+          "EN": "I can spare this: {giftItemName}.",
+          "TL": "Maaari ko itong iligtas: {giftItemName}."
+        }
+      },
+      {
+        "key": "gift.received.equipment",
+        "text": {
+          "EN": "Good choice. Something like this can keep a bad day from getting worse.",
+          "TL": "Magandang pagpipilian. Maaaring pigilan ng isang bagay na tulad nito ang masamang araw na lumala."
+        }
+      },
+      {
+        "key": "gift.received.food",
+        "text": {
+          "EN": "This will not go to waste. I appreciate you sharing it with me.",
+          "TL": "Hindi ito mauubos. Pinapahalagahan ko ang pagbabahagi mo nito sa akin."
+        }
+      },
+      {
+        "key": "gift.received.general",
+        "text": {
+          "EN": "I can make use of this. Thank you.",
+          "TL": "Magagamit ko ito. salamat po."
+        }
+      },
+      {
+        "key": "gift.received.medical",
+        "text": {
+          "EN": "That is useful. Thank you for thinking ahead instead of waiting for a crisis.",
+          "TL": "Kapaki-pakinabang iyan. Salamat sa pag-iisip nang maaga sa halip na maghintay ng krisis."
+        }
+      }
+    ]
+  },
+  "response": {
+    "act": "NEEDS",
+    "turns": [
+      {
+        "id": "opening",
+        "metadata": {
+          "textKey": "opening"
+        },
+        "text": {
+          "EN": "There are a few things I could use.",
+          "TL": "May ilang bagay akong magagamit."
+        },
+        "offers": [
+          {
+            "id": "supplies",
+            "label": {
+              "EN": "Need any supplies?",
+              "TL": "Kailangan ng anumang mga supply?"
+            },
+            "utterance": {
+              "EN": "Need any supplies?",
+              "TL": "Kailangan ng anumang mga supply?"
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "SUPPLIES",
+              "topic": "needs"
+            },
+            "metadata": {
+              "choiceKey": "choice.supplies",
+              "responseKey": "response.supplies",
+              "responseText": {
+                "EN": "Food and clean water never hurt.",
+                "TL": "Ang pagkain at malinis na tubig ay hindi nasaktan."
+              }
+            }
+          },
+          {
+            "id": "medical",
+            "label": {
+              "EN": "Any medical problems?",
+              "TL": "Anumang mga medikal na problema?"
+            },
+            "utterance": {
+              "EN": "Any medical problems?",
+              "TL": "Anumang mga medikal na problema?"
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "MEDICAL",
+              "topic": "needs"
+            },
+            "metadata": {
+              "choiceKey": "choice.medical",
+              "responseKey": "response.medical",
+              "responseText": {
+                "EN": "Nothing I cannot handle right now.",
+                "TL": "Wala akong kakayanin ngayon."
+              }
+            }
+          },
+          {
+            "id": "gift",
+            "label": {
+              "EN": "I have something you might need.",
+              "TL": "Mayroon akong isang bagay na maaaring kailanganin mo."
+            },
+            "utterance": {
+              "EN": "I have something you might need.",
+              "TL": "Mayroon akong isang bagay na maaaring kailanganin mo."
+            },
+            "frame": {
+              "intent": "OFFER",
+              "speechAct": "OFFER",
+              "subject": "GIFT",
+              "topic": "needs"
+            },
+            "metadata": {
+              "choiceKey": "choice.gift",
+              "responseKey": "response.gift",
+              "responseText": {
+                "EN": "Let me see what you can spare.",
+                "TL": "Hayaan akong makita kung ano ang maaari mong matitira."
+              },
+              "next": "gift"
+            }
+          }
+        ]
+      },
+      {
+        "id": "gift",
+        "metadata": {
+          "textKey": "gift.opening"
+        },
+        "text": {
+          "EN": "Choose something to give me, then return to the conversation.",
+          "TL": "Pumili ng ibibigay sa akin, pagkatapos ay bumalik sa usapan."
+        },
+        "offers": [
+          {
+            "id": "gift_return",
+            "label": {
+              "EN": "I will hold on to the rest.",
+              "TL": "Hahawakan ko ang natitira."
+            },
+            "utterance": {
+              "EN": "I will hold on to the rest.",
+              "TL": "Hahawakan ko ang natitira."
+            },
+            "frame": {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "GIFT_RETURN",
+              "topic": "needs"
+            },
+            "metadata": {
+              "choiceKey": "choice.gift_return",
+              "responseKey": "response.gift_return",
+              "responseText": {
+                "EN": "Understood.",
+                "TL": "Understood."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "namespace": "needs.neutral",
+  "schema": "psychopatz.convo-engine.v1"
+}

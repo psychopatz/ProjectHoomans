@@ -1,0 +1,47 @@
+{
+  "kind": "dialogue",
+  "id": "return_home",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
+    "responseTemplateID": "semantic.command.player.return_home"
+  },
+  "response": {
+    "act": "DIRECTIVE",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "{addressee.name}, head home.",
+          "TL": "{addressee.name}, umuwi na kayo."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Return to the base, {addressee.name}.",
+          "TL": "Bumalik sa base, {addressee.name}."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "{addressee.name}, get back home safely.",
+          "TL": "{addressee.name}, ligtas na umuwi."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.command.player",
+  "schema": "psychopatz.convo-engine.v1"
+}

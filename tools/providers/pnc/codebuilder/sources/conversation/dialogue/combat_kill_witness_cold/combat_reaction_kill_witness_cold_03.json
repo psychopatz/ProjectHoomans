@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "kill_witness_cold_03",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/cold.json",
+    "responseTemplateID": "semantic.combat.reaction.kill_witness_cold_03",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Fine. One less.",
+          "TL": "Sige. Isa na lang ang nabawas."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Acceptable. Keep moving.",
+          "TL": "Pwede na. Tuloy ang lakad."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "One obstacle eliminated.",
+          "TL": "Isang sagabal ang naalis."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Target down. Sufficient.",
+          "TL": "Bagsak ang target. Sapat na."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Threat neutralized. Proceed.",
+          "TL": "Banta naalis na. Magpatuloy."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "One down. March on.",
+          "TL": "Isang bagsak. Magmartsa."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Handled. Next sector.",
+          "TL": "Naasikaso. Susunod na bahagi."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Done. Do not linger.",
+          "TL": "Tapos. Huwag magtagal."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Adequate strike. Keep the pace.",
+          "TL": "Sapat na tama. Panatilihin ang bilis."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Casualty verified. Step forward.",
+          "TL": "Kumpirmadong biktima. Hakbang pasulong."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.combat.reaction",
+  "schema": "psychopatz.convo-engine.v1"
+}

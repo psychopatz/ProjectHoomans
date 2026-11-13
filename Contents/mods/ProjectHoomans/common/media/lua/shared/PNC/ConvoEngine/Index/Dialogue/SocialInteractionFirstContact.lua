@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.interaction.first_contact.challenge.guarded",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_interaction_first_contact.json",
+        ["source"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
     },
     ["semantic.interaction.first_contact.challenge.neutral"] = {
         ["domain"] = "social_interaction_first_contact",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "semantic.interaction.first_contact.challenge.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_interaction_first_contact.json",
+        ["source"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
     },
     ["semantic.interaction.first_contact.challenge.terse"] = {
         ["domain"] = "social_interaction_first_contact",
@@ -25,7 +25,7 @@ return {
         },
         ["id"] = "semantic.interaction.first_contact.challenge.terse",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_interaction_first_contact.json",
+        ["source"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
     },
     ["semantic.interaction.first_contact.challenge.warm"] = {
         ["domain"] = "social_interaction_first_contact",
@@ -34,6 +34,6 @@ return {
         },
         ["id"] = "semantic.interaction.first_contact.challenge.warm",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_interaction_first_contact.json",
+        ["source"] = "adopters/hoomans/dialogue/social_interaction_first_contact/interaction_first_contact_challenge.json",
     },
 }

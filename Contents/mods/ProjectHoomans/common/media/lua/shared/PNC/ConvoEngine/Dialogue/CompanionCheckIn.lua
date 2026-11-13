@@ -5,12 +5,13 @@ return {
         ["id"] = "social.companion_check_in",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "companion_check_in",
             ["sourceId"] = "social.companion_check_in",
-            ["sourcePath"] = "psdl/dialogue/companion_check_in.json",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_check_in/social_companion_check_in.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCheckIn",
+        ["namespace"] = "social",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_check_in.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_check_in/social_companion_check_in.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

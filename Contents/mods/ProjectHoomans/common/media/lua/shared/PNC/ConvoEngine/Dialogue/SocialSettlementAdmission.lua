@@ -5,12 +5,13 @@ return {
         ["id"] = "social.settlement_admission",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "settlement_admission",
             ["sourceId"] = "social.settlement_admission",
-            ["sourcePath"] = "psdl/dialogue/social_settlement_admission.json",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_settlement_admission/social_settlement_admission.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialSettlementAdmission",
+        ["namespace"] = "social",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -95,7 +96,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_settlement_admission.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_settlement_admission/social_settlement_admission.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

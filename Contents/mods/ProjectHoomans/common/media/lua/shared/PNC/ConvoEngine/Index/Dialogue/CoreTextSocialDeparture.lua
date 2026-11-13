@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "text.departure.confirmed",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/core_text_social_departure.json",
+        ["source"] = "dialogue/core_text_social_departure/departure_confirmed.json",
     },
     ["text.departure.rejected"] = {
         ["domain"] = "core_text_social_departure",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "text.departure.rejected",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/core_text_social_departure.json",
+        ["source"] = "dialogue/core_text_social_departure/departure_rejected.json",
     },
     ["text.departure.warning"] = {
         ["domain"] = "core_text_social_departure",
@@ -25,6 +25,6 @@ return {
         },
         ["id"] = "text.departure.warning",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/core_text_social_departure.json",
+        ["source"] = "dialogue/core_text_social_departure/departure_warning.json",
     },
 }

@@ -1,0 +1,30 @@
+{
+  "id": "former_job",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.question.backstory.known.former_job",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "FORMER_JOB",
+    "variants": [
+      {
+        "id": "semantic.question.backstory.known.former_job.authored",
+        "metadata": {
+          "fallback": "I worked as %1 before all this.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        },
+        "text": {
+          "EN": "I worked as %1 before all this.",
+          "TL": "Nagtrabaho ako bilang %1 bago ang lahat ng ito."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.question.backstory.known",
+  "schema": "psychopatz.convo-engine.v1"
+}

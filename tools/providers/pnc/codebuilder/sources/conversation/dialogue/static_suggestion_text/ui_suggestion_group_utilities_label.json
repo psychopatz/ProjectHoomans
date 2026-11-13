@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.group.utilities.label",
+    "textRows": [
+      {
+        "key": "suggestion.group.utilities.label",
+        "text": {
+          "EN": "Conversation utilities",
+          "TL": "Mga gamit sa usapan"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Conversation utilities",
+    "TL": "Mga gamit sa usapan"
+  },
+  "namespace": "ui.suggestion.group.utilities",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.navigation.camp.guarded",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_camp.json",
     },
     ["semantic.navigation.camp.neutral"] = {
         ["domain"] = "navigation",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "semantic.navigation.camp.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_camp.json",
     },
     ["semantic.navigation.camp.terse"] = {
         ["domain"] = "navigation",
@@ -25,7 +25,7 @@ return {
         },
         ["id"] = "semantic.navigation.camp.terse",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_camp.json",
     },
     ["semantic.navigation.camp.warm"] = {
         ["domain"] = "navigation",
@@ -34,7 +34,7 @@ return {
         },
         ["id"] = "semantic.navigation.camp.warm",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_camp.json",
     },
     ["semantic.navigation.camp_empty.guarded"] = {
         ["domain"] = "navigation",
@@ -43,7 +43,7 @@ return {
         },
         ["id"] = "semantic.navigation.camp_empty.guarded",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_camp_empty.json",
     },
     ["semantic.navigation.camp_empty.neutral"] = {
         ["domain"] = "navigation",
@@ -52,7 +52,7 @@ return {
         },
         ["id"] = "semantic.navigation.camp_empty.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_camp_empty.json",
     },
     ["semantic.navigation.camp_empty.terse"] = {
         ["domain"] = "navigation",
@@ -61,7 +61,7 @@ return {
         },
         ["id"] = "semantic.navigation.camp_empty.terse",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_camp_empty.json",
     },
     ["semantic.navigation.camp_empty.warm"] = {
         ["domain"] = "navigation",
@@ -70,7 +70,7 @@ return {
         },
         ["id"] = "semantic.navigation.camp_empty.warm",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_camp_empty.json",
     },
     ["semantic.navigation.default.guarded"] = {
         ["domain"] = "navigation",
@@ -79,7 +79,7 @@ return {
         },
         ["id"] = "semantic.navigation.default.guarded",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_default.json",
     },
     ["semantic.navigation.default.neutral"] = {
         ["domain"] = "navigation",
@@ -88,7 +88,7 @@ return {
         },
         ["id"] = "semantic.navigation.default.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_default.json",
     },
     ["semantic.navigation.default.terse"] = {
         ["domain"] = "navigation",
@@ -97,7 +97,7 @@ return {
         },
         ["id"] = "semantic.navigation.default.terse",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_default.json",
     },
     ["semantic.navigation.default.warm"] = {
         ["domain"] = "navigation",
@@ -106,7 +106,7 @@ return {
         },
         ["id"] = "semantic.navigation.default.warm",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_default.json",
     },
     ["semantic.navigation.orders.guarded"] = {
         ["domain"] = "navigation",
@@ -115,7 +115,7 @@ return {
         },
         ["id"] = "semantic.navigation.orders.guarded",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_orders.json",
     },
     ["semantic.navigation.orders.neutral"] = {
         ["domain"] = "navigation",
@@ -124,7 +124,7 @@ return {
         },
         ["id"] = "semantic.navigation.orders.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_orders.json",
     },
     ["semantic.navigation.orders.terse"] = {
         ["domain"] = "navigation",
@@ -133,7 +133,7 @@ return {
         },
         ["id"] = "semantic.navigation.orders.terse",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_orders.json",
     },
     ["semantic.navigation.orders.warm"] = {
         ["domain"] = "navigation",
@@ -142,7 +142,7 @@ return {
         },
         ["id"] = "semantic.navigation.orders.warm",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_orders.json",
     },
     ["semantic.navigation.subject_change.guarded"] = {
         ["domain"] = "navigation",
@@ -151,7 +151,7 @@ return {
         },
         ["id"] = "semantic.navigation.subject_change.guarded",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_subject_change.json",
     },
     ["semantic.navigation.subject_change.neutral"] = {
         ["domain"] = "navigation",
@@ -160,7 +160,7 @@ return {
         },
         ["id"] = "semantic.navigation.subject_change.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_subject_change.json",
     },
     ["semantic.navigation.subject_change.terse"] = {
         ["domain"] = "navigation",
@@ -169,7 +169,7 @@ return {
         },
         ["id"] = "semantic.navigation.subject_change.terse",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_subject_change.json",
     },
     ["semantic.navigation.subject_change.warm"] = {
         ["domain"] = "navigation",
@@ -178,6 +178,6 @@ return {
         },
         ["id"] = "semantic.navigation.subject_change.warm",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/navigation.json",
+        ["source"] = "adopters/hoomans/dialogue/navigation/navigation_subject_change.json",
     },
 }

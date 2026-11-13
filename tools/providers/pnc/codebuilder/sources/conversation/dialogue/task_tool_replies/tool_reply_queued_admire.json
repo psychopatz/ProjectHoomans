@@ -1,0 +1,196 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_admire.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_admire.json",
+        "responseTemplateID": "semantic.tool_reply.queued_admire.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I hear you.",
+              "TL": "Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Message received.",
+              "TL": "Natanggap ang mensahe."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I hear what you're saying.",
+              "TL": "Naririnig ko ang sinasabi mo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Understood. I heard that.",
+              "TL": "Naintindihan. Narinig ko 'yon."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Got your words.",
+              "TL": "Nakuha ko ang sinabi mo."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Heard and acknowledged.",
+              "TL": "Narinig at kinilala."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I hear you, loud and clear.",
+              "TL": "Naririnig kita, malakas at malinaw."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Fair enough. I heard that.",
+              "TL": "Makatwiran. Narinig ko 'yon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Noted. I hear you.",
+              "TL": "Tala ko na. Naririnig kita."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I'm listening. Heard.",
+              "TL": "Nakikinig ako. Narinig."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_admire.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_admire.json",
+        "responseTemplateID": "semantic.tool_reply.queued_admire.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That got through.",
+              "TL": "Nakarating iyon sa akin."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "That reached me. Thank you.",
+              "TL": "Tumagos iyon sa akin. Salamat."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I took that in.",
+              "TL": "Inintindi ko iyon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Your message made its mark.",
+              "TL": "Nag-iwan ng marka ang mensahe mo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I felt that. Thanks.",
+              "TL": "Naramdaman ko iyon. Salamat."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "That registered with me.",
+              "TL": "Tumatak iyon sa akin."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "That got through to me.",
+              "TL": "Nakarating iyon sa loob ko."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I received that clearly.",
+              "TL": "Malinaw kong natanggap iyon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "That landed well. Thank you.",
+              "TL": "Maganda ang naging dating niyan. Salamat."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Understood. That made an impression.",
+              "TL": "Naintindihan. Nag-iwan 'yan ng magandang impresyon."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

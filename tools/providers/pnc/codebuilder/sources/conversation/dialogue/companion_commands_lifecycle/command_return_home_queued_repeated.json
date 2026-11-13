@@ -1,0 +1,96 @@
+{
+  "kind": "dialogue",
+  "id": "repeated",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/return_home.json",
+    "responseTemplateID": "semantic.command.return_home.queued.repeated"
+  },
+  "response": {
+    "act": "REPLY",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "I'm still heading home.",
+          "TL": "Pauwi pa rin ako."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Already on my way back. Just navigating the path.",
+          "TL": "Pauwi na ako. Dumaraan lang sa ligtas na ruta."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Still traveling toward base. Be there soon.",
+          "TL": "Naglalakbay pa rin patungong base. Nandoon na agad."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "I haven't stopped moving toward home.",
+          "TL": "Di ako humihinto sa paglakad pauwi."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Already heading home. Keep calm.",
+          "TL": "Pauwi na nga ako. Kumalma ka lang."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Still on the road home.",
+          "TL": "Nasa daan pa rin pauwi."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Almost there. Still heading for base.",
+          "TL": "Malapit na roon. Papatungo pa rin sa base."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Already following the return route.",
+          "TL": "Sumusunod na sa rutang pabalik."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Still en route to home. No need to yell.",
+          "TL": "Nasa biyahe pa rin pauwi. Di kailangang sumigaw."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "I'm already on the way back.",
+          "TL": "Pauwi na talaga ako."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.command.return_home.queued",
+  "schema": "psychopatz.convo-engine.v1"
+}

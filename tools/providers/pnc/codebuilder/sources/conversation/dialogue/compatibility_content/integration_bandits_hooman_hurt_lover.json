@@ -1,0 +1,34 @@
+{
+  "kind": "dialogue",
+  "id": "neutral",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:compatibility_content",
+    "contentOwner": "projecthoomans.dialogue_content.compatibility",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
+    "responseTemplateID": "semantic.compat.bandits.hooman_hurt.lover",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Bandit fire. Stay close; I have got you.",
+          "TL": "Bandit fire. Stay close; I have got you."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.integration.bandits.hooman_hurt.lover",
+  "schema": "psychopatz.convo-engine.v1"
+}

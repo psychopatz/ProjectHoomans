@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "text.death.report",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/core_text_memory_gossip_death.json",
+        ["source"] = "dialogue/core_text_memory_gossip_death/death_report.json",
     },
     ["text.death.sacrifice"] = {
         ["domain"] = "core_text_memory_gossip_death",
@@ -16,6 +16,6 @@ return {
         },
         ["id"] = "text.death.sacrifice",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/core_text_memory_gossip_death.json",
+        ["source"] = "dialogue/core_text_memory_gossip_death/death_sacrifice.json",
     },
 }

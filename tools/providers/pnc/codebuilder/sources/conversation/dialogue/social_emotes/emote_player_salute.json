@@ -1,0 +1,48 @@
+{
+  "kind": "dialogue",
+  "id": "neutral",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
+    "responseTemplateID": "semantic.emote.player.salute",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Respect, {addressee.name}.",
+          "TL": "Paggalang, {addressee.name}."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "I see you, {addressee.name}.",
+          "TL": "Nakikita kita, {addressee.name}."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Stay sharp, {addressee.name}.",
+          "TL": "Manatiling alerto, {addressee.name}."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.emote.player.salute",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.combat.tactical_spatial.hostile.clock.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.combat.tactical_spatial.hostile.clock.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_combat.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_clock.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
+        ["namespace"] = "semantic.combat.tactical_spatial.hostile.clock",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_clock.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.combat.tactical_spatial.hostile.coarse.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.combat.tactical_spatial.hostile.coarse.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_combat.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_coarse.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
+        ["namespace"] = "semantic.combat.tactical_spatial.hostile.coarse",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_hostile_coarse.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.combat.tactical_spatial.zombie.clock.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.combat.tactical_spatial.zombie.clock.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_combat.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_clock.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
+        ["namespace"] = "semantic.combat.tactical_spatial.zombie.clock",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_clock.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.combat.tactical_spatial.zombie.coarse.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.combat.tactical_spatial.zombie.coarse.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_scene_combat.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_coarse.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionSceneCombat",
+        ["namespace"] = "semantic.combat.tactical_spatial.zombie.coarse",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_scene_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_scene_combat/combat_tactical_spatial_zombie_coarse.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.question.needs.offer.fatigue.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.needs.offer.fatigue.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_needs.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_fatigue.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "semantic.question.needs.offer.fatigue",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_needs.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_fatigue.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.question.needs.offer.hunger.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.question.needs.offer.hunger.guarded",
-            ["sourcePath"] = "psdl/dialogue/conversation_needs.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "semantic.question.needs.offer.hunger",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_needs.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.question.needs.offer.hunger.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.needs.offer.hunger.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_needs.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "semantic.question.needs.offer.hunger",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_needs.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.question.needs.offer.hunger.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.question.needs.offer.hunger.terse",
-            ["sourcePath"] = "psdl/dialogue/conversation_needs.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "semantic.question.needs.offer.hunger",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_needs.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -629,12 +633,13 @@ return {
         ["id"] = "semantic.question.needs.offer.hunger.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.question.needs.offer.hunger.warm",
-            ["sourcePath"] = "psdl/dialogue/conversation_needs.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "semantic.question.needs.offer.hunger",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +777,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_needs.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_hunger.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,12 +790,13 @@ return {
         ["id"] = "semantic.question.needs.offer.thirst.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.needs.offer.thirst.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_needs.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_thirst.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "semantic.question.needs.offer.thirst",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -928,7 +934,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_needs.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_thirst.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -941,12 +947,13 @@ return {
         ["id"] = "semantic.question.needs.offer.unknown.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.needs.offer.unknown.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_needs.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_unknown.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "semantic.question.needs.offer.unknown",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1084,7 +1091,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_needs.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_offer_unknown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1097,12 +1104,13 @@ return {
         ["id"] = "semantic.question.needs.proposal.hunger.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.needs.proposal.hunger.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_needs.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_hunger.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "semantic.question.needs.proposal.hunger",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1240,7 +1248,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_needs.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_hunger.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1253,12 +1261,13 @@ return {
         ["id"] = "semantic.question.needs.proposal.thirst.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.needs.proposal.thirst.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_needs.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_thirst.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "semantic.question.needs.proposal.thirst",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1396,7 +1405,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_needs.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_thirst.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1409,12 +1418,13 @@ return {
         ["id"] = "semantic.question.needs.proposal.unknown.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.needs.proposal.unknown.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_needs.json#records[12]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_unknown.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "semantic.question.needs.proposal.unknown",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1552,7 +1562,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_needs.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_proposal_unknown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1565,12 +1575,13 @@ return {
         ["id"] = "semantic.question.needs.quantity.hunger.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.needs.quantity.hunger.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_needs.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_hunger.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "semantic.question.needs.quantity.hunger",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1708,7 +1719,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_needs.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_hunger.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1721,12 +1732,13 @@ return {
         ["id"] = "semantic.question.needs.quantity.thirst.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.needs.quantity.thirst.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_needs.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_thirst.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "semantic.question.needs.quantity.thirst",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1864,7 +1876,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_needs.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_thirst.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1877,12 +1889,13 @@ return {
         ["id"] = "semantic.question.needs.quantity.unknown.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.needs.quantity.unknown.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_needs.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_unknown.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationNeeds",
+        ["namespace"] = "semantic.question.needs.quantity.unknown",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2020,7 +2033,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_needs.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_needs/question_needs_quantity_unknown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

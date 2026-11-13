@@ -1,0 +1,291 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.apology.1.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/apology.json",
+        "responseTemplateID": "semantic.tool_reply.apology.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "All right. Let us move on.",
+              "TL": "Sige. Magpatuloy na tayo."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "No problem. Let us keep moving.",
+              "TL": "Walang anuman. Tuloy na tayo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "We are good. Let us get back to business.",
+              "TL": "Ayos na tayo. Balik na tayo sa ginagawa natin."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Done. No need to dwell on it.",
+              "TL": "Tapos na 'yon. Hindi na kailangang pag-usapan pa."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "All right. Water under the bridge.",
+              "TL": "Sige. Lumipas na 'yon."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Let us put it behind us and focus on surviving.",
+              "TL": "Iwan na natin 'yan sa likod at magpokus sa kaligtasan."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Fine by me. Move forward.",
+              "TL": "Ayos lang sa 'kin. Abante na."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Okay. We move past it.",
+              "TL": "Sige. Kalimutan na 'yon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Agreed. Let us not waste daylight on it.",
+              "TL": "Sang-ayon ako. Huwag nating sayangin ang oras diyan."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Understood. We are square.",
+              "TL": "Naiintindihan ko. Kuwits na tayo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.apology.2.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/apology.json",
+        "responseTemplateID": "semantic.tool_reply.apology.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I accept the apology.",
+              "TL": "Tinatanggap ko ang tawad mo."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Apology accepted. We are fine.",
+              "TL": "Tanggap ko na. Ayos na tayo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I appreciate you owning up to it.",
+              "TL": "Salamat at inamin mo ang pagkakamali mo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Takes guts to say that out here. I accept.",
+              "TL": "Kailangan ng tapang para aminin 'yan dito. Tanggap ko."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Thank you. Apology accepted.",
+              "TL": "Salamat. Tanggap ko ang paumanhin."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "We all make mistakes under pressure. Accepted.",
+              "TL": "Lahat naman nagkakamali kapag tensiyonado. Tanggap ko."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I hear you, and I accept.",
+              "TL": "Narinig kita, at tanggap ko."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Fair enough. Apology accepted.",
+              "TL": "Makatwiran. Tanggap ko ang paumanhin."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Good. I accept your apology.",
+              "TL": "Mabuti. Tinatanggap ko ang tawad mo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I appreciate the honesty. We are good.",
+              "TL": "Salamat sa katapatan. Ayos na tayo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.apology.3.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/apology.json",
+        "responseTemplateID": "semantic.tool_reply.apology.3",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Fine. We can put it behind us.",
+              "TL": "Sige. Iwan na natin sa nakaraan 'yon."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Let it go. We have bigger problems.",
+              "TL": "Hayaan mo na. Mas malaki ang mga problema natin."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "It is done. No grudges.",
+              "TL": "Tapos na. Walang samaan ng loob."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Consider it forgotten.",
+              "TL": "Ituring mo nang limot na."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "We are clear. Do not sweat it.",
+              "TL": "Malinaw na tayo. Huwag mo nang alalahanin."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Past is past. Watch your step next time.",
+              "TL": "Nakalipas na. Mag-ingat ka na lang sa susunod."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I am not holding onto it. Let us move.",
+              "TL": "Hindi ko na 'yan itatago sa loob ko. Tara na."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "All right. We put it behind us.",
+              "TL": "Sige. Kalimutan na natin 'yan."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "No hard feelings. Let us keep our heads on.",
+              "TL": "Walang samaan ng loob. Manatili tayong alisto."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Agreed. It is behind us now.",
+              "TL": "Sige. Tapos na 'yon ngayon."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

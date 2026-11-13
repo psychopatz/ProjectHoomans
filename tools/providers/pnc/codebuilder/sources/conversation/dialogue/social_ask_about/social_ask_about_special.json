@@ -1,0 +1,89 @@
+{
+  "kind": "dialogue",
+  "id": "special",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:ask_about_special",
+    "category": "projecthoomans:ask_about",
+    "audience": "special",
+    "textTarget": "psdl/social/ask_about/special",
+    "textDomain": "pnc.psdl.social.ask_about.special"
+  },
+  "response": {
+    "act": "ASK_ABOUT",
+    "turns": [
+      {
+        "id": "opening",
+        "metadata": {
+          "textKey": "opening"
+        },
+        "text": {
+          "EN": "You can ask me anything, {addressee.name}.",
+          "TL": "Maaari mo akong tanungin tungkol sa kahit ano, {addressee.name}."
+        },
+        "offers": [
+          {
+            "id": "background",
+            "label": {
+              "EN": "Tell me something about your old life.",
+              "TL": "Sabihin mo sa akin ang tungkol sa iyong dating buhay."
+            },
+            "utterance": {
+              "EN": "Tell me something about your old life.",
+              "TL": "Sabihin mo sa akin ang tungkol sa iyong dating buhay."
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "BACKGROUND",
+              "topic": "ask_about"
+            },
+            "metadata": {
+              "choiceKey": "choice.background",
+              "responseKey": "response.background",
+              "responseText": {
+                "EN": "Only if you tell me something about yours afterward.",
+                "TL": "Kung sasabihin mo lang sa akin ang tungkol sa iyo pagkatapos."
+              }
+            }
+          },
+          {
+            "id": "skills",
+            "label": {
+              "EN": "What are you proud of?",
+              "TL": "Ano ang ipinagmamalaki mo?"
+            },
+            "utterance": {
+              "EN": "What are you proud of?",
+              "TL": "Ano ang ipinagmamalaki mo?"
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "SKILLS",
+              "topic": "ask_about"
+            },
+            "metadata": {
+              "choiceKey": "choice.skills",
+              "responseKey": "response.skills",
+              "responseText": {
+                "EN": "Surviving long enough to meet you.",
+                "TL": "Nakaligtas nang sapat upang makilala ka."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "namespace": "social.ask_about",
+  "schema": "psychopatz.convo-engine.v1"
+}

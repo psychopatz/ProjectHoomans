@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.combat.horde.choice.avoid",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "avoid",
             ["sourceId"] = "semantic.combat.horde.choice.avoid",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_combat.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_choice_avoid.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
+        ["namespace"] = "semantic.combat.horde.choice",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -147,7 +148,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_choice_avoid.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -160,12 +161,13 @@ return {
         ["id"] = "semantic.combat.horde.choice.engage",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "engage",
             ["sourceId"] = "semantic.combat.horde.choice.engage",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_combat.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_choice_engage.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
+        ["namespace"] = "semantic.combat.horde.choice",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -302,7 +304,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_choice_engage.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -315,12 +317,13 @@ return {
         ["id"] = "semantic.combat.horde.choice.hold",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "hold",
             ["sourceId"] = "semantic.combat.horde.choice.hold",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_combat.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_choice_hold.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
+        ["namespace"] = "semantic.combat.horde.choice",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -457,7 +460,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_choice_hold.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -470,12 +473,13 @@ return {
         ["id"] = "semantic.combat.horde.deescalated",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "deescalated",
             ["sourceId"] = "semantic.combat.horde.deescalated",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_combat.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_deescalated.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
+        ["namespace"] = "semantic.combat.horde",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -612,7 +616,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_deescalated.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -625,12 +629,13 @@ return {
         ["id"] = "semantic.combat.horde.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "default",
             ["sourceId"] = "semantic.combat.horde.default",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_combat.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
+        ["namespace"] = "semantic.combat.horde",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -767,7 +772,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -780,12 +785,13 @@ return {
         ["id"] = "semantic.combat.horde.escalated",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "escalated",
             ["sourceId"] = "semantic.combat.horde.escalated",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_combat.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_escalated.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
+        ["namespace"] = "semantic.combat.horde",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -922,7 +928,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_escalated.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -935,12 +941,13 @@ return {
         ["id"] = "semantic.combat.horde.prompt.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "default",
             ["sourceId"] = "semantic.combat.horde.prompt.default",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_combat.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_prompt_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
+        ["namespace"] = "semantic.combat.horde.prompt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1077,7 +1084,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_prompt_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1090,12 +1097,13 @@ return {
         ["id"] = "semantic.combat.horde.prompt.eager",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "eager",
             ["sourceId"] = "semantic.combat.horde.prompt.eager",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_combat.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_prompt_eager.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
+        ["namespace"] = "semantic.combat.horde.prompt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1232,7 +1240,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_prompt_eager.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1245,12 +1253,13 @@ return {
         ["id"] = "semantic.combat.horde.prompt.reserved",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "reserved",
             ["sourceId"] = "semantic.combat.horde.prompt.reserved",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_combat.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_prompt_reserved.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
+        ["namespace"] = "semantic.combat.horde.prompt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1387,7 +1396,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_prompt_reserved.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1400,12 +1409,13 @@ return {
         ["id"] = "semantic.combat.horde.prompt.shaken",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "shaken",
             ["sourceId"] = "semantic.combat.horde.prompt.shaken",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_combat.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_prompt_shaken.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
+        ["namespace"] = "semantic.combat.horde.prompt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1542,7 +1552,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_prompt_shaken.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1555,12 +1565,13 @@ return {
         ["id"] = "semantic.combat.horde.started",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "started",
             ["sourceId"] = "semantic.combat.horde.started",
-            ["sourcePath"] = "psdl/dialogue/companion_commands_combat.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_started.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat",
+        ["namespace"] = "semantic.combat.horde",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1697,7 +1708,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_commands_combat.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_started.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

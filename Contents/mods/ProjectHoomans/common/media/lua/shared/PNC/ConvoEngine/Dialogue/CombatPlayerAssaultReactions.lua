@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.combat.player_assaulted.aggressive",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "aggressive",
             ["sourceId"] = "semantic.combat.player_assaulted.aggressive",
-            ["sourcePath"] = "psdl/dialogue/combat_player_assault_reactions.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_aggressive.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
+        ["namespace"] = "semantic.combat.player_assaulted",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_player_assault_reactions.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_aggressive.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.combat.player_assaulted.brave",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "brave",
             ["sourceId"] = "semantic.combat.player_assaulted.brave",
-            ["sourcePath"] = "psdl/dialogue/combat_player_assault_reactions.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_brave.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
+        ["namespace"] = "semantic.combat.player_assaulted",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_player_assault_reactions.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_brave.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.combat.player_assaulted.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "default",
             ["sourceId"] = "semantic.combat.player_assaulted.default",
-            ["sourcePath"] = "psdl/dialogue/combat_player_assault_reactions.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
+        ["namespace"] = "semantic.combat.player_assaulted",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_player_assault_reactions.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.combat.player_assaulted.reserved",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "reserved",
             ["sourceId"] = "semantic.combat.player_assaulted.reserved",
-            ["sourcePath"] = "psdl/dialogue/combat_player_assault_reactions.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_reserved.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
+        ["namespace"] = "semantic.combat.player_assaulted",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_player_assault_reactions.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_reserved.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -629,12 +633,13 @@ return {
         ["id"] = "semantic.combat.player_assaulted.shaken",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "shaken",
             ["sourceId"] = "semantic.combat.player_assaulted.shaken",
-            ["sourcePath"] = "psdl/dialogue/combat_player_assault_reactions.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_shaken.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
+        ["namespace"] = "semantic.combat.player_assaulted",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +777,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_player_assault_reactions.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_player_assault_reactions/combat_player_assaulted_shaken.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

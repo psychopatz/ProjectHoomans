@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "neutral",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:conversation_content",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
+    "responseTemplateID": "semantic.question.needs.offer.unknown",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "I don't know what I need right now.",
+          "TL": "Hindi ko alam kung ano ang kailangan ko ngayon."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Hard to say what would help most at the moment.",
+          "TL": "Mahirap sabihin kung ano ang pinakakailangan sa ngayon."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Not entirely sure what supplies I'm missing yet.",
+          "TL": "Hindi pa ako sigurado kung anong gamit ang kulang sa akin."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Need a minute to take inventory of my situation.",
+          "TL": "Kailangan ko ng sandali para alamin ang sitwasyon ko."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Can't pinpoint what I need right now. Let me check my bag.",
+          "TL": "Hindi ko masabi kung anong kailangan ngayon. Tingnan ko muna gamit ko."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Nothing specific comes to mind right this second.",
+          "TL": "Walang partikular na pumapasok sa isip ko sa ngayon."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Unsure. Let me get my thoughts together first.",
+          "TL": "Hindi sigurado. Ayusin ko muna ang mga iniisip ko."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "I'm okay for now, or at least nothing urgent stands out.",
+          "TL": "Maayos pa naman sa ngayon, o walang agarang kailangan."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Not sure what to ask for. What do you have available?",
+          "TL": "Hindi ko alam kung anong hihingin. Anong mayroon ka?"
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Can't tell what would help most right now. Ask me later.",
+          "TL": "Hindi ko masabi kung anong makakatulong ngayon. Tanungin mo ako mamaya."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.question.needs.offer.unknown",
+  "schema": "psychopatz.convo-engine.v1"
+}

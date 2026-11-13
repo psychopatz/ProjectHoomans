@@ -1,0 +1,25 @@
+{
+  "id": "utterance",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.wait_at.utterance",
+    "textRows": [
+      {
+        "key": "suggestion.wait_at.utterance",
+        "text": {
+          "EN": "Wait there.",
+          "TL": "Maghintay ka roon."
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Wait there.",
+    "TL": "Maghintay ka roon."
+  },
+  "namespace": "ui.suggestion.wait_at",
+  "schema": "psychopatz.convo-engine.v1"
+}

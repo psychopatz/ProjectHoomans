@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.conversation.acknowledged.default.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.conversation.acknowledged.default.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.conversation.acknowledged.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.conversation.acknowledged.default.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.conversation.acknowledged.default.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.conversation.acknowledged.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.conversation.acknowledged.default.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.conversation.acknowledged.default.terse",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.conversation.acknowledged.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.conversation.acknowledged.default.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.conversation.acknowledged.default.warm",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.conversation.acknowledged.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/conversation_acknowledged_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -629,12 +633,13 @@ return {
         ["id"] = "semantic.emote.player.clap.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.player.clap.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_clap.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.player.clap",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -695,7 +700,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_player_clap.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -708,12 +713,13 @@ return {
         ["id"] = "semantic.emote.player.insult.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.player.insult.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_insult.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.player.insult",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -774,7 +780,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_player_insult.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -787,12 +793,13 @@ return {
         ["id"] = "semantic.emote.player.salute.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.player.salute.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_salute.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.player.salute",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -853,7 +860,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_player_salute.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -866,12 +873,13 @@ return {
         ["id"] = "semantic.emote.player.thankyou.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.player.thankyou.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_thankyou.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.player.thankyou",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -932,7 +940,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_player_thankyou.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -945,12 +953,13 @@ return {
         ["id"] = "semantic.emote.player.thumbsdown.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.player.thumbsdown.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_thumbsdown.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.player.thumbsdown",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1011,7 +1020,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_player_thumbsdown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1024,12 +1033,13 @@ return {
         ["id"] = "semantic.emote.player.thumbsup.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.player.thumbsup.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_thumbsup.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.player.thumbsup",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1090,7 +1100,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_player_thumbsup.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1103,12 +1113,13 @@ return {
         ["id"] = "semantic.emote.player.wavebye.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.player.wavebye.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_wavebye.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.player.wavebye",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1169,7 +1180,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_player_wavebye.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1182,12 +1193,13 @@ return {
         ["id"] = "semantic.emote.player.wavehi.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.player.wavehi.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_player_wavehi.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.player.wavehi",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1248,7 +1260,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_player_wavehi.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1261,12 +1273,13 @@ return {
         ["id"] = "semantic.emote.reply.clap.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.reply.clap.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[12]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_clap.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.clap",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1404,7 +1417,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_clap.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1417,12 +1430,13 @@ return {
         ["id"] = "semantic.emote.reply.clap.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.emote.reply.clap.warm",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[13]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_clap.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.clap",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1560,7 +1574,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_clap.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1573,12 +1587,13 @@ return {
         ["id"] = "semantic.emote.reply.default.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.reply.default.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[14]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1716,7 +1731,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1729,12 +1744,13 @@ return {
         ["id"] = "semantic.emote.reply.insult.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.reply.insult.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[15]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_insult.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.insult",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1872,7 +1888,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_insult.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1885,12 +1901,13 @@ return {
         ["id"] = "semantic.emote.reply.insult.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.emote.reply.insult.warm",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[16]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_insult.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.insult",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2028,7 +2045,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_insult.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2041,12 +2058,13 @@ return {
         ["id"] = "semantic.emote.reply.salute.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.reply.salute.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[17]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_salute.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.salute",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2184,7 +2202,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_salute.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2197,12 +2215,13 @@ return {
         ["id"] = "semantic.emote.reply.salute.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.emote.reply.salute.warm",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[18]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_salute.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.salute",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2340,7 +2359,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_salute.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2353,12 +2372,13 @@ return {
         ["id"] = "semantic.emote.reply.thankyou.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.reply.thankyou.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[19]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thankyou.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.thankyou",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2496,7 +2516,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thankyou.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2509,12 +2529,13 @@ return {
         ["id"] = "semantic.emote.reply.thankyou.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.emote.reply.thankyou.warm",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[20]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thankyou.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.thankyou",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2652,7 +2673,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thankyou.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2665,12 +2686,13 @@ return {
         ["id"] = "semantic.emote.reply.thumbsdown.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.reply.thumbsdown.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[21]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsdown.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.thumbsdown",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2808,7 +2830,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsdown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2821,12 +2843,13 @@ return {
         ["id"] = "semantic.emote.reply.thumbsup.active.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.reply.thumbsup.active.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[24]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup_active.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.thumbsup.active",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2964,7 +2987,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup_active.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2977,12 +3000,13 @@ return {
         ["id"] = "semantic.emote.reply.thumbsup.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.reply.thumbsup.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[22]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.thumbsup",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3120,7 +3144,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3133,12 +3157,13 @@ return {
         ["id"] = "semantic.emote.reply.thumbsup.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.emote.reply.thumbsup.warm",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[23]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.thumbsup",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3276,7 +3301,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_thumbsup.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3289,12 +3314,13 @@ return {
         ["id"] = "semantic.emote.reply.wavebye.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.reply.wavebye.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[25]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavebye.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.wavebye",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3432,7 +3458,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavebye.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3445,12 +3471,13 @@ return {
         ["id"] = "semantic.emote.reply.wavebye.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.emote.reply.wavebye.warm",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[26]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavebye.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.wavebye",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3588,7 +3615,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavebye.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3601,12 +3628,13 @@ return {
         ["id"] = "semantic.emote.reply.wavehi.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.emote.reply.wavehi.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[27]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.wavehi",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3744,7 +3772,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3757,12 +3785,13 @@ return {
         ["id"] = "semantic.emote.reply.wavehi.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.emote.reply.wavehi.terse",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[28]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.wavehi",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3900,7 +3929,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3913,12 +3942,13 @@ return {
         ["id"] = "semantic.emote.reply.wavehi.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.emote.reply.wavehi.warm",
-            ["sourcePath"] = "psdl/dialogue/social_emotes.json#records[29]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialEmotes",
+        ["namespace"] = "semantic.emote.reply.wavehi",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4056,7 +4086,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_emotes.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_emotes/emote_reply_wavehi.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

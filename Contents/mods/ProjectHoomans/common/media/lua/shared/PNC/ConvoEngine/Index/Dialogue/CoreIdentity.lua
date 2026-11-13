@@ -16,6 +16,6 @@ return {
             "question.identity_nickname",
             "question.identity_surname",
         },
-        ["source"] = "psdl/dialogue/core_identity.json",
+        ["source"] = "dialogue/core_identity/social_core_identity.json",
     },
 }

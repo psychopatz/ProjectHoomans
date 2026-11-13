@@ -10,7 +10,7 @@ return {
         },
         ["id"] = "question.activity",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/core_check_in.json",
+        ["source"] = "dialogue/core_check_in/social_core_check_in.json",
     },
     ["question.date"] = {
         ["dependents"] = {
@@ -22,7 +22,7 @@ return {
         },
         ["id"] = "question.date",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/core_check_in.json",
+        ["source"] = "dialogue/core_check_in/social_core_check_in.json",
     },
     ["question.time"] = {
         ["dependents"] = {
@@ -34,7 +34,7 @@ return {
         },
         ["id"] = "question.time",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/core_check_in.json",
+        ["source"] = "dialogue/core_check_in/social_core_check_in.json",
     },
     ["question.weather"] = {
         ["dependents"] = {
@@ -46,7 +46,7 @@ return {
         },
         ["id"] = "question.weather",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/core_check_in.json",
+        ["source"] = "dialogue/core_check_in/social_core_check_in.json",
     },
     ["question.wellbeing"] = {
         ["dependents"] = {
@@ -58,7 +58,7 @@ return {
         },
         ["id"] = "question.wellbeing",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/core_check_in.json",
+        ["source"] = "dialogue/core_check_in/social_core_check_in.json",
     },
     ["question.wellbeing_detail"] = {
         ["dependents"] = {
@@ -70,6 +70,6 @@ return {
         },
         ["id"] = "question.wellbeing_detail",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/core_check_in.json",
+        ["source"] = "dialogue/core_check_in/social_core_check_in.json",
     },
 }

@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "text.identity.introduction",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/core_text_social_identity.json",
+        ["source"] = "dialogue/core_text_social_identity/identity_introduction.json",
     },
 }

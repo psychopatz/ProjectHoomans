@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.social.acknowledged.bond_guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "bond_guarded",
             ["sourceId"] = "semantic.social.acknowledged.bond_guarded",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged_bond_guarded.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.acknowledged",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged_bond_guarded.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.social.acknowledged.bond_neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "bond_neutral",
             ["sourceId"] = "semantic.social.acknowledged.bond_neutral",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged_bond_neutral.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.acknowledged",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged_bond_neutral.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.social.acknowledged.bond_terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "bond_terse",
             ["sourceId"] = "semantic.social.acknowledged.bond_terse",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged_bond_terse.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.acknowledged",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged_bond_terse.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.social.acknowledged.bond_warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "bond_warm",
             ["sourceId"] = "semantic.social.acknowledged.bond_warm",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged_bond_warm.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.acknowledged",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged_bond_warm.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -629,12 +633,13 @@ return {
         ["id"] = "semantic.social.acknowledged.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.social.acknowledged.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.acknowledged",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +777,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,12 +790,13 @@ return {
         ["id"] = "semantic.social.acknowledged.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.social.acknowledged.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.acknowledged",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -928,7 +934,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -941,12 +947,13 @@ return {
         ["id"] = "semantic.social.acknowledged.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.social.acknowledged.terse",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.acknowledged",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1084,7 +1091,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1097,12 +1104,13 @@ return {
         ["id"] = "semantic.social.acknowledged.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.social.acknowledged.warm",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.acknowledged",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1240,7 +1248,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_acknowledged.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1253,12 +1261,13 @@ return {
         ["id"] = "semantic.social.dispute_friendly.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.social.dispute_friendly.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_friendly.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1396,7 +1405,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_friendly.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1409,12 +1418,13 @@ return {
         ["id"] = "semantic.social.dispute_friendly.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.social.dispute_friendly.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_friendly.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1552,7 +1562,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_friendly.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1565,12 +1575,13 @@ return {
         ["id"] = "semantic.social.dispute_friendly.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.social.dispute_friendly.terse",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_friendly.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1708,7 +1719,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_friendly.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1721,12 +1732,13 @@ return {
         ["id"] = "semantic.social.dispute_friendly.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.social.dispute_friendly.warm",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_friendly.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1864,7 +1876,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_friendly.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1877,12 +1889,13 @@ return {
         ["id"] = "semantic.social.dispute_stressed.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.social.dispute_stressed.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[12]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_stressed.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_stressed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2020,7 +2033,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_stressed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2033,12 +2046,13 @@ return {
         ["id"] = "semantic.social.dispute_stressed.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.social.dispute_stressed.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[13]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_stressed.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_stressed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2176,7 +2190,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_stressed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2189,12 +2203,13 @@ return {
         ["id"] = "semantic.social.dispute_stressed.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.social.dispute_stressed.terse",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[14]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_stressed.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_stressed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2332,7 +2347,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_stressed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2345,12 +2360,13 @@ return {
         ["id"] = "semantic.social.dispute_stressed.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.social.dispute_stressed.warm",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[15]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_stressed.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_stressed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2488,7 +2504,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_stressed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2501,12 +2517,13 @@ return {
         ["id"] = "semantic.social.dispute_trusted.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.social.dispute_trusted.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[16]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_trusted.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_trusted",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2644,7 +2661,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_trusted.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2657,12 +2674,13 @@ return {
         ["id"] = "semantic.social.dispute_trusted.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.social.dispute_trusted.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[17]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_trusted.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_trusted",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2800,7 +2818,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_trusted.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2813,12 +2831,13 @@ return {
         ["id"] = "semantic.social.dispute_trusted.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.social.dispute_trusted.terse",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[18]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_trusted.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_trusted",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2956,7 +2975,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_trusted.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2969,12 +2988,13 @@ return {
         ["id"] = "semantic.social.dispute_trusted.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.social.dispute_trusted.warm",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[19]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_trusted.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_trusted",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3112,7 +3132,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_trusted.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3125,12 +3145,13 @@ return {
         ["id"] = "semantic.social.dispute_withdrawn.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.social.dispute_withdrawn.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[20]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_withdrawn",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3268,7 +3289,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3281,12 +3302,13 @@ return {
         ["id"] = "semantic.social.dispute_withdrawn.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.social.dispute_withdrawn.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[21]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_withdrawn",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3424,7 +3446,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3437,12 +3459,13 @@ return {
         ["id"] = "semantic.social.dispute_withdrawn.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.social.dispute_withdrawn.terse",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[22]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_withdrawn",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3580,7 +3603,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3593,12 +3616,13 @@ return {
         ["id"] = "semantic.social.dispute_withdrawn.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.social.dispute_withdrawn.warm",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[23]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.dispute_withdrawn",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3736,7 +3760,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_dispute_withdrawn.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3749,12 +3773,13 @@ return {
         ["id"] = "semantic.social.hostile_boundary.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.social.hostile_boundary.guarded",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[24]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_hostile_boundary.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.hostile_boundary",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3892,7 +3917,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_hostile_boundary.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3905,12 +3930,13 @@ return {
         ["id"] = "semantic.social.hostile_boundary.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.social.hostile_boundary.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[25]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_hostile_boundary.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.hostile_boundary",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4048,7 +4074,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_hostile_boundary.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4061,12 +4087,13 @@ return {
         ["id"] = "semantic.social.hostile_boundary.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.social.hostile_boundary.terse",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[26]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_hostile_boundary.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.hostile_boundary",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4204,7 +4231,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_hostile_boundary.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4217,12 +4244,13 @@ return {
         ["id"] = "semantic.social.hostile_boundary.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.social.hostile_boundary.warm",
-            ["sourcePath"] = "psdl/dialogue/social_reactions_ack_dispute.json#records[27]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_hostile_boundary.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
+        ["namespace"] = "semantic.social.hostile_boundary",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4360,7 +4388,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_reactions_ack_dispute.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_reactions_ack_dispute/social_hostile_boundary.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+        "responseTemplateID": "semantic.social.hostile_stressed",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "That's enough. Back away.",
+              "TL": "Tama na. Umatras ka."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "Get back before I make you.",
+              "TL": "Umatras ka bago pa kita pilitin."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Give me space right now.",
+              "TL": "Bigyan mo ako ng puwang ngayon din."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Step back and keep your hands where I can see them.",
+              "TL": "Umatras ka at panatilihin ang kamay sa kita ko."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "I am armed and exhausted. Back off.",
+              "TL": "May armas ako at pagod na. Lumayo ka."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "Back away from me immediately.",
+              "TL": "Lumayo ka sa akin agad-agad."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Don't crowd me while my nerves are on edge.",
+              "TL": "Huwag mo akong dikitan habang tensiyonado ako."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Move back now.",
+              "TL": "Umatras ka ngayon."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "I'm not warning you again. Step back.",
+              "TL": "Hindi na kita babalaan ulit. Umatras ka."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Stay five paces away from me.",
+              "TL": "Manatili kang limang hakbang ang layo sa akin."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.hostile_stressed"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+        "responseTemplateID": "semantic.social.hostile_stressed",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That's enough. Everyone needs to step back.",
+              "TL": "Tama na. Kailangang umatras ng lahat."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Please give me some space to cool off.",
+              "TL": "Pakiusap bigyan mo ako ng puwang para kumalma."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "We're all too stressed for this. Step away.",
+              "TL": "Masyado tayong tensiyonado para rito. Lumayo muna."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Back up. Let's not make things worse.",
+              "TL": "Umatras ka. Huwag nating palalain ang sitwasyon."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I need room to think. Step back.",
+              "TL": "Kailangan ko ng espasyo para mag-isip. Umatras ka."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Let's put some distance between us right now.",
+              "TL": "Maglagay muna tayo ng distansya ngayon."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Back away until tempers settle down.",
+              "TL": "Umatras muna hanggang sa humupa ang init ng ulo."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Stop crowding me. Take a few steps back.",
+              "TL": "Huwag mo akong sikipin. Umatras ka nang ilang hakbang."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "We need space right now. Move back.",
+              "TL": "Kailangan natin ng puwang ngayon. Umatras ka."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Give it some breathing room.",
+              "TL": "Bigyan mo ng puwang para makahinga."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.hostile_stressed"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+        "responseTemplateID": "semantic.social.hostile_stressed",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Back off.",
+              "TL": "Umatras ka."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Step back.",
+              "TL": "Lumayo ka."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Space.",
+              "TL": "Puwang."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Away.",
+              "TL": "Malayo."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Back up.",
+              "TL": "Abante pabalik."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Not close.",
+              "TL": "Huwag lumapit."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Distance.",
+              "TL": "Distansya."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Enough.",
+              "TL": "Sapat na."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Move.",
+              "TL": "Kilos."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Off me.",
+              "TL": "Umalis ka sa tabi ko."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.hostile_stressed"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+        "responseTemplateID": "semantic.social.hostile_stressed",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "Hey, please, give me some space. I'm overwhelmed.",
+              "TL": "Huy, pakiusap, bigyan mo ako ng puwang. Sobra na ang bigat."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "I don't want to snap at you, so please step back for a moment.",
+              "TL": "Ayokong masigawan ka, kaya pakiusap umatras ka muna."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "I love you as a friend, but I really need room to breathe right now.",
+              "TL": "Mahalaga ka sa 'kin bilang kaibigan, pero kailangan ko talagang makahinga ngayon."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Let's put a little distance between us so we don't say things we regret.",
+              "TL": "Maglagay muna tayo ng kaunting distansya para di tayo magkasakitan."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "I'm asking gently: please back away for a minute.",
+              "TL": "Nakikiusap ako nang maayos: umatras ka muna sandali."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "I'm on the verge of breaking. Give me a minute alone.",
+              "TL": "Bibigay na ako. Bigyan mo muna ako ng sandaling mag-isa."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Step back, partner. Let's both catch our breath.",
+              "TL": "Umatras ka muna, kasama. Huminga muna tayong pareho."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "We're going to be okay, but I need physical space right now.",
+              "TL": "Magiging maayos tayo, pero kailangan ko ng espasyo ngayon."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Please, just let me sit with my thoughts for a bit.",
+              "TL": "Pakiusap, hayaan mo muna akong mapag-isa nang kaunti."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Back away for now. We'll talk when my head clears.",
+              "TL": "Lumayo muna ngayon. Mag-uusap tayo kapag luminaw na ang isip ko."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.hostile_stressed"
+    }
+  ]
+}

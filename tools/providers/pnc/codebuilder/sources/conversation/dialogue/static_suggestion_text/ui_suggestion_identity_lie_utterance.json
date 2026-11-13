@@ -1,0 +1,25 @@
+{
+  "id": "utterance",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.identity.lie.utterance",
+    "textRows": [
+      {
+        "key": "suggestion.identity.lie.utterance",
+        "text": {
+          "EN": "I'll go by a different name.",
+          "TL": "Ibang pangalan ang gagamitin ko."
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "I'll go by a different name.",
+    "TL": "Ibang pangalan ang gagamitin ko."
+  },
+  "namespace": "ui.suggestion.identity.lie",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.aggressive.axe_head_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "axe_head_01",
             ["sourceId"] = "semantic.combat.kill.killer.aggressive.axe_head_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_aggressive.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
+        ["namespace"] = "semantic.combat.kill.killer.aggressive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_aggressive.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_axe_head_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.aggressive.blade_head_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "blade_head_01",
             ["sourceId"] = "semantic.combat.kill.killer.aggressive.blade_head_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_aggressive.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blade_head_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
+        ["namespace"] = "semantic.combat.kill.killer.aggressive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_aggressive.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blade_head_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.aggressive.blunt_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "blunt_01",
             ["sourceId"] = "semantic.combat.kill.killer.aggressive.blunt_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_aggressive.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blunt_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
+        ["namespace"] = "semantic.combat.kill.killer.aggressive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_aggressive.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_blunt_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.aggressive.firearm_high_named_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "firearm_high_named_01",
             ["sourceId"] = "semantic.combat.kill.killer.aggressive.firearm_high_named_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_aggressive.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
+        ["namespace"] = "semantic.combat.kill.killer.aggressive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -622,7 +626,7 @@ return {
                 ["type"] = "entity.item",
             },
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_aggressive.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -635,12 +639,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.aggressive.firearm_high_named_02",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "firearm_high_named_02",
             ["sourceId"] = "semantic.combat.kill.killer.aggressive.firearm_high_named_02",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_aggressive.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named_02.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
+        ["namespace"] = "semantic.combat.kill.killer.aggressive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -778,7 +783,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_aggressive.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_firearm_high_named_02.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -791,12 +796,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.aggressive.spear_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "spear_01",
             ["sourceId"] = "semantic.combat.kill.killer.aggressive.spear_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_aggressive.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_spear_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillAggressive",
+        ["namespace"] = "semantic.combat.kill.killer.aggressive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -934,7 +940,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_aggressive.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_aggressive/combat_kill_killer_aggressive_spear_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

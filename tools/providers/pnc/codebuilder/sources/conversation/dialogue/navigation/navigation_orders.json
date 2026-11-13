@@ -1,0 +1,546 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:navigation",
+        "sourceSurface": "content/navigation.json",
+        "responseTemplateID": "semantic.navigation.orders",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "NAVIGATION_RESPONSE",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.orders.neutral.01"
+            },
+            "text": {
+              "EN": "All right. What do you need?",
+              "TL": "Sige. Ano ang kailangan mo?"
+            }
+          },
+          {
+            "id": "neutral.02",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.orders.neutral.02"
+            },
+            "text": {
+              "EN": "What are your orders?",
+              "TL": "Ano ang mga utos mo?"
+            }
+          },
+          {
+            "id": "neutral.03",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.orders.neutral.03"
+            },
+            "text": {
+              "EN": "I'm ready for instructions. What should I do?",
+              "TL": "Handa na ako sa tagubilin. Ano'ng dapat kong gawin?"
+            }
+          },
+          {
+            "id": "neutral.04",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.orders.neutral.04"
+            },
+            "text": {
+              "EN": "What do you need me to handle?",
+              "TL": "Ano ang kailangan mong asikasuhin ko?"
+            }
+          },
+          {
+            "id": "neutral.05",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.orders.neutral.05"
+            },
+            "text": {
+              "EN": "Give me the task.",
+              "TL": "Ibigay mo sa akin ang gawain."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.orders.neutral.06"
+            },
+            "text": {
+              "EN": "What are our next steps?",
+              "TL": "Ano ang susunod nating mga hakbang?"
+            }
+          },
+          {
+            "id": "neutral.07",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.orders.neutral.07"
+            },
+            "text": {
+              "EN": "Standing by for orders.",
+              "TL": "Nakaabang sa mga utos."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.orders.neutral.08"
+            },
+            "text": {
+              "EN": "What would you like me to do next?",
+              "TL": "Ano ang gusto mong gawin ko susunod?"
+            }
+          },
+          {
+            "id": "neutral.09",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.orders.neutral.09"
+            },
+            "text": {
+              "EN": "Tell me what needs doing.",
+              "TL": "Sabihin mo kung ano ang kailangang gawin."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.orders.neutral.10"
+            },
+            "text": {
+              "EN": "Awaiting your directive.",
+              "TL": "Naghihintay sa tagubilin mo."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.navigation.orders"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:navigation",
+        "sourceSurface": "content/navigation.json",
+        "responseTemplateID": "semantic.navigation.orders",
+        "style": "warm"
+      },
+      "response": {
+        "act": "NAVIGATION_RESPONSE",
+        "variants": [
+          {
+            "id": "warm.01",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.orders.warm.01"
+            },
+            "text": {
+              "EN": "Sure. What do you need?",
+              "TL": "Sige. Ano ang kailangan mo?"
+            }
+          },
+          {
+            "id": "warm.02",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.orders.warm.02"
+            },
+            "text": {
+              "EN": "Whatever you need, I'm glad to help.",
+              "TL": "Kahit ano'ng kailangan mo, masaya akong tumulong."
+            }
+          },
+          {
+            "id": "warm.03",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.orders.warm.03"
+            },
+            "text": {
+              "EN": "Just tell me what to do and I'll see to it.",
+              "TL": "Sabihin mo lang kung ano'ng gagawin at ako na ang bahala."
+            }
+          },
+          {
+            "id": "warm.04",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.orders.warm.04"
+            },
+            "text": {
+              "EN": "Ready to work together. What's the plan?",
+              "TL": "Handang magtulungan. Ano'ng plano?"
+            }
+          },
+          {
+            "id": "warm.05",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.orders.warm.05"
+            },
+            "text": {
+              "EN": "What would you like me to take care of?",
+              "TL": "Ano ang gusto mong asikasuhin ko?"
+            }
+          },
+          {
+            "id": "warm.06",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.orders.warm.06"
+            },
+            "text": {
+              "EN": "Always happy to lend a hand. What's the task?",
+              "TL": "Laging handang tumulong. Ano'ng gawain?"
+            }
+          },
+          {
+            "id": "warm.07",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.orders.warm.07"
+            },
+            "text": {
+              "EN": "Tell me how I can help you right now.",
+              "TL": "Sabihin mo kung paano ako makakatulong sa'yo ngayon."
+            }
+          },
+          {
+            "id": "warm.08",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.orders.warm.08"
+            },
+            "text": {
+              "EN": "I'm with you all the way. What do you need?",
+              "TL": "Kasama mo ako sa lahat. Ano'ng kailangan mo?"
+            }
+          },
+          {
+            "id": "warm.09",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.orders.warm.09"
+            },
+            "text": {
+              "EN": "Happy to follow your lead. What's next?",
+              "TL": "Masayang sumunod sa pamumuno mo. Ano'ng susunod?"
+            }
+          },
+          {
+            "id": "warm.10",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.orders.warm.10"
+            },
+            "text": {
+              "EN": "Give me a job and I'll do my best.",
+              "TL": "Bigyan mo ako ng gawain at gagawin ko ang makakaya ko."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.navigation.orders"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:navigation",
+        "sourceSurface": "content/navigation.json",
+        "responseTemplateID": "semantic.navigation.orders",
+        "style": "terse"
+      },
+      "response": {
+        "act": "NAVIGATION_RESPONSE",
+        "variants": [
+          {
+            "id": "terse.01",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.orders.terse.01"
+            },
+            "text": {
+              "EN": "What do you need?",
+              "TL": "Ano ang kailangan mo?"
+            }
+          },
+          {
+            "id": "terse.02",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.orders.terse.02"
+            },
+            "text": {
+              "EN": "Orders?",
+              "TL": "Mga utos?"
+            }
+          },
+          {
+            "id": "terse.03",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.orders.terse.03"
+            },
+            "text": {
+              "EN": "Command?",
+              "TL": "Utos?"
+            }
+          },
+          {
+            "id": "terse.04",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.orders.terse.04"
+            },
+            "text": {
+              "EN": "Directive?",
+              "TL": "Tagubilin?"
+            }
+          },
+          {
+            "id": "terse.05",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.orders.terse.05"
+            },
+            "text": {
+              "EN": "What's next?",
+              "TL": "Ano'ng susunod?"
+            }
+          },
+          {
+            "id": "terse.06",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.orders.terse.06"
+            },
+            "text": {
+              "EN": "Task?",
+              "TL": "Gawain?"
+            }
+          },
+          {
+            "id": "terse.07",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.orders.terse.07"
+            },
+            "text": {
+              "EN": "Say the word.",
+              "TL": "Sabihin mo lang."
+            }
+          },
+          {
+            "id": "terse.08",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.orders.terse.08"
+            },
+            "text": {
+              "EN": "What now?",
+              "TL": "Ano ngayon?"
+            }
+          },
+          {
+            "id": "terse.09",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.orders.terse.09"
+            },
+            "text": {
+              "EN": "Instructions?",
+              "TL": "Mga bilin?"
+            }
+          },
+          {
+            "id": "terse.10",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.orders.terse.10"
+            },
+            "text": {
+              "EN": "Give order.",
+              "TL": "Mag-utos ka."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.navigation.orders"
+    },
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:navigation",
+        "sourceSurface": "content/navigation.json",
+        "responseTemplateID": "semantic.navigation.orders",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "NAVIGATION_RESPONSE",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.orders.guarded.01"
+            },
+            "text": {
+              "EN": "All right. What is it?",
+              "TL": "Sige. Ano iyon?"
+            }
+          },
+          {
+            "id": "guarded.02",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.orders.guarded.02"
+            },
+            "text": {
+              "EN": "What order? Keep it realistic.",
+              "TL": "Anong utos? Siguraduhing makatwiran."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.orders.guarded.03"
+            },
+            "text": {
+              "EN": "What do you want me to do? Nothing reckless.",
+              "TL": "Ano'ng gusto mong gawin ko? Huwag mapusok."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.orders.guarded.04"
+            },
+            "text": {
+              "EN": "Give the order, but watch my back.",
+              "TL": "Ibigay ang utos, pero bantayan mo likod ko."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.orders.guarded.05"
+            },
+            "text": {
+              "EN": "What's the directive? Make it sensible.",
+              "TL": "Ano'ng direktiba? Gawing may kabuluhan."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.orders.guarded.06"
+            },
+            "text": {
+              "EN": "I'm listening to commands, but I judge safety.",
+              "TL": "Nakikinig ako sa utos, pero ako ang humahatol sa kaligtasan."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.orders.guarded.07"
+            },
+            "text": {
+              "EN": "What do you need done? Don't waste my time.",
+              "TL": "Ano'ng kailangang gawin? Huwag sayangin ang oras ko."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.orders.guarded.08"
+            },
+            "text": {
+              "EN": "State the command quickly.",
+              "TL": "Sabihin ang utos agad."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.orders.guarded.09"
+            },
+            "text": {
+              "EN": "What's the plan? Don't get us trapped.",
+              "TL": "Ano'ng plano? Huwag tayong ipitin."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.orders.guarded.10"
+            },
+            "text": {
+              "EN": "What are your orders?",
+              "TL": "Ano ang mga utos mo?"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.navigation.orders"
+    }
+  ]
+}

@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.cold.blade_head_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "blade_head_01",
             ["sourceId"] = "semantic.combat.kill.killer.cold.blade_head_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_cold.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_blade_head_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillCold",
+        ["namespace"] = "semantic.combat.kill.killer.cold",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_cold.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_blade_head_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.cold.firearm_high_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "firearm_high_01",
             ["sourceId"] = "semantic.combat.kill.killer.cold.firearm_high_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_cold.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_firearm_high_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillCold",
+        ["namespace"] = "semantic.combat.kill.killer.cold",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_cold.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_firearm_high_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.cold.heavy_melee_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "heavy_melee_01",
             ["sourceId"] = "semantic.combat.kill.killer.cold.heavy_melee_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_cold.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_heavy_melee_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillCold",
+        ["namespace"] = "semantic.combat.kill.killer.cold",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_cold.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_cold/combat_kill_killer_cold_heavy_melee_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

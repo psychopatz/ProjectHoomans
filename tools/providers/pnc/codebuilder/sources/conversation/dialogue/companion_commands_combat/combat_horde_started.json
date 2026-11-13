@@ -1,0 +1,96 @@
+{
+  "kind": "dialogue",
+  "id": "started",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
+    "responseTemplateID": "semantic.combat.horde.started"
+  },
+  "response": {
+    "act": "REPLY",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "That's a lot of them. Stay sharp.",
+          "TL": "Ang dami nila. Mag-ingat tayo."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "We've got a whole crowd moving in. Eyes open.",
+          "TL": "May malaking grupo na paparating. Magmatyag."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Horde spotted! Check your exits.",
+          "TL": "May kuyog! Tignan ang mga labasan."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Too many bodies out there. Watch the perimeter.",
+          "TL": "Masyado silang marami sa labas. Bantayan ang paligid."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "They're grouping up. Form a line.",
+          "TL": "Nagsasama-sama sila. Ayusin ang hanay."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Sound drew a swarm. Get ready.",
+          "TL": "Nakaakit ng kuyog ang ingay. Humanda."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Look at that herd. Stay close.",
+          "TL": "Tingnan mo ang kawan na 'yan. Dumikit ka."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Mass contacts coming from down the street.",
+          "TL": "Napakaraming papalapit mula sa kalsada."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Here they come. Don't let them flank us.",
+          "TL": "Heto na sila. Huwag silang hayaang pumaligid."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Big group incoming. Watch each other's backs.",
+          "TL": "Malaking grupo ang dumarating. Bantayan ang likod ng bawat isa."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.combat.horde",
+  "schema": "psychopatz.convo-engine.v1"
+}

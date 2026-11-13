@@ -1,0 +1,49 @@
+{
+  "id": "activity",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.question.activity",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "ACTIVITY",
+    "variants": [
+      {
+        "id": "semantic.question.activity.dataset.keep_moving",
+        "metadata": {
+          "fallback": "Just doing what I can to keep things moving.",
+          "templateID": "semantic.question.activity.dataset.keep_moving"
+        },
+        "text": {
+          "EN": "Just doing what I can to keep things moving.",
+          "TL": "Just doing what I can to keep things moving."
+        }
+      },
+      {
+        "id": "semantic.question.activity.dataset.bit_of_everything",
+        "metadata": {
+          "fallback": "A little bit of everything.",
+          "templateID": "semantic.question.activity.dataset.bit_of_everything"
+        },
+        "text": {
+          "EN": "A little bit of everything.",
+          "TL": "A little bit of everything."
+        }
+      },
+      {
+        "id": "semantic.question.activity.dataset.taking_care",
+        "metadata": {
+          "fallback": "Just taking care of what needs doing.",
+          "templateID": "semantic.question.activity.dataset.taking_care"
+        },
+        "text": {
+          "EN": "Just taking care of what needs doing.",
+          "TL": "Just taking care of what needs doing."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.question",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -1,0 +1,50 @@
+{
+  "id": "refuse",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.refuse",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "REFUSE",
+    "variants": [
+      {
+        "id": "semantic.refuse.dataset.pending_unavailable",
+        "metadata": {
+          "fallback": "I can't take that on right now.",
+          "priority": 1,
+          "templateID": "semantic.refuse.dataset.pending_unavailable"
+        },
+        "text": {
+          "EN": "I can't take that on right now.",
+          "TL": "I can't take that on right now."
+        },
+        "when": {
+          "op": "eq",
+          "path": "conversation.hasPendingRequest",
+          "value": true
+        }
+      },
+      {
+        "id": "semantic.refuse.dataset.pending_enough",
+        "metadata": {
+          "fallback": "Not this time. I have enough to manage.",
+          "priority": 1,
+          "templateID": "semantic.refuse.dataset.pending_enough"
+        },
+        "text": {
+          "EN": "Not this time. I have enough to manage.",
+          "TL": "Not this time. I have enough to manage."
+        },
+        "when": {
+          "op": "eq",
+          "path": "conversation.hasPendingRequest",
+          "value": true
+        }
+      }
+    ]
+  },
+  "namespace": "semantic",
+  "schema": "psychopatz.convo-engine.v1"
+}

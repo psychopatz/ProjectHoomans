@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/excursion.json",
+        "responseTemplateID": "semantic.interaction.scene.excursion_preparing",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "We're getting ready to head out.",
+              "TL": "Naghahanda na tayong umalis."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Double-check your pack and gear before we leave.",
+              "TL": "Suriing muli ang bag at gamit bago tayo umalis."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Making preparations for the run now.",
+              "TL": "Naghahanda na para sa pagbiyahe ngayon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Gather what you need. Departure is soon.",
+              "TL": "Tipunin ang kailangan mo. Aalis na agad."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Check weapons, food, and water.",
+              "TL": "Suriin ang armas, pagkain, at tubig."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Prepping for the excursion. Almost ready.",
+              "TL": "Naghahanda para sa paglabas. Halos handa na."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Let's make sure nothing essential gets left behind.",
+              "TL": "Tiyaking walang mahahalagang gamit na maiiwan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Getting everything squared away for the road.",
+              "TL": "Inaayos ang lahat para sa paglalakbay."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Final checks before we open the gates.",
+              "TL": "Huling pagsusuri bago buksan ang tarangkahan."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Prepare your supplies. We move shortly.",
+              "TL": "Ihanda ang mga supply. Kikilos na tayo maya-maya."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.excursion_preparing"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/excursion.json",
+        "responseTemplateID": "semantic.interaction.scene.excursion_preparing",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "We're getting ready. Make sure you've got what you need.",
+              "TL": "Naghahanda na tayo. Siguraduhin mong dala mo ang kailangan mo."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Take your time prepping, friend. Better safe than sorry.",
+              "TL": "Maghanda nang mabuti, kaibigan. Mas mabuting handa."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Need help packing anything up, partner?",
+              "TL": "Kailangan mo ba ng tulong sa pag-iimpake, kasama?"
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Got an extra bandage if you need one. Let's prep well.",
+              "TL": "May sobra akong bendahe kung kailangan mo. Maghanda tayo nang maayos."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Excited and nervous, but we've got each other. Ready up!",
+              "TL": "Kaba at sabik, pero magkasama tayo. Maghanda na!"
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Make sure you've eaten and drank water before we go.",
+              "TL": "Tiyaking nakakain at nakainom ka bago tayo umalis."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Getting ready! We'll make this a successful run together.",
+              "TL": "Naghahanda na! Gagawin nating matagumpay ang biyaheng ito."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Double-check your boots and bandages, friend.",
+              "TL": "Suriin ang bota at bendahe mo, kaibigan."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "I'm right here prepping alongside you. We'll do great.",
+              "TL": "Nandito lang ako naghahanda kasabay mo. Magiging maayos tayo."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Readying supplies. Stay positive, we've got this!",
+              "TL": "Inihahanda ang mga gamit. Maging positibo, kaya natin ito!"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.excursion_preparing"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/excursion.json",
+        "responseTemplateID": "semantic.interaction.scene.excursion_preparing",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Get ready. We leave soon.",
+              "TL": "Maghanda. Aalis tayo agad."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Pack up.",
+              "TL": "Mag-impake."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Check gear.",
+              "TL": "Tingnan ang gamit."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Prepping.",
+              "TL": "Naghahanda."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Load out.",
+              "TL": "Ihanda ang karga."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Almost time.",
+              "TL": "Malapit na."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Ready weapons.",
+              "TL": "Ihanda ang armas."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Moving soon.",
+              "TL": "Aalis na agad."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Supplies ready.",
+              "TL": "Handa na ang supply."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Final checks.",
+              "TL": "Huling pagsusuri."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.excursion_preparing"
+    },
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/excursion.json",
+        "responseTemplateID": "semantic.interaction.scene.excursion_preparing",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "Prep first. We move when everyone's ready.",
+              "TL": "Maghanda muna. Aalis tayo kapag handa na ang lahat."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "If you forget something vital out there, nobody is turning back for you.",
+              "TL": "Kapag may naiwan kang mahalaga, walang babalik para sa 'yo."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Check your ammunition count twice. No excuses.",
+              "TL": "Bilangin ang bala mo nang dalawang beses. Walang palusot."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Sharpen your blade now. We don't stop for maintenance in the field.",
+              "TL": "Hasiin ang talim mo ngayon. Walang hinto para magkumpuni sa labas."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Pack light, pack lethal. Don't carry useless junk.",
+              "TL": "Magdala ng magaan at nakamamatay. Huwag magdala ng kalat."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "Inspect your boots. A twisted ankle out there is fatal.",
+              "TL": "Suriin ang sapatos mo. Nakamamatay ang maipit ang paa sa labas."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Be completely ready before you step past that gate.",
+              "TL": "Maging handang-handa bago lumabas sa tarangkahang 'yan."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Check your medical supplies. You bleed, you fix it.",
+              "TL": "Tingnan ang gamot mo. Kapag nagdugo ka, gamutin mo sarili mo."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "Preparing now. Stay disciplined once we cross the threshold.",
+              "TL": "Naghahanda na. Maging disiplinado paglabas natin."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Lock and load. Don't slow the group down.",
+              "TL": "Magkarga ng armas. Huwag mong pabagalin ang grupo."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.excursion_preparing"
+    }
+  ]
+}

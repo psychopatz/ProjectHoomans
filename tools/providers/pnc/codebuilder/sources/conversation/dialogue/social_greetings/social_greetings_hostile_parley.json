@@ -1,0 +1,88 @@
+{
+  "kind": "dialogue",
+  "id": "parley",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:hostile_parley",
+    "category": "projecthoomans:greetings",
+    "audience": "hostile",
+    "priority": 100,
+    "weight": 100,
+    "textTarget": "psdl/social/greetings/hostile/parley",
+    "textDomain": "pnc.psdl.social.greetings.hostile.parley",
+    "textRows": [
+      {
+        "key": "result.accepted",
+        "text": {
+          "EN": "Ceasefire accepted for one hour.",
+          "TL": "Tinanggap ang tigil-putukan sa loob ng isang oras."
+        }
+      },
+      {
+        "key": "result.rejected",
+        "text": {
+          "EN": "Ceasefire refused.",
+          "TL": "Tumanggi ang tigil-putukan."
+        }
+      }
+    ]
+  },
+  "response": {
+    "act": "PARLEY",
+    "turns": [
+      {
+        "id": "opening",
+        "metadata": {
+          "textKey": "opening"
+        },
+        "text": {
+          "EN": "The survivor watches you carefully, ready to fight.",
+          "TL": "Maingat kang pinagmamasdan ng survivor, handang lumaban."
+        },
+        "offers": [
+          {
+            "id": "ceasefire",
+            "label": {
+              "EN": "Ceasefire. Stand down for now.",
+              "TL": "Ceasefire. Tumayo sa ngayon."
+            },
+            "utterance": {
+              "EN": "Ceasefire. Stand down for now.",
+              "TL": "Ceasefire. Tumayo sa ngayon."
+            },
+            "frame": {
+              "intent": "REQUEST",
+              "speechAct": "REQUEST",
+              "subject": "CEASEFIRE",
+              "topic": "parley"
+            },
+            "metadata": {
+              "choiceKey": "choice.ceasefire",
+              "responseKey": "response.ceasefire",
+              "responseText": {
+                "EN": "You ask for a short ceasefire.",
+                "TL": "Humihingi ka ng maikling tigil-putukan."
+              },
+              "close": true,
+              "effects": [
+                {
+                  "type": "pnc:ceasefire"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "namespace": "social.greetings.hostile",
+  "schema": "psychopatz.convo-engine.v1"
+}

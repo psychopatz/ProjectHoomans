@@ -1,0 +1,136 @@
+{
+  "kind": "dialogue",
+  "id": "bandage",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:medical_event",
+    "sourceSurface": "content/event/medical/call.json",
+    "responseTemplateID": "semantic.medical.distress.call.bandage",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "MEDICAL_RESPONSE",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.call.bandage.neutral.01"
+        },
+        "text": {
+          "EN": "I'm hurt and down! Need a bandage over here!",
+          "TL": "Sugatan ako at nakahandusay! Kailangan ko ng benda rito!"
+        }
+      },
+      {
+        "id": "neutral.02",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.call.bandage.neutral.02"
+        },
+        "text": {
+          "EN": "Deep cut... I need a bandage now!",
+          "TL": "Malalim ang sugat... kailangan ko ng benda ngayon din!"
+        }
+      },
+      {
+        "id": "neutral.03",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.call.bandage.neutral.03"
+        },
+        "text": {
+          "EN": "I can't stop this wound alone! Bring a bandage!",
+          "TL": "Hindi ko mapatigil ang sugat nang mag-isa! Magdala ka ng benda!"
+        }
+      },
+      {
+        "id": "neutral.04",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.call.bandage.neutral.04"
+        },
+        "text": {
+          "EN": "Patch me up, please! I'm losing blood!",
+          "TL": "Bendahan mo ako, pakiusap! Nauubusan ako ng dugo!"
+        }
+      },
+      {
+        "id": "neutral.05",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.call.bandage.neutral.05"
+        },
+        "text": {
+          "EN": "I'm down! Does anyone have a clean rag or bandage?!",
+          "TL": "Bagsak ako! May malinis ba kayong basahan o benda?!"
+        }
+      },
+      {
+        "id": "neutral.06",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.call.bandage.neutral.06"
+        },
+        "text": {
+          "EN": "Gash on my leg... need wrapping right now!",
+          "TL": "May hiwa sa binti ko... kailangang balutin ngayon din!"
+        }
+      },
+      {
+        "id": "neutral.07",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.call.bandage.neutral.07"
+        },
+        "text": {
+          "EN": "Help! I need these wounds dressed!",
+          "TL": "Tulong! Kailangang gamutin ang mga sugat na 'to!"
+        }
+      },
+      {
+        "id": "neutral.08",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.call.bandage.neutral.08"
+        },
+        "text": {
+          "EN": "I'm on the floor, bleeding! Get a bandage over here!",
+          "TL": "Nasa sahig ako, dumurugo! Dalhan mo ako ng benda rito!"
+        }
+      },
+      {
+        "id": "neutral.09",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.call.bandage.neutral.09"
+        },
+        "text": {
+          "EN": "Need a patch immediately! I'm grounded!",
+          "TL": "Kailangan ng panapal agad! Hindi ako makatayo!"
+        }
+      },
+      {
+        "id": "neutral.10",
+        "metadata": {
+          "style": "neutral",
+          "textKey": "semantic.medical.distress.call.bandage.neutral.10"
+        },
+        "text": {
+          "EN": "Bandage, quick! I can't get up without one!",
+          "TL": "Benda, bilis! Hindi ako makakabangon kung wala 'yan!"
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.medical.distress.call",
+  "schema": "psychopatz.convo-engine.v1"
+}

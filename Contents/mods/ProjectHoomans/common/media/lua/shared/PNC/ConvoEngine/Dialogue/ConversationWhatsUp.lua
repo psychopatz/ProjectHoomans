@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.question.whats_up.busy.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.question.whats_up.busy.guarded",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.busy",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.question.whats_up.busy.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.whats_up.busy.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.busy",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.question.whats_up.busy.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.question.whats_up.busy.terse",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.busy",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.question.whats_up.busy.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.question.whats_up.busy.warm",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.busy",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_busy.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -629,12 +633,13 @@ return {
         ["id"] = "semantic.question.whats_up.default.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.question.whats_up.default.guarded",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +777,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,12 +790,13 @@ return {
         ["id"] = "semantic.question.whats_up.default.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.whats_up.default.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -928,7 +934,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -941,12 +947,13 @@ return {
         ["id"] = "semantic.question.whats_up.default.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.question.whats_up.default.terse",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1084,7 +1091,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1097,12 +1104,13 @@ return {
         ["id"] = "semantic.question.whats_up.default.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.question.whats_up.default.warm",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1240,7 +1248,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1253,12 +1261,13 @@ return {
         ["id"] = "semantic.question.whats_up.default_alt.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.question.whats_up.default_alt.guarded",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.default_alt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1396,7 +1405,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1409,12 +1418,13 @@ return {
         ["id"] = "semantic.question.whats_up.default_alt.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.whats_up.default_alt.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.default_alt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1552,7 +1562,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1565,12 +1575,13 @@ return {
         ["id"] = "semantic.question.whats_up.default_alt.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.question.whats_up.default_alt.terse",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.default_alt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1708,7 +1719,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1721,12 +1732,13 @@ return {
         ["id"] = "semantic.question.whats_up.default_alt.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.question.whats_up.default_alt.warm",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.default_alt",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1864,7 +1876,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_default_alt.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1877,12 +1889,13 @@ return {
         ["id"] = "semantic.question.whats_up.traveling.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.question.whats_up.traveling.guarded",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[12]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.traveling",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2020,7 +2033,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2033,12 +2046,13 @@ return {
         ["id"] = "semantic.question.whats_up.traveling.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.whats_up.traveling.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[13]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.traveling",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2176,7 +2190,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2189,12 +2203,13 @@ return {
         ["id"] = "semantic.question.whats_up.traveling.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.question.whats_up.traveling.terse",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[14]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.traveling",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2332,7 +2347,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2345,12 +2360,13 @@ return {
         ["id"] = "semantic.question.whats_up.traveling.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.question.whats_up.traveling.warm",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[15]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.traveling",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2488,7 +2504,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_traveling.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2501,12 +2517,13 @@ return {
         ["id"] = "semantic.question.whats_up.weather.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.question.whats_up.weather.guarded",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[16]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.weather",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2644,7 +2661,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2657,12 +2674,13 @@ return {
         ["id"] = "semantic.question.whats_up.weather.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.question.whats_up.weather.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[17]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.weather",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2800,7 +2818,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2813,12 +2831,13 @@ return {
         ["id"] = "semantic.question.whats_up.weather.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.question.whats_up.weather.terse",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[18]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.weather",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2956,7 +2975,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2969,12 +2988,13 @@ return {
         ["id"] = "semantic.question.whats_up.weather.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.question.whats_up.weather.warm",
-            ["sourcePath"] = "psdl/dialogue/conversation_whats_up.json#records[19]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationWhatsUp",
+        ["namespace"] = "semantic.question.whats_up.weather",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -3112,7 +3132,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_whats_up.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_whats_up/question_whats_up_weather.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

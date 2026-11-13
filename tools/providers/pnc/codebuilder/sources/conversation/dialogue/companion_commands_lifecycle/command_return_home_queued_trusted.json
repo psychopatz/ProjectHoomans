@@ -1,0 +1,96 @@
+{
+  "kind": "dialogue",
+  "id": "trusted",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/return_home.json",
+    "responseTemplateID": "semantic.command.return_home.queued.trusted"
+  },
+  "response": {
+    "act": "REPLY",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "All right, I'm heading home. Guard the rear.",
+          "TL": "Sige, pauwi na ako. Bantayan mo ang likod."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "I trust your call. I'll make sure base is secure.",
+          "TL": "Tiwala ako sa pasya mo. Titiyakin kong ligtas ang base."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Heading home, partner. Don't take unnecessary risks out here.",
+          "TL": "Pauwi na, kasama. Huwag sumugal sa panganib dito."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Understood. I'll be waiting at camp for your return.",
+          "TL": "Naintindihan. Maghihintay ako sa kampo sa pagbalik mo."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Heading home. Make sure you come back in one piece.",
+          "TL": "Pauwi na. Tiyakin mong makababalik ka nang buo."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "I'll hold down the fort until you get back.",
+          "TL": "Babantayan ko ang kuta hanggang sa makabalik ka."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Heading back. Trusting you to watch yourself.",
+          "TL": "Pabalik na. Nagtitiwala akong iingatan mo ang sarili mo."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "I'll see you at home, friend. Stay vigilant.",
+          "TL": "Magkita tayo sa bahay, kaibigan. Manatiling mapagmatyag."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Returning to our haven. Stay alive for me.",
+          "TL": "Babalik sa kanlungan natin. Manatiling buhay para sa akin."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Understood. Heading back to secure our home.",
+          "TL": "Naiintindihan ko. Pabalik na para i-secure ang tahanan natin."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.command.return_home.queued",
+  "schema": "psychopatz.convo-engine.v1"
+}

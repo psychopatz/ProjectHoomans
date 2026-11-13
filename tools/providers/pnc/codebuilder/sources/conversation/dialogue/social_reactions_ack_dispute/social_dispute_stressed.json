@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/disputes.json",
+        "responseTemplateID": "semantic.social.dispute_stressed",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "I hear you. Not now.",
+              "TL": "Naririnig kita. Hindi ngayon."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "We don't have time to fight. Stand down.",
+              "TL": "Wala tayong oras para mag-away. Tumigil ka."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Too much on the line to argue. Shut it down.",
+              "TL": "Masyadong malaki ang nakataya para magtalo. Itigil mo na."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "I'm stressed, you're stressed. Drop it.",
+              "TL": "Pagod ako, pagod ka. Hayaan mo na."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Don't push an argument while we're in danger.",
+              "TL": "Huwag kang magpumilit makipagtalo habang delikado."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "One more word about this and I walk away.",
+              "TL": "Isa pang salita tungkol dito at aalis ako."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Save the bickering before it gets us killed.",
+              "TL": "Itabi ang bangayan bago tayo mapatay nito."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Not the time. Eyes forward.",
+              "TL": "Hindi ito ang tamang oras. Tumingin sa unahan."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "I'm done debating under pressure.",
+              "TL": "Tapos na akong makipagtalo sa gitna ng tensiyon."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Cut the argument right now.",
+              "TL": "Putulin mo ang pagtatalo ngayon din."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.dispute_stressed"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/disputes.json",
+        "responseTemplateID": "semantic.social.dispute_stressed",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Tensions are high. Let's table this for later.",
+              "TL": "Mataas ang tensiyon. Ipagpaliban muna natin mamaya."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "We're both stressed. Let's not make bad calls right now.",
+              "TL": "Pareho tayong pagod. Huwag tayong gumawa ng maling desisyon."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Now isn't the moment to hash this out.",
+              "TL": "Hindi ngayon ang oras para pagtalunan ito."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Let's catch our breath before we argue further.",
+              "TL": "Huminga muna tayo bago magpatuloy sa pagtatalo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "We need clear heads right now, not arguments.",
+              "TL": "Kailangan natin ng malinaw na isip, hindi bangayan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I understand you're upset, but we need to survive first.",
+              "TL": "Naiintindihan kong galit ka, pero kaligtasan muna."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Let's put a pin in this until we're safe.",
+              "TL": "Iwan muna natin ito hanggang sa maging ligtas tayo."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Arguing right now only helps the dead.",
+              "TL": "Ang pagtatalo ngayon ay pabor lang sa mga patay."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I hear the frustration. Let's focus on the threat.",
+              "TL": "Naririnig ko ang inis mo. Magpokus tayo sa banta."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "We can settle this once we're behind walls.",
+              "TL": "Maaayos natin ito kapag nasa loob na tayo ng pader."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.dispute_stressed"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/disputes.json",
+        "responseTemplateID": "semantic.social.dispute_stressed",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Not now.",
+              "TL": "Hindi ngayon."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Stop.",
+              "TL": "Tigil."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Cool it.",
+              "TL": "Kumalma ka."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Later.",
+              "TL": "Mamaya na."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Drop it.",
+              "TL": "Hayaan mo na."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Too tense.",
+              "TL": "Masyadong delikado."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Hold your tongue.",
+              "TL": "Pigilin ang dila."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Focus.",
+              "TL": "Magpokus."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Enough.",
+              "TL": "Sapat na."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Quiet.",
+              "TL": "Tahimik."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.dispute_stressed"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/disputes.json",
+        "responseTemplateID": "semantic.social.dispute_stressed",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "Hey, we're both frayed right now. Let's take a breath.",
+              "TL": "Huy, pagod tayong pareho ngayon. Huminga muna tayo nang malalim."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "I know you're hurting and tense. I'm right here. Let's pause.",
+              "TL": "Alam kong nahihirapan ka at tensiyonado. Narito lang ako. Huminto muna tayo."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Don't let the stress tear us apart. We're partners.",
+              "TL": "Huwag nating hayaang paglayuin tayo ng pagod. Magkasama tayo."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "I hear your worry, but let's get somewhere safe first.",
+              "TL": "Naririnig ko ang kaba mo, pero lumipat muna tayo sa ligtas."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "I care about what you think, just not while we're in danger.",
+              "TL": "Mahalaga sa akin ang opinyon mo, pero huwag habang nasa panganib."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Let's take a second to reset. We're on the same side.",
+              "TL": "Maglaan tayo ng sandali para kumalma. Magkakampi tayo."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Breathe with me. We'll work through this disagreement later.",
+              "TL": "Sumabay kang huminga sa akin. Aayusin natin ito mamaya."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "I'm not fighting you. Let's keep each other alive.",
+              "TL": "Hindi kita kalaban. Panatilihin nating buhay ang isa't isa."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Stress is talking right now. Let's be gentle on each other.",
+              "TL": "Pagod lang ang nagsasalita ngayon. Maging mahinahon tayo."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "We'll talk this through when the dust settles, I promise.",
+              "TL": "Pag-uusapan natin ito kapag humupa na ang gulo, pangako."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.dispute_stressed"
+    }
+  ]
+}

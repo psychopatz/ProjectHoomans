@@ -1,0 +1,30 @@
+{
+  "id": "known",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.question.backstory.known",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "KNOWN",
+    "variants": [
+      {
+        "id": "semantic.question.backstory.known.authored",
+        "metadata": {
+          "fallback": "Before all this, I was %1.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryKnown",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        },
+        "text": {
+          "EN": "Before all this, I was %1.",
+          "TL": "Bago ang lahat ng ito, ako ay %1."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.question.backstory",
+  "schema": "psychopatz.convo-engine.v1"
+}

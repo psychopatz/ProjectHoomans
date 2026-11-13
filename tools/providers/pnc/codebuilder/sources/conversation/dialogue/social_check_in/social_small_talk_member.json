@@ -1,0 +1,94 @@
+{
+  "kind": "dialogue",
+  "id": "member",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:small_talk_member",
+    "category": "projecthoomans:small_talk",
+    "audience": "member",
+    "textTarget": "psdl/social/small_talk/member",
+    "textDomain": "pnc.psdl.social.small_talk.member"
+  },
+  "response": {
+    "act": "SMALL_TALK",
+    "turns": [
+      {
+        "id": "opening",
+        "metadata": {
+          "textKey": "opening"
+        },
+        "text": {
+          "EN": "A quiet conversation sounds good right now.",
+          "TL": "Ang isang tahimik na pag-uusap ay pakinggan ngayon."
+        },
+        "offers": [
+          {
+            "id": "weather",
+            "label": {
+              "EN": "Some weather we're having.",
+              "TL": "Ilang panahon ang nararanasan natin."
+            },
+            "utterance": {
+              "EN": "Some weather we're having.",
+              "TL": "Ilang panahon ang nararanasan natin."
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "WEATHER",
+              "topic": "small_talk"
+            },
+            "metadata": {
+              "choiceKey": "choice.weather",
+              "responseKey": "response.weather",
+              "responseText": {
+                "EN": "Could be worse. We've worked through worse.",
+                "TL": "Maaaring mas masahol pa. Mas malala ang pinagdaanan namin."
+              }
+            }
+          },
+          {
+            "id": "quiet_day",
+            "label": {
+              "EN": "Quiet day so far.",
+              "TL": "Tahimik na araw hanggang ngayon."
+            },
+            "utterance": {
+              "EN": "Quiet day so far.",
+              "TL": "Tahimik na araw hanggang ngayon."
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "DAY",
+              "topic": "small_talk"
+            },
+            "when": {
+              "path": "relationship.speakerToAddressee.familiarity",
+              "op": ">=",
+              "value": 1
+            },
+            "metadata": {
+              "choiceKey": "choice.quiet_day",
+              "responseKey": "response.quiet_day",
+              "responseText": {
+                "EN": "The crew earned one.",
+                "TL": "Karapat-dapat iyon ng grupo."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "namespace": "social.small_talk",
+  "schema": "psychopatz.convo-engine.v1"
+}

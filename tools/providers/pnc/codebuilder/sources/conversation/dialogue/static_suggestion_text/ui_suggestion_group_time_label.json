@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.group.time.label",
+    "textRows": [
+      {
+        "key": "suggestion.group.time.label",
+        "text": {
+          "EN": "Time and date",
+          "TL": "Oras at petsa"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Time and date",
+    "TL": "Oras at petsa"
+  },
+  "namespace": "ui.suggestion.group.time",
+  "schema": "psychopatz.convo-engine.v1"
+}

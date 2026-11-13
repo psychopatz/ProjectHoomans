@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.corpse.reaction.default",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/event_reactions_corpse.json",
+        ["source"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_default.json",
     },
     ["semantic.corpse.reaction.revenge"] = {
         ["domain"] = "event_reactions_corpse",
@@ -16,6 +16,6 @@ return {
         },
         ["id"] = "semantic.corpse.reaction.revenge",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/event_reactions_corpse.json",
+        ["source"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_revenge.json",
     },
 }

@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.talk_again_about.label",
+    "textRows": [
+      {
+        "key": "suggestion.talk_again_about.label",
+        "text": {
+          "EN": "Talk again about",
+          "TL": "Pag-usapan muli ang"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Talk again about",
+    "TL": "Pag-usapan muli ang"
+  },
+  "namespace": "ui.suggestion.talk_again_about",
+  "schema": "psychopatz.convo-engine.v1"
+}

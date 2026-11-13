@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.combat.human_kill.supportive.line_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "line_01",
             ["sourceId"] = "semantic.combat.human_kill.supportive.line_01",
-            ["sourcePath"] = "psdl/dialogue/combat_human_banter_human_kill_supportive.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_supportive/combat_human_kill_supportive_line_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHuman__d4761372",
+        ["namespace"] = "semantic.combat.human_kill.supportive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_human_banter_human_kill_supportive.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_supportive/combat_human_kill_supportive_line_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.combat.human_kill.supportive.line_02",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "line_02",
             ["sourceId"] = "semantic.combat.human_kill.supportive.line_02",
-            ["sourcePath"] = "psdl/dialogue/combat_human_banter_human_kill_supportive.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_supportive/combat_human_kill_supportive_line_02.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHuman__d4761372",
+        ["namespace"] = "semantic.combat.human_kill.supportive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_human_banter_human_kill_supportive.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_supportive/combat_human_kill_supportive_line_02.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.combat.human_kill.supportive.line_03",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "line_03",
             ["sourceId"] = "semantic.combat.human_kill.supportive.line_03",
-            ["sourcePath"] = "psdl/dialogue/combat_human_banter_human_kill_supportive.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_supportive/combat_human_kill_supportive_line_03.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatHumanBanterHuman__d4761372",
+        ["namespace"] = "semantic.combat.human_kill.supportive",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_human_banter_human_kill_supportive.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_supportive/combat_human_kill_supportive_line_03.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.greeting_thank.label",
+    "textRows": [
+      {
+        "key": "suggestion.greeting_thank.label",
+        "text": {
+          "EN": "Thank them",
+          "TL": "Pasalamatan siya"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Thank them",
+    "TL": "Pasalamatan siya"
+  },
+  "namespace": "ui.suggestion.greeting_thank",
+  "schema": "psychopatz.convo-engine.v1"
+}

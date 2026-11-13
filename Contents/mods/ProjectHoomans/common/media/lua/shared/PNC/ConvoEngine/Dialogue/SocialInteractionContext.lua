@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.interaction.context.clarify.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.interaction.context.clarify.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_interaction_context.json",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_interaction_context/interaction_context_clarify.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialInteractionContext",
+        ["namespace"] = "semantic.interaction.context.clarify",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_interaction_context.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_interaction_context/interaction_context_clarify.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

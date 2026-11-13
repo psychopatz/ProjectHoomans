@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.group.response.label",
+    "textRows": [
+      {
+        "key": "suggestion.group.response.label",
+        "text": {
+          "EN": "NPC reply",
+          "TL": "Sagot ng NPC"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "NPC reply",
+    "TL": "Sagot ng NPC"
+  },
+  "namespace": "ui.suggestion.group.response",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "social.ask_about.member",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_ask_about.json",
+        ["source"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about_member.json",
     },
     ["social.ask_about.neutral"] = {
         ["domain"] = "social_ask_about",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "social.ask_about.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_ask_about.json",
+        ["source"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about.json",
     },
     ["social.ask_about.special"] = {
         ["domain"] = "social_ask_about",
@@ -25,6 +25,6 @@ return {
         },
         ["id"] = "social.ask_about.special",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_ask_about.json",
+        ["source"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about_special.json",
     },
 }

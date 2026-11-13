@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "pnc.dialogue.follow",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/companion_flows.json",
+        ["source"] = "adopters/hoomans/dialogue/companion_flows/follow.json",
     },
     ["pnc.lab.stay_with_you"] = {
         ["domain"] = "companion_flows",
@@ -16,6 +16,6 @@ return {
         },
         ["id"] = "pnc.lab.stay_with_you",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/companion_flows.json",
+        ["source"] = "adopters/hoomans/dialogue/companion_flows/lab_stay_with_you.json",
     },
 }

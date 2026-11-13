@@ -1,0 +1,25 @@
+{
+  "id": "tooltip",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.unavailable.tooltip",
+    "textRows": [
+      {
+        "key": "suggestion.unavailable.tooltip",
+        "text": {
+          "EN": "Unavailable in the current situation.",
+          "TL": "Hindi magagamit sa kasalukuyang sitwasyon."
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Unavailable in the current situation.",
+    "TL": "Hindi magagamit sa kasalukuyang sitwasyon."
+  },
+  "namespace": "ui.suggestion.unavailable",
+  "schema": "psychopatz.convo-engine.v1"
+}

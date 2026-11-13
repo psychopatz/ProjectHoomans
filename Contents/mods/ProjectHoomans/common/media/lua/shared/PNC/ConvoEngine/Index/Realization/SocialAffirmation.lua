@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "construction.social.acknowledge",
         ["kind"] = "realization",
-        ["source"] = "psdl/realization/social_affirmation.json",
+        ["source"] = "realization/social_affirmation/social_acknowledge.json",
     },
     ["construction.social.agree"] = {
         ["domain"] = "social_affirmation",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "construction.social.agree",
         ["kind"] = "realization",
-        ["source"] = "psdl/realization/social_affirmation.json",
+        ["source"] = "realization/social_affirmation/social_agree.json",
     },
     ["construction.social.apologize"] = {
         ["domain"] = "social_affirmation",
@@ -25,7 +25,7 @@ return {
         },
         ["id"] = "construction.social.apologize",
         ["kind"] = "realization",
-        ["source"] = "psdl/realization/social_affirmation.json",
+        ["source"] = "realization/social_affirmation/social_apologize.json",
     },
     ["construction.social.comfort"] = {
         ["domain"] = "social_affirmation",
@@ -34,7 +34,7 @@ return {
         },
         ["id"] = "construction.social.comfort",
         ["kind"] = "realization",
-        ["source"] = "psdl/realization/social_affirmation.json",
+        ["source"] = "realization/social_affirmation/social_comfort.json",
     },
     ["construction.social.deescalate"] = {
         ["domain"] = "social_affirmation",
@@ -43,7 +43,7 @@ return {
         },
         ["id"] = "construction.social.deescalate",
         ["kind"] = "realization",
-        ["source"] = "psdl/realization/social_affirmation.json",
+        ["source"] = "realization/social_affirmation/social_deescalate.json",
     },
     ["construction.social.disagree"] = {
         ["domain"] = "social_affirmation",
@@ -52,6 +52,6 @@ return {
         },
         ["id"] = "construction.social.disagree",
         ["kind"] = "realization",
-        ["source"] = "psdl/realization/social_affirmation.json",
+        ["source"] = "realization/social_affirmation/social_disagree.json",
     },
 }

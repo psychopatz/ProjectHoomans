@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.social.reaction.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "default",
             ["sourceId"] = "semantic.social.reaction.default",
-            ["sourcePath"] = "psdl/dialogue/event_reactions_social.json",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_social/social_reaction_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsSocial",
+        ["namespace"] = "semantic.social.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/event_reactions_social.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_social/social_reaction_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

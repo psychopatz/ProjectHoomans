@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.identity.rude.label",
+    "textRows": [
+      {
+        "key": "suggestion.identity.rude.label",
+        "text": {
+          "EN": "Don't tell your name",
+          "TL": "Huwag sabihin ang pangalan"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Don't tell your name",
+    "TL": "Huwag sabihin ang pangalan"
+  },
+  "namespace": "ui.suggestion.identity.rude",
+  "schema": "psychopatz.convo-engine.v1"
+}

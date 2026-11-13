@@ -1,0 +1,48 @@
+{
+  "kind": "dialogue",
+  "id": "neutral",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
+    "responseTemplateID": "semantic.emote.player.thumbsdown",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "No. That's not good enough, {addressee.name}.",
+          "TL": "Hindi. Hindi sapat iyan, {addressee.name}."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "I don't like that, {addressee.name}.",
+          "TL": "Hindi ko gusto iyan, {addressee.name}."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Try again, {addressee.name}.",
+          "TL": "Subukan muli, {addressee.name}."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.emote.player.thumbsdown",
+  "schema": "psychopatz.convo-engine.v1"
+}

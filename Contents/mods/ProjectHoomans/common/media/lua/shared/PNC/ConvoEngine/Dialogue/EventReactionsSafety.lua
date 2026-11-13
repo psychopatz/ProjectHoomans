@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.conversation.safety.danger",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "danger",
             ["sourceId"] = "semantic.conversation.safety.danger",
-            ["sourcePath"] = "psdl/dialogue/event_reactions_safety.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_safety/conversation_safety_danger.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsSafety",
+        ["namespace"] = "semantic.conversation.safety",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/event_reactions_safety.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_safety/conversation_safety_danger.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.conversation.safety.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "default",
             ["sourceId"] = "semantic.conversation.safety.default",
-            ["sourcePath"] = "psdl/dialogue/event_reactions_safety.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_safety/conversation_safety_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsSafety",
+        ["namespace"] = "semantic.conversation.safety",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/event_reactions_safety.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_safety/conversation_safety_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

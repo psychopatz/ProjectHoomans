@@ -5,12 +5,13 @@ return {
         ["id"] = "ui.semantic_suggestions.title",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "title",
             ["sourceId"] = "ui.semantic_suggestions.title",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[19]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_semantic_suggestions_title.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.semantic_suggestions",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -71,7 +72,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_semantic_suggestions_title.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -84,12 +85,13 @@ return {
         ["id"] = "ui.suggestion.back.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.back.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[20]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_back_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.back",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -150,7 +152,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_back_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -163,12 +165,13 @@ return {
         ["id"] = "ui.suggestion.check_in.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.check_in.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[21]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_check_in_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.check_in",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -229,7 +232,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_check_in_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -242,12 +245,13 @@ return {
         ["id"] = "ui.suggestion.check_in.utterance",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "utterance",
             ["sourceId"] = "ui.suggestion.check_in.utterance",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[22]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_check_in_utterance.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.check_in",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -308,7 +312,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_check_in_utterance.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -321,12 +325,13 @@ return {
         ["id"] = "ui.suggestion.companion_camp.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.companion_camp.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[25]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.companion_camp",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -387,7 +392,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -400,12 +405,13 @@ return {
         ["id"] = "ui.suggestion.companion_camp_here.utterance",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "utterance",
             ["sourceId"] = "ui.suggestion.companion_camp_here.utterance",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[23]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_here_utterance.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.companion_camp_here",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -466,7 +472,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_here_utterance.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -479,12 +485,13 @@ return {
         ["id"] = "ui.suggestion.companion_camp_room.utterance",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "utterance",
             ["sourceId"] = "ui.suggestion.companion_camp_room.utterance",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[24]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_room_utterance.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.companion_camp_room",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -545,7 +552,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_room_utterance.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -558,12 +565,13 @@ return {
         ["id"] = "ui.suggestion.companion_campfire.utterance",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "utterance",
             ["sourceId"] = "ui.suggestion.companion_campfire.utterance",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[26]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_campfire_utterance.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.companion_campfire",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -624,7 +632,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_campfire_utterance.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -637,12 +645,13 @@ return {
         ["id"] = "ui.suggestion.companion_orders.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.companion_orders.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[27]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_orders_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.companion_orders",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -703,7 +712,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_orders_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -716,12 +725,13 @@ return {
         ["id"] = "ui.suggestion.follow.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.follow.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[28]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_follow_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.follow",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -782,7 +792,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_follow_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -795,12 +805,13 @@ return {
         ["id"] = "ui.suggestion.follow.utterance",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "utterance",
             ["sourceId"] = "ui.suggestion.follow.utterance",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[29]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_follow_utterance.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.follow",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -861,7 +872,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_follow_utterance.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -874,12 +885,13 @@ return {
         ["id"] = "ui.suggestion.greeting_report_fine.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.greeting_report_fine.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[30]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.greeting_report_fine",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -940,7 +952,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -953,12 +965,13 @@ return {
         ["id"] = "ui.suggestion.greeting_report_fine.utterance",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "utterance",
             ["sourceId"] = "ui.suggestion.greeting_report_fine.utterance",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[31]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine_utterance.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.greeting_report_fine",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1019,7 +1032,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine_utterance.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1032,12 +1045,13 @@ return {
         ["id"] = "ui.suggestion.greeting_thank.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.greeting_thank.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[32]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_thank_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.greeting_thank",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1098,7 +1112,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_thank_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1111,12 +1125,13 @@ return {
         ["id"] = "ui.suggestion.greeting_thank.utterance",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "utterance",
             ["sourceId"] = "ui.suggestion.greeting_thank.utterance",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[33]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_thank_utterance.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.greeting_thank",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1177,7 +1192,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_thank_utterance.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1190,12 +1205,13 @@ return {
         ["id"] = "ui.suggestion.group.actions.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.group.actions.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[34]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_actions_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.group.actions",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1256,7 +1272,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_actions_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1269,12 +1285,13 @@ return {
         ["id"] = "ui.suggestion.group.flow.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.group.flow.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[35]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_flow_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.group.flow",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1335,7 +1352,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_flow_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1348,12 +1365,13 @@ return {
         ["id"] = "ui.suggestion.group.identity.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.group.identity.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[36]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_identity_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.group.identity",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1414,7 +1432,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_identity_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1427,12 +1445,13 @@ return {
         ["id"] = "ui.suggestion.group.landing.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.group.landing.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[37]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_landing_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.group.landing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1493,7 +1512,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_landing_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1506,12 +1525,13 @@ return {
         ["id"] = "ui.suggestion.group.medical.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.group.medical.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[38]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_medical_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.group.medical",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1572,7 +1592,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_medical_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1585,12 +1605,13 @@ return {
         ["id"] = "ui.suggestion.group.movement.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.group.movement.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[39]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_movement_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.group.movement",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1651,7 +1672,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_movement_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1664,12 +1685,13 @@ return {
         ["id"] = "ui.suggestion.group.needs.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.group.needs.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[40]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_needs_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.group.needs",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1730,7 +1752,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_needs_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1743,12 +1765,13 @@ return {
         ["id"] = "ui.suggestion.group.response.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.group.response.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[41]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_response_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.group.response",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1809,7 +1832,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_response_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1822,12 +1845,13 @@ return {
         ["id"] = "ui.suggestion.group.time.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.group.time.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[42]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_time_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.group.time",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1888,7 +1912,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_time_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1901,12 +1925,13 @@ return {
         ["id"] = "ui.suggestion.group.utilities.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.group.utilities.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[43]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_utilities_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.group.utilities",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1967,7 +1992,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_utilities_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1980,12 +2005,13 @@ return {
         ["id"] = "ui.suggestion.group.weather.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.group.weather.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[44]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_weather_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.group.weather",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2046,7 +2072,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_weather_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2059,12 +2085,13 @@ return {
         ["id"] = "ui.suggestion.group.wellbeing.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.group.wellbeing.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[45]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_wellbeing_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.group.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2125,7 +2152,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_wellbeing_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2138,12 +2165,13 @@ return {
         ["id"] = "ui.suggestion.group.whats_up.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.group.whats_up.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[46]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_whats_up_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.group.whats_up",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2204,7 +2232,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_whats_up_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2217,12 +2245,13 @@ return {
         ["id"] = "ui.suggestion.identity.lie.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.identity.lie.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.identity.lie",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2283,7 +2312,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2296,12 +2325,13 @@ return {
         ["id"] = "ui.suggestion.identity.lie.utterance",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "utterance",
             ["sourceId"] = "ui.suggestion.identity.lie.utterance",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie_utterance.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.identity.lie",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2362,7 +2392,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie_utterance.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2375,12 +2405,13 @@ return {
         ["id"] = "ui.suggestion.identity.real.label",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "label",
             ["sourceId"] = "ui.suggestion.identity.real.label",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_real_label.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.identity.real",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2441,7 +2472,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_real_label.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2454,12 +2485,13 @@ return {
         ["id"] = "ui.suggestion.identity.real.utterance",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "utterance",
             ["sourceId"] = "ui.suggestion.identity.real.utterance",
-            ["sourcePath"] = "psdl/dialogue/static_suggestion_text.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_real_utterance.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.identity.real",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2520,7 +2552,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/static_suggestion_text.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_real_utterance.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

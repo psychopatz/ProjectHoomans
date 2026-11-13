@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.brave.axe_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "axe_01",
             ["sourceId"] = "semantic.combat.kill.killer.brave.axe_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_brave.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_axe_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillBrave",
+        ["namespace"] = "semantic.combat.kill.killer.brave",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_brave.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_axe_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.brave.blade_head_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "blade_head_01",
             ["sourceId"] = "semantic.combat.kill.killer.brave.blade_head_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_brave.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_blade_head_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillBrave",
+        ["namespace"] = "semantic.combat.kill.killer.brave",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_brave.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_blade_head_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.brave.firearm_high_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "firearm_high_01",
             ["sourceId"] = "semantic.combat.kill.killer.brave.firearm_high_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_brave.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_firearm_high_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillBrave",
+        ["namespace"] = "semantic.combat.kill.killer.brave",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_brave.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_firearm_high_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.brave.spear_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "spear_01",
             ["sourceId"] = "semantic.combat.kill.killer.brave.spear_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_brave.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_spear_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillBrave",
+        ["namespace"] = "semantic.combat.kill.killer.brave",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_brave.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_brave/combat_kill_killer_brave_spear_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "admitted",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/give.json",
+    "responseTemplateID": "semantic.task.give.admitted",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "I'll give that to you.",
+          "TL": "Ibibigay ko iyon sa iyo."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Understood. Handing it over.",
+          "TL": "Naintindihan. Iniaabot na."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Here, I'll pass that to you.",
+          "TL": "Heto, ipapasa ko 'yan sa 'yo."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "All right. I'll give you the item.",
+          "TL": "Sige. Ibibigay ko sa 'yo ang gamit."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Sure thing. Passing it over.",
+          "TL": "Walang anuman. Ipinapasa na."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Understood. You can have it.",
+          "TL": "Naiintindihan ko. Pwede mong kunin."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "I'll transfer that to your pack.",
+          "TL": "Ililipat ko 'yan sa bag mo."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Right. Handing it over.",
+          "TL": "Sige. Iniaabot na."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "I'll give you what you requested.",
+          "TL": "Ibibigay ko ang hiniling mo."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Sounds good. Giving it now.",
+          "TL": "Maganda 'yan. Ibibigay na ngayon."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.task.give",
+  "schema": "psychopatz.convo-engine.v1"
+}

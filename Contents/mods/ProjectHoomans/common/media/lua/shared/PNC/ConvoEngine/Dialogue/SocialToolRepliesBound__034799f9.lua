@@ -7,7 +7,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.hostile.1.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[0]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_hostile.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -148,7 +148,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_hostile.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -163,7 +163,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.hostile.2.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[1]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_hostile.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -304,7 +304,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_hostile.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -319,7 +319,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.hostile.3.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[2]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_hostile.json#records[2]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -460,7 +460,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_hostile.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -475,7 +475,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.insult.1.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[3]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_insult.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -616,7 +616,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_insult.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -631,7 +631,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.insult.2.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[4]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_insult.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -772,7 +772,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_insult.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -787,7 +787,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.insult.3.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[5]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_insult.json#records[2]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -928,7 +928,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_insult.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -943,7 +943,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.orientation.1.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[6]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_orientation.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -1084,7 +1084,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_orientation.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1099,7 +1099,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.orientation.2.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[7]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_orientation.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -1240,7 +1240,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_orientation.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1255,7 +1255,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.personality.1.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[8]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_personality.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -1396,7 +1396,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_personality.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1411,7 +1411,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.personality.2.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[9]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_personality.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -1552,7 +1552,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_personality.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1567,7 +1567,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.praise.1.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[10]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_praise.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -1708,7 +1708,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_praise.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1723,7 +1723,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.praise.2.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[11]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_praise.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -1864,7 +1864,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_praise.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1879,7 +1879,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.praise.3.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[12]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_praise.json#records[2]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -2020,7 +2020,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_praise.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2035,7 +2035,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.relationship.1.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[13]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_relationship.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -2176,7 +2176,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_relationship.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2191,7 +2191,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.relationship.2.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[14]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_relationship.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -2332,7 +2332,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_relationship.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2347,7 +2347,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.romantic.1.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[15]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_romantic.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -2488,7 +2488,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_romantic.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2503,7 +2503,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.romantic.2.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[16]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_romantic.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -2644,7 +2644,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_romantic.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2659,7 +2659,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.romantic.3.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[17]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_romantic.json#records[2]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -2800,7 +2800,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_romantic.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2815,7 +2815,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.sexual.1.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[18]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_sexual.json#records[0]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -2956,7 +2956,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_sexual.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2971,7 +2971,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.sexual.2.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[19]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_sexual.json#records[1]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -3112,7 +3112,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_sexual.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -3127,7 +3127,7 @@ return {
         ["lineage"] = {
             ["migrationReadOnly"] = true,
             ["sourceId"] = "semantic.tool_reply.sexual.3.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_tool_replies_boundary_identity.json#records[20]",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_sexual.json#records[2]",
             ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__034799f9",
@@ -3268,7 +3268,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_tool_replies_boundary_identity.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_tool_replies_boundary_identity/tool_reply_sexual.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

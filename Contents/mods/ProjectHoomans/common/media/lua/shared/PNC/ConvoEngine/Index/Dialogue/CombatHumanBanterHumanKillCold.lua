@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.combat.human_kill.cold.line_01",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/combat_human_banter_human_kill_cold.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_cold/combat_human_kill_cold_line_01.json",
     },
     ["semantic.combat.human_kill.cold.line_02"] = {
         ["domain"] = "combat_human_banter_human_kill_cold",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "semantic.combat.human_kill.cold.line_02",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/combat_human_banter_human_kill_cold.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_cold/combat_human_kill_cold_line_02.json",
     },
     ["semantic.combat.human_kill.cold.line_03"] = {
         ["domain"] = "combat_human_banter_human_kill_cold",
@@ -25,6 +25,6 @@ return {
         },
         ["id"] = "semantic.combat.human_kill.cold.line_03",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/combat_human_banter_human_kill_cold.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_human_banter_human_kill_cold/combat_human_kill_cold_line_03.json",
     },
 }

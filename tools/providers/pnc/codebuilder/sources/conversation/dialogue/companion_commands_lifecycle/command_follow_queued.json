@@ -1,0 +1,196 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "queued",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:companion_commands",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/follow.json",
+        "responseTemplateID": "semantic.command.follow.queued"
+      },
+      "response": {
+        "act": "REPLY",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Okay, I'll follow you.",
+              "TL": "Sige, susundan kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Right behind you.",
+              "TL": "Nasa likod mo lang ako."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Following now. Lead the way.",
+              "TL": "Sumusunod na ngayon. Mauna ka."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Understood. Sticking close behind.",
+              "TL": "Naintindihan. Didikit sa likod mo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Moving with you. Lead on.",
+              "TL": "Kumikilos kasabay mo. Mauna na."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I'm with you. Let's move.",
+              "TL": "Kasama mo ako. Kilos na."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Right on your tail. Watching our rear.",
+              "TL": "Nasa buntot mo lang. Binabantayan ang likod."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Following your pace. Keep going.",
+              "TL": "Sasabay sa bilis mo. Tuloy lang."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Understood. Falling in behind you.",
+              "TL": "Naiintindihan ko. Papatabi sa likod mo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Got it. Moving out with you.",
+              "TL": "Nakuha ko. Lalakad kasabay mo."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.command.follow"
+    },
+    {
+      "kind": "dialogue",
+      "id": "friendly",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:companion_commands",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/follow.json",
+        "responseTemplateID": "semantic.command.follow.queued.friendly"
+      },
+      "response": {
+        "act": "REPLY",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Of course, I'll follow you.",
+              "TL": "Siyempre, susundan kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Gladly, friend! Lead the way.",
+              "TL": "Malugod, kaibigan! Ituro ang daan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Always happy to travel with you. Let's go!",
+              "TL": "Laging masayang maglakbay kasama ka. Tara na!"
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I'm right behind you, partner. Let's do this.",
+              "TL": "Nasa likod mo lang ako, kasama. Gawin na natin ito."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Right with you, friend! Watch your steps.",
+              "TL": "Kasabay mo ako, kaibigan! Mag-ingat sa hakbang."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Wouldn't rather be following anyone else.",
+              "TL": "Wala nang ibang gugustuhin kong sundan kundi ikaw."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Lead on! I've got your six covered.",
+              "TL": "Mauna ka! Hawak ko ang likod mo."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Sure thing! Sticking like glue to you, friend.",
+              "TL": "Walang anuman! Didikit na parang pandikit sa 'yo, kaibigan."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Happy to follow. Keep us safe!",
+              "TL": "Masayang sumunod. Panatilihin tayong ligtas!"
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Right behind you, partner. Onward!",
+              "TL": "Nasa likod mo lang, kasama. Pasulong!"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.command.follow.queued"
+    }
+  ]
+}

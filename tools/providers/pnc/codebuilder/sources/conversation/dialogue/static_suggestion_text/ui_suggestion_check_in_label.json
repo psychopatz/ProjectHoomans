@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.check_in.label",
+    "textRows": [
+      {
+        "key": "suggestion.check_in.label",
+        "text": {
+          "EN": "Check in with them",
+          "TL": "Kumusta tayo"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Check in with them",
+    "TL": "Kumusta tayo"
+  },
+  "namespace": "ui.suggestion.check_in",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -1,0 +1,546 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:navigation",
+        "sourceSurface": "content/navigation.json",
+        "responseTemplateID": "semantic.navigation.default",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "NAVIGATION_RESPONSE",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.default.neutral.01"
+            },
+            "text": {
+              "EN": "All right. What would you like to discuss?",
+              "TL": "Sige. Ano ang gusto mong pag-usapan?"
+            }
+          },
+          {
+            "id": "neutral.02",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.default.neutral.02"
+            },
+            "text": {
+              "EN": "I'm listening. What did you want to talk about?",
+              "TL": "Nakikinig ako. Ano ang gusto mong pag-usapan?"
+            }
+          },
+          {
+            "id": "neutral.03",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.default.neutral.03"
+            },
+            "text": {
+              "EN": "What's on your mind?",
+              "TL": "Ano'ng nasa isip mo?"
+            }
+          },
+          {
+            "id": "neutral.04",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.default.neutral.04"
+            },
+            "text": {
+              "EN": "Go ahead. What do you need to discuss?",
+              "TL": "Sige lang. Ano ang kailangang pag-usapan?"
+            }
+          },
+          {
+            "id": "neutral.05",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.default.neutral.05"
+            },
+            "text": {
+              "EN": "I'm here. What would you like to say?",
+              "TL": "Nandito ako. Ano ang gusto mong sabihin?"
+            }
+          },
+          {
+            "id": "neutral.06",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.default.neutral.06"
+            },
+            "text": {
+              "EN": "What are you thinking?",
+              "TL": "Ano'ng iniisip mo?"
+            }
+          },
+          {
+            "id": "neutral.07",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.default.neutral.07"
+            },
+            "text": {
+              "EN": "Ready when you are. What's up?",
+              "TL": "Handa na ako. Ano'ng meron?"
+            }
+          },
+          {
+            "id": "neutral.08",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.default.neutral.08"
+            },
+            "text": {
+              "EN": "Yes? What did you want to bring up?",
+              "TL": "Oo? Ano ang gusto mong talakayin?"
+            }
+          },
+          {
+            "id": "neutral.09",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.default.neutral.09"
+            },
+            "text": {
+              "EN": "I have a moment. What is it?",
+              "TL": "May sandali ako. Ano 'yon?"
+            }
+          },
+          {
+            "id": "neutral.10",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.navigation.default.neutral.10"
+            },
+            "text": {
+              "EN": "Sure, what's on your mind?",
+              "TL": "Sige, ano'ng nasa isip mo?"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.navigation.default"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:navigation",
+        "sourceSurface": "content/navigation.json",
+        "responseTemplateID": "semantic.navigation.default",
+        "style": "warm"
+      },
+      "response": {
+        "act": "NAVIGATION_RESPONSE",
+        "variants": [
+          {
+            "id": "warm.01",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.default.warm.01"
+            },
+            "text": {
+              "EN": "Sure. What would you like to discuss?",
+              "TL": "Sige. Ano ang gusto mong pag-usapan?"
+            }
+          },
+          {
+            "id": "warm.02",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.default.warm.02"
+            },
+            "text": {
+              "EN": "Always glad to talk with you. What's on your mind?",
+              "TL": "Laging masayang makausap ka. Ano'ng nasa isip mo?"
+            }
+          },
+          {
+            "id": "warm.03",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.default.warm.03"
+            },
+            "text": {
+              "EN": "I'm all ears. What did you want to share?",
+              "TL": "Nakikinig ako nang buo. Ano'ng gusto mong ibahagi?"
+            }
+          },
+          {
+            "id": "warm.04",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.default.warm.04"
+            },
+            "text": {
+              "EN": "Take your time. What would you like to discuss?",
+              "TL": "Huwag kang magmadali. Ano ang gusto mong pag-usapan?"
+            }
+          },
+          {
+            "id": "warm.05",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.default.warm.05"
+            },
+            "text": {
+              "EN": "Happy to chat. What's going on?",
+              "TL": "Masayang makipagkwentuhan. Ano'ng nangyayari?"
+            }
+          },
+          {
+            "id": "warm.06",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.default.warm.06"
+            },
+            "text": {
+              "EN": "Good to talk to you. What's on your heart?",
+              "TL": "Mabuting makausap ka. Ano'ng nilalaman ng puso mo?"
+            }
+          },
+          {
+            "id": "warm.07",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.default.warm.07"
+            },
+            "text": {
+              "EN": "I'm right here with you. What did you need?",
+              "TL": "Nandito lang ako kasama mo. Ano'ng kailangan mo?"
+            }
+          },
+          {
+            "id": "warm.08",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.default.warm.08"
+            },
+            "text": {
+              "EN": "Whatever you need to talk about, I'm listening.",
+              "TL": "Kahit ano'ng gusto mong pag-usapan, nakikinig ako."
+            }
+          },
+          {
+            "id": "warm.09",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.default.warm.09"
+            },
+            "text": {
+              "EN": "Sure thing. What did you want to talk through?",
+              "TL": "Walang anuman. Ano ang gusto mong linawin?"
+            }
+          },
+          {
+            "id": "warm.10",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.navigation.default.warm.10"
+            },
+            "text": {
+              "EN": "It's always nice catching up with you. What is it?",
+              "TL": "Laging magandang kamustahin ka. Ano 'yon?"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.navigation.default"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:navigation",
+        "sourceSurface": "content/navigation.json",
+        "responseTemplateID": "semantic.navigation.default",
+        "style": "terse"
+      },
+      "response": {
+        "act": "NAVIGATION_RESPONSE",
+        "variants": [
+          {
+            "id": "terse.01",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.default.terse.01"
+            },
+            "text": {
+              "EN": "What is it?",
+              "TL": "Ano?"
+            }
+          },
+          {
+            "id": "terse.02",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.default.terse.02"
+            },
+            "text": {
+              "EN": "Yes?",
+              "TL": "Oo?"
+            }
+          },
+          {
+            "id": "terse.03",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.default.terse.03"
+            },
+            "text": {
+              "EN": "Speak.",
+              "TL": "Salita."
+            }
+          },
+          {
+            "id": "terse.04",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.default.terse.04"
+            },
+            "text": {
+              "EN": "What?",
+              "TL": "Ano 'yon?"
+            }
+          },
+          {
+            "id": "terse.05",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.default.terse.05"
+            },
+            "text": {
+              "EN": "Go on.",
+              "TL": "Sige."
+            }
+          },
+          {
+            "id": "terse.06",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.default.terse.06"
+            },
+            "text": {
+              "EN": "Listening.",
+              "TL": "Nakikinig."
+            }
+          },
+          {
+            "id": "terse.07",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.default.terse.07"
+            },
+            "text": {
+              "EN": "What's up?",
+              "TL": "Ano meron?"
+            }
+          },
+          {
+            "id": "terse.08",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.default.terse.08"
+            },
+            "text": {
+              "EN": "Say it.",
+              "TL": "Sabihin mo."
+            }
+          },
+          {
+            "id": "terse.09",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.default.terse.09"
+            },
+            "text": {
+              "EN": "Make it quick.",
+              "TL": "Bilisan mo."
+            }
+          },
+          {
+            "id": "terse.10",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.navigation.default.terse.10"
+            },
+            "text": {
+              "EN": "Talk.",
+              "TL": "Usap."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.navigation.default"
+    },
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:navigation",
+        "sourceSurface": "content/navigation.json",
+        "responseTemplateID": "semantic.navigation.default",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "NAVIGATION_RESPONSE",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.default.guarded.01"
+            },
+            "text": {
+              "EN": "All right. What now?",
+              "TL": "Sige. Ano ngayon?"
+            }
+          },
+          {
+            "id": "guarded.02",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.default.guarded.02"
+            },
+            "text": {
+              "EN": "What is it? Keep it short.",
+              "TL": "Ano 'yon? Iklian mo lang."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.default.guarded.03"
+            },
+            "text": {
+              "EN": "Make it quick. We're exposed.",
+              "TL": "Bilisan mo. Lantad tayo."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.default.guarded.04"
+            },
+            "text": {
+              "EN": "What do you want? Eyes open.",
+              "TL": "Ano'ng kailangan mo? Buksan ang mata."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.default.guarded.05"
+            },
+            "text": {
+              "EN": "Speak up, but don't draw attention.",
+              "TL": "Magsalita ka, pero huwag kang mag-ingay."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.default.guarded.06"
+            },
+            "text": {
+              "EN": "What's on your mind? Watch the street.",
+              "TL": "Ano'ng iniisip mo? Bantayan ang kalsada."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.default.guarded.07"
+            },
+            "text": {
+              "EN": "What now? We can't linger here.",
+              "TL": "Ano ngayon? Hindi tayo pwedeng tumambay rito."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.default.guarded.08"
+            },
+            "text": {
+              "EN": "I'm listening, but keep scanning.",
+              "TL": "Nakikinig ako, pero patuloy na magmasid."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.default.guarded.09"
+            },
+            "text": {
+              "EN": "State your business quickly.",
+              "TL": "Sabihin mo agad ang kailangan mo."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.navigation.default.guarded.10"
+            },
+            "text": {
+              "EN": "What is it? Trouble?",
+              "TL": "Ano 'yon? May gulo ba?"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.navigation.default"
+    }
+  ]
+}

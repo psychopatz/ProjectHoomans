@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "neutral",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
+    "responseTemplateID": "semantic.emote.reply.default",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "I hear you.",
+          "TL": "Narinig kita."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Got it.",
+          "TL": "Nakuha ko."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Understood.",
+          "TL": "Naiintindihan ko."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Fair enough.",
+          "TL": "May punto ka."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "I see you.",
+          "TL": "Nakikita kita."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Right back at you.",
+          "TL": "Pabalik din sa 'yo."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Acknowledged.",
+          "TL": "Kinikilala ko."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Noted.",
+          "TL": "Tala ko na."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "All right.",
+          "TL": "Sige."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Message received.",
+          "TL": "Mensahe nakuha."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.emote.reply.default",
+  "schema": "psychopatz.convo-engine.v1"
+}

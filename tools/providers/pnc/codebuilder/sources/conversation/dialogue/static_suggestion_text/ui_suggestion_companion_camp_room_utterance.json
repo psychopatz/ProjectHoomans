@@ -1,0 +1,25 @@
+{
+  "id": "utterance",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.companion_camp_room.utterance",
+    "textRows": [
+      {
+        "key": "suggestion.companion_camp_room.utterance",
+        "text": {
+          "EN": "Let's camp in the %1.",
+          "TL": "Magkampo tayo sa %1."
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Let's camp in the %1.",
+    "TL": "Magkampo tayo sa %1."
+  },
+  "namespace": "ui.suggestion.companion_camp_room",
+  "schema": "psychopatz.convo-engine.v1"
+}

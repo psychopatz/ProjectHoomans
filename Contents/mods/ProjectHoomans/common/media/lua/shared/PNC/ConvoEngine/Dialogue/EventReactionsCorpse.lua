@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.corpse.reaction.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "default",
             ["sourceId"] = "semantic.corpse.reaction.default",
-            ["sourcePath"] = "psdl/dialogue/event_reactions_corpse.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCorpse",
+        ["namespace"] = "semantic.corpse.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/event_reactions_corpse.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.corpse.reaction.revenge",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "revenge",
             ["sourceId"] = "semantic.corpse.reaction.revenge",
-            ["sourcePath"] = "psdl/dialogue/event_reactions_corpse.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_revenge.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCorpse",
+        ["namespace"] = "semantic.corpse.reaction",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/event_reactions_corpse.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_corpse/corpse_reaction_revenge.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

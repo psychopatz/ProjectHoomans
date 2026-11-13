@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
+        "responseTemplateID": "semantic.question.needs.offer.hunger",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Food would help, but I don't have an exact amount yet.",
+              "TL": "Makakatulong ang pagkain, pero wala akong eksaktong dami ngayon."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Any food you could spare would make a difference.",
+              "TL": "Kahit anong pagkaing maibibigay mo ay malaking tulong."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I'm definitely hungry. Whatever rations you have would be welcome.",
+              "TL": "Gutom na talaga ako. Anumang rasyon mayroon ka ay tatanggapin ko."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "A meal would be great, even if it's just something small.",
+              "TL": "Maganda sanang makakain, kahit kaunti lang."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I could really use some food right now.",
+              "TL": "Kailangang-kailangan ko talaga ng pagkain ngayon."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "My stomach is empty. Any edible supplies would help.",
+              "TL": "Walang laman ang tiyan ko. Makakatulong ang anumang makakain."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Food would keep me on my feet. I'll take whatever you offer.",
+              "TL": "Pagkain ang magpapanatili sa akin sa labas. Tatanggapin ko ang iaalok mo."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Running low on food out here. Appreciate whatever you can share.",
+              "TL": "Nauubusan na ako ng pagkain. Salamat sa anumang maibabahagi mo."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Haven't eaten a decent bite today. Food would go a long way.",
+              "TL": "Hindi pa ako kumakain nang maayos ngayon. Malaking tulong ang pagkain."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Could use rations soon. Let's see what you've got.",
+              "TL": "Kailangan ko ng rasyon agad. Tingnan natin kung anong mayroon ka."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.needs.offer.hunger"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
+        "responseTemplateID": "semantic.question.needs.offer.hunger",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "Food would help, if you can spare it.",
+              "TL": "Makakatulong ang pagkain, kung may maibibigay ka."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "I'd truly appreciate a bite to eat, friend, if you have extra.",
+              "TL": "Lubos kong pasasalamatan ang makakain, kaibigan, kung may sobra ka."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "You're very kind to offer. Some food would really lift my spirits.",
+              "TL": "Napakabait mong mag-alok. Talagang magpapagaan ng loob ko ang pagkain."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "I could definitely use a meal. Thank you for thinking of me.",
+              "TL": "Kailangan ko nga ng makakain. Salamat sa pag-alala sa akin."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Sharing rations is generous out here. I'd be grateful for anything.",
+              "TL": "Napakabuting magbahagi ng rasyon dito. Masaya ako sa kahit ano."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "A bit of food would mean the world right now, thank you.",
+              "TL": "Napakalaking bagay ng kahit kaunting pagkain ngayon, salamat."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "If you've got food to share, I won't say no. You're a lifesaver.",
+              "TL": "Kung may maibabahagi kang pagkain, tatanggapin ko. Ligtas ako sa 'yo."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "I'm hungry, and your generosity means a lot. Thank you.",
+              "TL": "Gutom ako, at malaking bagay ang kabaitan mo. Salamat."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Happy to accept any food you can spare. Let's eat together.",
+              "TL": "Masayang tatanggapin ang anumang sobra mo. Sabay tayong kumain."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Thank you for asking. A warm meal or small ration would be wonderful.",
+              "TL": "Salamat sa pagtatanong. Napakaganda sana ng kahit simpleng pagkain."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.needs.offer.hunger"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
+        "responseTemplateID": "semantic.question.needs.offer.hunger",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "I need food.",
+              "TL": "Kailangan ko ng pagkain."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Hungry.",
+              "TL": "Gutom."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Got food?",
+              "TL": "May pagkain?"
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Need rations.",
+              "TL": "Kailangan ng rasyon."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Food helps.",
+              "TL": "Makatutulong ang pagkain."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Starving.",
+              "TL": "Gutom na gutom."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Spare a bite.",
+              "TL": "Penge ng pagkain."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Any cans?",
+              "TL": "May de-lata?"
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Food. Please.",
+              "TL": "Pagkain. Pakiusap."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Empty stomach.",
+              "TL": "Walang laman ang tiyan."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.needs.offer.hunger"
+    },
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
+        "responseTemplateID": "semantic.question.needs.offer.hunger",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "I need food. Keep your distance.",
+              "TL": "Kailangan ko ng pagkain. Lumayo ka."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "If that food has strings attached, forget it.",
+              "TL": "Kung may kapalit ang pagkaing 'yan, huwag na lang."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "I'm hungry, but don't try anything funny.",
+              "TL": "Gutom ako, pero huwag kang magtangkang manloko."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Put the food down on the ground and step back.",
+              "TL": "Ilapag mo ang pagkain sa lupa at umatras ka."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "I could use rations, but I won't owe you my life.",
+              "TL": "Kailangan ko ng rasyon, pero hindi ko ibebenta ang sarili ko."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "Is that sealed? I don't take spoiled or poisoned rations.",
+              "TL": "Selyado ba 'yan? Hindi ako kumakain ng panis o may lason."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "I need food, but keep your hands where I can see them.",
+              "TL": "Kailangan ko ng pagkain, pero ilagay ang kamay sa kita ko."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Only take what you're offering freely. No hidden deals.",
+              "TL": "Kukunin ko lang kung bukal sa loob. Walang tagong kasunduan."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "I'm starving, but I'm still armed. Remember that.",
+              "TL": "Gutom ako, pero may armas pa rin ako. Tandaan mo 'yan."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Leave the supplies right there. No sudden moves.",
+              "TL": "Iwan mo ang gamit diyan. Walang biglaang galaw."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.needs.offer.hunger"
+    }
+  ]
+}

@@ -1,0 +1,142 @@
+{
+  "id": "wellbeing",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.question.wellbeing",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "WELLBEING",
+    "variants": [
+      {
+        "id": "semantic.question.wellbeing.dataset.hanging_in",
+        "metadata": {
+          "fallback": "I'm hanging in there. Thanks for asking.",
+          "templateID": "semantic.question.wellbeing.dataset.hanging_in"
+        },
+        "text": {
+          "EN": "I'm hanging in there. Thanks for asking.",
+          "TL": "I'm hanging in there. Thanks for asking."
+        }
+      },
+      {
+        "id": "semantic.question.wellbeing.dataset.all_things_considered",
+        "metadata": {
+          "fallback": "Doing okay, all things considered.",
+          "templateID": "semantic.question.wellbeing.dataset.all_things_considered"
+        },
+        "text": {
+          "EN": "Doing okay, all things considered.",
+          "TL": "Doing okay, all things considered."
+        }
+      },
+      {
+        "id": "semantic.question.wellbeing.dataset.getting_by",
+        "metadata": {
+          "fallback": "I'm getting by, one day at a time. How about you?",
+          "templateID": "semantic.question.wellbeing.dataset.getting_by"
+        },
+        "text": {
+          "EN": "I'm getting by, one day at a time. How about you?",
+          "TL": "I'm getting by, one day at a time. How about you?"
+        }
+      },
+      {
+        "id": "semantic.question.wellbeing.dataset.hungry",
+        "metadata": {
+          "fallback": "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
+          "priority": 2,
+          "templateID": "semantic.question.wellbeing.dataset.hungry"
+        },
+        "text": {
+          "EN": "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
+          "TL": "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it."
+        },
+        "when": {
+          "all": [
+            {
+              "op": "eq",
+              "path": "conversation.needType",
+              "value": "hunger"
+            },
+            {
+              "op": "in",
+              "path": "conversation.needUrgency",
+              "values": [
+                "moderate",
+                "severe",
+                "emergency",
+                "critical"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "semantic.question.wellbeing.dataset.thirsty",
+        "metadata": {
+          "fallback": "I'm pretty thirsty. If you have water, could you spare some?",
+          "priority": 3,
+          "templateID": "semantic.question.wellbeing.dataset.thirsty"
+        },
+        "text": {
+          "EN": "I'm pretty thirsty. If you have water, could you spare some?",
+          "TL": "I'm pretty thirsty. If you have water, could you spare some?"
+        },
+        "when": {
+          "all": [
+            {
+              "op": "eq",
+              "path": "conversation.needType",
+              "value": "thirst"
+            },
+            {
+              "op": "in",
+              "path": "conversation.needUrgency",
+              "values": [
+                "moderate",
+                "severe",
+                "emergency",
+                "critical"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "id": "semantic.question.wellbeing.dataset.tired",
+        "metadata": {
+          "fallback": "I'm tired, though I can manage for now.",
+          "priority": 2,
+          "templateID": "semantic.question.wellbeing.dataset.tired"
+        },
+        "text": {
+          "EN": "I'm tired, though I can manage for now.",
+          "TL": "I'm tired, though I can manage for now."
+        },
+        "when": {
+          "all": [
+            {
+              "op": "eq",
+              "path": "conversation.needType",
+              "value": "fatigue"
+            },
+            {
+              "op": "in",
+              "path": "conversation.needUrgency",
+              "values": [
+                "moderate",
+                "severe",
+                "emergency",
+                "critical"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.question",
+  "schema": "psychopatz.convo-engine.v1"
+}

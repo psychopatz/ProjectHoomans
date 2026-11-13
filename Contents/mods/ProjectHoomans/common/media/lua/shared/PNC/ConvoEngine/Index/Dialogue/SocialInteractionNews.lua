@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.interaction.news.acknowledge.guarded",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_interaction_news.json",
+        ["source"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
     },
     ["semantic.interaction.news.acknowledge.neutral"] = {
         ["domain"] = "social_interaction_news",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "semantic.interaction.news.acknowledge.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_interaction_news.json",
+        ["source"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
     },
     ["semantic.interaction.news.acknowledge.terse"] = {
         ["domain"] = "social_interaction_news",
@@ -25,7 +25,7 @@ return {
         },
         ["id"] = "semantic.interaction.news.acknowledge.terse",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_interaction_news.json",
+        ["source"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
     },
     ["semantic.interaction.news.acknowledge.warm"] = {
         ["domain"] = "social_interaction_news",
@@ -34,6 +34,6 @@ return {
         },
         ["id"] = "semantic.interaction.news.acknowledge.warm",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_interaction_news.json",
+        ["source"] = "adopters/hoomans/dialogue/social_interaction_news/interaction_news_acknowledge.json",
     },
 }

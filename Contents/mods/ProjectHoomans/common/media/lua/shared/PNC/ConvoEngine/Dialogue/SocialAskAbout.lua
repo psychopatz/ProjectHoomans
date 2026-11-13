@@ -5,12 +5,13 @@ return {
         ["id"] = "social.ask_about.member",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "member",
             ["sourceId"] = "social.ask_about.member",
-            ["sourcePath"] = "psdl/dialogue/social_ask_about.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about_member.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialAskAbout",
+        ["namespace"] = "social.ask_about",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -181,7 +182,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_ask_about.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about_member.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -194,12 +195,13 @@ return {
         ["id"] = "social.ask_about.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "social.ask_about.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_ask_about.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialAskAbout",
+        ["namespace"] = "social.ask_about",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -370,7 +372,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_ask_about.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -383,12 +385,13 @@ return {
         ["id"] = "social.ask_about.special",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "special",
             ["sourceId"] = "social.ask_about.special",
-            ["sourcePath"] = "psdl/dialogue/social_ask_about.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about_special.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialAskAbout",
+        ["namespace"] = "social.ask_about",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -559,7 +562,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_ask_about.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_ask_about/social_ask_about_special.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

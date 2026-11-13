@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+        "responseTemplateID": "semantic.social.hostile_short",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "Watch your mouth. Now.",
+              "TL": "Bantayan mo ang pananalita mo. Ngayon."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "Shut your mouth before I shut it for you.",
+              "TL": "Itikom mo ang bibig mo bago ko pa itikom 'yan."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "You're pushing me. Stop.",
+              "TL": "Sinasagad mo ako. Tigil."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "One more word out of you.",
+              "TL": "Isa pang salita mula sa 'yo."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Mind yourself right now.",
+              "TL": "Bantayan mo ang kilos mo ngayon."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "You're testing the wrong survivor.",
+              "TL": "Maling tao ang sinusubukan mo."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Quiet. Before things get violent.",
+              "TL": "Tahimik. Bago maging bayolente ito."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "You want trouble? Keep talking.",
+              "TL": "Gusto mo ng gulo? Sige, magsalita ka pa."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "Hold your tongue.",
+              "TL": "Pigilan mo ang dila mo."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Bite your tongue now.",
+              "TL": "Kagatin mo ang dila mo ngayon."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.hostile_short"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+        "responseTemplateID": "semantic.social.hostile_short",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Watch your language.",
+              "TL": "Bantayan mo ang pananalita mo."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "That kind of talk is dangerous here.",
+              "TL": "Mapanganib ang ganyang salita rito."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Keep your words civil.",
+              "TL": "Panatilihing maayos ang mga salita mo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I'm warning you to calm down.",
+              "TL": "Binabalaan kitang kumalma."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Don't escalate this situation.",
+              "TL": "Huwag mong palalain ang sitwasyong ito."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Control your temper.",
+              "TL": "Pigilan mo ang init ng ulo mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "There's no place for that attitude here.",
+              "TL": "Walang puwang ang ganyang asal dito."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Watch your mouth and think before you speak.",
+              "TL": "Ingatan ang bibig at mag-isip bago magsalita."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "You need to rein that in.",
+              "TL": "Kailangan mong kontrolin 'yan."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Keep it civil or step away.",
+              "TL": "Maging maayos ka o lumayo ka na."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.hostile_short"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+        "responseTemplateID": "semantic.social.hostile_short",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Shut it.",
+              "TL": "Tumahimik ka."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Watch it.",
+              "TL": "Mag-ingat ka."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Enough.",
+              "TL": "Sapat na."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Quiet.",
+              "TL": "Tahimik."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Careful.",
+              "TL": "Mag-ingat."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Bite it.",
+              "TL": "Itikom mo."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Stop.",
+              "TL": "Tigil."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Cool it.",
+              "TL": "Kumalma ka."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Done.",
+              "TL": "Tapos."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Last warning.",
+              "TL": "Huling babala."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.hostile_short"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+        "responseTemplateID": "semantic.social.hostile_short",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "Hey, watch your mouth, friend. We're better than that.",
+              "TL": "Huy, ingatan mo ang bibig mo, kaibigan. Mas maayos tayo riyan."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Don't talk like that. You're better than this anger.",
+              "TL": "Huwag kang magsalita nang ganyan. Higit ka sa galit mong 'yan."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Come on, watch your tone with me.",
+              "TL": "Sige na, ayusin mo ang tono mo sa akin."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Take a breath before you say something you'll regret.",
+              "TL": "Huminga ka muna bago ka magsabi ng pagsisisihan mo."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "I know you're frustrated, but don't lash out at me.",
+              "TL": "Alam kong naiinis ka, pero huwag mong ibunton sa akin."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Easy now. We're on the same team.",
+              "TL": "Dahan-dahan lang. Magkasama tayo rito."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Check yourself, partner. I'm with you, not against you.",
+              "TL": "Ayusin mo sarili mo, kasama. Kakampi mo ako, hindi kalaban."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Don't let the anger win today. Stay with me.",
+              "TL": "Huwag mong hayaang manalo ang galit ngayon. Sumama ka sa 'kin."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "I'm giving you space, but watch what you say.",
+              "TL": "Binibigyan kita ng puwang, pero bantayan mo ang sinasabi mo."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Hold your words. We can talk when you're calmer.",
+              "TL": "Pigilan mo ang salita mo. Mag-usap tayo kapag kalmado ka na."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.hostile_short"
+    }
+  ]
+}

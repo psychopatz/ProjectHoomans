@@ -123,7 +123,10 @@ class SocialApologyWordingShardTests(unittest.TestCase):
             payload = plan["payload"]
             metadata = payload["metadata"]
             self.assertEqual(plan["domain"], "social_apology")
-            self.assertEqual(plan["sourceShard"], "psdl/dialogue/social_apology.json")
+            self.assertTrue(
+                plan["sourceShard"].startswith("adopters/hoomans/dialogue/social_apology/"),
+                plan["sourceShard"],
+            )
             self.assertIn(metadata["responseTemplateID"], APOLOGY_IDS)
             self.assertIn(metadata["style"], STYLES)
             variants = payload["response"]["variants"]
@@ -133,15 +136,19 @@ class SocialApologyWordingShardTests(unittest.TestCase):
     def test_generated_apology_psdl_source_is_complete_and_legacy_fixed_keys_retired(
         self,
     ) -> None:
-        source = json.loads(
-            (
-                REPOSITORY
-                / "tools/providers/pnc/codebuilder/sources/conversation/psdl/dialogue/"
-                "social_apology.json"
-            ).read_text(encoding="utf-8")
+        source_dir = (
+            REPOSITORY
+            / "tools/providers/pnc/codebuilder/sources/conversation/dialogue/social_apology"
         )
-        self.assertEqual(len(source["records"]), len(APOLOGY_IDS) * len(STYLES))
-        for record in source["records"]:
+        files = sorted(source_dir.glob("*.json"))
+        self.assertEqual(len(files), len(APOLOGY_IDS))
+        records = [
+            record
+            for path in files
+            for record in json.loads(path.read_text(encoding="utf-8")).get("records", [])
+        ]
+        self.assertEqual(len(records), len(APOLOGY_IDS) * len(STYLES))
+        for record in records:
             self.assertEqual(record["owner"], "ProjectHoomans")
             self.assertEqual(record["metadata"]["sourceSurface"], "content/social_apology.json")
             self.assertEqual(record["metadata"]["responseTemplateID"] in APOLOGY_IDS, True)

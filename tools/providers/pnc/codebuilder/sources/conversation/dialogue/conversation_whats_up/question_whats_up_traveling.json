@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.conversation",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
+        "responseTemplateID": "semantic.question.whats_up.traveling",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "Keeping moving. Don't slow me down.",
+              "TL": "Patuloy lang sa paggalaw. Huwag mo akong pabagalin."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "On the move. Don't block my path.",
+              "TL": "Naglalakbay ako. Huwag kang humarang sa daan ko."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Travel's dangerous right now. Step aside.",
+              "TL": "Mapanganib ang daan ngayon. Tabi muna."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Covering ground. I don't stay in one spot too long.",
+              "TL": "Tuloy-tuloy ang lakad ko. Hindi ako tumatambay nang matagal."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Moving fast, staying light. No time to chat.",
+              "TL": "Mabilis ang lakad, magaan ang dala. Walang oras makipag-usap."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "Don't follow too closely. I walk alone.",
+              "TL": "Huwag kang masyadong lumapit. Nag-iisa akong naglalakad."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Just passing through. Mind your own road.",
+              "TL": "Dumadaan lang. Asikasuhin mo ang sarili mong daan."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Got places to be before dark. Move along.",
+              "TL": "May pupuntahan ako bago magdilim. Lumakad ka na."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "Traveling light and watching behind me. Stand clear.",
+              "TL": "Magaan ang dala at laging tumitingin sa likod. Tabi ka riyan."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Moving between points. Don't compromise my route.",
+              "TL": "Lumilipat ng pwesto. Huwag mong sirain ang ruta ko."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.whats_up.traveling"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.conversation",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
+        "responseTemplateID": "semantic.question.whats_up.traveling",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I'm keeping moving and watching what is ahead.",
+              "TL": "Patuloy akong gumagalaw at binabantayan ang nasa unahan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Just trekking from point to point. Road's fairly calm.",
+              "TL": "Naglalakad lang mula pwesto hanggang pwesto. Medyo kalmado ang kalsada."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Making headway before the sun starts dropping.",
+              "TL": "Bumabaybay habang mataas pa ang araw."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Covering some ground today. How's the path behind you?",
+              "TL": "Marami-rami na ring nalakad ngayon. Kumusta ang daan sa pinanggalingan mo?"
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "On the road again. Gotta keep moving to find supplies.",
+              "TL": "Nasa kalsada na naman. Kailangang gumalaw para maghanap ng gamit."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Heading out on a scouting loop. Everything looks quiet.",
+              "TL": "Nag-iikot para magmanman. Mukhang tahimik naman ang lahat."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Putting miles under my boots. Helps clear my head.",
+              "TL": "Tuloy lang sa paghakbang. Nakakatulong magpalinaw ng isip."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Just moving between shelters. Don't want to linger anywhere too long.",
+              "TL": "Lumilipat lang ng silungan. Ayokong tumambay nang matagal sa iisang lugar."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Traveling down the lane. Hoping to avoid any hordes.",
+              "TL": "Naglalakad sa kalsada. Sana walang makasalubong na kumpol ng patay."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "On my way across the sector. How are things looking your way?",
+              "TL": "Patawid ako sa kabilang bahagi. Kumusta ang kalagayan sa direksyon mo?"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.whats_up.traveling"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.conversation",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
+        "responseTemplateID": "semantic.question.whats_up.traveling",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Keeping moving.",
+              "TL": "Patuloy lang sa paggalaw."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "On the road.",
+              "TL": "Nasa daan."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Traveling.",
+              "TL": "Naglalakbay."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Moving out.",
+              "TL": "Umaalis."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Passing through.",
+              "TL": "Dumadaan lang."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Covering ground.",
+              "TL": "Naglalakad."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "On the move.",
+              "TL": "Kumikilos."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Headed out.",
+              "TL": "Papunta na."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "In transit.",
+              "TL": "Bumabyahe."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Pushing ahead.",
+              "TL": "Pasulong."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.whats_up.traveling"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.conversation",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
+        "responseTemplateID": "semantic.question.whats_up.traveling",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "I'm keeping moving and watching what is ahead. Come along if you want.",
+              "TL": "Patuloy akong gumagalaw at binabantayan ang nasa unahan. Sumama ka kung gusto mo."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "On the trail today! It's always safer and nicer walking together.",
+              "TL": "Nasa daan ngayon! Laging mas ligtas at masaya kapag may kasamang maglakad."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Traveling light. Feel free to tag along if you're headed that way.",
+              "TL": "Magaan ang dala. Sumabay ka kung papunta ka rin doon."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Making my way down the road. Glad I crossed paths with you today.",
+              "TL": "Bumabagtas sa daan. Masaya akong nakasalubong kita ngayong araw."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Covering ground, but always happy to pause and say hello to a friend.",
+              "TL": "Nagmamadali man, masaya pa ring huminto para kumustahin ang kaibigan."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Walking between camps. Safe travels on your end, my friend.",
+              "TL": "Naglalakad patungo sa kabilang kampo. Ingat sa biyahe mo, kaibigan."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Heading out for a bit. Watch your step, and maybe we'll meet again soon.",
+              "TL": "Aalis lang sandali. Mag-ingat sa paghakbang, at magkikita rin tayo mamaya."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "The road feels a lot less lonely whenever I see you around.",
+              "TL": "Hindi nakakalungkot ang daan kapag nakakasalubong kita."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Moving along, but I'm glad our paths crossed. Stay safe out there.",
+              "TL": "Lumalakad, pero masayang nagkasalubong tayo. Mag-ingat ka palagi sa labas."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Traveling to check on our boundaries. Good to see you in high spirits.",
+              "TL": "Tinitingnan ang hangganan ng kampo. Masarap kang makitang nasa maayos na lagay."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.whats_up.traveling"
+    }
+  ]
+}

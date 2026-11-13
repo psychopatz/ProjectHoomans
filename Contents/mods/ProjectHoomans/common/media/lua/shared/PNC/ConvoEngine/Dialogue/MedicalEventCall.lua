@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.medical.distress.call.bandage",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "bandage",
             ["sourceId"] = "semantic.medical.distress.call.bandage",
-            ["sourcePath"] = "psdl/dialogue/medical_event_call.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_bandage.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventCall",
+        ["namespace"] = "semantic.medical.distress.call",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -187,7 +188,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/medical_event_call.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_bandage.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -200,12 +201,13 @@ return {
         ["id"] = "semantic.medical.distress.call.bleedout",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "bleedout",
             ["sourceId"] = "semantic.medical.distress.call.bleedout",
-            ["sourcePath"] = "psdl/dialogue/medical_event_call.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_bleedout.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventCall",
+        ["namespace"] = "semantic.medical.distress.call",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -382,7 +384,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/medical_event_call.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_bleedout.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -395,12 +397,13 @@ return {
         ["id"] = "semantic.medical.distress.call.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "default",
             ["sourceId"] = "semantic.medical.distress.call.default",
-            ["sourcePath"] = "psdl/dialogue/medical_event_call.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventCall",
+        ["namespace"] = "semantic.medical.distress.call",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -577,7 +580,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/medical_event_call.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -590,12 +593,13 @@ return {
         ["id"] = "semantic.medical.distress.call.dehydration",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "dehydration",
             ["sourceId"] = "semantic.medical.distress.call.dehydration",
-            ["sourcePath"] = "psdl/dialogue/medical_event_call.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_dehydration.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventCall",
+        ["namespace"] = "semantic.medical.distress.call",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +776,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/medical_event_call.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_dehydration.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,12 +789,13 @@ return {
         ["id"] = "semantic.medical.distress.call.exhaustion",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "exhaustion",
             ["sourceId"] = "semantic.medical.distress.call.exhaustion",
-            ["sourcePath"] = "psdl/dialogue/medical_event_call.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_exhaustion.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventCall",
+        ["namespace"] = "semantic.medical.distress.call",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -967,7 +972,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/medical_event_call.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_exhaustion.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -980,12 +985,13 @@ return {
         ["id"] = "semantic.medical.distress.call.mercy",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "mercy",
             ["sourceId"] = "semantic.medical.distress.call.mercy",
-            ["sourcePath"] = "psdl/dialogue/medical_event_call.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_mercy.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventCall",
+        ["namespace"] = "semantic.medical.distress.call",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1162,7 +1168,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/medical_event_call.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_mercy.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1175,12 +1181,13 @@ return {
         ["id"] = "semantic.medical.distress.call.rescue",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "rescue",
             ["sourceId"] = "semantic.medical.distress.call.rescue",
-            ["sourcePath"] = "psdl/dialogue/medical_event_call.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_rescue.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventCall",
+        ["namespace"] = "semantic.medical.distress.call",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1357,7 +1364,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/medical_event_call.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_rescue.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1370,12 +1377,13 @@ return {
         ["id"] = "semantic.medical.distress.call.starvation",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "starvation",
             ["sourceId"] = "semantic.medical.distress.call.starvation",
-            ["sourcePath"] = "psdl/dialogue/medical_event_call.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_starvation.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventCall",
+        ["namespace"] = "semantic.medical.distress.call",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1552,7 +1560,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/medical_event_call.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_call/medical_distress_call_starvation.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

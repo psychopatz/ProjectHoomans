@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+        "responseTemplateID": "semantic.flow.greeting.opening.default",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "State your business. Keep your distance.",
+              "TL": "Sabihin mo ang pakay mo. Lumayo ka."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "Hold it right there. What do you want?",
+              "TL": "Diyan ka lang. Anong gusto mo?"
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Hands where I can see them. Who are you?",
+              "TL": "Itaas ang mga kamay. Sino ka?"
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Don't come any closer until I know your business.",
+              "TL": "Huwag kang lalapit hangga't hindi ko alam ang pakay mo."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Keep your hands clear. Talk from there.",
+              "TL": "Ilayo mo ang mga kamay mo. Magsalita ka riyan."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "I'm watching you. What brings you here?",
+              "TL": "Binabantayan kita. Anong nagdala sa 'yo rito?"
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Easy now. Step back and speak your piece.",
+              "TL": "Dahan-dahan lang. Umatras ka at sabihin mo ang sasabihin mo."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Keep your distance. Times are too dangerous for strangers.",
+              "TL": "Lumayo ka. Masyadong mapanganib ang panahon para sa mga estranghero."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "That's close enough. What are you looking for?",
+              "TL": "Tama na ang lapit na 'yan. Anong hinahanap mo?"
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Stay where you are. I don't know you yet.",
+              "TL": "Diyan ka lang. Hindi pa kita kilala."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.flow.greeting.opening.default"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+        "responseTemplateID": "semantic.flow.greeting.opening.default",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Hey there. Good to see you.",
+              "TL": "Uy, mabuti at nakita kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Hello there. How are things?",
+              "TL": "Kumusta. Kumusta ang lagay?"
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Good to see you.",
+              "TL": "Mabuti at nakita kita."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Morning. Hope the day treats you well.",
+              "TL": "Magandang umaga. Sana maayos ang araw mo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Hey again. What's going on?",
+              "TL": "Uy ulit. Anong nangyayari?"
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "There you are. Everything quiet?",
+              "TL": "Nandiyan ka pala. Tahimik ba ang lahat?"
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Afternoon. Staying out of trouble?",
+              "TL": "Magandang hapon. Ligtas ka ba sa gulo?"
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Hello. Good to run into another living person.",
+              "TL": "Kumusta. Mabuti at may nakasalubong akong buhay pa."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Hey. How's the perimeter looking?",
+              "TL": "Uy. Kumusta ang paligid?"
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Evening. Still on your feet, I see.",
+              "TL": "Magandang gabi. Nakatayo ka pa rin pala."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.flow.greeting.opening.default"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+        "responseTemplateID": "semantic.flow.greeting.opening.default",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Hello.",
+              "TL": "Kumusta."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Hi.",
+              "TL": "Hi."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Hey.",
+              "TL": "Uy."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Morning.",
+              "TL": "Magandang umaga."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "There you are.",
+              "TL": "Nandiyan ka pala."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Still here.",
+              "TL": "Nandito pa rin."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Afternoon.",
+              "TL": "Magandang hapon."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Quiet day.",
+              "TL": "Tahimik na araw."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "You good?",
+              "TL": "Maayos ka ba?"
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Evening.",
+              "TL": "Magandang gabi."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.flow.greeting.opening.default"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+        "responseTemplateID": "semantic.flow.greeting.opening.default",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "Hey! It is good to see you.",
+              "TL": "Uy! Mabuti at nakita kita."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Hey, good to see you in one piece.",
+              "TL": "Uy, mabuti at buo ka pa."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Glad to see you. How are you holding up?",
+              "TL": "Masaya akong nakita kita. Kumusta ang lagay mo?"
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Hey. Really glad you made it back safe.",
+              "TL": "Uy. Masaya talaga akong nakabalik ka nang ligtas."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Back already? Good to have you around.",
+              "TL": "Bumalik ka na agad? Mabuti at nandito ka."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "It's always a relief seeing you walk through.",
+              "TL": "Laging nakakagaan ng loob makita kang dumarating."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Good to see you on your feet today.",
+              "TL": "Mabuti at nakatayo ka pa rin ngayon."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Hey there! How's your day been treating you?",
+              "TL": "Uy! Kumusta ang araw mo?"
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Always good seeing a friendly face out here.",
+              "TL": "Laging magandang makakita ng pamilyar na mukha rito."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Welcome back. Hope things were quiet out there.",
+              "TL": "Maligayang pagbabalik. Sana tahimik lang sa labas."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.flow.greeting.opening.default"
+    }
+  ]
+}

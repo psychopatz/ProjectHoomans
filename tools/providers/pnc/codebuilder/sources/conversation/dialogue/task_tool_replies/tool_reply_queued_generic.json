@@ -1,0 +1,196 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_generic.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_generic.json",
+        "responseTemplateID": "semantic.tool_reply.queued_generic.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I hear you.",
+              "TL": "Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Understood.",
+              "TL": "Naiintindihan ko."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Message received.",
+              "TL": "Natanggap ang mensahe."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Got it.",
+              "TL": "Nakuha ko."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I hear what you said.",
+              "TL": "Narinig ko ang sinabi mo."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Heard.",
+              "TL": "Narinig."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Fair enough. I hear you.",
+              "TL": "Makatwiran. Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Point noted.",
+              "TL": "Tala ang punto."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I'm listening.",
+              "TL": "Nakikinig ako."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Acknowledged.",
+              "TL": "Kinikilala ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_generic.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_generic.json",
+        "responseTemplateID": "semantic.tool_reply.queued_generic.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Give me a moment.",
+              "TL": "Bigyan mo ako ng sandali."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Hold on just a second.",
+              "TL": "Teka sandali lang."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Let me finish what I'm doing first.",
+              "TL": "Hayaan mong tapusin ko muna ang ginagawa ko."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Just a minute.",
+              "TL": "Sandali lang."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Give me a bit of time.",
+              "TL": "Bigyan mo ako ng kaunting oras."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Hang on a second.",
+              "TL": "Teka lang saglit."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I need a moment to process that.",
+              "TL": "Kailangan ko ng sandali para pag-isipan 'yan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Hold your horses for a minute.",
+              "TL": "Dahan-dahan lang sandali."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Give me a brief moment.",
+              "TL": "Bigyan mo ako ng maikling sandali."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "One second. I'm wrapped up right now.",
+              "TL": "Isang segundo. May inaasikaso pa ako ngayon."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

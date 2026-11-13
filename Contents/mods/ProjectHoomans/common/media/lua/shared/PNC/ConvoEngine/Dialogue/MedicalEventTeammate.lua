@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.medical.distress.teammate.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "default",
             ["sourceId"] = "semantic.medical.distress.teammate.default",
-            ["sourcePath"] = "psdl/dialogue/medical_event_teammate.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTeammate",
+        ["namespace"] = "semantic.medical.distress.teammate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -187,7 +188,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/medical_event_teammate.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -200,12 +201,13 @@ return {
         ["id"] = "semantic.medical.distress.teammate.found",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "found",
             ["sourceId"] = "semantic.medical.distress.teammate.found",
-            ["sourcePath"] = "psdl/dialogue/medical_event_teammate.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_found.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTeammate",
+        ["namespace"] = "semantic.medical.distress.teammate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -382,7 +384,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/medical_event_teammate.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_found.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -395,12 +397,13 @@ return {
         ["id"] = "semantic.medical.distress.teammate.missing",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "missing",
             ["sourceId"] = "semantic.medical.distress.teammate.missing",
-            ["sourcePath"] = "psdl/dialogue/medical_event_teammate.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_missing.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTeammate",
+        ["namespace"] = "semantic.medical.distress.teammate",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -577,7 +580,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/medical_event_teammate.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_teammate/medical_distress_teammate_missing.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

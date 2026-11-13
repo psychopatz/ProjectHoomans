@@ -1,0 +1,25 @@
+{
+  "id": "utterance",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.companion_campfire.utterance",
+    "textRows": [
+      {
+        "key": "suggestion.companion_campfire.utterance",
+        "text": {
+          "EN": "Let's camp by the campfire.",
+          "TL": "Magkampo tayo sa tabi ng apoy."
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Let's camp by the campfire.",
+    "TL": "Magkampo tayo sa tabi ng apoy."
+  },
+  "namespace": "ui.suggestion.companion_campfire",
+  "schema": "psychopatz.convo-engine.v1"
+}

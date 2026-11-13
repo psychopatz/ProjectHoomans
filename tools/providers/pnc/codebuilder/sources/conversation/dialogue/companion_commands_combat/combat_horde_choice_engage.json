@@ -1,0 +1,96 @@
+{
+  "kind": "dialogue",
+  "id": "engage",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_horde_reactions.json",
+    "responseTemplateID": "semantic.combat.horde.choice.engage"
+  },
+  "response": {
+    "act": "REPLY",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Take them.",
+          "TL": "Sugurin natin."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "We fight. Weapons up.",
+          "TL": "Lalaban tayo. Itaas ang sandata."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Engage. Clear them all.",
+          "TL": "Sugod. Ubusin silang lahat."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Stand and fight. Don't break line.",
+          "TL": "Tumayo at lumaban. Huwag sirain ang linya."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Let's take them down right here.",
+          "TL": "Itumba na natin sila rito mismo."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Strike now. Watch each other's sides.",
+          "TL": "Tira na ngayon. Bantayan ang gilid ng isa't isa."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "We're clearing this herd. Let's go.",
+          "TL": "Lilinisin natin ang kuyog na 'to. Tara."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Cut them down one by one.",
+          "TL": "Hiwain sila isa-isa."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Fight through them. Forward.",
+          "TL": "Lusubin natin sila. Pasulong."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Take the fight to them.",
+          "TL": "Harapin natin ang laban."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.combat.horde.choice",
+  "schema": "psychopatz.convo-engine.v1"
+}

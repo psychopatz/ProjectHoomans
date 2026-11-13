@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "active",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/give.json",
+    "responseTemplateID": "semantic.task.give.active",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Handing that over now.",
+          "TL": "Iniaabot ko na ngayon."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Passing the item to you right now.",
+          "TL": "Ipinapasa ko na ang gamit sa 'yo ngayon."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Transferring the supplies.",
+          "TL": "Inililipat na ang mga kagamitan."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Giving this to you now.",
+          "TL": "Ibinibigay ko na ito sa 'yo ngayon."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Currently handing it over.",
+          "TL": "Kasalukuyang iniaabot."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Reaching out to give you the item.",
+          "TL": "Inaabot para ibigay sa 'yo ang gamit."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Giving you what was asked.",
+          "TL": "Ibinibigay sa 'yo ang hiningi."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "In the middle of the handoff.",
+          "TL": "Kasalukuyang nag-aabot."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Handing it off now. Take hold.",
+          "TL": "Iniaabot na. Hawakan mo."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Giving it as ordered.",
+          "TL": "Ibinibigay ayon sa utos."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.task.give",
+  "schema": "psychopatz.convo-engine.v1"
+}

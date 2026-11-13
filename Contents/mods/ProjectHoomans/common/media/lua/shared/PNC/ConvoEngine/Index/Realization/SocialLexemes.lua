@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "lexeme.social.agreement.yes",
         ["kind"] = "realization",
-        ["source"] = "psdl/realization/social_lexemes.json",
+        ["source"] = "realization/social_lexemes/social_agreement_yes.json",
     },
     ["lexeme.social.apology.sorry"] = {
         ["domain"] = "social_lexemes",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "lexeme.social.apology.sorry",
         ["kind"] = "realization",
-        ["source"] = "psdl/realization/social_lexemes.json",
+        ["source"] = "realization/social_lexemes/social_apology_sorry.json",
     },
     ["lexeme.social.disagreement.no"] = {
         ["domain"] = "social_lexemes",
@@ -25,7 +25,7 @@ return {
         },
         ["id"] = "lexeme.social.disagreement.no",
         ["kind"] = "realization",
-        ["source"] = "psdl/realization/social_lexemes.json",
+        ["source"] = "realization/social_lexemes/social_disagreement_no.json",
     },
     ["lexeme.social.profanity.fuck"] = {
         ["domain"] = "social_lexemes",
@@ -34,6 +34,6 @@ return {
         },
         ["id"] = "lexeme.social.profanity.fuck",
         ["kind"] = "realization",
-        ["source"] = "psdl/realization/social_lexemes.json",
+        ["source"] = "realization/social_lexemes/social_profanity_fuck.json",
     },
 }

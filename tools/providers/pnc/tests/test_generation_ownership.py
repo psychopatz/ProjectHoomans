@@ -39,7 +39,7 @@ from tools.semantic_harness.codebuilder.generation_ownership import (
 REPOSITORY = Path(__file__).resolve().parents[4]
 CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
 PNC_PSDL_DIALOGUE_RELATIVE = Path(
-    "tools/providers/pnc/codebuilder/sources/conversation/psdl/dialogue"
+    "tools/providers/pnc/codebuilder/sources/conversation/dialogue"
 )
 
 
@@ -47,8 +47,7 @@ def copy_pnc_psdl_sources(repository: Path) -> None:
     target = repository / PNC_PSDL_DIALOGUE_RELATIVE
     target.mkdir(parents=True, exist_ok=True)
     source_root = REPOSITORY / PNC_PSDL_DIALOGUE_RELATIVE
-    for source in source_root.glob("*.json"):
-        shutil.copy2(source, target / source.name)
+    shutil.copytree(source_root, target, dirs_exist_ok=True)
 
 
 class GenerationOwnershipTests(unittest.TestCase):
@@ -177,7 +176,11 @@ class GenerationOwnershipTests(unittest.TestCase):
         self.assertEqual(facet_report["registryOwner"], "ProjectHoomans")
         self.assertEqual(facet_report["sourceOwner"], CORE_OWNER)
 
-        pack_module, pack_report = by_source[("psdl/dialogue/trading.json", "Packs")]
+        pack_module, pack_report = next(
+            pair
+            for (src, kind), pair in by_source.items()
+            if kind == "Packs" and pair[1].get("domain") == "trading"
+        )
         self.assertEqual(pack_report["owner"], "DTCommon")
         self.assertEqual(pack_report["kind"], "Packs")
         self.assertTrue(
@@ -187,9 +190,11 @@ class GenerationOwnershipTests(unittest.TestCase):
             pack_module,
         )
 
-        module, report = by_source[
-            ("psdl/dialogue/companion_commands_player.json", "PSDL")
-        ]
+        module, report = next(
+            pair
+            for (src, kind), pair in by_source.items()
+            if kind == "PSDL" and pair[1].get("domain") == "companion_commands_player"
+        )
         self.assertEqual(report["owner"], "ProjectHoomans")
         self.assertTrue(module.startswith("PNC/ConvoEngine/"), module)
 

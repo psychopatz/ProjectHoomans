@@ -1,0 +1,294 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
+        "responseTemplateID": "semantic.emote.reply.wavehi",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Hey.",
+              "TL": "Uy."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Hello there.",
+              "TL": "Kumusta ka."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Good to see you.",
+              "TL": "Mabuti at nakita kita."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Greetings.",
+              "TL": "Pagbati sa 'yo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Hey. What's the word?",
+              "TL": "Uy. Anong balita?"
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Hello. Everything quiet?",
+              "TL": "Kumusta. Tahimik ba ang lahat?"
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Morning or afternoon, good to see another survivor.",
+              "TL": "Umaga man o hapon, mabuting makakita ng buhay na tao."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Hey. How are things looking?",
+              "TL": "Uy. Kamusta ang kalagayan diyan?"
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Hello. Need something?",
+              "TL": "Kumusta. May kailangan ka ba?"
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Hey there. Staying in one piece?",
+              "TL": "Kumusta. Buo pa ba ang katawan mo?"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.emote.reply.wavehi"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
+        "responseTemplateID": "semantic.emote.reply.wavehi",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "There you are.",
+              "TL": "Nandiyan ka pala."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Hey.",
+              "TL": "Uy."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "What's up.",
+              "TL": "Anong meron."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "You're back.",
+              "TL": "Bumalik ka."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Morning.",
+              "TL": "Magandang araw."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Evening.",
+              "TL": "Magandang gabi."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "State your business.",
+              "TL": "Sabihin ang pakay mo."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Saw you.",
+              "TL": "Nakita kita."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Alive still.",
+              "TL": "Buhay pa."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Speak up.",
+              "TL": "Magsalita ka."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.emote.reply.wavehi"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
+        "responseTemplateID": "semantic.emote.reply.wavehi",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "Hey again. Good to see a friendly face.",
+              "TL": "Uy muli. Mabuti at may nakitang kaibigang mukha."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Hello, friend! How's your day treating you?",
+              "TL": "Kumusta, kaibigan! Kamusta ang araw mo?"
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Hey there! Always brightens things up when you come around.",
+              "TL": "Kumusta! Laging sumasaya kapag dumadaan ka rito."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Great to see you again! Everything okay with you?",
+              "TL": "Napakagandang makita ka muli! Maayos ba ang lagay mo?"
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Hey! I was just hoping you'd swing by.",
+              "TL": "Uy! Umasa nga akong dadaan ka rito."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Welcome back! Good to have you around.",
+              "TL": "Maligayang pagbabalik! Mabuting narito ka."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Hello! Glad to see you made it through safely.",
+              "TL": "Kumusta! Mabuti at nakaligtas ka nang ligtas."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Hey there! Come on over, take a seat.",
+              "TL": "Kumusta! Halika rito, umupo ka muna."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Always a relief to see you walking up. Hey!",
+              "TL": "Laging nakapagpapagaan ng loob na makita kang naglalakad papalapit. Uy!"
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Hey, good to see you! How are you holding up?",
+              "TL": "Uy, mabuting makita ka! Kumusta ang lagay mo?"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.emote.reply.wavehi"
+    }
+  ]
+}

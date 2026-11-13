@@ -10,7 +10,7 @@ return {
         },
         ["id"] = "action.trade",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/trading.json",
+        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_suggestions.json",
     },
     ["question.destination"] = {
         ["dependents"] = {
@@ -22,7 +22,7 @@ return {
         },
         ["id"] = "question.destination",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/trading.json",
+        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_suggestions.json",
     },
     ["question.origin"] = {
         ["dependents"] = {
@@ -34,7 +34,7 @@ return {
         },
         ["id"] = "question.origin",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/trading.json",
+        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_suggestions.json",
     },
     ["question.rumors"] = {
         ["dependents"] = {
@@ -46,7 +46,7 @@ return {
         },
         ["id"] = "question.rumors",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/trading.json",
+        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_suggestions.json",
     },
     ["question.settlement"] = {
         ["dependents"] = {
@@ -58,7 +58,7 @@ return {
         },
         ["id"] = "question.settlement",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/trading.json",
+        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_suggestions.json",
     },
     ["question.story"] = {
         ["dependents"] = {
@@ -70,7 +70,7 @@ return {
         },
         ["id"] = "question.story",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/trading.json",
+        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_suggestions.json",
     },
     ["question.trader"] = {
         ["dependents"] = {
@@ -82,7 +82,7 @@ return {
         },
         ["id"] = "question.trader",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/trading.json",
+        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_suggestions.json",
     },
     ["question.whereabouts"] = {
         ["domain"] = "trading",
@@ -91,6 +91,6 @@ return {
         },
         ["id"] = "question.whereabouts",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/trading.json",
+        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_suggestions.json",
     },
 }

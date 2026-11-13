@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.group.flow.label",
+    "textRows": [
+      {
+        "key": "suggestion.group.flow.label",
+        "text": {
+          "EN": "Current conversation branch",
+          "TL": "Kasalukuyang sangay ng usapan"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Current conversation branch",
+    "TL": "Kasalukuyang sangay ng usapan"
+  },
+  "namespace": "ui.suggestion.group.flow",
+  "schema": "psychopatz.convo-engine.v1"
+}

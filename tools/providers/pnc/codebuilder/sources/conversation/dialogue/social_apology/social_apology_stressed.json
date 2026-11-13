@@ -1,0 +1,546 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.stressed",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.stressed.neutral.01"
+            },
+            "text": {
+              "EN": "I know things are tense. Let's keep it calm.",
+              "TL": "Alam kong tensiyonado tayo. Panatilihin nating mahinahon."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.stressed.neutral.02"
+            },
+            "text": {
+              "EN": "We're all under a lot of stress. Just take a breath.",
+              "TL": "Lahat tayo nai-stress. Huminga ka muna nang malalim."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.stressed.neutral.03"
+            },
+            "text": {
+              "EN": "Tensions are high right now. Let's not lose our heads.",
+              "TL": "Mataas ang tensiyon ngayon. Huwag tayong mawalan ng katinuan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.stressed.neutral.04"
+            },
+            "text": {
+              "EN": "It's fine. We just need to keep our cool.",
+              "TL": "Ayos lang. Kailangan lang nating magpakahinahon."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.stressed.neutral.05"
+            },
+            "text": {
+              "EN": "Pressure gets to everyone out here. We're okay.",
+              "TL": "Lahat naman nadadala sa bigat ng sitwasyon. Ayos lang tayo."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.stressed.neutral.06"
+            },
+            "text": {
+              "EN": "Let's reset and focus on what needs doing.",
+              "TL": "Mag-reset tayo at magpokus sa kailangang gawin."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.stressed.neutral.07"
+            },
+            "text": {
+              "EN": "No one's at their best under this much strain. It's fine.",
+              "TL": "Walang perpekto kapag ganito kabigat ang sitwasyon. Ayos lang."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.stressed.neutral.08"
+            },
+            "text": {
+              "EN": "Take it easy. We can work through this.",
+              "TL": "Dahan-dahan lang. Kakayanin natin ito."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.stressed.neutral.09"
+            },
+            "text": {
+              "EN": "It's all right. Let's keep our nerves steady.",
+              "TL": "Ayos lang. Panatilihin nating kalmado ang sarili natin."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.stressed.neutral.10"
+            },
+            "text": {
+              "EN": "Understood. Let's de-escalate and move forward.",
+              "TL": "Naiintindihan ko. Magpahinga muna at magpatuloy."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.stressed"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.stressed",
+        "style": "warm"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "warm.01",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.stressed.warm.01"
+            },
+            "text": {
+              "EN": "I know things are tense. Thanks for saying that.",
+              "TL": "Alam kong tensiyonado tayo. Salamat sa pagsabi niyan."
+            }
+          },
+          {
+            "id": "warm.02",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.stressed.warm.02"
+            },
+            "text": {
+              "EN": "Hey, we're all frayed right now. It's totally okay.",
+              "TL": "Huy, pagod tayong lahat ngayon. Ayos na ayos lang 'yan."
+            }
+          },
+          {
+            "id": "warm.03",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.stressed.warm.03"
+            },
+            "text": {
+              "EN": "I know how hard this is on you. We're in this together.",
+              "TL": "Alam ko kung gaano kabigat ito sa 'yo. Magkasama tayo rito."
+            }
+          },
+          {
+            "id": "warm.04",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.stressed.warm.04"
+            },
+            "text": {
+              "EN": "Don't apologize for being stressed. You're human.",
+              "TL": "Huwag kang mag-sorry dahil nai-stress ka. Tao ka lang."
+            }
+          },
+          {
+            "id": "warm.05",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.stressed.warm.05"
+            },
+            "text": {
+              "EN": "I appreciate you taking the time to say that. We're good.",
+              "TL": "Salamat sa paglalaan ng oras para sabihin 'yan. Ayos tayo."
+            }
+          },
+          {
+            "id": "warm.06",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.stressed.warm.06"
+            },
+            "text": {
+              "EN": "Take a breath. I'm right here with you.",
+              "TL": "Huminga ka muna. Narito lang ako kasama mo."
+            }
+          },
+          {
+            "id": "warm.07",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.stressed.warm.07"
+            },
+            "text": {
+              "EN": "We'll get through the rough patch together. Don't worry.",
+              "TL": "Lalampasan natin ang hirap na ito nang magkasama. Huwag kang mag-alala."
+            }
+          },
+          {
+            "id": "warm.08",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.stressed.warm.08"
+            },
+            "text": {
+              "EN": "Thank you for checking in despite the chaos. It means a lot.",
+              "TL": "Salamat sa pangungumusta sa kabila ng gulo. Malaking bagay ito."
+            }
+          },
+          {
+            "id": "warm.09",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.stressed.warm.09"
+            },
+            "text": {
+              "EN": "You don't have to carry the stress alone. We're okay.",
+              "TL": "Hindi mo kailangang pasanin mag-isa ang bigat. Ayos tayo."
+            }
+          },
+          {
+            "id": "warm.10",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.stressed.warm.10"
+            },
+            "text": {
+              "EN": "It's okay. Let's just catch our breath for a minute.",
+              "TL": "Ayos lang. Huminga muna tayo nang sandali."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.stressed"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.stressed",
+        "style": "terse"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "terse.01",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.stressed.terse.01"
+            },
+            "text": {
+              "EN": "Keep it calm.",
+              "TL": "Maging mahinahon."
+            }
+          },
+          {
+            "id": "terse.02",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.stressed.terse.02"
+            },
+            "text": {
+              "EN": "Breathe.",
+              "TL": "Huminga ka."
+            }
+          },
+          {
+            "id": "terse.03",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.stressed.terse.03"
+            },
+            "text": {
+              "EN": "Cool off.",
+              "TL": "Kumalma ka muna."
+            }
+          },
+          {
+            "id": "terse.04",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.stressed.terse.04"
+            },
+            "text": {
+              "EN": "Not now. Stay focused.",
+              "TL": "Hindi ngayon. Magpokus ka."
+            }
+          },
+          {
+            "id": "terse.05",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.stressed.terse.05"
+            },
+            "text": {
+              "EN": "Keep your head.",
+              "TL": "Gamitin ang isip."
+            }
+          },
+          {
+            "id": "terse.06",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.stressed.terse.06"
+            },
+            "text": {
+              "EN": "Fine. Settle down.",
+              "TL": "Sige. Kalma na."
+            }
+          },
+          {
+            "id": "terse.07",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.stressed.terse.07"
+            },
+            "text": {
+              "EN": "No drama. We have work.",
+              "TL": "Walang drama. May trabaho tayo."
+            }
+          },
+          {
+            "id": "terse.08",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.stressed.terse.08"
+            },
+            "text": {
+              "EN": "Steady up.",
+              "TL": "Magpakatatag ka."
+            }
+          },
+          {
+            "id": "terse.09",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.stressed.terse.09"
+            },
+            "text": {
+              "EN": "Heard. Keep moving.",
+              "TL": "Narinig ko. Tuloy ang lakad."
+            }
+          },
+          {
+            "id": "terse.10",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.stressed.terse.10"
+            },
+            "text": {
+              "EN": "Hold it together.",
+              "TL": "Kayanin mo."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.stressed"
+    },
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.stressed",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.stressed.guarded.01"
+            },
+            "text": {
+              "EN": "Things are tense. Leave it there.",
+              "TL": "Tensiyonado tayo. Tama na iyon."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.stressed.guarded.02"
+            },
+            "text": {
+              "EN": "We don't need panic on top of danger. Keep steady.",
+              "TL": "Hindi natin kailangan ng takot sa ibabaw ng panganib. Magpakatatag."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.stressed.guarded.03"
+            },
+            "text": {
+              "EN": "Keep your stress to yourself. We need clear heads.",
+              "TL": "Kimkimin mo ang kaba mo. Kailangan natin ng malinaw na isip."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.stressed.guarded.04"
+            },
+            "text": {
+              "EN": "I'm stressed too, but I'm not snapping. Watch yourself.",
+              "TL": "Pagod din ako, pero di ako nagwawala. Mag-ingat ka."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.stressed.guarded.05"
+            },
+            "text": {
+              "EN": "Apology heard. Don't let your nerves get us killed.",
+              "TL": "Narinig ang tawad. Huwag mong hayaang mapatay tayo ng kaba mo."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.stressed.guarded.06"
+            },
+            "text": {
+              "EN": "Keep a grip on yourself. That's all I ask.",
+              "TL": "Kontrolin mo ang sarili mo. Iyon lang ang hinihiling ko."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.stressed.guarded.07"
+            },
+            "text": {
+              "EN": "If you lose control out here, we're all finished.",
+              "TL": "Kapag nawalan ka ng kontrol dito, tapos tayong lahat."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.stressed.guarded.08"
+            },
+            "text": {
+              "EN": "I heard you. Pull yourself together now.",
+              "TL": "Narinig kita. Ayusin mo ang sarili mo ngayon."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.stressed.guarded.09"
+            },
+            "text": {
+              "EN": "Stress is an excuse that gets survivors killed.",
+              "TL": "Ang kaba ay dahilan na ikinamamatay ng mga tao."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.stressed.guarded.10"
+            },
+            "text": {
+              "EN": "Leave it. Keep your eyes on our surroundings.",
+              "TL": "Tama na. Iwan mo ang paningin mo sa paligid."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.stressed"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "fear",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.question.backstory.known.fear",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "FEAR",
+    "variants": [
+      {
+        "id": "semantic.question.backstory.known.fear.authored",
+        "metadata": {
+          "fallback": "I have always been afraid of %1.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFear",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        },
+        "text": {
+          "EN": "I have always been afraid of %1.",
+          "TL": "Palagi akong natatakot sa %1."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.question.backstory.known",
+  "schema": "psychopatz.convo-engine.v1"
+}

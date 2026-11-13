@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.talk_something_else.label",
+    "textRows": [
+      {
+        "key": "suggestion.talk_something_else.label",
+        "text": {
+          "EN": "Let's talk something else",
+          "TL": "Iba naman ang pag-usapan natin"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Let's talk something else",
+    "TL": "Iba naman ang pag-usapan natin"
+  },
+  "namespace": "ui.suggestion.talk_something_else",
+  "schema": "psychopatz.convo-engine.v1"
+}

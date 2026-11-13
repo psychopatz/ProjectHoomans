@@ -1,0 +1,25 @@
+{
+  "id": "utterance",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.identity.rude.utterance",
+    "textRows": [
+      {
+        "key": "suggestion.identity.rude.utterance",
+        "text": {
+          "EN": "That's none of your business.",
+          "TL": "Wala ka nang pakialam."
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "That's none of your business.",
+    "TL": "Wala ka nang pakialam."
+  },
+  "namespace": "ui.suggestion.identity.rude",
+  "schema": "psychopatz.convo-engine.v1"
+}

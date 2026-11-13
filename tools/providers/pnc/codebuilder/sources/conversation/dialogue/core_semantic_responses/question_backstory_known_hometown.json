@@ -1,0 +1,30 @@
+{
+  "id": "hometown",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.question.backstory.known.hometown",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "HOMETOWN",
+    "variants": [
+      {
+        "id": "semantic.question.backstory.known.hometown.authored",
+        "metadata": {
+          "fallback": "I grew up in %1.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryHometown",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        },
+        "text": {
+          "EN": "I grew up in %1.",
+          "TL": "Lumaki ako sa %1."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.question.backstory.known",
+  "schema": "psychopatz.convo-engine.v1"
+}

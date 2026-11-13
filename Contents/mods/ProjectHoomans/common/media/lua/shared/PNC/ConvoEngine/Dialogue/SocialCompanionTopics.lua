@@ -5,12 +5,13 @@ return {
         ["id"] = "social.personal.special.trust",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "trust",
             ["sourceId"] = "social.personal.special.trust",
-            ["sourcePath"] = "psdl/dialogue/social_companion_topics.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_companion_topics/social_personal_special_trust.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCompanionTopics",
+        ["namespace"] = "social.personal.special",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -138,7 +139,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_companion_topics.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_companion_topics/social_personal_special_trust.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -155,12 +156,13 @@ return {
         ["id"] = "social.relationship.special.affinity",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "affinity",
             ["sourceId"] = "social.relationship.special.affinity",
-            ["sourcePath"] = "psdl/dialogue/social_companion_topics.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_companion_topics/social_relationship_special_affinity.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCompanionTopics",
+        ["namespace"] = "social.relationship.special",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -288,7 +290,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_companion_topics.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_companion_topics/social_relationship_special_affinity.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -305,12 +307,13 @@ return {
         ["id"] = "social.set_territory.member.claim",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "claim",
             ["sourceId"] = "social.set_territory.member.claim",
-            ["sourcePath"] = "psdl/dialogue/social_companion_topics.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_companion_topics/social_set_territory_member_claim.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCompanionTopics",
+        ["namespace"] = "social.set_territory.member",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -447,7 +450,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_companion_topics.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_companion_topics/social_set_territory_member_claim.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "work_orders.member.status",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "status",
             ["sourceId"] = "work_orders.member.status",
-            ["sourcePath"] = "psdl/dialogue/social_companion_topics.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_companion_topics/work_orders_member_status.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCompanionTopics",
+        ["namespace"] = "work_orders.member",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -651,7 +655,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_companion_topics.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_companion_topics/work_orders_member_status.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "admitted",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/fetch.json",
+    "responseTemplateID": "semantic.task.fetch.admitted",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "I'll fetch that.",
+          "TL": "Kukunin ko iyon."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Understood. I will retrieve the item.",
+          "TL": "Naintindihan. Kukunin ko ang gamit."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "I'll go grab that for you.",
+          "TL": "Pupuntahan ko para kunin 'yan para sa 'yo."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "On it. Fetching the supplies.",
+          "TL": "Inaasikaso na. Kukunin ang mga kagamitan."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Right away. Going to pick it up.",
+          "TL": "Agad-agad. Pupulutin ko 'yon."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Understood. I'll bring it back.",
+          "TL": "Naiintindihan ko. Ibabalik ko rito."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "I'll secure that item.",
+          "TL": "Kukunin ko ang gamit na 'yan."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Heading out to fetch it.",
+          "TL": "Lalabas para kunin iyon."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Got the order. Fetching.",
+          "TL": "Nakuha ang utos. Kukunin na."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Sounds good. Retrieving it now.",
+          "TL": "Maganda 'yan. Kukunin na ngayon."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.task.fetch",
+  "schema": "psychopatz.convo-engine.v1"
+}

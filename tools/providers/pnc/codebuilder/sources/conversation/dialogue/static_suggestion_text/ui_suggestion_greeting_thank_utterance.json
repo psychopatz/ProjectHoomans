@@ -1,0 +1,25 @@
+{
+  "id": "utterance",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.greeting_thank.utterance",
+    "textRows": [
+      {
+        "key": "suggestion.greeting_thank.utterance",
+        "text": {
+          "EN": "Thanks.",
+          "TL": "Salamat."
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Thanks.",
+    "TL": "Salamat."
+  },
+  "namespace": "ui.suggestion.greeting_thank",
+  "schema": "psychopatz.convo-engine.v1"
+}

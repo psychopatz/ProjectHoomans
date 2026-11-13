@@ -1,0 +1,546 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.withdrawn",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.withdrawn.neutral.01"
+            },
+            "text": {
+              "EN": "All right. Let's leave it there.",
+              "TL": "Sige. Tama na iyon."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.withdrawn.neutral.02"
+            },
+            "text": {
+              "EN": "Okay. Let's drop the subject.",
+              "TL": "Sige. Huwag na nating pag-usapan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.withdrawn.neutral.03"
+            },
+            "text": {
+              "EN": "Understood. Moving past it.",
+              "TL": "Naiintindihan ko. Lumalampas na roon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.withdrawn.neutral.04"
+            },
+            "text": {
+              "EN": "No need to say more. It's settled.",
+              "TL": "Wala nang dapat sabihin pa. Ayos na 'yan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.withdrawn.neutral.05"
+            },
+            "text": {
+              "EN": "We've said what we needed to say.",
+              "TL": "Nasabi na natin ang kailangang sabihin."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.withdrawn.neutral.06"
+            },
+            "text": {
+              "EN": "Let's leave it at that and get back to work.",
+              "TL": "Iwan na natin doon at bumalik sa trabaho."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.withdrawn.neutral.07"
+            },
+            "text": {
+              "EN": "Fine by me. Subject closed.",
+              "TL": "Ayos sa akin. Sarado na ang usapan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.withdrawn.neutral.08"
+            },
+            "text": {
+              "EN": "Nothing more to discuss. Let's move.",
+              "TL": "Wala nang dapat pagtalunan pa. Tara na."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.withdrawn.neutral.09"
+            },
+            "text": {
+              "EN": "Fair enough. We'll leave it alone.",
+              "TL": "Makatwiran. Hayaan na natin."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.withdrawn.neutral.10"
+            },
+            "text": {
+              "EN": "All right. That's the end of it.",
+              "TL": "Sige. Diyan na nagtatapos 'yan."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.withdrawn"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.withdrawn",
+        "style": "warm"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "warm.01",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.withdrawn.warm.01"
+            },
+            "text": {
+              "EN": "All right. Let's leave it there for now.",
+              "TL": "Sige. Tama na muna iyon."
+            }
+          },
+          {
+            "id": "warm.02",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.withdrawn.warm.02"
+            },
+            "text": {
+              "EN": "We can give it some space. We're still good.",
+              "TL": "Bigyan muna natin ng puwang. Maayos pa rin tayo."
+            }
+          },
+          {
+            "id": "warm.03",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.withdrawn.warm.03"
+            },
+            "text": {
+              "EN": "Take your time. We don't have to talk about it anymore.",
+              "TL": "Magpahinga ka. Hindi na natin kailangang pag-usapan pa 'yan."
+            }
+          },
+          {
+            "id": "warm.04",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.withdrawn.warm.04"
+            },
+            "text": {
+              "EN": "I hear you, and it's okay. We can put it to rest.",
+              "TL": "Narinig kita, at ayos lang. Pwede na nating ipahinga 'yon."
+            }
+          },
+          {
+            "id": "warm.05",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.withdrawn.warm.05"
+            },
+            "text": {
+              "EN": "It's okay. We can take a break from this topic.",
+              "TL": "Ayos lang. Pwede tayong magpahinga sa paksang ito."
+            }
+          },
+          {
+            "id": "warm.06",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.withdrawn.warm.06"
+            },
+            "text": {
+              "EN": "No worries at all. We'll leave it behind us.",
+              "TL": "Walang problema talaga. Iiwan na natin 'yan sa likod."
+            }
+          },
+          {
+            "id": "warm.07",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.withdrawn.warm.07"
+            },
+            "text": {
+              "EN": "I understand. Let's just focus on each other and staying safe.",
+              "TL": "Nauunawaan ko. Magpokus na lang tayo sa isa't isa at kaligtasan."
+            }
+          },
+          {
+            "id": "warm.08",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.withdrawn.warm.08"
+            },
+            "text": {
+              "EN": "All good. No pressure to explain anything more.",
+              "TL": "Ayos ang lahat. Walang pamimilit na magpaliwanag pa."
+            }
+          },
+          {
+            "id": "warm.09",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.withdrawn.warm.09"
+            },
+            "text": {
+              "EN": "We're okay. Let's leave it there peacefully.",
+              "TL": "Ayos lang tayo. Iwan na natin doon nang payapa."
+            }
+          },
+          {
+            "id": "warm.10",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.withdrawn.warm.10"
+            },
+            "text": {
+              "EN": "I'm with you. We don't need to rehash it.",
+              "TL": "Kasama mo ako. Hindi na natin kailangang ulit-ulitin."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.withdrawn"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.withdrawn",
+        "style": "terse"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "terse.01",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.withdrawn.terse.01"
+            },
+            "text": {
+              "EN": "Leave it.",
+              "TL": "Tama na."
+            }
+          },
+          {
+            "id": "terse.02",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.withdrawn.terse.02"
+            },
+            "text": {
+              "EN": "Drop it.",
+              "TL": "Hayaan mo na."
+            }
+          },
+          {
+            "id": "terse.03",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.withdrawn.terse.03"
+            },
+            "text": {
+              "EN": "Enough.",
+              "TL": "Sapat na."
+            }
+          },
+          {
+            "id": "terse.04",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.withdrawn.terse.04"
+            },
+            "text": {
+              "EN": "Done.",
+              "TL": "Tapos na."
+            }
+          },
+          {
+            "id": "terse.05",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.withdrawn.terse.05"
+            },
+            "text": {
+              "EN": "Subject closed.",
+              "TL": "Sarado na ang usapan."
+            }
+          },
+          {
+            "id": "terse.06",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.withdrawn.terse.06"
+            },
+            "text": {
+              "EN": "No more.",
+              "TL": "Wala nang kasunod."
+            }
+          },
+          {
+            "id": "terse.07",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.withdrawn.terse.07"
+            },
+            "text": {
+              "EN": "Let it be.",
+              "TL": "Hayaan mo na 'yan."
+            }
+          },
+          {
+            "id": "terse.08",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.withdrawn.terse.08"
+            },
+            "text": {
+              "EN": "Finished.",
+              "TL": "Tapos."
+            }
+          },
+          {
+            "id": "terse.09",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.withdrawn.terse.09"
+            },
+            "text": {
+              "EN": "Moving on.",
+              "TL": "Tuloy na."
+            }
+          },
+          {
+            "id": "terse.10",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.withdrawn.terse.10"
+            },
+            "text": {
+              "EN": "End of discussion.",
+              "TL": "Tapos na ang diskusyon."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.withdrawn"
+    },
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.withdrawn",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.withdrawn.guarded.01"
+            },
+            "text": {
+              "EN": "All right. Leave it there.",
+              "TL": "Sige. Tama na iyon."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.withdrawn.guarded.02"
+            },
+            "text": {
+              "EN": "Don't bring it up again.",
+              "TL": "Huwag mo nang bubuksan muli 'yan."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.withdrawn.guarded.03"
+            },
+            "text": {
+              "EN": "Drop it while you're ahead.",
+              "TL": "Itigil mo na habang maaga pa."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.withdrawn.guarded.04"
+            },
+            "text": {
+              "EN": "I'm done hearing about it.",
+              "TL": "Ayoko nang marinig ang tungkol diyan."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.withdrawn.guarded.05"
+            },
+            "text": {
+              "EN": "Leave it where it lies.",
+              "TL": "Hayaan mo kung saan 'yan naroroon."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.withdrawn.guarded.06"
+            },
+            "text": {
+              "EN": "We're not reopening this. Ever.",
+              "TL": "Hindi na natin bubuksan muli ito. Kailanman."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.withdrawn.guarded.07"
+            },
+            "text": {
+              "EN": "That's enough out of you.",
+              "TL": "Sapat na ang narinig ko sa 'yo."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.withdrawn.guarded.08"
+            },
+            "text": {
+              "EN": "Keep your distance from that subject.",
+              "TL": "Lumayo ka sa paksang 'yan."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.withdrawn.guarded.09"
+            },
+            "text": {
+              "EN": "Consider this matter closed.",
+              "TL": "Ituring mong sarado na ang usaping ito."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.withdrawn.guarded.10"
+            },
+            "text": {
+              "EN": "Leave it there and don't test me.",
+              "TL": "Iwan mo na diyan at huwag mo akong subukan."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.withdrawn"
+    }
+  ]
+}

@@ -1279,8 +1279,8 @@ T.truthy(
 )
 T.equal(
     greetingPlan.sourceShard,
-    "psdl/dialogue/conversation_greeting.json",
-    "greeting keeps canonical PSDL source lineage"
+    "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json",
+    "greeting keeps canonical ConvoEngine source lineage"
 )
 T.finish("pnc_conversation_smoke")
 

@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.task.refill.completed",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "completed",
             ["sourceId"] = "semantic.task.refill.completed",
-            ["sourcePath"] = "psdl/dialogue/task_lifecycle.json#records[32]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_refill_completed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle__ecb92fd8",
+        ["namespace"] = "semantic.task.refill",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_refill_completed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.task.refill.failed",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "failed",
             ["sourceId"] = "semantic.task.refill.failed",
-            ["sourcePath"] = "psdl/dialogue/task_lifecycle.json#records[33]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_refill_failed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle__ecb92fd8",
+        ["namespace"] = "semantic.task.refill",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_refill_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.task.refill.rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "rejected",
             ["sourceId"] = "semantic.task.refill.rejected",
-            ["sourcePath"] = "psdl/dialogue/task_lifecycle.json#records[34]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_refill_rejected.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle__ecb92fd8",
+        ["namespace"] = "semantic.task.refill",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_refill_rejected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.task.wait_at.active",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "active",
             ["sourceId"] = "semantic.task.wait_at.active",
-            ["sourcePath"] = "psdl/dialogue/task_lifecycle.json#records[35]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_wait_at_active.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle__ecb92fd8",
+        ["namespace"] = "semantic.task.wait_at",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_wait_at_active.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -629,12 +633,13 @@ return {
         ["id"] = "semantic.task.wait_at.admitted",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "admitted",
             ["sourceId"] = "semantic.task.wait_at.admitted",
-            ["sourcePath"] = "psdl/dialogue/task_lifecycle.json#records[36]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_wait_at_admitted.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle__ecb92fd8",
+        ["namespace"] = "semantic.task.wait_at",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +777,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_wait_at_admitted.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,12 +790,13 @@ return {
         ["id"] = "semantic.task.wait_at.completed",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "completed",
             ["sourceId"] = "semantic.task.wait_at.completed",
-            ["sourcePath"] = "psdl/dialogue/task_lifecycle.json#records[37]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_wait_at_completed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle__ecb92fd8",
+        ["namespace"] = "semantic.task.wait_at",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -928,7 +934,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_wait_at_completed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -941,12 +947,13 @@ return {
         ["id"] = "semantic.task.wait_at.failed",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "failed",
             ["sourceId"] = "semantic.task.wait_at.failed",
-            ["sourcePath"] = "psdl/dialogue/task_lifecycle.json#records[38]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_wait_at_failed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle__ecb92fd8",
+        ["namespace"] = "semantic.task.wait_at",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1084,7 +1091,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_wait_at_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1097,12 +1104,13 @@ return {
         ["id"] = "semantic.task.wait_at.rejected",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "rejected",
             ["sourceId"] = "semantic.task.wait_at.rejected",
-            ["sourcePath"] = "psdl/dialogue/task_lifecycle.json#records[39]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/task_lifecycle/task_wait_at_rejected.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/TaskLifecycle__ecb92fd8",
+        ["namespace"] = "semantic.task.wait_at",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1240,7 +1248,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/task_lifecycle.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/task_lifecycle/task_wait_at_rejected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

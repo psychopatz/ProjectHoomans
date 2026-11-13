@@ -1,0 +1,291 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.hostile.1.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/hostile.json",
+        "responseTemplateID": "semantic.tool_reply.hostile.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Watch your mouth.",
+              "TL": "Ingatan mo ang bibig mo."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Check your tone.",
+              "TL": "Ayusin mo ang tono mo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "You do not want to talk to me like that.",
+              "TL": "Huwag mo akong kakausapin nang ganyan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Mind how you speak to me.",
+              "TL": "Mag-ingat ka sa pagsasalita mo sa akin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Lower your voice and watch your words.",
+              "TL": "Hinaan mo ang boses mo at bantayan ang dila mo."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "You are crossing a line with that mouth.",
+              "TL": "Sumusobra ka na sa mga sinasabi mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Bite your tongue before I lose patience.",
+              "TL": "Kagatin mo ang dila mo bago maubos ang pasensya ko."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Watch it.",
+              "TL": "Mag-ingat ka."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "That mouth of yours is going to get you hurt.",
+              "TL": "Ipapahamak ka ng bibig mong 'yan."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Careful what comes out of your mouth next.",
+              "TL": "Bantayan mo ang susunod na lalabas sa bibig mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.hostile.2.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/hostile.json",
+        "responseTemplateID": "semantic.tool_reply.hostile.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Try that again and see what happens.",
+              "TL": "Ulitin mo 'yan at tingnan natin ang mangyayari."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Say that one more time. I dare you.",
+              "TL": "Subukan mong sabihin 'yan ulit. Hinahamon kita."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Push me again and find out.",
+              "TL": "Itulak mo pa ako at nang malaman mo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Do not test my patience.",
+              "TL": "Huwag mong subukan ang pasensya ko."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Keep pushing. See where it lands you.",
+              "TL": "Sige, magpumilit ka pa. Tingnan natin kung saan ka pupulutin."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "One more step out of line and we have a problem.",
+              "TL": "Isa pang maling kilos mo at magkakaproblema tayo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "You really want to go down this road?",
+              "TL": "Gusto mo ba talagang daanan ang landas na 'to?"
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Try it. See how fast this goes south.",
+              "TL": "Sige, subukan mo. Tingnan natin kung gaano kabilis magkakagulo."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "You are gambling with your safety right now.",
+              "TL": "Isinusugal mo ang kaligtasan mo ngayon."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Last warning. Back off.",
+              "TL": "Huling babala. Lumayo ka."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.hostile.3.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/hostile.json",
+        "responseTemplateID": "semantic.tool_reply.hostile.3",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "You need to back off right now.",
+              "TL": "Kailangan mong lumayo ngayon din."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Step back.",
+              "TL": "Umatras ka."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Give me space before things get ugly.",
+              "TL": "Bigyan mo ako ng puwang bago magkagulo rito."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Back away from me.",
+              "TL": "Lumayo ka sa akin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I said back off.",
+              "TL": "Sabi ko umatras ka."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Keep your distance.",
+              "TL": "Panatilihin mo ang distansya mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Get out of my face.",
+              "TL": "Umalis ka sa harap ko."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "You have about two seconds to back up.",
+              "TL": "May dalawang segundo ka para umatras."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Take a step back while you still can.",
+              "TL": "Umatras ka habang kaya mo pa."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Back off. I will not say it again.",
+              "TL": "Umatras ka. Hindi ko na uulitin ito."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

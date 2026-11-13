@@ -1,0 +1,546 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.friendly",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.friendly.neutral.01"
+            },
+            "text": {
+              "EN": "It's okay. We can put that behind us.",
+              "TL": "Ayos lang. Kalimutan na natin iyon."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.friendly.neutral.02"
+            },
+            "text": {
+              "EN": "No worries. It happens to everyone.",
+              "TL": "Huwag kang mag-alala. Nangyayari 'yan kahit kanino."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.friendly.neutral.03"
+            },
+            "text": {
+              "EN": "We're good. Don't worry about it.",
+              "TL": "Ayos tayo. Huwag mo nang alalahanin."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.friendly.neutral.04"
+            },
+            "text": {
+              "EN": "Forget about it. All good here.",
+              "TL": "Kalimutan mo na. Ayos ang lahat dito."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.friendly.neutral.05"
+            },
+            "text": {
+              "EN": "It's all right. We move forward.",
+              "TL": "Ayos lang. Tuloy ang lakad natin."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.friendly.neutral.06"
+            },
+            "text": {
+              "EN": "No harm done. We're square.",
+              "TL": "Walang nasaktan. Kuwits na tayo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.friendly.neutral.07"
+            },
+            "text": {
+              "EN": "I appreciate the apology. We're good.",
+              "TL": "Salamat sa paumanhin. Ayos na tayo."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.friendly.neutral.08"
+            },
+            "text": {
+              "EN": "Don't sweat the small stuff out here.",
+              "TL": "Huwag mong problemahin ang maliliit na bagay dito."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.friendly.neutral.09"
+            },
+            "text": {
+              "EN": "We all have off moments. It's behind us.",
+              "TL": "Lahat naman may pagkakamali. Lumipas na 'yon."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.friendly.neutral.10"
+            },
+            "text": {
+              "EN": "All cleared up. Let's keep working.",
+              "TL": "Malinaw na ang lahat. Tuloy na sa trabaho."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.friendly"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.friendly",
+        "style": "warm"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "warm.01",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.friendly.warm.01"
+            },
+            "text": {
+              "EN": "It's okay. I appreciate you saying that.",
+              "TL": "Ayos lang. Pinahahalagahan ko ang sinabi mo."
+            }
+          },
+          {
+            "id": "warm.02",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.friendly.warm.02"
+            },
+            "text": {
+              "EN": "Don't worry about it for a second. We're friends.",
+              "TL": "Huwag mo nang alalahanin kahit sandali. Magkaibigan tayo."
+            }
+          },
+          {
+            "id": "warm.03",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.friendly.warm.03"
+            },
+            "text": {
+              "EN": "Hey, it takes a good person to say that. Thank you.",
+              "TL": "Kailangan ng mabuting puso para sabihin 'yan. Salamat."
+            }
+          },
+          {
+            "id": "warm.04",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.friendly.warm.04"
+            },
+            "text": {
+              "EN": "We're completely fine. Really.",
+              "TL": "Maayos na maayos tayo. Totoo."
+            }
+          },
+          {
+            "id": "warm.05",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.friendly.warm.05"
+            },
+            "text": {
+              "EN": "You don't have to carry that around. I forgive you.",
+              "TL": "Huwag mo nang dalhin sa dibdib mo 'yan. Pinatatawad kita."
+            }
+          },
+          {
+            "id": "warm.06",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.friendly.warm.06"
+            },
+            "text": {
+              "EN": "I appreciate your honesty. It means a lot to me.",
+              "TL": "Salamat sa katapatan mo. Malaking bagay ito sa akin."
+            }
+          },
+          {
+            "id": "warm.07",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.friendly.warm.07"
+            },
+            "text": {
+              "EN": "We look out for each other. Don't worry about it.",
+              "TL": "Nagtitinginan tayo rito. Huwag mo nang isipin 'yon."
+            }
+          },
+          {
+            "id": "warm.08",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.friendly.warm.08"
+            },
+            "text": {
+              "EN": "You're good in my book. Always.",
+              "TL": "Mabuti ka sa akin. Palagi."
+            }
+          },
+          {
+            "id": "warm.09",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.friendly.warm.09"
+            },
+            "text": {
+              "EN": "Thanks for being real with me. We're good.",
+              "TL": "Salamat sa pagiging tapat sa akin. Ayos tayo."
+            }
+          },
+          {
+            "id": "warm.10",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.friendly.warm.10"
+            },
+            "text": {
+              "EN": "No bad blood between us. Not now, not ever.",
+              "TL": "Walang samaan ng loob sa atin. Kahit kailan."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.friendly"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.friendly",
+        "style": "terse"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "terse.01",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.friendly.terse.01"
+            },
+            "text": {
+              "EN": "It's okay.",
+              "TL": "Ayos lang."
+            }
+          },
+          {
+            "id": "terse.02",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.friendly.terse.02"
+            },
+            "text": {
+              "EN": "All good.",
+              "TL": "Ayos na."
+            }
+          },
+          {
+            "id": "terse.03",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.friendly.terse.03"
+            },
+            "text": {
+              "EN": "Forget it.",
+              "TL": "Kalimutan mo na."
+            }
+          },
+          {
+            "id": "terse.04",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.friendly.terse.04"
+            },
+            "text": {
+              "EN": "We're good.",
+              "TL": "Ayos tayo."
+            }
+          },
+          {
+            "id": "terse.05",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.friendly.terse.05"
+            },
+            "text": {
+              "EN": "No problem.",
+              "TL": "Walang problema."
+            }
+          },
+          {
+            "id": "terse.06",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.friendly.terse.06"
+            },
+            "text": {
+              "EN": "Drop it.",
+              "TL": "Tama na."
+            }
+          },
+          {
+            "id": "terse.07",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.friendly.terse.07"
+            },
+            "text": {
+              "EN": "Square.",
+              "TL": "Kuwits."
+            }
+          },
+          {
+            "id": "terse.08",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.friendly.terse.08"
+            },
+            "text": {
+              "EN": "Understood. Good.",
+              "TL": "Naintindihan. Mabuti."
+            }
+          },
+          {
+            "id": "terse.09",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.friendly.terse.09"
+            },
+            "text": {
+              "EN": "Done with it.",
+              "TL": "Tapos na roon."
+            }
+          },
+          {
+            "id": "terse.10",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.friendly.terse.10"
+            },
+            "text": {
+              "EN": "Move on.",
+              "TL": "Tuloy na."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.friendly"
+    },
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.friendly",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.friendly.guarded.01"
+            },
+            "text": {
+              "EN": "I heard you. Leave it there.",
+              "TL": "Narinig kita. Tama na."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.friendly.guarded.02"
+            },
+            "text": {
+              "EN": "Fine. Just don't let it happen again.",
+              "TL": "Sige. Huwag mo lang hahayaang maulit."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.friendly.guarded.03"
+            },
+            "text": {
+              "EN": "Accepted. Watch your step next time.",
+              "TL": "Tanggap ko. Mag-ingat ka na lang sa susunod."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.friendly.guarded.04"
+            },
+            "text": {
+              "EN": "All right. But I'll be keeping an eye out.",
+              "TL": "Sige. Pero magmamasid pa rin ako."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.friendly.guarded.05"
+            },
+            "text": {
+              "EN": "We'll let it slide this time.",
+              "TL": "Palalampasin natin sa pagkakataong ito."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.friendly.guarded.06"
+            },
+            "text": {
+              "EN": "Understood. Do better going forward.",
+              "TL": "Naintindihan. Ayusin mo sa mga susunod."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.friendly.guarded.07"
+            },
+            "text": {
+              "EN": "I accept it. Just remember what's at stake.",
+              "TL": "Tinatanggap ko. Tandaan mo lang kung anong nakataya."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.friendly.guarded.08"
+            },
+            "text": {
+              "EN": "Fair enough. Let's not have a repeat.",
+              "TL": "Makatwiran. Huwag nang uulitin."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.friendly.guarded.09"
+            },
+            "text": {
+              "EN": "I hear the words. Make sure actions follow.",
+              "TL": "Naririnig ko ang salita. Tiyakin mong susunod ang gawa."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.friendly.guarded.10"
+            },
+            "text": {
+              "EN": "We're even for now. Keep it that way.",
+              "TL": "Pantay tayo sa ngayon. Panatilihin mong ganoon."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.friendly"
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "id": "proposal",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.question.needs.proposal",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "PROPOSAL",
+    "variants": [
+      {
+        "id": "semantic.question.needs.proposal.dataset.thirst",
+        "metadata": {
+          "fallback": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+          "plan": {
+            "dialogueAct": "PROMISE_ACKNOWLEDGEMENT",
+            "groundedFactRefs": [
+              "npc.needs.thirst"
+            ],
+            "sourcePoolID": "semantic.question.needs.proposal",
+            "tone": "direct",
+            "topic": "NEEDS",
+            "turns": [
+              {
+                "continuation": "continue",
+                "id": "dataset_proposal_acknowledged",
+                "segments": [
+                  {
+                    "fallback": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                    "kind": "translation",
+                    "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst",
+                    "translations": {
+                      "EN": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                      "TL": "Maaari ko iyong ituring na panukala, pero kailangan ko pa ang item at dami bago ako magtala ng pangako."
+                    }
+                  }
+                ]
+              }
+            ],
+            "uncertainty": "pending"
+          },
+          "priority": 4,
+          "reviewed": true,
+          "sourceRefs": [
+            "MASSIVE",
+            "SGD"
+          ],
+          "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst"
+        },
+        "text": {
+          "EN": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+          "TL": "Maaari ko iyong ituring na panukala, pero kailangan ko pa ang item at dami bago ako magtala ng pangako."
+        },
+        "when": {
+          "all": [
+            {
+              "op": "eq",
+              "path": "conversation.needType",
+              "value": "thirst"
+            },
+            {
+              "op": "in",
+              "path": "conversation.needUrgency",
+              "values": [
+                "moderate",
+                "severe",
+                "emergency",
+                "critical"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.question.needs",
+  "schema": "psychopatz.convo-engine.v1"
+}

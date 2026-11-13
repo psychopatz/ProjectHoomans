@@ -1,0 +1,91 @@
+{
+  "kind": "dialogue",
+  "id": "status",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:work_orders_member",
+    "category": "projecthoomans:work_orders",
+    "audiences": [
+      "member"
+    ],
+    "textTarget": "psdl/work_orders/member/status",
+    "textDomain": "pnc.psdl.work_orders.member.status"
+  },
+  "response": {
+    "act": "WORK_ORDERS",
+    "turns": [
+      {
+        "id": "opening",
+        "metadata": {
+          "textKey": "opening"
+        },
+        "text": {
+          "EN": "I'm ready. What needs doing?",
+          "TL": "handa na ako. Ano ang kailangang gawin?"
+        },
+        "offers": [
+          {
+            "id": "orders",
+            "label": {
+              "EN": "I have work for you.",
+              "TL": "may trabaho ako sayo."
+            },
+            "utterance": {
+              "EN": "I have work for you.",
+              "TL": "may trabaho ako sayo."
+            },
+            "frame": {
+              "intent": "REQUEST",
+              "speechAct": "REQUEST",
+              "subject": "WORK",
+              "topic": "work_orders"
+            },
+            "metadata": {
+              "choiceKey": "choice.orders",
+              "responseKey": "response.orders",
+              "responseText": {
+                "EN": "Tell me what needs doing.",
+                "TL": "Sabihin mo sa akin kung ano ang kailangang gawin."
+              }
+            }
+          },
+          {
+            "id": "status",
+            "label": {
+              "EN": "Report on your current work.",
+              "TL": "Mag-ulat sa iyong kasalukuyang gawain."
+            },
+            "utterance": {
+              "EN": "Report on your current work.",
+              "TL": "Mag-ulat sa iyong kasalukuyang gawain."
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "WORK",
+              "topic": "work_orders"
+            },
+            "metadata": {
+              "choiceKey": "choice.status",
+              "responseKey": "response.status",
+              "responseText": {
+                "EN": "Everything is on track for now.",
+                "TL": "Ang lahat ay nasa track sa ngayon."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "namespace": "work_orders.member",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -1,0 +1,198 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
+        "responseTemplateID": "semantic.emote.reply.salute",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Stay sharp.",
+              "TL": "Manatiling alerto."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Keep your guard up.",
+              "TL": "Huwag ibaba ang bantay."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Eyes forward.",
+              "TL": "Tumingin sa unahan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "At ease.",
+              "TL": "Magpahinga."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Stay safe out there.",
+              "TL": "Mag-ingat ka sa labas."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Watch your six.",
+              "TL": "Bantayan mo ang likod mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Salute returned.",
+              "TL": "Ganti ang pagsaludo."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Keep moving and stay vigilant.",
+              "TL": "Patuloy na lumakad at maging mapagmatyag."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Understood. Stay ready.",
+              "TL": "Naintindihan. Maging laging handa."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Stand firm.",
+              "TL": "Magpakatatag."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.emote.reply.salute"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
+        "responseTemplateID": "semantic.emote.reply.salute",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "Always. Stay safe out there.",
+              "TL": "Palagi. Mag-ingat ka sa labas."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Salute to you too, friend.",
+              "TL": "Saludo rin sa 'yo, kaibigan."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Right back at you. Let's make it back in one piece.",
+              "TL": "Pabalik din sa 'yo. Tiyakin nating makababalik tayo nang buo."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Honored to stand with you.",
+              "TL": "Ikinararangal kong makatabi ka sa laban."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Keep your head down and stay alive for me.",
+              "TL": "Yumuko ka sa panganib at manatiling buhay para sa akin."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Good to have you beside me out here.",
+              "TL": "Mabuting kasama kita rito."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Salute returned with respect, partner.",
+              "TL": "May kasamang respeto ang ganting saludo ko, kasama."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "We watch each other's backs. Always.",
+              "TL": "Binabantayan natin ang likod ng isa't isa. Palagi."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Take care of yourself today. I mean it.",
+              "TL": "Ingatan mo ang sarili mo ngayong araw. Seryoso ako."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Stay strong out there. We'll get through this.",
+              "TL": "Magpakatatag ka sa labas. Malalampasan natin ito."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.emote.reply.salute"
+    }
+  ]
+}

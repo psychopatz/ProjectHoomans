@@ -5,12 +5,13 @@ return {
         ["id"] = "pnc.dialogue.follow",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "follow",
             ["sourceId"] = "pnc.dialogue.follow",
-            ["sourcePath"] = "psdl/dialogue/companion_flows.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_flows/follow.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionFlows",
+        ["namespace"] = "pnc.dialogue",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -100,7 +101,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_flows.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_flows/follow.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -113,12 +114,13 @@ return {
         ["id"] = "pnc.lab.stay_with_you",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "stay_with_you",
             ["sourceId"] = "pnc.lab.stay_with_you",
-            ["sourcePath"] = "psdl/dialogue/companion_flows.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/companion_flows/lab_stay_with_you.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CompanionFlows",
+        ["namespace"] = "pnc.lab",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -198,7 +200,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/companion_flows.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/companion_flows/lab_stay_with_you.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

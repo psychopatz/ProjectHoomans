@@ -5,12 +5,13 @@ return {
         ["id"] = "conversation.landing.whats_up",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "whats_up",
             ["sourceId"] = "conversation.landing.whats_up",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[13]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/conversation_landing_whats_up.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "conversation.landing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -50,7 +51,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/conversation_landing_whats_up.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -63,12 +64,13 @@ return {
         ["id"] = "semantic.flow.greeting.followup.default.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.flow.greeting.followup.default.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_followup_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "semantic.flow.greeting.followup.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -206,7 +208,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_followup_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -219,12 +221,13 @@ return {
         ["id"] = "semantic.flow.greeting.followup.friendly.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.flow.greeting.followup.friendly.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_followup.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "semantic.flow.greeting.followup.friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -362,7 +365,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_followup.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -375,12 +378,13 @@ return {
         ["id"] = "semantic.flow.greeting.opening.default.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.flow.greeting.opening.default.guarded",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "semantic.flow.greeting.opening.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -518,7 +522,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -531,12 +535,13 @@ return {
         ["id"] = "semantic.flow.greeting.opening.default.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.flow.greeting.opening.default.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "semantic.flow.greeting.opening.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -674,7 +679,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -687,12 +692,13 @@ return {
         ["id"] = "semantic.flow.greeting.opening.default.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.flow.greeting.opening.default.terse",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "semantic.flow.greeting.opening.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -830,7 +836,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -843,12 +849,13 @@ return {
         ["id"] = "semantic.flow.greeting.opening.default.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.flow.greeting.opening.default.warm",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "semantic.flow.greeting.opening.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -986,7 +993,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -999,12 +1006,13 @@ return {
         ["id"] = "semantic.flow.greeting.opening.friendly.guarded",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "guarded",
             ["sourceId"] = "semantic.flow.greeting.opening.friendly.guarded",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json#records[0]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "semantic.flow.greeting.opening.friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1142,7 +1150,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1155,12 +1163,13 @@ return {
         ["id"] = "semantic.flow.greeting.opening.friendly.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.flow.greeting.opening.friendly.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json#records[1]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "semantic.flow.greeting.opening.friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1298,7 +1307,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1311,12 +1320,13 @@ return {
         ["id"] = "semantic.flow.greeting.opening.friendly.terse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "terse",
             ["sourceId"] = "semantic.flow.greeting.opening.friendly.terse",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json#records[2]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "semantic.flow.greeting.opening.friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1454,7 +1464,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1467,12 +1477,13 @@ return {
         ["id"] = "semantic.flow.greeting.opening.friendly.warm",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "warm",
             ["sourceId"] = "semantic.flow.greeting.opening.friendly.warm",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json#records[3]",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "semantic.flow.greeting.opening.friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1610,7 +1621,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1623,12 +1634,13 @@ return {
         ["id"] = "semantic.flow.greeting.opening.question.default.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.flow.greeting.opening.question.default.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_question_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "semantic.flow.greeting.opening.question.default",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1766,7 +1778,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_question_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1779,12 +1791,13 @@ return {
         ["id"] = "semantic.flow.greeting.opening.question.friendly.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.flow.greeting.opening.question.friendly.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_question.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "semantic.flow.greeting.opening.question.friendly",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1922,7 +1935,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_question.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1935,12 +1948,13 @@ return {
         ["id"] = "semantic.flow.greeting.opening.rain.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.flow.greeting.opening.rain.neutral",
-            ["sourcePath"] = "psdl/dialogue/conversation_greeting.json#records[12]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_rain.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/ConversationGreeting",
+        ["namespace"] = "semantic.flow.greeting.opening.rain",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2078,7 +2092,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/conversation_greeting.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_rain.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

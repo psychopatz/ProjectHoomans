@@ -1,0 +1,25 @@
+{
+  "id": "utterance",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.personal_check_in.utterance",
+    "textRows": [
+      {
+        "key": "suggestion.personal_check_in.utterance",
+        "text": {
+          "EN": "Anything bothering you?",
+          "TL": "May bumabagabag ba sa'yo?"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Anything bothering you?",
+    "TL": "May bumabagabag ba sa'yo?"
+  },
+  "namespace": "ui.suggestion.personal_check_in",
+  "schema": "psychopatz.convo-engine.v1"
+}

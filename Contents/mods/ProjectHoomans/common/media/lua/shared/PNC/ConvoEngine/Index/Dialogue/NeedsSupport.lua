@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "needs.member.support",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/needs_support.json",
+        ["source"] = "adopters/hoomans/dialogue/needs_support/needs_member_support.json",
     },
     ["needs.neutral.support"] = {
         ["domain"] = "needs_support",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "needs.neutral.support",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/needs_support.json",
+        ["source"] = "adopters/hoomans/dialogue/needs_support/needs_neutral_support.json",
     },
     ["needs.special.support"] = {
         ["domain"] = "needs_support",
@@ -25,6 +25,6 @@ return {
         },
         ["id"] = "needs.special.support",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/needs_support.json",
+        ["source"] = "adopters/hoomans/dialogue/needs_support/needs_special_support.json",
     },
 }

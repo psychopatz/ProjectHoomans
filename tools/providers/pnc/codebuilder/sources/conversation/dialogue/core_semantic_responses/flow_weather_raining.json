@@ -1,0 +1,66 @@
+{
+  "id": "raining",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.flow.weather.raining",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "RAINING",
+    "variants": [
+      {
+        "id": "semantic.flow.weather.raining.dataset.contextual_switch",
+        "metadata": {
+          "fallback": "It is raining right now. We can return to that proposal when you are ready.",
+          "plan": {
+            "dialogueAct": "WEATHER_REPORT",
+            "groundedFactRefs": [
+              "world.weather.raining"
+            ],
+            "personalityStyle": "contextual",
+            "sourcePoolID": "semantic.flow.weather.raining",
+            "tone": "conversational",
+            "topic": "WEATHER",
+            "turns": [
+              {
+                "continuation": "continue",
+                "id": "dataset_contextual_weather_switch",
+                "segments": [
+                  {
+                    "fallback": "It is raining right now. We can return to that proposal when you are ready.",
+                    "kind": "translation",
+                    "templateID": "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch",
+                    "translations": {
+                      "EN": "It is raining right now. We can return to that proposal when you are ready.",
+                      "TL": "Umuulan ngayon. Maaari tayong bumalik sa panukalang iyon kapag handa ka na."
+                    }
+                  }
+                ]
+              }
+            ],
+            "uncertainty": "known"
+          },
+          "priority": 4,
+          "reviewed": true,
+          "sourceRefs": [
+            "MASSIVE",
+            "SGD"
+          ],
+          "templateID": "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch"
+        },
+        "text": {
+          "EN": "It is raining right now. We can return to that proposal when you are ready.",
+          "TL": "Umuulan ngayon. Maaari tayong bumalik sa panukalang iyon kapag handa ka na."
+        },
+        "when": {
+          "op": "eq",
+          "path": "conversation.pattern",
+          "value": "pnc.dataset.question.weather.can_we_talk_about_the_weather"
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.flow.weather",
+  "schema": "psychopatz.convo-engine.v1"
+}

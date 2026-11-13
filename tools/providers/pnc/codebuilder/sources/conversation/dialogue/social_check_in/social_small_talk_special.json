@@ -1,0 +1,94 @@
+{
+  "kind": "dialogue",
+  "id": "special",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:small_talk_special",
+    "category": "projecthoomans:small_talk",
+    "audience": "special",
+    "textTarget": "psdl/social/small_talk/special",
+    "textDomain": "pnc.psdl.social.small_talk.special"
+  },
+  "response": {
+    "act": "SMALL_TALK",
+    "turns": [
+      {
+        "id": "opening",
+        "metadata": {
+          "textKey": "opening"
+        },
+        "text": {
+          "EN": "I always have time for you, {addressee.name}.",
+          "TL": "Palagi akong may oras para sa iyo, {addressee.name}."
+        },
+        "offers": [
+          {
+            "id": "weather",
+            "label": {
+              "EN": "Some weather we're having.",
+              "TL": "Ilang panahon ang nararanasan natin."
+            },
+            "utterance": {
+              "EN": "Some weather we're having.",
+              "TL": "Ilang panahon ang nararanasan natin."
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "WEATHER",
+              "topic": "small_talk"
+            },
+            "metadata": {
+              "choiceKey": "choice.weather",
+              "responseKey": "response.weather",
+              "responseText": {
+                "EN": "I barely noticed. I was watching you.",
+                "TL": "bahagya kong napansin. pinapanood kita."
+              }
+            }
+          },
+          {
+            "id": "quiet_day",
+            "label": {
+              "EN": "Quiet day so far.",
+              "TL": "Tahimik na araw hanggang ngayon."
+            },
+            "utterance": {
+              "EN": "Quiet day so far.",
+              "TL": "Tahimik na araw hanggang ngayon."
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "DAY",
+              "topic": "small_talk"
+            },
+            "when": {
+              "path": "relationship.speakerToAddressee.familiarity",
+              "op": ">=",
+              "value": 1
+            },
+            "metadata": {
+              "choiceKey": "choice.quiet_day",
+              "responseKey": "response.quiet_day",
+              "responseText": {
+                "EN": "Then spend part of it with me.",
+                "TL": "Kung gayon, gugulin mo ang bahagi nito kasama ako."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "namespace": "social.small_talk",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -1,0 +1,196 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.orientation.1.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/orientation.json",
+        "responseTemplateID": "semantic.tool_reply.orientation.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That is not really how I swing.",
+              "TL": "Hindi talaga ganoon ang hilig ko."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I do not lean that way, just so you know.",
+              "TL": "Hindi ako ganoon magkainteres, para alam mo lang."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Not my preference, but thanks for being open.",
+              "TL": "Hindi ko gusto ang ganoon, pero salamat sa pagiging tapat."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I appreciate the honesty, but that is not for me.",
+              "TL": "Salamat sa katapatan, pero hindi 'yan para sa akin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "That is not my type of thing.",
+              "TL": "Hindi ko tipo ang ganyang bagay."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Just so we are clear, I do not look at you that way.",
+              "TL": "Para malinaw sa atin, hindi kita tinitingnan sa ganoong paraan."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I am not interested in that kind of arrangement.",
+              "TL": "Hindi ako interesado sa ganyang uri ng ugnayan."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Fair enough, but that is not my direction.",
+              "TL": "Nirerespeto ko, pero hindi 'yan ang patutunguhan ko."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I keep things strictly platonic here.",
+              "TL": "Hanggang magkaibigan lang talaga ako rito."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Good to know where you stand, but I do not swing that way.",
+              "TL": "Mabuting malaman ang panig mo, pero hindi ganoon ang akin."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.orientation.2.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/orientation.json",
+        "responseTemplateID": "semantic.tool_reply.orientation.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I prefer to keep things simple between us.",
+              "TL": "Mas gusto kong panatilihing simple ang lahat sa pagitan natin."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Let us just keep this uncomplicated.",
+              "TL": "Panatilihin na lang nating hindi magulo ito."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Survival is messy enough without adding that.",
+              "TL": "Magulo na ang kaligtasan para dagdagan pa niyan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I like where we are at. Let us not complicate it.",
+              "TL": "Gusto ko kung nasaan tayo ngayon. Huwag na nating guluhin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "We work best when things stay straightforward.",
+              "TL": "Mas maayos tayong nagtutulungan kapag diretso lang ang usapan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I am not looking for anything complicated out here.",
+              "TL": "Hindi ako naghahanap ng anumang kumplikado dito."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Simple is safe. Let us keep it that way.",
+              "TL": "Ligtas kapag simple. Panatilihin nating ganoon."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I value this partnership too much to make it awkward.",
+              "TL": "Masyadong mahalaga ang samahan natin para gawing asiwa."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Let us stay focused on staying alive instead.",
+              "TL": "Magpokus na lang tayo sa pananatiling buhay."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Keeping it clear and simple works best for both of us.",
+              "TL": "Mas maganda para sa ating dalawa kung malinaw at simple lang."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

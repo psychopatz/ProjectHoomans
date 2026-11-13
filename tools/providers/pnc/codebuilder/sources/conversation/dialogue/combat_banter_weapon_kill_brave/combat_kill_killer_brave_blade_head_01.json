@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "blade_head_01",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/brave.json",
+    "responseTemplateID": "semantic.combat.kill.killer.brave.blade_head_01",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Clean cut. Next.",
+          "TL": "Malinis na hiwa. Sunod."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Head severed. Move up.",
+          "TL": "Pugot ang ulo. Sulong."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Blade struck true. Keep the line.",
+          "TL": "Tumama nang tumpak ang talim. Hawakan ang linya."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "One strike. Proceed.",
+          "TL": "Isang hampas. Tuloy."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Downed without breaking stride.",
+          "TL": "Bumagsak nang hindi nahihinto ang hakbang."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Decapitated. Clear the path.",
+          "TL": "Napugutan. Linisin ang daan."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Threat down. Maintain vigilance.",
+          "TL": "Banta bagsak na. Manatiling alerto."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Firm strike. Moving ahead.",
+          "TL": "Matatag na hampas. Pasulong."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Head neutralized. Don't linger.",
+          "TL": "Ulo nawasak. Huwag magtagal."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Swift cut. Let's keep moving.",
+          "TL": "Mabilis na hiwa. Tuloy-tuloy tayo."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.combat.kill.killer.brave",
+  "schema": "psychopatz.convo-engine.v1"
+}

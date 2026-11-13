@@ -1,0 +1,198 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
+        "responseTemplateID": "semantic.emote.reply.wavebye",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Take care.",
+              "TL": "Mag-ingat ka."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "See you around.",
+              "TL": "Magkita na lang tayo mamaya."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Watch your back out there.",
+              "TL": "Bantayan mo ang likod mo sa labas."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Until next time.",
+              "TL": "Hanggang sa muli."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Stay safe.",
+              "TL": "Manatiling ligtas."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Keep your guard up on the way.",
+              "TL": "Huwag ibaba ang bantay habang naglalakad."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Catch you later.",
+              "TL": "Usap na lang tayo mamaya."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Farewell for now.",
+              "TL": "Paalam muna sa ngayon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Keep your head down.",
+              "TL": "Yumuko ka sa panganib."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "See you when you get back.",
+              "TL": "Kita tayo pagbalik mo."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.emote.reply.wavebye"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
+        "responseTemplateID": "semantic.emote.reply.wavebye",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "Goodbye. Come back in one piece.",
+              "TL": "Paalam. Bumalik ka nang buo."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Take good care of yourself, friend.",
+              "TL": "Ingatan mo nang maayos ang sarili mo, kaibigan."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "See you soon. Don't do anything reckless.",
+              "TL": "Magkita tayo agad. Huwag kang gagawa ng padalos-dalos."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "I'll be waiting right here. Stay safe.",
+              "TL": "Maghihintay ako rito. Mag-ingat ka."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Farewell for now. Looking forward to our next talk.",
+              "TL": "Paalam muna. Inaasahan ko ang susunod nating usapan."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Safe travels out there. Keep your wits about you.",
+              "TL": "Ligtas na paglalakbay sa labas. Gamitin lagi ang isip."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Goodbye! Make sure you make it back.",
+              "TL": "Paalam! Tiyakin mong makababalik ka."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Catch you later, partner. Be careful.",
+              "TL": "Kita tayo mamaya, kasama. Mag-iingat ka."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Take care. I'll keep the fire going.",
+              "TL": "Mag-ingat ka. Pananatilihin kong may apoy rito."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "See you later. Stay alive out there.",
+              "TL": "Kita tayo mamaya. Manatiling buhay sa labas."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.emote.reply.wavebye"
+    }
+  ]
+}

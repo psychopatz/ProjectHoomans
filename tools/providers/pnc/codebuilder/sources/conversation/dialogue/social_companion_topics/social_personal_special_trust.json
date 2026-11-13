@@ -1,0 +1,78 @@
+{
+  "kind": "dialogue",
+  "id": "trust",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "when": {
+    "path": "relationship.speakerToAddressee.familiarity",
+    "op": "gte",
+    "value": 10
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:personal_special",
+    "category": "projecthoomans:personal",
+    "audiences": [
+      "special"
+    ],
+    "textTarget": "psdl/social/personal/special/trust",
+    "textDomain": "pnc.psdl.social.personal.special.trust"
+  },
+  "response": {
+    "act": "PERSONAL_TOPIC",
+    "turns": [
+      {
+        "id": "opening",
+        "metadata": {
+          "textKey": "opening"
+        },
+        "text": {
+          "EN": "All right, {addressee.name}. We can talk about us.",
+          "TL": "Sige, {addressee.name}. Maaari naming pag-usapan ang tungkol sa amin."
+        },
+        "offers": [
+          {
+            "id": "trust",
+            "label": {
+              "EN": "You can trust me.",
+              "TL": "Maaari kang magtiwala sa akin."
+            },
+            "utterance": {
+              "EN": "You can trust me.",
+              "TL": "Maaari kang magtiwala sa akin."
+            },
+            "frame": {
+              "intent": "REQUEST",
+              "speechAct": "REQUEST",
+              "subject": "TRUST",
+              "topic": "personal"
+            },
+            "metadata": {
+              "choiceKey": "choice.trust",
+              "responseKey": "response.trust",
+              "responseText": {
+                "EN": "I know. That still means more than I can say.",
+                "TL": "alam ko. Nangangahulugan pa rin iyon ng higit pa sa masasabi ko."
+              },
+              "effects": [
+                {
+                  "type": "pnc:relationship",
+                  "approval": 2,
+                  "familiarity": 2
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "namespace": "social.personal.special",
+  "schema": "psychopatz.convo-engine.v1"
+}

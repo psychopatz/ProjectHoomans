@@ -1,0 +1,38 @@
+{
+  "id": "compliment",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.compliment",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "COMPLIMENT",
+    "variants": [
+      {
+        "id": "semantic.compliment.dataset.kind_of_you",
+        "metadata": {
+          "fallback": "That's kind of you. I appreciate it.",
+          "templateID": "semantic.compliment.dataset.kind_of_you"
+        },
+        "text": {
+          "EN": "That's kind of you. I appreciate it.",
+          "TL": "That's kind of you. I appreciate it."
+        }
+      },
+      {
+        "id": "semantic.compliment.dataset.means_a_lot",
+        "metadata": {
+          "fallback": "Aw, thank you. That means a lot.",
+          "templateID": "semantic.compliment.dataset.means_a_lot"
+        },
+        "text": {
+          "EN": "Aw, thank you. That means a lot.",
+          "TL": "Aw, thank you. That means a lot."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic",
+  "schema": "psychopatz.convo-engine.v1"
+}

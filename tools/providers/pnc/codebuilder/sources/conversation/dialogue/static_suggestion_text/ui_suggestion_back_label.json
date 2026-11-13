@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.back.label",
+    "textRows": [
+      {
+        "key": "suggestion.back.label",
+        "text": {
+          "EN": "Back",
+          "TL": "Bumalik"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Back",
+    "TL": "Bumalik"
+  },
+  "namespace": "ui.suggestion.back",
+  "schema": "psychopatz.convo-engine.v1"
+}

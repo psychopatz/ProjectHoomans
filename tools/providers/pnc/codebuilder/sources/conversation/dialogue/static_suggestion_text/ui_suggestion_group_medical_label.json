@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.group.medical.label",
+    "textRows": [
+      {
+        "key": "suggestion.group.medical.label",
+        "text": {
+          "EN": "Medical",
+          "TL": "Medikal"
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Medical",
+    "TL": "Medikal"
+  },
+  "namespace": "ui.suggestion.group.medical",
+  "schema": "psychopatz.convo-engine.v1"
+}

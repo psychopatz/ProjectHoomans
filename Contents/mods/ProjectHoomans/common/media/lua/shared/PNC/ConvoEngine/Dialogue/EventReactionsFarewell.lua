@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.flow.farewell.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "default",
             ["sourceId"] = "semantic.flow.farewell.default",
-            ["sourcePath"] = "psdl/dialogue/event_reactions_farewell.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_farewell/flow_farewell_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsFarewell",
+        ["namespace"] = "semantic.flow.farewell",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/event_reactions_farewell.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_farewell/flow_farewell_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.flow.farewell.friendly",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "friendly",
             ["sourceId"] = "semantic.flow.farewell.friendly",
-            ["sourcePath"] = "psdl/dialogue/event_reactions_farewell.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/event_reactions_farewell/flow_farewell.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsFarewell",
+        ["namespace"] = "semantic.flow.farewell",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/event_reactions_farewell.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/event_reactions_farewell/flow_farewell.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

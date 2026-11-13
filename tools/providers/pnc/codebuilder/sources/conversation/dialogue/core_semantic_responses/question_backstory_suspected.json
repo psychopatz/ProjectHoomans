@@ -1,0 +1,30 @@
+{
+  "id": "suspected",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.question.backstory.suspected",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "SUSPECTED",
+    "variants": [
+      {
+        "id": "semantic.question.backstory.suspected.authored",
+        "metadata": {
+          "fallback": "I think it was %1, but I could be mistaken.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstorySuspected",
+          "translationArgs": {
+            "content": "fact_content"
+          }
+        },
+        "text": {
+          "EN": "I think it was %1, but I could be mistaken.",
+          "TL": "Sa tingin ko ay %1 iyon, pero maaaring mali ako."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.question.backstory",
+  "schema": "psychopatz.convo-engine.v1"
+}

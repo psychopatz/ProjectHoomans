@@ -1,0 +1,196 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_hostile.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_hostile.json",
+        "responseTemplateID": "semantic.tool_reply.queued_hostile.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I heard you. Watch yourself.",
+              "TL": "Narinig kita. Mag-ingat ka sa sarili mo."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Heard that tone. Mind your step.",
+              "TL": "Narinig ko ang tonong 'yan. Mag-ingat sa hakbang."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I heard the anger. Keep it in check.",
+              "TL": "Narinig ko ang galit. Kontrolin mo 'yan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I hear you, but don't cross the line.",
+              "TL": "Narinig kita, pero huwag mong tawirin ang hangganan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Message heard. Control yourself.",
+              "TL": "Narinig ang mensahe. Magpigil ka."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Heard that loud and clear. Back off.",
+              "TL": "Narinig nang malakas at malinaw. Umatras ka."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I heard you. Don't make a mistake you can't undo.",
+              "TL": "Narinig kita. Huwag kang gumawa ng pagkakamaling di mo mababawi."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I heard the threat. Tread lightly.",
+              "TL": "Narinig ko ang banta. Mag-ingat sa pagtapak."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Noted. Don't let your temper get you killed.",
+              "TL": "Tala ko na. Huwag mong hayaang mapatay ka ng galit mo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I hear you. Watch your back.",
+              "TL": "Narinig kita. Bantayan mo ang likod mo."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_hostile.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_hostile.json",
+        "responseTemplateID": "semantic.tool_reply.queued_hostile.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Noted. Choose your next words carefully.",
+              "TL": "Tala ko na. Piliin mong mabuti ang susunod mong sasabihin."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Be very careful what comes out of your mouth next.",
+              "TL": "Maging maingat sa susunod na lalabas sa bibig mo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "You're walking on thin ice with that talk.",
+              "TL": "Nasa manipis kang yelo sa salitang 'yan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Think twice before repeating that.",
+              "TL": "Mag-isip ka nang dalawang beses bago ulitin 'yan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Choose your next move with extreme caution.",
+              "TL": "Piliin ang susunod mong hakbang nang buong pag-iingat."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "You're testing boundaries that have teeth.",
+              "TL": "Sinusubukan mo ang mga hangganang may bangil."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Careful now. Words have consequences out here.",
+              "TL": "Mag-ingat ka. May kapalit ang salita dito."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Watch what you say next.",
+              "TL": "Bantayan mo ang susunod mong sasabihin."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "One wrong word and this conversation ends badly.",
+              "TL": "Isang maling salita at magtatapos sa masama ang usapang ito."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Noted. Mind your tongue.",
+              "TL": "Tala ko na. Ingatan ang dila mo."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

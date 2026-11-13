@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/post_combat.json",
+        "responseTemplateID": "semantic.interaction.scene.post_combat_clear",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Looks clear now. That got rough for a minute.",
+              "TL": "Mukhang malinaw na. Naging delikado sandali."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Area is secure. Check yourselves for injuries.",
+              "TL": "Ligtas na ang lugar. Tingnan niyo kung may mga sugat kayo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "They're all down. Take a breath and reload.",
+              "TL": "Tumba na silang lahat. Huminga at magkarga ng bala."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Fight's over. Good work holding the line.",
+              "TL": "Tapos na ang laban. Magandang pagpigil sa linya."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Looks like the immediate threat is dealt with.",
+              "TL": "Mukhang naasikaso na ang agarang banta."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Clear. Everyone still in one piece?",
+              "TL": "Malinaw. Buo pa ba ang lahat?"
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Threat neutralized. Let's recover our stamina.",
+              "TL": "Nalipol ang banta. Bawiin natin ang lakas natin."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "It's quiet again. Stay alert for stragglers.",
+              "TL": "Tahimik na ulit. Magbantay sa mga naiwan."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Combat is finished. Reload and bandage up.",
+              "TL": "Tapos na ang bakbakan. Magkarga at magbenda."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "We held them off. Area appears clear.",
+              "TL": "Naitaboy natin sila. Mukhang malinis na ang lugar."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.post_combat_clear"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/post_combat.json",
+        "responseTemplateID": "semantic.interaction.scene.post_combat_clear",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "We made it through! Is everyone okay?",
+              "TL": "Nakalusot tayo! Ayos lang ba ang lahat?"
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Thank goodness you're alive. That was terrifying.",
+              "TL": "Salamat sa Diyos at buhay ka. Napakatindi noon."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Great fighting, partner! I'm so glad we survived that.",
+              "TL": "Napakagaling mong lumaban, kasama! Masayang-masaya ako't nakaligtas tayo."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Come here, let me check you over for bites or scratches.",
+              "TL": "Halika rito, titingnan ko kung may kagat o gasgas ka."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "We did it together. Nobody got left behind.",
+              "TL": "Nagawa natin nang magkasama. Walang naiwan sa atin."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Take a breath, friend. We held the line.",
+              "TL": "Huminga ka muna, kaibigan. Naipagtanggol natin ang pwesto."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "I was worried for a second there, but you fought bravely.",
+              "TL": "Nag-alala ako nang sandali, pero buong tapang kang lumaban."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Proud to stand beside you in that fight. We're safe now.",
+              "TL": "Ipinagmamalaki kong tumabi sa 'yo sa laban. Ligtas na tayo ngayon."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Rest for a minute. You earned it after that mess.",
+              "TL": "Magpahinga ka muna. Karapat-dapat ka roon pagkatapos ng gulo."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "All clear! Hugely relieved we're both standing.",
+              "TL": "Malinis na! Napakalaking ginhawa na nakatayo pa tayong pareho."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.post_combat_clear"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/post_combat.json",
+        "responseTemplateID": "semantic.interaction.scene.post_combat_clear",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Clear.",
+              "TL": "Malinaw."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "All down.",
+              "TL": "Tumba lahat."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Reload.",
+              "TL": "Magkarga."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Check wounds.",
+              "TL": "Tingnan ang sugat."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Secure.",
+              "TL": "Ligtas."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Done.",
+              "TL": "Tapos."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Quiet now.",
+              "TL": "Tahimik na."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Hold positions.",
+              "TL": "Manatili sa pwesto."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Breathe.",
+              "TL": "Huminga."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Threat gone.",
+              "TL": "Wala nang banta."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.post_combat_clear"
+    },
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/post_combat.json",
+        "responseTemplateID": "semantic.interaction.scene.post_combat_clear",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "Don't relax yet. Scan for stragglers.",
+              "TL": "Huwag munang magpakampante. Maghanap ng mga naiwan."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "Down, but keep your weapon ready. More could be coming.",
+              "TL": "Tumba na, pero ihanda ang armas. Baka may paparating pa."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Check your perimeter before you start celebrating.",
+              "TL": "Suriin ang paligid bago magdiwang."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Check every corpse. Make sure they stay down.",
+              "TL": "Tingnan ang bawat bangkay. Tiyaking hindi na gagalaw."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Gunfire brings more of them. We need to be ready to move.",
+              "TL": "Nakahahatak ng iba ang putok. Maging handa tayong umalis."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "Wipe your blade and reload immediately.",
+              "TL": "Punasan ang talim at magkarga agad ng bala."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Are you bitten? Answer me right now.",
+              "TL": "Kinagat ka ba? Sagutin mo ako ngayon din."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Threat is dead, but noise travels fast out here.",
+              "TL": "Patay ang banta, pero mabilis kumalat ang ingay dito."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "Keep low. Don't silhouette yourself in the doorway.",
+              "TL": "Yumuko ka. Huwag mong i-expose ang sarili mo sa pinto."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Clear for now. Expect a second wave.",
+              "TL": "Malinis sa ngayon. Maghanda sa pangalawang bugso."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.post_combat_clear"
+    }
+  ]
+}

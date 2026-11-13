@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.combat.reaction.default",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/event_reactions_combat.json",
+        ["source"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_default.json",
     },
     ["semantic.combat.reaction.retreat"] = {
         ["domain"] = "event_reactions_combat",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "semantic.combat.reaction.retreat",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/event_reactions_combat.json",
+        ["source"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_retreat.json",
     },
     ["semantic.combat.reaction.threat"] = {
         ["domain"] = "event_reactions_combat",
@@ -25,6 +25,6 @@ return {
         },
         ["id"] = "semantic.combat.reaction.threat",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/event_reactions_combat.json",
+        ["source"] = "adopters/hoomans/dialogue/event_reactions_combat/combat_reaction_threat.json",
     },
 }

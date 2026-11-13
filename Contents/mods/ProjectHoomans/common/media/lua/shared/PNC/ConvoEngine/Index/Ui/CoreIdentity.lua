@@ -10,7 +10,7 @@ return {
         },
         ["id"] = "question.identity",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/core_identity.json",
+        ["source"] = "dialogue/core_identity/social_core_identity.json",
     },
     ["question.identity_faction"] = {
         ["dependents"] = {
@@ -25,7 +25,7 @@ return {
         ["related"] = {
             "pnc.question.identity.faction",
         },
-        ["source"] = "psdl/dialogue/core_identity.json",
+        ["source"] = "dialogue/core_identity/social_core_identity.json",
     },
     ["question.identity_nickname"] = {
         ["dependents"] = {
@@ -40,7 +40,7 @@ return {
         ["related"] = {
             "pnc.question.identity.nickname",
         },
-        ["source"] = "psdl/dialogue/core_identity.json",
+        ["source"] = "dialogue/core_identity/social_core_identity.json",
     },
     ["question.identity_surname"] = {
         ["dependents"] = {
@@ -55,6 +55,6 @@ return {
         ["related"] = {
             "pnc.question.identity.surname",
         },
-        ["source"] = "psdl/dialogue/core_identity.json",
+        ["source"] = "dialogue/core_identity/social_core_identity.json",
     },
 }

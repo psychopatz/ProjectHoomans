@@ -1,0 +1,103 @@
+{
+  "kind": "dialogue",
+  "id": "dawn",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "when": {
+    "all": [
+      {
+        "path": "relationship.speakerToAddressee.state",
+        "op": "eq",
+        "value": "Acquaintance"
+      },
+      {
+        "all": [
+          {
+            "path": "world.time.hour",
+            "op": "gte",
+            "value": 5
+          },
+          {
+            "path": "world.time.hour",
+            "op": "lt",
+            "value": 6.5
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:greeting_acquaintance_dawn",
+    "category": "projecthoomans:greetings",
+    "audience": "neutral",
+    "priority": 10,
+    "weight": 100,
+    "portraitAnimation": "greeting.wavehi",
+    "textTarget": "psdl/social/greetings/neutral/acquaintance/dawn",
+    "textDomain": "pnc.psdl.social.greetings.neutral.acquaintance.dawn"
+  },
+  "response": {
+    "act": "GREETING",
+    "variants": [
+      {
+        "id": "greeting.001",
+        "metadata": {
+          "textKey": "greeting.001"
+        },
+        "text": {
+          "EN": "You're awake early too. Everything all right?",
+          "TL": "Gising ka rin nang maaga. Ayos ba ang lahat?"
+        }
+      },
+      {
+        "id": "greeting.002",
+        "metadata": {
+          "textKey": "greeting.002"
+        },
+        "text": {
+          "EN": "Morning. I didn't expect to see you before sunrise.",
+          "TL": "Umaga. Hindi ko inaasahan na makikita kita bago sumikat ang araw."
+        }
+      },
+      {
+        "id": "greeting.003",
+        "metadata": {
+          "textKey": "greeting.003"
+        },
+        "text": {
+          "EN": "Couldn't sleep? Neither could I.",
+          "TL": "hindi makatulog? Hindi ko rin kaya."
+        }
+      },
+      {
+        "id": "greeting.004",
+        "metadata": {
+          "textKey": "greeting.004"
+        },
+        "text": {
+          "EN": "Good, it's you. What brings you over this early?",
+          "TL": "Buti, ikaw pala. Ano ang nagdudulot sa iyo ng ganito kaaga?"
+        }
+      },
+      {
+        "id": "greeting.005",
+        "metadata": {
+          "textKey": "greeting.005"
+        },
+        "text": {
+          "EN": "Dawn patrol, or did you need something?",
+          "TL": "Dawn patrol, o may kailangan ka?"
+        }
+      }
+    ]
+  },
+  "namespace": "social.greetings.acquaintance",
+  "schema": "psychopatz.convo-engine.v1"
+}

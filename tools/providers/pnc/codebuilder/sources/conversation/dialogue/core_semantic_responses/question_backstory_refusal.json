@@ -1,0 +1,27 @@
+{
+  "id": "refusal",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.question.backstory.refusal",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "REFUSAL",
+    "variants": [
+      {
+        "id": "semantic.question.backstory.refusal.authored",
+        "metadata": {
+          "fallback": "I'm not ready to talk about that yet.",
+          "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal"
+        },
+        "text": {
+          "EN": "I'm not ready to talk about that yet.",
+          "TL": "Hindi pa ako handang pag-usapan iyan."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.question.backstory",
+  "schema": "psychopatz.convo-engine.v1"
+}

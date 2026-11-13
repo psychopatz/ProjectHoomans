@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/horde.json",
+        "responseTemplateID": "semantic.interaction.scene.horde_reply_steady",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Hold here. Don't rush it.",
+              "TL": "Dito muna. Huwag padalos-dalos."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Wait for them to thin out before making a move.",
+              "TL": "Hintaying mabawasan sila bago gumalaw."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Stay in position. Let's see which way they drift.",
+              "TL": "Manatili sa pwesto. Tingnan kung saan sila papunta."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Hold your ground and observe their path.",
+              "TL": "Hawakan ang pwesto at bantayan ang ruta nila."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "No sudden movements. Let them pass if possible.",
+              "TL": "Walang biglaang galaw. Hayaang lumampas kung maaari."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Keep calm and hold the line right here.",
+              "TL": "Kumalma at hawakan ang linya dito."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Patience. Let's wait for the right opening.",
+              "TL": "Pasensya muna. Hintayin ang tamang puwang."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Hold steady. We decide when we have better information.",
+              "TL": "Maging matatag. Magpapasya tayo kapag mas marami nang impormasyon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Don't panic. Hold position behind cover.",
+              "TL": "Huwag mag-panic. Manatili sa likod ng kublihan."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Steady now. Let's assess before we commit.",
+              "TL": "Dahan-dahan lang. Timbangin muna bago sumugod."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.horde_reply_steady"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/horde.json",
+        "responseTemplateID": "semantic.interaction.scene.horde_reply_steady",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "Stay together. Let's hold before we commit.",
+              "TL": "Magkakasama tayo. Humawak muna bago sumugod."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Breathe easy, friend. We hold right here by each other.",
+              "TL": "Huminga ka nang maluwag, kaibigan. Hawak-kamay tayo rito."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "I'm right beside you. Let's wait for a safe moment.",
+              "TL": "Nasa tabi mo lang ako. Hintayin natin ang ligtas na sandali."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Hold steady, partner. We don't have to rush into danger.",
+              "TL": "Magpakatatag ka, kasama. Di natin kailangang magpadalos-dalos."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Stay low with me. Let's watch their movements together.",
+              "TL": "Yumuko ka kasabay ko. Sabay nating bantayan ang galaw nila."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Keep calm. As long as we hold together, we'll be fine.",
+              "TL": "Manatiling kalmado. Hangga't magkasama tayo, magiging maayos tayo."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Just hold on for a minute. Let the worst of the herd pass.",
+              "TL": "Sandali lang. Hayaang lumampas ang pinakamalaking kawan."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Steady, friend. I'm right here with you in the quiet.",
+              "TL": "Dahan-dahan, kaibigan. Narito lang ako kasama mo sa katahimikan."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Don't be scared. We hold this spot until we have a clean shot.",
+              "TL": "Huwag kang matakot. Hawakan ang pwesto hanggang may malinaw na daan."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Together and steady. Let's let them drift away.",
+              "TL": "Sama-sama at matatag. Hayaan natin silang lumayo."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.horde_reply_steady"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/horde.json",
+        "responseTemplateID": "semantic.interaction.scene.horde_reply_steady",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Hold. Watch them.",
+              "TL": "Hawak. Bantayan sila."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Hold position.",
+              "TL": "Hawakan ang pwesto."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Wait.",
+              "TL": "Teka."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Stay low.",
+              "TL": "Yumuko."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Steady.",
+              "TL": "Magpakatatag."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Do not move.",
+              "TL": "Huwag gagalaw."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Hold.",
+              "TL": "Hawak."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Patience.",
+              "TL": "Pasensya."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Freeze.",
+              "TL": "Tigil."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Quiet. Watch.",
+              "TL": "Tahimik. Magmasid."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.horde_reply_steady"
+    },
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/horde.json",
+        "responseTemplateID": "semantic.interaction.scene.horde_reply_steady",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "No rush. Hold position and watch the pressure.",
+              "TL": "Walang pagmamadali. Humawak at bantayan ang galaw nila."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "Hold here. If you twitch, you draw the whole pack.",
+              "TL": "Dito muna. Kapag kumilos ka, mahahatak mo ang buong kawan."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Stay rooted. Wait until their lead walkers pass.",
+              "TL": "Manatiling nakatuntong. Hintaying lumampas ang nauuna."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Maintain silence and hold the corner.",
+              "TL": "Panatilihin ang katahimikan at hawakan ang kanto."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Do not engage prematurely. Let the herd scatter.",
+              "TL": "Huwag aatake nang maaga. Hayaang maghiwa-hiwalay ang kawan."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "Hold your breath if you have to, but don't move.",
+              "TL": "Pigilin ang hininga kung kailangan, pero huwag gagalaw."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "We wait for an exploitable mistake. Stay still.",
+              "TL": "Hintayin natin ang pagkakamali nila. Huwag gumalaw."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Keep your weapon ready, but do not fire yet. Hold.",
+              "TL": "Ihanda ang armas, pero huwag munang puputok. Hawak."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "Hold tight against the wall. Let them walk past.",
+              "TL": "Dumikit sa pader. Hayaang maglakad sila palampas."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Steady. Any sound will turn this into a slaughterhouse.",
+              "TL": "Dahan-dahan. Anumang ingay ay gagawin itong katayan."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.horde_reply_steady"
+    }
+  ]
+}

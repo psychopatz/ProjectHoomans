@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "text.response.ambient_visit.accepted.1",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/core_text_social_greetings.json",
+        ["source"] = "dialogue/core_text_social_greetings/response_ambient_visit_accepted.json",
     },
 }

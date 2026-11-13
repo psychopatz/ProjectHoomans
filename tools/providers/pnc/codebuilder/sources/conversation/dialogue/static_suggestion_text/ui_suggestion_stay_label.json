@@ -1,0 +1,25 @@
+{
+  "id": "label",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.stay.label",
+    "textRows": [
+      {
+        "key": "suggestion.stay.label",
+        "text": {
+          "EN": "Wait here.",
+          "TL": "Dito ka maghintay."
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Wait here.",
+    "TL": "Dito ka maghintay."
+  },
+  "namespace": "ui.suggestion.stay",
+  "schema": "psychopatz.convo-engine.v1"
+}

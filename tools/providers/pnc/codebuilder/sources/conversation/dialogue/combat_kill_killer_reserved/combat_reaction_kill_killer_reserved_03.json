@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "kill_killer_reserved_03",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/killer/reserved.json",
+    "responseTemplateID": "semantic.combat.reaction.kill_killer_reserved_03",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Clear.",
+          "TL": "Malinis."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Path open.",
+          "TL": "Bukas ang daan."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Secure.",
+          "TL": "Ligtas."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Nothing here.",
+          "TL": "Walang anuman dito."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Clean.",
+          "TL": "Maayos."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "No contacts.",
+          "TL": "Walang kalaban."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Lane clear.",
+          "TL": "Malinis ang linya."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Safe.",
+          "TL": "Ayos."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Open.",
+          "TL": "Bukas."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Quiet now.",
+          "TL": "Tahimik na."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.combat.reaction",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/medical_bite.json",
+        "responseTemplateID": "semantic.question.medical_bite.positive",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "Yes. I've been bitten. That's all.",
+              "TL": "Oo. Nakagat ako. Tama na."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "They got me. Don't make a scene.",
+              "TL": "Nakuha nila ako. Huwag kang magsisigaw."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "I was bitten. Keep your gun ready if you must.",
+              "TL": "Nakagat ako. Ihanda mo ang baril mo kung kinakailangan."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Yes, it happened. Stay back from me.",
+              "TL": "Oo, nangyari. Lumayo ka sa akin."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Got teeth in my arm. I know what that means.",
+              "TL": "May kagat sa braso ko. Alam ko ang ibig sabihin niyan."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "Bitten. Don't touch me.",
+              "TL": "Nakagat. Huwag mo akong hawakan."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "It's true. I don't want your sympathy.",
+              "TL": "Totoo. Hindi ko kailangan ang awa mo."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "One of them bit me. Step away.",
+              "TL": "Kinagat ako ng isa sa kanila. Umatras ka."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "I'm marked. Do what you have to do.",
+              "TL": "May marka na ako. Gawin mo ang dapat mong gawin."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Yes. I won't let myself become a danger to you.",
+              "TL": "Oo. Hindi ko hahayaang maging panganib ako sa 'yo."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.medical_bite.positive"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/medical_bite.json",
+        "responseTemplateID": "semantic.question.medical_bite.positive",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Yes, I've been bitten.",
+              "TL": "Oo, nakagat ako."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "One of them got their teeth in me. It's bad.",
+              "TL": "Nabaon ng isa sa kanila ang ngipin sa akin. Masama ito."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I got bitten during the struggle. No denying it.",
+              "TL": "Nakagat ako habang nagpupumiglas. Hindi maikakaila."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "There's a bite mark on my shoulder. I'm infected.",
+              "TL": "May bakas ng kagat sa balikat ko. Nahawaan ako."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "It broke the skin. I know what's coming.",
+              "TL": "Bumaon sa balat. Alam ko kung ano ang kahihinatnan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Yes, unfortunately. I was bitten.",
+              "TL": "Oo, sa kasamaang-palad. Nakagat ako."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "They got through my sleeve. It's a bite.",
+              "TL": "Lumusot sa manggas ko. Kagat nga."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I've been bitten. We need to plan for what comes next.",
+              "TL": "Nakagat ako. Kailangan nating pag-isipan ang susunod na gagawin."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Found the mark earlier. I was bitten.",
+              "TL": "Nakita ko ang marka kanina. Nakagat talaga ako."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I'm infected. A walker bit me.",
+              "TL": "Nahawaan na ako. Kinagat ako ng patay."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.medical_bite.positive"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/medical_bite.json",
+        "responseTemplateID": "semantic.question.medical_bite.positive",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Yes. I've been bitten.",
+              "TL": "Oo. Nakagat ako."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Bitten.",
+              "TL": "Nakagat."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "They got me.",
+              "TL": "Nakuha ako."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "It's a bite.",
+              "TL": "Kagat ito."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Infected.",
+              "TL": "Nahawaan."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "I'm turned.",
+              "TL": "Mamamatay ako."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Bite mark.",
+              "TL": "Bakas ng kagat."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Yes.",
+              "TL": "Oo."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Skin broke.",
+              "TL": "Bumaon."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "It's over.",
+              "TL": "Tapos na."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.medical_bite.positive"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:health_content",
+        "contentOwner": "projecthoomans.dialogue_content.health",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/medical_bite.json",
+        "responseTemplateID": "semantic.question.medical_bite.positive",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "Yes. I've been bitten, and I appreciate you checking.",
+              "TL": "Oo. Nakagat ako, at salamat sa pagsuri."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "They got me, friend. I'm sorry to bring you this news.",
+              "TL": "Nakuha nila ako, kaibigan. Pasensya na sa masamang balita."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "I was bitten. Thank you for caring enough to ask me directly.",
+              "TL": "Nakagat ako. Salamat sa pagtatanong nang diretso sa akin."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "It happened. I'm just glad I got to know you before the end.",
+              "TL": "Nangyari na. Masaya akong nakilala kita bago ang lahat."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "I've been bitten. Please, keep yourself safe when the time comes.",
+              "TL": "Nakagat ako. Pakiusap, protektahan mo ang sarili mo pagdating ng oras."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Yes, they got their teeth in me. Thank you for standing by me.",
+              "TL": "Oo, kinagat nila ako. Salamat sa pananatili sa tabi ko."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "I won't hide it from you. I was bitten. Take care of yourself.",
+              "TL": "Hindi ko itatago sa 'yo. Nakagat ako. Alagaan mo ang sarili mo."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "It's a bite, friend. I appreciate all the times we shared.",
+              "TL": "Kagat nga, kaibigan. Salamat sa lahat ng pinagsamahan natin."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "I'm infected. Thank you for treating me like a human being.",
+              "TL": "Nahawaan na ako. Salamat sa pagtrato sa akin bilang kapwa tao."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "They bit me. Don't be sad; we fought as hard as we could.",
+              "TL": "Kinagat nila ako. Huwag kang malungkot; lumaban tayo nang buong husay."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.medical_bite.positive"
+    }
+  ]
+}

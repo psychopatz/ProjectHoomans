@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.medical.distress.treatment.bandage",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "bandage",
             ["sourceId"] = "semantic.medical.distress.treatment.bandage",
-            ["sourcePath"] = "psdl/dialogue/medical_event_treatment.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTreatment",
+        ["namespace"] = "semantic.medical.distress.treatment",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -187,7 +188,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/medical_event_treatment.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_bandage.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -200,12 +201,13 @@ return {
         ["id"] = "semantic.medical.distress.treatment.default",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "default",
             ["sourceId"] = "semantic.medical.distress.treatment.default",
-            ["sourcePath"] = "psdl/dialogue/medical_event_treatment.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_default.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/MedicalEventTreatment",
+        ["namespace"] = "semantic.medical.distress.treatment",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -382,7 +384,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/medical_event_treatment.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/medical_event_treatment/medical_distress_treatment_default.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

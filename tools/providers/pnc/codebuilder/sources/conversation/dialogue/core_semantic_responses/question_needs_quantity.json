@@ -1,0 +1,74 @@
+{
+  "id": "quantity",
+  "kind": "dialogue",
+  "metadata": {
+    "responsePoolID": "semantic.question.needs.quantity",
+    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e"
+  },
+  "owner": "ProjectHoomans",
+  "response": {
+    "act": "QUANTITY",
+    "variants": [
+      {
+        "id": "semantic.question.needs.quantity.dataset.clarify_thirst",
+        "metadata": {
+          "fallback": "I can confirm water is a need, but which item do you mean?",
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "groundedFactRefs": [
+              "npc.needs.thirst"
+            ],
+            "sourcePoolID": "semantic.question.needs.quantity",
+            "tone": "clarifying",
+            "topic": "NEEDS",
+            "turns": [
+              {
+                "continuation": "continue",
+                "id": "dataset_needs_clarification",
+                "segments": [
+                  {
+                    "fallback": "I can confirm water is a need, but which item do you mean?",
+                    "kind": "translation",
+                    "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
+                    "translations": {
+                      "EN": "I can confirm water is a need, but which item do you mean?",
+                      "TL": "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?"
+                    }
+                  }
+                ]
+              }
+            ],
+            "uncertainty": "ambiguous"
+          },
+          "priority": 4,
+          "reviewed": true,
+          "sourceRefs": [
+            "MASSIVE",
+            "SGD"
+          ],
+          "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst"
+        },
+        "text": {
+          "EN": "I can confirm water is a need, but which item do you mean?",
+          "TL": "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?"
+        },
+        "when": {
+          "all": [
+            {
+              "op": "eq",
+              "path": "conversation.lastIntent",
+              "value": "CLARIFY"
+            },
+            {
+              "op": "eq",
+              "path": "conversation.needType",
+              "value": "thirst"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.question.needs",
+  "schema": "psychopatz.convo-engine.v1"
+}

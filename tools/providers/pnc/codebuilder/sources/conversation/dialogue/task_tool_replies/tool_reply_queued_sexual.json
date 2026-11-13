@@ -1,0 +1,196 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_sexual.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_sexual.json",
+        "responseTemplateID": "semantic.tool_reply.queued_sexual.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I heard you. Give me a second.",
+              "TL": "Narinig kita. Bigyan mo ako ng sandali."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Heard that proposition. Let me catch my breath.",
+              "TL": "Narinig ang alok na 'yan. Huminga muna ako."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I heard you clearly. Hold on for a moment.",
+              "TL": "Narinig kita nang malinaw. Maghintay nang sandali."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Message received loud and clear. Give me a minute.",
+              "TL": "Nakuha ang mensahe nang malinaw. Bigyan mo ako ng sandali."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I heard that. Give me a beat to think.",
+              "TL": "Narinig ko 'yon. Bigyan mo ako ng oras para mag-isip."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Heard. That's a lot to process right now.",
+              "TL": "Narinig. Napakabigat iproseso niyan sa ngayon."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "I heard what you just proposed. Just hold up.",
+              "TL": "Narinig ko ang inalok mo. Teka lang muna."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Got that. Let me gather my thoughts.",
+              "TL": "Nakuha 'yon. Tipunin ko muna ang isip ko."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I heard you. Don't rush me.",
+              "TL": "Narinig kita. Huwag mo akong madaliin."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Heard every word. Give me some room.",
+              "TL": "Narinig ang bawat salita. Bigyan mo ako ng puwang."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_sexual.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_sexual.json",
+        "responseTemplateID": "semantic.tool_reply.queued_sexual.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That is a bold thing to say.",
+              "TL": "Matapang na bagay ang sabihin iyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "You don't waste time with subtlety, do you?",
+              "TL": "Di ka nagsasayang ng oras sa pahiwatig, 'no?"
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "That's about as blunt as it gets out here.",
+              "TL": "Kasing-prangka na 'yan ng kahit ano rito."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "You're taking quite a gamble saying that.",
+              "TL": "Malaking sugal ang pagsasabi niyan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "That's an audacious thing to drop on me.",
+              "TL": "Napakapangahas na bagay ang ibagsak sa akin."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "You definitely speak your mind without filters.",
+              "TL": "Nagsasalita ka talaga nang walang preno."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Bold proposition. Let's see what happens.",
+              "TL": "Matapang na alok. Tingnan natin ang mangyayari."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "That takes some serious nerve to put out there.",
+              "TL": "Nangangailangan ng tunay na tapang para ilatag 'yan."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "You're playing with high stakes with that talk.",
+              "TL": "Naglalaro ka sa mataas na pustahan sa salitang 'yan."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Direct and daring. Noted.",
+              "TL": "Diretso at mapangahas. Tala ko na."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

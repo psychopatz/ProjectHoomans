@@ -1,0 +1,196 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "queued",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:companion_commands",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/return_home.json",
+        "responseTemplateID": "semantic.command.return_home.queued"
+      },
+      "response": {
+        "act": "REPLY",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Okay, I'll head home.",
+              "TL": "Sige, uuwi ako."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Heading back to base now.",
+              "TL": "Pabalik na sa base ngayon."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Understood. Moving toward home.",
+              "TL": "Naintindihan. Papatungo na sa tahanan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I'll make my way back to our shelter.",
+              "TL": "Babalik ako sa silungan natin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Returning to camp as ordered.",
+              "TL": "Babalik sa kampo ayon sa utos."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Right. Time to head home.",
+              "TL": "Sige. Oras na para umuwi."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Understood. Retracing my steps to base.",
+              "TL": "Naiintindihan ko. Binabalikan ang daan sa base."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "On my way back home.",
+              "TL": "Papauwi na ako ngayon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Got it. Returning to home coordinates.",
+              "TL": "Nakuha ko. Pabalik sa mga coordinate ng tahanan."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Heading inbound for home.",
+              "TL": "Papasok na pauwi."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.command.return_home"
+    },
+    {
+      "kind": "dialogue",
+      "id": "friendly",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:companion_commands",
+        "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/return_home.json",
+        "responseTemplateID": "semantic.command.return_home.queued.friendly"
+      },
+      "response": {
+        "act": "REPLY",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Sure, I'll head home. See you back there soon!",
+              "TL": "Sige, uuwi ako. Kita tayo roon agad!"
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Sounds wonderful, friend. I'll get back to camp safely.",
+              "TL": "Napakaganda, kaibigan. Babalik ako sa kampo nang ligtas."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Heading home, partner! Make sure you stay safe too.",
+              "TL": "Pauwi na, kasama! Tiyakin mong mag-iingat ka rin."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I'll go keep the fire warm for when you return.",
+              "TL": "Pupunta ako para panatilihing mainit ang apoy pagbalik mo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Great idea! I'll head home and stow our gear.",
+              "TL": "Magandang ideya! Uuwi ako at itatabi ang gamit natin."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Happy to head home. Don't stay out too late, friend!",
+              "TL": "Masayang uuwi. Huwag kang magpagabi sa labas, kaibigan!"
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "On my way back to our safe place. Take care!",
+              "TL": "Papauwi na sa ligtas nating lugar. Mag-ingat ka!"
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Heading home with a smile. See you shortly, partner.",
+              "TL": "Pauwi nang may ngiti. Magkita tayo maya-maya, kasama."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I'll get things tidy back at base for us.",
+              "TL": "Aayusin ko ang mga gamit sa base para sa atin."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Heading home! Be careful on your way back.",
+              "TL": "Pauwi na! Mag-ingat ka sa pagbalik mo."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.command.return_home.queued"
+    }
+  ]
+}

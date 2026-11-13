@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/horde.json",
+        "responseTemplateID": "semantic.interaction.scene.horde_prompt",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That's a horde. We fighting through or pulling back?",
+              "TL": "Kawan iyan. Lalaban ba tayo o uurong?"
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Look at that crowd. Do we stand our ground or run?",
+              "TL": "Tingnan mo ang dami nila. Maninindigan ba tayo o tatakbo?"
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Huge pack ahead. What's the call: fight or retreat?",
+              "TL": "Malaking kawan sa unahan. Anong pasya: lalaban o aatras?"
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "That is a serious horde. Do we engage or bypass?",
+              "TL": "Matinding kawan 'yan. Lalabanan ba natin o iiwasan?"
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "They're swarming. Are we cutting through or falling back?",
+              "TL": "Dumudumog sila. Babasagin ba natin o aatras tayo?"
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Too many bodies out there. What do you want to do?",
+              "TL": "Napakaraming patay sa labas. Ano ang gusto mong gawin?"
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Horde spotted. We taking them on or finding another route?",
+              "TL": "May kawan sa unahan. Lalabanan ba natin o maghahanap ng ibang daan?"
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Massive group approaching. Engage or evacuate?",
+              "TL": "Napakalaking grupo ang papalapit. Lalaban o lilikas?"
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "That's a swarm. Give the order: fight or retreat?",
+              "TL": "Kawan 'yan. Mag-utos ka: laban o urong?"
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Look at that numbers disadvantage. Stand or withdraw?",
+              "TL": "Tingnan mo ang dami nila laban sa atin. Tatayo o aatras?"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.horde_prompt"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/horde.json",
+        "responseTemplateID": "semantic.interaction.scene.horde_prompt",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "That's a lot of them. Stay close—fight or fall back?",
+              "TL": "Ang dami nila. Dumikit ka—lalaban o uurong?"
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Too many for comfort, friend. What's your gut say: fight or run?",
+              "TL": "Masyadong marami para maging panatag, kaibigan. Anong kutob mo: laban o takbo?"
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Stay right next to me. Do we take them together or get out?",
+              "TL": "Manatili ka sa tabi ko. Sabay ba nating lalabanan o aalis tayo?"
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "That swarm is dangerous. I want us alive—fight or retreat?",
+              "TL": "Delikado ang kawang 'yan. Gusto kong mabuhay tayo—laban o urong?"
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "I'm with you whatever you decide. Are we pushing through or retreating?",
+              "TL": "Kasama mo ako kahit anong desisyon mo. Susulong ba tayo o aatras?"
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Careful, partner. That's a massive pack. Call the play.",
+              "TL": "Mag-ingat, kasama. Malaking kawan 'yan. Sabihin mo ang plano."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Look out, friend! Do we clear them or save our strength and run?",
+              "TL": "Mag-ingat, kaibigan! Uubusin ba natin sila o magtitipid ng lakas at tatakbo?"
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "They're everywhere. Stick by me—fight or fall back?",
+              "TL": "Nasa lahat sila ng sulok. Dumikit ka—laban o urong?"
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "I trust your call. Are we taking this swarm on or heading back?",
+              "TL": "Tiwala ako sa pasya mo. Lalabanan ba natin ang kawang ito o babalik?"
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Big herd ahead. Don't worry, we're a team. What's the plan?",
+              "TL": "Malaking kawan sa unahan. Huwag kang mag-alala, magkasama tayo. Anong plano?"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.horde_prompt"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/horde.json",
+        "responseTemplateID": "semantic.interaction.scene.horde_prompt",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Horde. Fight or fall back?",
+              "TL": "Kawan. Laban o urong?"
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Too many. Call it: stand or run?",
+              "TL": "Sobra sila. Magpasya: tayo o takbo?"
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Swarm ahead. Fight or retreat?",
+              "TL": "Kawan sa unahan. Laban o urong?"
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Herd. What's the call?",
+              "TL": "Kawan. Anong desisyon?"
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Massive group. Push or pull?",
+              "TL": "Malaking grupo. Sulong o urong?"
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Numbers are bad. Engage?",
+              "TL": "Masama ang bilang. Lalaban?"
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Horde spotted. Decision now.",
+              "TL": "Kawan nakita. Desisyon ngayon na."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Dozens of them. Stand or flee?",
+              "TL": "Dose-dosena sila. Lalaban o tatakas?"
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Swarm incoming. Your call.",
+              "TL": "Kawan parating. Pasya mo."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Crowd ahead. Fight or back off?",
+              "TL": "Grupo sa harap. Laban o atras?"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.horde_prompt"
+    },
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/horde.json",
+        "responseTemplateID": "semantic.interaction.scene.horde_prompt",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "Big group ahead. We decide now: engage or avoid.",
+              "TL": "Malaking grupo sa harap. Magpasya tayo ngayon: lumaban o umiwas."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "That horde will tear us apart if we hesitate. What's the move?",
+              "TL": "Lalapain tayo ng kawang 'yan kapag nag-atubili tayo. Anong galaw?"
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Bad odds. We fight with discipline or we slip away right now.",
+              "TL": "Masamang tsansa. Lumaban nang may disiplina o tumakas agad ngayon."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "I'm not dying here. Decide: cut through or fall back?",
+              "TL": "Di ako mamamatay dito. Magpasya ka: basagin o umatras?"
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Check the numbers. Engage only if we have choke points.",
+              "TL": "Tingnan mo ang dami. Lumaban lang kung may masisikipang daan."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "Horde is closing in. Make a choice before they surround us.",
+              "TL": "Palapit na ang kawan. Pumili bago nila tayo mapaligiran."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "We can't afford mistakes against that herd. Stand or withdraw?",
+              "TL": "Di tayo pwede magkamali sa kawang 'yan. Lalaban o aatras?"
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Watch the flanks. Do we fight or get the hell out?",
+              "TL": "Bantayan ang tagiliran. Lalaban ba tayo o aalis na agad?"
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "They'll overwhelm an open position. Call it now.",
+              "TL": "Tatalunin nila tayo sa bukas na lugar. Magpasya ka na."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Huge pack. If we fight, nobody breaks formation.",
+              "TL": "Malaking kawan. Kung lalaban, walang sisira sa pormasyon."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.horde_prompt"
+    }
+  ]
+}

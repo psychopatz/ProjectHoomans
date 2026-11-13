@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.combat.reaction.kill_killer_supportive_01",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/combat_kill_killer_supportive.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive_01.json",
     },
     ["semantic.combat.reaction.kill_killer_supportive_02"] = {
         ["domain"] = "combat_kill_killer_supportive",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "semantic.combat.reaction.kill_killer_supportive_02",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/combat_kill_killer_supportive.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive_02.json",
     },
     ["semantic.combat.reaction.kill_killer_supportive_03"] = {
         ["domain"] = "combat_kill_killer_supportive",
@@ -25,6 +25,6 @@ return {
         },
         ["id"] = "semantic.combat.reaction.kill_killer_supportive_03",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/combat_kill_killer_supportive.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_kill_killer_supportive/combat_reaction_kill_killer_supportive_03.json",
     },
 }

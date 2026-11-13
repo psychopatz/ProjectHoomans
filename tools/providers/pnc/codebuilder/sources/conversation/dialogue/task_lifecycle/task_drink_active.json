@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "active",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/drink.json",
+    "responseTemplateID": "semantic.task.drink.active",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Taking a drink now.",
+          "TL": "Umiinom na ako ngayon."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Drinking some water right now.",
+          "TL": "Umiinom ng kaunting tubig ngayon."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Quenching my thirst. Give me a second.",
+          "TL": "Pinapawi ang uhaw. Sandali lang."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Currently having a drink.",
+          "TL": "Kasalukuyang umiinom."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Taking some fluids now.",
+          "TL": "Umiinom na ngayon."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Drinking. Needed this badly.",
+          "TL": "Umiinom. Kailangang-kailangan ko ito."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Getting some water in me.",
+          "TL": "Nagpapasok ng tubig sa katawan."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Taking a quick drink.",
+          "TL": "Umiinom nang mabilisan."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Drinking now. Won't take long.",
+          "TL": "Umiinom na. Di magtatagal."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Having a drink as ordered.",
+          "TL": "Umiinom ayon sa utos."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.task.drink",
+  "schema": "psychopatz.convo-engine.v1"
+}

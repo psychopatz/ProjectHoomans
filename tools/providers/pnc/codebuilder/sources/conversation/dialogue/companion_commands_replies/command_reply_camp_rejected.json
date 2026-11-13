@@ -1,0 +1,96 @@
+{
+  "kind": "dialogue",
+  "id": "camp_rejected",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
+    "responseTemplateID": "semantic.command.reply.camp_rejected"
+  },
+  "response": {
+    "act": "REPLY",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "I can't find a safe room or campfire nearby.",
+          "TL": "Wala akong makitang ligtas na silid o apoy dito."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Not safe enough to camp here.",
+          "TL": "Hindi sapat ang ligtas ng lugar para magkampo rito."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "We need walls or fire before we can camp.",
+          "TL": "Kailangan natin ng pader o apoy bago magkampo."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Too exposed. Find better shelter first.",
+          "TL": "Masyadong bukas. Humanap muna ng mas maayos na silungan."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "I refuse to sleep in the open like this.",
+          "TL": "Ayokong matulog sa bukas na lugar nang ganito."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Can't camp here. It's crawling with danger.",
+          "TL": "Hindi pwedeng magkampo rito. Napakaraming panganib."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Find a secure room before we bed down.",
+          "TL": "Maghanap ng ligtas na kwarto bago tayo matulog."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "No cover, no heat. We can't camp here.",
+          "TL": "Walang silong, walang init. Di tayo pwedeng magkampo rito."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Invalid camping spot. We need real shelter.",
+          "TL": "Maling pwesto para magkampo. Kailangan natin ng tunay na silungan."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "We'd get killed sleeping here. Find a safer building.",
+          "TL": "Mapapatay tayo kapag natulog dito. Humanap ng mas ligtas na bahay."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.command.reply",
+  "schema": "psychopatz.convo-engine.v1"
+}

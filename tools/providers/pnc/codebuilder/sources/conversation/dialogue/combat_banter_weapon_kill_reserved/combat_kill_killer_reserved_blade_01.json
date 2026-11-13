@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "blade_01",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/reserved.json",
+    "responseTemplateID": "semantic.combat.kill.killer.reserved.blade_01",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Cut down.",
+          "TL": "Nahati."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Head severed.",
+          "TL": "Pugot."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Down.",
+          "TL": "Bagsak."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Done.",
+          "TL": "Tapos."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Clear.",
+          "TL": "Malinis."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "Finished.",
+          "TL": "Yari."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Eliminated.",
+          "TL": "Tanggal."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Fell.",
+          "TL": "Bumagsak."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Clean strike.",
+          "TL": "Malinis na tama."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Moving.",
+          "TL": "Lalakad na."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.combat.kill.killer.reserved",
+  "schema": "psychopatz.convo-engine.v1"
+}

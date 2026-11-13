@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/acknowledgement.json",
+        "responseTemplateID": "semantic.social.acknowledged",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "Understood. We'll leave it there.",
+              "TL": "Naiintindihan ko. Tama na iyon."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "I hear you. Don't press it any further.",
+              "TL": "Narinig kita. Huwag mo nang ipagpilitan pa."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Message received. Keep your distance.",
+              "TL": "Nakuha ko. Manatili ka sa puwesto mo."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Got it. Let's stay alert.",
+              "TL": "Naintindihan. Maging alerto tayo."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Understood. No need for more words.",
+              "TL": "Naiintindihan ko. Hindi na kailangan ng salita."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "All right. Watching my back, you watch yours.",
+              "TL": "Sige. Babantayan ko ang likod ko, bantayan mo ang sa 'yo."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Noted. Keep your eyes on the road.",
+              "TL": "Tala ko na. Iwan mo ang paningin mo sa daan."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Heard. Leaving it at that.",
+              "TL": "Narinig ko. Iiwan ko na roon."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "Clear enough. Let's focus on surviving.",
+              "TL": "Malinaw na. Magpokus na lang tayo sa pananatiling buhay."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Fair enough. Step back a bit.",
+              "TL": "Makatwiran. Umatras ka nang kaunti."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.acknowledged"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/acknowledgement.json",
+        "responseTemplateID": "semantic.social.acknowledged",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "All right. Understood.",
+              "TL": "Sige. Naiintindihan ko."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I hear you. Makes sense.",
+              "TL": "Narinig kita. May katuturan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Got it. We can work with that.",
+              "TL": "Nakuha ko. Pwede nating gamitin 'yan."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Message received. Moving forward.",
+              "TL": "Natanggap ang mensahe. Magpapatuloy na."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Sounds fair to me.",
+              "TL": "Mukhang makatwiran para sa akin."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Point taken.",
+              "TL": "Nakuha ko ang punto mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Understood. Let's proceed.",
+              "TL": "Naiintindihan ko. Magpatuloy na tayo."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "All right. We're on the same page.",
+              "TL": "Sige. Pareho tayo ng takbo ng isip."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Fair enough. Good to know.",
+              "TL": "Makatwiran. Mabuting malaman."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Acknowledged. Let's get it done.",
+              "TL": "Kinikilala ko. Tapusin na natin."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.acknowledged"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/acknowledgement.json",
+        "responseTemplateID": "semantic.social.acknowledged",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "All right.",
+              "TL": "Sige."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Understood.",
+              "TL": "Naintindihan."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Heard.",
+              "TL": "Narinig ko."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Got it.",
+              "TL": "Nakuha ko."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Clear.",
+              "TL": "Malinaw."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Right.",
+              "TL": "Tama."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Noted.",
+              "TL": "Tala ko na."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Good.",
+              "TL": "Mabuti."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Done.",
+              "TL": "Tapos."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Agreed.",
+              "TL": "Sang-ayon."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.acknowledged"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/acknowledgement.json",
+        "responseTemplateID": "semantic.social.acknowledged",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "All right. I hear you.",
+              "TL": "Sige. Narinig kita."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Got it, friend. Glad we talked.",
+              "TL": "Nakuha ko, kaibigan. Mabuti at nagkausap tayo."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "I completely understand. Thanks for explaining.",
+              "TL": "Lubos kong nauunawaan. Salamat sa pagpapaliwanag."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Sounds great. Glad we're in this together.",
+              "TL": "Napakaganda. Mabuti at magkasama tayo rito."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Understood. Take care of yourself out there.",
+              "TL": "Naiintindihan ko. Ingatan mo ang sarili mo sa labas."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "I'm with you on that. Good call.",
+              "TL": "Kasama mo ako riyan. Magandang desisyon."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Heard and appreciated. We've got this.",
+              "TL": "Narinig at pinahahalagahan. Kayang-kaya natin ito."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Clear as crystal. Happy to follow your lead.",
+              "TL": "Napakalinaw. Masayang sumunod sa 'yo."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Got it. Always a pleasure working with you.",
+              "TL": "Nakuha ko. Laging masarap kang makatrabaho."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "All right. Let's look out for each other.",
+              "TL": "Sige. Magtulungan tayo sa isa't isa."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.acknowledged"
+    }
+  ]
+}

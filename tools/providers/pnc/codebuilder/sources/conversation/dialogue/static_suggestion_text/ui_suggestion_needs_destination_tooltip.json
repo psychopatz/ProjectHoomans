@@ -1,0 +1,25 @@
+{
+  "id": "tooltip",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.needs_destination.tooltip",
+    "textRows": [
+      {
+        "key": "suggestion.needs_destination.tooltip",
+        "text": {
+          "EN": "Choose a destination first.",
+          "TL": "Pumili muna ng pupuntahan."
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "Choose a destination first.",
+    "TL": "Pumili muna ng pupuntahan."
+  },
+  "namespace": "ui.suggestion.needs_destination",
+  "schema": "psychopatz.convo-engine.v1"
+}

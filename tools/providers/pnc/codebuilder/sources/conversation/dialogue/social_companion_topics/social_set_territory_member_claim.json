@@ -1,0 +1,96 @@
+{
+  "kind": "dialogue",
+  "id": "claim",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "when": {
+    "all": [
+      {
+        "path": "conversation.audience",
+        "op": "eq",
+        "value": "member"
+      },
+      {
+        "path": "scene.baseEstablished",
+        "op": "eq",
+        "value": false
+      }
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:set_territory_member",
+    "category": "projecthoomans:set_territory",
+    "audiences": [
+      "member"
+    ],
+    "priority": 1000,
+    "textTarget": "psdl/social/territory/member/claim",
+    "textDomain": "pnc.psdl.social.territory.member.claim",
+    "textRows": [
+      {
+        "key": "locked.base_established",
+        "text": {
+          "EN": "Our territory is already established.",
+          "TL": "Ang aming teritoryo ay naitatag na."
+        }
+      }
+    ]
+  },
+  "response": {
+    "act": "SET_TERRITORY",
+    "turns": [
+      {
+        "id": "opening",
+        "metadata": {
+          "textKey": "opening"
+        },
+        "text": {
+          "EN": "We have enough people to stop surviving from one night to the next. Pick a place, mark it as ours, and we can start building something that lasts.",
+          "TL": "We have enough people to stop surviving from one night to the next. Pick a place, mark it as ours, and we can simulan gusali something that lasts."
+        },
+        "offers": [
+          {
+            "id": "set_territory",
+            "label": {
+              "EN": "Set Territory",
+              "TL": "Itakda ang Teritoryo"
+            },
+            "utterance": {
+              "EN": "Set Territory",
+              "TL": "Itakda ang Teritoryo"
+            },
+            "frame": {
+              "intent": "REQUEST",
+              "speechAct": "REQUEST",
+              "subject": "TERRITORY",
+              "topic": "territory"
+            },
+            "metadata": {
+              "choiceKey": "choice.set_territory",
+              "responseKey": "response.set_territory",
+              "responseText": {
+                "EN": "Then let us find ground worth defending. I will help turn it into home.",
+                "TL": "Then let us find ground worth defending. I will tulong turn it into home."
+              },
+              "close": true,
+              "effects": [
+                {
+                  "type": "pnc:open_territory_claim"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "namespace": "social.set_territory.member",
+  "schema": "psychopatz.convo-engine.v1"
+}

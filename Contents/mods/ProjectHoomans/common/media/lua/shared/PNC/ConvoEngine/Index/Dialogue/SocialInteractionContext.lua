@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "semantic.interaction.context.clarify.neutral",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/social_interaction_context.json",
+        ["source"] = "adopters/hoomans/dialogue/social_interaction_context/interaction_context_clarify.json",
     },
 }

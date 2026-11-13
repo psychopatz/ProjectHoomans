@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.shaken.blade_head_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "blade_head_01",
             ["sourceId"] = "semantic.combat.kill.killer.shaken.blade_head_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_shaken.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_shaken/combat_kill_killer_shaken_blade_head_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillShaken",
+        ["namespace"] = "semantic.combat.kill.killer.shaken",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_shaken.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_shaken/combat_kill_killer_shaken_blade_head_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.shaken.firearm_low_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "firearm_low_01",
             ["sourceId"] = "semantic.combat.kill.killer.shaken.firearm_low_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_shaken.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_shaken/combat_kill_killer_shaken_firearm_low_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillShaken",
+        ["namespace"] = "semantic.combat.kill.killer.shaken",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_shaken.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_shaken/combat_kill_killer_shaken_firearm_low_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.combat.kill.killer.shaken.unarmed_01",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "unarmed_01",
             ["sourceId"] = "semantic.combat.kill.killer.shaken.unarmed_01",
-            ["sourcePath"] = "psdl/dialogue/combat_banter_weapon_kill_shaken.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_shaken/combat_kill_killer_shaken_unarmed_01.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CombatBanterWeaponKillShaken",
+        ["namespace"] = "semantic.combat.kill.killer.shaken",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/combat_banter_weapon_kill_shaken.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_shaken/combat_kill_killer_shaken_unarmed_01.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

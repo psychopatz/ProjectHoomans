@@ -1,0 +1,89 @@
+{
+  "kind": "dialogue",
+  "id": "neutral",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:ask_about_neutral",
+    "category": "projecthoomans:ask_about",
+    "audience": "neutral",
+    "textTarget": "psdl/social/ask_about/neutral",
+    "textDomain": "pnc.psdl.social.ask_about.neutral"
+  },
+  "response": {
+    "act": "ASK_ABOUT",
+    "turns": [
+      {
+        "id": "opening",
+        "metadata": {
+          "textKey": "opening"
+        },
+        "text": {
+          "EN": "What do you want to know?",
+          "TL": "Ano ang gusto mong malaman?"
+        },
+        "offers": [
+          {
+            "id": "background",
+            "label": {
+              "EN": "What did you do before all this?",
+              "TL": "Ano ang ginawa mo bago ang lahat ng ito?"
+            },
+            "utterance": {
+              "EN": "What did you do before all this?",
+              "TL": "Ano ang ginawa mo bago ang lahat ng ito?"
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "BACKGROUND",
+              "topic": "ask_about"
+            },
+            "metadata": {
+              "choiceKey": "choice.background",
+              "responseKey": "response.background",
+              "responseText": {
+                "EN": "That's a long story. Maybe one worth telling.",
+                "TL": "mahabang kwento yan. Siguro isa na dapat sabihin."
+              }
+            }
+          },
+          {
+            "id": "skills",
+            "label": {
+              "EN": "What are you good at?",
+              "TL": "Ano ang kaya mong gawin?"
+            },
+            "utterance": {
+              "EN": "What are you good at?",
+              "TL": "Ano ang kaya mong gawin?"
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "SKILLS",
+              "topic": "ask_about"
+            },
+            "metadata": {
+              "choiceKey": "choice.skills",
+              "responseKey": "response.skills",
+              "responseText": {
+                "EN": "Enough things to have survived this long.",
+                "TL": "Sapat na ang mga bagay para mabuhay ng ganito katagal."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "namespace": "social.ask_about",
+  "schema": "psychopatz.convo-engine.v1"
+}

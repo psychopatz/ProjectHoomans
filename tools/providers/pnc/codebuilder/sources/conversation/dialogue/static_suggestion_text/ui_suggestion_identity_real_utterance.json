@@ -1,0 +1,25 @@
+{
+  "id": "utterance",
+  "kind": "dialogue",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textKey": "suggestion.identity.real.utterance",
+    "textRows": [
+      {
+        "key": "suggestion.identity.real.utterance",
+        "text": {
+          "EN": "My real name.",
+          "TL": "Tunay kong pangalan."
+        }
+      }
+    ],
+    "textTarget": "UI_PNC_Conversation"
+  },
+  "owner": "ProjectHoomans",
+  "text": {
+    "EN": "My real name.",
+    "TL": "Tunay kong pangalan."
+  },
+  "namespace": "ui.suggestion.identity.real",
+  "schema": "psychopatz.convo-engine.v1"
+}

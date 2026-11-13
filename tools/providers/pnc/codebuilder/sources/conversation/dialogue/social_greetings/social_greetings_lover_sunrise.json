@@ -1,0 +1,103 @@
+{
+  "kind": "dialogue",
+  "id": "sunrise",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "when": {
+    "all": [
+      {
+        "path": "relationship.speakerToAddressee.state",
+        "op": "eq",
+        "value": "Lover"
+      },
+      {
+        "all": [
+          {
+            "path": "world.time.hour",
+            "op": "gte",
+            "value": 6.5
+          },
+          {
+            "path": "world.time.hour",
+            "op": "lt",
+            "value": 12
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:greeting_lover_sunrise",
+    "category": "projecthoomans:greetings",
+    "audience": "special",
+    "priority": 10,
+    "weight": 100,
+    "portraitAnimation": "greeting.wavehi",
+    "textTarget": "psdl/social/greetings/special/lover/sunrise",
+    "textDomain": "pnc.psdl.social.greetings.special.lover.sunrise"
+  },
+  "response": {
+    "act": "GREETING",
+    "variants": [
+      {
+        "id": "greeting.001",
+        "metadata": {
+          "textKey": "greeting.001"
+        },
+        "text": {
+          "EN": "Morning, love. You sleep all right?",
+          "TL": "Umaga, mahal. Matulog ka na okay?"
+        }
+      },
+      {
+        "id": "greeting.002",
+        "metadata": {
+          "textKey": "greeting.002"
+        },
+        "text": {
+          "EN": "There you are. I was starting to miss you.",
+          "TL": "Narito ka pala. Nagsisimula na kitang ma-miss."
+        }
+      },
+      {
+        "id": "greeting.003",
+        "metadata": {
+          "textKey": "greeting.003"
+        },
+        "text": {
+          "EN": "Good morning. Stay close today, okay?",
+          "TL": "Magandang umaga po. Manatiling malapit ngayon, okay?"
+        }
+      },
+      {
+        "id": "greeting.004",
+        "metadata": {
+          "textKey": "greeting.004"
+        },
+        "text": {
+          "EN": "Seeing you first thing still makes this place feel almost normal.",
+          "TL": "Ang una mong makita ay halos normal pa rin ang pakiramdam ng lugar na ito."
+        }
+      },
+      {
+        "id": "greeting.005",
+        "metadata": {
+          "textKey": "greeting.005"
+        },
+        "text": {
+          "EN": "Morning. Whatever happens today, we handle it together.",
+          "TL": "Umaga. Kung ano man ang mangyari ngayon, sabay nating haharapin."
+        }
+      }
+    ]
+  },
+  "namespace": "social.greetings.lover",
+  "schema": "psychopatz.convo-engine.v1"
+}

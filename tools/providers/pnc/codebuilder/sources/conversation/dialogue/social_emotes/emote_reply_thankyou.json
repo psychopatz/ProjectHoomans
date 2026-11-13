@@ -1,0 +1,198 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
+        "responseTemplateID": "semantic.emote.reply.thankyou",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "You're welcome.",
+              "TL": "Walang anuman."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "No problem.",
+              "TL": "Walang problema."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Don't mention it.",
+              "TL": "Huwag mo nang alalahanin."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Glad to help.",
+              "TL": "Masayang tumulong."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Anytime.",
+              "TL": "Kahit kailan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Just doing my part.",
+              "TL": "Ginagawa ko lang ang bahagi ko."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Happy to assist.",
+              "TL": "Mabuti at nakatulong ako."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "No trouble at all.",
+              "TL": "Walang anuman talaga."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "All part of surviving together.",
+              "TL": "Bahagi lang 'yan ng sabay na pamumuhay."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "You'd do the same for me.",
+              "TL": "Gagawin mo rin 'yan para sa akin."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.emote.reply.thankyou"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/reply.json",
+        "responseTemplateID": "semantic.emote.reply.thankyou",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "Anytime. We look after our own.",
+              "TL": "Kahit kailan. Inaalagaan natin ang mga kasama natin."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "You're very welcome, friend.",
+              "TL": "Walang anuman talaga, kaibigan."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Always happy to lend a hand to you.",
+              "TL": "Lagi akong handang tumulong sa 'yo."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Don't worry about it for a second. Glad to be here.",
+              "TL": "Huwag mo nang isipin kahit sandali. Mabuti at narito ako."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "We've got each other's backs. That's what counts.",
+              "TL": "Nagtitinginan tayo sa isa't isa. Iyon ang mahalaga."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "You deserve the help. Don't mention it.",
+              "TL": "Karapat-dapat ka sa tulong. Huwag mo nang banggitin."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Anytime! Seriously, just ask whenever.",
+              "TL": "Kahit kailan! magsabi ka lang kapag may kailangan ka."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "I'm glad I could be there for you.",
+              "TL": "Mabuti at nakatulong ako sa 'yo."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "No need to thank me. That's what partners do.",
+              "TL": "Di mo kailangang magpasalamat. Ganyan talaga ang magkasama."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Happy to help. Always.",
+              "TL": "Masayang tumulong. Palagi."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.emote.reply.thankyou"
+    }
+  ]
+}

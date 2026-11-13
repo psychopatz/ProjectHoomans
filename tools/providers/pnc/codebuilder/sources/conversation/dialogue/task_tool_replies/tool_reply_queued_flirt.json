@@ -1,0 +1,196 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_flirt.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_flirt.json",
+        "responseTemplateID": "semantic.tool_reply.queued_flirt.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I heard you.",
+              "TL": "Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I heard that little remark.",
+              "TL": "Narinig ko ang maikling linyang 'yon."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Caught that.",
+              "TL": "Nahuli ko 'yon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I heard what you whispered.",
+              "TL": "Narinig ko ang ibinulong mo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Message heard.",
+              "TL": "Narinig ang mensahe."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I hear where your head is at.",
+              "TL": "Naririnig ko kung ano ang iniisip mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Got that loud and clear.",
+              "TL": "Nakuha 'yon nang malakas at malinaw."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I heard you just fine.",
+              "TL": "Narinig kita nang maayos."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Heard you. Don't think I missed it.",
+              "TL": "Narinig kita. Huwag mong isiping pinalampas ko."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I caught that flirt.",
+              "TL": "Nakuha ko ang pambobolang 'yon."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_flirt.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_flirt.json",
+        "responseTemplateID": "semantic.tool_reply.queued_flirt.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "You are bold, I will give you that.",
+              "TL": "Matapang ka, aaminin ko iyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "You certainly don't lack nerve.",
+              "TL": "Talagang hindi ka kulang sa lakas ng loob."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Bold move talking like that out here.",
+              "TL": "Matapang na hakbang ang magsalita nang ganyan dito."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "You have plenty of confidence, I'll say that.",
+              "TL": "Marami kang tiwala sa sarili, aaminin ko."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "That's quite a forward thing to say.",
+              "TL": "Medyo mapangahas ang linyang 'yan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "You certainly know how to shoot your shot.",
+              "TL": "Marunong ka talagang sumubok ng diskarte mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Bold words for someone in danger.",
+              "TL": "Matatapang na salita para sa taong nasa panganib."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I admire the guts, if nothing else.",
+              "TL": "Hanga ako sa tapang mo, kahit 'yon man lang."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "You're definitely not shy.",
+              "TL": "Talagang hindi ka mahiyain."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "You like living dangerously, don't you?",
+              "TL": "Gusto mo talagang sumugal sa delikado, 'no?"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.combat.kill.killer.reserved.blade_01",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/combat_banter_weapon_kill_reserved.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_blade_01.json",
     },
     ["semantic.combat.kill.killer.reserved.firearm_01"] = {
         ["domain"] = "combat_banter_weapon_kill_reserved",
@@ -16,6 +16,6 @@ return {
         },
         ["id"] = "semantic.combat.kill.killer.reserved.firearm_01",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/combat_banter_weapon_kill_reserved.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_banter_weapon_kill_reserved/combat_kill_killer_reserved_firearm_01.json",
     },
 }

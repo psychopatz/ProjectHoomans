@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.accept",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "accept",
             ["sourceId"] = "semantic.accept",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/accept.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -77,7 +78,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/accept.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -90,12 +91,13 @@ return {
         ["id"] = "semantic.compliment",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "compliment",
             ["sourceId"] = "semantic.compliment",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[12]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/compliment.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -150,7 +152,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/compliment.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -163,12 +165,13 @@ return {
         ["id"] = "semantic.flow.weather.raining",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "raining",
             ["sourceId"] = "semantic.flow.weather.raining",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/flow_weather_raining.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.flow.weather",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -247,7 +250,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/flow_weather_raining.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -260,12 +263,13 @@ return {
         ["id"] = "semantic.greeting",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "greeting",
             ["sourceId"] = "semantic.greeting",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/greeting.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -335,7 +339,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/greeting.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -348,12 +352,13 @@ return {
         ["id"] = "semantic.offer",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "offer",
             ["sourceId"] = "semantic.offer",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/offer.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -448,7 +453,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/offer.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -461,12 +466,13 @@ return {
         ["id"] = "semantic.question.activity",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "activity",
             ["sourceId"] = "semantic.question.activity",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_activity.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -536,7 +542,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_activity.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -549,12 +555,13 @@ return {
         ["id"] = "semantic.question.backstory.ambiguous",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "ambiguous",
             ["sourceId"] = "semantic.question.backstory.ambiguous",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[22]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_ambiguous.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.backstory",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -594,7 +601,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_ambiguous.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -607,12 +614,13 @@ return {
         ["id"] = "semantic.question.backstory.follow_up.location",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "location",
             ["sourceId"] = "semantic.question.backstory.follow_up.location",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[24]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_follow_up_location.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.backstory.follow_up",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -652,7 +660,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_follow_up_location.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -665,12 +673,13 @@ return {
         ["id"] = "semantic.question.backstory.follow_up.miss",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "miss",
             ["sourceId"] = "semantic.question.backstory.follow_up.miss",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[25]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_follow_up_miss.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.backstory.follow_up",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -710,7 +719,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_follow_up_miss.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -723,12 +732,13 @@ return {
         ["id"] = "semantic.question.backstory.known",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "known",
             ["sourceId"] = "semantic.question.backstory.known",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[20]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.backstory",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -771,7 +781,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -784,12 +794,13 @@ return {
         ["id"] = "semantic.question.backstory.known.education",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "education",
             ["sourceId"] = "semantic.question.backstory.known.education",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[15]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_education.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -832,7 +843,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_education.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -845,12 +856,13 @@ return {
         ["id"] = "semantic.question.backstory.known.family_background",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "family_background",
             ["sourceId"] = "semantic.question.backstory.known.family_background",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[17]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_family_background.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -893,7 +905,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_family_background.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -906,12 +918,13 @@ return {
         ["id"] = "semantic.question.backstory.known.fear",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "fear",
             ["sourceId"] = "semantic.question.backstory.known.fear",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[18]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_fear.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -954,7 +967,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_fear.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -967,12 +980,13 @@ return {
         ["id"] = "semantic.question.backstory.known.former_job",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "former_job",
             ["sourceId"] = "semantic.question.backstory.known.former_job",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[13]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_former_job.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1015,7 +1029,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_former_job.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1028,12 +1042,13 @@ return {
         ["id"] = "semantic.question.backstory.known.hobby",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "hobby",
             ["sourceId"] = "semantic.question.backstory.known.hobby",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[16]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_hobby.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1076,7 +1091,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_hobby.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1089,12 +1104,13 @@ return {
         ["id"] = "semantic.question.backstory.known.hometown",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "hometown",
             ["sourceId"] = "semantic.question.backstory.known.hometown",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[14]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_hometown.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1137,7 +1153,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_hometown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1150,12 +1166,13 @@ return {
         ["id"] = "semantic.question.backstory.known.tragedy",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "tragedy",
             ["sourceId"] = "semantic.question.backstory.known.tragedy",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[19]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_tragedy.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.backstory.known",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1198,7 +1215,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_known_tragedy.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1211,12 +1228,13 @@ return {
         ["id"] = "semantic.question.backstory.refusal",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "refusal",
             ["sourceId"] = "semantic.question.backstory.refusal",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[23]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_refusal.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.backstory",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1256,7 +1274,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_refusal.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1269,12 +1287,13 @@ return {
         ["id"] = "semantic.question.backstory.suspected",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "suspected",
             ["sourceId"] = "semantic.question.backstory.suspected",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[21]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_suspected.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.backstory",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1317,7 +1336,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_backstory_suspected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1330,12 +1349,13 @@ return {
         ["id"] = "semantic.question.identity",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "identity",
             ["sourceId"] = "semantic.question.identity",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_identity.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1432,7 +1452,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_identity.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1445,12 +1465,13 @@ return {
         ["id"] = "semantic.question.needs.proposal",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "proposal",
             ["sourceId"] = "semantic.question.needs.proposal",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_needs_proposal.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.needs",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1542,7 +1563,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_needs_proposal.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1555,12 +1576,13 @@ return {
         ["id"] = "semantic.question.needs.quantity",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "quantity",
             ["sourceId"] = "semantic.question.needs.quantity",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_needs_quantity.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.needs",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1647,7 +1669,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_needs_quantity.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1660,12 +1682,13 @@ return {
         ["id"] = "semantic.question.wellbeing",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "wellbeing",
             ["sourceId"] = "semantic.question.wellbeing",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_wellbeing.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1840,7 +1863,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_wellbeing.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1853,12 +1876,13 @@ return {
         ["id"] = "semantic.question.wellbeing.unknown",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "unknown",
             ["sourceId"] = "semantic.question.wellbeing.unknown",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/question_wellbeing_unknown.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic.question.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1945,7 +1969,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/question_wellbeing_unknown.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1958,12 +1982,13 @@ return {
         ["id"] = "semantic.refuse",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "refuse",
             ["sourceId"] = "semantic.refuse",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/refuse.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2030,7 +2055,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/refuse.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2043,12 +2068,13 @@ return {
         ["id"] = "semantic.thanks",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "thanks",
             ["sourceId"] = "semantic.thanks",
-            ["sourcePath"] = "psdl/dialogue/core_semantic_responses.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/core_semantic_responses/thanks.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
+        ["namespace"] = "semantic",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2118,7 +2144,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/core_semantic_responses.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/core_semantic_responses/thanks.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

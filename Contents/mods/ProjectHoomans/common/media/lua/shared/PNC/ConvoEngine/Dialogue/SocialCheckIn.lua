@@ -5,12 +5,13 @@ return {
         ["id"] = "social.small_talk.member",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "member",
             ["sourceId"] = "social.small_talk.member",
-            ["sourcePath"] = "psdl/dialogue/social_check_in.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_check_in/social_small_talk_member.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCheckIn",
+        ["namespace"] = "social.small_talk",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -191,7 +192,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_check_in.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_check_in/social_small_talk_member.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -204,12 +205,13 @@ return {
         ["id"] = "social.small_talk.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "social.small_talk.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_check_in.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_check_in/social_small_talk.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCheckIn",
+        ["namespace"] = "social.small_talk",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -390,7 +392,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_check_in.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_check_in/social_small_talk.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -403,12 +405,13 @@ return {
         ["id"] = "social.small_talk.special",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "special",
             ["sourceId"] = "social.small_talk.special",
-            ["sourcePath"] = "psdl/dialogue/social_check_in.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_check_in/social_small_talk_special.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCheckIn",
+        ["namespace"] = "social.small_talk",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -589,7 +592,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_check_in.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_check_in/social_small_talk_special.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -602,12 +605,13 @@ return {
         ["id"] = "social.wellbeing.member",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "member",
             ["sourceId"] = "social.wellbeing.member",
-            ["sourcePath"] = "psdl/dialogue/social_check_in.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_check_in/social_wellbeing_member.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCheckIn",
+        ["namespace"] = "social.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -848,7 +852,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_check_in.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_check_in/social_wellbeing_member.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -861,12 +865,13 @@ return {
         ["id"] = "social.wellbeing.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "social.wellbeing.neutral",
-            ["sourcePath"] = "psdl/dialogue/social_check_in.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_check_in/social_wellbeing.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCheckIn",
+        ["namespace"] = "social.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1107,7 +1112,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_check_in.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_check_in/social_wellbeing.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1120,12 +1125,13 @@ return {
         ["id"] = "social.wellbeing.special",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "special",
             ["sourceId"] = "social.wellbeing.special",
-            ["sourcePath"] = "psdl/dialogue/social_check_in.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/social_check_in/social_wellbeing_special.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/SocialCheckIn",
+        ["namespace"] = "social.wellbeing",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1366,7 +1372,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/social_check_in.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/social_check_in/social_wellbeing_special.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

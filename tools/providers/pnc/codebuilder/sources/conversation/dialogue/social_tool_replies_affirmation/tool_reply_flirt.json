@@ -1,0 +1,291 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.flirt.1.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/flirt.json",
+        "responseTemplateID": "semantic.tool_reply.flirt.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Careful. You are making me smile.",
+              "TL": "Dahan-dahan. Napapangiti mo ako."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Watch it. You might actually make me blush.",
+              "TL": "Mag-ingat ka. Baka mamula ako niyan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "You are playing with fire, you know that?",
+              "TL": "Naglalaro ka sa apoy, alam mo ba 'yon?"
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Do not start something you cannot finish.",
+              "TL": "Huwag kang magsimula ng hindi mo kayang tapusin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "You certainly know how to talk.",
+              "TL": "Marunong ka talagang magsalita."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Is that your charm talking or the apocalypse?",
+              "TL": "Diskarte mo ba 'yan o dahil sa katapusan ng mundo?"
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "You are smooth. I will give you that.",
+              "TL": "Malaman kang bumanat, aaminin ko."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Save some of that charm for later.",
+              "TL": "Itabi mo ang ilan sa mga pambobola mo mamaya."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Careful now. People are watching.",
+              "TL": "Dahan-dahan. May mga nakatingin."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "You have a way with words.",
+              "TL": "May galing ka talaga sa pananalita."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.flirt.2.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/flirt.json",
+        "responseTemplateID": "semantic.tool_reply.flirt.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "You always know how to get my attention.",
+              "TL": "Alam mo talaga kung paano kukunin ang pansin ko."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Well, you definitely have my full attention now.",
+              "TL": "Nakuha mo nang buo ang atensyon ko."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "You do that on purpose, do you not?",
+              "TL": "Sinasadya mo 'yan, hindi ba?"
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "You know exactly what you are doing.",
+              "TL": "Alam na alam mo ang ginagawa mo."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I was trying to focus, but you made that hard.",
+              "TL": "Sinisikap kong magpokus, pero pinapahirapan mo ako."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "You caught my ear with that one.",
+              "TL": "Nakuha mo ako sa linyang 'yon."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "You never miss a chance to turn heads, do you?",
+              "TL": "Hindi mo pinapalampas ang pagkakataong magpapansin, 'no?"
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I am listening. What else do you have?",
+              "TL": "Nakikinig ako. Ano pa ang sasabihin mo?"
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "You always manage to pull my focus your way.",
+              "TL": "Lagi mong nahahatak ang tingin ko papunta sa 'yo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "All right, you got my eyes on you.",
+              "TL": "Sige na, nasa sa 'yo na ang tingin ko."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.flirt.3.neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/flirt.json",
+        "responseTemplateID": "semantic.tool_reply.flirt.3",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That is a dangerous thing to say to me.",
+              "TL": "Mapanganib na bagay ang sabihin 'yan sa akin."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "You are taking a big risk talking like that.",
+              "TL": "Malaking sugal ang magsalita ka nang ganyan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Be careful what you wish for.",
+              "TL": "Mag-ingat ka sa mga hinihiling mo."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "You like living on the edge, do not you?",
+              "TL": "Gusto mo talagang sumugal sa delikado, 'no?"
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Do not tease me unless you mean it.",
+              "TL": "Huwag mo akong biruin kung hindi mo kayang panindigan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "That kind of talk gets people into trouble.",
+              "TL": "Ang ganyang salitaan ay nagdadala ng gulo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Bold words for someone within arm's reach.",
+              "TL": "Matapang na salita para sa taong abot-kamay lang."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Keep talking like that and we will see.",
+              "TL": "Ipagpatuloy mo 'yan at tingnan natin."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "You are walking a very thin line.",
+              "TL": "Napakakitid ng nilalakaran mong linya."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Dangerous words. But I like the confidence.",
+              "TL": "Delikadong salita. Pero gusto ko ang lakas ng loob mo."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

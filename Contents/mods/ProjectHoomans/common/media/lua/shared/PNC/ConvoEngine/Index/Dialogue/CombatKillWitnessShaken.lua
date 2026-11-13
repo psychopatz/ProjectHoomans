@@ -7,7 +7,7 @@ return {
         },
         ["id"] = "semantic.combat.reaction.kill_witness_shaken_01",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/combat_kill_witness_shaken.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken_01.json",
     },
     ["semantic.combat.reaction.kill_witness_shaken_02"] = {
         ["domain"] = "combat_kill_witness_shaken",
@@ -16,7 +16,7 @@ return {
         },
         ["id"] = "semantic.combat.reaction.kill_witness_shaken_02",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/combat_kill_witness_shaken.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken_02.json",
     },
     ["semantic.combat.reaction.kill_witness_shaken_03"] = {
         ["domain"] = "combat_kill_witness_shaken",
@@ -25,6 +25,6 @@ return {
         },
         ["id"] = "semantic.combat.reaction.kill_witness_shaken_03",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/combat_kill_witness_shaken.json",
+        ["source"] = "adopters/hoomans/dialogue/combat_kill_witness_shaken/combat_reaction_kill_witness_shaken_03.json",
     },
 }

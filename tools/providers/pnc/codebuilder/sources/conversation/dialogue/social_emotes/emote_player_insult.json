@@ -1,0 +1,48 @@
+{
+  "kind": "dialogue",
+  "id": "neutral",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:core_social_content",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/emotes/emotes_player.json",
+    "responseTemplateID": "semantic.emote.player.insult",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "Back off, {addressee.name}.",
+          "TL": "Lumayo ka, {addressee.name}."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "You're asking for trouble, {addressee.name}.",
+          "TL": "Naghahanap ka ng gulo, {addressee.name}."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Keep your distance, {addressee.name}.",
+          "TL": "Panatilihin ang distansya, {addressee.name}."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.emote.player.insult",
+  "schema": "psychopatz.convo-engine.v1"
+}

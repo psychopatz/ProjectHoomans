@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/grounded_news.json",
+        "responseTemplateID": "semantic.interaction.scene.grounded_news_share",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I heard something worth passing on.",
+              "TL": "May narinig akong mahalagang ipasa sa iyo."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Got an update on what's happening nearby.",
+              "TL": "May balita ako sa mga nangyayari sa paligid."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "There's fresh news from the neighboring zone.",
+              "TL": "May sariwang balita mula sa kalapit na lugar."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I picked up some information you should know about.",
+              "TL": "May nakuha akong impormasyon na dapat mong malaman."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Heads up: I heard a report about conditions outside.",
+              "TL": "Makinig ka: may narinig akong ulat tungkol sa kalagayan sa labas."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Passing along some intelligence I gathered.",
+              "TL": "Ipinapasa ko ang ilang impormasyong nakalap ko."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Here's what I've learned from other travelers.",
+              "TL": "Ito ang nalaman ko mula sa ibang manlalakbay."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "You might want to hear this latest report.",
+              "TL": "Baka gusto mong marinig itong pinakahuling balita."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "I have some verified information to share.",
+              "TL": "May napatunayan akong impormasyon na ibabahagi."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Listen to this news before you head out.",
+              "TL": "Pakinggan mo itong balita bago ka lumabas."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.grounded_news_share"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/grounded_news.json",
+        "responseTemplateID": "semantic.interaction.scene.grounded_news_share",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "I thought you should hear what I learned.",
+              "TL": "Naisip kong dapat mong marinig ang nalaman ko."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Hey friend, I found out something that might help us.",
+              "TL": "Huy kaibigan, may nalaman akong makatutulong sa atin."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "I wanted to make sure you were in the loop on this news.",
+              "TL": "Gusto kong tiyakin na may alam ka sa balitang ito."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Got some good intel to share with you, partner.",
+              "TL": "May magandang balita akong ibabahagi sa 'yo, kasama."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Always looking out for you—listen to what I heard.",
+              "TL": "Lagi kitang iniisip—makinig ka sa narinig ko."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Thought of you as soon as I heard this update.",
+              "TL": "Ikaw agad ang naisip ko nang marinig ko ang balitang ito."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Come here, I have news that might make things easier.",
+              "TL": "Halika rito, may balita ako na magpapagaan ng sitwasyon."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Happy to share this bit of hope with you today.",
+              "TL": "Masayang ibahagi ang kaunting pag-asang ito sa 'yo ngayon."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Listen up, friend. This could keep us safer.",
+              "TL": "Makinig ka, kaibigan. Mas makapagpapanatiling ligtas ito sa atin."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "I wanted you to hear this first from me.",
+              "TL": "Gusto kong sa akin mo unang marinig ito."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.grounded_news_share"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/grounded_news.json",
+        "responseTemplateID": "semantic.interaction.scene.grounded_news_share",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Got some news for you.",
+              "TL": "May balita ako para sa iyo."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "News.",
+              "TL": "Balita."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Listen up.",
+              "TL": "Makinig."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Heard something.",
+              "TL": "May narinig ako."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Intel for you.",
+              "TL": "Impormasyon para sa 'yo."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Update.",
+              "TL": "Ulat."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Here's the word.",
+              "TL": "Ito ang balita."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "New report.",
+              "TL": "Bagong balita."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Check this.",
+              "TL": "Tingnan mo 'to."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Word from outside.",
+              "TL": "Balita mula sa labas."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.grounded_news_share"
+    },
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/interaction/scene/grounded_news.json",
+        "responseTemplateID": "semantic.interaction.scene.grounded_news_share",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "I have something I can confirm.",
+              "TL": "May bagay akong makukumpirma."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "I have verified intel, but keep it quiet.",
+              "TL": "May napatunayan akong impormasyon, pero panatilihing lihim."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Listen close. I don't want everyone overhearing this.",
+              "TL": "Makinig nang mabuti. Ayokong marinig ito ng lahat."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "I'm sharing this with you because you need to know the risks.",
+              "TL": "Ibinabahagi ko ito dahil kailangan mong malaman ang panganib."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "News from the perimeter. Don't go spreading it wildly.",
+              "TL": "Balita mula sa paligid. Huwag mong ikalat kung saan-saan."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "I verified this rumor myself. Take it seriously.",
+              "TL": "Kinumpirma ko ang balitang ito mismo. Seryosohin mo."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Careful who you repeat this to, but here's the situation.",
+              "TL": "Mag-ingat kung kanino mo sasabihin, pero ito ang kalagayan."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "I have confirmed facts about what happened out there.",
+              "TL": "May napatunayan akong katotohanan sa nangyari sa labas."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "Keep your voice low. Here's what I confirmed.",
+              "TL": "Hinaan ang boses mo. Ito ang nakumpirma ko."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Actionable intel. Use it to protect yourself.",
+              "TL": "Magagamit na impormasyon. Gamitin para protektahan ang sarili."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.interaction.scene.grounded_news_share"
+    }
+  ]
+}

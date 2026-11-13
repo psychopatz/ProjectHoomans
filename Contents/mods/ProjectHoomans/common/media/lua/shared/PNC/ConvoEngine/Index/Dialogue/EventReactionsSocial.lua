@@ -7,6 +7,6 @@ return {
         },
         ["id"] = "semantic.social.reaction.default",
         ["kind"] = "dialogue",
-        ["source"] = "psdl/dialogue/event_reactions_social.json",
+        ["source"] = "adopters/hoomans/dialogue/event_reactions_social/social_reaction_default.json",
     },
 }

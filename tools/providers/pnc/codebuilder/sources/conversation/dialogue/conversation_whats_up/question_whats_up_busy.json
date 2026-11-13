@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.conversation",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
+        "responseTemplateID": "semantic.question.whats_up.busy",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "Keeping busy. Don't distract me.",
+              "TL": "Abala ako. Huwag mo akong gambalain."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "I've got work to do. Keep moving.",
+              "TL": "May trabaho pa ako. Magpatuloy ka na."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "Hands are full right now. Leave me to it.",
+              "TL": "Marami akong ginagawa ngayon. Hayaan mo muna ako."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Occupied. Don't crowd my workspace.",
+              "TL": "May ginagawa ako. Huwag kang humarang dito."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "Too much to do to stand around chatting.",
+              "TL": "Masyadong maraming gagawin para tumambay at makipag-usap."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "I'm busy with survival. You should be too.",
+              "TL": "Abala ako sa pagpapatuloy. Dapat ikaw rin."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Focusing on my duties. Step back.",
+              "TL": "Nakatutok ako sa tungkulin ko. Umatras ka."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Work doesn't stop because you want to talk.",
+              "TL": "Hindi hihinto ang trabaho dahil lang gusto mong makipag-usap."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "Busy here. Come back when I'm done.",
+              "TL": "Abala ako rito. Bumalik ka kapag tapos na ako."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Got critical tasks to finish. Don't get in the way.",
+              "TL": "May mahalagang gawain akong tatapusin. Huwag kang humarang."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.whats_up.busy"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.conversation",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
+        "responseTemplateID": "semantic.question.whats_up.busy",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I'm keeping busy and trying to stay useful.",
+              "TL": "Abala ako at sinusubukan kong maging kapaki-pakinabang."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Just working through my checklist for the day.",
+              "TL": "Inaayos ko lang ang mga kailangan kong gawin ngayong araw."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Plenty of chores to keep my mind off the dead.",
+              "TL": "Maraming gawain para hindi maisip ang mga patay."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Taking care of camp business. Always something to fix.",
+              "TL": "Inaasikaso ang mga kailangan sa kampo. Laging may aayusin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Putting in work so we all stay safe.",
+              "TL": "Nagtatrabaho para manatiling ligtas tayong lahat."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Staying occupied. It helps pass the hours.",
+              "TL": "Pinananatiling abala ang sarili. Nakatutulong magpalipas ng oras."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Tending to tasks. What about you?",
+              "TL": "Gumagawa ng mga gawain. Kumusta naman ikaw?"
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Got a few projects on my plate today.",
+              "TL": "May ilang proyekto akong inaasikaso ngayon."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Just getting things organized around here.",
+              "TL": "Inaayos lang ang mga gamit dito."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Keeping my hands moving. Idleness gets people killed.",
+              "TL": "Gumagalaw palagi. Ang kawalan ng gawa ang nagpapahamak sa tao."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.whats_up.busy"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.conversation",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
+        "responseTemplateID": "semantic.question.whats_up.busy",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Keeping busy.",
+              "TL": "Abala ako."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Working.",
+              "TL": "Nagtatrabaho."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Busy.",
+              "TL": "Abala."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Tasks.",
+              "TL": "Mga gawain."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Hands full.",
+              "TL": "Maraming hawak."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Occupied.",
+              "TL": "May ginagawa."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Still on it.",
+              "TL": "Ginagawa pa."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "No slack.",
+              "TL": "Walang tigil."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Chores.",
+              "TL": "Gawain sa kampo."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Getting it done.",
+              "TL": "Tinatapos ito."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.whats_up.busy"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:conversation_content",
+        "contentOwner": "projecthoomans.dialogue_content.conversation",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
+        "responseTemplateID": "semantic.question.whats_up.busy",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "I'm keeping busy and trying to stay useful. There's always something to do.",
+              "TL": "Abala ako at sinusubukan kong maging kapaki-pakinabang. Laging may kailangang gawin."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Working hard so our camp stays strong. Glad you stopped by!",
+              "TL": "Nagsusumikap para sa kampo. Masayang dumaan ka!"
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "Keeping active, but never too busy for a good word with you.",
+              "TL": "Abala man, hindi mawawalan ng oras para kumustahin ka."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Tending to some chores. Nice to take a quick breather with a friend.",
+              "TL": "Gumagawa ng gawain. Masarap magpahinga sandali kasama ang kaibigan."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "Just doing my part for our little community. How are you doing?",
+              "TL": "Ginagawa lang ang parte ko sa komunidad. Kumusta ka naman?"
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "Keeping busy helps keep the worry away. Always good to see you.",
+              "TL": "Nawawala ang kaba kapag may ginagawa. Laging magandang makita ka."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Working away! Let me know if you need any help with your own tasks.",
+              "TL": "Nagtatrabaho lang! Sabihan mo ako kung kailangan mo ng tulong sa gawain mo."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "Plenty of work, but having good folks around makes it easy.",
+              "TL": "Maraming trabaho, pero gumagaan kapag may mabubuting kasama."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Just finishing up a few things. It's lovely seeing you today.",
+              "TL": "Tinatapos lang ang ilang bagay. Masarap kang makita ngayong araw."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Doing what I can to pitch in. Thank you for checking in on me.",
+              "TL": "Tumutulong sa abot ng makakaya. Salamat sa pangangamusta mo."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.question.whats_up.busy"
+    }
+  ]
+}

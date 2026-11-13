@@ -1,0 +1,291 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_generic.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_generic.json",
+        "responseTemplateID": "semantic.tool_reply.order_generic.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "All right.",
+              "TL": "Sige."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Understood.",
+              "TL": "Naintindihan."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Got it.",
+              "TL": "Nakuha ko."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Right.",
+              "TL": "Tama."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Copy that.",
+              "TL": "Kopyado."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "On it.",
+              "TL": "Inaasikaso na."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Will do.",
+              "TL": "Gagawin ko."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Heard.",
+              "TL": "Narinig ko."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Acknowledged.",
+              "TL": "Kinikilala ko."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Sure.",
+              "TL": "Sige ba."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_generic.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_generic.json",
+        "responseTemplateID": "semantic.tool_reply.order_generic.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Understood.",
+              "TL": "Naiintindihan ko."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Order received loud and clear.",
+              "TL": "Natanggap ang utos nang malakas at malinaw."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Understood. Moving on that now.",
+              "TL": "Naintindihan. Kikilos na roon ngayon."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Clear as crystal. Executing.",
+              "TL": "Kasing-linaw ng kristal. Isasakatuparan."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Message understood.",
+              "TL": "Naiintindihan ang mensahe."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Understood. I will comply.",
+              "TL": "Naintindihan. Susunod ako."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Orders clear. Starting now.",
+              "TL": "Malinaw ang mga utos. Simulan na ngayon."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Understood. No problem.",
+              "TL": "Naiintindihan ko. Walang problema."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Clear. On my way to do it.",
+              "TL": "Malinaw. Papunta na para gawin."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Understood completely.",
+              "TL": "Lubos na naiintindihan."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.order_generic.3",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/order_generic.json",
+        "responseTemplateID": "semantic.tool_reply.order_generic.3",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I will handle it.",
+              "TL": "Ako na ang bahala."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Consider it done.",
+              "TL": "Ituring mo nang tapos na."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "I'll take care of this.",
+              "TL": "Aasikasuhin ko ito."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "Leave it to me.",
+              "TL": "Ipaubaya mo sa akin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I'm on the job.",
+              "TL": "Nasa trabaho na ako."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I'll see to it right away.",
+              "TL": "Titiyakin kong magagawa agad."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Handling that now.",
+              "TL": "Hinahawakan na 'yan ngayon."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I've got this covered.",
+              "TL": "Hawak ko na ito."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Taking care of business.",
+              "TL": "Inaasikaso ang kailangan."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I'll get it sorted out.",
+              "TL": "Aayusin ko iyan."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

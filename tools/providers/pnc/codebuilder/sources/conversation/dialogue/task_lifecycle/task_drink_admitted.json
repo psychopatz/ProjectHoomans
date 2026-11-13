@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "admitted",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/drink.json",
+    "responseTemplateID": "semantic.task.drink.admitted",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "I'll have a drink.",
+          "TL": "Iinom ako."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "Understood. Getting some water.",
+          "TL": "Naintindihan. Kukuha ng tubig."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "I could use some water. Drinking now.",
+          "TL": "Kailangan ko nga ng tubig. Iinom na."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "All right, I'll hydrate.",
+          "TL": "Sige, magpapatubig ako."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Good call. I was getting thirsty.",
+          "TL": "Magandang paalala. Nauuhaw na nga ako."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "I'll take a drink from my supply.",
+          "TL": "Iinom ako mula sa baon ko."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "Understood. Hydrating immediately.",
+          "TL": "Naiintindihan ko. Iinom agad."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Right. Taking a sip.",
+          "TL": "Sige. Iinom nang kaunti."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "I'll drink that now.",
+          "TL": "Iinumin ko na iyan ngayon."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Sounds good. Drinking.",
+          "TL": "Maganda 'yan. Iinom na."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.task.drink",
+  "schema": "psychopatz.convo-engine.v1"
+}

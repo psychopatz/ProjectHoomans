@@ -1,0 +1,97 @@
+{
+  "kind": "dialogue",
+  "id": "neutral",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:conversation_content",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
+    "responseTemplateID": "semantic.flow.greeting.followup.default",
+    "style": "neutral"
+  },
+  "response": {
+    "act": "REACT",
+    "variants": [
+      {
+        "id": "neutral.01",
+        "text": {
+          "EN": "You're welcome. Take care.",
+          "TL": "Walang anuman. Mag-iingat ka."
+        }
+      },
+      {
+        "id": "neutral.02",
+        "text": {
+          "EN": "No trouble. Stay safe.",
+          "TL": "Walang problema. Manatiling ligtas."
+        }
+      },
+      {
+        "id": "neutral.03",
+        "text": {
+          "EN": "Anytime. Watch your back out there.",
+          "TL": "Kahit kailan. Mag-ingat ka sa labas."
+        }
+      },
+      {
+        "id": "neutral.04",
+        "text": {
+          "EN": "Don't mention it. See you around.",
+          "TL": "Wala 'yon. Magkikita pa tayo."
+        }
+      },
+      {
+        "id": "neutral.05",
+        "text": {
+          "EN": "Glad to help. Take it easy.",
+          "TL": "Masayang nakatulong. Dahan-dahan lang."
+        }
+      },
+      {
+        "id": "neutral.06",
+        "text": {
+          "EN": "All right. Stay alert today.",
+          "TL": "Sige. Maging alerto ka ngayon."
+        }
+      },
+      {
+        "id": "neutral.07",
+        "text": {
+          "EN": "No problem at all. Be careful.",
+          "TL": "Walang anuman talaga. Mag-ingat ka."
+        }
+      },
+      {
+        "id": "neutral.08",
+        "text": {
+          "EN": "Sure thing. Keep your eyes open.",
+          "TL": "Oo naman. Buksan mo ang mga mata mo."
+        }
+      },
+      {
+        "id": "neutral.09",
+        "text": {
+          "EN": "Take care of yourself out there.",
+          "TL": "Alagaan mo ang sarili mo sa labas."
+        }
+      },
+      {
+        "id": "neutral.10",
+        "text": {
+          "EN": "Until next time. Stay safe.",
+          "TL": "Hanggang sa muli. Manatiling ligtas."
+        }
+      }
+    ]
+  },
+  "namespace": "semantic.flow.greeting.followup.default",
+  "schema": "psychopatz.convo-engine.v1"
+}

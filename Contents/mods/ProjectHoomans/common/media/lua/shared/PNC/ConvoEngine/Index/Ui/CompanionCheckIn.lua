@@ -10,7 +10,7 @@ return {
         },
         ["id"] = "question.gossip",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/companion_check_in.json",
+        ["source"] = "adopters/hoomans/dialogue/companion_check_in/social_companion_check_in.json",
     },
     ["question.health"] = {
         ["dependents"] = {
@@ -22,7 +22,7 @@ return {
         },
         ["id"] = "question.health",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/companion_check_in.json",
+        ["source"] = "adopters/hoomans/dialogue/companion_check_in/social_companion_check_in.json",
     },
     ["question.needs"] = {
         ["dependents"] = {
@@ -34,6 +34,6 @@ return {
         },
         ["id"] = "question.needs",
         ["kind"] = "ui",
-        ["source"] = "psdl/dialogue/companion_check_in.json",
+        ["source"] = "adopters/hoomans/dialogue/companion_check_in/social_companion_check_in.json",
     },
 }

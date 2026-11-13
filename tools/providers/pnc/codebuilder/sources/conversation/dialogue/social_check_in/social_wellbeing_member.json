@@ -1,0 +1,131 @@
+{
+  "kind": "dialogue",
+  "id": "member",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:wellbeing_member",
+    "category": "projecthoomans:wellbeing",
+    "audience": "member",
+    "textTarget": "psdl/social/wellbeing/member",
+    "textDomain": "pnc.psdl.social.wellbeing.member"
+  },
+  "response": {
+    "act": "CHECK_IN",
+    "turns": [
+      {
+        "id": "opening",
+        "metadata": {
+          "textKey": "opening"
+        },
+        "text": {
+          "EN": "Still standing. Go ahead.",
+          "TL": "Nakatayo pa rin. Sige na."
+        },
+        "offers": [
+          {
+            "id": "condition",
+            "label": {
+              "EN": "How are you holding up?",
+              "TL": "Kamusta ka na?"
+            },
+            "utterance": {
+              "EN": "How are you holding up?",
+              "TL": "Kamusta ka na?"
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "WELLBEING",
+              "topic": "wellbeing"
+            },
+            "when": {
+              "all": [
+                {
+                  "path": "relationship.speakerToAddressee.approval",
+                  "op": ">=",
+                  "value": 1
+                },
+                {
+                  "path": "relationship.speakerToAddressee.familiarity",
+                  "op": ">=",
+                  "value": 1
+                }
+              ]
+            },
+            "metadata": {
+              "choiceKey": "choice.condition",
+              "responseKey": "response.condition",
+              "effects": [
+                {
+                  "type": "pnc:relationship",
+                  "approval": 1,
+                  "familiarity": 1
+                }
+              ],
+              "responseText": {
+                "EN": "Tired, but ready if the group needs me.",
+                "TL": "Tired, but ready if the grupo needs me."
+              }
+            }
+          },
+          {
+            "id": "offer_help",
+            "label": {
+              "EN": "Do you need any help?",
+              "TL": "Kailangan mo ba ng anumang tulong?"
+            },
+            "utterance": {
+              "EN": "Do you need any help?",
+              "TL": "Kailangan mo ba ng anumang tulong?"
+            },
+            "frame": {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "HELP",
+              "topic": "wellbeing"
+            },
+            "when": {
+              "all": [
+                {
+                  "path": "relationship.speakerToAddressee.approval",
+                  "op": ">=",
+                  "value": 2
+                },
+                {
+                  "path": "relationship.speakerToAddressee.respect",
+                  "op": ">=",
+                  "value": 1
+                }
+              ]
+            },
+            "metadata": {
+              "choiceKey": "choice.offer_help",
+              "responseKey": "response.offer_help",
+              "effects": [
+                {
+                  "type": "pnc:relationship",
+                  "approval": 2,
+                  "respect": 1
+                }
+              ],
+              "responseText": {
+                "EN": "A little rest would help. I appreciate you asking.",
+                "TL": "Makakatulong ang kaunting pahinga. Pinahahalagahan ko ang pagtatanong mo."
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "namespace": "social.wellbeing",
+  "schema": "psychopatz.convo-engine.v1"
+}

@@ -1,0 +1,390 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+        "responseTemplateID": "semantic.social.hostile_boundary",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "text": {
+              "EN": "Don't talk to me like that.",
+              "TL": "Huwag mo akong kausapin nang ganyan."
+            }
+          },
+          {
+            "id": "guarded.02",
+            "text": {
+              "EN": "Check yourself before you speak to me again.",
+              "TL": "Pagsabihan mo ang sarili mo bago ka makipag-usap sa 'kin ulit."
+            }
+          },
+          {
+            "id": "guarded.03",
+            "text": {
+              "EN": "You're stepping way out of line.",
+              "TL": "Sumusobra ka na sa linya."
+            }
+          },
+          {
+            "id": "guarded.04",
+            "text": {
+              "EN": "Mind your mouth around me.",
+              "TL": "Bantayan mo ang bibig mo sa harap ko."
+            }
+          },
+          {
+            "id": "guarded.05",
+            "text": {
+              "EN": "I don't take disrespect from anyone.",
+              "TL": "Hindi ako pumapayag na bastusin ng kahit sino."
+            }
+          },
+          {
+            "id": "guarded.06",
+            "text": {
+              "EN": "You cross that boundary again and see what happens.",
+              "TL": "Tawirin mo ulit ang hangganang 'yan at tingnan natin."
+            }
+          },
+          {
+            "id": "guarded.07",
+            "text": {
+              "EN": "Watch how you address me.",
+              "TL": "Bantayan mo kung paano mo ako kausapin."
+            }
+          },
+          {
+            "id": "guarded.08",
+            "text": {
+              "EN": "Keep your tone in check.",
+              "TL": "Ayusin mo ang tono mo."
+            }
+          },
+          {
+            "id": "guarded.09",
+            "text": {
+              "EN": "You are playing with a short fuse.",
+              "TL": "Naglalaro ka sa maikling mitsa."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "text": {
+              "EN": "Back off that attitude.",
+              "TL": "Alisin mo ang ganyang ugali."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.hostile_boundary"
+    },
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+        "responseTemplateID": "semantic.social.hostile_boundary",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "That tone isn't acceptable.",
+              "TL": "Hindi katanggap-tanggap ang ganyang tono."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "Speak to me with respect or don't speak to me at all.",
+              "TL": "Kausapin mo ako nang may galang o huwag na lang."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "We need to keep this professional and decent.",
+              "TL": "Kailangan nating panatilihing maayos at magalang ito."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "There's no call for hostility here.",
+              "TL": "Walang dahilan para maging marahas dito."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "I won't be spoken to that way.",
+              "TL": "Hindi ako papayag na ganyanin ang pananalita sa akin."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Keep your hostility out of this conversation.",
+              "TL": "Alisin mo ang galit sa usapang ito."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "We have boundaries here. Respect them.",
+              "TL": "May mga hangganan tayo rito. Igalang mo ang mga 'yon."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "That kind of talk isn't going to get you anywhere.",
+              "TL": "Walang patutunguhan ang ganyang pananalita."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Lower your voice and adjust your attitude.",
+              "TL": "Hinaan mo ang boses mo at ayusin ang asal mo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "I expect basic decency from the people around me.",
+              "TL": "Umaasa ako sa simpleng respeto mula sa mga kasama ko."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.hostile_boundary"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+        "responseTemplateID": "semantic.social.hostile_boundary",
+        "style": "terse"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "terse.01",
+            "text": {
+              "EN": "Watch it.",
+              "TL": "Mag-ingat ka."
+            }
+          },
+          {
+            "id": "terse.02",
+            "text": {
+              "EN": "Out of line.",
+              "TL": "Sobra na."
+            }
+          },
+          {
+            "id": "terse.03",
+            "text": {
+              "EN": "Stop.",
+              "TL": "Tigil."
+            }
+          },
+          {
+            "id": "terse.04",
+            "text": {
+              "EN": "Tone it down.",
+              "TL": "Hinaan mo."
+            }
+          },
+          {
+            "id": "terse.05",
+            "text": {
+              "EN": "Respect.",
+              "TL": "Respeto."
+            }
+          },
+          {
+            "id": "terse.06",
+            "text": {
+              "EN": "Check yourself.",
+              "TL": "Ayusin mo sarili mo."
+            }
+          },
+          {
+            "id": "terse.07",
+            "text": {
+              "EN": "Enough.",
+              "TL": "Sapat na."
+            }
+          },
+          {
+            "id": "terse.08",
+            "text": {
+              "EN": "Not with me.",
+              "TL": "Huwag sa akin."
+            }
+          },
+          {
+            "id": "terse.09",
+            "text": {
+              "EN": "Line crossed.",
+              "TL": "Lumagpas ka na."
+            }
+          },
+          {
+            "id": "terse.10",
+            "text": {
+              "EN": "Back off.",
+              "TL": "Umatras ka."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.hostile_boundary"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:core_social_content",
+        "contentOwner": "projecthoomans.dialogue_content.social",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+        "responseTemplateID": "semantic.social.hostile_boundary",
+        "style": "warm"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "warm.01",
+            "text": {
+              "EN": "Hey, where is this hostility coming from? We're allies.",
+              "TL": "Huy, saan nanggagaling ang galit na 'yan? Magkakampi tayo."
+            }
+          },
+          {
+            "id": "warm.02",
+            "text": {
+              "EN": "Don't snap at me like that. I've only ever helped you.",
+              "TL": "Huwag mo akong sigawan nang ganyan. Tumulong lang ako sa 'yo."
+            }
+          },
+          {
+            "id": "warm.03",
+            "text": {
+              "EN": "I care about you, but that doesn't mean you can disrespect me.",
+              "TL": "Nagmamalasakit ako sa 'yo, pero di ibig sabihing pwede mo akong bastusin."
+            }
+          },
+          {
+            "id": "warm.04",
+            "text": {
+              "EN": "Please, let's treat each other better than this.",
+              "TL": "Pakiusap, magtrato tayo nang mas maayos kaysa rito."
+            }
+          },
+          {
+            "id": "warm.05",
+            "text": {
+              "EN": "That hurt, coming from you. Let's dial it back.",
+              "TL": "Masakit marinig galing sa 'yo. Bawiin mo 'yan."
+            }
+          },
+          {
+            "id": "warm.06",
+            "text": {
+              "EN": "We've got enough enemies out there without turning on each other.",
+              "TL": "Marami na tayong kaaway sa labas, huwag na tayong mag-away."
+            }
+          },
+          {
+            "id": "warm.07",
+            "text": {
+              "EN": "Take a breath. I'm not your enemy.",
+              "TL": "Huminga ka muna. Hindi mo ako kalaban."
+            }
+          },
+          {
+            "id": "warm.08",
+            "text": {
+              "EN": "I don't deserve that kind of anger from you.",
+              "TL": "Hindi ako karapat-dapat sa ganyang galit mo."
+            }
+          },
+          {
+            "id": "warm.09",
+            "text": {
+              "EN": "Let's remember who we are to each other.",
+              "TL": "Tandaan natin kung sino tayo sa isa't isa."
+            }
+          },
+          {
+            "id": "warm.10",
+            "text": {
+              "EN": "Don't burn this bridge over a bad temper.",
+              "TL": "Huwag mong sirain ang samahan natin dahil sa init ng ulo."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.hostile_boundary"
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "kind": "dialogue",
+  "id": "dawn",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "when": {
+    "all": [
+      {
+        "path": "relationship.speakerToAddressee.state",
+        "op": "eq",
+        "value": "Lover"
+      },
+      {
+        "all": [
+          {
+            "path": "world.time.hour",
+            "op": "gte",
+            "value": 5
+          },
+          {
+            "path": "world.time.hour",
+            "op": "lt",
+            "value": 6.5
+          }
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "runtimeBlockID": "projecthoomans:greeting_lover_dawn",
+    "category": "projecthoomans:greetings",
+    "audience": "special",
+    "priority": 10,
+    "weight": 100,
+    "portraitAnimation": "greeting.wavehi",
+    "textTarget": "psdl/social/greetings/special/lover/dawn",
+    "textDomain": "pnc.psdl.social.greetings.special.lover.dawn"
+  },
+  "response": {
+    "act": "GREETING",
+    "variants": [
+      {
+        "id": "greeting.001",
+        "metadata": {
+          "textKey": "greeting.001"
+        },
+        "text": {
+          "EN": "You're awake already. I was hoping you'd sleep a little longer.",
+          "TL": "You're awake already. I was hoping you'd tulog a little longer."
+        }
+      },
+      {
+        "id": "greeting.002",
+        "metadata": {
+          "textKey": "greeting.002"
+        },
+        "text": {
+          "EN": "Morning, love. Come here before the day starts.",
+          "TL": "Umaga, mahal. Halika dito bago magsimula ang araw."
+        }
+      },
+      {
+        "id": "greeting.003",
+        "metadata": {
+          "textKey": "greeting.003"
+        },
+        "text": {
+          "EN": "I missed you, and you were only asleep.",
+          "TL": "Namiss kita, tulog ka lang."
+        }
+      },
+      {
+        "id": "greeting.004",
+        "metadata": {
+          "textKey": "greeting.004"
+        },
+        "text": {
+          "EN": "First light looks better with you here.",
+          "TL": "Mas maganda ang unang liwanag kapag kasama ka rito."
+        }
+      },
+      {
+        "id": "greeting.005",
+        "metadata": {
+          "textKey": "greeting.005"
+        },
+        "text": {
+          "EN": "Couldn't sleep without checking on everyone, could you?",
+          "TL": "Hindi makatulog nang hindi sinusuri ang lahat, hindi ba?"
+        }
+      }
+    ]
+  },
+  "namespace": "social.greetings.lover",
+  "schema": "psychopatz.convo-engine.v1"
+}

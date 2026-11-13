@@ -1,0 +1,546 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "neutral",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.default",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.default.neutral.01"
+            },
+            "text": {
+              "EN": "What are you apologizing for?",
+              "TL": "Ano ang hinihingi mo ng tawad?"
+            }
+          },
+          {
+            "id": "neutral.02",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.default.neutral.02"
+            },
+            "text": {
+              "EN": "What is that for?",
+              "TL": "Para saan iyan?"
+            }
+          },
+          {
+            "id": "neutral.03",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.default.neutral.03"
+            },
+            "text": {
+              "EN": "Why are you saying sorry?",
+              "TL": "Bakit ka humihingi ng pasensya?"
+            }
+          },
+          {
+            "id": "neutral.04",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.default.neutral.04"
+            },
+            "text": {
+              "EN": "What did you do?",
+              "TL": "Anong ginawa mo?"
+            }
+          },
+          {
+            "id": "neutral.05",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.default.neutral.05"
+            },
+            "text": {
+              "EN": "Did something happen that I missed?",
+              "TL": "May nangyari ba na hindi ko napansin?"
+            }
+          },
+          {
+            "id": "neutral.06",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.default.neutral.06"
+            },
+            "text": {
+              "EN": "No need to apologize unless something went wrong.",
+              "TL": "Walang kailangang ihingi ng tawad maliban kung may nagkamali."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.default.neutral.07"
+            },
+            "text": {
+              "EN": "What's the apology about?",
+              "TL": "Tungkol saan ang paumanhin?"
+            }
+          },
+          {
+            "id": "neutral.08",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.default.neutral.08"
+            },
+            "text": {
+              "EN": "You don't owe me an apology unless you broke something.",
+              "TL": "Wala kang utang na tawad sa 'kin maliban kung may nasira ka."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.default.neutral.09"
+            },
+            "text": {
+              "EN": "Hold on, what are you apologizing for?",
+              "TL": "Teka, para saan ang tawad mo?"
+            }
+          },
+          {
+            "id": "neutral.10",
+            "metadata": {
+              "style": "neutral",
+              "textKey": "semantic.social.apology.default.neutral.10"
+            },
+            "text": {
+              "EN": "What brought this on?",
+              "TL": "Bakit mo biglang sinabi 'yan?"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.default"
+    },
+    {
+      "kind": "dialogue",
+      "id": "warm",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.default",
+        "style": "warm"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "warm.01",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.default.warm.01"
+            },
+            "text": {
+              "EN": "What are you apologizing for?",
+              "TL": "Ano ang hinihingi mo ng tawad?"
+            }
+          },
+          {
+            "id": "warm.02",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.default.warm.02"
+            },
+            "text": {
+              "EN": "Hey, you don't have to apologize to me.",
+              "TL": "Huy, hindi mo kailangang humingi ng tawad sa akin."
+            }
+          },
+          {
+            "id": "warm.03",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.default.warm.03"
+            },
+            "text": {
+              "EN": "What's this for? We're good.",
+              "TL": "Para saan ito? Ayos tayo."
+            }
+          },
+          {
+            "id": "warm.04",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.default.warm.04"
+            },
+            "text": {
+              "EN": "Don't sweat it. What's on your mind?",
+              "TL": "Huwag mong alalahanin. Anong iniisip mo?"
+            }
+          },
+          {
+            "id": "warm.05",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.default.warm.05"
+            },
+            "text": {
+              "EN": "You didn't do anything wrong. What happened?",
+              "TL": "Wala kang ginawang mali. Anong nangyari?"
+            }
+          },
+          {
+            "id": "warm.06",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.default.warm.06"
+            },
+            "text": {
+              "EN": "You don't need to apologize. We look out for each other.",
+              "TL": "Di mo kailangang magpaumanhin. Nagtutulungan tayo rito."
+            }
+          },
+          {
+            "id": "warm.07",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.default.warm.07"
+            },
+            "text": {
+              "EN": "Why the apology? Everything is okay between us.",
+              "TL": "Bakit ka nagpapaumanhin? Maayos ang lahat sa atin."
+            }
+          },
+          {
+            "id": "warm.08",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.default.warm.08"
+            },
+            "text": {
+              "EN": "You're too hard on yourself. What's wrong?",
+              "TL": "Masyado mong pinahihirapan ang sarili mo. May problema ba?"
+            }
+          },
+          {
+            "id": "warm.09",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.default.warm.09"
+            },
+            "text": {
+              "EN": "No need for apologies here. We're on the same side.",
+              "TL": "Walang kailangang tawad dito. Magkakampi tayo."
+            }
+          },
+          {
+            "id": "warm.10",
+            "metadata": {
+              "style": "warm",
+              "textKey": "semantic.social.apology.default.warm.10"
+            },
+            "text": {
+              "EN": "It's all right. You really don't have to apologize.",
+              "TL": "Ayos lang talaga. Hindi mo kailangang mag-sorry."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.default"
+    },
+    {
+      "kind": "dialogue",
+      "id": "terse",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.default",
+        "style": "terse"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "terse.01",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.default.terse.01"
+            },
+            "text": {
+              "EN": "What are you apologizing for?",
+              "TL": "Ano ang hinihingi mo ng tawad?"
+            }
+          },
+          {
+            "id": "terse.02",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.default.terse.02"
+            },
+            "text": {
+              "EN": "Why?",
+              "TL": "Bakit?"
+            }
+          },
+          {
+            "id": "terse.03",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.default.terse.03"
+            },
+            "text": {
+              "EN": "For what?",
+              "TL": "Dahil saan?"
+            }
+          },
+          {
+            "id": "terse.04",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.default.terse.04"
+            },
+            "text": {
+              "EN": "What did you break?",
+              "TL": "Anong sinira mo?"
+            }
+          },
+          {
+            "id": "terse.05",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.default.terse.05"
+            },
+            "text": {
+              "EN": "Explain.",
+              "TL": "Ipaliwanag mo."
+            }
+          },
+          {
+            "id": "terse.06",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.default.terse.06"
+            },
+            "text": {
+              "EN": "What happened?",
+              "TL": "Anong nangyari?"
+            }
+          },
+          {
+            "id": "terse.07",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.default.terse.07"
+            },
+            "text": {
+              "EN": "Apologizing for what?",
+              "TL": "Hihingi ng tawad para saan?"
+            }
+          },
+          {
+            "id": "terse.08",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.default.terse.08"
+            },
+            "text": {
+              "EN": "Spit it out.",
+              "TL": "Diretsuhin mo na."
+            }
+          },
+          {
+            "id": "terse.09",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.default.terse.09"
+            },
+            "text": {
+              "EN": "Why are you sorry?",
+              "TL": "Bakit ka nagso-sorry?"
+            }
+          },
+          {
+            "id": "terse.10",
+            "metadata": {
+              "style": "terse",
+              "textKey": "semantic.social.apology.default.terse.10"
+            },
+            "text": {
+              "EN": "What did you do now?",
+              "TL": "Anong ginawa mo ngayon?"
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.default"
+    },
+    {
+      "kind": "dialogue",
+      "id": "guarded",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:social.apology",
+        "sourceSurface": "content/social_apology.json",
+        "responseTemplateID": "semantic.social.apology.default",
+        "style": "guarded"
+      },
+      "response": {
+        "act": "APOLOGY_RESPONSE",
+        "variants": [
+          {
+            "id": "guarded.01",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.default.guarded.01"
+            },
+            "text": {
+              "EN": "What are you apologizing for?",
+              "TL": "Ano ang hinihingi mo ng tawad?"
+            }
+          },
+          {
+            "id": "guarded.02",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.default.guarded.02"
+            },
+            "text": {
+              "EN": "Why are you apologizing? What happened?",
+              "TL": "Bakit ka nagpapaumanhin? Anong nangyari?"
+            }
+          },
+          {
+            "id": "guarded.03",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.default.guarded.03"
+            },
+            "text": {
+              "EN": "What went wrong that I should know about?",
+              "TL": "Anong pumalpak na dapat kong malaman?"
+            }
+          },
+          {
+            "id": "guarded.04",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.default.guarded.04"
+            },
+            "text": {
+              "EN": "People only apologize when they messed up. What was it?",
+              "TL": "Nagsasabi lang ng sorry ang tao kapag pumalpak. Ano 'yon?"
+            }
+          },
+          {
+            "id": "guarded.05",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.default.guarded.05"
+            },
+            "text": {
+              "EN": "What are you trying to get ahead of?",
+              "TL": "Ano ang inuunahan mong sabihin?"
+            }
+          },
+          {
+            "id": "guarded.06",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.default.guarded.06"
+            },
+            "text": {
+              "EN": "Did you touch something you shouldn't have?",
+              "TL": "May ginalaw ka ba na hindi dapat?"
+            }
+          },
+          {
+            "id": "guarded.07",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.default.guarded.07"
+            },
+            "text": {
+              "EN": "Hold on. Why are you saying sorry to me?",
+              "TL": "Teka. Bakit ka humihingi ng tawad sa akin?"
+            }
+          },
+          {
+            "id": "guarded.08",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.default.guarded.08"
+            },
+            "text": {
+              "EN": "What's the damage?",
+              "TL": "Gaano kalaki ang sira?"
+            }
+          },
+          {
+            "id": "guarded.09",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.default.guarded.09"
+            },
+            "text": {
+              "EN": "Tell me what you did before I find out myself.",
+              "TL": "Sabihin mo ang ginawa mo bago ko pa matuklasan."
+            }
+          },
+          {
+            "id": "guarded.10",
+            "metadata": {
+              "style": "guarded",
+              "textKey": "semantic.social.apology.default.guarded.10"
+            },
+            "text": {
+              "EN": "Don't apologize until you tell me what you did.",
+              "TL": "Huwag kang mag-sorry hangga't di mo sinasabi ang ginawa mo."
+            }
+          }
+        ]
+      },
+      "namespace": "semantic.social.apology.default"
+    }
+  ]
+}

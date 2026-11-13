@@ -5,12 +5,13 @@ return {
         ["id"] = "semantic.quest.clinic_supplies.accept.failed.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.quest.clinic_supplies.accept.failed.neutral",
-            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[0]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept_failed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["namespace"] = "semantic.quest.clinic_supplies.accept.failed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -148,7 +149,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -161,12 +162,13 @@ return {
         ["id"] = "semantic.quest.clinic_supplies.accept.queued.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.quest.clinic_supplies.accept.queued.neutral",
-            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[1]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept_queued.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["namespace"] = "semantic.quest.clinic_supplies.accept.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -304,7 +306,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -317,12 +319,13 @@ return {
         ["id"] = "semantic.quest.clinic_supplies.accept.rejected.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.quest.clinic_supplies.accept.rejected.neutral",
-            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[2]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept_rejected.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["namespace"] = "semantic.quest.clinic_supplies.accept.rejected",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -460,7 +463,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_accept_rejected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -473,12 +476,13 @@ return {
         ["id"] = "semantic.quest.clinic_supplies.offer.failed.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.quest.clinic_supplies.offer.failed.neutral",
-            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[3]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_offer_failed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["namespace"] = "semantic.quest.clinic_supplies.offer.failed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -616,7 +620,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_offer_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -629,12 +633,13 @@ return {
         ["id"] = "semantic.quest.clinic_supplies.offer.queued.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.quest.clinic_supplies.offer.queued.neutral",
-            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[4]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_offer_queued.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["namespace"] = "semantic.quest.clinic_supplies.offer.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -772,7 +777,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_offer_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -785,12 +790,13 @@ return {
         ["id"] = "semantic.quest.clinic_supplies.offer.rejected.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.quest.clinic_supplies.offer.rejected.neutral",
-            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[5]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_offer_rejected.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["namespace"] = "semantic.quest.clinic_supplies.offer.rejected",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -928,7 +934,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_offer_rejected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -941,12 +947,13 @@ return {
         ["id"] = "semantic.quest.clinic_supplies.status.failed.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.quest.clinic_supplies.status.failed.neutral",
-            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[6]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_status_failed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["namespace"] = "semantic.quest.clinic_supplies.status.failed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1084,7 +1091,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_status_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1097,12 +1104,13 @@ return {
         ["id"] = "semantic.quest.clinic_supplies.status.queued.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.quest.clinic_supplies.status.queued.neutral",
-            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[7]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_status_queued.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["namespace"] = "semantic.quest.clinic_supplies.status.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1240,7 +1248,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_status_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1253,12 +1261,13 @@ return {
         ["id"] = "semantic.quest.clinic_supplies.status.rejected.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.quest.clinic_supplies.status.rejected.neutral",
-            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[8]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_status_rejected.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["namespace"] = "semantic.quest.clinic_supplies.status.rejected",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1396,7 +1405,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_status_rejected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1409,12 +1418,13 @@ return {
         ["id"] = "semantic.quest.clinic_supplies.turn_in.failed.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.quest.clinic_supplies.turn_in.failed.neutral",
-            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[9]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_turn_in_failed.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["namespace"] = "semantic.quest.clinic_supplies.turn_in.failed",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1552,7 +1562,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_turn_in_failed.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1565,12 +1575,13 @@ return {
         ["id"] = "semantic.quest.clinic_supplies.turn_in.queued.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.quest.clinic_supplies.turn_in.queued.neutral",
-            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[10]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_turn_in_queued.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["namespace"] = "semantic.quest.clinic_supplies.turn_in.queued",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1708,7 +1719,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_turn_in_queued.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1721,12 +1732,13 @@ return {
         ["id"] = "semantic.quest.clinic_supplies.turn_in.rejected.neutral",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["migrationReadOnly"] = true,
+            ["localId"] = "neutral",
             ["sourceId"] = "semantic.quest.clinic_supplies.turn_in.rejected.neutral",
-            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[11]",
-            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+            ["sourcePath"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_turn_in_rejected.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["namespace"] = "semantic.quest.clinic_supplies.turn_in.rejected",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1864,7 +1876,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/quest_content/quest_clinic_supplies_turn_in_rejected.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,

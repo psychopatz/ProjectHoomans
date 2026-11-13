@@ -1,0 +1,196 @@
+{
+  "schema": "psychopatz.semantic.dialogue-language.v1",
+  "owner": "ProjectHoomans",
+  "records": [
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_comfort.1",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_comfort.json",
+        "responseTemplateID": "semantic.tool_reply.queued_comfort.1",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "I hear you.",
+              "TL": "Narinig kita."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I hear your comfort.",
+              "TL": "Naririnig ko ang pampalubag-loob mo."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Got the message. Thanks.",
+              "TL": "Nakuha ko ang mensahe. Salamat."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I hear what you're trying to do.",
+              "TL": "Naririnig ko ang sinusubukan mong gawin."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Heard and appreciated.",
+              "TL": "Narinig at pinahahalagahan."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "I hear your reassurance.",
+              "TL": "Naririnig ko ang pampanatag mo."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Got it. Taking it to heart.",
+              "TL": "Nakuha ko. Isinasapuso ko."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "I hear you. It helps a bit.",
+              "TL": "Naririnig kita. Nakakatulong nang kaunti."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Understood. I hear your voice.",
+              "TL": "Naintindihan. Naririnig ko ang boses mo."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Heard clearly.",
+              "TL": "Narinig nang malinaw."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "dialogue",
+      "id": "semantic.tool_reply.queued_comfort.2",
+      "owner": "ProjectHoomans",
+      "participants": {
+        "speaker": [
+          "participant"
+        ],
+        "addressee": [
+          "participant"
+        ]
+      },
+      "metadata": {
+        "category": "projecthoomans:tool_replies",
+        "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+        "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_comfort.json",
+        "responseTemplateID": "semantic.tool_reply.queued_comfort.2",
+        "style": "neutral"
+      },
+      "response": {
+        "act": "REACT",
+        "variants": [
+          {
+            "id": "neutral.01",
+            "text": {
+              "EN": "Thanks for saying that.",
+              "TL": "Salamat sa pagsabi niyan."
+            }
+          },
+          {
+            "id": "neutral.02",
+            "text": {
+              "EN": "I appreciate you saying that to me.",
+              "TL": "Salamat at sinabi mo 'yan sa akin."
+            }
+          },
+          {
+            "id": "neutral.03",
+            "text": {
+              "EN": "Thank you. That takes some edge off.",
+              "TL": "Maraming salamat. Nabawasan ang kaba ko."
+            }
+          },
+          {
+            "id": "neutral.04",
+            "text": {
+              "EN": "I needed to hear that. Thank you.",
+              "TL": "Kailangan kong marinig 'yan. Salamat."
+            }
+          },
+          {
+            "id": "neutral.05",
+            "text": {
+              "EN": "Appreciate the soothing words.",
+              "TL": "Salamat sa nakapagpapatahang mga salita."
+            }
+          },
+          {
+            "id": "neutral.06",
+            "text": {
+              "EN": "Thanks for taking the time to say that.",
+              "TL": "Salamat sa paglalaan ng oras para sabihin 'yan."
+            }
+          },
+          {
+            "id": "neutral.07",
+            "text": {
+              "EN": "Good of you to speak up. Thanks.",
+              "TL": "Mabuti sa 'yo ang magsalita. Salamat."
+            }
+          },
+          {
+            "id": "neutral.08",
+            "text": {
+              "EN": "Thank you for the comfort.",
+              "TL": "Salamat sa pampalubag-loob."
+            }
+          },
+          {
+            "id": "neutral.09",
+            "text": {
+              "EN": "Thanks. That means something out here.",
+              "TL": "Salamat. May halaga 'yan dito."
+            }
+          },
+          {
+            "id": "neutral.10",
+            "text": {
+              "EN": "Appreciate your kindness today.",
+              "TL": "Salamat sa kabaitan mo ngayong araw."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
