@@ -4,6 +4,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.SocialEvents = PNC.SocialEvents or {}
 local SocialEvents = PNC.SocialEvents
 local Internal = SocialEvents.Internal
@@ -13,8 +14,7 @@ local isAuthority = Internal.IsAuthority
 local observerSpecs = Internal.ObserverSpecs
 local preflightObserver = Internal.PreflightObserver
 local EntityRef = PNC.EntityRef
-local InteractionLifecycle = PNC.Semantics
-    and PNC.Semantics.InteractionLifecycle or nil
+local InteractionLifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
 local InteractionPersistence = PNC.Conversation
     and PNC.Conversation.InteractionLifecyclePersistence or nil
 

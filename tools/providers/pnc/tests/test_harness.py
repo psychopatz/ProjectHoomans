@@ -35,7 +35,7 @@ class SemanticHarnessTests(unittest.TestCase):
             result = worker.input("hello there")
         self.assertTrue(result["accepted"])
         self.assertEqual(result["result"]["decision"]["route"], "deterministic")
-        self.assertIn("PNC/Semantics/PNC_SemanticDialogueInput.lua", result["loadedModules"])
+        self.assertIn("PNC/ConvoEngine/Dialogue/Input.lua", result["loadedModules"])
         self.assertEqual(len(result["messages"]), 2)
         self.assertEqual(
             [message["payload"]["planTurn"] for message in result["messages"]],
@@ -499,7 +499,7 @@ class SemanticHarnessTests(unittest.TestCase):
             manifest_paths,
         )
         self.assertIn(
-            "ProjectHoomans:shared:PNC/Semantics/PNC_SemanticToolResultRealization.lua",
+            "ProjectHoomans:shared:PNC/ConvoEngine/ToolResultRealization.lua",
             manifest_paths,
         )
         self.assertIn(

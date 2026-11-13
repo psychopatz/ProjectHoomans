@@ -5,11 +5,12 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 then return end
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Router = PNC.ServerCommandRouter
 local Const = PNC.Const
-local Runtime = require "PNC/Semantics/PNC_SemanticInteractionSceneRuntime"
-local Transport = require "PNC/Semantics/PNC_SemanticInteractionSceneTransport"
+local Runtime = require "PNC/ConvoEngine/Interaction/SceneRuntime"
+local Transport = require "PNC/ConvoEngine/Interaction/SceneTransport"
 
 local function clean(value, maximum)
     value = tostring(value or "")
@@ -90,8 +91,7 @@ local function handle(player, args)
                 role = "recipient",
             },
         })
-        local socialAdopters = PNC.Semantics
-            and PNC.Semantics.InteractionSceneAdopters or nil
+        local socialAdopters = PNC.ConvoEngine and PNC.ConvoEngine.InteractionSceneAdopters or nil
         if socialAdopters
             and type(socialAdopters.ResumeSocialAfterPlayer) == "function"
         then

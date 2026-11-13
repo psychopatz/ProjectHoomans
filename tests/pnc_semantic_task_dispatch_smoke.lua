@@ -12,8 +12,10 @@ local view = {
 
 PNC = {
     Core = { Now = function() return 100 end },
-    Semantics = {
+    ConvoEngine = {
         DialogueInput = { Internal = {} },
+    },
+    Semantics = {
         CommandAdapter = {
             Dispatch = function()
                 return { status = "unmapped", accepted = false }
@@ -26,7 +28,7 @@ PNC = {
 local Input = T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Actions.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Actions.lua"
 )
 Input.ActiveView = view
 PNC.Semantics.TaskAdapter.Dispatch = function(actionIntent, context)

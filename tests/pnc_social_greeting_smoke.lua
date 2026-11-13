@@ -156,9 +156,10 @@ PNC = {
         end,
     },
 }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Lifecycle = T.load(
-    SHARED .. "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua"
+    SHARED .. "PNC/ConvoEngine/Interaction/Lifecycle.lua"
 )
 local lifecycleStore = Lifecycle.New({ worldHour = 0 })
 PNC.Semantics = { InteractionLifecycle = Lifecycle }
@@ -303,7 +304,7 @@ T.equal(
     "hostile NPCs do not receive friendly automatic greeting behavior"
 )
 T.equal(
-    PNC.Semantics.CompanionSpeech.ResolveGreeting({
+    PNC.ConvoEngine.CompanionSpeech.ResolveGreeting({
         npcID = "npc-family",
         npcType = "family",
         relationshipTier = "warm",

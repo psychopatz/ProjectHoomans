@@ -1,4 +1,5 @@
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Conversation = PNC.Conversation or {}
 
 local Conversation = PNC.Conversation
@@ -14,13 +15,11 @@ if type(TopicCatalog) ~= "table" then
 end
 Internal.TopicCatalog = TopicCatalog
 
-local CategoryOwnership = PNC.Semantics
-    and PNC.Semantics.ConversationCategoryOwnership
+local CategoryOwnership = PNC.ConvoEngine and PNC.ConvoEngine.ConversationCategoryOwnership
 if type(CategoryOwnership) ~= "table" then
     pcall(require,
-        "PNC/Semantics/PNC_SemanticConversationCategoryOwnership")
-    CategoryOwnership = PNC.Semantics
-        and PNC.Semantics.ConversationCategoryOwnership
+        "PNC/ConvoEngine/CategoryOwnership")
+    CategoryOwnership = PNC.ConvoEngine and PNC.ConvoEngine.ConversationCategoryOwnership
 end
 Internal.CategoryOwnership = CategoryOwnership
 

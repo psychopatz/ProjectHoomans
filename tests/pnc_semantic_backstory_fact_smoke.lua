@@ -29,12 +29,12 @@ T.load(
 local Facts = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueFacts.lua"
+    "PNC/ConvoEngine/Dialogue/Facts.lua"
 )
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource.lua"
+    "PNC/ConvoEngine/Dialogue/BackstoryFactSource.lua"
 )
 
 local record = {

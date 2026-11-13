@@ -1,10 +1,11 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Base conversation view specification and production diagnostics.
 
 local Spec = {}
 
 local function choicePresentation(view, authoredChoices)
-    local input = PNC.Semantics
-        and PNC.Semantics.DialogueInput or nil
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     local internal = input and input.Internal or nil
     if internal
         and type(internal.PresentSemanticChoices) == "function"

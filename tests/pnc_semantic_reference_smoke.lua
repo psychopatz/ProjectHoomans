@@ -9,6 +9,8 @@ local Semantic = T.load(
     "common",
     "PsychopatzCore/Semantics/PsychopatzSemantic.lua"
 )
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueState.lua")
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueRouter.lua")
 T.load(
     "ProjectHoomans",
     "shared",
@@ -17,15 +19,15 @@ T.load(
 local Policy = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
 local Resolver = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueReferenceResolver.lua"
+    "PNC/ConvoEngine/Dialogue/ReferenceResolver.lua"
 )
 
-local router = Semantic.DialogueRouter.New({
+local router = PsychopatzCore.ConvoEngine.DialogueRouter.New({
     stateSpec = { maxEvents = 4 },
     parser = Semantic.Parser.Parse,
     contextResolver = Resolver.Resolve,
@@ -86,7 +88,7 @@ T.equal(takePreview.decision.branch, "COMMAND_ACCEPTED",
 T.equal(takePreview.decision.actionIntent.action, "TAKE",
     "resolved reference preserves the requested action")
 
-local emptyRouter = Semantic.DialogueRouter.New({
+local emptyRouter = PsychopatzCore.ConvoEngine.DialogueRouter.New({
     stateSpec = { maxEvents = 4 },
     parser = Semantic.Parser.Parse,
     contextResolver = Resolver.Resolve,

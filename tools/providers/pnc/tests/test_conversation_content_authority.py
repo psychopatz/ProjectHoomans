@@ -53,7 +53,7 @@ class ConversationContentAuthorityTests(unittest.TestCase):
         registry = render_conversation_registry(first, reports)
         self.assertIn("function Registry.FamilyFor", registry)
         self.assertIn("function Registry.PlayerChoice", registry)
-        self.assertIn("PNC.Semantics.ConversationRegistry", registry)
+        self.assertIn("PNC.ConvoEngine.Registry", registry)
         self.assertNotIn("DialogueContentRegistry", registry)
 
     def test_authoring_service_locks_structure_and_allows_content_only_edits(self) -> None:

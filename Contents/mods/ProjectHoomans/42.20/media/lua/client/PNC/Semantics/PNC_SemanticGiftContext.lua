@@ -6,6 +6,7 @@
 -- state never enter the dialogue context.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 require "PNC/Semantics/PNC_SemanticDiagnostics"
 
@@ -54,10 +55,10 @@ local function ensureContext(view)
     then
         return session.semanticDialogueContext
     end
-    local context = PNC.Semantics.DialogueContextState
+    local context = PNC.ConvoEngine.DialogueContextState
     if type(context) ~= "table" then
         local ok, loaded = pcall(require,
-            "PNC/Semantics/PNC_SemanticDialogueContextState")
+            "PNC/ConvoEngine/Dialogue/ContextState")
         if ok then context = loaded end
     end
     if type(context) ~= "table" or type(context.New) ~= "function" then
@@ -78,7 +79,7 @@ function GiftContext.RecordTransfer(view, args, pending)
     if not context then
         return contextFailure("context_state_unavailable", view, args, pending)
     end
-    local input = PNC.Semantics.DialogueInput
+    local input = PNC.ConvoEngine.DialogueInput
     local internal = input and input.Internal or nil
     local ir, types, mentions = TransferProjection.Build(
         args, pending, GiftContext.MAX_ITEMS)

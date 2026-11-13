@@ -7,7 +7,7 @@ PNC = {
 }
 local Catalog = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 local Moment = T.load(
     "ProjectHoomans", "shared",
@@ -15,7 +15,7 @@ local Moment = T.load(
 )
 local Arbiter = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticCombatBanterArbiter.lua"
+    "PNC/ConvoEngine/CombatBanterArbiter.lua"
 )
 local Encounter = T.load(
     "ProjectHoomans", "shared",

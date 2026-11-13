@@ -3,6 +3,7 @@ T.addPackagePaths()
 
 PsychopatzCore = {}
 PNC = { Semantics = {} }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Semantic = T.load(
     "PsychopatzCore",
@@ -12,7 +13,7 @@ local Semantic = T.load(
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueContextState.lua"
+    "PNC/ConvoEngine/Dialogue/ContextState.lua"
 )
 T.load(
     "ProjectHoomans",
@@ -27,7 +28,7 @@ T.load(
 local ReferenceResolver = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueReferenceResolver.lua"
+    "PNC/ConvoEngine/Dialogue/ReferenceResolver.lua"
 )
 T.load(
     "ProjectHoomans",
@@ -66,13 +67,13 @@ PNC.Gifts = {
     },
 }
 
-local store = PNC.Semantics.DialogueContextState.New({
+local store = PNC.ConvoEngine.DialogueContextState.New({
     maxTurns = 4,
     maxMentions = 8,
     maxFocus = 4,
 })
 local view = { session = { semanticDialogueContext = store } }
-PNC.Semantics.DialogueInput = {
+PNC.ConvoEngine.DialogueInput = {
     Internal = {
         RecordContextTurn = function(currentView, ir, options)
             return currentView.session.semanticDialogueContext:RecordTurn(

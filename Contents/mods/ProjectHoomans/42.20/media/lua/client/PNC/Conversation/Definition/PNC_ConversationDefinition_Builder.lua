@@ -1,5 +1,6 @@
 -- Build the stable PsychopatzCore Conversation definition contract.
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Conversation = PNC.Conversation or {}
 
 local Conversation = PNC.Conversation
@@ -102,8 +103,7 @@ local function semanticInputFactory()
     -- already the owner of the widget factory, so use it directly as a safe
     -- same-process fallback and then publish the canonical Conversation
     -- factory for later definitions.
-    local directInput = PNC.Semantics
-        and PNC.Semantics.DialogueInput or nil
+    local directInput = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     if directInput and type(directInput.CreatePart) == "function" then
         Conversation.CreateSemanticDialogueInput = function(bounds, options)
             return directInput.CreatePart(bounds, options)
@@ -118,7 +118,7 @@ local function semanticInputFactory()
     require "PNC/Conversation/PNC_ConversationTime"
     require "PNC/Conversation/PNC_ConversationGroup"
     local loaded, loadError = pcall(require,
-        "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime")
+        "PNC/ConvoEngine/RuntimeFacade")
     local semanticRuntime = Conversation.Semantic
     if not loaded or not semanticRuntime
         or type(semanticRuntime.Register) ~= "function"
@@ -328,8 +328,7 @@ function Conversation.BuildDefinition(
         -- choice write. Hoomans supplies semantic rows when a valid
         -- projection exists; Core keeps authored choices as the fallback.
         choicePresentation = function(view, authoredChoices)
-            local input = PNC.Semantics
-                and PNC.Semantics.DialogueInput or nil
+            local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
             local internal = input and input.Internal or nil
             if internal
                 and type(internal.PresentSemanticChoices) == "function"

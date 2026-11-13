@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Active-view refresh callbacks for asynchronous conversation receipts.
 
 local Conversation = PNC.Conversation
@@ -53,7 +55,7 @@ local function refreshForNPC(npcID)
     then
         return false
     end
-    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     local internal = input and input.Internal or nil
     if internal and type(internal.RefreshRootSuggestions) == "function" then
         internal.RefreshRootSuggestions(view)

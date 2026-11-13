@@ -22,12 +22,12 @@ require "PsychopatzCore/Semantics/PsychopatzSemantic"
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 local Reactions = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticSocialReaction.lua"
+    "PNC/ConvoEngine/Social/Reaction.lua"
 )
 local Resolver = require "PNC/Core/Social/PNC_SemanticSocialContext"
 local Const = PNC.Semantics.SocialContextConstants

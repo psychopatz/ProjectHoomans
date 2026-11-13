@@ -4,9 +4,10 @@ require "ISUI/ISButton"
 
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
-local Surface = PNC.Semantics.CombatResponseSurface
-    or require "PNC/Semantics/PNC_SemanticCombatResponseSurface"
+local Surface = PNC.ConvoEngine.CombatResponseSurface
+    or require "PNC/ConvoEngine/CombatResponseSurface"
 local Strip = PNC.CombatResponseStrip or {}
 PNC.CombatResponseStrip = Strip
 

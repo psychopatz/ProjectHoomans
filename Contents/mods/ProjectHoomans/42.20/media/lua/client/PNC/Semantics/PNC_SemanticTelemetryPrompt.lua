@@ -2,7 +2,7 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 require "ISUI/ISComboBox"
 require "ISUI/ISLabel"
-require "PNC/Semantics/PNC_SemanticDialoguePolicy"
+require "PNC/ConvoEngine/Dialogue/Policy"
 require "PNC/Semantics/PNC_SemanticTelemetryStorage"
 
 PNC = PNC or {}

@@ -4,7 +4,7 @@ T.addPackagePaths()
 PNC = {}
 local Provider = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueRuleProvider.lua")
+    "PNC/ConvoEngine/Dialogue/RuleProvider.lua")
 
 T.falsy(Provider.IsBound(), "rule provider starts unbound")
 local passed, reason = Provider.EvaluateGateStatus({}, {})
@@ -26,7 +26,7 @@ T.equal(statusReason, "test_bound", "bound rules preserve the reason")
 
 local Kernel = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueFlowKernel.lua")
+    "PNC/ConvoEngine/Dialogue/FlowKernel.lua")
 T.equal(Kernel.Internal.Rules, Provider,
     "flow kernel consumes the semantic rule provider contract")
 

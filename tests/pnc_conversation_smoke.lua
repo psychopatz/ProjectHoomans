@@ -21,6 +21,7 @@ PNC = {
         RegisterProvider = function(provider) registeredProvider = provider end,
     },
 }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PsychopatzCore = {
     Conversation = {
         History = { GetDay = function() return 7 end },
@@ -59,7 +60,7 @@ T.load("PsychopatzCore", "common",
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRules.lua")
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationSelector.lua")
 T.load(SHARED .. "PNC/Conversation/Memory/PNC_ConversationMemory.lua")
-T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueContextState.lua")
+T.load(SHARED .. "PNC/ConvoEngine/Dialogue/ContextState.lua")
 T.load(CLIENT .. "PNC/Semantics/PNC_SemanticGiftLifecycle.lua")
 T.load(CLIENT .. "PNC/Semantics/PNC_SemanticGiftContext.lua")
 T.load(COMMON_SHARED
@@ -251,9 +252,9 @@ T.truthy(Rules.CheckRepeat({ oncePerDay = true }, {
 
 local psdlAdapter = T.read(
     "ProjectHoomans", "common_lua",
-    "PNC/Conversation/PSDL/PNC_ConversationPSDLBlocks.lua"
+    "PNC/ConvoEngine/DialogueBlocks.lua"
 )
-T.truthy(string.find(psdlAdapter, "Generated.PSDLPlan", 1, true),
+T.truthy(string.find(psdlAdapter, "Generated.ConvoPlan", 1, true),
     "PNC blocks are projected from Core-generated PSDL plans")
 
 T.truthy(Rules.EvaluateGate({
@@ -682,14 +683,14 @@ T.truthy(loadingTerritoryDiagnostic.visible,
 PNC.Network = savedNetwork
 
 local savedClient = PNC.Client
-local savedSemantics = PNC.Semantics
+local savedConvoEngine = PNC.ConvoEngine
 PNC.Network = { ClientState = { npcPresentations = {} } }
-PNC.Semantics = { DialogueInput = {} }
+PNC.ConvoEngine = { DialogueInput = {} }
 PNC.Client = {
     RequestNPCKnowledge = function() return true end,
 }
 local firstOpenDefinition = PNC.Conversation.Open(entry, player, "dawn")
-T.equal(PNC.Semantics.DialogueInput.ActiveView, firstOpenDefinition,
+T.equal(PNC.ConvoEngine.DialogueInput.ActiveView, firstOpenDefinition,
     "native conversation publishes its active host to semantic input")
 local firstOpenProjection = PNC.Network.ClientState.npcPresentations[entry.id]
 T.equal(firstOpenProjection.state, "unknown",
@@ -705,7 +706,7 @@ end
 T.truthy(firstOpenAskName, "first neutral conversation offers Ask Name")
 T.truthy(firstOpenRecruit, "first neutral conversation offers Recruit")
 PNC.Client = savedClient
-PNC.Semantics = savedSemantics
+PNC.ConvoEngine = savedConvoEngine
 PNC.Network = savedNetwork
 PsychopatzCore.Conversation.instance = nil
 
@@ -1268,8 +1269,8 @@ T.truthy(option, "Talk option created")
 option.callback()
 T.equal(opened.npcID, "npc-12", "Talk opens selected NPC")
 
-local GeneratedPSDL = require "PNC/Semantics/Generated/Conversation/Registry"
-local greetingPlan = GeneratedPSDL.PSDLPlan(
+local GeneratedPSDL = require "PNC/ConvoEngine/Registry"
+local greetingPlan = GeneratedPSDL.ConvoPlan(
     "semantic.flow.greeting.opening.default.neutral"
 )
 T.truthy(

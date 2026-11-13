@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Authored conversation-block projection.
 
 local Block = {}
@@ -24,13 +26,11 @@ function Block.project(view)
     local block = PNC.Conversation and PsychopatzCore.Conversation.Registry
         and PsychopatzCore.Conversation.Registry.GetBlock
         and PsychopatzCore.Conversation.Registry.GetBlock(blockID) or nil
-    local ownership = PNC.Semantics
-        and PNC.Semantics.ConversationCategoryOwnership
+    local ownership = PNC.ConvoEngine and PNC.ConvoEngine.ConversationCategoryOwnership
     if type(ownership) ~= "table" then
         local ok, loaded = pcall(require,
-            "PNC/Semantics/PNC_SemanticConversationCategoryOwnership")
-        ownership = PNC.Semantics
-            and PNC.Semantics.ConversationCategoryOwnership
+            "PNC/ConvoEngine/CategoryOwnership")
+        ownership = PNC.ConvoEngine and PNC.ConvoEngine.ConversationCategoryOwnership
         if type(ownership) ~= "table" and ok and type(loaded) == "table" then
             ownership = loaded
         end

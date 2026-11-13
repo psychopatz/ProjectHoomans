@@ -16,7 +16,7 @@ class ConversationCategoryOwnershipTests(unittest.TestCase):
             snapshot = worker.snapshot()
 
         self.assertIn(
-            "PNC/Semantics/PNC_SemanticConversationCategoryOwnership.lua",
+            "PNC/ConvoEngine/CategoryOwnership.lua",
             snapshot["loadedModules"],
         )
 

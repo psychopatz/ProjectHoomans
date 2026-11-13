@@ -9,6 +9,8 @@ local Semantic = T.load(
     "common",
     "PsychopatzCore/Semantics/PsychopatzSemantic.lua"
 )
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueState.lua")
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueRouter.lua")
 T.load(
     "ProjectHoomans",
     "shared",
@@ -17,9 +19,9 @@ T.load(
 local Policy = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
-local Router = Semantic.DialogueRouter
+local Router = PsychopatzCore.ConvoEngine.DialogueRouter
 local registered, response = Policy.RegisterResponse("TEST_BRANCH", {
     templateID = "semantic.test",
     fallback = "Test response.",
@@ -27,7 +29,7 @@ local registered, response = Policy.RegisterResponse("TEST_BRANCH", {
 T.equal(registered, true, "response templates are data-driven")
 T.equal(response.templateID, "semantic.test", "response template registration")
 
-local state = Semantic.DialogueState.New({
+local state = PsychopatzCore.ConvoEngine.DialogueState.New({
     participants = { "player:one", "npc:alice" },
     maxEvents = 2,
 })

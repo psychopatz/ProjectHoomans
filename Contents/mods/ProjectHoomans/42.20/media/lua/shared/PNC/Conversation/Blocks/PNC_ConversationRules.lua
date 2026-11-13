@@ -15,7 +15,7 @@ require "PNC/Conversation/Blocks/PNC_ConversationRules/PNC_ConversationRules_Eva
 require "PNC/Conversation/Blocks/PNC_ConversationRules/PNC_ConversationRules_Effects"
 
 local RuleProvider = require
-    "PNC/Semantics/PNC_SemanticDialogueRuleProvider"
+    "PNC/ConvoEngine/Dialogue/RuleProvider"
 RuleProvider.Bind(PNC.Conversation.Rules)
 
 return PNC.Conversation.Rules

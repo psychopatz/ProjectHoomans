@@ -11,7 +11,7 @@ PNC = {
 }
 local Providers = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticInteractionProviders.lua"
+    "PNC/ConvoEngine/Interaction/Providers.lua"
 )
 
 local context = {

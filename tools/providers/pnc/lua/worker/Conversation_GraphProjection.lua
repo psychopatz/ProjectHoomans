@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Semantic flow and hub graph projections.
 
 local Graph = {}
@@ -18,7 +20,7 @@ local function semanticFlowGraphProjection(view)
     if type(flow) ~= "table" then flow = {} end
     local flowID = activeFlow and activeFlow.flowID or flow.flowId
     if not flowID or tostring(flowID) == "" then return nil end
-    local registry = PNC.Semantics and PNC.Semantics.DialogueFlowRegistry
+    local registry = PNC.ConvoEngine and PNC.ConvoEngine.DialogueFlowRegistry
     local definition = registry and type(registry.Get) == "function"
         and registry.Get(flowID) or nil
     if type(definition) ~= "table" or type(definition.nodes) ~= "table" then

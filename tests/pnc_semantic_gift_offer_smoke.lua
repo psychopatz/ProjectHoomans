@@ -27,7 +27,7 @@ T.load(
 )
 local Policy = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
 local Offer = T.load(
     "ProjectHoomans", "shared", "PNC/Gifts/PNC_GiftSemanticOffer.lua"
@@ -218,15 +218,15 @@ PNC.InventoryWindow = {
 getSpecificPlayer = function() return player end
 local Input = T.load(
     "ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Actions.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Actions.lua"
 )
 T.load(
     "ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_GiftPresentation.lua"
+    "PNC/ConvoEngine/Dialogue/Input_GiftPresentation.lua"
 )
 T.load(
     "ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Gifts.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Gifts.lua"
 )
 local actionView = {
     spec = {

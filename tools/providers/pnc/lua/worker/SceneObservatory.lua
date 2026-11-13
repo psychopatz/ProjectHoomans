@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Disposable fixture orchestration for the production Interaction Scene
 -- Observatory. All scene decisions and inspection come from production Lua.
 local SceneObservatory = {}
@@ -5,11 +7,11 @@ local SceneObservatory = {}
 local MAX_PARTICIPANTS = 4
 
 local function requireProduction()
-    local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-    local Opportunity = require "PNC/Semantics/PNC_SemanticInteractionOpportunity"
-    local Runtime = require "PNC/Semantics/PNC_SemanticInteractionSceneRuntime"
+    local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+    local Opportunity = require "PNC/ConvoEngine/Interaction/Opportunity"
+    local Runtime = require "PNC/ConvoEngine/Interaction/SceneRuntime"
     local Observatory = require
-        "PNC/Semantics/PNC_SemanticInteractionSceneObservatory"
+        "PNC/ConvoEngine/Interaction/SceneObservatory"
     return Providers, Opportunity, Runtime, Observatory
 end
 
@@ -131,9 +133,9 @@ function SceneObservatory.fixture(context, payload)
 
     if payload.social == true then
         local SocialDirector = require
-            "PNC/Semantics/SemanticSocial/PNC_SemanticSocialDirector"
+            "PNC/ConvoEngine/Social/Director"
         local SocialConversation = require
-            "PNC/Semantics/SemanticSocial/PNC_SemanticSocialConversation"
+            "PNC/ConvoEngine/Social/Conversation"
         local runtime = Runtime.ResetForTests({
             maxActiveScenes = 4,
             maxParticipants = 4,
@@ -190,7 +192,7 @@ function SceneObservatory.fixture(context, payload)
             admission.socialOpportunity
         )
 
-        PNC.Semantics.InteractionSceneAdopters = {
+        PNC.ConvoEngine.InteractionSceneAdopters = {
             _semanticHarnessSceneObservatory = true,
             Manager = function() return manager end,
             Snapshot = function()
@@ -234,11 +236,11 @@ function SceneObservatory.fixture(context, payload)
     end
 
     if PNC.Semantics
-        and type(PNC.Semantics.InteractionSceneAdopters) == "table"
-        and PNC.Semantics.InteractionSceneAdopters
+        and type(PNC.ConvoEngine.InteractionSceneAdopters) == "table"
+        and PNC.ConvoEngine.InteractionSceneAdopters
             ._semanticHarnessSceneObservatory == true
     then
-        PNC.Semantics.InteractionSceneAdopters = nil
+        PNC.ConvoEngine.InteractionSceneAdopters = nil
     end
 
     local registered, registerReason = Opportunity.RegisterProvider({

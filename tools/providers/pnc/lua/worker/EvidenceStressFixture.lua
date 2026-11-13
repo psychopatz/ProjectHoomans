@@ -1,7 +1,7 @@
 -- Developer-only bounded pressure and query measurements on detached owners.
 local Fixture = {}
 local ContextProjection = require "worker/Conversation_Context"
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
 
 local function relationshipLimit()
     local coreSocial = PsychopatzCore and PsychopatzCore.Actors

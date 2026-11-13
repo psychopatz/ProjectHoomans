@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Authority diagnostic adapters. Domain services retain snapshot and action policy.
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode()
@@ -110,8 +112,7 @@ Router.Register(Const.CMD_SEMANTIC_SOCIAL_DEBUG_REQUEST,
             )
             return
         end
-        local audit = PNC.Semantics
-            and PNC.Semantics.SocialDirectorAudit or nil
+        local audit = PNC.ConvoEngine and PNC.ConvoEngine.SocialDirectorAudit or nil
         if not audit or type(audit.BuildSnapshot) ~= "function" then
             Network.SendSemanticSocialDebug(
                 player, nil, true, "semantic_social_debug_unavailable"

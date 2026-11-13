@@ -1,0 +1,277 @@
+-- Context and router lifecycle for the hybrid semantic dialogue input.
+-- This spoke owns conversation-local semantic state, not presentation or
+-- gameplay effects.
+PNC = PNC or {}
+PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
+
+local Input = PNC.ConvoEngine.DialogueInput or {}
+PNC.ConvoEngine.DialogueInput = Input
+
+local Internal = Input.Internal or {}
+Input.Internal = Internal
+
+local Semantic = PsychopatzCore.Semantics
+PsychopatzCore.ConvoEngine = PsychopatzCore.ConvoEngine or {}
+local ConvoEngine = PsychopatzCore.ConvoEngine
+local DialogueRouter = ConvoEngine.DialogueRouter
+if type(DialogueRouter) ~= "table" then
+    local loaded = pcall(require, "PsychopatzCore/ConvoEngine/DialogueRouter")
+        and ConvoEngine.DialogueRouter or nil
+    DialogueRouter = type(loaded) == "table" and loaded or nil
+end
+local State = ConvoEngine.DialogueState
+if type(State) ~= "table" then
+    local loaded = pcall(require, "PsychopatzCore/ConvoEngine/DialogueState")
+        and ConvoEngine.DialogueState or nil
+    State = type(loaded) == "table" and loaded or nil
+end
+local DialogueTurn = ConvoEngine.DialogueTurn
+if type(DialogueTurn) ~= "table" then
+    local loaded = pcall(require, "PsychopatzCore/ConvoEngine/DialogueTurn")
+        and ConvoEngine.DialogueTurn or nil
+    DialogueTurn = type(loaded) == "table" and loaded or nil
+end
+local DialogueContextState = PNC.ConvoEngine.DialogueContextState
+if type(DialogueContextState) ~= "table" then
+    local loaded = require
+        "PNC/ConvoEngine/Dialogue/ContextState"
+    DialogueContextState = type(loaded) == "table" and loaded or nil
+end
+local Policy = PNC.ConvoEngine.DialoguePolicy
+local Topics = PNC.Semantics.TopicCatalog
+if type(Topics) ~= "table" then
+    local loaded = require "PNC/Semantics/PNC_SemanticTopicCatalog"
+    Topics = type(loaded) == "table" and loaded or nil
+end
+local WorldContext = PNC.Semantics.WorldContext
+if type(WorldContext) ~= "table" then
+    local loaded = require "PNC/Semantics/PNC_SemanticWorldContext"
+    WorldContext = type(loaded) == "table" and loaded or nil
+end
+local ReferenceResolver = PNC.ConvoEngine.DialogueReferenceResolver
+if type(ReferenceResolver) ~= "table" then
+    local loaded = require
+        "PNC/ConvoEngine/Dialogue/ReferenceResolver"
+    ReferenceResolver = type(loaded) == "table" and loaded or nil
+end
+local EntityResolver = PNC.Semantics.EntityResolver
+if type(EntityResolver) ~= "table" then
+    local loaded = require "PNC/Semantics/PNC_SemanticEntityResolver"
+    EntityResolver = type(loaded) == "table" and loaded or nil
+end
+local FactResolver = PNC.ConvoEngine.DialogueFacts
+if type(FactResolver) ~= "table" then
+    local loaded = require "PNC/ConvoEngine/Dialogue/Facts"
+    FactResolver = type(loaded) == "table" and loaded or nil
+end
+local Situation = PNC.ConvoEngine.DialogueSituation
+if type(Situation) ~= "table" then
+    local loaded = require "PNC/ConvoEngine/Dialogue/Situation"
+    Situation = type(loaded) == "table" and loaded or nil
+end
+
+local ContextProjection = require
+    "PNC/ConvoEngine/Dialogue/Input_ContextProjection"
+local SemanticHubPresentationState = require
+    "PNC/ConvoEngine/Dialogue/HubPresentationState"
+local SocialFeatures = require "PNC/ConvoEngine/Social/Features"
+local Requests = require "PNC/ConvoEngine/Dialogue/Input_Requests"
+local RouterLifecycle = require
+    "PNC/ConvoEngine/Dialogue/Input_RouterLifecycle"
+local ActorConversationService = require
+    "PNC/Semantics/PNC_SemanticActorConversationService"
+ContextProjection.Configure(WorldContext, EntityResolver, Situation)
+RouterLifecycle.Configure(
+    State,
+    DialogueContextState,
+    DialogueRouter,
+    Policy,
+    Internal,
+    ActorConversationService
+)
+pcall(require, "PNC/ConvoEngine/Dialogue/FactSources")
+
+Internal.Policy = Policy
+Internal.LLMEnabled = ContextProjection.LLMEnabled
+Internal.ProviderStatus = function()
+    return ContextProjection.ProviderStatus(Internal.LLMEnabled)
+end
+Internal.SemanticHubPresentationState = SemanticHubPresentationState
+Internal.AttachSemanticHubPresentation = function(context, view)
+    return SemanticHubPresentationState.AttachContext(context, view)
+end
+Internal.ShallowContext = function(view)
+    local output = ContextProjection.Build(view, Internal.ProviderStatus)
+    local group = view and view.groupConversation or nil
+    local session = group and type(group.PrimarySession) == "function"
+        and group:PrimarySession() or view and view.session
+    local lifecycle = PNC.Semantics and PNC.Semantics.GiftLifecycle or nil
+    if lifecycle and type(lifecycle.PendingOfferConsent) == "function" then
+        output.pendingGiftConsent = lifecycle.PendingOfferConsent(
+            session,
+            Internal.Now and Internal.Now() or nil,
+            nil,
+            group and group.id or nil
+        )
+    end
+    return output
+end
+Internal.ClearPendingGiftConsent = function(view)
+    local group = view and view.groupConversation or nil
+    local session = group and type(group.PrimarySession) == "function"
+        and group:PrimarySession() or view and view.session
+    local lifecycle = PNC.Semantics and PNC.Semantics.GiftLifecycle or nil
+    if lifecycle and type(lifecycle.ClearOfferConsent) == "function" then
+        return lifecycle.ClearOfferConsent(session)
+    end
+    return false
+end
+Internal.RequestCognitionForIR = Requests.RequestCognitionForIR
+Internal.IsDeferredFactSubject = Requests.IsDeferredFactSubject
+Internal.PrepareIdentityRequest = Requests.PrepareIdentityRequest
+Internal.DispatchIdentityRequest = Requests.DispatchIdentityRequest
+Internal.RequestIdentityForIR = function(view, ir, context)
+    return Requests.RequestIdentityForIR(view, ir, context, Internal)
+end
+
+function Internal.Parse(value, options)
+    local parser = Semantic.Parser and Semantic.Parser.Parse
+    if type(parser) ~= "function" then return nil, "parser_unavailable" end
+    local ir, reason = parser(value, options)
+    if ir and Topics and type(Topics.Annotate) == "function" then
+        Topics.Annotate(ir, value)
+    end
+    if ir and SocialFeatures and type(SocialFeatures.Annotate) == "function" then
+        SocialFeatures.Annotate(ir)
+    end
+    return ir, reason
+end
+
+function Internal.ParseCandidates(value, options)
+    local parser = Semantic.Parser and Semantic.Parser.ParseCandidates
+    if type(parser) ~= "function" then
+        return nil, "candidate_parser_unavailable"
+    end
+    local bundle, reason = parser(value, options)
+    if type(bundle) ~= "table" then return bundle, reason end
+    if Topics and type(Topics.Annotate) == "function" then
+        local candidates = bundle.candidates
+        local index
+        local candidate
+        for index = 1, #(type(candidates) == "table" and candidates or {}) do
+            candidate = candidates[index]
+            if candidate and candidate.ir then
+                Topics.Annotate(candidate.ir, value)
+                if SocialFeatures
+                    and type(SocialFeatures.Annotate) == "function"
+                then
+                    SocialFeatures.Annotate(candidate.ir)
+                end
+            end
+        end
+        if bundle.selected and bundle.selected.ir then
+            Topics.Annotate(bundle.selected.ir, value)
+        end
+    end
+    return bundle, reason
+end
+
+-- Core owns the bounded clause split; this adapter keeps candidate parsing and
+-- vocabulary ownership in the existing Hoomans/Core parser path.
+function Internal.ParseTurn(value, options, view)
+    local service = view and Internal.ActorConversationService
+        and Internal.ActorConversationService(view) or nil
+    if service and type(service.ParseTurn) == "function" then
+        return service:ParseTurn(value, options)
+    end
+    local turn = (PsychopatzCore and PsychopatzCore.ConvoEngine
+        and PsychopatzCore.ConvoEngine.DialogueTurn) or DialogueTurn
+    if not turn or type(turn.Parse) ~= "function" then
+        return nil, "dialogue_turn_unavailable"
+    end
+    return turn.Parse(value, Internal.ParseCandidates, options)
+end
+
+function Internal.ResolveReferences(ir, state, context, options)
+    local output = ir
+    if ReferenceResolver
+        and type(ReferenceResolver.Resolve) == "function"
+    then
+        output = ReferenceResolver.Resolve(ir, state, context, options)
+    end
+    if FactResolver and type(FactResolver.Annotate) == "function" then
+        output = FactResolver.Annotate(output, state, context, options)
+    end
+    return output
+end
+
+function Internal.Now()
+    return getTimeInMillis and getTimeInMillis()
+        or getTimestampMs and getTimestampMs() or 0
+end
+
+function Internal.Interactive(view)
+    local session = view and view.session
+    if not view or not session then return false end
+    if session.closed == true or session.conversationMemoryClosed == true then
+        return false
+    end
+    if view.closed == true or view.closing == true
+        or view.editMode == true
+    then
+        return false
+    end
+
+    -- The semantic input is a live conversation channel, not a choice
+    -- button.  A queued NPC line makes Session.busy true while it is being
+    -- typed/released, but it must not prevent the player from sending the
+    -- next turn.  Keep the legacy host callback as a fallback for custom
+    -- conversation hosts that do not expose the view animation state.
+    if view.headless == true then
+        return view.lifecycleFinished ~= true
+    end
+    if view.animationInteractive ~= nil then
+        return view.animationInteractive == true
+    end
+    return type(view.isConversationInteractive) == "function"
+        and view:isConversationInteractive() == true
+end
+
+function Internal.RecordContextTurn(view, ir, options)
+    local session = view and view.session
+    local context = session and session.semanticDialogueContext or nil
+    if not context or type(context.RecordTurn) ~= "function" then
+        return false, "context_state_unavailable"
+    end
+    options = type(options) == "table" and options or {}
+    local preserveCurrentTopic = false
+    if ir.intent == "ACCEPT"
+        or ir.intent == "ACKNOWLEDGE"
+        or ir.intent == "AGREE"
+        or ir.intent == "THANK"
+    then
+        preserveCurrentTopic = context.pendingFollowUp == nil
+    end
+    local recordOptions = {
+        timestamp = options.timestamp,
+        speaker = options.speaker or "player",
+        source = options.source or "player_input",
+        mentions = options.mentions,
+        preserveCurrentTopic = preserveCurrentTopic,
+    }
+    return context:RecordTurn(ir, recordOptions)
+end
+
+Internal.RouterFor = RouterLifecycle.For
+Internal.ActorConversationService = function(view)
+    local session = view and view.session
+    if not session then return nil end
+    if session.semanticActorConversationService then
+        return session.semanticActorConversationService
+    end
+    RouterLifecycle.For(view)
+    return session.semanticActorConversationService
+end
+
+return Input

@@ -1,9 +1,9 @@
 -- Build 42.20 world-context integration for conversations.
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.ContextHub = PNC.ContextHub or {}
-local DialogueRuntime = PNC.Semantics
-    and PNC.Semantics.SemanticDialogueRuntime
-    or require "PNC/Semantics/PNC_SemanticDialogueRuntime"
+local DialogueRuntime = PNC.ConvoEngine and PNC.ConvoEngine.SemanticDialogueRuntime
+    or require "PNC/ConvoEngine/Dialogue/Runtime"
 local Openers = PNC.Conversation
     and PNC.Conversation.Openers
     or require "PNC/Conversation/PNC_ConversationOpeners"

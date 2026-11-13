@@ -9,6 +9,8 @@ local Semantic = T.load(
     "common",
     "PsychopatzCore/Semantics/PsychopatzSemantic.lua"
 )
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueState.lua")
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueRouter.lua")
 T.load(
     "ProjectHoomans",
     "shared",
@@ -17,7 +19,7 @@ T.load(
 local Policy = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
 local EntityResolver = T.load(
     "ProjectHoomans",
@@ -27,7 +29,7 @@ local EntityResolver = T.load(
 local ReferenceResolver = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueReferenceResolver.lua"
+    "PNC/ConvoEngine/Dialogue/ReferenceResolver.lua"
 )
 
 local index = EntityResolver.BuildIndex({
@@ -58,7 +60,7 @@ local index = EntityResolver.BuildIndex({
     },
 })
 
-local router = Semantic.DialogueRouter.New({
+local router = PsychopatzCore.ConvoEngine.DialogueRouter.New({
     stateSpec = { maxEvents = 4 },
     parser = Semantic.Parser.Parse,
     contextResolver = ReferenceResolver.Resolve,

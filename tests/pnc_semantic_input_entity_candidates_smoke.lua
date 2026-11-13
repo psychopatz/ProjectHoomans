@@ -39,7 +39,7 @@ PNC = {
 
 local EntityCandidates = T.load(
     "ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_EntityCandidates.lua"
+    "PNC/ConvoEngine/Dialogue/Input_EntityCandidates.lua"
 )
 
 local source = {

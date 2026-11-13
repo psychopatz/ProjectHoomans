@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Public conversation façade assembled from cohesive semantic-harness modules.
 
 local Conversation = {}
@@ -39,7 +41,7 @@ Conversation.preview = function(context, text)
 end
 
 -- The delegated turn implementation reaches the same live production seam:
--- PNC.Semantics.DialogueInput.Submit(view, text). Keeping the seam named here
+-- PNC.ConvoEngine.DialogueInput.Submit(view, text). Keeping the seam named here
 -- makes the worker's parity contract explicit without duplicating the router.
 -- The delegated implementation also preserves the live outputs:
 -- local result = view.lastSemanticDialogueResult

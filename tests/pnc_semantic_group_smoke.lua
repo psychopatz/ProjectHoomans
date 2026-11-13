@@ -23,12 +23,13 @@ PNC = {
         Now = function() return 1234 end,
     },
     Conversation = {},
-    Semantics = {
+    ConvoEngine = {
         DialogueInput = {
             Internal = {},
         },
     },
 }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Group = T.load(
     "ProjectHoomans",
@@ -130,8 +131,8 @@ local function makeResult(value, sequence)
     return result
 end
 
-local internal = PNC.Semantics.DialogueInput.Internal
-local dialogueInput = PNC.Semantics.DialogueInput
+local internal = PNC.ConvoEngine.DialogueInput.Internal
+local dialogueInput = PNC.ConvoEngine.DialogueInput
 internal.Now = function() return 1234 end
 internal.ShallowContext = function(view) return view.spec.context end
 internal.RecordContextTurn = function(view, result, options)

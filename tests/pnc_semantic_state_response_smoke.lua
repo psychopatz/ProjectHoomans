@@ -9,6 +9,8 @@ local Semantic = T.load(
     "common",
     "PsychopatzCore/Semantics/PsychopatzSemantic.lua"
 )
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueState.lua")
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueRouter.lua")
 T.load(
     "ProjectHoomans",
     "shared",
@@ -17,9 +19,9 @@ T.load(
 local Policy = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
-local Router = Semantic.DialogueRouter
+local Router = PsychopatzCore.ConvoEngine.DialogueRouter
 
 local router = Router.New({
     stateSpec = { maxEvents = 4 },

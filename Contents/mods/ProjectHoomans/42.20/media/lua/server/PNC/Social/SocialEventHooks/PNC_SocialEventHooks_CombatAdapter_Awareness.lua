@@ -4,6 +4,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.SocialEventHooks = PNC.SocialEventHooks or {}
 PNC.SocialEventHooksInternal = PNC.SocialEventHooksInternal or {}
 
@@ -24,20 +25,18 @@ local CombatReactionProfile = PNC.Semantics
 local CombatMoment = PNC.Semantics
     and PNC.Semantics.CombatMoment
     or require "PNC/Semantics/PNC_SemanticCombatMoment"
-local BanterArbiter = PNC.Semantics
-    and PNC.Semantics.CombatBanterArbiter
-    or require "PNC/Semantics/PNC_SemanticCombatBanterArbiter"
+local BanterArbiter = PNC.ConvoEngine and PNC.ConvoEngine.CombatBanterArbiter
+    or require "PNC/ConvoEngine/CombatBanterArbiter"
 local TacticalSpatial = PNC.TacticalSpatialProjection
     or require "PNC/Core/Spatial/PNC_TacticalSpatialProjection"
 local TacticalLanguage = PNC.Semantics
     and PNC.Semantics.TacticalSpatialLanguage
     or require "PNC/Semantics/PNC_SemanticTacticalSpatialLanguage"
-local SocialReactions = PNC.Semantics
-    and PNC.Semantics.SocialReactions or nil
+local SocialReactions = PNC.ConvoEngine and PNC.ConvoEngine.SocialReactions or nil
 if not SocialReactions then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticSocialReaction"
+        "PNC/ConvoEngine/Social/Reaction"
     )
     SocialReactions = ok and loaded or nil
 end
@@ -893,8 +892,7 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
                     record, "cleared", clearedEpisodeID, now
                 )
             end
-            local sceneAdopters = PNC.Semantics
-                and PNC.Semantics.InteractionSceneAdopters or nil
+            local sceneAdopters = PNC.ConvoEngine and PNC.ConvoEngine.InteractionSceneAdopters or nil
             if sceneAdopters
                 and type(sceneAdopters.OnHordeTransition) == "function"
             then
@@ -939,8 +937,7 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
         local tacticalSpatial = buildHordeSpatial(
             record, now, state.episodeID
         )
-        local sceneAdopters = PNC.Semantics
-            and PNC.Semantics.InteractionSceneAdopters or nil
+        local sceneAdopters = PNC.ConvoEngine and PNC.ConvoEngine.InteractionSceneAdopters or nil
         if sceneAdopters
             and type(sceneAdopters.OnHordeTransition) == "function"
         then

@@ -6,6 +6,7 @@
 -- can be compared with the audited checkout and installed package.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Diagnostics = PNC.Semantics.SemanticDiagnostics
 if type(Diagnostics) ~= "table" then
@@ -105,10 +106,11 @@ function Handshake.Report()
     end
 
     local semantic = PsychopatzCore and PsychopatzCore.Semantics or nil
+    local convoEngine = PsychopatzCore and PsychopatzCore.ConvoEngine or nil
     local parser = semantic and semantic.Parser or nil
-    local router = semantic and semantic.DialogueRouter or nil
+    local router = convoEngine and convoEngine.DialogueRouter or nil
     local ir = semantic and semantic.IR or nil
-    local policy = PNC.Semantics.DialoguePolicy
+    local policy = PNC.ConvoEngine.DialoguePolicy
     local translation = translationState()
     local failures = {}
 

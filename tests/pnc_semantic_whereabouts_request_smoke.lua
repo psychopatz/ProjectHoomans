@@ -23,7 +23,7 @@ end
 
 local Requests = T.load(
     "ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Requests.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Requests.lua"
 )
 local session = {
     conversationID = "conversation:whereabouts",

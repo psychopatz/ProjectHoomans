@@ -3,12 +3,15 @@ T.addPackagePaths()
 
 PsychopatzCore = {}
 PNC = {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Semantic = T.load(
     "PsychopatzCore",
     "common",
     "PsychopatzCore/Semantics/PsychopatzSemantic.lua"
 )
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueState.lua")
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueRouter.lua")
 local Catalog = T.load(
     "ProjectHoomans",
     "shared",
@@ -22,7 +25,7 @@ local GeneratedLexicon = T.load(
 local Policy = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
 local EntityResolver = T.load(
     "ProjectHoomans",
@@ -32,7 +35,7 @@ local EntityResolver = T.load(
 local ReferenceResolver = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueReferenceResolver.lua"
+    "PNC/ConvoEngine/Dialogue/ReferenceResolver.lua"
 )
 
 local Parser = Semantic.Parser
@@ -167,11 +170,11 @@ T.equal(pickedUpDecision.branch, "ASK_CLARIFICATION",
 T.equal(pickedUpDecision.actionIntent, nil,
     "the decision contains no executable FETCH candidate")
 
-PNC.Semantics.DialogueInput = { Internal = {} }
+PNC.ConvoEngine.DialogueInput = { Internal = {} }
 local DialogueInput = T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Actions.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Actions.lua"
 )
 local blockedCandidate = DialogueInput.Internal.DispatchAction({}, {
     sequence = "morphology:1",
@@ -226,7 +229,7 @@ local index = EntityResolver.BuildIndex({
         aliases = { "Sarah" },
     },
 })
-local router = Semantic.DialogueRouter.New({
+local router = PsychopatzCore.ConvoEngine.DialogueRouter.New({
     stateSpec = { maxEvents = 4 },
     parser = Parser.Parse,
     contextResolver = ReferenceResolver.Resolve,

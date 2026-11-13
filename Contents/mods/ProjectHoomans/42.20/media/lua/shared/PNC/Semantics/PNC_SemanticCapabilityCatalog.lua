@@ -341,9 +341,9 @@ end
 -- generator consumes this live catalog and returns data-only flow artifacts;
 -- it never becomes a second parser or dispatch path.
 local AutomaticFlowGenerator = require
-    "PNC/Semantics/PNC_SemanticAutomaticFlowGenerator"
+    "PNC/ConvoEngine/FlowGenerator"
 local generatedAutomaticFlows = require
-    "PNC/Semantics/PNC_SemanticGeneratedAutomaticFlows"
+    "PNC/ConvoEngine/GeneratedAutomaticFlows"
 local function automaticGenerationSignature()
     local values = {}
     for _, action in ipairs(Catalog.ListActions()) do

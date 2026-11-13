@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 local Awareness = PNC and PNC.CorpseAwareness
 if not Awareness then return end
 
@@ -12,23 +14,21 @@ local knownKillerName = Deps.knownKillerName
 local MEMORY_TYPE = Deps.MEMORY_TYPE
 local MEMORY_LIMIT_PER_NPC = Deps.MEMORY_LIMIT_PER_NPC
 local DETECTION_RADIUS_SQ = Deps.DETECTION_RADIUS_SQ
-local InteractionLifecycle = PNC.Semantics
-    and PNC.Semantics.InteractionLifecycle or nil
+local InteractionLifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
 if type(InteractionLifecycle) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticInteractionLifecycle"
+        "PNC/ConvoEngine/Interaction/Lifecycle"
     )
     InteractionLifecycle = ok and loaded or nil
 end
 local InteractionPersistence = PNC.Conversation
     and PNC.Conversation.InteractionLifecyclePersistence or nil
-local SocialReactions = PNC.Semantics
-    and PNC.Semantics.SocialReactions or nil
+local SocialReactions = PNC.ConvoEngine and PNC.ConvoEngine.SocialReactions or nil
 if type(SocialReactions) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticSocialReaction"
+        "PNC/ConvoEngine/Social/Reaction"
     )
     SocialReactions = ok and loaded or nil
 end

@@ -1,9 +1,9 @@
 local T = require "tests/support/test"
 T.addPackagePaths()
 
-local Offers = require "PNC/Semantics/PNC_SemanticDialogueBranchOffers"
-local ResponsePlan = require "PNC/Semantics/PNC_SemanticDialogueResponsePlan"
-local TextBinding = require "PsychopatzCore/Semantics/PsychopatzSemanticTextBinding"
+local Offers = require "PNC/ConvoEngine/Dialogue/BranchOffers"
+local ResponsePlan = require "PNC/ConvoEngine/Dialogue/ResponsePlan"
+local TextBinding = require "PsychopatzCore/ConvoEngine/TextBinding"
 
 local function truthy(value, label)
     if not value then error(label or "expected truthy") end

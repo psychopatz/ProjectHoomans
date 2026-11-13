@@ -3,7 +3,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 local Mutation = {}
-local Identity = require "PNC/Semantics/PNC_SemanticIdentityExchange"
+local Identity = require "PNC/ConvoEngine/IdentityExchange"
 
 function Mutation.Apply(request)
     if type(request) ~= "table"

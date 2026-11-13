@@ -3,6 +3,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.SocialEventHooks = PNC.SocialEventHooks or {}
 PNC.SocialEventHooksInternal = PNC.SocialEventHooksInternal or {}
 
@@ -13,12 +14,11 @@ local H = PNC.SocialEventHooksInternal
 local Core = PNC.Core
 local Registry = PNC.Registry
 local Network = PNC.Network
-local SocialReactions = PNC.Semantics
-    and PNC.Semantics.SocialReactions or nil
+local SocialReactions = PNC.ConvoEngine and PNC.ConvoEngine.SocialReactions or nil
 if not SocialReactions then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticSocialReaction"
+        "PNC/ConvoEngine/Social/Reaction"
     )
     SocialReactions = ok and loaded or nil
 end

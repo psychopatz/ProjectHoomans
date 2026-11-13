@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Persona and relationship catalogs for the semantic worker router.
 
 local Persona = {}
@@ -84,10 +86,9 @@ local function relationshipKindCatalog(context, payload)
 end
 
 local function speechRealizationCatalog(context)
-    local realization = PNC.Semantics
-        and PNC.Semantics.SpeechRealization or nil
+    local realization = PNC.ConvoEngine and PNC.ConvoEngine.SpeechRealization or nil
     if not realization then
-        local ok, value = pcall(require, "PNC/Semantics/PNC_SpeechRealization")
+        local ok, value = pcall(require, "PNC/ConvoEngine/SpeechRealization")
         if ok then realization = value end
     end
     if type(realization) ~= "table" then

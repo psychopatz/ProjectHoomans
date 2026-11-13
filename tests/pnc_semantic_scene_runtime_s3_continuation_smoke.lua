@@ -3,9 +3,9 @@ T.addPackagePaths()
 
 PNC = {}
 
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-local Catalog = require "PNC/Semantics/PNC_SemanticInteractionCatalog"
-local Scene = require "PNC/Semantics/PNC_SemanticInteractionScene"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+local Catalog = require "PNC/ConvoEngine/Interaction/Catalog"
+local Scene = require "PNC/ConvoEngine/Interaction/Scene"
 
 Catalog.ResetDraftOverlay()
 
@@ -401,11 +401,11 @@ T.falsy(snapshot.transcriptStored,
 
 local sceneSource = T.read(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticInteractionScene.lua"
+    "PNC/ConvoEngine/Interaction/Scene.lua"
 )
 local continuationSource = T.read(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticInteractionContinuation.lua"
+    "PNC/ConvoEngine/Interaction/Continuation.lua"
 )
 T.falsy(string.find(sceneSource, "PsychopatzSemantic.Parse", 1, true),
     "Scene continuation never calls parser/NLU")

@@ -1,12 +1,13 @@
 -- Provider-response cleanup and deterministic tool/failure acknowledgements.
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.PBrainZ = PNC.PBrainZ or {}
 PNC.PBrainZ.Internal = PNC.PBrainZ.Internal or {}
 
 local Integration = PNC.PBrainZ
 local Internal = Integration.Internal
 local Runtime = Internal.Runtime
-local ToolResultRealization = PNC.Semantics and PNC.Semantics.ToolResultRealization
+local ToolResultRealization = PNC.ConvoEngine and PNC.ConvoEngine.ToolResultRealization
 local Fallback = Internal.ResponseFallback or {}
 Internal.ResponseFallback = Fallback
 

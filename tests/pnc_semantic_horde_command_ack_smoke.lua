@@ -18,12 +18,12 @@ PNC = {
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 local Speech = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticCompanionSpeech.lua"
+    "PNC/ConvoEngine/CompanionSpeech.lua"
 )
 
 local eager = T.truthy(Speech.ResolveNPCCommand(

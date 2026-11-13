@@ -132,19 +132,20 @@ getGameTime = function()
     return { getWorldAgeHours = function() return 42 end }
 end
 
-T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua")
-T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua")
-T.load(SHARED .. "PNC/Semantics/PNC_SemanticCompanionSpeech.lua")
+T.load(SHARED .. "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua")
+T.load(SHARED .. "PNC/ConvoEngine/Dialogue/RealizationAuthority.lua")
+T.load(SHARED .. "PNC/ConvoEngine/CompanionSpeech.lua")
 T.load(SHARED .. "PNC/Core/Commands/PNC_VanillaEmoteInteractions.lua")
 T.load(SHARED .. "PNC/Core/Relationships/PNC_SocialEventDefinitions.lua")
 T.load(SHARED .. "PNC/Core/Conduct/PNC_ConductDefinitions.lua")
 
 local Lifecycle = T.load(
-    SHARED .. "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua"
+    SHARED .. "PNC/ConvoEngine/Interaction/Lifecycle.lua"
 )
 local lifecycleStore = Lifecycle.New({ worldHour = 0 })
 PNC.Semantics = PNC.Semantics or {}
-PNC.Semantics.InteractionLifecycle = Lifecycle
+PNC.ConvoEngine = PNC.ConvoEngine or {}
+PNC.ConvoEngine.InteractionLifecycle = Lifecycle
 PNC.Conversation = {
     InteractionLifecyclePersistence = {
         Apply = function(envelope, options)
@@ -160,7 +161,7 @@ PNC.Conversation = {
 }
 
 local Interactions = PNC.VanillaEmoteInteractions
-local CompanionSpeech = PNC.Semantics.CompanionSpeech
+local CompanionSpeech = PNC.ConvoEngine.CompanionSpeech
 local all = Interactions.List()
 T.equal(#all, 8, "first vanilla emote slice has eight interactions")
 for _, id in ipairs(all) do

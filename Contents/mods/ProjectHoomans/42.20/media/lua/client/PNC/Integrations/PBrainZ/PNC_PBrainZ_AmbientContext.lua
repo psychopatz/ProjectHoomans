@@ -1,5 +1,6 @@
 -- Context and prompt assembly for ambient social flavor packets.
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.PBrainZ = PNC.PBrainZ or {}
 PNC.PBrainZ.Internal = PNC.PBrainZ.Internal or {}
 require "PNC/Integrations/PBrainZ/PNC_PBrainZ_Runtime"
@@ -49,8 +50,7 @@ local function promptFor(eventType, playerMessage, playerFirstName, victimFirstN
 end
 
 local function activeConversationView(npcID, playerID)
-    local input = PNC.Semantics
-        and PNC.Semantics.DialogueInput or nil
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     local view = input and input.ActiveView or nil
     local session = view and view.session or nil
     local spec = view and type(view.spec) == "table" and view.spec or {}

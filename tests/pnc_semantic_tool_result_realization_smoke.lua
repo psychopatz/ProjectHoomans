@@ -2,10 +2,11 @@ local T = require "tests/support/test"
 T.addPackagePaths()
 
 PNC = {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 T.load("ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticToolResultRealization.lua")
+    "PNC/ConvoEngine/ToolResultRealization.lua")
 
-local Realization = PNC.Semantics.ToolResultRealization
+local Realization = PNC.ConvoEngine.ToolResultRealization
 local context = {
     request_id = "reply-catalog-1",
     npc_name = "Harley",

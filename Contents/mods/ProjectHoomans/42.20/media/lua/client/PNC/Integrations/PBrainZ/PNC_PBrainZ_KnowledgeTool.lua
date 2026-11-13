@@ -1,5 +1,6 @@
 -- LLM knowledge-disclosure and identity tool handlers.
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.PBrainZ = PNC.PBrainZ or {}
 PNC.PBrainZ.Internal = PNC.PBrainZ.Internal or {}
 
@@ -10,8 +11,7 @@ local ToolFlow = Internal.ToolFlow
 local Handlers = Internal.ToolHandlers
 
 local function identityQuestionResponse(packet, npcID)
-    local dialogueInput = PNC.Semantics
-        and PNC.Semantics.DialogueInput or nil
+    local dialogueInput = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     local dialogueInternal = dialogueInput and dialogueInput.Internal or nil
     local context = packet and packet.conversation_context or {}
     local state

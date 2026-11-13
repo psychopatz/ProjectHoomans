@@ -9,10 +9,12 @@ local Semantic = T.load(
     "common",
     "PsychopatzCore/Semantics/PsychopatzSemantic.lua"
 )
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueState.lua")
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueRouter.lua")
 local Context = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueContextState.lua"
+    "PNC/ConvoEngine/Dialogue/ContextState.lua"
 )
 T.load(
     "ProjectHoomans",
@@ -20,13 +22,13 @@ T.load(
     "PNC/Semantics/PNC_SemanticCatalog.lua"
 )
 local Registry = require
-    "PNC/Semantics/PNC_SemanticDialogueFlowRegistry"
+    "PNC/ConvoEngine/Dialogue/FlowRegistry"
 local Policy = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
-local Router = Semantic.DialogueRouter
+local Router = PsychopatzCore.ConvoEngine.DialogueRouter
 
 local function contextFor(contextState, npcID)
     return {
@@ -99,13 +101,13 @@ local conflictingOwner = Registry.Validate({
 T.falsy(conflictingOwner, "registry rejects conflicting slot owners")
 
 local duplicateRegistered, duplicateReason = Registry.Register(require
-    "PNC/Semantics/PNC_SemanticDialogueFlow_Identity")
+    "PNC/ConvoEngine/Dialogue/Flow_Identity")
 T.falsy(duplicateRegistered, "registry rejects duplicate flow IDs")
 T.equal(duplicateReason, "duplicate_flow_id:identity",
     "registry explains duplicate flow IDs")
 
 local contextState = Context.New({ maxFlows = 4, maxFlowStack = 2 })
-local state = Semantic.DialogueState.New({ maxEvents = 8 })
+local state = PsychopatzCore.ConvoEngine.DialogueState.New({ maxEvents = 8 })
 local context = contextFor(contextState, "npc-a")
 local router = Router.New({
     policy = Policy,
@@ -185,7 +187,7 @@ T.equal(#contextState:FlowSnapshot(), 0,
 local greetingContextState = Context.New()
 local greetingRouter = Router.New({
     policy = Policy,
-    state = Semantic.DialogueState.New(),
+    state = PsychopatzCore.ConvoEngine.DialogueState.New(),
     context = contextFor(greetingContextState, "npc-greeting"),
 })
 local greeting = greetingRouter:Process(
@@ -223,7 +225,7 @@ T.equal(#greetingContextState:FlowSnapshot(), 0,
 local refusalContextState = Context.New()
 local refusalRouter = Router.New({
     policy = Policy,
-    state = Semantic.DialogueState.New(),
+    state = PsychopatzCore.ConvoEngine.DialogueState.New(),
     context = contextFor(refusalContextState, "npc-refusal"),
 })
 refusalRouter:Process(
@@ -246,12 +248,12 @@ T.equal(#refusalContextState:FlowSnapshot(), 0,
 local sharedContext = Context.New({ maxFlows = 4 })
 local routerA = Router.New({
     policy = Policy,
-    state = Semantic.DialogueState.New(),
+    state = PsychopatzCore.ConvoEngine.DialogueState.New(),
     context = contextFor(sharedContext, "npc-a"),
 })
 local routerB = Router.New({
     policy = Policy,
-    state = Semantic.DialogueState.New(),
+    state = PsychopatzCore.ConvoEngine.DialogueState.New(),
     context = contextFor(sharedContext, "npc-b"),
 })
 routerA:Process("who are you", routerA.context, { timestamp = 7 })

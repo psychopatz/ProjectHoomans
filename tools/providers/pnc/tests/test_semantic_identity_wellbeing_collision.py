@@ -372,9 +372,9 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         required_modules = {
             "PsychopatzCore/Semantics/PsychopatzSemantic.lua",
             "PNC/Translation/PNC_TranslationBootstrap.lua",
-            "PNC/Semantics/PNC_SemanticDialoguePolicy.lua",
-            "PNC/Semantics/PNC_SemanticDialogueInput_Presentation.lua",
-            "PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+            "PNC/ConvoEngine/Dialogue/Policy.lua",
+            "PNC/ConvoEngine/Dialogue/Input_Presentation.lua",
+            "PNC/ConvoEngine/IdentityExchange.lua",
         }
         for turn in run.turns:
             self.assertTrue(turn["accepted"], turn.get("reason"))

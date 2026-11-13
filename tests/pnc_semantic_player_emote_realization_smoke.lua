@@ -54,9 +54,9 @@ package.preload["ISUI/ISEmoteRadialMenu"] = function()
     return ISEmoteRadialMenu
 end
 
-T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua")
-T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua")
-T.load(SHARED .. "PNC/Semantics/PNC_SemanticCompanionSpeech.lua")
+T.load(SHARED .. "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua")
+T.load(SHARED .. "PNC/ConvoEngine/Dialogue/RealizationAuthority.lua")
+T.load(SHARED .. "PNC/ConvoEngine/CompanionSpeech.lua")
 T.load(SHARED .. "PNC/Core/Commands/PNC_VanillaEmoteInteractions.lua")
 T.load(CLIENT .. "PNC/Commands/PNC_CompanionCommandPresentation.lua")
 T.load(CLIENT .. "PNC/Commands/PNC_CompanionCommandEmotes.lua")

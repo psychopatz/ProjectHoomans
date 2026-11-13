@@ -1,0 +1,471 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "event_reactions_combat",
+        ["id"] = "semantic.combat.reaction.default",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.combat.reaction.default",
+            ["sourcePath"] = "psdl/dialogue/event_reactions_combat.json#records[0]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:event_reactions",
+                ["contentOwner"] = "projecthoomans.dialogue_content.events",
+                ["responseTemplateID"] = "semantic.combat.reaction.default",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/combat.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good work. Keep watching the area.",
+                            },
+                            ["TL"] = {
+                                "Magandang trabaho. Patuloy na bantayan ang paligid.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Threat's handled. Stay on your toes.",
+                            },
+                            ["TL"] = {
+                                "Naasikaso ang banta. Maging handa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Nice job. Don't relax just yet.",
+                            },
+                            ["TL"] = {
+                                "Mahusay. Huwag munang magpakampante.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Target down. Keep scanning the perimeter.",
+                            },
+                            ["TL"] = {
+                                "Bagsak ang target. Patuloy na suriin ang paligid.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Handled. Watch your surroundings.",
+                            },
+                            ["TL"] = {
+                                "Naasikaso na. Bantayan ang paligid mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good strike. Stay vigilant.",
+                            },
+                            ["TL"] = {
+                                "Magandang tama. Manatiling alerto.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "That one's finished. Check the corners.",
+                            },
+                            ["TL"] = {
+                                "Tapos na ang isang 'yon. Tignan ang mga sulok.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Well done. Keep weapons at the ready.",
+                            },
+                            ["TL"] = {
+                                "Magaling. Ihanda pa rin ang sandata.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Clear here. Eyes on the shadows.",
+                            },
+                            ["TL"] = {
+                                "Malinis dito. Tumingin sa mga anino.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Threat eliminated. Keep moving carefully.",
+                            },
+                            ["TL"] = {
+                                "Banta naalis na. Tuloy sa maingat na pagkilos.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/event_reactions_combat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "event_reactions_combat",
+        ["id"] = "semantic.combat.reaction.retreat",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.combat.reaction.retreat",
+            ["sourcePath"] = "psdl/dialogue/event_reactions_combat.json#records[1]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:event_reactions",
+                ["contentOwner"] = "projecthoomans.dialogue_content.events",
+                ["responseTemplateID"] = "semantic.combat.reaction.retreat",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/combat.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I need a moment before I can swing again.",
+                            },
+                            ["TL"] = {
+                                "Kailangan ko muna ng saglit bago makahataw ulit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Arms are heavy. Give me a second.",
+                            },
+                            ["TL"] = {
+                                "Mabigat ang mga braso ko. Bigyan mo ako ng saglit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Falling back! Need to recover stamina.",
+                            },
+                            ["TL"] = {
+                                "Aatras muna! Kailangang makabawi ng lakas.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Out of breath! Step back a bit.",
+                            },
+                            ["TL"] = {
+                                "Hinihingal ako! Umatras muna nang kaunti.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Can't keep swinging like this. Backing up.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko kayang tuloy-tuloy ang hataw. Aatras muna.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Give me space to breathe and reset.",
+                            },
+                            ["TL"] = {
+                                "Bigyan mo ako ng puwang para makahinga.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Too exhausted to strike. Pulling back.",
+                            },
+                            ["TL"] = {
+                                "Masyado akong pagod para humampas. Umuurong muna.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Need ten seconds to shake out my arms.",
+                            },
+                            ["TL"] = {
+                                "Kailangan ko ng sampung segundo para ipagpag ang braso ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Step back! I'm completely winded.",
+                            },
+                            ["TL"] = {
+                                "Atras! Sagad na ang hingal ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back up! Let me catch my breath.",
+                            },
+                            ["TL"] = {
+                                "Umatras! Pahingahin mo muna ako.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/event_reactions_combat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "event_reactions_combat",
+        ["id"] = "semantic.combat.reaction.threat",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.combat.reaction.threat",
+            ["sourcePath"] = "psdl/dialogue/event_reactions_combat.json#records[2]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/EventReactionsCombat",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:event_reactions",
+                ["contentOwner"] = "projecthoomans.dialogue_content.events",
+                ["responseTemplateID"] = "semantic.combat.reaction.threat",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/combat.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "That threat is down. Stay alert.",
+                            },
+                            ["TL"] = {
+                                "Bagsak na ang banta. Manatiling alerto.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Threat neutralized. Don't drop your guard.",
+                            },
+                            ["TL"] = {
+                                "Naalis na ang banta. Huwag ibaba ang depensa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Target eliminated. Keep watching.",
+                            },
+                            ["TL"] = {
+                                "Target naalis na. Patuloy na magmatyag.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Danger's passed for now. Stay sharp.",
+                            },
+                            ["TL"] = {
+                                "Lumipas na ang panganib pansamantala. Maging handa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Handled that hazard. Eyes open.",
+                            },
+                            ["TL"] = {
+                                "Nalutas ang panganib na 'yon. Buksan ang mata.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Threat's in the dirt. Scan the flanks.",
+                            },
+                            ["TL"] = {
+                                "Nasa lupa na ang banta. Suriin ang gilid.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Threat ceased. Maintain alertness.",
+                            },
+                            ["TL"] = {
+                                "Tumigil na ang banta. Panatilihin ang pag-iingat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Downed the contact. Watch your sector.",
+                            },
+                            ["TL"] = {
+                                "Naitumba ang kalaban. Bantayan ang parte mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "No more threat from that one. Stay ready.",
+                            },
+                            ["TL"] = {
+                                "Wala nang panganib mula sa kanya. Maging handa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Handled. Stay focused on remaining risks.",
+                            },
+                            ["TL"] = {
+                                "Naayos na. Tutukan ang iba pang panganib.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/event_reactions_combat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

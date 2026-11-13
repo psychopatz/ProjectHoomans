@@ -3,10 +3,10 @@ T.addPackagePaths()
 
 PNC = {}
 
-local Scheduler = require "PNC/Semantics/PNC_SemanticInteractionScheduler"
-local Stimulus = require "PNC/Semantics/PNC_SemanticInteractionStimulus"
+local Scheduler = require "PNC/ConvoEngine/Interaction/Scheduler"
+local Stimulus = require "PNC/ConvoEngine/Interaction/Stimulus"
 local Lifecycle = require
-    "PNC/Semantics/PNC_SemanticInteractionLifecycle"
+    "PNC/ConvoEngine/Interaction/Lifecycle"
 local Envelope = Lifecycle.Envelope
 
 T.equal(Scheduler.MAX_ACTIVE_SCENES, 16,
@@ -68,27 +68,27 @@ T.equal(npcSpeech.targetID, "npc-b",
 
 local sceneSource = T.read(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticInteractionScene.lua"
+    "PNC/ConvoEngine/Interaction/Scene.lua"
 )
 local schedulerSource = T.read(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticInteractionScheduler.lua"
+    "PNC/ConvoEngine/Interaction/Scheduler.lua"
 )
 local flowSource = T.read(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy_Flow.lua"
+    "PNC/ConvoEngine/Dialogue/Policy_Flow.lua"
 )
 local coreSource = T.read(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy_Core.lua"
+    "PNC/ConvoEngine/Dialogue/Policy_Core.lua"
 )
 local providerSource = T.read(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticInteractionProviders.lua"
+    "PNC/ConvoEngine/Interaction/Providers.lua"
 )
 local storageSource = T.read(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticInteractionLifecycle_State_Storage.lua"
+    "PNC/ConvoEngine/Interaction/Lifecycle_State_Storage.lua"
 )
 
 T.contains(sceneSource, "maxActiveScenes = 1",

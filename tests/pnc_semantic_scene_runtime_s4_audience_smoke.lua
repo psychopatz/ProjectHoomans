@@ -18,12 +18,12 @@ PNC = {
     },
 }
 
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-local Catalog = require "PNC/Semantics/PNC_SemanticInteractionCatalog"
-local Runtime = require "PNC/Semantics/PNC_SemanticInteractionSceneRuntime"
-local Transport = require "PNC/Semantics/PNC_SemanticInteractionSceneTransport"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+local Catalog = require "PNC/ConvoEngine/Interaction/Catalog"
+local Runtime = require "PNC/ConvoEngine/Interaction/SceneRuntime"
+local Transport = require "PNC/ConvoEngine/Interaction/SceneTransport"
 local Affordances = require
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_GeneratedAffordanceProvider"
+    "PNC/ConvoEngine/Suggestions/GeneratedAffordanceProvider"
 
 Catalog.ResetDraftOverlay()
 
@@ -300,7 +300,7 @@ T.equal(resumed.continuation.mode, "terminate",
 
 local transportSource = T.read(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticInteractionSceneTransport.lua"
+    "PNC/ConvoEngine/Interaction/SceneTransport.lua"
 )
 local clientSource = T.read(
     "ProjectHoomans", "client",
@@ -308,7 +308,7 @@ local clientSource = T.read(
 )
 local handoffSource = T.read(
     "ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_SceneHandoff.lua"
+    "PNC/ConvoEngine/Dialogue/Input_SceneHandoff.lua"
 )
 local ambientSource = T.read(
     "ProjectHoomans", "client",

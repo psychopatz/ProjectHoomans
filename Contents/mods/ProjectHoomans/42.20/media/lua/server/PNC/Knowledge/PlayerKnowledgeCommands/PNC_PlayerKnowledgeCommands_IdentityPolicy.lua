@@ -2,7 +2,7 @@
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
-local Identity = require "PNC/Semantics/PNC_SemanticIdentityExchange"
+local Identity = require "PNC/ConvoEngine/IdentityExchange"
 local Policy = {}
 
 function Policy.EffectFor(kind, truthful)

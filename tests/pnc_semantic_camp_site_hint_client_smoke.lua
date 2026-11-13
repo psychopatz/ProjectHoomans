@@ -193,7 +193,7 @@ T.equal(campfireLookups, 2,
 local ActionTargetHints = T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_ActionTargetHints.lua"
+    "PNC/ConvoEngine/Dialogue/Input_ActionTargetHints.lua"
 )
 local refreshCalls = 0
 local refreshedAction = ActionTargetHints.AttachCampSiteHint({

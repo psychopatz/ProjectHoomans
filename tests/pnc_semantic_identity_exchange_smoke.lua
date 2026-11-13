@@ -98,11 +98,12 @@ PNC = {
         SendConversationRelationship = function() end,
     },
 }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticIdentityExchange.lua"
+    "PNC/ConvoEngine/IdentityExchange.lua"
 )
 T.load(
     "ProjectHoomans",
@@ -111,7 +112,7 @@ T.load(
 )
 
 local Commands = PNC.PlayerKnowledgeCommands
-local Identity = PNC.Semantics.IdentityExchange
+local Identity = PNC.ConvoEngine.IdentityExchange
 local IdentityPolicy = require
     "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityPolicy"
 
@@ -317,7 +318,7 @@ T.load("ProjectHoomans", "client",
 T.load("ProjectHoomans", "client",
     "PNC/Networking/ClientRequests/PNC_ClientRequests_Identity.lua")
 local Requests = T.load("ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Requests.lua")
+    "PNC/ConvoEngine/Dialogue/Input_Requests.lua")
 local wire
 sendClientCommand = function(_, _, _, args) wire = args end
 for _, remote in ipairs({ false, true }) do

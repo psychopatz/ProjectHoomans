@@ -3,8 +3,8 @@
 -- are owned by the same Lua contracts used by production interaction.
 local InteractionEditor = {}
 
-local Catalog = require "PNC/Semantics/PNC_SemanticInteractionCatalog"
-local Director = require "PNC/Semantics/PNC_SemanticInteractionDirector"
+local Catalog = require "PNC/ConvoEngine/Interaction/Catalog"
+local Director = require "PNC/ConvoEngine/Interaction/Director"
 
 local function catalog(context)
     local Values = context.Values

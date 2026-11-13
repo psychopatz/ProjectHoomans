@@ -45,7 +45,7 @@ PNC = {
             end,
         },
     },
-    Semantics = {
+    ConvoEngine = {
         DialogueInput = { ActiveView = view },
     },
 }

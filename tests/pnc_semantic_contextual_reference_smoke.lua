@@ -3,6 +3,7 @@ T.addPackagePaths()
 
 PsychopatzCore = {}
 PNC = {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Semantic = T.load(
     "PsychopatzCore",
@@ -12,7 +13,7 @@ local Semantic = T.load(
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueContextState.lua"
+    "PNC/ConvoEngine/Dialogue/ContextState.lua"
 )
 T.load(
     "ProjectHoomans",
@@ -27,10 +28,10 @@ T.load(
 local ReferenceResolver = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueReferenceResolver.lua"
+    "PNC/ConvoEngine/Dialogue/ReferenceResolver.lua"
 )
 
-local ContextState = PNC.Semantics.DialogueContextState
+local ContextState = PNC.ConvoEngine.DialogueContextState
 local store = ContextState.New({
     maxTurns = 4,
     maxMentions = 8,

@@ -13,6 +13,7 @@ local function copy(value)
 end
 
 PNC = { Core = { DeepCopy = copy }, Const = { PERSISTENCE_VERSION = 6 } }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 local Store = require "PNC/Core/Persistence/PNC_ModDataStore"
 local legacy = require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 T.equal(Store, legacy, "legacy storage import keeps the same canonical object")
@@ -70,7 +71,7 @@ local full = require "PNC/Conversation/Memory/PNC_ConversationMemory"
 T.equal(full, Memory, "full facade extends the same memory owner")
 T.equal(full.Repository, MemoryRepository, "full facade retains the repository")
 T.truthy(type(full.RenderGossipPacket) == "function", "full gossip behavior is available")
-T.equal(PNC.Semantics.ConversationMemoryProvider.Implementation, Memory,
+T.equal(PNC.ConvoEngine.ConversationMemoryProvider.Implementation, Memory,
     "semantic adapter binds the canonical memory table")
 
 T.finish("pnc_domain_repository_bootstrap_smoke")

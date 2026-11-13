@@ -70,9 +70,9 @@ EventBus.subscribe(Message.EVENT_TYPE, function(message)
     messages[#messages + 1] = message
 end, "companion-command-interaction-message")
 
-T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua")
-T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua")
-T.load(SHARED .. "PNC/Semantics/PNC_SemanticCompanionSpeech.lua")
+T.load(SHARED .. "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua")
+T.load(SHARED .. "PNC/ConvoEngine/Dialogue/RealizationAuthority.lua")
+T.load(SHARED .. "PNC/ConvoEngine/CompanionSpeech.lua")
 T.load(CLIENT .. "PNC/Commands/PNC_CompanionCommandPresentation.lua")
 
 Client.Reset()

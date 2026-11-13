@@ -1,5 +1,6 @@
 -- Client receivers for shared semantic projections.
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Client = PNC.Client or {}
 PNC.Client.Internal = PNC.Client.Internal or {}
 
@@ -54,12 +55,11 @@ if Const.CMD_COMBAT_ENCOUNTER_INTENT_STATE then
     Internal.RegisterServerCommand(
         Const.CMD_COMBAT_ENCOUNTER_INTENT_STATE,
         function(args)
-            local surface = PNC.Semantics
-                and PNC.Semantics.CombatResponseSurface or nil
+            local surface = PNC.ConvoEngine and PNC.ConvoEngine.CombatResponseSurface or nil
             if type(surface) ~= "table" then
                 local ok, loaded = pcall(
                     require,
-                    "PNC/Semantics/PNC_SemanticCombatResponseSurface"
+                    "PNC/ConvoEngine/CombatResponseSurface"
                 )
                 surface = ok and loaded or nil
             end
@@ -74,8 +74,7 @@ if Const.CMD_SEMANTIC_TASK_RESULT then
     Internal.RegisterServerCommand(Const.CMD_SEMANTIC_TASK_RESULT,
         function(args)
             recordCampResult(args)
-            local input = PNC.Semantics
-                and PNC.Semantics.DialogueInput
+            local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput
             if input and type(input.ReceiveSemanticTaskResult)
                 == "function"
             then
@@ -87,8 +86,7 @@ end
 if Const.CMD_SEMANTIC_QUEST_RESULT then
     Internal.RegisterServerCommand(Const.CMD_SEMANTIC_QUEST_RESULT,
         function(args)
-            local input = PNC.Semantics
-                and PNC.Semantics.DialogueInput
+            local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput
             if input and type(input.ReceiveSemanticQuestResult)
                 == "function"
             then
@@ -100,7 +98,7 @@ end
 Internal.RegisterServerCommand(
     Const.CMD_SEMANTIC_INVENTORY_QUERY_RESULT,
     function(args)
-        local input = PNC.Semantics and PNC.Semantics.DialogueInput
+        local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput
         if input and type(input.ReceiveInventoryQueryResult) == "function" then
             input.ReceiveInventoryQueryResult(args or {})
         end

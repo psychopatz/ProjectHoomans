@@ -1,8 +1,9 @@
 local T = require "tests/support/test"
 T.addPackagePaths()
 PsychopatzCore = { Conversation = {} }
-PNC = { Semantics = { DialogueInput = { Internal = {} } } }
-local Input = PNC.Semantics.DialogueInput
+PNC = { ConvoEngine = { DialogueInput = { Internal = {} } } }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
+local Input = PNC.ConvoEngine.DialogueInput
 local Internal = Input.Internal
 local frame = { kind = "semantic_conversation_category", candidateID = "knowledge", requestRevision = 0 }
 local router = { state = { sequence = 0 } }
@@ -15,8 +16,8 @@ Internal.authoredRootChoice = function() return nil end
 Internal.preserveAuthoredValue = function(v) return v end
 Internal.restoreSemanticChoices = function() end
 Internal.recordSemanticChoiceClick = function() end
-T.load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticDialogueInput_FrameSupport.lua")
-T.load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation_Choices.lua")
+T.load("ProjectHoomans", "client", "PNC/ConvoEngine/Dialogue/Input_FrameSupport.lua")
+T.load("ProjectHoomans", "client", "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Presentation_Choices.lua")
 local routed = 0
 Input.SubmitSemanticFrame = function(view, clicked)
     local accepted, reason = Internal.BeginDirectFrame(view, clicked)

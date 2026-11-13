@@ -4,18 +4,18 @@
 -- maps command outcomes to semantic plans and suppresses duplicate acks.
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.CompanionCommandPresentation = PNC.CompanionCommandPresentation or {}
 
 require "PNC/Commands/PNC_CompanionCommandInteractionQueue"
 
 local Presentation = PNC.CompanionCommandPresentation
 local Registry = PNC.Registry
-local CompanionSpeech = PNC.Semantics
-    and PNC.Semantics.CompanionSpeech or nil
+local CompanionSpeech = PNC.ConvoEngine and PNC.ConvoEngine.CompanionSpeech or nil
 if type(CompanionSpeech) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticCompanionSpeech"
+        "PNC/ConvoEngine/CompanionSpeech"
     )
     CompanionSpeech = ok and loaded or nil
 end

@@ -8,11 +8,11 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 then return end
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Conversation = PNC.Conversation or {}
 
-local Lifecycle = PNC.Semantics
-    and PNC.Semantics.InteractionLifecycle
-    or require "PNC/Semantics/PNC_SemanticInteractionLifecycle"
+local Lifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle
+    or require "PNC/ConvoEngine/Interaction/Lifecycle"
 local Reset = PNC.ModDataStore
     or require "PNC/Core/Persistence/PNC_ModDataStore"
 

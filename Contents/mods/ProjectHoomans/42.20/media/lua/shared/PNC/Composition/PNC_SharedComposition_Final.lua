@@ -1,5 +1,5 @@
 -- Ordered shared composition segment: Final.
-require "PNC/Semantics/PNC_SemanticIdentityExchange"
+require "PNC/ConvoEngine/IdentityExchange"
 require "PNC/Semantics/PNC_SemanticIdentityNetwork"
 require "PNC/Core/Commands/PNC_CompanionCommands"
 require "PNC/Core/Health/PNC_Treatment"

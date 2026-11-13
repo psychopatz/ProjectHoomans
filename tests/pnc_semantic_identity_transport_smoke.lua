@@ -35,7 +35,7 @@ end
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticIdentityExchange.lua"
+    "PNC/ConvoEngine/IdentityExchange.lua"
 )
 T.load(
     "ProjectHoomans",

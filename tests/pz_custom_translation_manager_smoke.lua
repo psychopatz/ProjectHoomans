@@ -195,7 +195,7 @@ T.equal(DiscoveryPresentation.Population(4), "Populasyon: 4",
 
 local ToolResultRealization = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticToolResultRealization.lua")
+    "PNC/ConvoEngine/ToolResultRealization.lua")
 local localizedNameReply = ToolResultRealization.Text({
     { name = "ask_name", accepted = true, reason = "dispatched" },
 }, { request_id = "translation-name-1", npc_name = "Harley" })

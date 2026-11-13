@@ -7,7 +7,7 @@ PNC = PNC or {}
 local Admission = {}
 local Commands = PNC.PlayerKnowledgeCommands or {}
 local H = Commands.Internal or {}
-local Identity = require "PNC/Semantics/PNC_SemanticIdentityExchange"
+local Identity = require "PNC/ConvoEngine/IdentityExchange"
 local IdentityPresentation = require
     "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityPresentation"
 

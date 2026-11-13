@@ -9,6 +9,8 @@ local Semantic = T.load(
     "common",
     "PsychopatzCore/Semantics/PsychopatzSemantic.lua"
 )
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueState.lua")
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueRouter.lua")
 T.load(
     "ProjectHoomans",
     "shared",
@@ -17,22 +19,22 @@ T.load(
 local Policy = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
 local DialogueContext = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueContextState.lua"
+    "PNC/ConvoEngine/Dialogue/ContextState.lua"
 )
 local ResponseAdapter = T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Presentation_Responses.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Presentation_Responses.lua"
 )
 local Presentation = T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Presentation.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Presentation.lua"
 )
 
 local Parser = Semantic.Parser
@@ -111,7 +113,7 @@ T.falsy(acknowledgementIR.intent == "ACCEPT"
     or acknowledgementIR.intent == "AGREE",
     "understanding is not parsed as agreement or acceptance")
 
-local state = Semantic.DialogueState.New({ participants = { "npc:mara" } })
+local state = PsychopatzCore.ConvoEngine.DialogueState.New({ participants = { "npc:mara" } })
 local standaloneAcknowledgement = Policy.Decide(
     acknowledgementIR,
     state,

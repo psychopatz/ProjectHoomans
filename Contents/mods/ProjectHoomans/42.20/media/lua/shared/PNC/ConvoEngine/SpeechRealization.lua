@@ -1,0 +1,485 @@
+-- Shared SpeechRealization registry, resolver, and fallback boundary.
+--
+-- Built-in phrase content lives in cohesive domain packs. This file owns the
+-- one registry and the one application path used by semantic responses.
+PNC = PNC or {}
+PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
+
+local Realization = PNC.ConvoEngine.SpeechRealization or {}
+PNC.ConvoEngine.SpeechRealization = Realization
+
+Realization.VERSION = 1
+Realization.MAX_FAMILY_APPLICATIONS = 8
+
+local Style = PNC.ConvoEngine.SpeechStyleContext
+    or require "PNC/ConvoEngine/SpeechStyleContext"
+local UtterancePlan = PNC.ConvoEngine.UtterancePlan
+    or require "PNC/ConvoEngine/UtterancePlan"
+local phraseRegistry
+do
+    local ok, value = pcall(require,
+        "PNC/ConvoEngine/Registry")
+    if ok and type(value) == "table" then phraseRegistry = value end
+end
+local COVERAGE = {
+    { family = "greeting", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "wellbeing", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "needs", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "medical", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "identity", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "knowledge", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "acknowledgement", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "apology", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "offer_help", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "dispute_refusal", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "threat_hostility", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "gossip_event", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "companion_action", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "trading_entry", supported = { "neutral", "warm", "terse", "guarded" } },
+    { family = "quest_commitment", supported = { "neutral", "warm", "terse", "guarded" } },
+}
+
+local function copy(value, depth)
+    if type(value) ~= "table" then return value end
+    depth = tonumber(depth) or 0
+    if depth >= 12 then return nil end
+    local output = {}
+    local count = 0
+    for key, item in pairs(value) do
+        if count >= 128 then break end
+        if type(key) == "string" or type(key) == "number" then
+            output[key] = copy(item, depth + 1)
+            count = count + 1
+        end
+    end
+    return output
+end
+
+local PHRASE_MAX_HISTORY = 128
+local phraseHistory = Realization.phraseHistory or {}
+Realization.phraseHistory = phraseHistory
+local phraseHistoryOrder = Realization.phraseHistoryOrder or {}
+Realization.phraseHistoryOrder = phraseHistoryOrder
+
+local function hash(value)
+    local output = 0
+    value = tostring(value or "")
+    for index = 1, #value do
+        output = (output * 31 + string.byte(value, index)) % 2147483647
+    end
+    return output
+end
+
+local function phraseActorID(context)
+    context = type(context) == "table" and context or {}
+    local npc = type(context.npcState) == "table" and context.npcState or {}
+    local npcData = type(context.npcData) == "table" and context.npcData or {}
+    return tostring(
+        context.npcID or context.actorID or npc.npcID or npc.id
+            or npcData.npcID or npcData.id or "semantic-actor"
+    )
+end
+
+local function selectPhrase(templateID, styleVariant, context, salt, localSelections)
+    if type(phraseRegistry) ~= "table"
+        or type(phraseRegistry.FamilyFor) ~= "function"
+    then
+        return nil
+    end
+    local family, phrases, selectedStyle = phraseRegistry.FamilyFor(
+        templateID, styleVariant
+    )
+    if type(family) ~= "table" or type(phrases) ~= "table" or #phrases == 0 then
+        return nil
+    end
+    local familyID = tostring(family.id or templateID)
+    local style = tostring(selectedStyle or styleVariant or "neutral")
+    local key = phraseActorID(context) .. ":" .. familyID .. ":" .. style
+    local existing = localSelections and localSelections[key]
+    if existing then return existing end
+
+    local isSeeded = type(context) == "table" and (
+        context.phraseSalt ~= nil
+        or context.variationSeed ~= nil
+        or context.seed ~= nil
+        or context.caseID ~= nil
+    )
+    local isStrict = (type(context) == "table" and context.strictCanonical == true)
+        or salt == "canonical"
+
+    local previous = phraseHistory[key]
+    local index
+    local reason
+    if previous == nil then
+        if isSeeded and not isStrict then
+            index = (hash(tostring(salt or "") .. ":" .. key) % #phrases) + 1
+            reason = "initial_seeded"
+        else
+            -- The default unseeded initial turn uses the accepted canonical
+            -- wording (index 1). Subsequent turns use the stable salt and anti-repeat rule.
+            index = 1
+            reason = "initial_canonical"
+        end
+    else
+        index = (hash(tostring(salt or "") .. ":" .. key) % #phrases) + 1
+        if #phrases > 1 and tostring(phrases[index].id) == tostring(previous) then
+            index = index % #phrases + 1
+            reason = "immediate_repeat_avoided"
+        else
+            reason = "deterministic_hash"
+        end
+    end
+    local selected = phrases[index]
+    if type(selected) ~= "table" then return nil end
+    if previous == nil then
+        while #phraseHistoryOrder >= PHRASE_MAX_HISTORY do
+            local oldest = table.remove(phraseHistoryOrder, 1)
+            phraseHistory[oldest] = nil
+        end
+        phraseHistoryOrder[#phraseHistoryOrder + 1] = key
+    end
+    phraseHistory[key] = selected.id
+    local result = {
+        familyID = familyID,
+        semanticTemplateID = tostring(templateID),
+        style = style,
+        phraseID = tostring(selected.id or ""),
+        translationKey = tostring(selected.key or ""),
+        fallback = tostring(selected.fallback or ""),
+        poolSize = #phrases,
+        antiRepeatReason = reason,
+    }
+    if localSelections then localSelections[key] = result end
+    return result
+end
+
+function Realization.PhraseCoverage()
+    if type(phraseRegistry) ~= "table" then return {} end
+    return copy({
+        schema = phraseRegistry.SCHEMA,
+        fingerprint = phraseRegistry.CONTENT_FINGERPRINT,
+        families = phraseRegistry.PHRASE_FAMILIES,
+        playerChoices = phraseRegistry.PLAYER_CHOICES,
+    })
+end
+
+function Realization.GetFamilyKeys()
+    local keys = {}
+    if phraseRegistry and type(phraseRegistry.PHRASE_FAMILIES) == "table" then
+        for k in pairs(phraseRegistry.PHRASE_FAMILIES) do
+            keys[#keys + 1] = tostring(k)
+        end
+    end
+    table.sort(keys)
+    return keys
+end
+
+function Realization.ResetPhraseHistory()
+    for key in pairs(phraseHistory) do phraseHistory[key] = nil end
+    for index = #phraseHistoryOrder, 1, -1 do phraseHistoryOrder[index] = nil end
+end
+
+function Realization.Coverage()
+    return copy(COVERAGE)
+end
+
+local function relationshipArgument(style, argument)
+    if argument ~= "familyAddress" then return nil end
+    local bond = type(style) == "table" and style.bond or nil
+    local term = type(bond) == "table" and bond.term or nil
+    local translation = PNC.Translation
+    if type(term) == "table" and term.addressKey
+        and translation and type(translation.GetKey) == "function"
+    then
+        local value = translation.GetKey(
+            term.addressKey, tostring(bond.kind or "family")
+        )
+        if value ~= nil and tostring(value) ~= "" then return tostring(value) end
+    end
+    return term and tostring(bond.kind or "") or nil
+end
+
+local function preferredPhraseStyle(style)
+    style = type(style) == "table" and style or {}
+    local variant = tostring(style.variant or "neutral")
+    local bond = type(style.bond) == "table" and style.bond or nil
+    if bond and tostring(bond.class or "") ~= "" then
+        return "bond_" .. variant
+    end
+    return variant
+end
+
+function Realization.Resolve(templateID, style, semanticFallback)
+    local family = FAMILIES[tostring(templateID or "")]
+    if not family then return nil, "realization_family_unavailable" end
+    style = type(style) == "table" and style or {}
+    local selectedFamily = family
+    local bond = type(style.bond) == "table" and style.bond or nil
+    local bondFamily = bond and family.bond and family.bond.any or nil
+    if type(bondFamily) == "table" and tostring(bond.class or "") ~= "" then
+        selectedFamily = bondFamily
+    end
+    local selected = tostring(style.variant or "neutral")
+    local value = selectedFamily[selected]
+    local reason
+    if type(value) ~= "table" then
+        value = selectedFamily.neutral or family.neutral
+        reason = "neutral_fallback"
+    end
+    if type(value) ~= "table" then
+        return nil, "realization_neutral_unavailable"
+    end
+    if selected == "neutral" and not value.forceKey then
+        return {
+            templateID = tostring(templateID),
+            fallback = tostring(semanticFallback or value.fallback or ""),
+            family = tostring(templateID),
+            variant = "neutral",
+            fallbackReason = nil,
+        }
+    end
+    return {
+        templateID = tostring(value.key or templateID),
+        fallback = tostring(value.fallback or ""),
+        family = tostring(templateID),
+        variant = type(selectedFamily[selected]) == "table"
+            and selected or "neutral",
+        fallbackReason = reason,
+        argument = value.argument,
+    }
+end
+
+local function applySegment(segment, style, blocked, context, salt, localSelections)
+    if type(segment) ~= "table" or segment.kind ~= "translation" then
+        return segment, nil
+    end
+    if type(blocked) == "table" and blocked[segment.templateID] then
+        return segment, nil
+    end
+
+    local phrase = selectPhrase(
+        segment.templateID,
+        preferredPhraseStyle(style),
+        context,
+        salt,
+        localSelections
+    )
+    if not phrase then return segment, nil end
+
+    local output = copy(segment)
+    output.args = copy(segment.args or {})
+    output.semanticTemplateID = segment.templateID
+    output.templateID = phrase.translationKey
+    output.fallback = phrase.fallback
+    output.realizationFamily = segment.templateID
+    output.realizationVariant = tostring(
+        type(style) == "table" and style.variant or "neutral"
+    )
+    output.phraseFamilyID = phrase.familyID
+    output.phraseID = phrase.phraseID
+    output.phrasePoolSize = phrase.poolSize
+    output.phraseAntiRepeatReason = phrase.antiRepeatReason
+    output.phraseSemanticTemplateID = phrase.semanticTemplateID
+    output.phraseStyle = phrase.style
+    if tostring(phrase.style or ""):sub(1, 5) == "bond_" then
+        output.args.familyAddress = relationshipArgument(style, "familyAddress")
+        output.args["addressee.name"] = output.args.familyAddress
+    end
+
+    return output, {
+        templateID = phrase.translationKey,
+        fallback = phrase.fallback,
+        family = segment.templateID,
+        variant = output.realizationVariant,
+        contentStyle = phrase.style,
+        fallbackReason = nil,
+    }
+end
+
+local function compositionalInteractionResponse(
+    response, context, style, semanticPlan
+)
+    context = type(context) == "table" and context or {}
+    local interactionPlan = type(context.interactionPlan) == "table"
+        and context.interactionPlan or nil
+    local ir = type(context.dialogueIR) == "table"
+        and context.dialogueIR or nil
+    if not interactionPlan or not ir then
+        return nil, "interaction_context_unavailable"
+    end
+    local expectedTemplate = tostring(
+        interactionPlan.contentTemplateID or ""
+    )
+    if expectedTemplate == ""
+        or tostring(response.templateID or "") ~= expectedTemplate
+    then
+        return nil, "interaction_response_template_mismatch"
+    end
+
+    local plan, planReason = UtterancePlan.FromInteraction(
+        ir, interactionPlan, {
+            speaker = "npc",
+            target = "player",
+            styleVariant = style and style.variant or "neutral",
+            selectionSalt = context.utterancePlanSalt
+                or response.selectionID
+                or interactionPlan.behaviorID,
+        }
+    )
+    if not plan then return nil, planReason end
+    local realized, reason = UtterancePlan.Realize(plan)
+    if not realized then return nil, reason end
+
+    local output = copy(response)
+    output.speechStyleContext = Style.PublicView(style)
+    output.utterancePlan = copy(plan)
+    output.utteranceRealization = copy(realized)
+    output.fallback = realized.text
+    output.renderPlan = {
+        schemaVersion = 1,
+        kind = "dialogue_act_plan",
+        dialogueAct = plan.dialogueAct ~= ""
+            and plan.dialogueAct or "REPLY",
+        groundedFactRefs = copy(
+            type(semanticPlan) == "table"
+                and semanticPlan.groundedFactRefs or {}
+        ) or {},
+        turns = {
+            {
+                id = "microplan",
+                separator = " ",
+                continuation = "end",
+                offers = {},
+                segments = {
+                    {
+                        kind = "literal",
+                        text = realized.text,
+                    },
+                },
+            },
+        },
+    }
+    if semanticPlan then output.plan = semanticPlan end
+    output.realization = {
+        family = "utterance_plan",
+        variant = tostring(realized.constructionID or ""),
+        applied = true,
+        applicationCount = 1,
+        neutralFallbackCount = 0,
+        maxApplications = Realization.MAX_FAMILY_APPLICATIONS,
+        compositional = true,
+    }
+    output.realizationFamily = "utterance_plan"
+    output.realizationVariant = realized.constructionID
+    output.semanticVariantID = output.selectionID
+    output.speechStyleVariant = style.variant
+    output.renderTemplateID = nil
+    return output, "utterance_plan_realized"
+end
+
+function Realization.Apply(response, context)
+    if type(response) ~= "table" then return response end
+    local style = Style.Resolve(context)
+    local output = copy(response)
+    local semanticPlan = type(response.plan) == "table"
+        and copy(response.plan) or nil
+    local compositional, compositionalReason =
+        compositionalInteractionResponse(
+            response, context, style, semanticPlan
+        )
+    if compositional then return compositional end
+    local renderPlan = output.plan
+    local applications = 0
+    local fallbackCount = 0
+    local first
+    local resolved
+    local segment
+    local turn
+    local blocked = {}
+    local localSelections = {}
+    local phraseSalt = (type(context) == "table" and (
+        context.phraseSalt
+        or context.variationSeed
+        or context.seed
+        or context.caseID
+    )) or response.selectionID
+
+    if response.selectionID == "semantic.refuse.default" then
+        blocked["semantic.social.acknowledged"] = true
+    end
+
+    output.speechStyleContext = Style.PublicView(style)
+    if type(renderPlan) == "table" and type(renderPlan.turns) == "table" then
+        for index = 1, math.min(#renderPlan.turns, 4) do
+            turn = renderPlan.turns[index]
+            for segmentIndex = 1, math.min(#(turn.segments or {}), 6) do
+                segment, resolved = applySegment(
+                    turn.segments[segmentIndex], style, blocked,
+                    context, phraseSalt, localSelections
+                )
+                turn.segments[segmentIndex] = segment
+                if resolved then
+                    applications = applications + 1
+                    first = first or resolved
+                    if resolved.fallbackReason then fallbackCount = fallbackCount + 1 end
+                end
+            end
+        end
+    end
+    segment, resolved = applySegment({
+        kind = "translation",
+        templateID = output.templateID,
+        fallback = output.fallback,
+        args = output.args,
+    }, style, blocked, context, phraseSalt, localSelections)
+    if resolved then
+        output.args = segment.args
+        output.semanticTemplateID = output.templateID
+        output.renderTemplateID = segment.templateID or resolved.templateID
+        output.fallback = segment.fallback or resolved.fallback
+        output.realizationFamily = resolved.family
+        output.realizationVariant = resolved.variant
+        output.realizationFallbackReason = resolved.fallbackReason
+        output.phraseFamilyID = segment.phraseFamilyID
+        output.phraseID = segment.phraseID
+        output.phrasePoolSize = segment.phrasePoolSize
+        output.phraseAntiRepeatReason = segment.phraseAntiRepeatReason
+        output.phraseSemanticTemplateID = segment.phraseSemanticTemplateID
+        if output.phraseID then
+            output.phraseSelection = {
+                familyID = output.phraseFamilyID,
+                phraseID = output.phraseID,
+                style = style.variant,
+                poolSize = output.phrasePoolSize,
+                antiRepeatReason = output.phraseAntiRepeatReason,
+            }
+        end
+        applications = applications + 1
+        first = first or resolved
+        if resolved.fallbackReason then fallbackCount = fallbackCount + 1 end
+    end
+    output.realization = {
+        family = first and first.family or nil,
+        variant = first and first.variant or style.variant,
+        applied = applications > 0,
+        applicationCount = applications,
+        neutralFallbackCount = fallbackCount,
+        maxApplications = Realization.MAX_FAMILY_APPLICATIONS,
+    }
+    output.semanticVariantID = output.selectionID
+    output.speechStyleVariant = style.variant
+    if type(context) == "table" and context.interactionPlan ~= nil then
+        output.utterancePlanFallbackReason = compositionalReason
+    end
+    -- Keep the semantic response plan canonical while the renderer uses the
+    -- realized copy. Queued payloads and decision results then share one
+    -- stable plan identity without losing style-specific rendering.
+    if semanticPlan then
+        output.renderPlan = output.plan
+        output.plan = semanticPlan
+    end
+    return output
+end
+
+return Realization

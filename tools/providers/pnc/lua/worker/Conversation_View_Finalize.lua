@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Conversation view session activation and derived projections.
 
 local Finalize = {}
@@ -17,7 +19,7 @@ function Finalize.apply(workerContext, Conversation, view, session, spec)
         view.spec.context.conversationRoot =
             composer.BuildSemanticRootProjection(view)
     end
-    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     local internal = input and input.Internal or nil
     if internal and type(internal.RefreshRootSuggestions) == "function" then
         local projection = internal.RefreshRootSuggestions(view)

@@ -23,7 +23,7 @@ end
 
 -- Compact read projection, independent of relationship-memory survival.
 function Events.QuerySemanticEvidence(record, targetKey, actorID, query)
-    local Evidence = require "PNC/Semantics/PNC_SemanticInteractionEvidence"
+    local Evidence = require "PNC/ConvoEngine/Interaction/Evidence"
     local target = Events.ResolveTarget(targetKey)
     if not target or not target.seed or type(record) ~= "table" then return {} end
     local normalized = Events.Normalize(record.memory) or {}

@@ -4,6 +4,7 @@
 -- in PNC_CompanionCommandInteraction.lua.
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.CompanionCommandPresentation = PNC.CompanionCommandPresentation or {}
 
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
@@ -15,12 +16,11 @@ local InteractionPresentationRegistry = require
 local Presentation = PNC.CompanionCommandPresentation
 local Identity = PNC.NPCIdentityPresentation
 local Registry = PNC.Registry
-local CompanionSpeech = PNC.Semantics
-    and PNC.Semantics.CompanionSpeech or nil
+local CompanionSpeech = PNC.ConvoEngine and PNC.ConvoEngine.CompanionSpeech or nil
 if type(CompanionSpeech) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticCompanionSpeech"
+        "PNC/ConvoEngine/CompanionSpeech"
     )
     CompanionSpeech = ok and loaded or nil
 end

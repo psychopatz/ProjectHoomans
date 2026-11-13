@@ -9,7 +9,7 @@ T.addPackagePaths({
 PNC = { Semantics = {} }
 local Reactions = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticSocialReaction.lua"
+    "PNC/ConvoEngine/Social/Reaction.lua"
 )
 
 local styles = {

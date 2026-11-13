@@ -179,7 +179,7 @@ PNC.NPCKnowledgeAPI = {
 
 T.load("ProjectHoomans", "server", SERVER .. "PNC_PlayerKnowledgeCommands_Core.lua")
 T.load("ProjectHoomans", "server", SERVER .. "PNC_PlayerKnowledgeCommands_Presentation.lua")
-T.load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticIdentityExchange.lua")
+T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/IdentityExchange.lua")
 T.load("ProjectHoomans", "server", SERVER .. "PNC_PlayerKnowledgeCommands_Identity.lua")
 
 local Commands = PNC.PlayerKnowledgeCommands

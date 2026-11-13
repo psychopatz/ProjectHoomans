@@ -2,7 +2,7 @@
 require "PNC/Core/Base/PNC_Core"
 require "PNC/Core/ActorControl/PNC_ActorControl"
 require "PNC/Core/Compatibility/PNC_CompatibilityRuntime"
-require "PNC/Semantics/PNC_SemanticFoundation"
+require "PNC/ConvoEngine/Foundation"
 require "PNC/Translation/PNC_TranslationBootstrap"
 require "PNC/Core/Perception/PNC_HumanNPCThreatSafeguards"
 require "PNC/Core/Base/PNC_Constants"

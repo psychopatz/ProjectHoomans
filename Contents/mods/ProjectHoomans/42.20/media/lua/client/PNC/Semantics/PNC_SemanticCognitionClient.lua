@@ -5,6 +5,7 @@
 -- authority and never creates a fact locally.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Client = PNC.Semantics.CognitionClient or {}
 PNC.Semantics.CognitionClient = Client
@@ -15,10 +16,10 @@ local Network = PNC.Network or {}
 local ClientState = Network.ClientState or {}
 if Network.ClientState == nil then Network.ClientState = ClientState end
 local Core = PNC.Core
-local Memory = PNC.Semantics.ConversationMemoryProvider
+local Memory = PNC.ConvoEngine.ConversationMemoryProvider
 if type(Memory) ~= "table" then
     Memory = require
-        "PNC/Semantics/PNC_SemanticConversationMemoryProvider"
+        "PNC/ConvoEngine/MemoryProvider"
 end
 if type(Memory) ~= "table" then Memory = nil end
 
@@ -161,7 +162,7 @@ local function notifyDialogueRequest(id, payload, pending)
     local requests = ClientState.semanticCognitionDialogueRequests
     local requestID = tostring(pending and pending.requestID or "")
     local request = requests and requests[requestID] or nil
-    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     local complete
     local ok
     local accepted

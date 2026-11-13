@@ -8,7 +8,7 @@ PNC = { Semantics = {} }
 
 local Responder = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticAffordanceResponder.lua"
+    "PNC/ConvoEngine/Suggestions/AffordanceResponder.lua"
 )
 
 local legacy = Responder.Project({
@@ -67,7 +67,7 @@ T.falsy(
 
 local Context = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueContextState.lua"
+    "PNC/ConvoEngine/Dialogue/ContextState.lua"
 )
 local semanticState = Context.New({ maxTurns = 5 })
 semanticState:RecordTurn({
@@ -86,7 +86,7 @@ semanticState:RecordTurn({
 
 local Policy = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticAffordanceContinuationPolicy.lua"
+    "PNC/ConvoEngine/Suggestions/AffordanceContinuationPolicy.lua"
 )
 local allowed, reason = Policy.Allowed("DOUBLE_DOWN", {
     semanticContextState = semanticState,

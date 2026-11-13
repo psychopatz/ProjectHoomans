@@ -5,7 +5,7 @@ PNC = { Semantics = {} }
 require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local Catalog = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 
 local function explain(pool, context, salt)

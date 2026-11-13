@@ -14,11 +14,11 @@ PNC = {
     },
 }
 
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-local Opportunity = require "PNC/Semantics/PNC_SemanticInteractionOpportunity"
-local Runtime = require "PNC/Semantics/PNC_SemanticInteractionSceneRuntime"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+local Opportunity = require "PNC/ConvoEngine/Interaction/Opportunity"
+local Runtime = require "PNC/ConvoEngine/Interaction/SceneRuntime"
 local Observatory = require
-    "PNC/Semantics/PNC_SemanticInteractionSceneObservatory"
+    "PNC/ConvoEngine/Interaction/SceneObservatory"
 
 local function projection(id, confidence)
     return {
@@ -211,7 +211,7 @@ T.equal(
 
 local source = T.read(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticInteractionSceneObservatory.lua"
+    "PNC/ConvoEngine/Interaction/SceneObservatory.lua"
 )
 T.falsy(string.find(source, "rawText", 1, true),
     "Observatory never projects raw dialogue text")

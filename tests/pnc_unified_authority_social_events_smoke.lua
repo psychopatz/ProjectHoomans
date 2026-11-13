@@ -7,18 +7,19 @@ T.addPackagePaths()
 -- a semantic ResponsePlan and selected wording when the old prose registry is
 -- absent.  Generic PsychopatzCore compatibility remains a separate boundary.
 PNC = { Semantics = {} }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 local Semantic = require "PsychopatzCore/Semantics/PsychopatzSemantic"
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 local Reactions = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticSocialReaction.lua"
+    "PNC/ConvoEngine/Social/Reaction.lua"
 )
-local Authority = PNC.Semantics.RealizationAuthority
+local Authority = PNC.ConvoEngine.RealizationAuthority
 
 T.falsy(PNC.SocialFlavorDefinitions,
     "semantic selection does not require first-party Flavor definitions")

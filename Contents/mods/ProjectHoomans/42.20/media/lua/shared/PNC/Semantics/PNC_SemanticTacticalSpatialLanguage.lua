@@ -6,7 +6,7 @@ PNC.Semantics.TacticalSpatialLanguage = Language
 
 Language.VERSION = 1
 
-local Registry = require "PNC/Semantics/Generated/Conversation/Registry"
+local Registry = require "PNC/ConvoEngine/Registry"
 
 local function spatialRelation()
     if PsychopatzCore and PsychopatzCore.SpatialRelation then

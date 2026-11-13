@@ -1,7 +1,8 @@
 require "PsychopatzCore/Conversation/PsychopatzConversationTextCatalog"
-local DialogueSession = require "PNC/Semantics/PNC_SemanticDialogueSession"
+local DialogueSession = require "PNC/ConvoEngine/Dialogue/Session"
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Conversation = PNC.Conversation or {}
 
 local Conversation = PNC.Conversation
@@ -185,7 +186,7 @@ local function sendRequest(command, payloadValue)
 end
 
 local function restoreCurrentChoices(view)
-    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     local semanticInternal = input and input.Internal or nil
     if semanticInternal
         and type(semanticInternal.RefreshRootSuggestions) == "function"

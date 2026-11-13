@@ -110,10 +110,10 @@ PNC = {
     },
 }
 
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
 local Adapter = require
-    "PNC/Semantics/PNC_SemanticInteractionActorAdapter_ProjectHoomans"
-local Scene = require "PNC/Semantics/PNC_SemanticInteractionScene"
+    "PNC/ConvoEngine/Interaction/ActorAdapter_ProjectHoomans"
+local Scene = require "PNC/ConvoEngine/Interaction/Scene"
 
 local installed = false
 for _, id in ipairs(Providers.AdapterIDs()) do

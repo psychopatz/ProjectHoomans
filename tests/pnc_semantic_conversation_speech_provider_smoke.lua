@@ -4,7 +4,7 @@ T.addPackagePaths()
 PNC = {}
 local Provider = T.load(
     "ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua")
+    "PNC/ConvoEngine/ConversationSpeechProvider.lua")
 
 T.falsy(Provider.IsBound(), "speech provider starts unbound")
 local accepted, reason = Provider.Receive({}, {}, {})

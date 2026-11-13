@@ -1,6 +1,7 @@
 -- Client-only speech and emote presentation for authority-owned commands.
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.CompanionCommandPresentation = PNC.CompanionCommandPresentation or {}
 
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
@@ -8,30 +9,27 @@ require "PNC/Semantics/PNC_SemanticAddressResolver"
 require "PNC/Audio/PNC_PlayerSpeech"
 local InteractionPresentationRegistry = require
     "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
-local InteractionLifecycle = PNC.Semantics
-    and PNC.Semantics.InteractionLifecycle or nil
-local RealizationAuthority = PNC.Semantics
-    and PNC.Semantics.RealizationAuthority or nil
+local InteractionLifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
+local RealizationAuthority = PNC.ConvoEngine and PNC.ConvoEngine.RealizationAuthority or nil
 if type(InteractionLifecycle) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticInteractionLifecycle"
+        "PNC/ConvoEngine/Interaction/Lifecycle"
     )
     InteractionLifecycle = ok and loaded or nil
 end
-local CompanionSpeech = PNC.Semantics
-    and PNC.Semantics.CompanionSpeech or nil
+local CompanionSpeech = PNC.ConvoEngine and PNC.ConvoEngine.CompanionSpeech or nil
 if type(CompanionSpeech) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticCompanionSpeech"
+        "PNC/ConvoEngine/CompanionSpeech"
     )
     CompanionSpeech = ok and loaded or nil
 end
 if type(RealizationAuthority) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
+        "PNC/ConvoEngine/Dialogue/RealizationAuthority"
     )
     RealizationAuthority = ok and loaded or nil
 end
@@ -45,12 +43,11 @@ local PlayerSpeech = PNC.PlayerSpeech
 local AddressResolver = PNC.Semantics
     and PNC.Semantics.AddressResolver
     or require "PNC/Semantics/PNC_SemanticAddressResolver"
-local SocialReactions = PNC.Semantics
-    and PNC.Semantics.SocialReactions or nil
+local SocialReactions = PNC.ConvoEngine and PNC.ConvoEngine.SocialReactions or nil
 if type(SocialReactions) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticSocialReaction"
+        "PNC/ConvoEngine/Social/Reaction"
     )
     SocialReactions = ok and loaded or nil
 end

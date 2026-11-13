@@ -61,7 +61,7 @@ class GenerationOwnershipTests(unittest.TestCase):
         )
         self.assertEqual(
             package_descriptor(DT_COMMON_OWNER).registry_namespace,
-            "DTCommon.Semantics.ConversationRegistry",
+            "DTCommon.ConvoEngine.Registry",
         )
         with self.assertRaises(OwnerConfigurationError):
             normalize_owner("some-unregistered-addon")
@@ -93,7 +93,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             )
 
             dt_module = (
-                "DTCommon/Semantics/Generated/Conversation/Trader/Offer"
+                "DTCommon/ConvoEngine/Trader/Offer"
             )
             repository, target = module_target(
                 hoomans,
@@ -112,7 +112,7 @@ class GenerationOwnershipTests(unittest.TestCase):
 
     def test_module_owner_does_not_guess_project_hoomans_for_unknown_modules(self) -> None:
         self.assertEqual(
-            module_owner("DTCommon/Semantics/Generated/Conversation/Registry"),
+            module_owner("DTCommon/ConvoEngine/Registry"),
             DT_COMMON_OWNER,
         )
         with self.assertRaises(OwnerConfigurationError):
@@ -123,7 +123,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             root = Path(directory)
             hoomans = root / "ProjectHoomans"
             dynamic_trading = root / "DynamicTrading"
-            module = "DTCommon/Semantics/Generated/Conversation/Trader/Offer"
+            module = "DTCommon/ConvoEngine/Trader/Offer"
             paths = _write_routed_modules(
                 hoomans,
                 None,
@@ -167,7 +167,7 @@ class GenerationOwnershipTests(unittest.TestCase):
         )
         self.assertTrue(
             module.startswith(
-                "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/"
+                "PsychopatzCore/ConvoEngine/Patterns/Common/"
             ),
             module,
         )
@@ -182,7 +182,7 @@ class GenerationOwnershipTests(unittest.TestCase):
         self.assertEqual(pack_report["kind"], "Packs")
         self.assertTrue(
             pack_module.startswith(
-                "DTCommon/Semantics/Generated/Conversation/Packs/Psdl/Dialogue/"
+                "DTCommon/ConvoEngine/Packs/Dialogue/"
             ),
             pack_module,
         )
@@ -191,7 +191,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             ("psdl/dialogue/companion_commands_player.json", "PSDL")
         ]
         self.assertEqual(report["owner"], "ProjectHoomans")
-        self.assertTrue(module.startswith("PNC/Semantics/Generated/Conversation/"), module)
+        self.assertTrue(module.startswith("PNC/ConvoEngine/"), module)
 
     def test_dtcommon_registry_fixture_uses_package_namespace_and_paths(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -271,7 +271,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             ]
             self.assertTrue(
                 pattern_module.startswith(
-                    "DTCommon/Semantics/Generated/Conversation/"
+                    "DTCommon/ConvoEngine/"
                 ),
                 pattern_module,
             )
@@ -287,12 +287,12 @@ class GenerationOwnershipTests(unittest.TestCase):
             registry = (
                 dynamic_trading
                 / "Contents/mods/DTCommon/common/media/lua/shared/"
-                / "DTCommon/Semantics/Generated/Conversation/Registry.lua"
+                / "DTCommon/ConvoEngine/Registry.lua"
             )
             pack_module = (
                 dynamic_trading
                 / "Contents/mods/DTCommon/common/media/lua/shared/"
-                / "DTCommon/Semantics/Generated/Conversation/Packs/"
+                / "DTCommon/ConvoEngine/Packs/"
                 "Psdl/Dialogue/Trading.lua"
             )
             manifest_lua = registry.with_name("Manifest.lua")
@@ -306,12 +306,12 @@ class GenerationOwnershipTests(unittest.TestCase):
                     for path in paths
                 )
             )
-            self.assertIn("DTCommon.Semantics.ConversationRegistry", registry.read_text())
+            self.assertIn("DTCommon.ConvoEngine.Registry", registry.read_text())
             self.assertIn('Registry.OWNER = "DTCommon"', registry.read_text())
             registry_text = registry.read_text(encoding="utf-8")
             self.assertIn("Registry.PACKS = {}", registry_text)
             self.assertIn(
-                'DTCommon/Semantics/Generated/Conversation/Packs/Psdl/Dialogue/Trading',
+                'DTCommon/ConvoEngine/Packs/Dialogue/Trading',
                 registry_text,
             )
             self.assertIn(
@@ -350,42 +350,42 @@ class GenerationOwnershipTests(unittest.TestCase):
             core_identity = (
                 core
                 / "Contents/mods/PsychopatzCore/common/media/lua/shared/"
-                / "PsychopatzCore/Semantics/Generated/Conversation/"
+                / "PsychopatzCore/ConvoEngine/"
                 / "Patterns/Common/Identity.lua"
             )
             core_foundation_registry = (
                 core
                 / "Contents/mods/PsychopatzCore/common/media/lua/shared/"
-                / "PsychopatzCore/Semantics/Generated/Conversation/"
+                / "PsychopatzCore/ConvoEngine/"
                 "FoundationRegistry.lua"
             )
             core_check_in = (
                 core
                 / "Contents/mods/PsychopatzCore/common/media/lua/shared/"
-                / "PsychopatzCore/Semantics/Generated/Conversation/UI/"
-                "Psdl/Dialogue/CoreCheckIn.lua"
+                / "PsychopatzCore/ConvoEngine/UI/"
+                "Dialogue/CoreCheckIn.lua"
             )
             core_identity_dialogue = (
                 core
                 / "Contents/mods/PsychopatzCore/common/media/lua/shared/"
-                / "PsychopatzCore/Semantics/Generated/Conversation/UI/"
-                "Psdl/Dialogue/CoreIdentity.lua"
+                / "PsychopatzCore/ConvoEngine/UI/"
+                "Dialogue/CoreIdentity.lua"
             )
             stale_hoomans_identity = (
                 hoomans
                 / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
-                / "PNC/Semantics/Generated/Conversation/Patterns/Common/Identity.lua"
+                / "PNC/ConvoEngine/Patterns/Common/Identity.lua"
             )
             hoomans_psdl = (
                 hoomans
                 / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
-                / "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/"
-                "semantic_command_player_follow.lua"
+                / "PNC/ConvoEngine/Dialogue/"
+                "CompanionCommandsPlayer.lua"
             )
             registry = (
                 hoomans
                 / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
-                / "PNC/Semantics/Generated/Conversation/Registry.lua"
+                / "PNC/ConvoEngine/Registry.lua"
             )
 
             self.assertTrue(core_identity.is_file())
@@ -401,26 +401,26 @@ class GenerationOwnershipTests(unittest.TestCase):
             foundation_text = core_foundation_registry.read_text(encoding="utf-8")
             self.assertIn(
                 'Registry.REGISTRY_MODULE = '
-                '"PsychopatzCore/Semantics/Generated/Conversation/FoundationRegistry"',
+                '"PsychopatzCore/ConvoEngine/FoundationRegistry"',
                 foundation_text,
             )
             self.assertIn(
-                '"PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreCheckIn"',
+                '"PsychopatzCore/ConvoEngine/UI/Dialogue/CoreCheckIn"',
                 foundation_text,
             )
             self.assertIn(
-                '"PsychopatzCore/Semantics/Generated/Conversation/UI/Psdl/Dialogue/CoreIdentity"',
+                '"PsychopatzCore/ConvoEngine/UI/Dialogue/CoreIdentity"',
                 foundation_text,
             )
             registry_text = registry.read_text(encoding="utf-8")
             self.assertIn(
-                'require "PsychopatzCore/Semantics/Generated/Conversation/'
+                'require "PsychopatzCore/ConvoEngine/'
                 'Patterns/Common/Identity"',
                 registry_text,
             )
             self.assertIn(
-                'appendPSDL(require "PNC/Semantics/Generated/Conversation/'
-                'PSDL/Dialogue/semantic_command_player_follow")',
+                'appendConvoPlans(require "PNC/ConvoEngine/'
+                'Dialogue/CompanionCommandsPlayer")',
                 registry_text,
             )
 

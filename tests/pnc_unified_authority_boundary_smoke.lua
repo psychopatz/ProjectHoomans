@@ -47,7 +47,7 @@ local Flavor = require
     "PsychopatzCore/Conversation/PsychopatzSocialFlavor"
 local Client = require
     "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient"
-require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
 local Presentation = require "PNC/Conversation/PNC_SemanticSpeechPresentation"
 
 local fallbackCalls = 0

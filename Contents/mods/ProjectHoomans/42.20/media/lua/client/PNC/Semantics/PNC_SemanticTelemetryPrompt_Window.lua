@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 local TelemetryPrompt = PNC.Semantics.SemanticTelemetryPrompt
 local UI = PsychopatzCore.UI
 local Layout = UI.Layout
@@ -94,7 +96,7 @@ function TelemetryPromptWindow:createChildren()
     self.actionCombo:addOption(tr("SelectSemantic",
         "Select a supported semantic..."))
 
-    local policy = PNC.Semantics and PNC.Semantics.DialoguePolicy
+    local policy = PNC.ConvoEngine and PNC.ConvoEngine.DialoguePolicy
     local actions = policy and type(policy.GetCommandActions) == "function"
         and policy.GetCommandActions() or {}
     for _, action in ipairs(actions) do

@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Typed conversation turn execution.
 
 local Turn = {}
@@ -20,11 +22,11 @@ function Turn.run(context, text, Conversation)
     local accepted
     local reason
     if semanticClickFrame then
-        accepted, reason = PNC.Semantics.DialogueInput.SubmitSemanticFrame(
+        accepted, reason = PNC.ConvoEngine.DialogueInput.SubmitSemanticFrame(
             view, semanticClickFrame
         )
     else
-        accepted, reason = PNC.Semantics.DialogueInput.Submit(view, text)
+        accepted, reason = PNC.ConvoEngine.DialogueInput.Submit(view, text)
     end
     local composer = PNC.Conversation and PNC.Conversation.Composer
     local mode = Runtime.scenario and Runtime.scenario.runtime

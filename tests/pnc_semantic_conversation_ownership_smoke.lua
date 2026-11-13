@@ -11,7 +11,7 @@ T.load(
 local Ownership = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticConversationCategoryOwnership.lua"
+    "PNC/ConvoEngine/CategoryOwnership.lua"
 )
 
 local expected = {

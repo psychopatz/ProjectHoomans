@@ -28,8 +28,10 @@ local worldContext = {
 }
 
 PNC = {
-    Semantics = {
+    ConvoEngine = {
         DialogueInput = input,
+    },
+    Semantics = {
         SemanticDiagnostics = diagnostics,
         EntityResolver = entityResolver,
         WorldContext = worldContext,
@@ -37,7 +39,7 @@ PNC = {
 }
 
 require = function(moduleName)
-    if moduleName == "PNC/Semantics/PNC_SemanticDialogueInput"
+    if moduleName == "PNC/ConvoEngine/Dialogue/Input"
         or moduleName == "PNC/Semantics/PNC_SemanticWorldContext"
     then
         return true
@@ -47,7 +49,7 @@ end
 
 local Runtime = T.load(
     "ProjectHoomans", "client",
-    "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime.lua")
+    "PNC/ConvoEngine/RuntimeFacade.lua")
 require = previousRequire
 
 T.equal(Runtime, PNC.Conversation.Semantic,

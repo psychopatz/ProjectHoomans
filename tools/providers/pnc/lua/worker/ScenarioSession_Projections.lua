@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Scenario session projections and bounded transport shaping.
 
 local function install(ScenarioSession)
@@ -207,8 +209,7 @@ local function install(ScenarioSession)
 
     local function interactionProjection(context)
         local Runtime = context.Runtime
-        local Lifecycle = PNC.Semantics
-            and PNC.Semantics.InteractionLifecycle or nil
+        local Lifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
         local store = Runtime.interactionLifecycle
         if not Lifecycle or not store then return nil end
         local playerUUID = Runtime.interactionLifecyclePlayerUUID

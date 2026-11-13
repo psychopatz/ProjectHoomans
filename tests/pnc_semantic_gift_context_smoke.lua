@@ -3,6 +3,7 @@ T.addPackagePaths()
 
 PsychopatzCore = {}
 PNC = { Semantics = {} }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Semantic = T.load(
     "PsychopatzCore",
@@ -12,7 +13,7 @@ local Semantic = T.load(
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueContextState.lua"
+    "PNC/ConvoEngine/Dialogue/ContextState.lua"
 )
 T.load(
     "ProjectHoomans",
@@ -22,10 +23,10 @@ T.load(
 local ReferenceResolver = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueReferenceResolver.lua"
+    "PNC/ConvoEngine/Dialogue/ReferenceResolver.lua"
 )
 
-local ContextState = PNC.Semantics.DialogueContextState
+local ContextState = PNC.ConvoEngine.DialogueContextState
 local store = ContextState.New({
     maxTurns = 4,
     maxMentions = 8,
@@ -56,7 +57,7 @@ PNC.Gifts = {
 
 local recordedTurns = 0
 local lastRecordedIR
-PNC.Semantics.DialogueInput = {
+PNC.ConvoEngine.DialogueInput = {
     Internal = {
         RecordContextTurn = function(view, ir, options)
             recordedTurns = recordedTurns + 1
@@ -165,15 +166,15 @@ T.equal(GiftContext.RecordTransfer(view, {
 T.equal(lastRecordedIR.extensions.semanticMentions[1].fullType,
     "Base.Apple", "pending selection keeps the stable item type")
 
-local originalInput = PNC.Semantics.DialogueInput
-PNC.Semantics.DialogueInput = nil
+local originalInput = PNC.ConvoEngine.DialogueInput
+PNC.ConvoEngine.DialogueInput = nil
 local fallbackRecorded = GiftContext.RecordTransfer(view, {
     npcId = "npc-alice",
     itemTypes = { "Base.Apple" },
 }, nil)
 T.equal(fallbackRecorded, true,
     "gift context records directly when the dialogue input adapter is absent")
-PNC.Semantics.DialogueInput = originalInput
+PNC.ConvoEngine.DialogueInput = originalInput
 
 local Lifecycle = T.load(
     "ProjectHoomans",

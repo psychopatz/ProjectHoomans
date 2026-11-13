@@ -4,8 +4,8 @@ T.addPackagePaths()
 PNC = {}
 
 local ConversationRegistry = require
-    "PNC/Semantics/Generated/Conversation/Registry"
-local Catalog = require "PNC/Semantics/PNC_SemanticInteractionCatalog"
+    "PNC/ConvoEngine/Registry"
+local Catalog = require "PNC/ConvoEngine/Interaction/Catalog"
 local Behaviors = Catalog.Behaviors
 local Beats = Catalog.Beats
 

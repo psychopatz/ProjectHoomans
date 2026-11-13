@@ -1,6 +1,7 @@
 -- Optional structured semantic result handoff from PBrainZ.
 -- The structured path activates only when the provider includes semantic_ir.
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.PBrainZ = PNC.PBrainZ or {}
 PNC.PBrainZ.Internal = PNC.PBrainZ.Internal or {}
 
@@ -68,7 +69,7 @@ function SemanticResult.Apply(pending, arguments)
         return nil, result and result.reason or "semantic_result_rejected"
     end
 
-    local input = PNC.Semantics and PNC.Semantics.DialogueInput
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput
     local actionResult
     if input and input.Internal
         and type(input.Internal.DispatchAction) == "function"

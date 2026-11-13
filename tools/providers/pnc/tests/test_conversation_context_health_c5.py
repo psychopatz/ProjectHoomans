@@ -78,17 +78,17 @@ class ConversationContextHealthC5Tests(unittest.TestCase):
     def test_generated_paths_explain_canonical_ownership(self) -> None:
         modules = {row["module"]: row for row in self.reports}
         expected = {
-            "PNC/Semantics/Generated/Conversation/PSDL/Dialogue/semantic_command_player_follow":
+            "PNC/ConvoEngine/Dialogue/semantic_command_player_follow":
                 "psdl/dialogue/companion_commands_player.json",
-            "PNC/Semantics/Generated/Conversation/Content/Social/ToolReplies/Hostile":
+            "PNC/ConvoEngine/Content/Social/ToolReplies/Hostile":
                 "content/social/tool_replies/hostile.json",
-            "PNC/Semantics/Generated/Conversation/Content/Task/Lifecycle/Eat":
+            "PNC/ConvoEngine/Content/Task/Lifecycle/Eat":
                 "content/task/lifecycle/eat.json",
-            "PsychopatzCore/Semantics/Generated/Conversation/Patterns/Common/GreetingWhatsUp":
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp":
                 "patterns/common/greeting_whats_up.json",
-            "PNC/Semantics/Generated/Conversation/Behaviors/Social/RetaliateVerbally":
+            "PNC/ConvoEngine/Behaviors/Social/RetaliateVerbally":
                 "behaviors/social/retaliate_verbally.json",
-            "PNC/Semantics/Generated/Conversation/Beats/Social/ArgumentEscalation":
+            "PNC/ConvoEngine/Beats/Social/ArgumentEscalation":
                 "beats/social/argument_escalation.json",
         }
         for module, source in expected.items():
@@ -130,7 +130,7 @@ class ConversationContextHealthC5Tests(unittest.TestCase):
         self.assertEqual(
             row["generated"],
             [
-                "PNC/Semantics/Generated/Conversation/"
+                "PNC/ConvoEngine/"
                 "Behaviors/Social/RetaliateVerbally"
             ],
         )
@@ -164,7 +164,7 @@ class ConversationContextHealthC5Tests(unittest.TestCase):
             closure["sources"],
         )
         self.assertIn(
-            "PNC/Semantics/Generated/Conversation/"
+            "PNC/ConvoEngine/"
             "Behaviors/Social/RetaliateVerbally",
             closure["generated"],
         )
@@ -228,7 +228,7 @@ class ConversationContextHealthC5Tests(unittest.TestCase):
             generated = (
                 repository
                 / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
-                "PNC/Semantics/Generated/Conversation"
+                "PNC/ConvoEngine"
             )
             self.assertFalse(generated.exists())
 

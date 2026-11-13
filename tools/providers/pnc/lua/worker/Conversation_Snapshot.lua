@@ -2,7 +2,7 @@
 
 local Snapshot = {}
 local SpeechStyleContext = require
-    "PNC/Semantics/PNC_SpeechStyleContext"
+    "PNC/ConvoEngine/SpeechStyleContext"
 
 function Snapshot.relationship(context)
     local scenario = context.Runtime.scenario or {}

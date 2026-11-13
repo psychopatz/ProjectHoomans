@@ -49,7 +49,7 @@ end
 
 -- Bounded read API: never copies journals or exposes mutable owner tables.
 function Relationships.QuerySemanticEvidence(observerNPCID, targetKey, actorID, worldAgeHours, query)
-    local Evidence = require "PNC/Semantics/PNC_SemanticInteractionEvidence"
+    local Evidence = require "PNC/ConvoEngine/Interaction/Evidence"
     worldAgeHours = finiteNumber(worldAgeHours)
     if worldAgeHours == nil then
         local time = getGameTime and getGameTime() or nil

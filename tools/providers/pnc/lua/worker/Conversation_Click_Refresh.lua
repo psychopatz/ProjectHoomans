@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Semantic frame application and suggestion refresh.
 
 local Refresh = {}
@@ -42,7 +44,7 @@ function Refresh.apply(context, state)
     end
     state.Conversation.refreshViewContext(context)
     if classification.isGroup and view.semanticSuggestions then
-        local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+        local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
         local internal = input and input.Internal or nil
         if internal and type(internal.ApplySemanticChoices) == "function" then
             internal.ApplySemanticChoices(view, view.semanticSuggestions)

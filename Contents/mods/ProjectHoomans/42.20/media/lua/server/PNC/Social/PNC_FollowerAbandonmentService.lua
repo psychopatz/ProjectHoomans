@@ -9,6 +9,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 then return end
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.FollowerAbandonment = PNC.FollowerAbandonment or {}
 
 local Service = PNC.FollowerAbandonment
@@ -22,12 +23,11 @@ local Relationships = PNC.Relationships
 local Network = PNC.Network
 local Meeting = PNC.SocialMeeting
     or PNC.SocialGreeting
-local SocialReactions = PNC.Semantics
-    and PNC.Semantics.SocialReactions or nil
+local SocialReactions = PNC.ConvoEngine and PNC.ConvoEngine.SocialReactions or nil
 if not SocialReactions then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticSocialReaction"
+        "PNC/ConvoEngine/Social/Reaction"
     )
     SocialReactions = ok and loaded or nil
 end

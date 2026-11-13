@@ -168,10 +168,10 @@ class C0AHistoricalEvidenceTests(unittest.TestCase):
             "content/social/reactions.json",
             REPOSITORY
             / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
-            "PNC/Semantics/Generated/Conversation/Content/Social/Reactions.lua",
+            "PNC/ConvoEngine/Content/Social/Reactions.lua",
             REPOSITORY
             / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
-            "PNC/Semantics/Generated/Conversation/Registry.lua",
+            "PNC/ConvoEngine/Registry.lua",
         ]
         before = {path: path.read_bytes() for path in paths}
         capture_storage()

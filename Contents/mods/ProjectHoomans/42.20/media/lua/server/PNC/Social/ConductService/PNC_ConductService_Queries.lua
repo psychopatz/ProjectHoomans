@@ -11,7 +11,7 @@ local Constants = PNC.ConductConstants
 
 -- Selective semantic read through the conduct owner; never exports its store.
 function Conduct.QuerySemanticEvidence(entityKey, subjectKey, actorID, targetID, at, query)
-    local Evidence = require "PNC/Semantics/PNC_SemanticInteractionEvidence"
+    local Evidence = require "PNC/ConvoEngine/Interaction/Evidence"
     local time = getGameTime and getGameTime() or nil
     at = tonumber(at) or time and time.getWorldAgeHours and tonumber(time:getWorldAgeHours())
     if not at or at ~= at or at < 0 or at == math.huge or at == -math.huge then return {} end

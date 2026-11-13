@@ -3,6 +3,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Service = PNC.Semantics.CombatTargetCallouts or {}
 PNC.Semantics.CombatTargetCallouts = Service
@@ -25,8 +26,8 @@ local Language = PNC.Semantics.TacticalSpatialLanguage
     or require "PNC/Semantics/PNC_SemanticTacticalSpatialLanguage"
 local Profile = PNC.Semantics.CombatReactionProfile
     or require "PNC/Semantics/PNC_SemanticCombatReactionProfile"
-local Banter = PNC.Semantics.CombatBanterArbiter
-    or require "PNC/Semantics/PNC_SemanticCombatBanterArbiter"
+local Banter = PNC.ConvoEngine.CombatBanterArbiter
+    or require "PNC/ConvoEngine/CombatBanterArbiter"
 
 local function finite(value)
     value = tonumber(value)

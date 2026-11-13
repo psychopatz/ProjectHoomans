@@ -3,6 +3,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 -- Server-authoritative social greeting transaction provider.
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.SocialGreeting = PNC.SocialGreeting or {}
 local Service = PNC.SocialGreeting
 if not Service.Internal then return Service end
@@ -17,16 +18,14 @@ local relationshipSummary = Internal.RelationshipSummary
 local relationshipDelta = Internal.RelationshipDelta
 local effectFor = Internal.EffectFor
 local playerKey = Internal.PlayerKey
-local InteractionLifecycle = PNC.Semantics
-    and PNC.Semantics.InteractionLifecycle or nil
+local InteractionLifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
 local InteractionPersistence = PNC.Conversation
     and PNC.Conversation.InteractionLifecyclePersistence or nil
-local CompanionSpeech = PNC.Semantics
-    and PNC.Semantics.CompanionSpeech or nil
+local CompanionSpeech = PNC.ConvoEngine and PNC.ConvoEngine.CompanionSpeech or nil
 if not CompanionSpeech then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticCompanionSpeech"
+        "PNC/ConvoEngine/CompanionSpeech"
     )
     CompanionSpeech = ok and loaded or nil
 end

@@ -1,8 +1,8 @@
 local T = require "tests/support/test"
 T.addPackagePaths()
 PNC = {}
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-local Context = require "PNC/Semantics/PNC_SemanticInteractionContext"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+local Context = require "PNC/ConvoEngine/Interaction/Context"
 for _, tier in ipairs({ "SESSION", "TODAY", "DURABLE" }) do
     local sourceTier = tier
     T.truthy(Providers.RegisterEvidenceAdapter({ id = "fixture." .. tier,

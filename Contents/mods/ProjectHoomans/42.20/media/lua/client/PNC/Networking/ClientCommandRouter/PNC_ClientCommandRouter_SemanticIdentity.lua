@@ -1,6 +1,6 @@
 -- Client presentation for authoritative identity-claim outcomes.
 require "PNC/Semantics/PNC_SemanticDiagnostics"
-local DialogueSession = require "PNC/Semantics/PNC_SemanticDialogueSession"
+local DialogueSession = require "PNC/ConvoEngine/Dialogue/Session"
 
 PNC = PNC or {}
 PNC.Client = PNC.Client or {}

@@ -1,6 +1,7 @@
 -- Context normalization and identity enrichment for ambient semantic speech.
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.SemanticSpeechPresentation = PNC.SemanticSpeechPresentation or {}
 PNC.SemanticSpeechPresentationInternal =
     PNC.SemanticSpeechPresentationInternal or {}
@@ -14,12 +15,11 @@ local currentPlayer = H.CurrentPlayer
 local updateMedicalSupplyRequest = H.UpdateMedicalSupplyRequest
 local playerAddress = H.PlayerAddress
 local npcIdentity = H.NPCIdentity
-local InteractionLifecycle = PNC.Semantics
-    and PNC.Semantics.InteractionLifecycle or nil
+local InteractionLifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
 if type(InteractionLifecycle) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticInteractionLifecycle"
+        "PNC/ConvoEngine/Interaction/Lifecycle"
     )
     InteractionLifecycle = ok and loaded or nil
 end

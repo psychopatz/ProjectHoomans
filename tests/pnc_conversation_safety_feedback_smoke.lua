@@ -52,8 +52,8 @@ local Client = require "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient
 local NameplateSpeech = require "PNC/UI/Nameplates/PNC_NameplateSpeech"
 -- Native shared composition loads the production response registry before
 -- client presentation; the standalone fixture must honor that contract.
-require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
-local Reactions = require "PNC/Semantics/PNC_SemanticSocialReaction"
+require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
+local Reactions = require "PNC/ConvoEngine/Social/Reaction"
 local Presentation = require "PNC/Conversation/PNC_SemanticSpeechPresentation"
 
 local view = {

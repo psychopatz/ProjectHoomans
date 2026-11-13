@@ -6,7 +6,7 @@ PNC = {}
 local Situation = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueSituation.lua"
+    "PNC/ConvoEngine/Dialogue/Situation.lua"
 )
 
 local projection = Situation.Build({

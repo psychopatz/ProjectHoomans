@@ -33,7 +33,7 @@ PNC = {
 
 local Consequences = T.load(
     "ProjectHoomans", "server",
-    "PNC/Semantics/PNC_SemanticSocialConsequenceService.lua"
+    "PNC/ConvoEngine/Social/ConsequenceService.lua"
 )
 
 T.equal(

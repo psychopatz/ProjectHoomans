@@ -7,6 +7,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Service = PNC.Semantics.CombatReactionService or {}
 PNC.Semantics.CombatReactionService = Service
@@ -18,14 +19,14 @@ local Registry = PNC.Registry
 local Spatial = PNC.SpatialIndex
 local Perception = PNC.Perception
 local Network = PNC.Network
-local Reactions = PNC.Semantics.SocialReactions
-    or require "PNC/Semantics/PNC_SemanticSocialReaction"
+local Reactions = PNC.ConvoEngine.SocialReactions
+    or require "PNC/ConvoEngine/Social/Reaction"
 local Profile = PNC.Semantics.CombatReactionProfile
     or require "PNC/Semantics/PNC_SemanticCombatReactionProfile"
 local Moment = PNC.Semantics.CombatMoment
     or require "PNC/Semantics/PNC_SemanticCombatMoment"
-local Arbiter = PNC.Semantics.CombatBanterArbiter
-    or require "PNC/Semantics/PNC_SemanticCombatBanterArbiter"
+local Arbiter = PNC.ConvoEngine.CombatBanterArbiter
+    or require "PNC/ConvoEngine/CombatBanterArbiter"
 local WeaponContext = PNC.Semantics.CombatWeaponContext
     or require "PNC/Semantics/PNC_SemanticCombatWeaponContext"
 

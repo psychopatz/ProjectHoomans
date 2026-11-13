@@ -10,17 +10,18 @@ PNC = {
         end,
     },
 }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-local Catalog = require "PNC/Semantics/PNC_SemanticInteractionCatalog"
-local Runtime = require "PNC/Semantics/PNC_SemanticInteractionSceneRuntime"
-local Opportunity = require "PNC/Semantics/PNC_SemanticInteractionOpportunity"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+local Catalog = require "PNC/ConvoEngine/Interaction/Catalog"
+local Runtime = require "PNC/ConvoEngine/Interaction/SceneRuntime"
+local Opportunity = require "PNC/ConvoEngine/Interaction/Opportunity"
 local SocialDirector = require
-    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialDirector"
+    "PNC/ConvoEngine/Social/Director"
 local SocialConversation = require
-    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialConversation"
+    "PNC/ConvoEngine/Social/Conversation"
 local Observatory = require
-    "PNC/Semantics/PNC_SemanticInteractionSceneObservatory"
+    "PNC/ConvoEngine/Interaction/SceneObservatory"
 
 Catalog.ResetDraftOverlay()
 Opportunity.ResetProvidersForTests()
@@ -295,7 +296,7 @@ local choiceStep = controller:Advance(
 T.truthy(choiceStep.mode == "emit" or choiceStep.mode == "terminate",
     "future domain reaches bounded NPC choice or silence")
 
-PNC.Semantics.InteractionSceneAdopters = {
+PNC.ConvoEngine.InteractionSceneAdopters = {
     Manager = function() return futureManager end,
     Snapshot = function()
         return {
@@ -347,11 +348,11 @@ end
 -- Generic social algorithms must stay free of fixture/domain special cases,
 -- scans, persistence and routine LLM/text-reparse side channels.
 for _, relative in ipairs({
-    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialDirector.lua",
-    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialChoicePolicy.lua",
-    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialTurnPolicy.lua",
-    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialBudget.lua",
-    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialConversation.lua",
+    "PNC/ConvoEngine/Social/Director.lua",
+    "PNC/ConvoEngine/Social/ChoicePolicy.lua",
+    "PNC/ConvoEngine/Social/TurnPolicy.lua",
+    "PNC/ConvoEngine/Social/Budget.lua",
+    "PNC/ConvoEngine/Social/Conversation.lua",
 }) do
     local source = T.read("ProjectHoomans", "shared", relative)
     T.falsy(string.find(source, "SOCIAL_S8_", 1, true),

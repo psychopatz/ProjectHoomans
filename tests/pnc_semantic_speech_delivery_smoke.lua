@@ -39,16 +39,17 @@ PNC = {
         end,
     },
 }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 getSpecificPlayer = function() return player end
 
 local SpeechProvider = T.load(
-    CLIENT .. "PNC/Semantics/PNC_SemanticConversationSpeechProvider.lua")
+    CLIENT .. "PNC/ConvoEngine/ConversationSpeechProvider.lua")
 T.truthy(SpeechProvider, "semantic speech provider is composed")
 T.truthy(SpeechProvider.Bind(PNC.SemanticSpeechPresentation),
     "semantic speech test binds its presentation sink")
-T.load(CLIENT .. "PNC/Semantics/PNC_SemanticSpeechDelivery.lua")
-local Delivery = PNC.Semantics.SemanticSpeechDelivery
+T.load(CLIENT .. "PNC/ConvoEngine/SpeechDelivery.lua")
+local Delivery = PNC.ConvoEngine.SemanticSpeechDelivery
 
 local sessionMessages = {}
 local session = {

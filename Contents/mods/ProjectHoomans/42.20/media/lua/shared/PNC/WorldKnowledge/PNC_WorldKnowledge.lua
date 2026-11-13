@@ -1,4 +1,5 @@
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.WorldKnowledge = PNC.WorldKnowledge or {}
 
 local Adapter = PNC.WorldKnowledge
@@ -144,8 +145,7 @@ function Adapter.PublishDeath(record, damageEvent, reason, at)
         source = "faction_death_record", acquisitionPath = "faction",
         confidence = known and 0.95 or 0.7, learnedAt = at,
     }) end
-    local sceneAdopters = PNC.Semantics
-        and PNC.Semantics.InteractionSceneAdopters or nil
+    local sceneAdopters = PNC.ConvoEngine and PNC.ConvoEngine.InteractionSceneAdopters or nil
     if sceneAdopters
         and type(sceneAdopters.OnWorldKnowledgeFact) == "function"
     then

@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Knowledge, backstory, and world-knowledge commands for the semantic worker router.
 
 local Knowledge = {}
@@ -55,7 +57,7 @@ local function backstorySnapshot(context, payload)
 end
 
 local function backstoryFact(context, payload)
-    local facts = PNC.Semantics and PNC.Semantics.DialogueFacts
+    local facts = PNC.ConvoEngine and PNC.ConvoEngine.DialogueFacts
     local result
     payload = type(payload) == "table" and payload or {}
     if not facts or type(facts.Resolve) ~= "function" then

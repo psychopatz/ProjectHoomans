@@ -2,8 +2,8 @@ local T = require "tests/support/test"
 T.addPackagePaths()
 PNC = {}
 local Resolver = require "PNC/Semantics/PNC_SemanticPragmaticResolver"
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+local Relations = require "PNC/ConvoEngine/Interaction/Relations"
 local function stimulus(act)
     return { source = { actorID = "player:a" }, targets = { "npc:b" },
         semantic = { speechAct = act, intent = act } }

@@ -1,12 +1,13 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Client-side player-emote interaction result presentation provider.
 local Presentation = PNC.CompanionCommandPresentation
 local Internal = Presentation.Internal
 local Registry = Internal.Registry
 local CompanionSpeech = Internal.CompanionSpeech
 local speak = Internal.speak
-local SpeechDelivery = PNC.Semantics
-    and PNC.Semantics.SemanticSpeechDelivery
-    or require "PNC/Semantics/PNC_SemanticSpeechDelivery"
+local SpeechDelivery = PNC.ConvoEngine and PNC.ConvoEngine.SemanticSpeechDelivery
+    or require "PNC/ConvoEngine/SpeechDelivery"
 
 local function activeConversationSession(npcID)
     local conversation = PsychopatzCore and PsychopatzCore.Conversation

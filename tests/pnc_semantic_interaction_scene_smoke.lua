@@ -3,9 +3,9 @@ T.addPackagePaths()
 
 PNC = {}
 
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
-local Scene = require "PNC/Semantics/PNC_SemanticInteractionScene"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
+local Scene = require "PNC/ConvoEngine/Interaction/Scene"
 
 local registered, reason = Providers.RegisterActorAdapter({
     id = "synthetic.scene_actor",

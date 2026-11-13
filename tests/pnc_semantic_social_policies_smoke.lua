@@ -8,15 +8,15 @@ PNC = { Semantics = {} }
 
 local Choice = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialChoicePolicy.lua"
+    "PNC/ConvoEngine/Social/ChoicePolicy.lua"
 )
 local Turn = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialTurnPolicy.lua"
+    "PNC/ConvoEngine/Social/TurnPolicy.lua"
 )
 local Budget = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialBudget.lua"
+    "PNC/ConvoEngine/Social/Budget.lua"
 )
 
 local frontier = {

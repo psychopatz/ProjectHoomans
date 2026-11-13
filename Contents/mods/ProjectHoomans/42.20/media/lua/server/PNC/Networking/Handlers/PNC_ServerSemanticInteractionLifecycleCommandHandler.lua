@@ -6,12 +6,12 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 then return end
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 local Router = PNC.ServerCommandRouter
 local Const = PNC.Const
 local Core = PNC.Core
-local Lifecycle = PNC.Semantics
-    and PNC.Semantics.InteractionLifecycle
-    or require "PNC/Semantics/PNC_SemanticInteractionLifecycle"
+local Lifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle
+    or require "PNC/ConvoEngine/Interaction/Lifecycle"
 local Persistence = PNC.Conversation
     and PNC.Conversation.InteractionLifecyclePersistence
     or require "PNC/Conversation/PNC_InteractionLifecyclePersistence"
@@ -161,8 +161,8 @@ local function handle(player, args)
     -- The existing leased server lifecycle owns compact semantic-act markers.
     -- Client plans/relevance are not trusted or persisted: recompute admission
     -- through the same bounded providers using server-owned day/domain facts.
-    local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
-    local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
+    local Relations = require "PNC/ConvoEngine/Interaction/Relations"
+    local Providers = require "PNC/ConvoEngine/Interaction/Providers"
     local Resolver = require "PNC/Semantics/PNC_SemanticPragmaticResolver"
     local metadata = Relations.GetAct(envelope.act)
     local compact = Relations.GetCompactType(envelope.act)

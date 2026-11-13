@@ -6,16 +6,17 @@ T.addPackagePaths()
 -- SocialFlavor definition shard.  The external adapter supplies facts; the
 -- Hoomans semantic catalog selects the response and its bounded plan.
 PNC = { Semantics = {} }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 require "PsychopatzCore/Semantics/PsychopatzSemantic"
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 local Reactions = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticSocialReaction.lua"
+    "PNC/ConvoEngine/Social/Reaction.lua"
 )
 
 T.falsy(PNC.SocialFlavorDefinitions,
@@ -163,16 +164,16 @@ T.equal(dog.realizationID,
     "semantic.compat.companion_dogs.feed.male",
     "Companion Dogs sex selects the matching semantic variant")
 
-T.truthy(PNC.Semantics.ResponseCatalog.Get(
+T.truthy(PNC.ConvoEngine.ResponseCatalog.Get(
     "semantic.compat.bandits.hooman_hurt"
 ), "Bandits pool is registered in the production catalog")
-T.truthy(PNC.Semantics.ResponseCatalog.Get(
+T.truthy(PNC.ConvoEngine.ResponseCatalog.Get(
     "semantic.compat.necroa.mask_warning"
 ), "Necroa pool is registered in the production catalog")
-T.truthy(PNC.Semantics.ResponseCatalog.Get(
+T.truthy(PNC.ConvoEngine.ResponseCatalog.Get(
     "semantic.compat.projectalife.meta"
 ), "Project A-Life pool is registered in the production catalog")
-T.truthy(PNC.Semantics.ResponseCatalog.Get(
+T.truthy(PNC.ConvoEngine.ResponseCatalog.Get(
     "semantic.compat.companion_dogs.greeting"
 ), "Companion Dogs pool is registered in the production catalog")
 

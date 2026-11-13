@@ -7,14 +7,15 @@ PNC = { Semantics = {}, Network = { ClientState = {
         ["npc-a"] = { id = "npc-a", activeBehavior = "FollowOwner" },
     },
 } } }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 require "PsychopatzCore/Semantics/PsychopatzSemantic"
 T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 local Reactions = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticSocialReaction.lua"
+    "PNC/ConvoEngine/Social/Reaction.lua"
 )
 T.load(
     "ProjectHoomans", "shared",
@@ -22,11 +23,11 @@ T.load(
 )
 local Suggestions = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueSuggestions.lua"
+    "PNC/ConvoEngine/Dialogue/Suggestions.lua"
 )
 
 local submitted
-PNC.Semantics.DialogueInput = {
+PNC.ConvoEngine.DialogueInput = {
     Internal = {
         RouterFor = function(view)
             view._router = view._router or { state = { sequence = 7 } }
@@ -44,7 +45,7 @@ PNC.Semantics.DialogueInput = {
 
 local Surface = T.load(
     "ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticCombatResponseSurface.lua"
+    "PNC/ConvoEngine/CombatResponseSurface.lua"
 )
 
 local clock = 1000
@@ -191,11 +192,11 @@ T.equal(Surface.Snapshot(), nil, "expired tactical prompt is removed")
 
 local preflightSource = T.read(
     "ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single_Preflight.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Single_Preflight.lua"
 )
 local commitSource = T.read(
     "ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single_Commit.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Single_Commit.lua"
 )
 T.contains(preflightSource, "semanticTransientSurface",
     "transient presentation flag survives semantic preflight")

@@ -1,0 +1,471 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "combat_kill_witness_practical",
+        ["id"] = "semantic.combat.reaction.kill_witness_practical_01",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.combat.reaction.kill_witness_practical_01",
+            ["sourcePath"] = "psdl/dialogue/combat_kill_witness_practical.json#records[0]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessPractical",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:combat_kill",
+                ["contentOwner"] = "projecthoomans.dialogue_content.events",
+                ["responseTemplateID"] = "semantic.combat.reaction.kill_witness_practical_01",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/practical.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good. Check the area.",
+                            },
+                            ["TL"] = {
+                                "Ayos. Suriin natin ang paligid.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Nice kill. Scan before moving in.",
+                            },
+                            ["TL"] = {
+                                "Magandang patay. Magmasid bago lumapit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Target down. Clear your corners.",
+                            },
+                            ["TL"] = {
+                                "Bagsak ang target. Linisin ang mga sulok.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good takedown. Check for flankers.",
+                            },
+                            ["TL"] = {
+                                "Magandang pagpabagsak. Tignan kung may pumapaligid.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Downed. Watch the shadows.",
+                            },
+                            ["TL"] = {
+                                "Bagsak na. Bantayan ang mga anino.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Solid strike. Secure the room first.",
+                            },
+                            ["TL"] = {
+                                "Solidong tama. Siguraduhin muna ang kwarto.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Well handled. Don't step out without scanning.",
+                            },
+                            ["TL"] = {
+                                "Maayos na napigilan. Huwag lalabas nang hindi nagmamasid.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Threat cleared. Look all around.",
+                            },
+                            ["TL"] = {
+                                "Banta naalis. Tumingin sa buong paligid.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Clean hit. Ensure the perimeter is safe.",
+                            },
+                            ["TL"] = {
+                                "Malinis na tama. Tiyaking ligtas ang paligid.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Dropped it. Scan before continuing.",
+                            },
+                            ["TL"] = {
+                                "Naibagsak mo. Magmasid bago magpatuloy.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/combat_kill_witness_practical.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "combat_kill_witness_practical",
+        ["id"] = "semantic.combat.reaction.kill_witness_practical_02",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.combat.reaction.kill_witness_practical_02",
+            ["sourcePath"] = "psdl/dialogue/combat_kill_witness_practical.json#records[1]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessPractical",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:combat_kill",
+                ["contentOwner"] = "projecthoomans.dialogue_content.events",
+                ["responseTemplateID"] = "semantic.combat.reaction.kill_witness_practical_02",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/practical.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "One down. Watch for more.",
+                            },
+                            ["TL"] = {
+                                "Isa na. Bantayan ang iba.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good hit. Expect stragglers.",
+                            },
+                            ["TL"] = {
+                                "Magandang tama. Asahan ang mga naiwan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "That's one. Don't assume the area is clear.",
+                            },
+                            ["TL"] = {
+                                "Isa 'yan. Huwag ipalagay na malinis na ang lugar.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Downed. Listen for more footsteps.",
+                            },
+                            ["TL"] = {
+                                "Bagsak. Makinig kung may mga yabag pa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "One eliminated. Watch the windows.",
+                            },
+                            ["TL"] = {
+                                "Isa ang tinanggal. Bantayan ang mga bintana.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Threat dead. Stay alert for secondary threats.",
+                            },
+                            ["TL"] = {
+                                "Patay ang banta. Maging alerto sa mga susunod.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Handled that one. Watch the hallway.",
+                            },
+                            ["TL"] = {
+                                "Naasikaso 'yon. Bantayan ang pasilyo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "One in the dirt. Keep your guard raised.",
+                            },
+                            ["TL"] = {
+                                "Isa sa lupa. Panatilihing nakataas ang depensa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good takedown. More could be nearby.",
+                            },
+                            ["TL"] = {
+                                "Magandang pagtumba. Baka may iba pang malapit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Down. Keep your ears open.",
+                            },
+                            ["TL"] = {
+                                "Bagsak. Buksan ang pandinig.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/combat_kill_witness_practical.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "combat_kill_witness_practical",
+        ["id"] = "semantic.combat.reaction.kill_witness_practical_03",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.combat.reaction.kill_witness_practical_03",
+            ["sourcePath"] = "psdl/dialogue/combat_kill_witness_practical.json#records[2]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/CombatKillWitnessPractical",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:combat_kill",
+                ["contentOwner"] = "projecthoomans.dialogue_content.events",
+                ["responseTemplateID"] = "semantic.combat.reaction.kill_witness_practical_03",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/combat_kill/witness/practical.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Nice. Let's make sure it's clear.",
+                            },
+                            ["TL"] = {
+                                "Maganda. Siguraduhin nating malinaw ang paligid.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Clean drop. Verify the whole sector.",
+                            },
+                            ["TL"] = {
+                                "Malinis na pagbagsak. Kumpirmahin ang buong bahagi.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good hit. Check behind all doors.",
+                            },
+                            ["TL"] = {
+                                "Magandang tama. Tignan sa likod ng lahat ng pinto.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Target down. Confirm no further movement.",
+                            },
+                            ["TL"] = {
+                                "Bagsak ang target. Kumpirmahing wala nang galaw.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Well done. Let's sweep the rest of the room.",
+                            },
+                            ["TL"] = {
+                                "Magaling. Linisin natin ang natitira sa kwarto.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Threat neutralized. Methodical check next.",
+                            },
+                            ["TL"] = {
+                                "Banta naalis. Maingat na pagsusuri ang susunod.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Solid kill. Sweep the perimeter together.",
+                            },
+                            ["TL"] = {
+                                "Solidong patay. Sabay nating linisin ang paligid.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Downed cleanly. Verify our exit is open.",
+                            },
+                            ["TL"] = {
+                                "Malinis na naibagsak. Tiyaking bukas ang labasan natin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Handled. Make sure nothing is creeping up.",
+                            },
+                            ["TL"] = {
+                                "Naasikaso na. Siguruhing walang gumagapang palapit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good work. Let's make certain the coast is clear.",
+                            },
+                            ["TL"] = {
+                                "Magandang trabaho. Tiyakin nating malinis ang daan.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/combat_kill_witness_practical.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

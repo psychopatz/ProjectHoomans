@@ -2,14 +2,15 @@ local T = require "tests/support/test"
 T.addPackagePaths()
 
 PNC = { Semantics = {} }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local Plan = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponsePlan.lua"
+    "PNC/ConvoEngine/Dialogue/ResponsePlan.lua"
 )
 local Catalog = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 T.load(
     "ProjectHoomans", "shared",
@@ -17,7 +18,7 @@ T.load(
 )
 local Suggestions = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueSuggestions.lua"
+    "PNC/ConvoEngine/Dialogue/Suggestions.lua"
 )
 
 local allowed = {
@@ -157,17 +158,17 @@ local tacticalView = {
         context = tacticalContext,
     },
 }
-PNC.Semantics.DialogueInput = {
+PNC.ConvoEngine.DialogueInput = {
     Internal = {
         Suggestions = Suggestions,
         audit = function() end,
         attachInteractionEnvelope = function() end,
     },
 }
-local Input = PNC.Semantics.DialogueInput
+local Input = PNC.ConvoEngine.DialogueInput
 T.load(
     "ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single_Interpretation.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Single_Interpretation.lua"
 )
 local typedFrame = T.truthy(Input.Internal.TacticalFrameForTyped(
     tacticalView, "Take them!", tacticalContext

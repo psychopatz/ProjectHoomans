@@ -17,7 +17,7 @@ Events = {
 local Lifecycle = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua"
+    "PNC/ConvoEngine/Interaction/Lifecycle.lua"
 )
 local Persistence = T.load(
     "ProjectHoomans",

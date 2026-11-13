@@ -5,7 +5,7 @@ PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
 local ValueBounds = require "PNC/Semantics/PNC_SemanticValueBounds"
-local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
+local Relations = require "PNC/ConvoEngine/Interaction/Relations"
 
 local Resolver = PNC.Semantics.PragmaticResolver or {}
 PNC.Semantics.PragmaticResolver = Resolver

@@ -5,6 +5,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 then return end
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Compatibility = PNC.Compatibility or {}
 PNC.Compatibility.Necroa = PNC.Compatibility.Necroa or {}
 
@@ -12,12 +13,11 @@ local Social = {}
 local EntityRef = PNC.EntityRef
 local Network = PNC.Network
 local Hooks = PNC.SocialEventHooks
-local SocialReactions = PNC.Semantics
-    and PNC.Semantics.SocialReactions or nil
+local SocialReactions = PNC.ConvoEngine and PNC.ConvoEngine.SocialReactions or nil
 if type(SocialReactions) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticSocialReaction"
+        "PNC/ConvoEngine/Social/Reaction"
     )
     SocialReactions = ok and loaded or nil
 end

@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Semantic context assembly from normalized production sources.
 
 local Builder = {}
@@ -254,12 +256,12 @@ function Builder.build(context)
     -- Keep the worker on the same production projection seam as the client:
     -- raw health is converted into the bounded semantic situation before
     -- actor context and suggestion ranking consume it.
-    local situation = PNC.Semantics and PNC.Semantics.DialogueSituation or nil
+    local situation = PNC.ConvoEngine and PNC.ConvoEngine.DialogueSituation or nil
     if situation and type(situation.Build) == "function" then
         output.dialogueSituation = situation.Build(output)
     end
     output.actorConversationContext = ActorConversationContext.Build(output)
-    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     local internal = input and input.Internal or nil
     if internal and type(internal.AttachSemanticHubPresentation)
         == "function"

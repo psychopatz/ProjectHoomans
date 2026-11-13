@@ -18,8 +18,7 @@ function ProductionModules.load(context)
             "SEMANTIC_HARNESS_CANDIDATE_OVERLAY_MODULE"
         ) or ""
         if moduleName ~= "" and not string.match(moduleName,
-            "^PNC/Semantics/SemanticDialogueResponseCatalog/"
-                .. "PNC_SemanticDialogueResponseCatalog_[%w_]+$")
+            "^PNC/ConvoEngine/ResponseCatalog/[%w_]+$")
         then
             error("invalid candidate overlay provider module")
         end
@@ -126,13 +125,13 @@ function ProductionModules.load(context)
         error("unexpected production require failure for " .. tostring(name)
             .. ": " .. reason)
     end
-    load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticDialogueInput.lua", "semantic_entry")
+    load("ProjectHoomans", "client", "PNC/ConvoEngine/Dialogue/Input.lua", "semantic_entry")
     -- The Conversation semantic façade is loaded after the input entry point
     -- so its lazy dependency seam observes the same worker-owned input table
     -- without executing the entry point a second time through require.
     load(
         "ProjectHoomans", "client",
-        "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime.lua",
+        "PNC/ConvoEngine/RuntimeFacade.lua",
         "conversation_semantic_runtime"
     )
     for _, spoke in ipairs({
@@ -149,17 +148,17 @@ function ProductionModules.load(context)
     end
     registerEntryPointModule(
         "ProjectHoomans", "client",
-        "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation.lua",
+        "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Presentation.lua",
         "semantic_lifecycle_spoke"
     )
     registerEntryPointModule(
         "ProjectHoomans", "client",
-        "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Navigation.lua",
+        "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Navigation.lua",
         "semantic_lifecycle_spoke"
     )
     registerEntryPointModule(
         "ProjectHoomans", "client",
-        "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission.lua",
+        "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission.lua",
         "semantic_lifecycle_spoke"
     )
     for _, spoke in ipairs({
@@ -186,7 +185,7 @@ function ProductionModules.load(context)
     )
     load(
         "ProjectHoomans", "shared",
-        "PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource.lua",
+        "PNC/ConvoEngine/Dialogue/BackstoryFactSource.lua",
         "conversation_memory"
     )
     load(

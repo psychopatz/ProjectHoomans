@@ -3,11 +3,11 @@ T.addPackagePaths({ { "ProjectHoomans", "client" } })
 
 PNC = nil
 local Session = T.load("ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticDialogueSession.lua")
+    "PNC/ConvoEngine/Dialogue/Session.lua")
 T.equal(rawget(_G, "PNC"), nil, "cold seam does not initialize a global owner")
 T.equal(PNC.Semantics, nil, "translation fallback gains no semantic application owner")
 T.equal(Session.GetActiveView(), nil, "cold active-view query is empty")
-T.equal(package.loaded["PNC/Semantics/PNC_SemanticDialogueInput"], nil,
+T.equal(package.loaded["PNC/ConvoEngine/Dialogue/Input"], nil,
     "session seam does not boot the semantic application")
 Session.ClearWorkingState(nil)
 Session.ReleaseView(nil)
@@ -23,7 +23,8 @@ local session = {
 local view = {
     session = session, lastSemanticDialogueResult = {}, lastSemanticActionResult = {},
 }
-PNC = { Semantics = { DialogueInput = { ActiveView = view } } }
+PNC = { ConvoEngine = { DialogueInput = { ActiveView = view } } }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 T.equal(Session.GetActiveView(), view, "query returns the canonical active view")
 Session.ClearWorkingState(session)
 T.equal(resets, 1, "semantic context resets once before its reference is released")
@@ -44,7 +45,7 @@ T.equal(view.lastSemanticDialogueResult, nil, "semantic presentation is released
 T.equal(view.lastSemanticActionResult, nil, "action presentation is released")
 
 local other = {}
-PNC.Semantics.DialogueInput.ActiveView = other
+PNC.ConvoEngine.DialogueInput.ActiveView = other
 Session.ReleaseView(view)
 T.equal(Session.GetActiveView(), other, "late cleanup cannot replace a different active view")
 T.finish("pnc_semantic_session_boundary_smoke")

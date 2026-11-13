@@ -3,8 +3,8 @@ T.addPackagePaths()
 
 PNC = {}
 
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-local Runtime = require "PNC/Semantics/PNC_SemanticInteractionSceneRuntime"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+local Runtime = require "PNC/ConvoEngine/Interaction/SceneRuntime"
 
 local function projection(id, facts, sociability, empathy)
     return {
@@ -191,7 +191,7 @@ T.equal(final.metrics.admissionRejected, 1,
 
 local runtimeSource = T.read(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticInteractionSceneRuntime.lua"
+    "PNC/ConvoEngine/Interaction/SceneRuntime.lua"
 )
 T.falsy(string.find(runtimeSource, "Events.OnTick", 1, true),
     "global Scene Runtime has no tick hook")

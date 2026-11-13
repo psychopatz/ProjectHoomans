@@ -21,7 +21,8 @@ SEMANTIC_INPUT_ROOT = (
     / "lua"
     / "client"
     / "PNC"
-    / "Semantics"
+    / "ConvoEngine"
+    / "Dialogue"
 )
 SERVER_HANDLER_ROOT = (
     REPOSITORY
@@ -41,7 +42,7 @@ TICK_REGISTRATION = re.compile(r"\bEvents\s*\.\s*OnTick\b|\bOnTick\s*\.\s*Add\b"
 
 class Phase6StaticBoundaryTests(unittest.TestCase):
     def test_semantic_input_modules_have_no_tick_polling_registration(self) -> None:
-        paths = sorted(SEMANTIC_INPUT_ROOT.glob("PNC_SemanticDialogueInput*.lua"))
+        paths = sorted(SEMANTIC_INPUT_ROOT.glob("Input*.lua"))
         self.assertTrue(paths, "semantic input modules were not found")
         offenders = [
             str(path.relative_to(REPOSITORY))

@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 local Internal = PNC.PBrainZ.Internal
 local Payload = Internal.ContextPayload
 local Runtime = Internal.Runtime
@@ -11,8 +13,7 @@ local MemoryIdentity = PNC.PBrainZ.Identity
 local DialogueFacts = PNC.PBrainZ.ContextPayloadDialogueFacts
 local SemanticResult = PNC.Semantics and PNC.Semantics.LLMResult
 local WorldContext = PNC.Semantics and PNC.Semantics.WorldContext
-local DialogueSituation = PNC.Semantics
-    and PNC.Semantics.DialogueSituation
+local DialogueSituation = PNC.ConvoEngine and PNC.ConvoEngine.DialogueSituation
 
 local function text(value, fallback)
     value = Runtime.Trim(value)

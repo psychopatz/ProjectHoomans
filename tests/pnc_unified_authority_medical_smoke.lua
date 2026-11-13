@@ -10,12 +10,12 @@ require "PsychopatzCore/Semantics/PsychopatzSemantic"
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 local Reactions = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticSocialReaction.lua"
+    "PNC/ConvoEngine/Social/Reaction.lua"
 )
 
 T.falsy(PNC.SocialFlavorDefinitions,

@@ -3,17 +3,17 @@
 -- external presentation bridge is called.
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Compatibility = PNC.Compatibility or {}
 local Bridge = PNC.Compatibility.CompanionDogs or {}
 local Internal = Bridge.Internal or {}
 Bridge.Internal = Internal
 PNC.Compatibility.CompanionDogs = Bridge
-local SocialReactions = PNC.Semantics
-    and PNC.Semantics.SocialReactions or nil
+local SocialReactions = PNC.ConvoEngine and PNC.ConvoEngine.SocialReactions or nil
 if type(SocialReactions) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticSocialReaction"
+        "PNC/ConvoEngine/Social/Reaction"
     )
     SocialReactions = ok and loaded or nil
 end

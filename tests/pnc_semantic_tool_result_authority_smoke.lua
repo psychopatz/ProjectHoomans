@@ -2,11 +2,12 @@ local T = require "tests/support/test"
 T.addPackagePaths()
 
 PNC = {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 T.load("ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticToolResultRealization.lua")
+    "PNC/ConvoEngine/ToolResultRealization.lua")
 
-local Realization = PNC.Semantics.ToolResultRealization
-local Catalog = PNC.Semantics.ResponseCatalog
+local Realization = PNC.ConvoEngine.ToolResultRealization
+local Catalog = PNC.ConvoEngine.ResponseCatalog
 
 T.falsy(
     package.loaded["PNC/Conversation/PNC_ConversationToolReplyCatalog"],

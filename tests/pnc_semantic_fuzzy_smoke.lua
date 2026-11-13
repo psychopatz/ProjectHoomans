@@ -9,6 +9,8 @@ local Semantic = T.load(
     "common",
     "PsychopatzCore/Semantics/PsychopatzSemantic.lua"
 )
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueState.lua")
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueRouter.lua")
 T.load(
     "ProjectHoomans",
     "shared",
@@ -17,12 +19,12 @@ T.load(
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 local Policy = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
 local Parser = Semantic.Parser
 
@@ -61,7 +63,7 @@ T.equal(typoWater.object.category, "WATER",
 T.equal(typoWater.diagnostics.fuzzyMatch, true,
     "fuzzy object recognition is diagnosable")
 
-local state = Semantic.DialogueState.New({ participants = { "npc:mara" } })
+local state = PsychopatzCore.ConvoEngine.DialogueState.New({ participants = { "npc:mara" } })
 local safeDecision = Policy.Decide(fuzzyFollow, state, {
     llmEnabled = false,
     npcID = "mara",

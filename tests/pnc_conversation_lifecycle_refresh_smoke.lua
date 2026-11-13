@@ -64,6 +64,7 @@ PNC = {
         end,
     },
 }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Lifecycle = T.load(
     "ProjectHoomans",
@@ -157,13 +158,13 @@ view.historyPart = {
     setMessages = function(self, messages)
         T.equal(view.session.semanticDialogueContext, nil,
             "semantic state is cleared before history presentation")
-        T.equal(PNC.Semantics.DialogueInput.ActiveView, view,
+        T.equal(PNC.ConvoEngine.DialogueInput.ActiveView, view,
             "active semantic view remains until presentation cleanup finishes")
         self.messages = messages
     end,
     setTyping = function(self, speaker) self.typingSpeaker = speaker end,
 }
-PNC.Semantics = { DialogueInput = { ActiveView = view } }
+PNC.ConvoEngine = { DialogueInput = { ActiveView = view } }
 Lifecycle.Create().finish(view, spec, state, "closed")
 T.equal(table.concat(closeOrder, ","), "farewell,scene,clear",
     "close schedules outcome, ends authority, then clears working state")
@@ -177,7 +178,7 @@ T.equal(session.semanticDialogueRouter, nil, "router is released")
 T.equal(session.semanticActorConversationService, nil, "actor context is released")
 T.equal(#session.queue, 0, "queued work is cleared")
 T.falsy(session.busy or session.llmPending, "pending flags clear")
-T.equal(PNC.Semantics.DialogueInput.ActiveView, nil, "active view is released")
+T.equal(PNC.ConvoEngine.DialogueInput.ActiveView, nil, "active view is released")
 T.equal(view.lastSemanticActionResult, nil, "action presentation is released")
 T.equal(#view.historyPart.messages, 0, "ordinary close clears visible history")
 
@@ -186,7 +187,7 @@ isClient = function() return true end
 sendClientCommand = function(module, command, payload) sent = { module, command, payload } end
 PNC.ConversationScene.CMD_END = "conversationEnd"
 PNC.SemanticSpeechPresentation = { EnqueueConversationSafety = function() return true end }
-PNC.Semantics.DialogueInput.ActiveView = view
+PNC.ConvoEngine.DialogueInput.ActiveView = view
 view.historyPart.messages = {
     { source = { eventType = "conversation_safety" } }, { text = "old" },
 }

@@ -32,7 +32,7 @@ PNC = {
         Now = function() return clock end,
         LogInfo = function(message) logs[#logs + 1] = message end,
     },
-    Semantics = {
+    ConvoEngine = {
         DialoguePolicy = {
             SelectCandidate = function() end,
             CommitFlow = function() end,
@@ -62,14 +62,7 @@ CustomTranslationManager = {
     forMod = function() end,
     getLanguage = function() return "EN" end,
 }
-PsychopatzCore.Semantics = {
-    VERSION = 1,
-    IR = { Validate = function() return true end },
-    Parser = {
-        Parse = function() end,
-        ParseCandidates = function() end,
-        CANDIDATE_VERSION = 1,
-    },
+PsychopatzCore.ConvoEngine = {
     DialogueRouter = {
         VERSION = 1,
         New = function() end,
@@ -77,6 +70,15 @@ PsychopatzCore.Semantics = {
         ProcessIR = function() end,
         SetCandidateParser = function() end,
         SetCandidateSelector = function() end,
+    },
+}
+PsychopatzCore.Semantics = {
+    VERSION = 1,
+    IR = { Validate = function() return true end },
+    Parser = {
+        Parse = function() end,
+        ParseCandidates = function() end,
+        CANDIDATE_VERSION = 1,
     },
 }
 

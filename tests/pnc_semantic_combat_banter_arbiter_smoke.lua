@@ -8,7 +8,7 @@ local Moment = T.load(
 )
 local Arbiter = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticCombatBanterArbiter.lua"
+    "PNC/ConvoEngine/CombatBanterArbiter.lua"
 )
 
 local ordinary = Moment.Build({

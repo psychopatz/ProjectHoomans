@@ -62,14 +62,15 @@ PNC = {
         end,
     },
 }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
 getSpecificPlayer = function() return player end
 
-T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua")
-T.load(SHARED .. "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua")
-T.load(SHARED .. "PNC/Semantics/PNC_SemanticCompanionSpeech.lua")
+T.load(SHARED .. "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua")
+T.load(SHARED .. "PNC/ConvoEngine/Dialogue/RealizationAuthority.lua")
+T.load(SHARED .. "PNC/ConvoEngine/CompanionSpeech.lua")
 T.load(CLIENT .. "PNC/Commands/PNC_CompanionCommandPresentation.lua")
 
 local playerEmoteRealization =
@@ -105,7 +106,7 @@ T.equal(string.find(
     1,
     true
 ), nil, "player emote target addresses do not leak the placeholder")
-local unknownAddressLine = PNC.Semantics.CompanionSpeech.ResolvePlayerEmote(
+local unknownAddressLine = PNC.ConvoEngine.CompanionSpeech.ResolvePlayerEmote(
     "wavehi",
     {
         npcID = "player:one",

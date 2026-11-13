@@ -1,6 +1,7 @@
 -- Client-side player-speech and safety presentation provider.
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.SemanticSpeechPresentation = PNC.SemanticSpeechPresentation or {}
 PNC.SemanticSpeechPresentationInternal =
     PNC.SemanticSpeechPresentationInternal or {}
@@ -22,12 +23,11 @@ local InteractionPresentationRegistry = require
 local MAX_PLAYER_SPEECH_RECIPIENTS = 8
 
 require "PNC/Conversation/PNC_SemanticSpeechPresentation_Receive"
-local SocialReactions = PNC.Semantics
-    and PNC.Semantics.SocialReactions or nil
+local SocialReactions = PNC.ConvoEngine and PNC.ConvoEngine.SocialReactions or nil
 if type(SocialReactions) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticSocialReaction"
+        "PNC/ConvoEngine/Social/Reaction"
     )
     SocialReactions = ok and loaded or nil
 end

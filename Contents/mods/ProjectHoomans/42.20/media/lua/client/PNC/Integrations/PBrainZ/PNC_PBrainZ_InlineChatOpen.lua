@@ -26,7 +26,7 @@ end
 
 local function semanticInput()
     pcall(require,
-        "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime")
+        "PNC/ConvoEngine/RuntimeFacade")
     local semantics = PNC.Semantics
     local input = semantics and semantics.DialogueInput or nil
     if input and type(input.Submit) == "function" then return input end

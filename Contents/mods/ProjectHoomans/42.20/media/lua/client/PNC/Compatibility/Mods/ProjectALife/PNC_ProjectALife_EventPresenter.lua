@@ -1,15 +1,16 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Nearby Hoomans speakers for normalized Project A-Life world events.
 --
 -- Project A-Life owns the event facts.  Hoomans semantic compatibility pools
 -- choose the response before this module enters the presentation queue.
 
 local Client = PNC.Compatibility.ProjectALifeEvents.Client
-local SocialReactions = PNC.Semantics
-    and PNC.Semantics.SocialReactions or nil
+local SocialReactions = PNC.ConvoEngine and PNC.ConvoEngine.SocialReactions or nil
 if type(SocialReactions) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticSocialReaction"
+        "PNC/ConvoEngine/Social/Reaction"
     )
     SocialReactions = ok and loaded or nil
 end

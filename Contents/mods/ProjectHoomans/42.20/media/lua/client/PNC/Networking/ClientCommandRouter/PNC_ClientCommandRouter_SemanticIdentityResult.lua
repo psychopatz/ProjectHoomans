@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Client application and delivery of authoritative identity-claim results.
 
 local Internal = PNC.Client.Internal
@@ -104,8 +106,7 @@ local function deliverIdentityResult(context, dependencies)
     end
     local unavailableResponse
     if args.accepted ~= true and args.kind == "identity_claim" then
-        local semanticInput = PNC.Semantics
-            and PNC.Semantics.DialogueInput
+        local semanticInput = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput
         local inputInternal = semanticInput and semanticInput.Internal
         if inputInternal
             and type(inputInternal.IdentityExchangeUnavailableResponse)

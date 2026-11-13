@@ -3,11 +3,11 @@ T.addPackagePaths()
 
 PNC = {}
 
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-local Catalog = require "PNC/Semantics/PNC_SemanticInteractionCatalog"
-local Scene = require "PNC/Semantics/PNC_SemanticInteractionScene"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+local Catalog = require "PNC/ConvoEngine/Interaction/Catalog"
+local Scene = require "PNC/ConvoEngine/Interaction/Scene"
 local Conversation = require
-    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialConversation"
+    "PNC/ConvoEngine/Social/Conversation"
 
 Catalog.ResetDraftOverlay()
 

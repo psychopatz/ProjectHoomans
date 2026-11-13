@@ -14,7 +14,7 @@ class ConversationSemanticCompositionTests(unittest.TestCase):
         snapshot = worker.snapshot()
 
         self.assertIn(
-            "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime.lua",
+            "PNC/ConvoEngine/RuntimeFacade.lua",
             snapshot["loadedModules"],
         )
 

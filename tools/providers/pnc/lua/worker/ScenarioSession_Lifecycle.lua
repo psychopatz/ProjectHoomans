@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Scenario source import, runtime configuration, and reset orchestration.
 
 local RuntimeEnvironment = require "worker/RuntimeEnvironment"
@@ -5,7 +7,7 @@ local SemanticAdapters = require "worker/SemanticAdapters"
 local InventoryFixtures = require "worker/InventoryFixtures"
 local ProductionRehydration = require "worker/ProductionRehydration"
 local SemanticDialogueRuntime = require
-    "PNC/Semantics/PNC_SemanticDialogueRuntime"
+    "PNC/ConvoEngine/Dialogue/Runtime"
 
 local function install(ScenarioSession)
     local Internal = ScenarioSession.Internal
@@ -106,8 +108,7 @@ local function install(ScenarioSession)
         ScenarioSession.configureRuntime(context)
         context.WorkingWorld.captureBaseline(Runtime, Values)
         local runtime = Runtime.scenario.runtime or {}
-        local lifecycle = PNC.Semantics
-            and PNC.Semantics.InteractionLifecycle or nil
+        local lifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
         if lifecycle and type(lifecycle.New) == "function" then
             local player = Runtime.scenario.player or {}
             local npc = Runtime.scenario.npc or {}

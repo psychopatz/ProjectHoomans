@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
@@ -21,12 +23,11 @@ local lastSupplyAttemptAt = Internal.LastSupplyAttemptAt
 local SUPPLY_PREFLIGHT_MS = Internal.SUPPLY_PREFLIGHT_MS
 local SUPPLY_NOTICE_RADIUS = Internal.SUPPLY_NOTICE_RADIUS
 local SUPPLY_NOTICE_REPEAT_MS = Internal.SUPPLY_NOTICE_REPEAT_MS
-local SocialReactions = PNC.Semantics
-    and PNC.Semantics.SocialReactions or nil
+local SocialReactions = PNC.ConvoEngine and PNC.ConvoEngine.SocialReactions or nil
 if type(SocialReactions) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticSocialReaction"
+        "PNC/ConvoEngine/Social/Reaction"
     )
     SocialReactions = ok and loaded or nil
 end

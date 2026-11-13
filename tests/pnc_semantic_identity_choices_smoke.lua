@@ -18,7 +18,7 @@ SurvivorFactory = {
 
 local Provider = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_StaticProvider.lua"
+    "PNC/ConvoEngine/Suggestions/StaticProvider.lua"
 )
 local context = {
     characterUUID = "char_identity_choices",

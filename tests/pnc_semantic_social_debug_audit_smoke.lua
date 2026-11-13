@@ -146,7 +146,7 @@ local conversation = setmetatable({}, { __index = ConversationMethods })
 local Audit = T.load(
     "ProjectHoomans",
     "server",
-    "PNC/Semantics/PNC_SemanticSocialDirectorAudit.lua"
+    "PNC/ConvoEngine/Social/DirectorAudit.lua"
 )
 
 Audit.ResetForTests()
@@ -264,7 +264,7 @@ T.equal(Audit.BuildSnapshot().eventCount, 0,
 local source = T.read(
     "ProjectHoomans",
     "server",
-    "PNC/Semantics/PNC_SemanticSocialDirectorAudit.lua"
+    "PNC/ConvoEngine/Social/DirectorAudit.lua"
 )
 T.falsy(string.find(source, "Events.OnTick", 1, true),
     "audit has no polling tick")
@@ -280,12 +280,12 @@ T.falsy(string.find(source, "transcriptText", 1, true),
 local directorSource = T.read(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialDirector.lua"
+    "PNC/ConvoEngine/Social/Director.lua"
 )
 local conversationSource = T.read(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/SemanticSocial/PNC_SemanticSocialConversation.lua"
+    "PNC/ConvoEngine/Social/Conversation.lua"
 )
 T.falsy(string.find(directorSource, "auditHook", 1, true),
     "disabled director hot path contains no audit branch")

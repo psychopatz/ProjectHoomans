@@ -1,0 +1,3123 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.default.guarded",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.default.guarded",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[3]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.default",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "guarded",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "guarded.01",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.default.guarded.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What are you apologizing for?",
+                            },
+                            ["TL"] = {
+                                "Ano ang hinihingi mo ng tawad?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.02",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.default.guarded.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Why are you apologizing? What happened?",
+                            },
+                            ["TL"] = {
+                                "Bakit ka nagpapaumanhin? Anong nangyari?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.03",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.default.guarded.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What went wrong that I should know about?",
+                            },
+                            ["TL"] = {
+                                "Anong pumalpak na dapat kong malaman?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.04",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.default.guarded.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "People only apologize when they messed up. What was it?",
+                            },
+                            ["TL"] = {
+                                "Nagsasabi lang ng sorry ang tao kapag pumalpak. Ano 'yon?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.05",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.default.guarded.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What are you trying to get ahead of?",
+                            },
+                            ["TL"] = {
+                                "Ano ang inuunahan mong sabihin?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.06",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.default.guarded.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Did you touch something you shouldn't have?",
+                            },
+                            ["TL"] = {
+                                "May ginalaw ka ba na hindi dapat?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.07",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.default.guarded.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hold on. Why are you saying sorry to me?",
+                            },
+                            ["TL"] = {
+                                "Teka. Bakit ka humihingi ng tawad sa akin?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.08",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.default.guarded.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What's the damage?",
+                            },
+                            ["TL"] = {
+                                "Gaano kalaki ang sira?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.09",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.default.guarded.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Tell me what you did before I find out myself.",
+                            },
+                            ["TL"] = {
+                                "Sabihin mo ang ginawa mo bago ko pa matuklasan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.10",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.default.guarded.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't apologize until you tell me what you did.",
+                            },
+                            ["TL"] = {
+                                "Huwag kang mag-sorry hangga't di mo sinasabi ang ginawa mo.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.default.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.default.neutral",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[0]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.default",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.default.neutral.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What are you apologizing for?",
+                            },
+                            ["TL"] = {
+                                "Ano ang hinihingi mo ng tawad?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.default.neutral.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What is that for?",
+                            },
+                            ["TL"] = {
+                                "Para saan iyan?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.default.neutral.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Why are you saying sorry?",
+                            },
+                            ["TL"] = {
+                                "Bakit ka humihingi ng pasensya?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.default.neutral.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What did you do?",
+                            },
+                            ["TL"] = {
+                                "Anong ginawa mo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.default.neutral.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Did something happen that I missed?",
+                            },
+                            ["TL"] = {
+                                "May nangyari ba na hindi ko napansin?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.default.neutral.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "No need to apologize unless something went wrong.",
+                            },
+                            ["TL"] = {
+                                "Walang kailangang ihingi ng tawad maliban kung may nagkamali.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.default.neutral.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What's the apology about?",
+                            },
+                            ["TL"] = {
+                                "Tungkol saan ang paumanhin?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.default.neutral.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "You don't owe me an apology unless you broke something.",
+                            },
+                            ["TL"] = {
+                                "Wala kang utang na tawad sa 'kin maliban kung may nasira ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.default.neutral.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hold on, what are you apologizing for?",
+                            },
+                            ["TL"] = {
+                                "Teka, para saan ang tawad mo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.default.neutral.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What brought this on?",
+                            },
+                            ["TL"] = {
+                                "Bakit mo biglang sinabi 'yan?",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.default.terse",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.default.terse",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[2]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.default",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "terse",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "terse.01",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.default.terse.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What are you apologizing for?",
+                            },
+                            ["TL"] = {
+                                "Ano ang hinihingi mo ng tawad?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.02",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.default.terse.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Why?",
+                            },
+                            ["TL"] = {
+                                "Bakit?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.03",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.default.terse.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "For what?",
+                            },
+                            ["TL"] = {
+                                "Dahil saan?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.04",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.default.terse.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What did you break?",
+                            },
+                            ["TL"] = {
+                                "Anong sinira mo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.05",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.default.terse.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Explain.",
+                            },
+                            ["TL"] = {
+                                "Ipaliwanag mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.06",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.default.terse.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What happened?",
+                            },
+                            ["TL"] = {
+                                "Anong nangyari?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.07",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.default.terse.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Apologizing for what?",
+                            },
+                            ["TL"] = {
+                                "Hihingi ng tawad para saan?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.08",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.default.terse.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Spit it out.",
+                            },
+                            ["TL"] = {
+                                "Diretsuhin mo na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.09",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.default.terse.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Why are you sorry?",
+                            },
+                            ["TL"] = {
+                                "Bakit ka nagso-sorry?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.10",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.default.terse.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What did you do now?",
+                            },
+                            ["TL"] = {
+                                "Anong ginawa mo ngayon?",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.default.warm",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.default.warm",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[1]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.default",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "warm",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "warm.01",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.default.warm.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What are you apologizing for?",
+                            },
+                            ["TL"] = {
+                                "Ano ang hinihingi mo ng tawad?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.02",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.default.warm.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey, you don't have to apologize to me.",
+                            },
+                            ["TL"] = {
+                                "Huy, hindi mo kailangang humingi ng tawad sa akin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.03",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.default.warm.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "What's this for? We're good.",
+                            },
+                            ["TL"] = {
+                                "Para saan ito? Ayos tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.04",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.default.warm.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't sweat it. What's on your mind?",
+                            },
+                            ["TL"] = {
+                                "Huwag mong alalahanin. Anong iniisip mo?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.05",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.default.warm.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "You didn't do anything wrong. What happened?",
+                            },
+                            ["TL"] = {
+                                "Wala kang ginawang mali. Anong nangyari?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.06",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.default.warm.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "You don't need to apologize. We look out for each other.",
+                            },
+                            ["TL"] = {
+                                "Di mo kailangang magpaumanhin. Nagtutulungan tayo rito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.07",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.default.warm.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Why the apology? Everything is okay between us.",
+                            },
+                            ["TL"] = {
+                                "Bakit ka nagpapaumanhin? Maayos ang lahat sa atin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.08",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.default.warm.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "You're too hard on yourself. What's wrong?",
+                            },
+                            ["TL"] = {
+                                "Masyado mong pinahihirapan ang sarili mo. May problema ba?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.09",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.default.warm.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "No need for apologies here. We're on the same side.",
+                            },
+                            ["TL"] = {
+                                "Walang kailangang tawad dito. Magkakampi tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.10",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.default.warm.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "It's all right. You really don't have to apologize.",
+                            },
+                            ["TL"] = {
+                                "Ayos lang talaga. Hindi mo kailangang mag-sorry.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.friendly.guarded",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.friendly.guarded",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[7]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.friendly",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "guarded",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "guarded.01",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.friendly.guarded.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I heard you. Leave it there.",
+                            },
+                            ["TL"] = {
+                                "Narinig kita. Tama na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.02",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.friendly.guarded.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Fine. Just don't let it happen again.",
+                            },
+                            ["TL"] = {
+                                "Sige. Huwag mo lang hahayaang maulit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.03",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.friendly.guarded.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Accepted. Watch your step next time.",
+                            },
+                            ["TL"] = {
+                                "Tanggap ko. Mag-ingat ka na lang sa susunod.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.04",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.friendly.guarded.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "All right. But I'll be keeping an eye out.",
+                            },
+                            ["TL"] = {
+                                "Sige. Pero magmamasid pa rin ako.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.05",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.friendly.guarded.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We'll let it slide this time.",
+                            },
+                            ["TL"] = {
+                                "Palalampasin natin sa pagkakataong ito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.06",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.friendly.guarded.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Understood. Do better going forward.",
+                            },
+                            ["TL"] = {
+                                "Naintindihan. Ayusin mo sa mga susunod.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.07",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.friendly.guarded.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I accept it. Just remember what's at stake.",
+                            },
+                            ["TL"] = {
+                                "Tinatanggap ko. Tandaan mo lang kung anong nakataya.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.08",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.friendly.guarded.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Fair enough. Let's not have a repeat.",
+                            },
+                            ["TL"] = {
+                                "Makatwiran. Huwag nang uulitin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.09",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.friendly.guarded.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I hear the words. Make sure actions follow.",
+                            },
+                            ["TL"] = {
+                                "Naririnig ko ang salita. Tiyakin mong susunod ang gawa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.10",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.friendly.guarded.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We're even for now. Keep it that way.",
+                            },
+                            ["TL"] = {
+                                "Pantay tayo sa ngayon. Panatilihin mong ganoon.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.friendly.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.friendly.neutral",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[4]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.friendly",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.friendly.neutral.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "It's okay. We can put that behind us.",
+                            },
+                            ["TL"] = {
+                                "Ayos lang. Kalimutan na natin iyon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.friendly.neutral.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "No worries. It happens to everyone.",
+                            },
+                            ["TL"] = {
+                                "Huwag kang mag-alala. Nangyayari 'yan kahit kanino.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.friendly.neutral.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We're good. Don't worry about it.",
+                            },
+                            ["TL"] = {
+                                "Ayos tayo. Huwag mo nang alalahanin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.friendly.neutral.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Forget about it. All good here.",
+                            },
+                            ["TL"] = {
+                                "Kalimutan mo na. Ayos ang lahat dito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.friendly.neutral.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "It's all right. We move forward.",
+                            },
+                            ["TL"] = {
+                                "Ayos lang. Tuloy ang lakad natin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.friendly.neutral.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "No harm done. We're square.",
+                            },
+                            ["TL"] = {
+                                "Walang nasaktan. Kuwits na tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.friendly.neutral.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I appreciate the apology. We're good.",
+                            },
+                            ["TL"] = {
+                                "Salamat sa paumanhin. Ayos na tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.friendly.neutral.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't sweat the small stuff out here.",
+                            },
+                            ["TL"] = {
+                                "Huwag mong problemahin ang maliliit na bagay dito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.friendly.neutral.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We all have off moments. It's behind us.",
+                            },
+                            ["TL"] = {
+                                "Lahat naman may pagkakamali. Lumipas na 'yon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.friendly.neutral.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "All cleared up. Let's keep working.",
+                            },
+                            ["TL"] = {
+                                "Malinaw na ang lahat. Tuloy na sa trabaho.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.friendly.terse",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.friendly.terse",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[6]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.friendly",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "terse",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "terse.01",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.friendly.terse.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "It's okay.",
+                            },
+                            ["TL"] = {
+                                "Ayos lang.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.02",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.friendly.terse.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "All good.",
+                            },
+                            ["TL"] = {
+                                "Ayos na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.03",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.friendly.terse.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Forget it.",
+                            },
+                            ["TL"] = {
+                                "Kalimutan mo na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.04",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.friendly.terse.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We're good.",
+                            },
+                            ["TL"] = {
+                                "Ayos tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.05",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.friendly.terse.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "No problem.",
+                            },
+                            ["TL"] = {
+                                "Walang problema.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.06",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.friendly.terse.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Drop it.",
+                            },
+                            ["TL"] = {
+                                "Tama na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.07",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.friendly.terse.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Square.",
+                            },
+                            ["TL"] = {
+                                "Kuwits.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.08",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.friendly.terse.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Understood. Good.",
+                            },
+                            ["TL"] = {
+                                "Naintindihan. Mabuti.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.09",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.friendly.terse.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Done with it.",
+                            },
+                            ["TL"] = {
+                                "Tapos na roon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.10",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.friendly.terse.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Move on.",
+                            },
+                            ["TL"] = {
+                                "Tuloy na.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.friendly.warm",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.friendly.warm",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[5]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.friendly",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "warm",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "warm.01",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.friendly.warm.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "It's okay. I appreciate you saying that.",
+                            },
+                            ["TL"] = {
+                                "Ayos lang. Pinahahalagahan ko ang sinabi mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.02",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.friendly.warm.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't worry about it for a second. We're friends.",
+                            },
+                            ["TL"] = {
+                                "Huwag mo nang alalahanin kahit sandali. Magkaibigan tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.03",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.friendly.warm.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey, it takes a good person to say that. Thank you.",
+                            },
+                            ["TL"] = {
+                                "Kailangan ng mabuting puso para sabihin 'yan. Salamat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.04",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.friendly.warm.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We're completely fine. Really.",
+                            },
+                            ["TL"] = {
+                                "Maayos na maayos tayo. Totoo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.05",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.friendly.warm.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "You don't have to carry that around. I forgive you.",
+                            },
+                            ["TL"] = {
+                                "Huwag mo nang dalhin sa dibdib mo 'yan. Pinatatawad kita.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.06",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.friendly.warm.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I appreciate your honesty. It means a lot to me.",
+                            },
+                            ["TL"] = {
+                                "Salamat sa katapatan mo. Malaking bagay ito sa akin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.07",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.friendly.warm.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We look out for each other. Don't worry about it.",
+                            },
+                            ["TL"] = {
+                                "Nagtitinginan tayo rito. Huwag mo nang isipin 'yon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.08",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.friendly.warm.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "You're good in my book. Always.",
+                            },
+                            ["TL"] = {
+                                "Mabuti ka sa akin. Palagi.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.09",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.friendly.warm.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Thanks for being real with me. We're good.",
+                            },
+                            ["TL"] = {
+                                "Salamat sa pagiging tapat sa akin. Ayos tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.10",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.friendly.warm.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "No bad blood between us. Not now, not ever.",
+                            },
+                            ["TL"] = {
+                                "Walang samaan ng loob sa atin. Kahit kailan.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.stressed.guarded",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.stressed.guarded",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[11]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.stressed",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "guarded",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "guarded.01",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.stressed.guarded.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Things are tense. Leave it there.",
+                            },
+                            ["TL"] = {
+                                "Tensiyonado tayo. Tama na iyon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.02",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.stressed.guarded.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We don't need panic on top of danger. Keep steady.",
+                            },
+                            ["TL"] = {
+                                "Hindi natin kailangan ng takot sa ibabaw ng panganib. Magpakatatag.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.03",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.stressed.guarded.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep your stress to yourself. We need clear heads.",
+                            },
+                            ["TL"] = {
+                                "Kimkimin mo ang kaba mo. Kailangan natin ng malinaw na isip.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.04",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.stressed.guarded.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm stressed too, but I'm not snapping. Watch yourself.",
+                            },
+                            ["TL"] = {
+                                "Pagod din ako, pero di ako nagwawala. Mag-ingat ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.05",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.stressed.guarded.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Apology heard. Don't let your nerves get us killed.",
+                            },
+                            ["TL"] = {
+                                "Narinig ang tawad. Huwag mong hayaang mapatay tayo ng kaba mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.06",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.stressed.guarded.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep a grip on yourself. That's all I ask.",
+                            },
+                            ["TL"] = {
+                                "Kontrolin mo ang sarili mo. Iyon lang ang hinihiling ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.07",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.stressed.guarded.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "If you lose control out here, we're all finished.",
+                            },
+                            ["TL"] = {
+                                "Kapag nawalan ka ng kontrol dito, tapos tayong lahat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.08",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.stressed.guarded.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I heard you. Pull yourself together now.",
+                            },
+                            ["TL"] = {
+                                "Narinig kita. Ayusin mo ang sarili mo ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.09",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.stressed.guarded.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Stress is an excuse that gets survivors killed.",
+                            },
+                            ["TL"] = {
+                                "Ang kaba ay dahilan na ikinamamatay ng mga tao.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.10",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.stressed.guarded.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Leave it. Keep your eyes on our surroundings.",
+                            },
+                            ["TL"] = {
+                                "Tama na. Iwan mo ang paningin mo sa paligid.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.stressed.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.stressed.neutral",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[8]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.stressed",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.stressed.neutral.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I know things are tense. Let's keep it calm.",
+                            },
+                            ["TL"] = {
+                                "Alam kong tensiyonado tayo. Panatilihin nating mahinahon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.stressed.neutral.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We're all under a lot of stress. Just take a breath.",
+                            },
+                            ["TL"] = {
+                                "Lahat tayo nai-stress. Huminga ka muna nang malalim.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.stressed.neutral.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Tensions are high right now. Let's not lose our heads.",
+                            },
+                            ["TL"] = {
+                                "Mataas ang tensiyon ngayon. Huwag tayong mawalan ng katinuan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.stressed.neutral.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "It's fine. We just need to keep our cool.",
+                            },
+                            ["TL"] = {
+                                "Ayos lang. Kailangan lang nating magpakahinahon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.stressed.neutral.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Pressure gets to everyone out here. We're okay.",
+                            },
+                            ["TL"] = {
+                                "Lahat naman nadadala sa bigat ng sitwasyon. Ayos lang tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.stressed.neutral.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Let's reset and focus on what needs doing.",
+                            },
+                            ["TL"] = {
+                                "Mag-reset tayo at magpokus sa kailangang gawin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.stressed.neutral.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "No one's at their best under this much strain. It's fine.",
+                            },
+                            ["TL"] = {
+                                "Walang perpekto kapag ganito kabigat ang sitwasyon. Ayos lang.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.stressed.neutral.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Take it easy. We can work through this.",
+                            },
+                            ["TL"] = {
+                                "Dahan-dahan lang. Kakayanin natin ito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.stressed.neutral.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "It's all right. Let's keep our nerves steady.",
+                            },
+                            ["TL"] = {
+                                "Ayos lang. Panatilihin nating kalmado ang sarili natin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.stressed.neutral.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Understood. Let's de-escalate and move forward.",
+                            },
+                            ["TL"] = {
+                                "Naiintindihan ko. Magpahinga muna at magpatuloy.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.stressed.terse",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.stressed.terse",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[10]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.stressed",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "terse",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "terse.01",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.stressed.terse.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep it calm.",
+                            },
+                            ["TL"] = {
+                                "Maging mahinahon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.02",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.stressed.terse.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Breathe.",
+                            },
+                            ["TL"] = {
+                                "Huminga ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.03",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.stressed.terse.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Cool off.",
+                            },
+                            ["TL"] = {
+                                "Kumalma ka muna.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.04",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.stressed.terse.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Not now. Stay focused.",
+                            },
+                            ["TL"] = {
+                                "Hindi ngayon. Magpokus ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.05",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.stressed.terse.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep your head.",
+                            },
+                            ["TL"] = {
+                                "Gamitin ang isip.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.06",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.stressed.terse.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Fine. Settle down.",
+                            },
+                            ["TL"] = {
+                                "Sige. Kalma na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.07",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.stressed.terse.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "No drama. We have work.",
+                            },
+                            ["TL"] = {
+                                "Walang drama. May trabaho tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.08",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.stressed.terse.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Steady up.",
+                            },
+                            ["TL"] = {
+                                "Magpakatatag ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.09",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.stressed.terse.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Heard. Keep moving.",
+                            },
+                            ["TL"] = {
+                                "Narinig ko. Tuloy ang lakad.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.10",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.stressed.terse.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hold it together.",
+                            },
+                            ["TL"] = {
+                                "Kayanin mo.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.stressed.warm",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.stressed.warm",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[9]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.stressed",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "warm",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "warm.01",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.stressed.warm.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I know things are tense. Thanks for saying that.",
+                            },
+                            ["TL"] = {
+                                "Alam kong tensiyonado tayo. Salamat sa pagsabi niyan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.02",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.stressed.warm.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey, we're all frayed right now. It's totally okay.",
+                            },
+                            ["TL"] = {
+                                "Huy, pagod tayong lahat ngayon. Ayos na ayos lang 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.03",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.stressed.warm.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I know how hard this is on you. We're in this together.",
+                            },
+                            ["TL"] = {
+                                "Alam ko kung gaano kabigat ito sa 'yo. Magkasama tayo rito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.04",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.stressed.warm.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't apologize for being stressed. You're human.",
+                            },
+                            ["TL"] = {
+                                "Huwag kang mag-sorry dahil nai-stress ka. Tao ka lang.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.05",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.stressed.warm.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I appreciate you taking the time to say that. We're good.",
+                            },
+                            ["TL"] = {
+                                "Salamat sa paglalaan ng oras para sabihin 'yan. Ayos tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.06",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.stressed.warm.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Take a breath. I'm right here with you.",
+                            },
+                            ["TL"] = {
+                                "Huminga ka muna. Narito lang ako kasama mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.07",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.stressed.warm.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We'll get through the rough patch together. Don't worry.",
+                            },
+                            ["TL"] = {
+                                "Lalampasan natin ang hirap na ito nang magkasama. Huwag kang mag-alala.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.08",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.stressed.warm.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Thank you for checking in despite the chaos. It means a lot.",
+                            },
+                            ["TL"] = {
+                                "Salamat sa pangungumusta sa kabila ng gulo. Malaking bagay ito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.09",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.stressed.warm.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "You don't have to carry the stress alone. We're okay.",
+                            },
+                            ["TL"] = {
+                                "Hindi mo kailangang pasanin mag-isa ang bigat. Ayos tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.10",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.stressed.warm.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "It's okay. Let's just catch our breath for a minute.",
+                            },
+                            ["TL"] = {
+                                "Ayos lang. Huminga muna tayo nang sandali.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.withdrawn.guarded",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.withdrawn.guarded",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[15]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.withdrawn",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "guarded",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "guarded.01",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.withdrawn.guarded.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "All right. Leave it there.",
+                            },
+                            ["TL"] = {
+                                "Sige. Tama na iyon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.02",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.withdrawn.guarded.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't bring it up again.",
+                            },
+                            ["TL"] = {
+                                "Huwag mo nang bubuksan muli 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.03",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.withdrawn.guarded.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Drop it while you're ahead.",
+                            },
+                            ["TL"] = {
+                                "Itigil mo na habang maaga pa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.04",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.withdrawn.guarded.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm done hearing about it.",
+                            },
+                            ["TL"] = {
+                                "Ayoko nang marinig ang tungkol diyan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.05",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.withdrawn.guarded.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Leave it where it lies.",
+                            },
+                            ["TL"] = {
+                                "Hayaan mo kung saan 'yan naroroon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.06",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.withdrawn.guarded.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We're not reopening this. Ever.",
+                            },
+                            ["TL"] = {
+                                "Hindi na natin bubuksan muli ito. Kailanman.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.07",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.withdrawn.guarded.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "That's enough out of you.",
+                            },
+                            ["TL"] = {
+                                "Sapat na ang narinig ko sa 'yo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.08",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.withdrawn.guarded.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep your distance from that subject.",
+                            },
+                            ["TL"] = {
+                                "Lumayo ka sa paksang 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.09",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.withdrawn.guarded.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Consider this matter closed.",
+                            },
+                            ["TL"] = {
+                                "Ituring mong sarado na ang usaping ito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.10",
+                        ["metadata"] = {
+                            ["style"] = "guarded",
+                            ["textKey"] = "semantic.social.apology.withdrawn.guarded.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Leave it there and don't test me.",
+                            },
+                            ["TL"] = {
+                                "Iwan mo na diyan at huwag mo akong subukan.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.withdrawn.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.withdrawn.neutral",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[12]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.withdrawn",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.withdrawn.neutral.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "All right. Let's leave it there.",
+                            },
+                            ["TL"] = {
+                                "Sige. Tama na iyon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.withdrawn.neutral.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Okay. Let's drop the subject.",
+                            },
+                            ["TL"] = {
+                                "Sige. Huwag na nating pag-usapan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.withdrawn.neutral.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Understood. Moving past it.",
+                            },
+                            ["TL"] = {
+                                "Naiintindihan ko. Lumalampas na roon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.withdrawn.neutral.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "No need to say more. It's settled.",
+                            },
+                            ["TL"] = {
+                                "Wala nang dapat sabihin pa. Ayos na 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.withdrawn.neutral.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We've said what we needed to say.",
+                            },
+                            ["TL"] = {
+                                "Nasabi na natin ang kailangang sabihin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.withdrawn.neutral.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Let's leave it at that and get back to work.",
+                            },
+                            ["TL"] = {
+                                "Iwan na natin doon at bumalik sa trabaho.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.withdrawn.neutral.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Fine by me. Subject closed.",
+                            },
+                            ["TL"] = {
+                                "Ayos sa akin. Sarado na ang usapan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.withdrawn.neutral.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Nothing more to discuss. Let's move.",
+                            },
+                            ["TL"] = {
+                                "Wala nang dapat pagtalunan pa. Tara na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.withdrawn.neutral.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Fair enough. We'll leave it alone.",
+                            },
+                            ["TL"] = {
+                                "Makatwiran. Hayaan na natin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["metadata"] = {
+                            ["style"] = "neutral",
+                            ["textKey"] = "semantic.social.apology.withdrawn.neutral.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "All right. That's the end of it.",
+                            },
+                            ["TL"] = {
+                                "Sige. Diyan na nagtatapos 'yan.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.withdrawn.terse",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.withdrawn.terse",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[14]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.withdrawn",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "terse",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "terse.01",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.withdrawn.terse.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Leave it.",
+                            },
+                            ["TL"] = {
+                                "Tama na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.02",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.withdrawn.terse.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Drop it.",
+                            },
+                            ["TL"] = {
+                                "Hayaan mo na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.03",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.withdrawn.terse.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Enough.",
+                            },
+                            ["TL"] = {
+                                "Sapat na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.04",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.withdrawn.terse.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Done.",
+                            },
+                            ["TL"] = {
+                                "Tapos na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.05",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.withdrawn.terse.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Subject closed.",
+                            },
+                            ["TL"] = {
+                                "Sarado na ang usapan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.06",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.withdrawn.terse.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "No more.",
+                            },
+                            ["TL"] = {
+                                "Wala nang kasunod.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.07",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.withdrawn.terse.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Let it be.",
+                            },
+                            ["TL"] = {
+                                "Hayaan mo na 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.08",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.withdrawn.terse.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Finished.",
+                            },
+                            ["TL"] = {
+                                "Tapos.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.09",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.withdrawn.terse.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Moving on.",
+                            },
+                            ["TL"] = {
+                                "Tuloy na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.10",
+                        ["metadata"] = {
+                            ["style"] = "terse",
+                            ["textKey"] = "semantic.social.apology.withdrawn.terse.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "End of discussion.",
+                            },
+                            ["TL"] = {
+                                "Tapos na ang diskusyon.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_apology",
+        ["id"] = "semantic.social.apology.withdrawn.warm",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.apology.withdrawn.warm",
+            ["sourcePath"] = "psdl/dialogue/social_apology.json#records[13]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialApology",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:social.apology",
+                ["responseTemplateID"] = "semantic.social.apology.withdrawn",
+                ["sourceSurface"] = "content/social_apology.json",
+                ["style"] = "warm",
+            },
+            ["response"] = {
+                ["act"] = "APOLOGY_RESPONSE",
+                ["variants"] = {
+                    {
+                        ["id"] = "warm.01",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.withdrawn.warm.01",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "All right. Let's leave it there for now.",
+                            },
+                            ["TL"] = {
+                                "Sige. Tama na muna iyon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.02",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.withdrawn.warm.02",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We can give it some space. We're still good.",
+                            },
+                            ["TL"] = {
+                                "Bigyan muna natin ng puwang. Maayos pa rin tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.03",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.withdrawn.warm.03",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "Take your time. We don't have to talk about it anymore.",
+                            },
+                            ["TL"] = {
+                                "Magpahinga ka. Hindi na natin kailangang pag-usapan pa 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.04",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.withdrawn.warm.04",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I hear you, and it's okay. We can put it to rest.",
+                            },
+                            ["TL"] = {
+                                "Narinig kita, at ayos lang. Pwede na nating ipahinga 'yon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.05",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.withdrawn.warm.05",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "It's okay. We can take a break from this topic.",
+                            },
+                            ["TL"] = {
+                                "Ayos lang. Pwede tayong magpahinga sa paksang ito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.06",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.withdrawn.warm.06",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "No worries at all. We'll leave it behind us.",
+                            },
+                            ["TL"] = {
+                                "Walang problema talaga. Iiwan na natin 'yan sa likod.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.07",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.withdrawn.warm.07",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I understand. Let's just focus on each other and staying safe.",
+                            },
+                            ["TL"] = {
+                                "Nauunawaan ko. Magpokus na lang tayo sa isa't isa at kaligtasan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.08",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.withdrawn.warm.08",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "All good. No pressure to explain anything more.",
+                            },
+                            ["TL"] = {
+                                "Ayos ang lahat. Walang pamimilit na magpaliwanag pa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.09",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.withdrawn.warm.09",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "We're okay. Let's leave it there peacefully.",
+                            },
+                            ["TL"] = {
+                                "Ayos lang tayo. Iwan na natin doon nang payapa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.10",
+                        ["metadata"] = {
+                            ["style"] = "warm",
+                            ["textKey"] = "semantic.social.apology.withdrawn.warm.10",
+                        },
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm with you. We don't need to rehash it.",
+                            },
+                            ["TL"] = {
+                                "Kasama mo ako. Hindi na natin kailangang ulit-ulitin.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_apology.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

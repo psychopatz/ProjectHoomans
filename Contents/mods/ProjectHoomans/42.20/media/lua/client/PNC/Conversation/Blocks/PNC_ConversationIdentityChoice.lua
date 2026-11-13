@@ -2,6 +2,7 @@
 -- Asking for a name starts the semantic prompt; verified claims reach the
 -- authoritative knowledge service through the semantic input lifecycle.
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Conversation = PNC.Conversation or {}
 
 local IdentityChoice = PNC.Conversation.IdentityChoice or {}
@@ -18,7 +19,7 @@ end
 
 function IdentityChoice.Request(npcID)
     local view = currentConversationView(npcID)
-    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     if not view then return false, "conversation_unavailable" end
     if not input or type(input.Submit) ~= "function" then
         return false, "semantic_dialogue_input_unavailable"

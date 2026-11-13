@@ -1,10 +1,11 @@
 -- Transport adapter for semantic identity validation results.
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Network = PNC.Network or {}
 PNC.Const = PNC.Const or {}
 
 local Network = PNC.Network
-local Identity = PNC.Semantics and PNC.Semantics.IdentityExchange
+local Identity = PNC.ConvoEngine and PNC.ConvoEngine.IdentityExchange
 local Internal = Network.Internal or {}
 
 function Network.SendSemanticIdentityResult(targetPlayer, payload)

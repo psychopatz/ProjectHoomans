@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Conversation open and ceasefire entry points.
 
 local Conversation = PNC.Conversation
@@ -134,7 +136,7 @@ function Conversation.Open(entry, player, forcedTime)
         -- The semantic projection is rendered through Core's native choices
         -- part. Refresh once after Core has created the session; subsequent
         -- semantic turns refresh the same part through the input lifecycle.
-        local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+        local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
         local internal = input and input.Internal or nil
         -- Keep the just-opened native host discoverable by the same semantic
         -- request/composer path used by later choice clicks. This reference

@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Disposable production-worker fixtures and storage measurements. No save IO.
 local Handler = {}
 
@@ -34,7 +36,7 @@ function Handler.handle(context, command, payload)
         return { ok = true, rows = rows, fallbackDynamic = fallback and fallback.dynamic }
     end
     if command == "TEST_EVIDENCE_PROVIDERS" then
-        local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
+        local Providers = require "PNC/ConvoEngine/Interaction/Providers"
         for _, tier in ipairs({ "SESSION", "TODAY", "DURABLE" }) do
             local sourceTier = tier
             Providers.RegisterEvidenceAdapter({ id = "fixture." .. tier,
@@ -149,7 +151,7 @@ function Handler.handle(context, command, payload)
         identity = { adapterTarget = Runtime.relationshipTargetKey, target = target,
             targetKind = dialogueContext.relationship and dialogueContext.relationship.targetKind,
             targetID = dialogueContext.relationship and dialogueContext.relationship.targetID },
-        evidence = PNC.Semantics.InteractionProviders.QueryEvidence(dialogueContext, {}),
+        evidence = PNC.ConvoEngine.InteractionProviders.QueryEvidence(dialogueContext, {}),
         limits = { today = 8, compactDurable = 6,
             relationship = PNC.RelationshipConstants.MEMORY_LIMIT,
             conduct = PNC.ConductConstants.EVIDENCE_LIMIT },

@@ -8,7 +8,7 @@ local receiveSource = T.read(
 local buildSources = T.read(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueSuggestions_Build_Sources.lua"
+    "PNC/ConvoEngine/Dialogue/Suggestions_Build_Sources.lua"
 )
 local zombieResolution = T.read(
     "ProjectHoomans",
@@ -28,7 +28,7 @@ local reactionService = T.read(
 local catalog = T.read(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/SemanticDialogueResponseCatalog/PNC_SemanticDialogueResponseCatalog_Social_Reactions.lua"
+    "PNC/ConvoEngine/ResponseCatalog/Social_Reactions.lua"
 )
 
 T.contains(receiveSource,

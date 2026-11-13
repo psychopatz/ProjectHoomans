@@ -6,17 +6,17 @@ require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local Catalog = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 local Reactions = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticSocialReaction.lua"
+    "PNC/ConvoEngine/Social/Reaction.lua"
 )
 local Lifecycle = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua"
+    "PNC/ConvoEngine/Interaction/Lifecycle.lua"
 )
 T.load(
     "ProjectHoomans",
@@ -26,7 +26,7 @@ T.load(
 local Suggestions = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueSuggestions.lua"
+    "PNC/ConvoEngine/Dialogue/Suggestions.lua"
 )
 
 local eventRef = "social:zombie_horde_encounter:npc-a:3000:1"

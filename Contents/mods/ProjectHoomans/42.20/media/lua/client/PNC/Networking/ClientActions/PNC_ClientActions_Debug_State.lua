@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Local debug actions for knowledge, factions, communities, needs, and
 -- abstract-director state.
 local Core = PNC.Core
@@ -83,7 +85,7 @@ return {
     end,
 
     semantic_social_debug_action = function(_, args)
-        local audit = PNC.Semantics and PNC.Semantics.SocialDirectorAudit or nil
+        local audit = PNC.ConvoEngine and PNC.ConvoEngine.SocialDirectorAudit or nil
         if not audit or type(audit.PerformAction) ~= "function" then
             return false
         end

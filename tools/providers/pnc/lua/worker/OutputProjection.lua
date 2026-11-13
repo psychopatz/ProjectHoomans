@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Convert production traces and state into the harness response contract.
 
 local OutputProjection = {}
@@ -121,8 +123,7 @@ function OutputProjection.toolResultSpeech(context, payload)
     payload = type(payload) == "table" and payload or {}
     local results = type(payload.results) == "table"
         and payload.results or {}
-    local realization = PNC.Semantics
-        and PNC.Semantics.ToolResultRealization or nil
+    local realization = PNC.ConvoEngine and PNC.ConvoEngine.ToolResultRealization or nil
     if not realization or type(realization.Text) ~= "function" then
         return { ok = false, error = "tool_result_realization_unavailable" }
     end

@@ -6,11 +6,12 @@
 pcall(require, "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient")
 require "PNC/Audio/PNC_PlayerSpeech"
 require "PNC/Conversation/PNC_ConversationFarewellContext"
-pcall(require, "PNC/Semantics/PNC_SemanticInteractionLifecycle")
+pcall(require, "PNC/ConvoEngine/Interaction/Lifecycle")
 local InteractionPresentationRegistry = require
     "PNC/Conversation/PNC_SemanticInteractionPresentationRegistry"
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Conversation = PNC.Conversation or {}
 
 local Farewell = PNC.Conversation.Farewell or {}
@@ -19,14 +20,12 @@ PNC.Conversation.Farewell = Farewell
 local pending = {}
 local recent = {}
 local Context = PNC.Conversation.FarewellContext
-local InteractionLifecycle = PNC.Semantics
-    and PNC.Semantics.InteractionLifecycle or nil
-local RealizationAuthority = PNC.Semantics
-    and PNC.Semantics.RealizationAuthority or nil
+local InteractionLifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
+local RealizationAuthority = PNC.ConvoEngine and PNC.ConvoEngine.RealizationAuthority or nil
 if not RealizationAuthority then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
+        "PNC/ConvoEngine/Dialogue/RealizationAuthority"
     )
     RealizationAuthority = ok and loaded or nil
 end

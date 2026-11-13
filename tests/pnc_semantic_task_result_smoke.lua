@@ -6,12 +6,12 @@ PNC = { Semantics = {} }
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Presentation.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Presentation.lua"
 )
 local Input = T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Tasks.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Tasks.lua"
 )
 
 local queued = {}

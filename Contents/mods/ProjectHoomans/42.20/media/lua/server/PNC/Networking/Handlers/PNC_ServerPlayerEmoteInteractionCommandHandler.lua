@@ -5,7 +5,8 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 then return end
 
 PNC = PNC or {}
-pcall(require, "PNC/Semantics/PNC_SemanticInteractionLifecycle")
+PNC.ConvoEngine = PNC.ConvoEngine or {}
+pcall(require, "PNC/ConvoEngine/Interaction/Lifecycle")
 PNC.PlayerEmoteInteractionAuthority =
     PNC.PlayerEmoteInteractionAuthority or {}
 
@@ -19,25 +20,22 @@ local Relationships = PNC.Relationships
 local RelationshipPresentation = PNC.RelationshipPresentation
 local Network = PNC.Network
 local Authority = PNC.PlayerEmoteInteractionAuthority
-local InteractionLifecycle = PNC.Semantics
-    and PNC.Semantics.InteractionLifecycle or nil
+local InteractionLifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
 local InteractionPersistence = PNC.Conversation
     and PNC.Conversation.InteractionLifecyclePersistence or nil
-local RealizationAuthority = PNC.Semantics
-    and PNC.Semantics.RealizationAuthority or nil
+local RealizationAuthority = PNC.ConvoEngine and PNC.ConvoEngine.RealizationAuthority or nil
 if not RealizationAuthority then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
+        "PNC/ConvoEngine/Dialogue/RealizationAuthority"
     )
     RealizationAuthority = ok and loaded or nil
 end
-local CompanionSpeech = PNC.Semantics
-    and PNC.Semantics.CompanionSpeech or nil
+local CompanionSpeech = PNC.ConvoEngine and PNC.ConvoEngine.CompanionSpeech or nil
 if type(CompanionSpeech) ~= "table" then
     local ok, loaded = pcall(
         require,
-        "PNC/Semantics/PNC_SemanticCompanionSpeech"
+        "PNC/ConvoEngine/CompanionSpeech"
     )
     CompanionSpeech = ok and loaded or nil
 end

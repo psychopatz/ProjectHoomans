@@ -1,7 +1,7 @@
 local T = require "tests/support/test"
 T.addPackagePaths()
 PNC = {}
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
 T.truthy(Providers.RegisterEvidenceAdapter({ id = "aaa.mutating_filter", sourceTier = "SESSION",
     Query = function(_, query) query.actorID = "intruder"; return {} end }))
 local terms = {}

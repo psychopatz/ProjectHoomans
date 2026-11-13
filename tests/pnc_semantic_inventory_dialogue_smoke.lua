@@ -50,12 +50,12 @@ T.load(
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
 T.load(
     "ProjectHoomans",
@@ -70,22 +70,22 @@ T.load(
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Context.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Context.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Presentation.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Presentation.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Actions.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Actions.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Inventory.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Inventory.lua"
 )
 
 local inventoryRequestCount = 0
@@ -116,56 +116,56 @@ require = function() return true end
 local Input = T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput.lua"
+    "PNC/ConvoEngine/Dialogue/Input.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Trace.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Trace.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_ProviderFallback.lua"
+    "PNC/ConvoEngine/Dialogue/Input_ProviderFallback.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Presentation.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation_Interaction.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Presentation_Interaction.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation_Choices.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Presentation_Choices.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Navigation.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Navigation.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission.lua"
 )
 for _, spoke in ipairs({
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Receipts.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Compound.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single_Preflight.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single_Interpretation.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single_Commit.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Gossip.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Receipts.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Compound.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Single_Preflight.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Single_Interpretation.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Single_Commit.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Single.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Gossip.lua",
 }) do
     T.load(
         "ProjectHoomans",
@@ -174,12 +174,12 @@ for _, spoke in ipairs({
     )
 end
 for _, spoke in ipairs({
-    "PNC/Semantics/PNC_SemanticDialogueInput_FrameSupport.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_NavigationFrames.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_SubmissionFrames_Conversation.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_SubmissionFrames_Navigation.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_SubmissionFrames.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_State.lua",
+    "PNC/ConvoEngine/Dialogue/Input_FrameSupport.lua",
+    "PNC/ConvoEngine/Dialogue/Input_NavigationFrames.lua",
+    "PNC/ConvoEngine/Dialogue/Input_SubmissionFrames_Conversation.lua",
+    "PNC/ConvoEngine/Dialogue/Input_SubmissionFrames_Navigation.lua",
+    "PNC/ConvoEngine/Dialogue/Input_SubmissionFrames.lua",
+    "PNC/ConvoEngine/Dialogue/Input_State.lua",
 }) do
     T.load(
         "ProjectHoomans",
@@ -236,7 +236,7 @@ T.equal(view.lastSemanticDialogueResult.decision.route, "deterministic",
     "inventory query does not use the LLM fallback route")
 
 local InventoryResponses = require
-    "PNC/Semantics/PNC_SemanticDialogueInput_InventoryResponses"
+    "PNC/ConvoEngine/Dialogue/Input_InventoryResponses"
 local allItemsReply = InventoryResponses.ForResult({
     status = "found",
     query = { concept = "ANY_ITEM", text = "items" },

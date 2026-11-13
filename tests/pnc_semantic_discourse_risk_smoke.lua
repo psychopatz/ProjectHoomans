@@ -7,7 +7,7 @@ PNC.Semantics = PNC.Semantics or {}
 local Risk = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueRiskPolicy.lua"
+    "PNC/ConvoEngine/Dialogue/RiskPolicy.lua"
 )
 
 local conversation = {

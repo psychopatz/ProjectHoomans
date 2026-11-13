@@ -9,6 +9,8 @@ local Semantic = T.load(
     "common",
     "PsychopatzCore/Semantics/PsychopatzSemantic.lua"
 )
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueState.lua")
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueRouter.lua")
 local Topics = T.load(
     "ProjectHoomans",
     "shared",
@@ -37,7 +39,7 @@ Topics.Annotate(morning, "Good morning")
 T.equal(morning.extensions.topic.id, "greeting",
     "time-shaped greetings remain greeting topics")
 
-local state = Semantic.DialogueState.New({ maxEvents = 2 })
+local state = PsychopatzCore.ConvoEngine.DialogueState.New({ maxEvents = 2 })
 local recorded, event = state:Record(weather, { timestamp = 100 })
 T.equal(recorded, true, "annotated IR enters dialogue state")
 T.equal(state.currentTopic, "weather",

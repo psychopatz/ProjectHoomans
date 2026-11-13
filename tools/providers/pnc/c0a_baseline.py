@@ -776,7 +776,7 @@ def capture_storage(repository: Path = REPOSITORY) -> dict[str, Any]:
         manifest_label = str(manifest_path)
     runtime_manifest = runtime_root / "Manifest.lua"
     registry = runtime_root / "Registry.lua"
-    companion_check_in = runtime_root / "UI/Psdl/Dialogue/CompanionCheckIn.lua"
+    companion_check_in = runtime_root / "UI/Dialogue/CompanionCheckIn.lua"
     source_missing = [
         key for key, location in model["locations"].items()
         if location.get("sourceShard") not in model["_source_documents"]
@@ -807,7 +807,7 @@ def capture_storage(repository: Path = REPOSITORY) -> dict[str, Any]:
         if path.name not in {"Manifest.lua", "Registry.lua"}
     }
     actual_modules = {
-        "PNC/Semantics/Generated/Conversation/" + item for item in actual_modules
+        "PNC/ConvoEngine/" + item for item in actual_modules
     }
     registry_text = registry.read_text(encoding="utf-8") if registry.is_file() else ""
     required_modules = re.findall(r'require "([^"]+)"', registry_text)
@@ -852,7 +852,7 @@ def capture_storage(repository: Path = REPOSITORY) -> dict[str, Any]:
             "indexSizes": {
                 "Manifest.lua": runtime_manifest.stat().st_size,
                 "Registry.lua": registry.stat().st_size,
-                "UI/Psdl/Dialogue/CompanionCheckIn.lua": companion_check_in.stat().st_size,
+                "UI/Dialogue/CompanionCheckIn.lua": companion_check_in.stat().st_size,
             },
         },
         "discoverability": {

@@ -11,12 +11,12 @@ T.load(
 local Catalog = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 local Lifecycle = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua"
+    "PNC/ConvoEngine/Interaction/Lifecycle.lua"
 )
 T.load(
     "ProjectHoomans",
@@ -26,12 +26,12 @@ T.load(
 local Suggestions = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueSuggestions.lua"
+    "PNC/ConvoEngine/Dialogue/Suggestions.lua"
 )
 local Response = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueLocalResponse.lua"
+    "PNC/ConvoEngine/Dialogue/LocalResponse.lua"
 )
 
 local selected = Catalog.Select(

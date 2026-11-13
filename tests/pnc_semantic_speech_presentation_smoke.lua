@@ -63,8 +63,8 @@ local Message = require "PsychopatzCore/Conversation/PsychopatzConversationMessa
 local Client = require "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient"
 -- Native shared composition loads the production response registry before
 -- client presentation; the standalone fixture must honor that contract.
-require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
-local Reactions = require "PNC/Semantics/PNC_SemanticSocialReaction"
+require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
+local Reactions = require "PNC/ConvoEngine/Social/Reaction"
 local Presentation = require "PNC/Conversation/PNC_SemanticSpeechPresentation"
 local Diary = PNC.Conversation.Diary
 local received

@@ -5,7 +5,7 @@ PNC.PBrainZ.Internal = PNC.PBrainZ.Internal or {}
 
 require "PNC/Conversation/PNC_ConversationTime"
 require "PNC/Conversation/PNC_ConversationGroup"
-pcall(require, "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime")
+pcall(require, "PNC/ConvoEngine/RuntimeFacade")
 
 local Integration = PNC.PBrainZ
 local Internal = Integration.Internal

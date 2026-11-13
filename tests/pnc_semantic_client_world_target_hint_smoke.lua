@@ -3,6 +3,7 @@ T.addPackagePaths()
 
 PsychopatzCore = {}
 PNC = { Semantics = {} }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local object = {
     getObjectName = function() return "IsoObject" end,
@@ -166,11 +167,11 @@ PNC.Semantics.TaskAdapter = {
         }
     end,
 }
-PNC.Semantics.DialogueInput = { Internal = {} }
+PNC.ConvoEngine.DialogueInput = { Internal = {} }
 local Input = T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Actions.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Actions.lua"
 )
 local dispatched = Input.Internal.DispatchAction({
     spec = {

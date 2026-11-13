@@ -7,7 +7,7 @@ T.addPackagePaths({
 PNC = { Semantics = {} }
 local Context = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueContextState.lua"
+    "PNC/ConvoEngine/Dialogue/ContextState.lua"
 )
 local context = Context.New({ maxTurns = 3 })
 local ok = context:RecordTurn({
@@ -30,7 +30,7 @@ T.equal(turns[1].stance, "NEGATIVE", "stance stays in session turn")
 
 local Policy = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticAffordanceContinuationPolicy.lua"
+    "PNC/ConvoEngine/Suggestions/AffordanceContinuationPolicy.lua"
 )
 local allowed, reason = Policy.Allowed("DOUBLE_DOWN", {
     semanticContextState = context,

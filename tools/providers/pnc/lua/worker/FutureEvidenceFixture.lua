@@ -1,9 +1,11 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Removable test-only adopter. No production algorithm or memory store.
 local Fixture = {}
-local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
-local Catalog = require "PNC/Semantics/PNC_SemanticInteractionCatalog"
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-local Director = require "PNC/Semantics/PNC_SemanticInteractionDirector"
+local Relations = require "PNC/ConvoEngine/Interaction/Relations"
+local Catalog = require "PNC/ConvoEngine/Interaction/Catalog"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+local Director = require "PNC/ConvoEngine/Interaction/Director"
 local ContextProjection = require "worker/Conversation_Context"
 
 local definitions = {
@@ -83,7 +85,7 @@ function Fixture.Run(context, payload)
     local preview, reason = Director.PreviewStimulus(stimulus,
         Runtime.view.session.semanticDialogueState, scene)
     if not preview then return nil, reason end
-    local UtterancePlan = PNC.Semantics.UtterancePlan
+    local UtterancePlan = PNC.ConvoEngine.UtterancePlan
     local plan = UtterancePlan.New({ speaker = "npc", target = "recipient",
         dialogueAct = "ACKNOWLEDGE", strategy = "ACKNOWLEDGE", topic = "commitment" })
     local realized = UtterancePlan.Realize(plan)

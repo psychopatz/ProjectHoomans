@@ -21,7 +21,7 @@ PNC = {
     },
 }
 
-package.loaded["PNC/Semantics/PNC_SemanticInteractionProviders"] = {
+package.loaded["PNC/ConvoEngine/Interaction/Providers"] = {
     EvidenceQueryForStimulus = function() return nil end,
     QueryEvidence = function()
         return { rows = { { relation = "test", confidence = 1 } } }
@@ -32,7 +32,7 @@ package.loaded["PNC/Semantics/PNC_SemanticPragmaticResolver"] = {
         return { status = "resolved", confidence = 1 }
     end,
 }
-package.loaded["PNC/Semantics/PNC_SemanticInteractionStimulus"] = {
+package.loaded["PNC/ConvoEngine/Interaction/Stimulus"] = {
     FromIR = function(ir)
         local output = {}
         for key, value in pairs(ir or {}) do output[key] = value end
@@ -40,14 +40,14 @@ package.loaded["PNC/Semantics/PNC_SemanticInteractionStimulus"] = {
         return output
     end,
 }
-package.loaded["PNC/Semantics/PNC_SemanticInteractionRelations"] = {
+package.loaded["PNC/ConvoEngine/Interaction/Relations"] = {
     ContextualActs = function() return {} end,
     GetAct = function() return nil end,
 }
 
 local Provider = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_GeneratedAffordanceProvider.lua"
+    "PNC/ConvoEngine/Suggestions/GeneratedAffordanceProvider.lua"
 )
 
 local legacyRows = Provider.collect({

@@ -5,7 +5,7 @@ PsychopatzCore = { Conversation = {} }
 PNC = {
     Registry = {},
     Core = { Now = function() return 1000 end },
-    Semantics = {
+    ConvoEngine = {
         CompanionSpeech = {
             ResolvePlayerCommand = function()
                 return {

@@ -3,6 +3,7 @@ T.addPackagePaths()
 
 PsychopatzCore = {}
 PNC = {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Semantic = T.load(
     "PsychopatzCore",
@@ -12,9 +13,9 @@ local Semantic = T.load(
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
-local Policy = PNC.Semantics.DialoguePolicy
+local Policy = PNC.ConvoEngine.DialoguePolicy
 local IR = Semantic.IR
 
 local navigation = IR.New({

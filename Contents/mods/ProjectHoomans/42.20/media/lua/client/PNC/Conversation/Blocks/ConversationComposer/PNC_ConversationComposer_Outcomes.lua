@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 local Conversation = PNC.Conversation
 local Composer = Conversation.Composer
 local Internal = Composer.Internal
@@ -78,7 +80,7 @@ function Composer.ReceiveBlock(args)
     end
     view.session.spec = view.spec
     view.session:enterNode("block:" .. tostring(args.nodeID or block.entryNode))
-    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     local semanticInternal = input and input.Internal or nil
     if semanticInternal
         and type(semanticInternal.RefreshRootSuggestions) == "function"

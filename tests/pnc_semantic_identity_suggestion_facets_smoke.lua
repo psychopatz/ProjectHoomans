@@ -16,7 +16,7 @@ PNC = {
 local Provider = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_StaticProvider.lua"
+    "PNC/ConvoEngine/Suggestions/StaticProvider.lua"
 )
 
 local function ids(context)

@@ -21,10 +21,10 @@ PNC = {
     },
 }
 
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-local Catalog = require "PNC/Semantics/PNC_SemanticInteractionCatalog"
-local Runtime = require "PNC/Semantics/PNC_SemanticInteractionSceneRuntime"
-local Opportunity = require "PNC/Semantics/PNC_SemanticInteractionOpportunity"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+local Catalog = require "PNC/ConvoEngine/Interaction/Catalog"
+local Runtime = require "PNC/ConvoEngine/Interaction/SceneRuntime"
+local Opportunity = require "PNC/ConvoEngine/Interaction/Opportunity"
 
 Catalog.ResetDraftOverlay()
 Opportunity.ResetProvidersForTests()
@@ -247,10 +247,10 @@ T.equal(registryScanCalls, 0,
 
 -- Generic algorithms must not contain synthetic-domain branches.
 for _, relative in ipairs({
-    "PNC/Semantics/PNC_SemanticInteractionSceneRuntime.lua",
-    "PNC/Semantics/PNC_SemanticInteractionDirector.lua",
-    "PNC/Semantics/PNC_SemanticInteractionScheduler.lua",
-    "PNC/Semantics/PNC_SemanticInteractionContinuation.lua",
+    "PNC/ConvoEngine/Interaction/SceneRuntime.lua",
+    "PNC/ConvoEngine/Interaction/Director.lua",
+    "PNC/ConvoEngine/Interaction/Scheduler.lua",
+    "PNC/ConvoEngine/Interaction/Continuation.lua",
 }) do
     local source = T.read("ProjectHoomans", "shared", relative)
     T.falsy(string.find(source, "S8_SYNTHETIC", 1, true),
@@ -507,11 +507,11 @@ T.equal(distantRuntime.scheduler:Metrics().directorEvaluations, 1,
 
 -- Static guards for the generic substrate.
 for _, relative in ipairs({
-    "PNC/Semantics/PNC_SemanticInteractionOpportunity.lua",
-    "PNC/Semantics/PNC_SemanticInteractionSceneRuntime.lua",
-    "PNC/Semantics/PNC_SemanticInteractionScheduler.lua",
-    "PNC/Semantics/PNC_SemanticInteractionContinuation.lua",
-    "PNC/Semantics/PNC_SemanticInteractionSceneObservatory.lua",
+    "PNC/ConvoEngine/Interaction/Opportunity.lua",
+    "PNC/ConvoEngine/Interaction/SceneRuntime.lua",
+    "PNC/ConvoEngine/Interaction/Scheduler.lua",
+    "PNC/ConvoEngine/Interaction/Continuation.lua",
+    "PNC/ConvoEngine/Interaction/SceneObservatory.lua",
 }) do
     local source = T.read("ProjectHoomans", "shared", relative)
     T.falsy(string.find(source, "Events.OnTick", 1, true),

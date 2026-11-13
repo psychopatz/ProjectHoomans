@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Semantic Lab commands for the production interaction lifecycle.
 -- Python transports requests and presents bounded results; Lua owns meaning,
 -- provenance, compaction, persistence and authority decisions.
@@ -83,8 +85,7 @@ end
 
 local function lifecycle(context)
     local value = context.Runtime and context.Runtime.interactionLifecycle
-    local module = PNC.Semantics
-        and PNC.Semantics.InteractionLifecycle or nil
+    local module = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
     return module, value
 end
 
@@ -183,7 +184,7 @@ local function npcEvent(context, payload, module, store)
         payload.semanticEventFacts
             or payload.context and payload.context.semanticEventFacts
     )
-    local reactions = PNC.Semantics and PNC.Semantics.SocialReactions
+    local reactions = PNC.ConvoEngine and PNC.ConvoEngine.SocialReactions
     if type(reactions) ~= "table"
         or type(reactions.Resolve) ~= "function"
     then
@@ -267,7 +268,7 @@ local function npcEvent(context, payload, module, store)
             },
         }
         context.Conversation.refreshViewContext(context)
-        local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+        local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
         local internal = input and input.Internal or nil
         if internal and type(internal.RefreshRootSuggestions) == "function" then
             internal.RefreshRootSuggestions(view)

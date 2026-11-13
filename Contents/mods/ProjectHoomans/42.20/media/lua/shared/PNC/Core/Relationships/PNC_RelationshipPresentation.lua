@@ -3,6 +3,7 @@
 -- attitude/score formatting rules.
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.RelationshipPresentation = PNC.RelationshipPresentation or {}
 
 local Presentation = PNC.RelationshipPresentation
@@ -196,7 +197,7 @@ function Presentation.BuildForConversation(player, npcID)
         relationshipRevision = summary.revision,
         interactionRevision = summary.interactionRevision or 0,
     }
-    local Providers = PNC.Semantics and PNC.Semantics.InteractionProviders
+    local Providers = PNC.ConvoEngine and PNC.ConvoEngine.InteractionProviders
     if Providers and type(Providers.QueryEvidence) == "function" then
         local time = getGameTime and getGameTime() or nil
         local at = time and time.getWorldAgeHours and time:getWorldAgeHours() or 0
@@ -204,7 +205,7 @@ function Presentation.BuildForConversation(player, npcID)
         local queryContext = { npcID = record.id,
             playerID = actorID, playerEntityKey = targetKey,
             worldContext = { worldAgeHours = at } }
-        local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
+        local Relations = require "PNC/ConvoEngine/Interaction/Relations"
         local families = Relations.ContextualRelations()
         local rows, seen = {}, {}
         local limit = math.max(1, math.floor(16 / math.max(1, #families)))

@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Conversation and interaction commands for the semantic worker router.
 
 local Conversation = {}
@@ -75,8 +77,7 @@ function Conversation.handle(context, command, payload)
             persisted = false,
         }
     elseif command == "SUGGESTION_PREDICATE" then
-        local predicates = PNC.Semantics
-            and PNC.Semantics.SuggestionPredicates or nil
+        local predicates = PNC.ConvoEngine and PNC.ConvoEngine.SuggestionPredicates or nil
         local view = context.Runtime and context.Runtime.view or nil
         if not predicates or type(predicates.Evaluate) ~= "function" then
             return nil, "suggestion_predicates_unavailable"
@@ -100,8 +101,7 @@ function Conversation.handle(context, command, payload)
         if not view or not view.session then
             return nil, "conversation_unavailable"
         end
-        local suggestions = PNC.Semantics
-            and PNC.Semantics.DialogueSuggestions or nil
+        local suggestions = PNC.ConvoEngine and PNC.ConvoEngine.DialogueSuggestions or nil
         if suggestions
             and (
                 (type(suggestions.IsConversationCategoryFrame) == "function"
@@ -133,7 +133,7 @@ function Conversation.handle(context, command, payload)
             type(payload) == "table" and payload.language or payload)
         context.Conversation.refreshViewContext(context)
         local view = context.Runtime.view
-        local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+        local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
         local internal = input and input.Internal or nil
         local suggestions
         if view and view.lastSemanticDialogueResult

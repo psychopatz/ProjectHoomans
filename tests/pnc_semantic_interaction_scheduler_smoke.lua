@@ -3,8 +3,8 @@ T.addPackagePaths()
 
 PNC = {}
 
-local Catalog = require "PNC/Semantics/PNC_SemanticInteractionCatalog"
-local Scheduler = require "PNC/Semantics/PNC_SemanticInteractionScheduler"
+local Catalog = require "PNC/ConvoEngine/Interaction/Catalog"
+local Scheduler = require "PNC/ConvoEngine/Interaction/Scheduler"
 
 local humanBefore = Catalog.IndexSnapshot("HUMAN_UTTERANCE")
 local worldBefore = Catalog.IndexSnapshot("WORLD_EVENT")

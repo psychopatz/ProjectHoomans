@@ -3,9 +3,9 @@ T.addPackagePaths()
 
 PNC = {}
 
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-local Catalog = require "PNC/Semantics/PNC_SemanticInteractionCatalog"
-local Arbitration = require "PNC/Semantics/PNC_SemanticInteractionArbitration"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+local Catalog = require "PNC/ConvoEngine/Interaction/Catalog"
+local Arbitration = require "PNC/ConvoEngine/Interaction/Arbitration"
 
 Catalog.ResetDraftOverlay()
 

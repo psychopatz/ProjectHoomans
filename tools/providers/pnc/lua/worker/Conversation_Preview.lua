@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Pure conversation preview execution.
 
 local Preview = {}
@@ -6,7 +8,7 @@ function Preview.run(context, text, Conversation)
     local Runtime = context.Runtime
     local Values = context.Values
     local view = Runtime.view
-    local Input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local Input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     local Internal = Input and Input.Internal or {}
     local router, routerReason
     if type(Internal.RouterFor) == "function" then

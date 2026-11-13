@@ -5,6 +5,7 @@
 -- and does not authorize gameplay effects.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Profile = PNC.Semantics.CombatReactionProfile or {}
 PNC.Semantics.CombatReactionProfile = Profile
@@ -14,8 +15,8 @@ Profile.SCHEMA = "semantic.combat.reaction_profile.v1"
 
 local TraitContext = PNC.NPCTraitContext
     or require "PNC/Core/Traits/PNC_NPCTraitContext"
-local Style = PNC.Semantics.SpeechStyleContext
-    or require "PNC/Semantics/PNC_SpeechStyleContext"
+local Style = PNC.ConvoEngine.SpeechStyleContext
+    or require "PNC/ConvoEngine/SpeechStyleContext"
 
 local function number(value, fallback)
     value = tonumber(value)

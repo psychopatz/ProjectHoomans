@@ -1,11 +1,12 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Compact results for authority-owned vanilla emote interactions.
 
 local Network = PNC.Network
 local Core = PNC.Core
 local Const = PNC.Const
 local Presentation = PNC.RelationshipPresentation
-local InteractionLifecycle = PNC.Semantics
-    and PNC.Semantics.InteractionLifecycle or nil
+local InteractionLifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
 
 local function appendUniqueRef(output, seen, value)
     if value == nil then return end
@@ -38,14 +39,14 @@ local function interactionFactRefs(context, ambient)
 end
 
 local function responseCatalog()
-    local catalog = PNC.Semantics and PNC.Semantics.ResponseCatalog
+    local catalog = PNC.ConvoEngine and PNC.ConvoEngine.ResponseCatalog
     if type(catalog) == "table"
         and type(catalog.OffersForSelection) == "function"
     then
         return catalog
     end
     local ok, loaded = pcall(
-        require, "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+        require, "PNC/ConvoEngine/Dialogue/ResponseCatalog"
     )
     if ok and type(loaded) == "table"
         and type(loaded.OffersForSelection) == "function"
@@ -103,9 +104,8 @@ local function ensureNPCSpeechInteraction(
         pcall(require, "PNC/Conversation/PNC_InteractionLifecyclePersistence")
     end
     if not InteractionLifecycle then
-        pcall(require, "PNC/Semantics/PNC_SemanticInteractionLifecycle")
-        InteractionLifecycle = PNC.Semantics
-            and PNC.Semantics.InteractionLifecycle or nil
+        pcall(require, "PNC/ConvoEngine/Interaction/Lifecycle")
+        InteractionLifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
     end
     local persistence = PNC.Conversation
         and PNC.Conversation.InteractionLifecyclePersistence or nil

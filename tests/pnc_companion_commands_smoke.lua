@@ -221,15 +221,16 @@ PNC = {
         end,
     },
 }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 T.load(SHARED_ROOT .. "PNC_CompanionCommandRegistry.lua")
 T.load(SHARED_ROOT .. "PNC_CompanionCommandDefinitions.lua")
 T.load("ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua")
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua")
 T.load("ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority.lua")
+    "PNC/ConvoEngine/Dialogue/RealizationAuthority.lua")
 T.load("ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticCompanionSpeech.lua")
+    "PNC/ConvoEngine/CompanionSpeech.lua")
 T.truthy(PNC.CompanionCommands.Get("manual_eat"),
     "manual eat command is registered")
 T.truthy(PNC.CompanionCommands.Get("manual_drink"),
@@ -256,7 +257,7 @@ T.truthy(string.find(
 ), "camp command site metadata is registered")
 T.equal(PNC.CompanionCommands.Get("manual_sleep").contextOnly, true,
     "manual sleep stays out of the radial command list")
-local playerCommand = PNC.Semantics.CompanionSpeech.ResolvePlayerCommand(
+local playerCommand = PNC.ConvoEngine.CompanionSpeech.ResolvePlayerCommand(
     "follow",
     "valid",
     {
@@ -275,7 +276,7 @@ T.equal(playerCommand.contentOwner,
 T.truthy(string.find(playerCommand.fallback, "Walker Sage", 1, true),
     "player command realization omitted companion name")
 
-local campNone = PNC.Semantics.CompanionSpeech.ResolvePlayerCommand(
+local campNone = PNC.ConvoEngine.CompanionSpeech.ResolvePlayerCommand(
     "camp", "none", { requestID = "command-semantic-2" }
 )
 T.equal(campNone.realizationID, "semantic.command.player.camp_none",
@@ -283,7 +284,7 @@ T.equal(campNone.realizationID, "semantic.command.player.camp_none",
 T.equal(campNone.fallback, "...",
     "camp without an NPC retains the accepted ellipsis wording")
 
-local npcReply = PNC.Semantics.CompanionSpeech.ResolveNPCCommand(
+local npcReply = PNC.ConvoEngine.CompanionSpeech.ResolveNPCCommand(
     "camp", "invalid", { requestID = "command-semantic-3" }
 )
 T.equal(npcReply.realizationID, "semantic.command.reply.camp_rejected",

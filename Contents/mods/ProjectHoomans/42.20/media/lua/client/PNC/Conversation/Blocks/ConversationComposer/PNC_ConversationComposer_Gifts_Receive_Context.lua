@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Client-side semantic gift result context and authoritative state boundary.
 
 local Conversation = PNC.Conversation
@@ -130,7 +132,7 @@ function ReceiveContext.ApplyGeneratedFlowResult(state)
     local flow, current = generatedFlowFor(state)
     local view = state and state.view or nil
     local session = state and state.session or nil
-    local policy = PNC.Semantics and PNC.Semantics.DialoguePolicy or nil
+    local policy = PNC.ConvoEngine and PNC.ConvoEngine.DialoguePolicy or nil
     local kernel = policy and policy.Internal and policy.Internal.FlowKernel
     local semanticState = session and session.semanticDialogueState
     if not flow or not view or not semanticState

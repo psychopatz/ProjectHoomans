@@ -9,6 +9,7 @@ then return end
 
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Projection = PNC.Semantics.CognitionProjection
     or require "PNC/Semantics/PNC_SemanticCognitionProjection"
@@ -17,10 +18,10 @@ PNC.Semantics.CognitionService = Service
 
 local Core = PNC.Core
 local Registry = PNC.Registry
-local Memory = PNC.Semantics.ConversationMemoryProvider
+local Memory = PNC.ConvoEngine.ConversationMemoryProvider
 if type(Memory) ~= "table" then
     Memory = require
-        "PNC/Semantics/PNC_SemanticConversationMemoryProvider"
+        "PNC/ConvoEngine/MemoryProvider"
 end
 if type(Memory) ~= "table" then Memory = nil end
 local MemoryEvents = Memory and Memory.Events or nil

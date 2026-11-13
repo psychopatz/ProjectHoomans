@@ -6,7 +6,7 @@ PNC = {}
 local Plan = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponsePlan.lua"
+    "PNC/ConvoEngine/Dialogue/ResponsePlan.lua"
 )
 
 local ok, single = Plan.Build({

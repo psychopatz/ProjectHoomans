@@ -203,11 +203,11 @@ T.equal(#snapshotB.categories, 0,
     "player B received player A's private backstory fact")
 
 local Facts = T.load(
-    "ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticDialogueFacts.lua"
+    "ProjectHoomans", "shared", "PNC/ConvoEngine/Dialogue/Facts.lua"
 )
 T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueBackstoryFactSource.lua"
+    "PNC/ConvoEngine/Dialogue/BackstoryFactSource.lua"
 )
 local hidden = Facts.Resolve({
     subject = "NPC_BACKSTORY", slots = { kind = "hometown" },

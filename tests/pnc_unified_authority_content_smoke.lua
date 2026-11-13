@@ -3,18 +3,19 @@ local T = require "tests/support/test"
 T.addPackagePaths()
 
 PNC = { Semantics = {} }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local Catalog = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 local Realization = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SpeechRealization.lua"
+    "PNC/ConvoEngine/SpeechRealization.lua"
 )
-local Registry = PNC.Semantics.ConversationRegistry
+local Registry = PNC.ConvoEngine.Registry
 
 T.truthy(Registry and Registry.FamilyFor,
     "generated Conversation registry is available to production realization")

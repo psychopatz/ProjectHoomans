@@ -5,16 +5,17 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.PlayerKnowledgeCommands = PNC.PlayerKnowledgeCommands or {}
 
-if not (PNC.Semantics and PNC.Semantics.IdentityExchange) then
-    require "PNC/Semantics/PNC_SemanticIdentityExchange"
+if not (PNC.ConvoEngine and PNC.ConvoEngine.IdentityExchange) then
+    require "PNC/ConvoEngine/IdentityExchange"
 end
 
 local Commands = PNC.PlayerKnowledgeCommands
 local H = Commands.Internal or {}
 Commands.Internal = H
-local Identity = PNC.Semantics.IdentityExchange
+local Identity = PNC.ConvoEngine.IdentityExchange
 local IdentityAdmission = require
     "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityAdmission"
 local IdentityMutation = require

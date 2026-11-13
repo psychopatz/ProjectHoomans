@@ -1,0 +1,3747 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.hostile_short.guarded",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.hostile_short.guarded",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[0]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.hostile_short",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+                ["style"] = "guarded",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "guarded.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Watch your mouth. Now.",
+                            },
+                            ["TL"] = {
+                                "Bantayan mo ang pananalita mo. Ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Shut your mouth before I shut it for you.",
+                            },
+                            ["TL"] = {
+                                "Itikom mo ang bibig mo bago ko pa itikom 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "You're pushing me. Stop.",
+                            },
+                            ["TL"] = {
+                                "Sinasagad mo ako. Tigil.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "One more word out of you.",
+                            },
+                            ["TL"] = {
+                                "Isa pang salita mula sa 'yo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Mind yourself right now.",
+                            },
+                            ["TL"] = {
+                                "Bantayan mo ang kilos mo ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "You're testing the wrong survivor.",
+                            },
+                            ["TL"] = {
+                                "Maling tao ang sinusubukan mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Quiet. Before things get violent.",
+                            },
+                            ["TL"] = {
+                                "Tahimik. Bago maging bayolente ito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "You want trouble? Keep talking.",
+                            },
+                            ["TL"] = {
+                                "Gusto mo ng gulo? Sige, magsalita ka pa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hold your tongue.",
+                            },
+                            ["TL"] = {
+                                "Pigilan mo ang dila mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Bite your tongue now.",
+                            },
+                            ["TL"] = {
+                                "Kagatin mo ang dila mo ngayon.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.hostile_short.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.hostile_short.neutral",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[1]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.hostile_short",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Watch your language.",
+                            },
+                            ["TL"] = {
+                                "Bantayan mo ang pananalita mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "That kind of talk is dangerous here.",
+                            },
+                            ["TL"] = {
+                                "Mapanganib ang ganyang salita rito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep your words civil.",
+                            },
+                            ["TL"] = {
+                                "Panatilihing maayos ang mga salita mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm warning you to calm down.",
+                            },
+                            ["TL"] = {
+                                "Binabalaan kitang kumalma.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't escalate this situation.",
+                            },
+                            ["TL"] = {
+                                "Huwag mong palalain ang sitwasyong ito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Control your temper.",
+                            },
+                            ["TL"] = {
+                                "Pigilan mo ang init ng ulo mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "There's no place for that attitude here.",
+                            },
+                            ["TL"] = {
+                                "Walang puwang ang ganyang asal dito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Watch your mouth and think before you speak.",
+                            },
+                            ["TL"] = {
+                                "Ingatan ang bibig at mag-isip bago magsalita.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "You need to rein that in.",
+                            },
+                            ["TL"] = {
+                                "Kailangan mong kontrolin 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep it civil or step away.",
+                            },
+                            ["TL"] = {
+                                "Maging maayos ka o lumayo ka na.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.hostile_short.terse",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.hostile_short.terse",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[2]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.hostile_short",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+                ["style"] = "terse",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "terse.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Shut it.",
+                            },
+                            ["TL"] = {
+                                "Tumahimik ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Watch it.",
+                            },
+                            ["TL"] = {
+                                "Mag-ingat ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Enough.",
+                            },
+                            ["TL"] = {
+                                "Sapat na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Quiet.",
+                            },
+                            ["TL"] = {
+                                "Tahimik.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Careful.",
+                            },
+                            ["TL"] = {
+                                "Mag-ingat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Bite it.",
+                            },
+                            ["TL"] = {
+                                "Itikom mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Stop.",
+                            },
+                            ["TL"] = {
+                                "Tigil.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Cool it.",
+                            },
+                            ["TL"] = {
+                                "Kumalma ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Done.",
+                            },
+                            ["TL"] = {
+                                "Tapos.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Last warning.",
+                            },
+                            ["TL"] = {
+                                "Huling babala.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.hostile_short.warm",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.hostile_short.warm",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[3]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.hostile_short",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+                ["style"] = "warm",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "warm.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey, watch your mouth, friend. We're better than that.",
+                            },
+                            ["TL"] = {
+                                "Huy, ingatan mo ang bibig mo, kaibigan. Mas maayos tayo riyan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't talk like that. You're better than this anger.",
+                            },
+                            ["TL"] = {
+                                "Huwag kang magsalita nang ganyan. Higit ka sa galit mong 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Come on, watch your tone with me.",
+                            },
+                            ["TL"] = {
+                                "Sige na, ayusin mo ang tono mo sa akin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Take a breath before you say something you'll regret.",
+                            },
+                            ["TL"] = {
+                                "Huminga ka muna bago ka magsabi ng pagsisisihan mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I know you're frustrated, but don't lash out at me.",
+                            },
+                            ["TL"] = {
+                                "Alam kong naiinis ka, pero huwag mong ibunton sa akin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Easy now. We're on the same team.",
+                            },
+                            ["TL"] = {
+                                "Dahan-dahan lang. Magkasama tayo rito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Check yourself, partner. I'm with you, not against you.",
+                            },
+                            ["TL"] = {
+                                "Ayusin mo sarili mo, kasama. Kakampi mo ako, hindi kalaban.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't let the anger win today. Stay with me.",
+                            },
+                            ["TL"] = {
+                                "Huwag mong hayaang manalo ang galit ngayon. Sumama ka sa 'kin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm giving you space, but watch what you say.",
+                            },
+                            ["TL"] = {
+                                "Binibigyan kita ng puwang, pero bantayan mo ang sinasabi mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hold your words. We can talk when you're calmer.",
+                            },
+                            ["TL"] = {
+                                "Pigilan mo ang salita mo. Mag-usap tayo kapag kalmado ka na.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.hostile_stressed.guarded",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.hostile_stressed.guarded",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[4]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.hostile_stressed",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+                ["style"] = "guarded",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "guarded.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "That's enough. Back away.",
+                            },
+                            ["TL"] = {
+                                "Tama na. Umatras ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Get back before I make you.",
+                            },
+                            ["TL"] = {
+                                "Umatras ka bago pa kita pilitin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Give me space right now.",
+                            },
+                            ["TL"] = {
+                                "Bigyan mo ako ng puwang ngayon din.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Step back and keep your hands where I can see them.",
+                            },
+                            ["TL"] = {
+                                "Umatras ka at panatilihin ang kamay sa kita ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I am armed and exhausted. Back off.",
+                            },
+                            ["TL"] = {
+                                "May armas ako at pagod na. Lumayo ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back away from me immediately.",
+                            },
+                            ["TL"] = {
+                                "Lumayo ka sa akin agad-agad.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't crowd me while my nerves are on edge.",
+                            },
+                            ["TL"] = {
+                                "Huwag mo akong dikitan habang tensiyonado ako.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Move back now.",
+                            },
+                            ["TL"] = {
+                                "Umatras ka ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm not warning you again. Step back.",
+                            },
+                            ["TL"] = {
+                                "Hindi na kita babalaan ulit. Umatras ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Stay five paces away from me.",
+                            },
+                            ["TL"] = {
+                                "Manatili kang limang hakbang ang layo sa akin.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.hostile_stressed.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.hostile_stressed.neutral",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[5]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.hostile_stressed",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "That's enough. Everyone needs to step back.",
+                            },
+                            ["TL"] = {
+                                "Tama na. Kailangang umatras ng lahat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Please give me some space to cool off.",
+                            },
+                            ["TL"] = {
+                                "Pakiusap bigyan mo ako ng puwang para kumalma.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "We're all too stressed for this. Step away.",
+                            },
+                            ["TL"] = {
+                                "Masyado tayong tensiyonado para rito. Lumayo muna.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back up. Let's not make things worse.",
+                            },
+                            ["TL"] = {
+                                "Umatras ka. Huwag nating palalain ang sitwasyon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I need room to think. Step back.",
+                            },
+                            ["TL"] = {
+                                "Kailangan ko ng espasyo para mag-isip. Umatras ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Let's put some distance between us right now.",
+                            },
+                            ["TL"] = {
+                                "Maglagay muna tayo ng distansya ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back away until tempers settle down.",
+                            },
+                            ["TL"] = {
+                                "Umatras muna hanggang sa humupa ang init ng ulo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Stop crowding me. Take a few steps back.",
+                            },
+                            ["TL"] = {
+                                "Huwag mo akong sikipin. Umatras ka nang ilang hakbang.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "We need space right now. Move back.",
+                            },
+                            ["TL"] = {
+                                "Kailangan natin ng puwang ngayon. Umatras ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Give it some breathing room.",
+                            },
+                            ["TL"] = {
+                                "Bigyan mo ng puwang para makahinga.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.hostile_stressed.terse",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.hostile_stressed.terse",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[6]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.hostile_stressed",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+                ["style"] = "terse",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "terse.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back off.",
+                            },
+                            ["TL"] = {
+                                "Umatras ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Step back.",
+                            },
+                            ["TL"] = {
+                                "Lumayo ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Space.",
+                            },
+                            ["TL"] = {
+                                "Puwang.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Away.",
+                            },
+                            ["TL"] = {
+                                "Malayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back up.",
+                            },
+                            ["TL"] = {
+                                "Abante pabalik.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Not close.",
+                            },
+                            ["TL"] = {
+                                "Huwag lumapit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Distance.",
+                            },
+                            ["TL"] = {
+                                "Distansya.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Enough.",
+                            },
+                            ["TL"] = {
+                                "Sapat na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Move.",
+                            },
+                            ["TL"] = {
+                                "Kilos.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Off me.",
+                            },
+                            ["TL"] = {
+                                "Umalis ka sa tabi ko.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.hostile_stressed.warm",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.hostile_stressed.warm",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[7]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.hostile_stressed",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+                ["style"] = "warm",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "warm.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey, please, give me some space. I'm overwhelmed.",
+                            },
+                            ["TL"] = {
+                                "Huy, pakiusap, bigyan mo ako ng puwang. Sobra na ang bigat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I don't want to snap at you, so please step back for a moment.",
+                            },
+                            ["TL"] = {
+                                "Ayokong masigawan ka, kaya pakiusap umatras ka muna.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I love you as a friend, but I really need room to breathe right now.",
+                            },
+                            ["TL"] = {
+                                "Mahalaga ka sa 'kin bilang kaibigan, pero kailangan ko talagang makahinga ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Let's put a little distance between us so we don't say things we regret.",
+                            },
+                            ["TL"] = {
+                                "Maglagay muna tayo ng kaunting distansya para di tayo magkasakitan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm asking gently: please back away for a minute.",
+                            },
+                            ["TL"] = {
+                                "Nakikiusap ako nang maayos: umatras ka muna sandali.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm on the verge of breaking. Give me a minute alone.",
+                            },
+                            ["TL"] = {
+                                "Bibigay na ako. Bigyan mo muna ako ng sandaling mag-isa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Step back, partner. Let's both catch our breath.",
+                            },
+                            ["TL"] = {
+                                "Umatras ka muna, kasama. Huminga muna tayong pareho.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "We're going to be okay, but I need physical space right now.",
+                            },
+                            ["TL"] = {
+                                "Magiging maayos tayo, pero kailangan ko ng espasyo ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Please, just let me sit with my thoughts for a bit.",
+                            },
+                            ["TL"] = {
+                                "Pakiusap, hayaan mo muna akong mapag-isa nang kaunti.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back away for now. We'll talk when my head clears.",
+                            },
+                            ["TL"] = {
+                                "Lumayo muna ngayon. Mag-uusap tayo kapag luminaw na ang isip ko.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.hostile_withdrawn.guarded",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.hostile_withdrawn.guarded",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[8]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.hostile_withdrawn",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+                ["style"] = "guarded",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "guarded.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Leave me alone. Now.",
+                            },
+                            ["TL"] = {
+                                "Iwan mo ako. Ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Get out of my sight.",
+                            },
+                            ["TL"] = {
+                                "Umalis ka sa paningin ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't come near me.",
+                            },
+                            ["TL"] = {
+                                "Huwag kang lalapit sa akin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I have nothing to say to you. Go.",
+                            },
+                            ["TL"] = {
+                                "Wala akong sasabihin sa 'yo. Umalis ka na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Walk away while you still can.",
+                            },
+                            ["TL"] = {
+                                "Lumakad ka palayo habang kaya mo pa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Leave me be.",
+                            },
+                            ["TL"] = {
+                                "Hayaan mo akong mag-isa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm done with you. Get lost.",
+                            },
+                            ["TL"] = {
+                                "Tapos na ako sa 'yo. Lumayas ka na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Stay away from my corner.",
+                            },
+                            ["TL"] = {
+                                "Huwag kang pupunta sa pwesto ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Leave. Immediately.",
+                            },
+                            ["TL"] = {
+                                "Umalis ka. Ngayon din.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't speak to me.",
+                            },
+                            ["TL"] = {
+                                "Huwag mo akong kausapin.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.hostile_withdrawn.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.hostile_withdrawn.neutral",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[9]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.hostile_withdrawn",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Please leave me alone.",
+                            },
+                            ["TL"] = {
+                                "Pakiusap iwan mo akong mag-isa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I need to be on my own right now.",
+                            },
+                            ["TL"] = {
+                                "Kailangan kong mapag-isa ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm asking for privacy. Please respect it.",
+                            },
+                            ["TL"] = {
+                                "Hinihiling ko ang katahimikan. Pakiusap igalang mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Go on. I'll be fine by myself.",
+                            },
+                            ["TL"] = {
+                                "Sige na. Ayos lang ako nang mag-isa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Let's not interact for the rest of today.",
+                            },
+                            ["TL"] = {
+                                "Huwag muna tayong mag-usap sa buong araw na ito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'd prefer not to speak to anyone right now.",
+                            },
+                            ["TL"] = {
+                                "Mas gusto kong walang makausap ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Please walk away.",
+                            },
+                            ["TL"] = {
+                                "Pakiusap lumayo ka na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Give me time to myself.",
+                            },
+                            ["TL"] = {
+                                "Bigyan mo ako ng oras para sa sarili ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I need some quiet. Leave me be.",
+                            },
+                            ["TL"] = {
+                                "Kailangan ko ng katahimikan. Hayaan mo ako.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "We're done talking for now.",
+                            },
+                            ["TL"] = {
+                                "Tapos na tayong mag-usap sa ngayon.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.hostile_withdrawn.terse",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.hostile_withdrawn.terse",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[10]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.hostile_withdrawn",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+                ["style"] = "terse",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "terse.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Leave.",
+                            },
+                            ["TL"] = {
+                                "Umalis ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Go.",
+                            },
+                            ["TL"] = {
+                                "Alis.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Away.",
+                            },
+                            ["TL"] = {
+                                "Malayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Alone.",
+                            },
+                            ["TL"] = {
+                                "Mag-isa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Out.",
+                            },
+                            ["TL"] = {
+                                "Labas.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Walk.",
+                            },
+                            ["TL"] = {
+                                "Lakad na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Done.",
+                            },
+                            ["TL"] = {
+                                "Tapos na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Quiet.",
+                            },
+                            ["TL"] = {
+                                "Tahimik.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Not now.",
+                            },
+                            ["TL"] = {
+                                "Hindi ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Get lost.",
+                            },
+                            ["TL"] = {
+                                "Lumayas ka.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.hostile_withdrawn.warm",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.hostile_withdrawn.warm",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[11]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.hostile_withdrawn",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/hostile.json",
+                ["style"] = "warm",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "warm.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I just need some time alone, friend. Please.",
+                            },
+                            ["TL"] = {
+                                "Kailangan ko lang ng oras mag-isa, kaibigan. Pakiusap.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "It's not you, I promise. I just need to be by myself.",
+                            },
+                            ["TL"] = {
+                                "Hindi ikaw ang may sala, pangako. Kailangan ko lang mapag-isa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Please give me some quiet time. We'll talk later.",
+                            },
+                            ["TL"] = {
+                                "Pakiusap bigyan mo ako ng katahimikan. Mag-usap tayo mamaya.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm in a dark headspace. I don't want to bring you down with me.",
+                            },
+                            ["TL"] = {
+                                "Mabigat ang iniisip ko. Ayokong mahawa ka sa akin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I need to withdraw for a little while. Take care of yourself.",
+                            },
+                            ["TL"] = {
+                                "Kailangan ko munang lumayo sandali. Ingatan mo sarili mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Let me sit in the quiet. I'll find you when I'm ready.",
+                            },
+                            ["TL"] = {
+                                "Hayaan mo muna akong maupo sa tahimik. Hahanapin kita kapag handa na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Thank you for understanding. I just need space today.",
+                            },
+                            ["TL"] = {
+                                "Salamat sa pag-unawa. Kailangan ko lang ng espasyo ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't worry about me, but please let me be for now.",
+                            },
+                            ["TL"] = {
+                                "Huwag kang mag-alala sa 'kin, pero hayaan mo muna ako ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I promise I'll be okay. Just give me this time.",
+                            },
+                            ["TL"] = {
+                                "Pangako magiging maayos ako. Ibigay mo lang ang oras na ito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "See you later, friend. I need the silence right now.",
+                            },
+                            ["TL"] = {
+                                "Kita tayo mamaya, kaibigan. Kailangan ko ng katahimikan ngayon.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.offer_friendly.bond_guarded",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.offer_friendly.bond_guarded",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[12]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.offer_friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/offers.json",
+                ["style"] = "bond_guarded",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "bond_guarded.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, no thanks. I'll handle it.",
+                            },
+                            ["TL"] = {
+                                "%s, hindi salamat. Ako na ang bahala.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_guarded.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, I appreciate the thought, but I've got this.",
+                            },
+                            ["TL"] = {
+                                "%s, salamat sa alok, pero kaya ko na ito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_guarded.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, keep your supplies. I can manage.",
+                            },
+                            ["TL"] = {
+                                "%s, itabi mo ang gamit mo. Kaya ko na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_guarded.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, no need. Save it for when we really need it.",
+                            },
+                            ["TL"] = {
+                                "%s, di kailangan. Itabi mo kapag talagang kailangan na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_guarded.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, I'll pass for now, but thanks.",
+                            },
+                            ["TL"] = {
+                                "%s, tatanggihan ko muna ngayon, pero salamat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_guarded.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, thanks, but I don't need charity.",
+                            },
+                            ["TL"] = {
+                                "%s, salamat, pero di ko kailangan ng limos.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_guarded.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, I'm good on my own, thanks.",
+                            },
+                            ["TL"] = {
+                                "%s, ayos lang ako mag-isa, salamat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_guarded.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, hold onto that. You might need it more.",
+                            },
+                            ["TL"] = {
+                                "%s, hawakan mo 'yan. Baka mas kailanganin mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_guarded.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, no thanks. Let's stay focused.",
+                            },
+                            ["TL"] = {
+                                "%s, hindi salamat. Manatili tayong nakapokus.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_guarded.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, appreciated, but I prefer to carry my own weight.",
+                            },
+                            ["TL"] = {
+                                "%s, salamat, pero mas gusto kong buhatin ang sarili ko.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.offer_friendly.bond_neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.offer_friendly.bond_neutral",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[13]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.offer_friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/offers.json",
+                ["style"] = "bond_neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "bond_neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, that's kind of you. I'll keep it in mind.",
+                            },
+                            ["TL"] = {
+                                "%s, mabuti iyon. Tatandaan ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, thanks for the offer. I'll think about it.",
+                            },
+                            ["TL"] = {
+                                "%s, salamat sa alok. Pag-iisipan ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, I appreciate the offer. Let's see how things go.",
+                            },
+                            ["TL"] = {
+                                "%s, salamat sa alok. Tingnan natin kung ano ang mangyayari.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, good to know. Thank you.",
+                            },
+                            ["TL"] = {
+                                "%s, mabuting malaman. Maraming salamat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, I might take you up on that later.",
+                            },
+                            ["TL"] = {
+                                "%s, baka tanggapin ko 'yan mamaya.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, thanks for putting that on the table.",
+                            },
+                            ["TL"] = {
+                                "%s, salamat sa paglalatag niyan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, that's helpful. Thanks.",
+                            },
+                            ["TL"] = {
+                                "%s, makatutulong 'yan. Salamat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, generous offer. Appreciate it.",
+                            },
+                            ["TL"] = {
+                                "%s, bukas-palad na alok. Salamat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, noted with thanks. I'll let you know.",
+                            },
+                            ["TL"] = {
+                                "%s, tala ko na kalakip ang pasasalamat. Sasabihan kita.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, thanks for looking out for me.",
+                            },
+                            ["TL"] = {
+                                "%s, salamat sa pag-alaga sa akin.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.offer_friendly.bond_terse",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.offer_friendly.bond_terse",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[14]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.offer_friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/offers.json",
+                ["style"] = "bond_terse",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "bond_terse.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, thanks.",
+                            },
+                            ["TL"] = {
+                                "%s, salamat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_terse.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, got it.",
+                            },
+                            ["TL"] = {
+                                "%s, nakuha ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_terse.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, noted.",
+                            },
+                            ["TL"] = {
+                                "%s, tala ko na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_terse.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, I'm good.",
+                            },
+                            ["TL"] = {
+                                "%s, ayos ako.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_terse.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, keep it.",
+                            },
+                            ["TL"] = {
+                                "%s, itago mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_terse.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, pass.",
+                            },
+                            ["TL"] = {
+                                "%s, tanggi muna.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_terse.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, appreciated.",
+                            },
+                            ["TL"] = {
+                                "%s, pinahahalagahan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_terse.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, good.",
+                            },
+                            ["TL"] = {
+                                "%s, mabuti.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_terse.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, later maybe.",
+                            },
+                            ["TL"] = {
+                                "%s, baka mamaya.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_terse.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, thank you.",
+                            },
+                            ["TL"] = {
+                                "%s, salamat sa 'yo.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.offer_friendly.bond_warm",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.offer_friendly.bond_warm",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[15]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.offer_friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/offers.json",
+                ["style"] = "bond_warm",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "bond_warm.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, thank you. I'll keep it in mind.",
+                            },
+                            ["TL"] = {
+                                "%s, salamat. Tatandaan ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_warm.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, you're always so generous. Thank you, friend.",
+                            },
+                            ["TL"] = {
+                                "%s, napakabait mo talaga palagi. Salamat, kaibigan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_warm.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, that means a lot coming from you. Thanks!",
+                            },
+                            ["TL"] = {
+                                "%s, malaking bagay 'yan galing sa 'yo. Salamat!",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_warm.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, I truly appreciate the gesture. You're great.",
+                            },
+                            ["TL"] = {
+                                "%s, talagang pinahahalagahan ko ang malasakit mo. Napakagaling mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_warm.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, you don't have to share, but thank you so much.",
+                            },
+                            ["TL"] = {
+                                "%s, di mo kailangang magbahagi, pero maraming salamat talaga.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_warm.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, thanks! It's rare to find such kindness out here.",
+                            },
+                            ["TL"] = {
+                                "%s, salamat! Bihira ang ganitong kabaitan dito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_warm.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, warm thanks. We always take care of our own.",
+                            },
+                            ["TL"] = {
+                                "%s, taos-pusong pasasalamat. Inaalagaan natin ang kasama.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_warm.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, that touches my heart. Thank you, partner.",
+                            },
+                            ["TL"] = {
+                                "%s, tumatagos sa puso ko 'yan. Salamat, kasama.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_warm.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, you're a lifesaver. I appreciate you.",
+                            },
+                            ["TL"] = {
+                                "%s, tagapagligtas ka. Salamat sa 'yo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "bond_warm.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "%s, thanks a million! I'll return the favor.",
+                            },
+                            ["TL"] = {
+                                "%s, milyong salamat! Babalikan ko ang pabor na 'to.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.offer_friendly.guarded",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.offer_friendly.guarded",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[16]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.offer_friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/offers.json",
+                ["style"] = "guarded",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "guarded.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "No thanks. I can handle it.",
+                            },
+                            ["TL"] = {
+                                "Hindi salamat. Kaya ko na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I don't need hand-outs. Thanks anyway.",
+                            },
+                            ["TL"] = {
+                                "Di ko kailangan ng limos. Salamat pa rin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep your supplies. You'll need them more than me.",
+                            },
+                            ["TL"] = {
+                                "Itago mo ang gamit mo. Mas kailangan mo 'yan kaysa sa akin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I prefer to rely on myself, but thanks.",
+                            },
+                            ["TL"] = {
+                                "Mas gusto kong umasa sa sarili ko, pero salamat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "No thank you. What's the catch?",
+                            },
+                            ["TL"] = {
+                                "Hindi salamat. May kapalit ba 'yan?",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm managing fine on my own.",
+                            },
+                            ["TL"] = {
+                                "Maayos ang pamamahala ko sa sarili ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Pass. I carry what I need.",
+                            },
+                            ["TL"] = {
+                                "Tatanggihan ko. Dala ko ang kailangan ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Thanks, but no. Save it.",
+                            },
+                            ["TL"] = {
+                                "Salamat, pero hindi. Itabi mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll take care of my own needs.",
+                            },
+                            ["TL"] = {
+                                "Ako na ang bahala sa mga pangangailangan ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Not interested, but thanks for offering.",
+                            },
+                            ["TL"] = {
+                                "Di ako interesado, pero salamat sa pag-alok.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.offer_friendly.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.offer_friendly.neutral",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[17]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.offer_friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/offers.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Thanks. I'll keep that in mind.",
+                            },
+                            ["TL"] = {
+                                "Salamat. Tatandaan ko iyan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Thank you for the offer.",
+                            },
+                            ["TL"] = {
+                                "Salamat sa alok mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I appreciate you offering. I'll let you know.",
+                            },
+                            ["TL"] = {
+                                "Salamat sa pag-alok. Sasabihan kita.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Good to know. I might take you up on that.",
+                            },
+                            ["TL"] = {
+                                "Mabuting malaman. Baka tanggapin ko 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Thanks. That's a helpful gesture.",
+                            },
+                            ["TL"] = {
+                                "Salamat. Nakatutulong ang malasakit mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll consider it. Thanks.",
+                            },
+                            ["TL"] = {
+                                "Isasaalang-alang ko. Salamat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Much obliged for the thought.",
+                            },
+                            ["TL"] = {
+                                "Maraming salamat sa magandang kaisipan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Appreciate the option. Thank you.",
+                            },
+                            ["TL"] = {
+                                "Salamat sa pagbibigay ng opsyon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Thanks. We'll see how the day goes.",
+                            },
+                            ["TL"] = {
+                                "Salamat. Tingnan natin ang takbo ng araw.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Kind offer. Thank you.",
+                            },
+                            ["TL"] = {
+                                "Mabuting alok. Salamat.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.offer_friendly.terse",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.offer_friendly.terse",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[18]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.offer_friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/offers.json",
+                ["style"] = "terse",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "terse.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Thanks.",
+                            },
+                            ["TL"] = {
+                                "Salamat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm good.",
+                            },
+                            ["TL"] = {
+                                "Ayos ako.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep it.",
+                            },
+                            ["TL"] = {
+                                "Itabi mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Pass.",
+                            },
+                            ["TL"] = {
+                                "Tanggi muna.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Noted.",
+                            },
+                            ["TL"] = {
+                                "Tala ko na.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Appreciated.",
+                            },
+                            ["TL"] = {
+                                "Pinahahalagahan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Got it.",
+                            },
+                            ["TL"] = {
+                                "Nakuha ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "No thanks.",
+                            },
+                            ["TL"] = {
+                                "Hindi salamat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Maybe later.",
+                            },
+                            ["TL"] = {
+                                "Baka mamaya.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Thank you.",
+                            },
+                            ["TL"] = {
+                                "Salamat sa 'yo.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.offer_friendly.warm",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.offer_friendly.warm",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[19]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.offer_friendly",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/offers.json",
+                ["style"] = "warm",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "warm.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Thank you, I appreciate the offer.",
+                            },
+                            ["TL"] = {
+                                "Salamat, pinahahalagahan ko ang alok mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "That is so kind of you! Thank you so much.",
+                            },
+                            ["TL"] = {
+                                "Napakabait mo naman! Maraming-maraming salamat.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm grateful for that. You're a true friend.",
+                            },
+                            ["TL"] = {
+                                "Nagpapasalamat ako riyan. Tunay kang kaibigan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "That makes life a little easier out here. Thanks!",
+                            },
+                            ["TL"] = {
+                                "Gumagaan ang buhay rito dahil diyan. Salamat!",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Always generous. Thank you, partner.",
+                            },
+                            ["TL"] = {
+                                "Laging bukas-palad. Salamat, kasama.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Thank you! I won't forget your kindness.",
+                            },
+                            ["TL"] = {
+                                "Salamat! Hindi ko malilimutan ang kabaitan mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "You didn't have to, but thank you from the bottom of my heart.",
+                            },
+                            ["TL"] = {
+                                "Hindi mo naman kailangang gawin, pero salamat mula sa puso.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "That's wonderful of you. Thank you!",
+                            },
+                            ["TL"] = {
+                                "Napakaganda ng ginawa mo. Salamat!",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Appreciate you so much. Let me return the favor soon.",
+                            },
+                            ["TL"] = {
+                                "Salamat nang marami. Hayaan mong masuklian ko 'to agad.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Thank you, friend. We look after one another.",
+                            },
+                            ["TL"] = {
+                                "Salamat, kaibigan. Nag-aalagaan tayo rito.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.threat_boundary.guarded",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.threat_boundary.guarded",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[20]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.threat_boundary",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/threats.json",
+                ["style"] = "guarded",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "guarded.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back away. Now.",
+                            },
+                            ["TL"] = {
+                                "Umatras ka. Ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Take one more step and find out.",
+                            },
+                            ["TL"] = {
+                                "Humakbang ka pa nang isa at nang malaman mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep your hands off your weapon and step back.",
+                            },
+                            ["TL"] = {
+                                "Alisin ang kamay sa armas at umatras ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "You're threatening the wrong survivor.",
+                            },
+                            ["TL"] = {
+                                "Maling tao ang tinatakot mo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back up before I put you down.",
+                            },
+                            ["TL"] = {
+                                "Umatras ka bago kita patumbahin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I am not afraid to defend myself. Back off.",
+                            },
+                            ["TL"] = {
+                                "Hindi ako natatakot ipagtanggol ang sarili ko. Lumayo ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Last chance to walk away alive.",
+                            },
+                            ["TL"] = {
+                                "Huling pagkakataon para lumakad palayo nang buhay.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "You don't want this fight. Step back.",
+                            },
+                            ["TL"] = {
+                                "Ayaw mo sa laban na ito. Umatras ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back away immediately.",
+                            },
+                            ["TL"] = {
+                                "Lumayo ka agad-agad.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "guarded.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hands where I can see them. Back off.",
+                            },
+                            ["TL"] = {
+                                "Kamay kung saan ko nakikita. Umatras ka.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.threat_boundary.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.threat_boundary.neutral",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[21]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.threat_boundary",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/threats.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Step back or we have a problem.",
+                            },
+                            ["TL"] = {
+                                "Umatras ka o magkakaproblema tayo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "You need to back off right now.",
+                            },
+                            ["TL"] = {
+                                "Kailangan mong lumayo ngayon din.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Keep your distance. Don't make this turn ugly.",
+                            },
+                            ["TL"] = {
+                                "Panatilihin ang distansya. Huwag mong gawing madugo ito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm giving you fair warning: stand down.",
+                            },
+                            ["TL"] = {
+                                "Binibigyan kita ng patas na babala: ibaba ang armas.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back away. Neither of us needs this fight.",
+                            },
+                            ["TL"] = {
+                                "Umatras ka. Walang nangangailangan ng laban na 'to.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Step down. Let's not do something stupid.",
+                            },
+                            ["TL"] = {
+                                "Huminahon ka. Huwag tayong gumawa ng katangahan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I won't hesitate if you keep advancing.",
+                            },
+                            ["TL"] = {
+                                "Hindi ako magdadalawang-isip kapag lumapit ka pa.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hold your ground right there. Do not advance.",
+                            },
+                            ["TL"] = {
+                                "Diyan ka lang. Huwag kang susulong.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Lower your weapon and step back.",
+                            },
+                            ["TL"] = {
+                                "Ibaba mo ang armas mo at umatras.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "This is your only warning. Back off.",
+                            },
+                            ["TL"] = {
+                                "Ito na ang nag-iisang babala mo. Umatras ka.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.threat_boundary.terse",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.threat_boundary.terse",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[22]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.threat_boundary",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/threats.json",
+                ["style"] = "terse",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "terse.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back off.",
+                            },
+                            ["TL"] = {
+                                "Umatras ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Step back.",
+                            },
+                            ["TL"] = {
+                                "Lumayo ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Stand down.",
+                            },
+                            ["TL"] = {
+                                "Ibaba ang armas.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't.",
+                            },
+                            ["TL"] = {
+                                "Huwag.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Back away.",
+                            },
+                            ["TL"] = {
+                                "Lumayo ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hands up.",
+                            },
+                            ["TL"] = {
+                                "Itaas ang kamay.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Stop.",
+                            },
+                            ["TL"] = {
+                                "Tigil.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Freeze.",
+                            },
+                            ["TL"] = {
+                                "Huwag gagalaw.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Last warning.",
+                            },
+                            ["TL"] = {
+                                "Huling babala.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "terse.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Drop it.",
+                            },
+                            ["TL"] = {
+                                "Ibaba mo 'yan.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "social_reactions_hostile_offer_threat",
+        ["id"] = "semantic.social.threat_boundary.warm",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.social.threat_boundary.warm",
+            ["sourcePath"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json#records[23]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/SocialReactionsHostile__c5a30a16",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:core_social_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.social",
+                ["responseTemplateID"] = "semantic.social.threat_boundary",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/reactions/threats.json",
+                ["style"] = "warm",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "warm.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hey, please, don't do this. Step back.",
+                            },
+                            ["TL"] = {
+                                "Huy, pakiusap, huwag mong gawin 'to. Umatras ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "We don't need blood spilled today. Put it down.",
+                            },
+                            ["TL"] = {
+                                "Di natin kailangang magpadanak ng dugo ngayon. Ibaba mo 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Listen to reason, friend. Step away before someone gets hurt.",
+                            },
+                            ["TL"] = {
+                                "Makinig ka sa katwiran, kaibigan. Lumayo ka bago may masaktan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I don't want to hurt you. Please, back off.",
+                            },
+                            ["TL"] = {
+                                "Ayaw kitang saktan. Pakiusap, umatras ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't throw your life away over this. Stand down.",
+                            },
+                            ["TL"] = {
+                                "Huwag mong itapon ang buhay mo dahil dito. Ibaba ang armas.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "We can still walk away peacefully. Step back.",
+                            },
+                            ["TL"] = {
+                                "Maaari pa tayong lumayo nang payapa. Umatras ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Take a breath and think about what you're doing. Back up.",
+                            },
+                            ["TL"] = {
+                                "Huminga ka muna at isipin ang ginagawa mo. Umatras ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I value your life, but I will protect mine. Please stop.",
+                            },
+                            ["TL"] = {
+                                "Mahalaga ang buhay mo, pero poprotektahan ko ang akin. Pakiusap tigil.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Don't make me do something we'll both regret. Step back.",
+                            },
+                            ["TL"] = {
+                                "Huwag mo akong piliting gumawa ng pagsisisihan natin. Umatras ka.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "warm.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "We're both survivors. Let's keep it that way. Back down.",
+                            },
+                            ["TL"] = {
+                                "Pareho tayong nakaligtas. Panatilihin nating ganoon. Huminahon ka.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/social_reactions_hostile_offer_threat.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

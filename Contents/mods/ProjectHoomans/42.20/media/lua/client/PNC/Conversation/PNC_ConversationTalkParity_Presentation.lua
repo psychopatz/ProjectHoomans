@@ -1,6 +1,7 @@
 -- Native Talk start and live presentation projection.
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Conversation = PNC.Conversation or {}
 
 local TalkParity = PNC.Conversation.TalkParity
@@ -202,7 +203,7 @@ function TalkParity.BuildPresentationProjection(context, view)
         and Conversation.Relationship.IsPresentationVisible
         and Conversation.Relationship.IsPresentationVisible()
         or false
-    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     local closed = view and (
         view.closed == true
             or view.lifecycleFinished == true

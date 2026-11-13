@@ -6,6 +6,7 @@ PNC = {
     Semantics = {},
     PBrainZ = { Internal = {} },
 }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 T.load(
     "ProjectHoomans",
@@ -14,7 +15,7 @@ T.load(
 )
 
 local dispatched
-PNC.Semantics.DialogueInput = {
+PNC.ConvoEngine.DialogueInput = {
     Internal = {
         DispatchAction = function(view, result, rawText)
             dispatched = {

@@ -23,6 +23,7 @@ PsychopatzCore = {
     },
 }
 PNC = {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Client = {
     RequestSemanticSocialInteraction = function()
         return true, nil, { accepted = true, status = "dispatched" }
@@ -76,7 +77,7 @@ T.load(
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
 local providerReady = true
 PNC.PBrainZ = {
@@ -90,20 +91,20 @@ PNC.PBrainZ = {
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Context.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Context.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Presentation.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Presentation.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Actions.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Actions.lua"
 )
 
-T.load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticDialogueSuggestions.lua")
+T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/Dialogue/Suggestions.lua")
 
 -- The production widget dependencies are UI-only. Keep the routing test
 -- headless while preserving the real Core parser, Hoomans catalog, policy,
@@ -112,56 +113,56 @@ require = function() return true end
 local Input = T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput.lua"
+    "PNC/ConvoEngine/Dialogue/Input.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Trace.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Trace.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_ProviderFallback.lua"
+    "PNC/ConvoEngine/Dialogue/Input_ProviderFallback.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Presentation.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation_Interaction.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Presentation_Interaction.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Presentation_Choices.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Presentation_Choices.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Navigation.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Navigation.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission.lua"
 )
 for _, spoke in ipairs({
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Receipts.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Compound.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single_Preflight.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single_Interpretation.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single_Commit.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Single.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle_Submission_Gossip.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Receipts.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Compound.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Single_Preflight.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Single_Interpretation.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Single_Commit.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Single.lua",
+    "PNC/ConvoEngine/Dialogue/Input_Lifecycle_Submission_Gossip.lua",
 }) do
     T.load(
         "ProjectHoomans",
@@ -170,12 +171,12 @@ for _, spoke in ipairs({
     )
 end
 for _, spoke in ipairs({
-    "PNC/Semantics/PNC_SemanticDialogueInput_FrameSupport.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_NavigationFrames.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_SubmissionFrames_Conversation.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_SubmissionFrames_Navigation.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_SubmissionFrames.lua",
-    "PNC/Semantics/PNC_SemanticDialogueInput_State.lua",
+    "PNC/ConvoEngine/Dialogue/Input_FrameSupport.lua",
+    "PNC/ConvoEngine/Dialogue/Input_NavigationFrames.lua",
+    "PNC/ConvoEngine/Dialogue/Input_SubmissionFrames_Conversation.lua",
+    "PNC/ConvoEngine/Dialogue/Input_SubmissionFrames_Navigation.lua",
+    "PNC/ConvoEngine/Dialogue/Input_SubmissionFrames.lua",
+    "PNC/ConvoEngine/Dialogue/Input_State.lua",
 }) do
     T.load(
         "ProjectHoomans",
@@ -523,7 +524,7 @@ local smallTalkView = {
     },
     isConversationInteractive = function() return true end,
 }
-local shortcut = PNC.Semantics.DialogueSuggestions.BuildShortcutFrame({
+local shortcut = PNC.ConvoEngine.DialogueSuggestions.BuildShortcutFrame({
     candidateID = "conversation.landing:whats_up", topic = "whats_up",
     utterance = "What's up?", labelFallback = "What's up?",
     extensions = { route = "semantic_hub", hubID = "whats_up", canonicalConcept = "WHATS_UP" },

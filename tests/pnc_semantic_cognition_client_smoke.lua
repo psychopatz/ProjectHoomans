@@ -21,6 +21,7 @@ PNC = {
     Core = { Now = function() return 100 end },
     Network = { ClientState = {} },
 }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 T.load(
     "ProjectHoomans",
@@ -138,7 +139,7 @@ local completedRequest
 local completedPayload
 local gossipRequest = { requestID = "gossip:1" }
 local clientState = PNC.Network.ClientState
-PNC.Semantics.DialogueInput = {
+PNC.ConvoEngine.DialogueInput = {
     CompleteGossipRequest = function(request, payload)
         completedRequest = request
         completedPayload = payload

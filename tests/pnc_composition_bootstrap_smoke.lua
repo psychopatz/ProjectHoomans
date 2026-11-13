@@ -310,7 +310,7 @@ local conversationRuntimeCalls = capture(
 )
 local semanticRuntimeIndex = indexOf(
     conversationRuntimeCalls,
-    "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime"
+    "PNC/ConvoEngine/RuntimeFacade"
 )
 T.falsy(semanticRuntimeIndex,
     "conversation runtime leaves semantic runtime wiring to composition")
@@ -340,8 +340,8 @@ local expectedConversationComposition = {
     "PNC/Semantics/PNC_SemanticGiftLifecycle",
     "PNC/Semantics/PNC_SemanticGiftContext",
     "PNC/Conversation/Composition/PNC_ConversationClientComposition",
-    "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime",
-    "PNC/Semantics/PNC_SemanticCombatResponseSurface",
+    "PNC/ConvoEngine/RuntimeFacade",
+    "PNC/ConvoEngine/CombatResponseSurface",
     "PNC/UI/Conversation/PNC_CombatResponseStrip",
     "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation",
     "PNC/Integrations/PBrainZ/PNC_PBrainZ",

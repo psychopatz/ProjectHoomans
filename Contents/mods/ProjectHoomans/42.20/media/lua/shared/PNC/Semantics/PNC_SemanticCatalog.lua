@@ -7,7 +7,7 @@ local Normalizer = Semantic.Normalizer
 local GeneratedLexicon = require
     "PsychopatzCore/Semantics/Generated/Lexicon/Catalog"
 local ConversationRegistry = require
-    "PNC/Semantics/Generated/Conversation/Registry"
+    "PNC/ConvoEngine/Registry"
 local CampSite = PNC.Semantics.CampSite
     or require "PNC/Semantics/PNC_SemanticCampSite"
 local Catalog = PNC.Semantics.Catalog or {}
@@ -254,6 +254,6 @@ Catalog.Register()
 -- Keep socially charged language in its own data module.  The base catalog
 -- remains the stable vocabulary hub, while this explicit dependency ensures
 -- every normal shared semantic load sees the same social patterns.
-require "PNC/Semantics/PNC_SemanticSocialCatalog"
+require "PNC/ConvoEngine/Social/Catalog"
 
 return Catalog

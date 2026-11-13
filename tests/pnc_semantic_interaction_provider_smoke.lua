@@ -5,9 +5,9 @@ PNC = {}
 
 local Predicate = require "PNC/Semantics/PNC_SemanticPredicate"
 local SuggestionPredicates = require
-    "PNC/Semantics/PNC_SemanticDialogueSuggestionPredicates"
-local Stimulus = require "PNC/Semantics/PNC_SemanticInteractionStimulus"
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
+    "PNC/ConvoEngine/Dialogue/SuggestionPredicates"
+local Stimulus = require "PNC/ConvoEngine/Interaction/Stimulus"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
 
 T.truthy(Predicate == SuggestionPredicates,
     "suggestions and interactions share one semantic predicate contract")

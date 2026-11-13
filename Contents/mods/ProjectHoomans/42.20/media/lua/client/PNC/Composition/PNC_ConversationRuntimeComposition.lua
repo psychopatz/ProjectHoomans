@@ -12,8 +12,8 @@ require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 require "PNC/Semantics/PNC_SemanticGiftLifecycle"
 require "PNC/Semantics/PNC_SemanticGiftContext"
 require "PNC/Conversation/Composition/PNC_ConversationClientComposition"
-require "PNC/Conversation/Semantic/PNC_ConversationSemanticRuntime"
-require "PNC/Semantics/PNC_SemanticCombatResponseSurface"
+require "PNC/ConvoEngine/RuntimeFacade"
+require "PNC/ConvoEngine/CombatResponseSurface"
 require "PNC/UI/Conversation/PNC_CombatResponseStrip"
 
 local Conversation = PNC.Conversation

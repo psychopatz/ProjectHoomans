@@ -126,11 +126,11 @@ T.falsy(io.open(
 PNC = { Semantics = {} }
 require "PsychopatzCore/Semantics/PsychopatzSemantic"
 T.load("ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua")
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua")
 local Reactions = T.load("ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticSocialReaction.lua")
+    "PNC/ConvoEngine/Social/Reaction.lua")
 local Ownership = T.load("ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticConversationCategoryOwnership.lua")
+    "PNC/ConvoEngine/CategoryOwnership.lua")
 
 for _, categoryID in ipairs({
     "projecthoomans:wellbeing",

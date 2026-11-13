@@ -1,5 +1,5 @@
 -- Close delivery and working-session cleanup. No start/heartbeat policy.
-local DialogueSession = require "PNC/Semantics/PNC_SemanticDialogueSession"
+local DialogueSession = require "PNC/ConvoEngine/Dialogue/Session"
 local Lifecycle = PNC.Conversation.Lifecycle
 local H = Lifecycle.Internal
 local Safety = H.Safety

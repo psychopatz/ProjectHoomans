@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Knowledge-disclosure response realization and receipt handling.
 
 local Conversation = PNC.Conversation
@@ -57,11 +59,11 @@ end
 local function disclosureResponsePayload(result)
     local topicID = tostring(result and result.topicID or "")
     if string.sub(topicID, 1, 10) ~= "backstory." then return nil end
-    local input = PNC.Semantics and PNC.Semantics.DialogueInput
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput
     local inputInternal = input and input.Internal or nil
     local responsePayload = inputInternal
         and inputInternal.ResponsePayload or nil
-    local catalog = PNC.Semantics and PNC.Semantics.ResponseCatalog or nil
+    local catalog = PNC.ConvoEngine and PNC.ConvoEngine.ResponseCatalog or nil
     if type(responsePayload) ~= "function"
         or type(catalog) ~= "table"
         or type(catalog.Select) ~= "function"

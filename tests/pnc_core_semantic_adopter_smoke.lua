@@ -20,7 +20,7 @@ package.path = HOOMANS_ROOT .. "?.lua;" .. package.path
 
 -- Load Core Semantics
 require "PsychopatzCore/Actors/PsychopatzSocial"
-require "PsychopatzCore/Semantics/PsychopatzSemanticDialogueFlow"
+require "PsychopatzCore/ConvoEngine/DialogueFlow"
 require "PsychopatzCore/Semantics/PsychopatzSemanticPackRegistry"
 require "PsychopatzCore/Semantics/PsychopatzSemantic"
 

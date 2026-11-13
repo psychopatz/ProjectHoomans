@@ -18,10 +18,10 @@ PNC = {
     },
 }
 
-local Providers = require "PNC/Semantics/PNC_SemanticInteractionProviders"
-local Catalog = require "PNC/Semantics/PNC_SemanticInteractionCatalog"
-local Runtime = require "PNC/Semantics/PNC_SemanticInteractionSceneRuntime"
-local Opportunity = require "PNC/Semantics/PNC_SemanticInteractionOpportunity"
+local Providers = require "PNC/ConvoEngine/Interaction/Providers"
+local Catalog = require "PNC/ConvoEngine/Interaction/Catalog"
+local Runtime = require "PNC/ConvoEngine/Interaction/SceneRuntime"
+local Opportunity = require "PNC/ConvoEngine/Interaction/Opportunity"
 
 Catalog.ResetDraftOverlay()
 Opportunity.ResetProvidersForTests()
@@ -289,7 +289,7 @@ T.equal(invalidReason, "participant_minimum",
 
 local source = T.read(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticInteractionOpportunity.lua"
+    "PNC/ConvoEngine/Interaction/Opportunity.lua"
 )
 T.falsy(string.find(source, "Events.OnTick", 1, true),
     "opportunity manager has no polling tick")

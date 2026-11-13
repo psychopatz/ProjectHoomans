@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Semantic suggestion-click orchestration.
 
 local Click = {}
@@ -8,8 +10,8 @@ local Response = require "worker/Conversation_Click_Response"
 function Click.run(context, frame, Conversation)
     local Runtime = context.Runtime
     local Values = context.Values
-    local Input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
-    local Suggestions = PNC.Semantics and PNC.Semantics.DialogueSuggestions
+    local Input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
+    local Suggestions = PNC.ConvoEngine and PNC.ConvoEngine.DialogueSuggestions
     local view = Runtime.view
     if not view or not view.session or not Input
         or type(Input.SubmitSemanticFrame) ~= "function"

@@ -100,7 +100,7 @@ local Lifecycle = T.load(
     T.path(
         "ProjectHoomans",
         "shared",
-        "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua"
+        "PNC/ConvoEngine/Interaction/Lifecycle.lua"
     )
 )
 local lifecycleStore = Lifecycle.New({ worldHour = 0 })

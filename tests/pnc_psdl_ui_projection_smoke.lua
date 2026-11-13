@@ -1,6 +1,6 @@
 local suggestions = dofile(
     "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
-        .. "Semantics/Generated/Conversation/UI/Psdl/Dialogue/"
+        .. "ConvoEngine/UI/Dialogue/"
         .. "CompanionCheckIn.lua"
 )
 

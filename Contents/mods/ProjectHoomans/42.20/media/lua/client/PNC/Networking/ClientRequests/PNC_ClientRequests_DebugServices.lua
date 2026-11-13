@@ -1,5 +1,6 @@
 -- Knowledge, needs, director, and world-effect debug request transport.
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Client = PNC.Client or {}
 PNC.Client.Internal = PNC.Client.Internal or {}
 
@@ -169,7 +170,7 @@ function Client.RequestSemanticSocialDebug()
         end
         return false, "player_unavailable"
     end
-    local audit = PNC.Semantics and PNC.Semantics.SocialDirectorAudit or nil
+    local audit = PNC.ConvoEngine and PNC.ConvoEngine.SocialDirectorAudit or nil
     if not audit or type(audit.BuildSnapshot) ~= "function" then
         return false, "semantic_social_debug_unavailable"
     end

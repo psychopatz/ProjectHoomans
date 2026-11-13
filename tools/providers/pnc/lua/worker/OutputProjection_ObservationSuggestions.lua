@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Suggestion instrumentation projection for an observation.
 
 local Suggestions = {}
@@ -6,8 +8,7 @@ function Suggestions.build(context, record, result, semanticContext)
     local Values = context.Values
     local runtime = context.Runtime
     local suggestionsModule = PNC
-        and PNC.Semantics
-        and PNC.Semantics.DialogueSuggestions
+        and PNC.ConvoEngine.DialogueSuggestions
     local suppressInstrumentation = record.type == "preview"
     local previousSuppression = runtime.suppressTranslationInstrumentation
     if suppressInstrumentation then

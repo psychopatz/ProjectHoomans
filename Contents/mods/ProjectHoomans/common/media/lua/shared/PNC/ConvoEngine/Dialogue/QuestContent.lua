@@ -1,0 +1,1875 @@
+-- Generated; do not edit by hand.
+return {
+    {
+        ["domain"] = "quest_content",
+        ["id"] = "semantic.quest.clinic_supplies.accept.failed.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.quest.clinic_supplies.accept.failed.neutral",
+            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[0]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:quest_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.quest",
+                ["responseTemplateID"] = "semantic.quest.clinic_supplies.accept.failed",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I couldn't accept that request.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko matanggap ang kahilingang iyon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Something went wrong. I couldn't take that on.",
+                            },
+                            ["TL"] = {
+                                "May nagkaproblema. Hindi ko magawang tanggapin 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I wasn't able to accept the clinic supply run.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko nagawang tanggapin ang pagkuha ng suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Unable to commit to that medical task right now.",
+                            },
+                            ["TL"] = {
+                                "Hindi makakapangako sa medikal na gawaing 'yan ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "The request failed to go through on my end.",
+                            },
+                            ["TL"] = {
+                                "Hindi pumasok ang kahilingan sa panig ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can't lock that clinic mission in.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko maitalaga ang misyong 'yan sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Couldn't confirm that request. Try again later.",
+                            },
+                            ["TL"] = {
+                                "Hindi makumpirma ang kahilingang 'yan. Subukan ulit mamaya.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Accepting that task didn't work out.",
+                            },
+                            ["TL"] = {
+                                "Hindi nagtagumpay ang pagtanggap sa gawaing 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I couldn't take on the supplies task right now.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko kayang balikatin ang gawain sa suplay ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "That request couldn't be accepted.",
+                            },
+                            ["TL"] = {
+                                "Hindi natanggap ang kahilingang iyon.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "quest_content",
+        ["id"] = "semantic.quest.clinic_supplies.accept.queued.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.quest.clinic_supplies.accept.queued.neutral",
+            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[1]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:quest_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.quest",
+                ["responseTemplateID"] = "semantic.quest.clinic_supplies.accept.queued",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll bring the clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Dadalahin ko ang mga suplay ng klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I've got the clinic supply run on my list.",
+                            },
+                            ["TL"] = {
+                                "Nasa listahan ko na ang pagkuha ng suplay para sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll gather the medical gear as soon as I can.",
+                            },
+                            ["TL"] = {
+                                "Kukunin ko ang mga gamot sa lalong madaling panahon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Count on me for the clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Asahan mo ako sa mga suplay ng klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll track down those medical items for you.",
+                            },
+                            ["TL"] = {
+                                "Hahanapin ko ang mga gamot na 'yon para sa'yo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Queued up. I'll secure those clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Nakalista na. Kukunin ko ang mga suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm on it. I'll deliver the clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Ako na bahala. Ihahatid ko ang mga suplay ng klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Medical supplies are queued. I'll get them.",
+                            },
+                            ["TL"] = {
+                                "Nakatala na ang mga medikal na suplay. Kukunin ko.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll fetch what the clinic needs.",
+                            },
+                            ["TL"] = {
+                                "Kukunin ko kung ano ang kailangan ng klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Accepted. I'll bring back those clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Tinanggap ko na. Dadalhin ko pabalik ang mga suplay sa klinika.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "quest_content",
+        ["id"] = "semantic.quest.clinic_supplies.accept.rejected.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.quest.clinic_supplies.accept.rejected.neutral",
+            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[2]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:quest_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.quest",
+                ["responseTemplateID"] = "semantic.quest.clinic_supplies.accept.rejected",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can't accept that request right now.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko matatanggap ang kahilingang iyon ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm not in a position to take that on.",
+                            },
+                            ["TL"] = {
+                                "Wala ako sa posisyong balikatin 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Too much on my plate. Can't accept the clinic run.",
+                            },
+                            ["TL"] = {
+                                "Masyado akong maraming ginagawa. Hindi ko matatanggap ang klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Not right now. I have to pass on that request.",
+                            },
+                            ["TL"] = {
+                                "Hindi muna ngayon. Tatanggihan ko muna ang kahilingang 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can't commit to gathering clinic supplies today.",
+                            },
+                            ["TL"] = {
+                                "Hindi ako makakapangakong mag-ipon ng suplay sa klinika ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I have to turn that down for now.",
+                            },
+                            ["TL"] = {
+                                "Kailangan ko munang tanggihan 'yan sa ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Can't help with the clinic run at the moment.",
+                            },
+                            ["TL"] = {
+                                "Hindi makakatulong sa klinika sa ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I won't be taking that request.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko tatanggapin ang kahilingang 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Sorry, I can't agree to that right now.",
+                            },
+                            ["TL"] = {
+                                "Pasensya na, hindi ako makakapayag diyan ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I must decline that medical supply task.",
+                            },
+                            ["TL"] = {
+                                "Kailangan kong tanggihan ang gawaing medikal na 'yan.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "quest_content",
+        ["id"] = "semantic.quest.clinic_supplies.offer.failed.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.quest.clinic_supplies.offer.failed.neutral",
+            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[3]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:quest_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.quest",
+                ["responseTemplateID"] = "semantic.quest.clinic_supplies.offer.failed",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I couldn't check that clinic-supplies request.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko masuri ang kahilingan para sa suplay.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Unable to look over the clinic supply offer.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko masilip ang alok sa suplay ng klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "The offer couldn't be processed.",
+                            },
+                            ["TL"] = {
+                                "Hindi maproseso ang alok na 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Something went wrong while checking the medical offer.",
+                            },
+                            ["TL"] = {
+                                "May nagkaproblema habang sinusuri ang medikal na alok.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Couldn't review the supplies request just now.",
+                            },
+                            ["TL"] = {
+                                "Hindi masuri ang kahilingan sa suplay ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I couldn't verify that clinic offer.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko makumpirma ang alok na 'yon sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Failed to inspect the clinic supplies details.",
+                            },
+                            ["TL"] = {
+                                "Bigo sa pagsusuri ng detalye ng suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I wasn't able to review that request.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko nasuri ang kahilingang iyon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Could not check the medical offer properly.",
+                            },
+                            ["TL"] = {
+                                "Hindi maayos na nasuri ang medikal na alok.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Checking that offer didn't work out.",
+                            },
+                            ["TL"] = {
+                                "Hindi gumana ang pagsusuri sa alok na 'yon.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "quest_content",
+        ["id"] = "semantic.quest.clinic_supplies.offer.queued.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.quest.clinic_supplies.offer.queued.neutral",
+            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[4]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:quest_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.quest",
+                ["responseTemplateID"] = "semantic.quest.clinic_supplies.offer.queued",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can help with the clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Matutulungan kita sa mga suplay ng klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm ready to lend a hand with those medical goods.",
+                            },
+                            ["TL"] = {
+                                "Handa akong tumulong sa mga medikal na gamit na 'yon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Put me down for the clinic supply run.",
+                            },
+                            ["TL"] = {
+                                "Ilista mo ako para sa pagkuha ng suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm available to help gather medical gear.",
+                            },
+                            ["TL"] = {
+                                "Available ako para tumulong mag-ipon ng gamot.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can assist with securing what the clinic needs.",
+                            },
+                            ["TL"] = {
+                                "Makatutulong ako sa pagkuha ng kailangan ng klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Count me in for the clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Isama mo ako sa suplay para sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll pitch in on that medical supply run.",
+                            },
+                            ["TL"] = {
+                                "Tutulong ako sa pagkuha ng medikal na suplay.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can offer my help for the clinic task.",
+                            },
+                            ["TL"] = {
+                                "Maaari kong ialok ang tulong ko sa gawaing ito sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Glad to help get those supplies to the clinic.",
+                            },
+                            ["TL"] = {
+                                "Masaya akong makatulong maihatid ang mga suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can take on part of that clinic effort.",
+                            },
+                            ["TL"] = {
+                                "Kaya kong gampanan ang bahagi ng gawaing 'yan sa klinika.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "quest_content",
+        ["id"] = "semantic.quest.clinic_supplies.offer.rejected.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.quest.clinic_supplies.offer.rejected.neutral",
+            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[5]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:quest_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.quest",
+                ["responseTemplateID"] = "semantic.quest.clinic_supplies.offer.rejected",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can't take that clinic-supplies request right now.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko matatanggap ang kahilingan para sa suplay ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I have to turn down the clinic offer for now.",
+                            },
+                            ["TL"] = {
+                                "Kailangan kong tanggihan ang alok sa klinika sa ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Not able to help with medical supplies today.",
+                            },
+                            ["TL"] = {
+                                "Hindi makakatulong sa mga medikal na suplay ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can't sign up for that clinic mission.",
+                            },
+                            ["TL"] = {
+                                "Hindi ako makakasali sa misyong 'yan sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Must decline the clinic supplies offer.",
+                            },
+                            ["TL"] = {
+                                "Kailangang tanggihan ang alok na suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can't accept the offer at this time.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko matatanggap ang alok sa panahong ito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Medical supply run isn't something I can do now.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko kayang gawin ang pagkuha ng medikal na suplay ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll have to pass on this clinic offer.",
+                            },
+                            ["TL"] = {
+                                "Lalagpasan ko muna ang alok na 'to para sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Can't take on the medical task right now.",
+                            },
+                            ["TL"] = {
+                                "Hindi maaring hawakan ang medikal na gawain ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I must reject that offer for the moment.",
+                            },
+                            ["TL"] = {
+                                "Kailangan kong tanggihan ang alok na 'yan sa sandaling ito.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "quest_content",
+        ["id"] = "semantic.quest.clinic_supplies.status.failed.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.quest.clinic_supplies.status.failed.neutral",
+            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[6]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:quest_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.quest",
+                ["responseTemplateID"] = "semantic.quest.clinic_supplies.status.failed",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I couldn't check that request.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko masuri ang kahilingang iyon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Unable to verify the status of the clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko makumpirma ang katayuan ng mga suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Status check on the medical supplies failed.",
+                            },
+                            ["TL"] = {
+                                "Bigo ang pagsusuri sa katayuan ng mga suplay.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Couldn't retrieve the clinic quest details.",
+                            },
+                            ["TL"] = {
+                                "Hindi makuha ang mga detalye ng misyon sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I wasn't able to inspect the request status.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko nasuri ang katayuan ng kahilingan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Failed to look up where we stand on clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Bigo sa pagtingin sa katayuan ng suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Couldn't confirm progress on that task.",
+                            },
+                            ["TL"] = {
+                                "Hindi makumpirma ang progreso sa gawaing 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Unable to check our clinic supplies progress.",
+                            },
+                            ["TL"] = {
+                                "Hindi masuri ang progreso natin sa suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Checking that request didn't go through.",
+                            },
+                            ["TL"] = {
+                                "Hindi natuloy ang pagsusuri sa kahilingang 'yan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Couldn't get a status read on the medical run.",
+                            },
+                            ["TL"] = {
+                                "Hindi makakuha ng ulat sa medikal na lakad.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "quest_content",
+        ["id"] = "semantic.quest.clinic_supplies.status.queued.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.quest.clinic_supplies.status.queued.neutral",
+            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[7]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:quest_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.quest",
+                ["responseTemplateID"] = "semantic.quest.clinic_supplies.status.queued",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll check the clinic-supplies request.",
+                            },
+                            ["TL"] = {
+                                "Susuriin ko ang kahilingan para sa suplay ng klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll see how we're doing on those medical supplies.",
+                            },
+                            ["TL"] = {
+                                "Titingnan ko kung kamusta na ang mga medikal na suplay natin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Checking our progress on the clinic gear now.",
+                            },
+                            ["TL"] = {
+                                "Sinusuri na ang progreso natin sa gamot para sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll look into the status of the clinic task.",
+                            },
+                            ["TL"] = {
+                                "Sisiyasatin ko ang katayuan ng gawain sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Reviewing where we stand with the clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Sinusuri kung nasaan na tayo sa mga suplay ng klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll pull up the clinic supply checklist.",
+                            },
+                            ["TL"] = {
+                                "Kukunin ko ang listahan ng suplay para sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Let me verify our clinic supplies count.",
+                            },
+                            ["TL"] = {
+                                "Hayaan mong kumpirmahin ko ang bilang ng suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm checking the medical supplies progress.",
+                            },
+                            ["TL"] = {
+                                "Sinusuri ko ang progreso ng mga medikal na suplay.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll inspect the clinic supplies status for you.",
+                            },
+                            ["TL"] = {
+                                "Titingnan ko ang katayuan ng suplay sa klinika para sa'yo.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Looking into the clinic request right now.",
+                            },
+                            ["TL"] = {
+                                "Sinisiyasat ko na ang kahilingan ng klinika ngayon.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "quest_content",
+        ["id"] = "semantic.quest.clinic_supplies.status.rejected.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.quest.clinic_supplies.status.rejected.neutral",
+            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[8]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:quest_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.quest",
+                ["responseTemplateID"] = "semantic.quest.clinic_supplies.status.rejected",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can't check that request right now.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko masuri ang kahilingang iyon ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Too busy to review the clinic task status.",
+                            },
+                            ["TL"] = {
+                                "Masyadong abala para suriin ang katayuan ng klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Can't inspect the medical supplies list at the moment.",
+                            },
+                            ["TL"] = {
+                                "Hindi masisilip ang listahan ng suplay sa sandaling ito.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Not able to pull up that status right now.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko mabuksan ang katayuang 'yan ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I won't be checking that request today.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko susuriin ang kahilingang 'yan ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I have to decline looking into the status now.",
+                            },
+                            ["TL"] = {
+                                "Kailangan kong tanggihan ang pagsilip sa katayuan ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Can't check the clinic supplies progress right now.",
+                            },
+                            ["TL"] = {
+                                "Hindi masusuri ang progreso ng suplay sa klinika ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Unable to review the request at this time.",
+                            },
+                            ["TL"] = {
+                                "Hindi magagawang suriin ang kahilingan sa oras na 'to.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can't follow up on that clinic task currently.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko matututukan ang gawaing 'yan sa klinika sa kasalukuyan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Not checking clinic status now. Ask later.",
+                            },
+                            ["TL"] = {
+                                "Hindi titingnan ang katayuan sa klinika ngayon. Magtanong mamaya.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "quest_content",
+        ["id"] = "semantic.quest.clinic_supplies.turn_in.failed.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.quest.clinic_supplies.turn_in.failed.neutral",
+            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[9]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:quest_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.quest",
+                ["responseTemplateID"] = "semantic.quest.clinic_supplies.turn_in.failed",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I couldn't turn in the clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko maipasa ang mga suplay ng klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Something went wrong handing over the medical gear.",
+                            },
+                            ["TL"] = {
+                                "May nagkaproblema sa pag-abot ng mga medikal na gamit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Turn-in failed. Check if we have every item.",
+                            },
+                            ["TL"] = {
+                                "Bigo ang pagpasa. Tignan kung kumpleto ang bawat gamit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Unable to complete the clinic supply delivery.",
+                            },
+                            ["TL"] = {
+                                "Hindi makumpleto ang paghahatid ng suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I wasn't able to drop off the clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko naibigay ang mga suplay para sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Failed to hand in the requested medical items.",
+                            },
+                            ["TL"] = {
+                                "Bigo sa pagpasa ng hinihiling na medikal na kagamitan.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Couldn't finalize the clinic supplies handover.",
+                            },
+                            ["TL"] = {
+                                "Hindi matapos ang paglilipat ng suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Delivery of clinic goods couldn't be registered.",
+                            },
+                            ["TL"] = {
+                                "Hindi naitala ang paghahatid ng gamit sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Could not complete the turn-in for the clinic.",
+                            },
+                            ["TL"] = {
+                                "Hindi makumpleto ang pagpasa para sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Turn-in was unsuccessful. Try again.",
+                            },
+                            ["TL"] = {
+                                "Hindi nagtagumpay ang pagpasa. Subukan ulit.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "quest_content",
+        ["id"] = "semantic.quest.clinic_supplies.turn_in.queued.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.quest.clinic_supplies.turn_in.queued.neutral",
+            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[10]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:quest_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.quest",
+                ["responseTemplateID"] = "semantic.quest.clinic_supplies.turn_in.queued",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll turn in the clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Ipapasa ko ang mga suplay ng klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'm heading over to drop off the medical items.",
+                            },
+                            ["TL"] = {
+                                "Pupunta na ako para iabot ang mga medikal na gamit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll deliver the clinic supplies right away.",
+                            },
+                            ["TL"] = {
+                                "Ihahatid ko agad ang mga suplay ng klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Queued to hand over the medical gear.",
+                            },
+                            ["TL"] = {
+                                "Nakatakdang iabot ang mga medikal na gamit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I will submit the clinic supplies now.",
+                            },
+                            ["TL"] = {
+                                "Ipapasa ko na ang mga suplay sa klinika ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Taking these supplies over to the clinic station.",
+                            },
+                            ["TL"] = {
+                                "Dadalhin ko na ang mga suplay na 'to sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll deposit the medical items as requested.",
+                            },
+                            ["TL"] = {
+                                "Ilalagak ko ang mga medikal na gamit tulad ng hiniling.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Handing in the clinic goods now.",
+                            },
+                            ["TL"] = {
+                                "Iniaabot ko na ang mga gamit sa klinika ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I'll complete the delivery of the clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Tatapusin ko ang paghahatid ng suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Off to turn in our gathered clinic supplies.",
+                            },
+                            ["TL"] = {
+                                "Aalis na para ipasa ang naipon nating suplay sa klinika.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "quest_content",
+        ["id"] = "semantic.quest.clinic_supplies.turn_in.rejected.neutral",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["migrationReadOnly"] = true,
+            ["sourceId"] = "semantic.quest.clinic_supplies.turn_in.rejected.neutral",
+            ["sourcePath"] = "psdl/dialogue/quest_content.json#records[11]",
+            ["sourceSchema"] = "psychopatz.semantic.dialogue-language.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/QuestContent",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["metadata"] = {
+                ["category"] = "projecthoomans:quest_content",
+                ["contentOwner"] = "projecthoomans.dialogue_content.quest",
+                ["responseTemplateID"] = "semantic.quest.clinic_supplies.turn_in.rejected",
+                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+                ["style"] = "neutral",
+            },
+            ["response"] = {
+                ["act"] = "REACT",
+                ["variants"] = {
+                    {
+                        ["id"] = "neutral.01",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I can't turn that in yet.",
+                            },
+                            ["TL"] = {
+                                "Hindi ko pa maipapasa iyon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.02",
+                        ["text"] = {
+                            ["EN"] = {
+                                "We don't have everything needed for the clinic yet.",
+                            },
+                            ["TL"] = {
+                                "Wala pa sa atin ang lahat ng kailangan para sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.03",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Supplies aren't complete. Can't hand them over.",
+                            },
+                            ["TL"] = {
+                                "Kulang pa ang mga suplay. Hindi pa pwedeng iabot.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.04",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I have to decline turning this in right now.",
+                            },
+                            ["TL"] = {
+                                "Kailangan kong tanggihan ang pagpasa nito ngayon.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.05",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Not ready for turn-in. Missing items.",
+                            },
+                            ["TL"] = {
+                                "Hindi pa handa sa pagpasa. May kulang na gamit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.06",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Can't drop these off yet. Double-check our pack.",
+                            },
+                            ["TL"] = {
+                                "Hindi pa maibibigay 'to. Tignan ulit ang bag natin.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.07",
+                        ["text"] = {
+                            ["EN"] = {
+                                "I won't turn in an incomplete medical bundle.",
+                            },
+                            ["TL"] = {
+                                "Hindi ako magpapasa ng kulang na medikal na gamit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.08",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Hold on, we can't submit these clinic supplies yet.",
+                            },
+                            ["TL"] = {
+                                "Sandali, hindi pa natin maipapasa ang mga suplay sa klinika.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.09",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Delivery cannot be accepted until all items are present.",
+                            },
+                            ["TL"] = {
+                                "Hindi matatanggap ang hatid hangga't kulang ang mga gamit.",
+                            },
+                        },
+                    },
+                    {
+                        ["id"] = "neutral.10",
+                        ["text"] = {
+                            ["EN"] = {
+                                "Can't finalize the clinic hand-in at this stage.",
+                            },
+                            ["TL"] = {
+                                "Hindi matatapos ang pagpasa sa klinika sa yugtong ito.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "psdl/dialogue/quest_content.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["when"] = nil,
+    },
+}

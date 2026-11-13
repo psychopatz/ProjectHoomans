@@ -6,7 +6,7 @@ PNC = {}
 local Catalog = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 
 local default = Catalog.Select(

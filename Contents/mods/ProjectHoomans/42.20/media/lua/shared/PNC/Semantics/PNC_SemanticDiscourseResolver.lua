@@ -9,9 +9,9 @@ PNC.Semantics = PNC.Semantics or {}
 local Semantic = require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local IR = Semantic.IR
 local Eligibility = require
-    "PNC/Semantics/PNC_SemanticDialogueCandidateEligibility"
+    "PNC/ConvoEngine/Dialogue/CandidateEligibility"
 local ContextResolver = require "PNC/Semantics/PNC_SemanticContextResolver"
-local SocialFeatures = require "PNC/Semantics/PNC_SemanticSocialFeatures"
+local SocialFeatures = require "PNC/ConvoEngine/Social/Features"
 
 local Resolver = PNC.Semantics.DiscourseResolver or {}
 PNC.Semantics.DiscourseResolver = Resolver

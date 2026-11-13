@@ -7,9 +7,10 @@
 -- command through this module.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
-local Facts = PNC.Semantics.DialogueFacts
-    or require "PNC/Semantics/PNC_SemanticDialogueFacts"
+local Facts = PNC.ConvoEngine.DialogueFacts
+    or require "PNC/ConvoEngine/Dialogue/Facts"
 local EngineFacts = PNC.Semantics.EngineFacts or {}
 PNC.Semantics.EngineFacts = EngineFacts
 

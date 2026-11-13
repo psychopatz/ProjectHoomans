@@ -5,7 +5,7 @@ PNC = {}
 local Lifecycle = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticInteractionLifecycle.lua"
+    "PNC/ConvoEngine/Interaction/Lifecycle.lua"
 )
 local Envelope = Lifecycle.Envelope
 

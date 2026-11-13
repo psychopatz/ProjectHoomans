@@ -3,18 +3,19 @@
 -- dispatches, persists, or scans combat state.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local Observatory = PNC.Semantics.CombatObservatory or {}
 PNC.Semantics.CombatObservatory = Observatory
 
 local Moment = PNC.Semantics.CombatMoment
     or require "PNC/Semantics/PNC_SemanticCombatMoment"
-local Arbiter = PNC.Semantics.CombatBanterArbiter
-    or require "PNC/Semantics/PNC_SemanticCombatBanterArbiter"
+local Arbiter = PNC.ConvoEngine.CombatBanterArbiter
+    or require "PNC/ConvoEngine/CombatBanterArbiter"
 local Encounter = PNC.Semantics.CombatEncounterIntent
     or require "PNC/Semantics/PNC_SemanticCombatEncounterIntent"
-local Catalog = PNC.Semantics.ResponseCatalog
-    or require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+local Catalog = PNC.ConvoEngine.ResponseCatalog
+    or require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
 
 Observatory.VERSION = 1
 Observatory.SCHEMA = "semantic.combat.observatory.v1"

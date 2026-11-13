@@ -38,6 +38,7 @@ PNC = {
     Communities = {},
     Factions = {},
 }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local player = {
     getUsername = function() return "Alex" end,
@@ -151,11 +152,11 @@ local Cognition = T.load(
 )
 T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueFacts.lua"
+    "PNC/ConvoEngine/Dialogue/Facts.lua"
 )
 T.load(
     "ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticDialogueCognitionFactSource.lua"
+    "PNC/ConvoEngine/Dialogue/CognitionFactSource.lua"
 )
 T.load(
     "ProjectHoomans", "shared",
@@ -163,15 +164,15 @@ T.load(
 )
 T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialogueLocalResponse.lua"
+    "PNC/ConvoEngine/Dialogue/LocalResponse.lua"
 )
 local Policy = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
 local ResponseAdapter = T.load(
     "ProjectHoomans", "client",
-    "PNC/Semantics/PNC_SemanticDialogueInput_Presentation_Responses.lua"
+    "PNC/ConvoEngine/Dialogue/Input_Presentation_Responses.lua"
 )
 
 PNC.Const = {
@@ -239,7 +240,7 @@ local function produce(question)
         llmEnabled = false,
         worldContext = { worldAgeHours = worldAge },
     }
-    local resolved, fact = PNC.Semantics.DialogueFacts.Annotate(
+    local resolved, fact = PNC.ConvoEngine.DialogueFacts.Annotate(
         ir, nil, context)
     local decision = Policy.Decide(resolved, nil, context)
     local payload = ResponseAdapter.Payload(decision, {

@@ -209,14 +209,14 @@ PNC = {
 }
 
 local Opportunity = require
-    "PNC/Semantics/PNC_SemanticInteractionOpportunity"
+    "PNC/ConvoEngine/Interaction/Opportunity"
 local Runtime = require
-    "PNC/Semantics/PNC_SemanticInteractionSceneRuntime"
-local Banter = require "PNC/Semantics/PNC_SemanticCombatBanterArbiter"
+    "PNC/ConvoEngine/Interaction/SceneRuntime"
+local Banter = require "PNC/ConvoEngine/CombatBanterArbiter"
 local Adopters = T.load(
     "ProjectHoomans",
     "server",
-    "PNC/Semantics/PNC_SemanticInteractionSceneAdopters.lua"
+    "PNC/ConvoEngine/Interaction/SceneAdopters.lua"
 )
 
 local runtime = Runtime.ResetForTests({
@@ -546,7 +546,7 @@ T.equal(Adopters.Manager():Snapshot().providers[1].id,
 local source = T.read(
     "ProjectHoomans",
     "server",
-    "PNC/Semantics/PNC_SemanticInteractionSceneAdopters.lua"
+    "PNC/ConvoEngine/Interaction/SceneAdopters.lua"
 )
 T.falsy(string.find(source, "Events.OnTick", 1, true),
     "production adopter hub has no polling tick")

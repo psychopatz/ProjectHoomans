@@ -1,6 +1,7 @@
 -- Talk session lifecycle, emotes, and target matrix operations.
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Conversation = PNC.Conversation or {}
 
 local TalkParity = PNC.Conversation.TalkParity
@@ -161,7 +162,7 @@ function TalkParity.Resume(context)
     view.suspended = false
     view.opened = true
     Runtime.conversationOpened = true
-    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     local internal = input and input.Internal or nil
     if internal and type(internal.ApplySemanticChoices) == "function"
         and view.semanticSuggestions
@@ -230,8 +231,7 @@ function TalkParity.Emote(context, payload)
     local gesture = tostring(
         emote.gesture or emote.id or emote.emoteID or ""
     )
-    local lifecycle = PNC.Semantics
-        and PNC.Semantics.InteractionLifecycle or nil
+    local lifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
     local store = Runtime.interactionLifecycle
     if not lifecycle or not store or type(lifecycle.Envelope) ~= "table"
         or type(lifecycle.Envelope.Emote) ~= "function"
@@ -272,9 +272,8 @@ function TalkParity.Emote(context, payload)
                 or scenario.world and scenario.world.worldAgeHours,
         }
     )
-    local realizationAuthority = PNC.Semantics
-        and PNC.Semantics.RealizationAuthority
-        or require "PNC/Semantics/PNC_SemanticDialogueRealizationAuthority"
+    local realizationAuthority = PNC.ConvoEngine and PNC.ConvoEngine.RealizationAuthority
+        or require "PNC/ConvoEngine/Dialogue/RealizationAuthority"
     local realization = realizationAuthority
         and type(realizationAuthority.Resolve) == "function"
         and realizationAuthority.Resolve({

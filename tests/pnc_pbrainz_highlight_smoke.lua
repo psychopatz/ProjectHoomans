@@ -193,7 +193,7 @@ local legacySubmit = Integration.Submit
 local legacyCalled = false
 PNC.Semantics = {}
 require = function(name)
-    if name == "PNC/Semantics/PNC_SemanticDialogueInput" then
+    if name == "PNC/ConvoEngine/Dialogue/Input" then
         return true
     end
     return semanticRequire(name)

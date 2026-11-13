@@ -104,7 +104,7 @@ class ConversationCompilerTests(unittest.TestCase):
         self.assertLess(
             len(
                 (REPOSITORY / "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
-                 "Semantics/Generated/Conversation/Registry.lua").read_bytes()
+                 "ConvoEngine/Registry.lua").read_bytes()
             ),
             64 * 1024,
         )

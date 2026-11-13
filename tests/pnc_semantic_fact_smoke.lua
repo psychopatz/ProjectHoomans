@@ -9,6 +9,8 @@ local Semantic = T.load(
     "common",
     "PsychopatzCore/Semantics/PsychopatzSemantic.lua"
 )
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueState.lua")
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueRouter.lua")
 T.load(
     "ProjectHoomans",
     "shared",
@@ -17,17 +19,17 @@ T.load(
 local Facts = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueFacts.lua"
+    "PNC/ConvoEngine/Dialogue/Facts.lua"
 )
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Semantics/PNC_SemanticDialogueFactSources.lua"
+    "PNC/ConvoEngine/Dialogue/FactSources.lua"
 )
 local Policy = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
 local EntityResolver = T.load(
     "ProjectHoomans",
@@ -37,7 +39,7 @@ local EntityResolver = T.load(
 local ReferenceResolver = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueReferenceResolver.lua"
+    "PNC/ConvoEngine/Dialogue/ReferenceResolver.lua"
 )
 
 PNC.Network = {
@@ -75,7 +77,7 @@ local function resolve(ir, state, context, options)
     return Facts.Annotate(output, state, context, options)
 end
 
-local router = Semantic.DialogueRouter.New({
+local router = PsychopatzCore.ConvoEngine.DialogueRouter.New({
     stateSpec = { maxEvents = 4 },
     parser = Semantic.Parser.Parse,
     contextResolver = resolve,
@@ -96,7 +98,7 @@ T.equal(strictLocation.decision.response.fallback,
     "I don't know where John is.",
     "unknown NPC location receives an honest local response")
 
-local ambientRouter = Semantic.DialogueRouter.New({
+local ambientRouter = PsychopatzCore.ConvoEngine.DialogueRouter.New({
     stateSpec = { maxEvents = 4 },
     parser = Semantic.Parser.Parse,
     contextResolver = resolve,
@@ -135,7 +137,7 @@ T.equal(missing.decision.response.fallback, "I don't know where Sarah is.",
 T.equal(missing.decision.route, "deterministic",
     "a recognized question does not wait on the LLM for missing facts")
 
-local seenRouter = Semantic.DialogueRouter.New({
+local seenRouter = PsychopatzCore.ConvoEngine.DialogueRouter.New({
     stateSpec = { maxEvents = 4 },
     parser = Semantic.Parser.Parse,
     contextResolver = resolve,

@@ -5,6 +5,7 @@
 -- order so native Talk and the Semantic Lab continue to share one contract.
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.Conversation = PNC.Conversation or {}
 
 local TalkParity = PNC.Conversation.TalkParity or {}
@@ -13,9 +14,8 @@ PNC.Conversation.TalkParity = TalkParity
 local Conversation = PNC.Conversation
 local TalkStart = Conversation.TalkStart
     or require "PNC/Conversation/PNC_ConversationTalkStart"
-local SpeechDelivery = PNC.Semantics
-    and PNC.Semantics.SemanticSpeechDelivery
-    or require "PNC/Semantics/PNC_SemanticSpeechDelivery"
+local SpeechDelivery = PNC.ConvoEngine and PNC.ConvoEngine.SemanticSpeechDelivery
+    or require "PNC/ConvoEngine/SpeechDelivery"
 
 TalkParity.VERSION = 1
 TalkParity.SCHEMA = "semantic.talk.parity.v1"

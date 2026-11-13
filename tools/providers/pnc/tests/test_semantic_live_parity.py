@@ -36,11 +36,11 @@ class SemanticLiveParityTests(unittest.TestCase):
 
         self.assertIn(
             'load("ProjectHoomans", "client", '
-            '"PNC/Semantics/PNC_SemanticDialogueInput.lua", "semantic_entry")',
+            '"PNC/ConvoEngine/Dialogue/Input.lua", "semantic_entry")',
             production_modules,
         )
         self.assertIn(
-            "PNC.Semantics.DialogueInput.Submit(view, text)",
+            "PNC.ConvoEngine.DialogueInput.Submit(view, text)",
             conversation,
         )
         self.assertIn(
@@ -61,12 +61,12 @@ class SemanticLiveParityTests(unittest.TestCase):
         )
 
         for required_module in (
-            "PsychopatzCore/Semantics/PsychopatzSemanticDialogueRouter",
-            "PNC/Semantics/PNC_SemanticDialoguePolicy",
-            "PNC/Semantics/PNC_SemanticDialogueResponseCatalog",
-            "PNC/Semantics/PNC_SemanticDialogueInput_Context",
-            "PNC/Semantics/PNC_SemanticDialogueInput_ProviderFallback",
-            "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle",
+            "PsychopatzCore/ConvoEngine/DialogueRouter",
+            "PNC/ConvoEngine/Dialogue/Policy",
+            "PNC/ConvoEngine/Dialogue/ResponseCatalog",
+            "PNC/ConvoEngine/Dialogue/Input_Context",
+            "PNC/ConvoEngine/Dialogue/Input_ProviderFallback",
+            "PNC/ConvoEngine/Dialogue/Input_Lifecycle",
         ):
             with self.subTest(module=required_module):
                 self.assertIn(f'require "{required_module}"', entrypoint)

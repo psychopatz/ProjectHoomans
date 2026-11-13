@@ -1,3 +1,5 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Disposable fixture orchestration for the production Combat Observatory.
 -- The worker owns only fixture setup; all decisions/snapshots come from
 -- ProjectHoomans production Lua modules.
@@ -10,8 +12,8 @@ local MAX_TRANSITIONS = 4
 local function requireProduction()
     local Moment = PNC.Semantics.CombatMoment
         or require "PNC/Semantics/PNC_SemanticCombatMoment"
-    local Arbiter = PNC.Semantics.CombatBanterArbiter
-        or require "PNC/Semantics/PNC_SemanticCombatBanterArbiter"
+    local Arbiter = PNC.ConvoEngine.CombatBanterArbiter
+        or require "PNC/ConvoEngine/CombatBanterArbiter"
     local Encounter = PNC.Semantics.CombatEncounterIntent
         or require "PNC/Semantics/PNC_SemanticCombatEncounterIntent"
     local Observatory = PNC.Semantics.CombatObservatory

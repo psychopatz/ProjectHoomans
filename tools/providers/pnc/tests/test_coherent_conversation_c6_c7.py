@@ -262,7 +262,7 @@ class CoherentConversationC6C7Tests(unittest.TestCase):
         self.assertEqual(
             index["construction.en.social.mirror_retort"]["generated"],
             [
-                "PNC/Semantics/Generated/Conversation/"
+                "PNC/ConvoEngine/"
                 "Realization/Social/ConstructionsFollowups"
             ],
         )

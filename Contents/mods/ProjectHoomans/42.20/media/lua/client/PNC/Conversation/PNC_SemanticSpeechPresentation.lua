@@ -9,7 +9,7 @@ require "PNC/Conversation/PNC_SemanticSpeechPresentation_Speech"
 require "PNC/Conversation/PNC_SemanticSpeechPresentation_Delivery"
 
 local SpeechProvider = require
-    "PNC/Semantics/PNC_SemanticConversationSpeechProvider"
+    "PNC/ConvoEngine/ConversationSpeechProvider"
 SpeechProvider.Bind(PNC.SemanticSpeechPresentation)
 
 return PNC.SemanticSpeechPresentation

@@ -9,6 +9,8 @@ local Semantic = T.load(
     "common",
     "PsychopatzCore/Semantics/PsychopatzSemantic.lua"
 )
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueState.lua")
+T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueRouter.lua")
 T.load(
     "ProjectHoomans",
     "shared",
@@ -17,22 +19,22 @@ T.load(
 local ResponseCatalog = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueResponseCatalog.lua"
+    "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua"
 )
 local Policy = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+    "PNC/ConvoEngine/Dialogue/Policy.lua"
 )
 local DialogueContext = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueContextState.lua"
+    "PNC/ConvoEngine/Dialogue/ContextState.lua"
 )
 local IdentityExchange = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticIdentityExchange.lua"
+    "PNC/ConvoEngine/IdentityExchange.lua"
 )
 local Parser = Semantic.Parser
 
@@ -208,7 +210,7 @@ T.equal(anyBandagesInventory.diagnostics.matchedPattern,
     "pnc.question.inventory_you_got",
     "any-item got questions keep the existing inventory grammar")
 
-local state = Semantic.DialogueState.New({ participants = { "npc:mara" } })
+local state = PsychopatzCore.ConvoEngine.DialogueState.New({ participants = { "npc:mara" } })
 local decision = Policy.Decide(insult, state, {
     llmEnabled = false,
     npcID = "mara",

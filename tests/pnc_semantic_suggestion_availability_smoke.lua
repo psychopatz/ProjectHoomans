@@ -9,12 +9,12 @@ PNC = { Semantics = {} }
 local Predicates = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueSuggestionPredicates.lua"
+    "PNC/ConvoEngine/Dialogue/SuggestionPredicates.lua"
 )
 local Provider = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_CapabilityProvider.lua"
+    "PNC/ConvoEngine/Suggestions/CapabilityProvider.lua"
 )
 
 local function context(baseEstablished)

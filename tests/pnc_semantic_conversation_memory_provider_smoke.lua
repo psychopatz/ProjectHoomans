@@ -4,7 +4,7 @@ T.addPackagePaths()
 PNC = {}
 local Provider = T.load(
     "ProjectHoomans", "shared",
-    "PNC/Semantics/PNC_SemanticConversationMemoryProvider.lua")
+    "PNC/ConvoEngine/MemoryProvider.lua")
 
 T.falsy(Provider.IsBound(), "memory provider starts unbound")
 T.equal(Provider.GetBackstory({}, "hometown"), nil,

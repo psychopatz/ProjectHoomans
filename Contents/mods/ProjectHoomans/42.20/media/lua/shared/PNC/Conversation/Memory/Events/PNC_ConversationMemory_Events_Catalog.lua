@@ -184,7 +184,7 @@ for _, id in ipairs(socialIDs) do
             semantic = memory.semantic, longTerm = memory.semantic.longTerm })
     end
 end
-local Relations = require "PNC/Semantics/PNC_SemanticInteractionRelations"
+local Relations = require "PNC/ConvoEngine/Interaction/Relations"
 for _, spec in ipairs(Relations.CompactTypes()) do Events.RegisterType(spec) end
 
 return true

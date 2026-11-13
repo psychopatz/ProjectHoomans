@@ -6,7 +6,7 @@ require "PNC/Conversation/Memory/PNC_ConversationMemory_Gossip"
 require "PNC/Conversation/Memory/PNC_ConversationMemory_Events"
 
 local MemoryProvider = require
-    "PNC/Semantics/PNC_SemanticConversationMemoryProvider"
+    "PNC/ConvoEngine/MemoryProvider"
 MemoryProvider.Bind(Memory)
 
 return Memory

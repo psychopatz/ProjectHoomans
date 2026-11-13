@@ -1,6 +1,7 @@
 -- Client-side ambient semantic speech receiver coordinator.
 
 PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 PNC.SemanticSpeechPresentation = PNC.SemanticSpeechPresentation or {}
 PNC.SemanticSpeechPresentationInternal =
     PNC.SemanticSpeechPresentationInternal or {}
@@ -46,12 +47,11 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
         and receive.context
         and receive.context.presentationClass == "TACTICAL_PROMPT"
     then
-        local surface = PNC.Semantics
-            and PNC.Semantics.CombatResponseSurface or nil
+        local surface = PNC.ConvoEngine and PNC.ConvoEngine.CombatResponseSurface or nil
         if type(surface) ~= "table" then
             local ok, loaded = pcall(
                 require,
-                "PNC/Semantics/PNC_SemanticCombatResponseSurface"
+                "PNC/ConvoEngine/CombatResponseSurface"
             )
             surface = ok and loaded or nil
         end

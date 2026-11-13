@@ -1,10 +1,12 @@
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 -- Bounded flow browser/editor seam over the production dialogue registry.
 -- Draft validation and registration deliberately use the same Registry that
 -- the live semantic policy loads; Python/Tk only presents and edits data.
 
 local FlowEditor = {}
 local Registry = require
-    "PNC/Semantics/PNC_SemanticDialogueFlowCatalog"
+    "PNC/ConvoEngine/Dialogue/FlowCatalog"
 
 local function capabilityCatalog()
     return PNC.Semantics.CapabilityCatalog
@@ -12,13 +14,13 @@ local function capabilityCatalog()
 end
 
 local function automaticGenerator()
-    return PNC.Semantics.AutomaticFlowGenerator
-        or require "PNC/Semantics/PNC_SemanticAutomaticFlowGenerator"
+    return PNC.ConvoEngine.AutomaticFlowGenerator
+        or require "PNC/ConvoEngine/FlowGenerator"
 end
 
 local function policyCatalog(Values, semanticCatalog)
-    local Policy = PNC.Semantics.DialoguePolicy
-        or require "PNC/Semantics/PNC_SemanticDialoguePolicy"
+    local Policy = PNC.ConvoEngine.DialoguePolicy
+        or require "PNC/ConvoEngine/Dialogue/Policy"
     local branches = {}
     local byID = {}
     local templates = type(Policy.ResponseTemplates) == "table"
@@ -30,7 +32,7 @@ local function policyCatalog(Values, semanticCatalog)
             byID[branchID] = {
                 id = branchID,
                 kind = "policy_branch",
-                owner = "PNC.Semantics.DialoguePolicy",
+                owner = "PNC.ConvoEngine.DialoguePolicy",
                 route = "DialoguePolicy.Internal.ResolveIntentBranch",
                 triggerIDs = {},
                 responseTemplate = Values.copy(definition),
@@ -62,7 +64,7 @@ local function policyCatalog(Values, semanticCatalog)
     end)
     return {
         schemaVersion = 1,
-        owner = "PNC.Semantics.DialoguePolicy",
+        owner = "PNC.ConvoEngine.DialoguePolicy",
         branchCount = #branches,
         branches = branches,
     }
@@ -140,8 +142,8 @@ local function catalog(context)
     local semanticCatalog = CapabilityCatalog.Snapshot()
     local generation = CapabilityCatalog.AutomaticFlowGeneration or {}
     local policy = policyCatalog(Values, semanticCatalog)
-    local ResponseCatalog = PNC.Semantics.ResponseCatalog
-        or require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+    local ResponseCatalog = PNC.ConvoEngine.ResponseCatalog
+        or require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
     local responsePools = responsePoolCatalog(Values, ResponseCatalog)
     local index
     local flowID
@@ -211,7 +213,7 @@ end
 
 local function poolFingerprint(pool)
     local Core = require
-        "PNC/Semantics/PNC_SemanticDialogueResponseCatalog_Core"
+        "PNC/ConvoEngine/Dialogue/ResponseCatalog_Core"
     return "catalog-v1:" .. tostring(Core.hash(stableValue(pool)))
 end
 
@@ -230,19 +232,19 @@ local function verifiedRegistrationOrigin(context, registeredSource)
     local relative = string.sub(registeredSource, #prefix + 1)
     if string.find(relative, "..", 1, true)
         or not string.match(relative,
-            "^Contents/mods/ProjectHoomans/[%w%.]+/media/lua/shared/PNC/Semantics/.*%.lua$")
+            "^Contents/mods/ProjectHoomans/[%w%.]+/media/lua/shared/PNC/ConvoEngine/.*%.lua$")
     then
         return "UNKNOWN", "UNKNOWN"
     end
     local handle = io.open(registeredSource, "rb")
     if not handle then return "UNKNOWN", "UNKNOWN" end
     handle:close()
-    if string.find(relative, "/SemanticDialogueResponseCatalog/", 1, true) then
+    if string.find(relative, "/ResponseCatalog/", 1, true) then
         return "AUTHORED_LUA", relative
     end
     -- Automatic generator registration identifies the executed assembly
     -- module only, never the canonical CodeBuilder edit input.
-    if string.find(relative, "/PNC_SemanticAutomaticFlowGenerator_", 1, true) then
+    if string.find(relative, "/FlowGenerator_", 1, true) then
         return "GENERATED_REGISTRATION_SITE", relative
     end
     return "REGISTRATION_SITE", relative
@@ -342,8 +344,8 @@ function FlowEditor.responsePoolList(context, request)
         return { ok = false, type = "response_pool_list",
             schemaVersion = 1, error = "invalid_filter" }
     end
-    local ResponseCatalog = PNC.Semantics.ResponseCatalog
-        or require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+    local ResponseCatalog = PNC.ConvoEngine.ResponseCatalog
+        or require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
     local matches = {}
     for id, pool in pairs(ResponseCatalog.POOLS or {}) do
         if filter == "" or string.find(string.lower(id),
@@ -389,8 +391,8 @@ function FlowEditor.sampleResponseSelection(context, request)
         return { ok = false, type = "response_selection_sample",
             schemaVersion = 1, error = "invalid_request" }
     end
-    local ResponseCatalog = PNC.Semantics.ResponseCatalog
-        or require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+    local ResponseCatalog = PNC.ConvoEngine.ResponseCatalog
+        or require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
     local selected, indexOrReason = ResponseCatalog.Select(
         request.poolID, request.context or {}, request.salt
     )
@@ -419,8 +421,8 @@ function FlowEditor.explainResponseSelection(context, request)
         return { ok = false, type = "response_selection_explanation",
             schemaVersion = 1, error = "invalid_context" }
     end
-    local ResponseCatalog = PNC.Semantics.ResponseCatalog
-        or require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+    local ResponseCatalog = PNC.ConvoEngine.ResponseCatalog
+        or require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
     local result, reason = ResponseCatalog.ExplainSelection(
         request.poolID, projected, request.salt
     )
@@ -439,8 +441,8 @@ function FlowEditor.responseKeyLookup(context, request)
         return { ok = false, type = "response_key_lookup",
             schemaVersion = 1, error = "invalid_response_key" }
     end
-    local ResponseCatalog = PNC.Semantics.ResponseCatalog
-        or require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+    local ResponseCatalog = PNC.ConvoEngine.ResponseCatalog
+        or require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
     local matches = {}
     local total = 0
     for poolID, pool in pairs(ResponseCatalog.POOLS or {}) do
@@ -486,8 +488,8 @@ function FlowEditor.responsePoolDetail(context, request)
         return { ok = false, type = "response_pool_detail",
             schemaVersion = 1, error = "invalid_pool_id" }
     end
-    local ResponseCatalog = PNC.Semantics.ResponseCatalog
-        or require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+    local ResponseCatalog = PNC.ConvoEngine.ResponseCatalog
+        or require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
     local pool = ResponseCatalog.Get(request.poolID)
     if not pool then
         return { ok = false, type = "response_pool_detail",

@@ -32,21 +32,22 @@ PNC = {
         },
     },
 }
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 ZombRand = function() return 1 end
 
 PNC.Identity = {}
 T.load("ProjectHoomans", "shared", "PNC/Core/Identity/PNC_Identity.lua")
-PNC.Semantics.SuggestionPredicates = {}
+PNC.ConvoEngine.SuggestionPredicates = {}
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueSuggestionPredicates.lua"
+    "PNC/ConvoEngine/Dialogue/SuggestionPredicates.lua"
 )
-PNC.Semantics.DialogueBranchOffers = {}
+PNC.ConvoEngine.DialogueBranchOffers = {}
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueBranchOffers.lua"
+    "PNC/ConvoEngine/Dialogue/BranchOffers.lua"
 )
 PNC.Semantics.ActorConversationContext = {}
 T.load(
@@ -54,40 +55,40 @@ T.load(
     "shared",
     "PNC/Semantics/PNC_ActorConversationContext.lua"
 )
-PNC.Semantics.DialogueChoiceRanking = {}
+PNC.ConvoEngine.DialogueChoiceRanking = {}
 T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_Ranking.lua"
+    "PNC/ConvoEngine/Suggestions/Ranking.lua"
 )
 
 local registry = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_Registry.lua"
+    "PNC/ConvoEngine/Suggestions/Registry.lua"
 )
 local staticProvider = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_StaticProvider.lua"
+    "PNC/ConvoEngine/Suggestions/StaticProvider.lua"
 )
 local capabilityProvider = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_CapabilityProvider.lua"
+    "PNC/ConvoEngine/Suggestions/CapabilityProvider.lua"
 )
 local socialProvider = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_SocialProvider.lua"
+    "PNC/ConvoEngine/Suggestions/SocialProvider.lua"
 )
 
 local originalRequire = require
 local loadedModules = {
-    ["PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_Registry"] = registry,
-    ["PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_StaticProvider"] = staticProvider,
-    ["PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_CapabilityProvider"] = capabilityProvider,
-    ["PNC/Semantics/SemanticDialogueSuggestions/PNC_SemanticDialogueSuggestions_SocialProvider"] = socialProvider,
+    ["PNC/ConvoEngine/Suggestions/Registry"] = registry,
+    ["PNC/ConvoEngine/Suggestions/StaticProvider"] = staticProvider,
+    ["PNC/ConvoEngine/Suggestions/CapabilityProvider"] = capabilityProvider,
+    ["PNC/ConvoEngine/Suggestions/SocialProvider"] = socialProvider,
 }
 require = function(name)
     return loadedModules[name] or originalRequire(name)
@@ -96,7 +97,7 @@ end
 local Suggestions = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Semantics/PNC_SemanticDialogueSuggestions.lua"
+    "PNC/ConvoEngine/Dialogue/Suggestions.lua"
 )
 require = originalRequire
 
