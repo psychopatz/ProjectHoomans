@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "It's down... but there are more.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.reaction.kill_witness_shaken.say_1",
+                            ["templateID"] = "convo.combat.reaction.kill_witness_shaken.say_1",
                         },
                     },
                 },

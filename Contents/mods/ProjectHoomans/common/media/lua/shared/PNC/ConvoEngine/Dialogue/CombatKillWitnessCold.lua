@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "Don't expect applause.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.reaction.kill_witness_cold.say_1",
+                            ["templateID"] = "convo.combat.reaction.kill_witness_cold.say_1",
                         },
                     },
                 },

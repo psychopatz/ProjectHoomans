@@ -42,8 +42,8 @@
     "priority": 10,
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
-    "textTarget": "psdl/social/greetings/member/twilight",
-    "textDomain": "pnc.psdl.social.greetings.member.twilight",
+    "textTarget": "convo/social/greetings/member/twilight",
+    "textDomain": "pnc.convo.social.greetings.member.twilight",
     "responseAct": "GREETING",
     "textRows": [
       {

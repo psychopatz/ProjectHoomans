@@ -1355,7 +1355,7 @@ return {
                             },
                             ["fallback"] = "Let's camp here.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.command.camp.say_1",
+                            ["templateID"] = "convo.command.camp.say_1",
                         },
                     },
                 },

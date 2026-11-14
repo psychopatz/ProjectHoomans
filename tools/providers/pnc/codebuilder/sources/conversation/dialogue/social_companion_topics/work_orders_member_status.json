@@ -16,8 +16,8 @@
     "audiences": [
       "member"
     ],
-    "textTarget": "psdl/work_orders/member/status",
-    "textDomain": "pnc.psdl.work_orders.member.status"
+    "textTarget": "convo/work_orders/member/status",
+    "textDomain": "pnc.convo.work_orders.member.status"
   },
   "response": {
     "act": "WORK_ORDERS",

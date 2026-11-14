@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "Good one. You okay?",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.reaction.kill_witness_supportive.say_1",
+                            ["templateID"] = "convo.combat.reaction.kill_witness_supportive.say_1",
                         },
                     },
                 },

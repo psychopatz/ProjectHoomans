@@ -459,7 +459,7 @@ return {
                             },
                             ["fallback"] = "Hold it. Who are you?",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.interaction.first_contact.challenge.say_1",
+                            ["templateID"] = "convo.interaction.first_contact.challenge.say_1",
                         },
                     },
                 },

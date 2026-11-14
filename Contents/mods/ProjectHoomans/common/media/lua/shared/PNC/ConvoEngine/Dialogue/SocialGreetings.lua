@@ -95,7 +95,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_acquaintance_dawn",
-                ["textDomain"] = "pnc.psdl.social.greetings.neutral.acquaintance.dawn",
+                ["textDomain"] = "pnc.convo.social.greetings.neutral.acquaintance.dawn",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -133,7 +133,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/neutral/acquaintance/dawn",
+                ["textTarget"] = "convo/social/greetings/neutral/acquaintance/dawn",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -190,7 +190,7 @@ return {
                             },
                             ["fallback"] = "You're awake early too. Everything all right?",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.acquaintance.dawn.say_1",
+                            ["templateID"] = "convo.social.greetings.acquaintance.dawn.say_1",
                         },
                     },
                 },
@@ -348,7 +348,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_acquaintance_dusk",
-                ["textDomain"] = "pnc.psdl.social.greetings.neutral.acquaintance.dusk",
+                ["textDomain"] = "pnc.convo.social.greetings.neutral.acquaintance.dusk",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -386,7 +386,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/neutral/acquaintance/dusk",
+                ["textTarget"] = "convo/social/greetings/neutral/acquaintance/dusk",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -443,7 +443,7 @@ return {
                             },
                             ["fallback"] = "Evening. Need something before we turn in?",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.acquaintance.dusk.say_1",
+                            ["templateID"] = "convo.social.greetings.acquaintance.dusk.say_1",
                         },
                     },
                 },
@@ -601,7 +601,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_acquaintance_sunrise",
-                ["textDomain"] = "pnc.psdl.social.greetings.neutral.acquaintance.sunrise",
+                ["textDomain"] = "pnc.convo.social.greetings.neutral.acquaintance.sunrise",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -639,7 +639,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/neutral/acquaintance/sunrise",
+                ["textTarget"] = "convo/social/greetings/neutral/acquaintance/sunrise",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -696,7 +696,7 @@ return {
                             },
                             ["fallback"] = "Morning. Good to see a familiar face.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.acquaintance.sunrise.say_1",
+                            ["templateID"] = "convo.social.greetings.acquaintance.sunrise.say_1",
                         },
                     },
                 },
@@ -854,7 +854,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_acquaintance_sunset",
-                ["textDomain"] = "pnc.psdl.social.greetings.neutral.acquaintance.sunset",
+                ["textDomain"] = "pnc.convo.social.greetings.neutral.acquaintance.sunset",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -892,7 +892,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/neutral/acquaintance/sunset",
+                ["textTarget"] = "convo/social/greetings/neutral/acquaintance/sunset",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -949,7 +949,7 @@ return {
                             },
                             ["fallback"] = "Hey. Been a long day?",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.acquaintance.sunset.say_1",
+                            ["templateID"] = "convo.social.greetings.acquaintance.sunset.say_1",
                         },
                     },
                 },
@@ -1107,7 +1107,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_acquaintance_twilight",
-                ["textDomain"] = "pnc.psdl.social.greetings.neutral.acquaintance.twilight",
+                ["textDomain"] = "pnc.convo.social.greetings.neutral.acquaintance.twilight",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -1145,7 +1145,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/neutral/acquaintance/twilight",
+                ["textTarget"] = "convo/social/greetings/neutral/acquaintance/twilight",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -1202,7 +1202,7 @@ return {
                             },
                             ["fallback"] = "Late night. What has you awake?",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.acquaintance.twilight.say_1",
+                            ["templateID"] = "convo.social.greetings.acquaintance.twilight.say_1",
                         },
                     },
                 },
@@ -1360,7 +1360,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_firstmeet_dawn",
-                ["textDomain"] = "pnc.psdl.social.greetings.neutral.first_meet.dawn",
+                ["textDomain"] = "pnc.convo.social.greetings.neutral.first_meet.dawn",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -1398,7 +1398,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/neutral/first_meet/dawn",
+                ["textTarget"] = "convo/social/greetings/neutral/first_meet/dawn",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -1455,7 +1455,7 @@ return {
                             },
                             ["fallback"] = "Hold there. I don't know you, and dawn is a strange time for introductions.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.firstmeet.dawn.say_1",
+                            ["templateID"] = "convo.social.greetings.firstmeet.dawn.say_1",
                         },
                     },
                 },
@@ -1613,7 +1613,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_firstmeet_dusk",
-                ["textDomain"] = "pnc.psdl.social.greetings.neutral.first_meet.dusk",
+                ["textDomain"] = "pnc.convo.social.greetings.neutral.first_meet.dusk",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -1651,7 +1651,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/neutral/first_meet/dusk",
+                ["textTarget"] = "convo/social/greetings/neutral/first_meet/dusk",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -1708,7 +1708,7 @@ return {
                             },
                             ["fallback"] = "Stop there. Dusk makes strangers hard to read.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.firstmeet.dusk.say_1",
+                            ["templateID"] = "convo.social.greetings.firstmeet.dusk.say_1",
                         },
                     },
                 },
@@ -1866,7 +1866,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_firstmeet_sunrise",
-                ["textDomain"] = "pnc.psdl.social.greetings.neutral.first_meet.sunrise",
+                ["textDomain"] = "pnc.convo.social.greetings.neutral.first_meet.sunrise",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -1904,7 +1904,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/neutral/first_meet/sunrise",
+                ["textTarget"] = "convo/social/greetings/neutral/first_meet/sunrise",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -1961,7 +1961,7 @@ return {
                             },
                             ["fallback"] = "Morning. I haven't seen you around before.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.firstmeet.sunrise.say_1",
+                            ["templateID"] = "convo.social.greetings.firstmeet.sunrise.say_1",
                         },
                     },
                 },
@@ -2119,7 +2119,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_firstmeet_sunset",
-                ["textDomain"] = "pnc.psdl.social.greetings.neutral.first_meet.sunset",
+                ["textDomain"] = "pnc.convo.social.greetings.neutral.first_meet.sunset",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -2157,7 +2157,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/neutral/first_meet/sunset",
+                ["textTarget"] = "convo/social/greetings/neutral/first_meet/sunset",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -2214,7 +2214,7 @@ return {
                             },
                             ["fallback"] = "You picked a late hour to approach a stranger.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.firstmeet.sunset.say_1",
+                            ["templateID"] = "convo.social.greetings.firstmeet.sunset.say_1",
                         },
                     },
                 },
@@ -2372,7 +2372,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_firstmeet_twilight",
-                ["textDomain"] = "pnc.psdl.social.greetings.neutral.first_meet.twilight",
+                ["textDomain"] = "pnc.convo.social.greetings.neutral.first_meet.twilight",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -2410,7 +2410,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/neutral/first_meet/twilight",
+                ["textTarget"] = "convo/social/greetings/neutral/first_meet/twilight",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -2467,7 +2467,7 @@ return {
                             },
                             ["fallback"] = "It's dark out. Stay where I can see you.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.firstmeet.twilight.say_1",
+                            ["templateID"] = "convo.social.greetings.firstmeet.twilight.say_1",
                         },
                     },
                 },
@@ -2557,7 +2557,7 @@ return {
                 ["category"] = "projecthoomans:greetings",
                 ["priority"] = 100,
                 ["runtimeBlockID"] = "projecthoomans:hostile_parley",
-                ["textDomain"] = "pnc.psdl.social.greetings.hostile.parley",
+                ["textDomain"] = "pnc.convo.social.greetings.hostile.parley",
                 ["textRows"] = {
                     {
                         ["key"] = "result.accepted",
@@ -2574,7 +2574,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/hostile/parley",
+                ["textTarget"] = "convo/social/greetings/hostile/parley",
                 ["weight"] = 100,
             },
             ["response"] = {
@@ -2665,9 +2665,9 @@ return {
                             },
                             ["id"] = "ceasefire",
                             ["labelFallback"] = "Ceasefire. Stand down for now.",
-                            ["labelKey"] = "psdl.social.greetings.hostile.parley.offer.ceasefire.label",
+                            ["labelKey"] = "convo.social.greetings.hostile.parley.offer.ceasefire.label",
                             ["utteranceFallback"] = "Ceasefire. Stand down for now.",
-                            ["utteranceKey"] = "psdl.social.greetings.hostile.parley.offer.ceasefire.utterance",
+                            ["utteranceKey"] = "convo.social.greetings.hostile.parley.offer.ceasefire.utterance",
                         },
                     },
                     ["segments"] = {
@@ -2676,7 +2676,7 @@ return {
                             },
                             ["fallback"] = "The survivor watches you carefully, ready to fight.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.hostile.parley.opening",
+                            ["templateID"] = "convo.social.greetings.hostile.parley.opening",
                         },
                     },
                 },
@@ -2787,7 +2787,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_lover_dawn",
-                ["textDomain"] = "pnc.psdl.social.greetings.special.lover.dawn",
+                ["textDomain"] = "pnc.convo.social.greetings.special.lover.dawn",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -2825,7 +2825,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/special/lover/dawn",
+                ["textTarget"] = "convo/social/greetings/special/lover/dawn",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -2882,7 +2882,7 @@ return {
                             },
                             ["fallback"] = "You're awake already. I was hoping you'd sleep a little longer.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.lover.dawn.say_1",
+                            ["templateID"] = "convo.social.greetings.lover.dawn.say_1",
                         },
                     },
                 },
@@ -3040,7 +3040,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_lover_dusk",
-                ["textDomain"] = "pnc.psdl.social.greetings.special.lover.dusk",
+                ["textDomain"] = "pnc.convo.social.greetings.special.lover.dusk",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -3078,7 +3078,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/special/lover/dusk",
+                ["textTarget"] = "convo/social/greetings/special/lover/dusk",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -3135,7 +3135,7 @@ return {
                             },
                             ["fallback"] = "Stay with me a minute before night watch.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.lover.dusk.say_1",
+                            ["templateID"] = "convo.social.greetings.lover.dusk.say_1",
                         },
                     },
                 },
@@ -3293,7 +3293,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_lover_sunrise",
-                ["textDomain"] = "pnc.psdl.social.greetings.special.lover.sunrise",
+                ["textDomain"] = "pnc.convo.social.greetings.special.lover.sunrise",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -3331,7 +3331,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/special/lover/sunrise",
+                ["textTarget"] = "convo/social/greetings/special/lover/sunrise",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -3388,7 +3388,7 @@ return {
                             },
                             ["fallback"] = "Morning, love. You sleep all right?",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.lover.sunrise.say_1",
+                            ["templateID"] = "convo.social.greetings.lover.sunrise.say_1",
                         },
                     },
                 },
@@ -3546,7 +3546,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_lover_sunset",
-                ["textDomain"] = "pnc.psdl.social.greetings.special.lover.sunset",
+                ["textDomain"] = "pnc.convo.social.greetings.special.lover.sunset",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -3584,7 +3584,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/special/lover/sunset",
+                ["textTarget"] = "convo/social/greetings/special/lover/sunset",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -3641,7 +3641,7 @@ return {
                             },
                             ["fallback"] = "There you are. I worried when you were gone so long.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.lover.sunset.say_1",
+                            ["templateID"] = "convo.social.greetings.lover.sunset.say_1",
                         },
                     },
                 },
@@ -3799,7 +3799,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_lover_twilight",
-                ["textDomain"] = "pnc.psdl.social.greetings.special.lover.twilight",
+                ["textDomain"] = "pnc.convo.social.greetings.special.lover.twilight",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -3837,7 +3837,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/special/lover/twilight",
+                ["textTarget"] = "convo/social/greetings/special/lover/twilight",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -3894,7 +3894,7 @@ return {
                             },
                             ["fallback"] = "Can't sleep? Neither can I.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.lover.twilight.say_1",
+                            ["templateID"] = "convo.social.greetings.lover.twilight.say_1",
                         },
                     },
                 },
@@ -4052,7 +4052,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_member_dawn",
-                ["textDomain"] = "pnc.psdl.social.greetings.member.dawn",
+                ["textDomain"] = "pnc.convo.social.greetings.member.dawn",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -4090,7 +4090,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/member/dawn",
+                ["textTarget"] = "convo/social/greetings/member/dawn",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -4147,7 +4147,7 @@ return {
                             },
                             ["fallback"] = "You're up. Good—we have plenty to do.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.member.dawn.say_1",
+                            ["templateID"] = "convo.social.greetings.member.dawn.say_1",
                         },
                     },
                 },

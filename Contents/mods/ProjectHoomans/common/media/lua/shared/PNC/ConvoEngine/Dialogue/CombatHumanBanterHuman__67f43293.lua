@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "He's down. Check the area.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.human_kill.practical.say_1",
+                            ["templateID"] = "convo.combat.human_kill.practical.say_1",
                         },
                     },
                 },

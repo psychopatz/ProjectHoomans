@@ -21,8 +21,8 @@
     "audiences": [
       "member"
     ],
-    "textTarget": "psdl/needs/member/support",
-    "textDomain": "pnc.psdl.needs.member.support",
+    "textTarget": "convo/needs/member/support",
+    "textDomain": "pnc.convo.needs.member.support",
     "textRows": [
       {
         "key": "gift.offer.multiple",

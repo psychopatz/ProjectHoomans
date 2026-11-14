@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "Jesus... he's dead.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.human_kill.shaken.say_1",
+                            ["templateID"] = "convo.combat.human_kill.shaken.say_1",
                         },
                     },
                 },

@@ -90,7 +90,7 @@ return {
                 ["priority"] = 1000,
                 ["responseAct"] = "SETTLEMENT_ADMISSION",
                 ["runtimeBlockID"] = "projecthoomans:settlement_admission",
-                ["textDomain"] = "pnc.psdl.social.greetings.settlement_admission.arrival",
+                ["textDomain"] = "pnc.convo.social.greetings.settlement_admission.arrival",
                 ["textRows"] = {
                     {
                         ["key"] = "opening.001",
@@ -121,7 +121,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/settlement_admission/arrival",
+                ["textTarget"] = "convo/social/greetings/settlement_admission/arrival",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -174,7 +174,7 @@ return {
                             },
                             ["fallback"] = "Please… let me stay. We have been walking for days, and I do not know how much longer the others can keep going.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.settlement_admission.say_1",
+                            ["templateID"] = "convo.social.settlement_admission.say_1",
                         },
                     },
                 },

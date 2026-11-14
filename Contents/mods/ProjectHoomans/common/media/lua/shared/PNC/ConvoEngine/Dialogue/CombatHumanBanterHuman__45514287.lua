@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "He's down. Keep pushing.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.human_kill.aggressive.say_1",
+                            ["templateID"] = "convo.combat.human_kill.aggressive.say_1",
                         },
                     },
                 },

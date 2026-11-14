@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "He's down.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.human_kill.reserved.say_1",
+                            ["templateID"] = "convo.combat.human_kill.reserved.say_1",
                         },
                     },
                 },

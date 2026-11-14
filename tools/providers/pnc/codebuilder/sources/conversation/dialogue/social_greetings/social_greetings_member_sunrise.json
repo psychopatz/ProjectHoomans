@@ -42,8 +42,8 @@
     "priority": 10,
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
-    "textTarget": "psdl/social/greetings/member/sunrise",
-    "textDomain": "pnc.psdl.social.greetings.member.sunrise",
+    "textTarget": "convo/social/greetings/member/sunrise",
+    "textDomain": "pnc.convo.social.greetings.member.sunrise",
     "responseAct": "GREETING",
     "textRows": [
       {

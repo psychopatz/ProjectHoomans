@@ -21,8 +21,8 @@
     "audiences": [
       "special"
     ],
-    "textTarget": "psdl/social/relationship/special/affinity",
-    "textDomain": "pnc.psdl.social.relationship.special.affinity"
+    "textTarget": "convo/social/relationship/special/affinity",
+    "textDomain": "pnc.convo.social.relationship.special.affinity"
   },
   "response": {
     "act": "RELATIONSHIP_TOPIC",

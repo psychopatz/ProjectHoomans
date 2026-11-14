@@ -27,8 +27,8 @@
     ],
     "priority": 1000,
     "weight": 100,
-    "textTarget": "psdl/social/greetings/settlement_admission/arrival",
-    "textDomain": "pnc.psdl.social.greetings.settlement_admission.arrival",
+    "textTarget": "convo/social/greetings/settlement_admission/arrival",
+    "textDomain": "pnc.convo.social.greetings.settlement_admission.arrival",
     "responseAct": "SETTLEMENT_ADMISSION",
     "textRows": [
       {

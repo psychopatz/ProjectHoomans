@@ -42,8 +42,8 @@
     "priority": 10,
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
-    "textTarget": "psdl/social/greetings/neutral/first_meet/dusk",
-    "textDomain": "pnc.psdl.social.greetings.neutral.first_meet.dusk",
+    "textTarget": "convo/social/greetings/neutral/first_meet/dusk",
+    "textDomain": "pnc.convo.social.greetings.neutral.first_meet.dusk",
     "responseAct": "GREETING",
     "textRows": [
       {

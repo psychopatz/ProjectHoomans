@@ -14,8 +14,8 @@
     "runtimeBlockID": "projecthoomans:wellbeing_special",
     "category": "projecthoomans:wellbeing",
     "audience": "special",
-    "textTarget": "psdl/social/wellbeing/special",
-    "textDomain": "pnc.psdl.social.wellbeing.special"
+    "textTarget": "convo/social/wellbeing/special",
+    "textDomain": "pnc.convo.social.wellbeing.special"
   },
   "response": {
     "act": "CHECK_IN",

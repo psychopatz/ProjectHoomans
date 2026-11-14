@@ -193,7 +193,7 @@ class GenerationOwnershipTests(unittest.TestCase):
         module, report = next(
             pair
             for (src, kind), pair in by_source.items()
-            if kind == "PSDL" and pair[1].get("domain") == "companion_commands_player"
+            if kind == "ConvoEngine" and pair[1].get("domain") == "companion_commands_player"
         )
         self.assertEqual(report["owner"], "ProjectHoomans")
         self.assertTrue(module.startswith("PNC/ConvoEngine/"), module)
@@ -381,7 +381,7 @@ class GenerationOwnershipTests(unittest.TestCase):
                 / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
                 / "PNC/ConvoEngine/Patterns/Common/Identity.lua"
             )
-            hoomans_psdl = (
+            hoomans_convo = (
                 hoomans
                 / "Contents/mods/ProjectHoomans/common/media/lua/shared/"
                 / "PNC/ConvoEngine/Dialogue/"
@@ -398,7 +398,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             self.assertTrue(core_check_in.is_file())
             self.assertTrue(core_identity_dialogue.is_file())
             self.assertFalse(stale_hoomans_identity.exists())
-            self.assertTrue(hoomans_psdl.is_file())
+            self.assertTrue(hoomans_convo.is_file())
             self.assertIn(core_identity, paths)
             self.assertIn(core_foundation_registry, paths)
             self.assertIn(core_check_in, paths)

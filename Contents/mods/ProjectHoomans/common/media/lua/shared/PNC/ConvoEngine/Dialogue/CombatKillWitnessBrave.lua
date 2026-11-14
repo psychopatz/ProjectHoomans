@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "Clean kill. Check the flanks.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.reaction.kill_witness_brave.say_1",
+                            ["templateID"] = "convo.combat.reaction.kill_witness_brave.say_1",
                         },
                     },
                 },

@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "Down. Keep moving.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.reaction.kill_killer_brave.say_1",
+                            ["templateID"] = "convo.combat.reaction.kill_killer_brave.say_1",
                         },
                     },
                 },

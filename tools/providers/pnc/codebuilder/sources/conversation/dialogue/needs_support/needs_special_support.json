@@ -21,8 +21,8 @@
     "audiences": [
       "special"
     ],
-    "textTarget": "psdl/needs/special/support",
-    "textDomain": "pnc.psdl.needs.special.support",
+    "textTarget": "convo/needs/special/support",
+    "textDomain": "pnc.convo.needs.special.support",
     "textRows": [
       {
         "key": "gift.offer.multiple",

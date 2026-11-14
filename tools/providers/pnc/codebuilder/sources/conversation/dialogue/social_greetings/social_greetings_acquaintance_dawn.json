@@ -42,8 +42,8 @@
     "priority": 10,
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
-    "textTarget": "psdl/social/greetings/neutral/acquaintance/dawn",
-    "textDomain": "pnc.psdl.social.greetings.neutral.acquaintance.dawn",
+    "textTarget": "convo/social/greetings/neutral/acquaintance/dawn",
+    "textDomain": "pnc.convo.social.greetings.neutral.acquaintance.dawn",
     "responseAct": "GREETING",
     "textRows": [
       {

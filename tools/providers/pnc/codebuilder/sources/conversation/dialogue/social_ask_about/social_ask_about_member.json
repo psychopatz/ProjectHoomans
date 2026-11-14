@@ -14,8 +14,8 @@
     "runtimeBlockID": "projecthoomans:ask_about_member",
     "category": "projecthoomans:ask_about",
     "audience": "member",
-    "textTarget": "psdl/social/ask_about/member",
-    "textDomain": "pnc.psdl.social.ask_about.member"
+    "textTarget": "convo/social/ask_about/member",
+    "textDomain": "pnc.convo.social.ask_about.member"
   },
   "response": {
     "act": "ASK_ABOUT",

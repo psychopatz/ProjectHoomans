@@ -28,7 +28,7 @@ return {
                 },
                 ["category"] = "projecthoomans:needs",
                 ["runtimeBlockID"] = "projecthoomans:needs_member",
-                ["textDomain"] = "pnc.psdl.needs.member.support",
+                ["textDomain"] = "pnc.convo.needs.member.support",
                 ["textRows"] = {
                     {
                         ["key"] = "gift.offer.multiple",
@@ -87,7 +87,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/needs/member/support",
+                ["textTarget"] = "convo/needs/member/support",
             },
             ["response"] = {
                 ["act"] = "NEEDS",
@@ -296,9 +296,9 @@ return {
                             },
                             ["id"] = "supplies",
                             ["labelFallback"] = "What supplies are we short on?",
-                            ["labelKey"] = "psdl.needs.member.support.offer.supplies.label",
+                            ["labelKey"] = "convo.needs.member.support.offer.supplies.label",
                             ["utteranceFallback"] = "What supplies are we short on?",
-                            ["utteranceKey"] = "psdl.needs.member.support.offer.supplies.utterance",
+                            ["utteranceKey"] = "convo.needs.member.support.offer.supplies.utterance",
                         },
                         {
                             ["consumers"] = {
@@ -312,9 +312,9 @@ return {
                             },
                             ["id"] = "medical",
                             ["labelFallback"] = "Does anyone need medical help?",
-                            ["labelKey"] = "psdl.needs.member.support.offer.medical.label",
+                            ["labelKey"] = "convo.needs.member.support.offer.medical.label",
                             ["utteranceFallback"] = "Does anyone need medical help?",
-                            ["utteranceKey"] = "psdl.needs.member.support.offer.medical.utterance",
+                            ["utteranceKey"] = "convo.needs.member.support.offer.medical.utterance",
                         },
                         {
                             ["consumers"] = {
@@ -328,9 +328,9 @@ return {
                             },
                             ["id"] = "gift",
                             ["labelFallback"] = "I have something you might need.",
-                            ["labelKey"] = "psdl.needs.member.support.offer.gift.label",
+                            ["labelKey"] = "convo.needs.member.support.offer.gift.label",
                             ["utteranceFallback"] = "I have something you might need.",
-                            ["utteranceKey"] = "psdl.needs.member.support.offer.gift.utterance",
+                            ["utteranceKey"] = "convo.needs.member.support.offer.gift.utterance",
                         },
                     },
                     ["segments"] = {
@@ -339,7 +339,7 @@ return {
                             },
                             ["fallback"] = "Let me think about what the group is short on.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.needs.member.support.opening",
+                            ["templateID"] = "convo.needs.member.support.opening",
                         },
                     },
                 },
@@ -359,9 +359,9 @@ return {
                             },
                             ["id"] = "gift_return",
                             ["labelFallback"] = "I will hold on to the rest.",
-                            ["labelKey"] = "psdl.needs.member.support.offer.gift_return.label",
+                            ["labelKey"] = "convo.needs.member.support.offer.gift_return.label",
                             ["utteranceFallback"] = "I will hold on to the rest.",
-                            ["utteranceKey"] = "psdl.needs.member.support.offer.gift_return.utterance",
+                            ["utteranceKey"] = "convo.needs.member.support.offer.gift_return.utterance",
                         },
                     },
                     ["segments"] = {
@@ -370,7 +370,7 @@ return {
                             },
                             ["fallback"] = "Choose something to give me, then return to the conversation.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.needs.member.support.gift",
+                            ["templateID"] = "convo.needs.member.support.gift",
                         },
                     },
                 },
@@ -414,7 +414,7 @@ return {
                 },
                 ["category"] = "projecthoomans:needs",
                 ["runtimeBlockID"] = "projecthoomans:needs_neutral",
-                ["textDomain"] = "pnc.psdl.needs.neutral.support",
+                ["textDomain"] = "pnc.convo.needs.neutral.support",
                 ["textRows"] = {
                     {
                         ["key"] = "gift.offer.multiple",
@@ -473,7 +473,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/needs/neutral/support",
+                ["textTarget"] = "convo/needs/neutral/support",
             },
             ["response"] = {
                 ["act"] = "NEEDS",
@@ -682,9 +682,9 @@ return {
                             },
                             ["id"] = "supplies",
                             ["labelFallback"] = "Need any supplies?",
-                            ["labelKey"] = "psdl.needs.neutral.support.offer.supplies.label",
+                            ["labelKey"] = "convo.needs.neutral.support.offer.supplies.label",
                             ["utteranceFallback"] = "Need any supplies?",
-                            ["utteranceKey"] = "psdl.needs.neutral.support.offer.supplies.utterance",
+                            ["utteranceKey"] = "convo.needs.neutral.support.offer.supplies.utterance",
                         },
                         {
                             ["consumers"] = {
@@ -698,9 +698,9 @@ return {
                             },
                             ["id"] = "medical",
                             ["labelFallback"] = "Any medical problems?",
-                            ["labelKey"] = "psdl.needs.neutral.support.offer.medical.label",
+                            ["labelKey"] = "convo.needs.neutral.support.offer.medical.label",
                             ["utteranceFallback"] = "Any medical problems?",
-                            ["utteranceKey"] = "psdl.needs.neutral.support.offer.medical.utterance",
+                            ["utteranceKey"] = "convo.needs.neutral.support.offer.medical.utterance",
                         },
                         {
                             ["consumers"] = {
@@ -714,9 +714,9 @@ return {
                             },
                             ["id"] = "gift",
                             ["labelFallback"] = "I have something you might need.",
-                            ["labelKey"] = "psdl.needs.neutral.support.offer.gift.label",
+                            ["labelKey"] = "convo.needs.neutral.support.offer.gift.label",
                             ["utteranceFallback"] = "I have something you might need.",
-                            ["utteranceKey"] = "psdl.needs.neutral.support.offer.gift.utterance",
+                            ["utteranceKey"] = "convo.needs.neutral.support.offer.gift.utterance",
                         },
                     },
                     ["segments"] = {
@@ -725,7 +725,7 @@ return {
                             },
                             ["fallback"] = "There are a few things I could use.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.needs.neutral.support.opening",
+                            ["templateID"] = "convo.needs.neutral.support.opening",
                         },
                     },
                 },
@@ -745,9 +745,9 @@ return {
                             },
                             ["id"] = "gift_return",
                             ["labelFallback"] = "I will hold on to the rest.",
-                            ["labelKey"] = "psdl.needs.neutral.support.offer.gift_return.label",
+                            ["labelKey"] = "convo.needs.neutral.support.offer.gift_return.label",
                             ["utteranceFallback"] = "I will hold on to the rest.",
-                            ["utteranceKey"] = "psdl.needs.neutral.support.offer.gift_return.utterance",
+                            ["utteranceKey"] = "convo.needs.neutral.support.offer.gift_return.utterance",
                         },
                     },
                     ["segments"] = {
@@ -756,7 +756,7 @@ return {
                             },
                             ["fallback"] = "Choose something to give me, then return to the conversation.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.needs.neutral.support.gift",
+                            ["templateID"] = "convo.needs.neutral.support.gift",
                         },
                     },
                 },
@@ -800,7 +800,7 @@ return {
                 },
                 ["category"] = "projecthoomans:needs",
                 ["runtimeBlockID"] = "projecthoomans:needs_special",
-                ["textDomain"] = "pnc.psdl.needs.special.support",
+                ["textDomain"] = "pnc.convo.needs.special.support",
                 ["textRows"] = {
                     {
                         ["key"] = "gift.offer.multiple",
@@ -859,7 +859,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/needs/special/support",
+                ["textTarget"] = "convo/needs/special/support",
             },
             ["response"] = {
                 ["act"] = "NEEDS",
@@ -1068,9 +1068,9 @@ return {
                             },
                             ["id"] = "supplies",
                             ["labelFallback"] = "What can I bring you?",
-                            ["labelKey"] = "psdl.needs.special.support.offer.supplies.label",
+                            ["labelKey"] = "convo.needs.special.support.offer.supplies.label",
                             ["utteranceFallback"] = "What can I bring you?",
-                            ["utteranceKey"] = "psdl.needs.special.support.offer.supplies.utterance",
+                            ["utteranceKey"] = "convo.needs.special.support.offer.supplies.utterance",
                         },
                         {
                             ["consumers"] = {
@@ -1084,9 +1084,9 @@ return {
                             },
                             ["id"] = "medical",
                             ["labelFallback"] = "Are you hurt?",
-                            ["labelKey"] = "psdl.needs.special.support.offer.medical.label",
+                            ["labelKey"] = "convo.needs.special.support.offer.medical.label",
                             ["utteranceFallback"] = "Are you hurt?",
-                            ["utteranceKey"] = "psdl.needs.special.support.offer.medical.utterance",
+                            ["utteranceKey"] = "convo.needs.special.support.offer.medical.utterance",
                         },
                         {
                             ["consumers"] = {
@@ -1100,9 +1100,9 @@ return {
                             },
                             ["id"] = "gift",
                             ["labelFallback"] = "I have something you might need.",
-                            ["labelKey"] = "psdl.needs.special.support.offer.gift.label",
+                            ["labelKey"] = "convo.needs.special.support.offer.gift.label",
                             ["utteranceFallback"] = "I have something you might need.",
-                            ["utteranceKey"] = "psdl.needs.special.support.offer.gift.utterance",
+                            ["utteranceKey"] = "convo.needs.special.support.offer.gift.utterance",
                         },
                     },
                     ["segments"] = {
@@ -1111,7 +1111,7 @@ return {
                             },
                             ["fallback"] = "Since it's you, I'll tell you what I need.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.needs.special.support.opening",
+                            ["templateID"] = "convo.needs.special.support.opening",
                         },
                     },
                 },
@@ -1131,9 +1131,9 @@ return {
                             },
                             ["id"] = "gift_return",
                             ["labelFallback"] = "I will hold on to the rest.",
-                            ["labelKey"] = "psdl.needs.special.support.offer.gift_return.label",
+                            ["labelKey"] = "convo.needs.special.support.offer.gift_return.label",
                             ["utteranceFallback"] = "I will hold on to the rest.",
-                            ["utteranceKey"] = "psdl.needs.special.support.offer.gift_return.utterance",
+                            ["utteranceKey"] = "convo.needs.special.support.offer.gift_return.utterance",
                         },
                     },
                     ["segments"] = {
@@ -1142,7 +1142,7 @@ return {
                             },
                             ["fallback"] = "Choose something to give me, then return to the conversation.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.needs.special.support.gift",
+                            ["templateID"] = "convo.needs.special.support.gift",
                         },
                     },
                 },

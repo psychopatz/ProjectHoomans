@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "Got it. Stay close.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.reaction.kill_killer_supportive.say_1",
+                            ["templateID"] = "convo.combat.reaction.kill_killer_supportive.say_1",
                         },
                     },
                 },

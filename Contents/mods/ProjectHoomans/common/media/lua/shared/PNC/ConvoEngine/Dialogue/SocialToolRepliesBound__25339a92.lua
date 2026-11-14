@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "You are bold. I cannot say I dislike that.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.tool_reply.sexual.say_1",
+                            ["templateID"] = "convo.tool_reply.sexual.say_1",
                         },
                     },
                 },

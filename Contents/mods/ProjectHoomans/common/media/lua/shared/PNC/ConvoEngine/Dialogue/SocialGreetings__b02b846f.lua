@@ -95,7 +95,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_member_dusk",
-                ["textDomain"] = "pnc.psdl.social.greetings.member.dusk",
+                ["textDomain"] = "pnc.convo.social.greetings.member.dusk",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -133,7 +133,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/member/dusk",
+                ["textTarget"] = "convo/social/greetings/member/dusk",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -190,7 +190,7 @@ return {
                             },
                             ["fallback"] = "Evening. Perimeter looks clear.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.member.dusk.say_1",
+                            ["templateID"] = "convo.social.greetings.member.dusk.say_1",
                         },
                     },
                 },
@@ -348,7 +348,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_member_sunrise",
-                ["textDomain"] = "pnc.psdl.social.greetings.member.sunrise",
+                ["textDomain"] = "pnc.convo.social.greetings.member.sunrise",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -386,7 +386,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/member/sunrise",
+                ["textTarget"] = "convo/social/greetings/member/sunrise",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -443,7 +443,7 @@ return {
                             },
                             ["fallback"] = "Morning. Ready when you are.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.member.sunrise.say_1",
+                            ["templateID"] = "convo.social.greetings.member.sunrise.say_1",
                         },
                     },
                 },
@@ -601,7 +601,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_member_sunset",
-                ["textDomain"] = "pnc.psdl.social.greetings.member.sunset",
+                ["textDomain"] = "pnc.convo.social.greetings.member.sunset",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -639,7 +639,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/member/sunset",
+                ["textTarget"] = "convo/social/greetings/member/sunset",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -696,7 +696,7 @@ return {
                             },
                             ["fallback"] = "We made it through the day. That's something.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.member.sunset.say_1",
+                            ["templateID"] = "convo.social.greetings.member.sunset.say_1",
                         },
                     },
                 },
@@ -854,7 +854,7 @@ return {
                 ["priority"] = 10,
                 ["responseAct"] = "GREETING",
                 ["runtimeBlockID"] = "projecthoomans:greeting_member_twilight",
-                ["textDomain"] = "pnc.psdl.social.greetings.member.twilight",
+                ["textDomain"] = "pnc.convo.social.greetings.member.twilight",
                 ["textRows"] = {
                     {
                         ["key"] = "greeting.001",
@@ -892,7 +892,7 @@ return {
                         },
                     },
                 },
-                ["textTarget"] = "psdl/social/greetings/member/twilight",
+                ["textTarget"] = "convo/social/greetings/member/twilight",
                 ["weight"] = 100,
             },
             ["say"] = {
@@ -949,7 +949,7 @@ return {
                             },
                             ["fallback"] = "You're supposed to be resting. What's wrong?",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.greetings.member.twilight.say_1",
+                            ["templateID"] = "convo.social.greetings.member.twilight.say_1",
                         },
                     },
                 },

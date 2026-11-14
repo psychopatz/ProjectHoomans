@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "Got it. Check the area.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.reaction.kill_killer_practical.say_1",
+                            ["templateID"] = "convo.combat.reaction.kill_killer_practical.say_1",
                         },
                     },
                 },

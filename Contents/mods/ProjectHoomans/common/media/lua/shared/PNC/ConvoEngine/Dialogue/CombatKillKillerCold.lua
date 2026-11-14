@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "Done. Keep up.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.reaction.kill_killer_cold.say_1",
+                            ["templateID"] = "convo.combat.reaction.kill_killer_cold.say_1",
                         },
                     },
                 },

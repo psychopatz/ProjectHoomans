@@ -177,7 +177,7 @@ return {
                             },
                             ["fallback"] = "I hear you.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.reaction.default.say_1",
+                            ["templateID"] = "convo.social.reaction.default.say_1",
                         },
                     },
                 },

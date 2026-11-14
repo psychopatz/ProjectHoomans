@@ -177,7 +177,7 @@ return {
                             },
                             ["fallback"] = "What are you referring to?",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.interaction.context.clarify.say_1",
+                            ["templateID"] = "convo.interaction.context.clarify.say_1",
                         },
                     },
                 },

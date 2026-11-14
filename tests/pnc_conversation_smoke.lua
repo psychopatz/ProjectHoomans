@@ -105,8 +105,8 @@ local migratedWellbeing = Registry.GetBlock("projecthoomans:wellbeing_neutral")
 T.equal(migratedWellbeing.textSource.modID, "ProjectHoomans",
     "PSDL wellbeing keeps adopter-owned text routing")
 T.equal(migratedWellbeing.textSource.domain,
-    "pnc.psdl.social.wellbeing.neutral",
-    "PSDL wellbeing keeps its declared text domain")
+    "pnc.convo.social.wellbeing.neutral",
+    "ConvoEngine wellbeing keeps its declared text domain")
 T.equal(migratedWellbeing.nodes.opening.textKey, "opening",
     "PSDL wellbeing preserves the opening turn")
 T.equal(migratedWellbeing.nodes.opening.choices[1].textKey,
@@ -118,8 +118,8 @@ T.equal(migratedWellbeing.nodes.opening.choices[1].outcomes[1].responseKey,
 
 local migratedPersonal = Registry.GetBlock("projecthoomans:personal_special")
 T.equal(migratedPersonal.textSource.domain,
-    "pnc.psdl.social.personal.special.trust",
-    "PSDL personal topic keeps its declared text domain")
+    "pnc.convo.social.personal.special.trust",
+    "ConvoEngine personal topic keeps its declared text domain")
 T.equal(migratedPersonal.nodes.opening.choices[1].textKey,
     "choice.trust",
     "PSDL personal topic preserves semantic choice text")
@@ -423,8 +423,8 @@ T.equal(visitGreeting.id,
     "projecthoomans:settlement_admission",
     "active settlement visit selects the dedicated desperate greeting")
 T.equal(visitGreeting.textSource.domain,
-    "pnc.psdl.social.greetings.settlement_admission.arrival",
-    "settlement admission uses adopter-owned PSDL text routing")
+    "pnc.convo.social.greetings.settlement_admission.arrival",
+    "settlement admission uses adopter-owned ConvoEngine text routing")
 T.equal(#visitGreeting.nodes.opening.textKeys, 3,
     "settlement admission preserves all authored PSDL variants")
 T.equal(visitGreeting.gates[1].type, "pnc:settlement_visit",

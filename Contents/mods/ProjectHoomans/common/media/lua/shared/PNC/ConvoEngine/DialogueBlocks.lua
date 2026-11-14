@@ -39,7 +39,7 @@ local function textSource(plan)
         modID = OWNER,
         pathPattern = "media/translation/{language}/Conversation/Text/"
             .. target .. ".json",
-        domain = tostring(values.textDomain or "pnc.psdl." .. target),
+        domain = tostring(values.textDomain or "pnc.convo." .. target),
     }
 end
 

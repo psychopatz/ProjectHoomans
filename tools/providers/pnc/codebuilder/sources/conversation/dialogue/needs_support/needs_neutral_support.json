@@ -21,8 +21,8 @@
     "audiences": [
       "neutral"
     ],
-    "textTarget": "psdl/needs/neutral/support",
-    "textDomain": "pnc.psdl.needs.neutral.support",
+    "textTarget": "convo/needs/neutral/support",
+    "textDomain": "pnc.convo.needs.neutral.support",
     "textRows": [
       {
         "key": "gift.offer.multiple",

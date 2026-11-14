@@ -14,8 +14,8 @@
     "runtimeBlockID": "projecthoomans:wellbeing_neutral",
     "category": "projecthoomans:wellbeing",
     "audience": "neutral",
-    "textTarget": "psdl/social/wellbeing/neutral",
-    "textDomain": "pnc.psdl.social.wellbeing.neutral"
+    "textTarget": "convo/social/wellbeing/neutral",
+    "textDomain": "pnc.convo.social.wellbeing.neutral"
   },
   "response": {
     "act": "CHECK_IN",

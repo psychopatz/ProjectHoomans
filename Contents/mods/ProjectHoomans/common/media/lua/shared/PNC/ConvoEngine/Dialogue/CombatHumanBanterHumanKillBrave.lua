@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "Threat's down. Stay sharp.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.human_kill.brave.say_1",
+                            ["templateID"] = "convo.combat.human_kill.brave.say_1",
                         },
                     },
                 },

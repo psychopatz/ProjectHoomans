@@ -42,8 +42,8 @@
     "priority": 10,
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
-    "textTarget": "psdl/social/greetings/special/lover/dusk",
-    "textDomain": "pnc.psdl.social.greetings.special.lover.dusk",
+    "textTarget": "convo/social/greetings/special/lover/dusk",
+    "textDomain": "pnc.convo.social.greetings.special.lover.dusk",
     "responseAct": "GREETING",
     "textRows": [
       {

@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "Got one. Who's next?",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.reaction.kill_killer_aggressive.say_1",
+                            ["templateID"] = "convo.combat.reaction.kill_killer_aggressive.say_1",
                         },
                     },
                 },

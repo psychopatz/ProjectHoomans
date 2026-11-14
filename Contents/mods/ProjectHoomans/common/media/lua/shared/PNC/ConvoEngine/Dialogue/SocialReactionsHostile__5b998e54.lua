@@ -459,7 +459,7 @@ return {
                             },
                             ["fallback"] = "Step back or we have a problem.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.social.threat_boundary.say_1",
+                            ["templateID"] = "convo.social.threat_boundary.say_1",
                         },
                     },
                 },

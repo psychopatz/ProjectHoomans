@@ -14,8 +14,8 @@
     "runtimeBlockID": "projecthoomans:small_talk_neutral",
     "category": "projecthoomans:small_talk",
     "audience": "neutral",
-    "textTarget": "psdl/social/small_talk/neutral",
-    "textDomain": "pnc.psdl.social.small_talk.neutral"
+    "textTarget": "convo/social/small_talk/neutral",
+    "textDomain": "pnc.convo.social.small_talk.neutral"
   },
   "response": {
     "act": "SMALL_TALK",

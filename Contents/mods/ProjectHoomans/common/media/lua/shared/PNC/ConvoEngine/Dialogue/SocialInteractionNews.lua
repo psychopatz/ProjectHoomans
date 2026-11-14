@@ -459,7 +459,7 @@ return {
                             },
                             ["fallback"] = "That's good to know.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.interaction.news.acknowledge.say_1",
+                            ["templateID"] = "convo.interaction.news.acknowledge.say_1",
                         },
                     },
                 },

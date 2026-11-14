@@ -31,8 +31,8 @@
       "member"
     ],
     "priority": 1000,
-    "textTarget": "psdl/social/territory/member/claim",
-    "textDomain": "pnc.psdl.social.territory.member.claim",
+    "textTarget": "convo/social/territory/member/claim",
+    "textDomain": "pnc.convo.social.territory.member.claim",
     "textRows": [
       {
         "key": "locked.base_established",

@@ -393,7 +393,7 @@ return {
                             },
                             ["fallback"] = "One less problem.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.combat.human_kill.cold.say_1",
+                            ["templateID"] = "convo.combat.human_kill.cold.say_1",
                         },
                     },
                 },

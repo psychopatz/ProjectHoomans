@@ -177,7 +177,7 @@ return {
                             },
                             ["fallback"] = "I could really use a drink. Do you have any water?",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.question.wellbeing.thirst_alt.say_1",
+                            ["templateID"] = "convo.question.wellbeing.thirst_alt.say_1",
                         },
                     },
                 },

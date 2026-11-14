@@ -11,9 +11,9 @@ end
 
 local offer = {
     id = "ask.direction",
-    labelKey = "psdl.social.location.ask.offer.label",
+    labelKey = "convo.social.location.ask.offer.label",
     labelFallback = "Ask for directions",
-    utteranceKey = "psdl.social.location.ask.offer.utterance",
+    utteranceKey = "convo.social.location.ask.offer.utterance",
     utteranceFallback = "Which way?",
     frame = {intent = "QUESTION", subject = "LOCATION_DIRECTION"},
     consumers = {"participant", "player", "npc"},
@@ -36,7 +36,7 @@ local built, planOrReason = ResponsePlan.Build({
             segments = {
                 {
                     kind = "translation",
-                    templateID = "psdl.social.location.ask.answer",
+                    templateID = "convo.social.location.ask.answer",
                     fallback = "{target.name} is north of here.",
                     args = {},
                 },
@@ -48,7 +48,7 @@ local built, planOrReason = ResponsePlan.Build({
             segments = {
                 {
                     kind = "translation",
-                    templateID = "psdl.social.location.ask.detail",
+                    templateID = "convo.social.location.ask.detail",
                     fallback = "Ask me if you need the route.",
                     args = {},
                 },

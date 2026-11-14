@@ -42,8 +42,8 @@
     "priority": 10,
     "weight": 100,
     "portraitAnimation": "greeting.wavehi",
-    "textTarget": "psdl/social/greetings/neutral/first_meet/sunset",
-    "textDomain": "pnc.psdl.social.greetings.neutral.first_meet.sunset",
+    "textTarget": "convo/social/greetings/neutral/first_meet/sunset",
+    "textDomain": "pnc.convo.social.greetings.neutral.first_meet.sunset",
     "responseAct": "GREETING",
     "textRows": [
       {

@@ -14,8 +14,8 @@
     "runtimeBlockID": "projecthoomans:small_talk_member",
     "category": "projecthoomans:small_talk",
     "audience": "member",
-    "textTarget": "psdl/social/small_talk/member",
-    "textDomain": "pnc.psdl.social.small_talk.member"
+    "textTarget": "convo/social/small_talk/member",
+    "textDomain": "pnc.convo.social.small_talk.member"
   },
   "response": {
     "act": "SMALL_TALK",

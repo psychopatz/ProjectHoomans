@@ -14,8 +14,8 @@
     "runtimeBlockID": "projecthoomans:ask_about_neutral",
     "category": "projecthoomans:ask_about",
     "audience": "neutral",
-    "textTarget": "psdl/social/ask_about/neutral",
-    "textDomain": "pnc.psdl.social.ask_about.neutral"
+    "textTarget": "convo/social/ask_about/neutral",
+    "textDomain": "pnc.convo.social.ask_about.neutral"
   },
   "response": {
     "act": "ASK_ABOUT",

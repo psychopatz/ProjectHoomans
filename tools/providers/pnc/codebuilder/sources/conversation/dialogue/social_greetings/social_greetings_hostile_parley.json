@@ -16,8 +16,8 @@
     "audience": "hostile",
     "priority": 100,
     "weight": 100,
-    "textTarget": "psdl/social/greetings/hostile/parley",
-    "textDomain": "pnc.psdl.social.greetings.hostile.parley",
+    "textTarget": "convo/social/greetings/hostile/parley",
+    "textDomain": "pnc.convo.social.greetings.hostile.parley",
     "textRows": [
       {
         "key": "result.accepted",
