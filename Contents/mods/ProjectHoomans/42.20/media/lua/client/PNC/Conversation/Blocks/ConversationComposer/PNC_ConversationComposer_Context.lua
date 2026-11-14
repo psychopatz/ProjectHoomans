@@ -245,8 +245,8 @@ function Composer.SetIdentityArguments(context, values)
     if type(context) ~= "table" then return false end
     values = type(values) == "table" and values or {}
     -- Project Hoomans owns this projection from its native identity model to
-    -- Core's actor-neutral PSDL text-binding contract.  Keep the historical
-    -- flat fields for existing adopter-owned catalogs, while every new PSDL
+    -- Core's actor-neutral ConvoEngine text-binding contract.  Keep the historical
+    -- flat fields for existing adopter-owned catalogs, while every new ConvoEngine
     -- record resolves through speaker/addressee/reference paths.
     values.speaker = values.speaker or {
         id = context.npcID,

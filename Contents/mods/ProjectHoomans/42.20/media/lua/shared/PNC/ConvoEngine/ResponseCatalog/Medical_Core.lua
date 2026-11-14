@@ -1,4 +1,4 @@
--- ProjectHoomans medical-event wording projected from final PSDL plans into
+-- ProjectHoomans medical-event wording projected from final ConvoEngine plans into
 -- the existing phrase-family/SpeechRealization authority.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}

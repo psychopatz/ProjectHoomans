@@ -1,5 +1,5 @@
 -- Shared adopter composition for the current PNC conversation surface.
--- PSDL owns migrated social check-in blocks; remaining domains stay on their
+-- ConvoEngine owns migrated social check-in blocks; remaining domains stay on their
 -- existing authorities until their own parity/caller-zero migration gate.
 
 require "PNC/ConvoEngine/DialogueBlocks"

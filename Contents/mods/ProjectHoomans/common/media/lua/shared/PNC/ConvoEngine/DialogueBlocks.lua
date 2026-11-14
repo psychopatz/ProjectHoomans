@@ -1,6 +1,6 @@
--- Project Hoomans adopter projection for PSDL dialogue plans.
+-- Project Hoomans adopter projection for ConvoEngine dialogue plans.
 --
--- PSDL remains authored and compiled by PsychopatzCore.  This module only
+-- ConvoEngine remains authored and compiled by PsychopatzCore.  This module only
 -- adapts the generated response/offer plan to the existing Core Conversation
 -- block registry so the established PNC composer and authority continue to
 -- own lifecycle, choice, and effect behavior.

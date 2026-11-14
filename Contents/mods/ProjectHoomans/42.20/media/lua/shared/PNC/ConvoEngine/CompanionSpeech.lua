@@ -70,7 +70,7 @@ local function formatTokens(text, context)
                 function() return tostring(value) end)
         end
     end
-    -- Command wording is authored with the actor-neutral PSDL binding. The
+    -- Command wording is authored with the actor-neutral ConvoEngine binding. The
     -- established command callers still provide the bounded group display
     -- value as `name`/`names`; project it into addressee.name at this one
     -- adopter boundary without creating a new semantic variable.

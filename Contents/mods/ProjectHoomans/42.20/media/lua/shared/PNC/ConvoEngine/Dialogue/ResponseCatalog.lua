@@ -26,7 +26,7 @@ installSelection(Catalog, Core)
 -- Built-in pools are grouped by semantic responsibility. The entry owns
 -- catalog mechanics and loads providers before generated extensions.
 require "PNC/ConvoEngine/ResponseCatalog/Situational"
--- Install Core-compiled PSDL wording before providers normalize response
+-- Install Core-compiled ConvoEngine wording before providers normalize response
 -- variants. Existing semantic providers use the shared content fallback seam
 -- during registration; load order must not make that fallback depend on the
 -- retired generated Content modules.

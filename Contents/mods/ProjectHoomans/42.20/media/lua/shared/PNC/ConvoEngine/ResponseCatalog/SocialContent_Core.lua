@@ -1,4 +1,4 @@
--- ProjectHoomans projects Core-compiled social, health, and wellbeing PSDL
+-- ProjectHoomans projects Core-compiled social, health, and wellbeing ConvoEngine
 -- records into the established phrase-family/SpeechRealization authority.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}

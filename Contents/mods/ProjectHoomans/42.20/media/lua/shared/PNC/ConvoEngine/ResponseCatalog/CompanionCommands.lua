@@ -107,7 +107,7 @@ local REPLY = {
 }
 
 -- The social reaction selector still owns the horde event pool.  These
--- semantic horde plans share the final companion-command PSDL source, so
+-- semantic horde plans share the final companion-command ConvoEngine source, so
 -- project their wording into the same existing phrase-family authority.
 local HORDE_REACTION_TEMPLATES = {
     "combat.horde.default",
