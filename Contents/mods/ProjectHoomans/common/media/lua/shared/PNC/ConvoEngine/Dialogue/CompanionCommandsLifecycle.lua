@@ -3,9 +3,111 @@ return {
     {
         ["domain"] = "companion_commands_lifecycle",
         ["exchangeFamily"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["groups"] = {
+                    "companion",
+                    "command",
+                    "camp",
+                },
+                ["labelFallback"] = "Set up camp",
+                ["labelKey"] = "convo.command.camp.affordance.label",
+                ["metadata"] = {
+                    ["action"] = "CAMP",
+                },
+                ["textRole"] = "button_label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Set up camp",
+                    },
+                    ["TL"] = {
+                        "Magtayo ng kampo",
+                    },
+                },
+            },
+            ["bindings"] = {
+                ["camp.locationPhrase"] = {
+                    ["from"] = "result.data.site",
+                    ["resolver"] = "pnc.camp.location_phrase",
+                    ["type"] = "entity.location",
+                },
+            },
+            ["execute"] = {
+                ["mode"] = "request_response",
+                ["use"] = "pnc.companion.camp",
+                ["with"] = {
+                    ["npcID"] = "$context.addressee.id",
+                    ["target"] = "$slot.camp_site",
+                },
+            },
             ["familyID"] = "command.camp",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Let's camp here.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.command.camp.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Let's camp here.",
+                                    },
+                                    ["TL"] = {
+                                        "Magkampo tayo rito.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
             ["namespace"] = "command",
             ["replies"] = {
+                ["completed"] = {
+                    ["act"] = "REPLY",
+                    ["outcome"] = "completed",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "We're set up {camp.locationPhrase}.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.command.camp.reply.completed.say.1.default",
+                                        ["textRole"] = "response",
+                                        ["translations"] = {
+                                            ["EN"] = {
+                                                "We're set up {camp.locationPhrase}.",
+                                            },
+                                            ["TL"] = {
+                                                "Nakatayo na ang kampo {camp.locationPhrase}.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
                 ["failed"] = {
                     ["act"] = "REPLY",
                     ["outcome"] = "failed",
@@ -48,6 +150,40 @@ return {
                                                 "Sinubukang magkampo, pero kinailangang umurong.",
                                                 "Di makapaglatag ng kampo roon. Di ligtas ang lupa.",
                                                 "Bigo ang pagtatangkang magkampo. Maghanap ng iba.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["pending"] = {
+                    ["act"] = "REPLY",
+                    ["outcome"] = "pending",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "I'll head {camp.locationPhrase} and set up camp.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.command.camp.reply.pending.say.1.default",
+                                        ["textRole"] = "response",
+                                        ["translations"] = {
+                                            ["EN"] = {
+                                                "I'll head {camp.locationPhrase} and set up camp.",
+                                            },
+                                            ["TL"] = {
+                                                "Pupunta ako {camp.locationPhrase} at magtatayo ng kampo.",
                                             },
                                         },
                                     },
@@ -290,8 +426,140 @@ return {
                     },
                     ["textRole"] = "response",
                 },
+                ["rejected_no_site"] = {
+                    ["act"] = "REPLY",
+                    ["outcome"] = "rejected_no_site",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "I don't see a safe place to camp nearby.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.command.camp.reply.rejected_no_site.say.1.default",
+                                        ["textRole"] = "response",
+                                        ["translations"] = {
+                                            ["EN"] = {
+                                                "I don't see a safe place to camp nearby.",
+                                            },
+                                            ["TL"] = {
+                                                "Wala akong makitang ligtas na lugar para magkampo sa malapit.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                    ["when"] = {
+                        ["op"] = "eq",
+                        ["path"] = "result.reasonClass",
+                        ["value"] = "target_unavailable",
+                    },
+                },
+                ["rejected_out_of_range"] = {
+                    ["act"] = "REPLY",
+                    ["outcome"] = "rejected_out_of_range",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "That camp location is too far away right now.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.command.camp.reply.rejected_out_of_range.say.1.default",
+                                        ["textRole"] = "response",
+                                        ["translations"] = {
+                                            ["EN"] = {
+                                                "That camp location is too far away right now.",
+                                            },
+                                            ["TL"] = {
+                                                "Masyadong malayo ang lugar ng kampo na iyon ngayon.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                    ["when"] = {
+                        ["op"] = "eq",
+                        ["path"] = "result.reasonClass",
+                        ["value"] = "out_of_range",
+                    },
+                },
+            },
+            ["slots"] = {
+                ["camp_site"] = {
+                    ["limit"] = 4,
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = true,
+                    ["suggest"] = "camp_site_candidates",
+                    ["type"] = "entity.location",
+                },
             },
             ["textRoles"] = {
+                {
+                    ["fallback"] = "Set up camp",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.command.camp.affordance.label",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Set up camp",
+                        },
+                        ["TL"] = {
+                            "Magtayo ng kampo",
+                        },
+                    },
+                },
+                {
+                    ["fallback"] = "Let's camp here.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.command.camp.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Let's camp here.",
+                        },
+                        ["TL"] = {
+                            "Magkampo tayo rito.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+                {
+                    ["fallback"] = "We're set up {camp.locationPhrase}.",
+                    ["outcome"] = "completed",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.command.camp.reply.completed.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "We're set up {camp.locationPhrase}.",
+                        },
+                        ["TL"] = {
+                            "Nakatayo na ang kampo {camp.locationPhrase}.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
                 {
                     ["fallback"] = "I couldn't set up camp there.",
                     ["outcome"] = "failed",
@@ -322,6 +590,22 @@ return {
                             "Sinubukang magkampo, pero kinailangang umurong.",
                             "Di makapaglatag ng kampo roon. Di ligtas ang lupa.",
                             "Bigo ang pagtatangkang magkampo. Maghanap ng iba.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+                {
+                    ["fallback"] = "I'll head {camp.locationPhrase} and set up camp.",
+                    ["outcome"] = "pending",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.command.camp.reply.pending.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I'll head {camp.locationPhrase} and set up camp.",
+                        },
+                        ["TL"] = {
+                            "Pupunta ako {camp.locationPhrase} at magtatayo ng kampo.",
                         },
                     },
                     ["variantID"] = "default",
@@ -530,6 +814,38 @@ return {
                     },
                     ["variantID"] = "default",
                 },
+                {
+                    ["fallback"] = "I don't see a safe place to camp nearby.",
+                    ["outcome"] = "rejected_no_site",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.command.camp.reply.rejected_no_site.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "I don't see a safe place to camp nearby.",
+                        },
+                        ["TL"] = {
+                            "Wala akong makitang ligtas na lugar para magkampo sa malapit.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+                {
+                    ["fallback"] = "That camp location is too far away right now.",
+                    ["outcome"] = "rejected_out_of_range",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.command.camp.reply.rejected_out_of_range.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That camp location is too far away right now.",
+                        },
+                        ["TL"] = {
+                            "Masyadong malayo ang lugar ng kampo na iyon ngayon.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
             },
         },
         ["id"] = "command.camp",
@@ -552,6 +868,43 @@ return {
             },
         },
         ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["groups"] = {
+                    "companion",
+                    "command",
+                    "camp",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Set up camp",
+                    },
+                    ["TL"] = {
+                        "Magtayo ng kampo",
+                    },
+                },
+                ["metadata"] = {
+                    ["action"] = "CAMP",
+                },
+                ["textRole"] = "button_label",
+            },
+            ["bindings"] = {
+                ["camp.locationPhrase"] = {
+                    ["from"] = "result.data.site",
+                    ["resolver"] = "pnc.camp.location_phrase",
+                    ["type"] = "entity.location",
+                },
+            },
+            ["execute"] = {
+                ["mode"] = "request_response",
+                ["use"] = "pnc.companion.camp",
+                ["with"] = {
+                    ["npcID"] = "$context.addressee.id",
+                    ["target"] = "$slot.camp_site",
+                },
+            },
             ["metadata"] = {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
@@ -559,6 +912,37 @@ return {
                 ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/camp.json",
             },
             ["reply"] = {
+                ["completed"] = {
+                    ["act"] = "REPLY",
+                    ["outcome"] = "completed",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["id"] = "default",
+                                        ["text"] = {
+                                            ["EN"] = {
+                                                "We're set up {camp.locationPhrase}.",
+                                            },
+                                            ["TL"] = {
+                                                "Nakatayo na ang kampo {camp.locationPhrase}.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
                 ["failed"] = {
                     ["act"] = "REPLY",
                     ["outcome"] = "failed",
@@ -598,6 +982,37 @@ return {
                                                 "Sinubukang magkampo, pero kinailangang umurong.",
                                                 "Di makapaglatag ng kampo roon. Di ligtas ang lupa.",
                                                 "Bigo ang pagtatangkang magkampo. Maghanap ng iba.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["pending"] = {
+                    ["act"] = "REPLY",
+                    ["outcome"] = "pending",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["id"] = "default",
+                                        ["text"] = {
+                                            ["EN"] = {
+                                                "I'll head {camp.locationPhrase} and set up camp.",
+                                            },
+                                            ["TL"] = {
+                                                "Pupunta ako {camp.locationPhrase} at magtatayo ng kampo.",
                                             },
                                         },
                                     },
@@ -822,11 +1237,140 @@ return {
                     },
                     ["textRole"] = "response",
                 },
+                ["rejected_no_site"] = {
+                    ["act"] = "REPLY",
+                    ["outcome"] = "rejected_no_site",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["id"] = "default",
+                                        ["text"] = {
+                                            ["EN"] = {
+                                                "I don't see a safe place to camp nearby.",
+                                            },
+                                            ["TL"] = {
+                                                "Wala akong makitang ligtas na lugar para magkampo sa malapit.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                    ["when"] = {
+                        ["op"] = "eq",
+                        ["path"] = "result.reasonClass",
+                        ["value"] = "target_unavailable",
+                    },
+                },
+                ["rejected_out_of_range"] = {
+                    ["act"] = "REPLY",
+                    ["outcome"] = "rejected_out_of_range",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["id"] = "default",
+                                        ["text"] = {
+                                            ["EN"] = {
+                                                "That camp location is too far away right now.",
+                                            },
+                                            ["TL"] = {
+                                                "Masyadong malayo ang lugar ng kampo na iyon ngayon.",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                    ["when"] = {
+                        ["op"] = "eq",
+                        ["path"] = "result.reasonClass",
+                        ["value"] = "out_of_range",
+                    },
+                },
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Let's camp here.",
+                                    },
+                                    ["TL"] = {
+                                        "Magkampo tayo rito.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
             },
         },
         ["references"] = {
         },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REPLY",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "command.camp",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Let's camp here.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.command.camp.say_1",
+                        },
+                    },
+                },
+            },
+        },
         ["slots"] = {
+            ["camp_site"] = {
+                ["limit"] = 4,
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = true,
+                ["suggest"] = "camp_site_candidates",
+                ["type"] = "entity.location",
+            },
         },
         ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_lifecycle/command_camp.json",
         ["target"] = {
@@ -835,6 +1379,50 @@ return {
             ["type"] = "entity.any",
         },
         ["textRoles"] = {
+            {
+                ["fallback"] = "Set up camp",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.command.camp.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Set up camp",
+                    },
+                    ["TL"] = {
+                        "Magtayo ng kampo",
+                    },
+                },
+            },
+            {
+                ["fallback"] = "Let's camp here.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.command.camp.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Let's camp here.",
+                    },
+                    ["TL"] = {
+                        "Magkampo tayo rito.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+            {
+                ["fallback"] = "We're set up {camp.locationPhrase}.",
+                ["outcome"] = "completed",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.command.camp.reply.completed.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "We're set up {camp.locationPhrase}.",
+                    },
+                    ["TL"] = {
+                        "Nakatayo na ang kampo {camp.locationPhrase}.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
             {
                 ["fallback"] = "I couldn't set up camp there.",
                 ["outcome"] = "failed",
@@ -865,6 +1453,22 @@ return {
                         "Sinubukang magkampo, pero kinailangang umurong.",
                         "Di makapaglatag ng kampo roon. Di ligtas ang lupa.",
                         "Bigo ang pagtatangkang magkampo. Maghanap ng iba.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+            {
+                ["fallback"] = "I'll head {camp.locationPhrase} and set up camp.",
+                ["outcome"] = "pending",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.command.camp.reply.pending.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I'll head {camp.locationPhrase} and set up camp.",
+                    },
+                    ["TL"] = {
+                        "Pupunta ako {camp.locationPhrase} at magtatayo ng kampo.",
                     },
                 },
                 ["variantID"] = "default",
@@ -1069,6 +1673,38 @@ return {
                         "Di makasusunod. Masyadong dehado ang pwestong 'yan.",
                         "Di ako hihiga roon. Pumili ka ng ibang kwarto.",
                         "Tinatanggihan ang kampo. Kailangan natin ng tunay na kaligtasan.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+            {
+                ["fallback"] = "I don't see a safe place to camp nearby.",
+                ["outcome"] = "rejected_no_site",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.command.camp.reply.rejected_no_site.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "I don't see a safe place to camp nearby.",
+                    },
+                    ["TL"] = {
+                        "Wala akong makitang ligtas na lugar para magkampo sa malapit.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+            {
+                ["fallback"] = "That camp location is too far away right now.",
+                ["outcome"] = "rejected_out_of_range",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.command.camp.reply.rejected_out_of_range.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That camp location is too far away right now.",
+                    },
+                    ["TL"] = {
+                        "Masyadong malayo ang lugar ng kampo na iyon ngayon.",
                     },
                 },
                 ["variantID"] = "default",

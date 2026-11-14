@@ -230,6 +230,112 @@
           "Bigo ang pagtatangkang magkampo. Maghanap ng iba."
         ]
       }
+    },
+    "pending": {
+      "act": "REPLY",
+      "say": {
+        "EN": [
+          "I'll head {camp.locationPhrase} and set up camp."
+        ],
+        "TL": [
+          "Pupunta ako {camp.locationPhrase} at magtatayo ng kampo."
+        ]
+      }
+    },
+    "completed": {
+      "act": "REPLY",
+      "say": {
+        "EN": [
+          "We're set up {camp.locationPhrase}."
+        ],
+        "TL": [
+          "Nakatayo na ang kampo {camp.locationPhrase}."
+        ]
+      }
+    },
+    "rejected_out_of_range": {
+      "when": {
+        "path": "result.reasonClass",
+        "op": "eq",
+        "value": "out_of_range"
+      },
+      "act": "REPLY",
+      "say": {
+        "EN": [
+          "That camp location is too far away right now."
+        ],
+        "TL": [
+          "Masyadong malayo ang lugar ng kampo na iyon ngayon."
+        ]
+      }
+    },
+    "rejected_no_site": {
+      "when": {
+        "path": "result.reasonClass",
+        "op": "eq",
+        "value": "target_unavailable"
+      },
+      "act": "REPLY",
+      "say": {
+        "EN": [
+          "I don't see a safe place to camp nearby."
+        ],
+        "TL": [
+          "Wala akong makitang ligtas na lugar para magkampo sa malapit."
+        ]
+      }
     }
+  },
+  "slots": {
+    "camp_site": {
+      "type": "entity.location",
+      "required": true,
+      "suggest": "camp_site_candidates",
+      "limit": 4
+    }
+  },
+  "bindings": {
+    "camp.locationPhrase": {
+      "resolver": "pnc.camp.location_phrase",
+      "from": "result.data.site",
+      "type": "entity.location"
+    }
+  },
+  "affordance": {
+    "label": {
+      "EN": [
+        "Set up camp"
+      ],
+      "TL": [
+        "Magtayo ng kampo"
+      ]
+    },
+    "consumers": [
+      "player"
+    ],
+    "groups": [
+      "companion",
+      "command",
+      "camp"
+    ],
+    "metadata": {
+      "action": "CAMP"
+    }
+  },
+  "say": {
+    "EN": [
+      "Let's camp here."
+    ],
+    "TL": [
+      "Magkampo tayo rito."
+    ]
+  },
+  "execute": {
+    "use": "pnc.companion.camp",
+    "with": {
+      "target": "$slot.camp_site",
+      "npcID": "$context.addressee.id"
+    },
+    "mode": "request_response"
   }
 }

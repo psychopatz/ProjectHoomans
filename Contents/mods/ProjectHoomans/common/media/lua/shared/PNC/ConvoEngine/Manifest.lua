@@ -1008,7 +1008,7 @@ return {
             ["sourceShard"] = "adopters/hoomans/dialogue/companion_commands_combat/combat_horde_choice_avoid.json",
         },
         {
-            ["bytes"] = 132746,
+            ["bytes"] = 159903,
             ["domain"] = "companion_commands_lifecycle",
             ["kind"] = "PSDL",
             ["module"] = "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
@@ -5120,5 +5120,5 @@ return {
             ["sourceShard"] = "@index/registry",
         },
     },
-    ["wholeModelFingerprint"] = "15b1b92bc9c9eee6ecac482992dad5cdb347839a72e0f3d323379db5e6d25198",
+    ["wholeModelFingerprint"] = "984de668d76da5f88e76fed9df29b57f7782e03f32b5850cf316f25557e8551f",
 }
