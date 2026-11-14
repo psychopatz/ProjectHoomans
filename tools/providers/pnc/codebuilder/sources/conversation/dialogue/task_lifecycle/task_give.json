@@ -1,0 +1,168 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "task",
+  "id": "give",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/give.json",
+    "responseAct": "REACT"
+  },
+  "reply": {
+    "admitted": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I'll give that to you.",
+          "Understood. Handing it over.",
+          "Here, I'll pass that to you.",
+          "All right. I'll give you the item.",
+          "Sure thing. Passing it over.",
+          "Understood. You can have it.",
+          "I'll transfer that to your pack.",
+          "Right. Handing it over.",
+          "I'll give you what you requested.",
+          "Sounds good. Giving it now."
+        ],
+        "TL": [
+          "Ibibigay ko iyon sa iyo.",
+          "Naintindihan. Iniaabot na.",
+          "Heto, ipapasa ko 'yan sa 'yo.",
+          "Sige. Ibibigay ko sa 'yo ang gamit.",
+          "Walang anuman. Ipinapasa na.",
+          "Naiintindihan ko. Pwede mong kunin.",
+          "Ililipat ko 'yan sa bag mo.",
+          "Sige. Iniaabot na.",
+          "Ibibigay ko ang hiniling mo.",
+          "Maganda 'yan. Ibibigay na ngayon."
+        ]
+      }
+    },
+    "active": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "Handing that over now.",
+          "Passing the item to you right now.",
+          "Transferring the supplies.",
+          "Giving this to you now.",
+          "Currently handing it over.",
+          "Reaching out to give you the item.",
+          "Giving you what was asked.",
+          "In the middle of the handoff.",
+          "Handing it off now. Take hold.",
+          "Giving it as ordered."
+        ],
+        "TL": [
+          "Iniaabot ko na ngayon.",
+          "Ipinapasa ko na ang gamit sa 'yo ngayon.",
+          "Inililipat na ang mga kagamitan.",
+          "Ibinibigay ko na ito sa 'yo ngayon.",
+          "Kasalukuyang iniaabot.",
+          "Inaabot para ibigay sa 'yo ang gamit.",
+          "Ibinibigay sa 'yo ang hiningi.",
+          "Kasalukuyang nag-aabot.",
+          "Iniaabot na. Hawakan mo.",
+          "Ibinibigay ayon sa utos."
+        ]
+      }
+    },
+    "completed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "There you go.",
+          "Handed over safely.",
+          "It's yours now.",
+          "Transfer complete.",
+          "All given. Take good care of it.",
+          "Done. It's in your hands.",
+          "Handoff finished.",
+          "Given as requested.",
+          "Item is officially yours.",
+          "Completed the handoff."
+        ],
+        "TL": [
+          "Heto na.",
+          "Naibigay na nang ligtas.",
+          "Nasa sa 'yo na ngayon.",
+          "Tapos na ang paglipat.",
+          "Naibigay na lahat. Ingatan mo 'yan.",
+          "Tapos na. Nasa mga kamay mo na.",
+          "Tapos na ang pag-aabot.",
+          "Naibigay ayon sa hiling.",
+          "Sa 'yo na ang gamit opisyal.",
+          "Natapos ang pag-aabot."
+        ]
+      }
+    },
+    "rejected": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I can't give that to you right now.",
+          "I need that item to survive. Can't spare it.",
+          "That is vital to my loadout. I won't give it away.",
+          "Refusing to hand that over.",
+          "I don't have that item to give.",
+          "Can't give that up under these circumstances.",
+          "That's not something I can part with.",
+          "Give order rejected. I'm keeping this.",
+          "I won't give that item away.",
+          "Not giving that. Ask for something else."
+        ],
+        "TL": [
+          "Hindi ko maibibigay iyon sa iyo ngayon.",
+          "Kailangan ko 'yan para mabuhay. Di ko maipamimigay.",
+          "Mahalaga 'yan sa gamit ko. Di ko ipamimigay.",
+          "Tumatangging iabot 'yan.",
+          "Wala sa akin ang gamit na 'yan para ibigay.",
+          "Di ko maibibigay 'yan sa ganitong kalagayan.",
+          "Hindi bagay 'yan na kaya kong bitiwan.",
+          "Tinatanggihan ang pagbibigay. Itatabi ko ito.",
+          "Di ko ipamimigay ang bagay na 'yan.",
+          "Di ibibigay 'yan. Humingi ka ng iba."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I couldn't give that to you.",
+          "Handoff failed. You were out of reach.",
+          "Your hands or pack were full. Couldn't give it.",
+          "Action interrupted. Item not given.",
+          "Unable to transfer the item to you.",
+          "Failed to hand it over. Something got in the way.",
+          "I couldn't complete the give action.",
+          "Dropped it during the exchange.",
+          "Give task failed.",
+          "Could not give that item."
+        ],
+        "TL": [
+          "Hindi ko naibigay iyon sa iyo.",
+          "Pumalpak ang pag-aabot. Masyado kang malayo.",
+          "Puno ang kamay o bag mo. Di maibigay.",
+          "Naabala ang kilos. Di naibigay ang gamit.",
+          "Di mailipat ang gamit sa 'yo.",
+          "Bigo sa pag-aabot. May humarang sa pagitan.",
+          "Di ko natapos ang pagbibigay.",
+          "Nahulog habang nagpapalitan.",
+          "Bigo ang gawaing magbigay.",
+          "Hindi naibigay ang bagay na 'yan."
+        ]
+      }
+    }
+  }
+}

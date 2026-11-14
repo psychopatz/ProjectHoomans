@@ -1,6 +1,9 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
     ["accept"] = {
+        ["dependents"] = {
+            "quest.clinic_supplies.accept",
+        },
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
@@ -43,6 +46,9 @@ return {
         ["source"] = "adopters/hoomans/dialogue/core_semantic_responses/greeting.json",
     },
     ["offer"] = {
+        ["dependents"] = {
+            "quest.clinic_supplies.offer",
+        },
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CoreSemanticResponses",
@@ -53,8 +59,8 @@ return {
     },
     ["question.activity"] = {
         ["dependents"] = {
+            "offer.question.activity",
             "question.activity.fishing",
-            "social.core_check_in",
         },
         ["domain"] = "core_semantic_responses",
         ["generated"] = {
@@ -223,6 +229,9 @@ return {
         },
         ["id"] = "question.needs.proposal",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.needs",
+        },
         ["source"] = "adopters/hoomans/dialogue/core_semantic_responses/question_needs_proposal.json",
     },
     ["question.needs.quantity"] = {
@@ -237,10 +246,14 @@ return {
         },
         ["id"] = "question.needs.quantity",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "question.needs",
+        },
         ["source"] = "adopters/hoomans/dialogue/core_semantic_responses/question_needs_quantity.json",
     },
     ["question.wellbeing"] = {
         ["dependents"] = {
+            "offer.question.wellbeing",
             "question.wellbeing.default",
             "question.wellbeing.fatigue",
             "question.wellbeing.fatigue_alt",
@@ -248,7 +261,6 @@ return {
             "question.wellbeing.hunger_alt",
             "question.wellbeing.injured",
             "question.wellbeing.panic",
-            "question.wellbeing.stress",
         },
         ["domain"] = "core_semantic_responses",
         ["generated"] = {

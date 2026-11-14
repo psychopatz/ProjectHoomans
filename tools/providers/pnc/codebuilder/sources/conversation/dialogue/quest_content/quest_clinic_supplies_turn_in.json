@@ -1,0 +1,110 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "quest.clinic_supplies",
+  "id": "turn_in",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:quest_content",
+    "contentOwner": "projecthoomans.dialogue_content.quest",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+    "responseAct": "REACT"
+  },
+  "reply": {
+    "queued": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I'll turn in the clinic supplies.",
+          "I'm heading over to drop off the medical items.",
+          "I'll deliver the clinic supplies right away.",
+          "Queued to hand over the medical gear.",
+          "I will submit the clinic supplies now.",
+          "Taking these supplies over to the clinic station.",
+          "I'll deposit the medical items as requested.",
+          "Handing in the clinic goods now.",
+          "I'll complete the delivery of the clinic supplies.",
+          "Off to turn in our gathered clinic supplies."
+        ],
+        "TL": [
+          "Ipapasa ko ang mga suplay ng klinika.",
+          "Pupunta na ako para iabot ang mga medikal na gamit.",
+          "Ihahatid ko agad ang mga suplay ng klinika.",
+          "Nakatakdang iabot ang mga medikal na gamit.",
+          "Ipapasa ko na ang mga suplay sa klinika ngayon.",
+          "Dadalhin ko na ang mga suplay na 'to sa klinika.",
+          "Ilalagak ko ang mga medikal na gamit tulad ng hiniling.",
+          "Iniaabot ko na ang mga gamit sa klinika ngayon.",
+          "Tatapusin ko ang paghahatid ng suplay sa klinika.",
+          "Aalis na para ipasa ang naipon nating suplay sa klinika."
+        ]
+      }
+    },
+    "rejected": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I can't turn that in yet.",
+          "We don't have everything needed for the clinic yet.",
+          "Supplies aren't complete. Can't hand them over.",
+          "I have to decline turning this in right now.",
+          "Not ready for turn-in. Missing items.",
+          "Can't drop these off yet. Double-check our pack.",
+          "I won't turn in an incomplete medical bundle.",
+          "Hold on, we can't submit these clinic supplies yet.",
+          "Delivery cannot be accepted until all items are present.",
+          "Can't finalize the clinic hand-in at this stage."
+        ],
+        "TL": [
+          "Hindi ko pa maipapasa iyon.",
+          "Wala pa sa atin ang lahat ng kailangan para sa klinika.",
+          "Kulang pa ang mga suplay. Hindi pa pwedeng iabot.",
+          "Kailangan kong tanggihan ang pagpasa nito ngayon.",
+          "Hindi pa handa sa pagpasa. May kulang na gamit.",
+          "Hindi pa maibibigay 'to. Tignan ulit ang bag natin.",
+          "Hindi ako magpapasa ng kulang na medikal na gamit.",
+          "Sandali, hindi pa natin maipapasa ang mga suplay sa klinika.",
+          "Hindi matatanggap ang hatid hangga't kulang ang mga gamit.",
+          "Hindi matatapos ang pagpasa sa klinika sa yugtong ito."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I couldn't turn in the clinic supplies.",
+          "Something went wrong handing over the medical gear.",
+          "Turn-in failed. Check if we have every item.",
+          "Unable to complete the clinic supply delivery.",
+          "I wasn't able to drop off the clinic supplies.",
+          "Failed to hand in the requested medical items.",
+          "Couldn't finalize the clinic supplies handover.",
+          "Delivery of clinic goods couldn't be registered.",
+          "Could not complete the turn-in for the clinic.",
+          "Turn-in was unsuccessful. Try again."
+        ],
+        "TL": [
+          "Hindi ko maipasa ang mga suplay ng klinika.",
+          "May nagkaproblema sa pag-abot ng mga medikal na gamit.",
+          "Bigo ang pagpasa. Tignan kung kumpleto ang bawat gamit.",
+          "Hindi makumpleto ang paghahatid ng suplay sa klinika.",
+          "Hindi ko naibigay ang mga suplay para sa klinika.",
+          "Bigo sa pagpasa ng hinihiling na medikal na kagamitan.",
+          "Hindi matapos ang paglilipat ng suplay sa klinika.",
+          "Hindi naitala ang paghahatid ng gamit sa klinika.",
+          "Hindi makumpleto ang pagpasa para sa klinika.",
+          "Hindi nagtagumpay ang pagpasa. Subukan ulit."
+        ]
+      }
+    }
+  }
+}

@@ -190,7 +190,7 @@ return {
         ["domain"] = "companion_check_in",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CompanionCheckIn",
-        ["recordCount"] = 1,
+        ["recordCount"] = 3,
     },
     {
         ["domain"] = "companion_commands_combat",
@@ -202,7 +202,7 @@ return {
         ["domain"] = "companion_commands_lifecycle",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CompanionCommandsLifecycle",
-        ["recordCount"] = 30,
+        ["recordCount"] = 5,
     },
     {
         ["domain"] = "companion_commands_player",
@@ -250,13 +250,13 @@ return {
         ["domain"] = "core_check_in",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CoreCheckIn",
-        ["recordCount"] = 1,
+        ["recordCount"] = 6,
     },
     {
         ["domain"] = "core_identity",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CoreIdentity",
-        ["recordCount"] = 1,
+        ["recordCount"] = 4,
     },
     {
         ["domain"] = "core_knowledge_activity",
@@ -268,7 +268,7 @@ return {
         ["domain"] = "core_knowledge_facts",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CoreKnowledgeFacts",
-        ["recordCount"] = 2,
+        ["recordCount"] = 1,
     },
     {
         ["domain"] = "core_knowledge_gossip",
@@ -280,7 +280,7 @@ return {
         ["domain"] = "core_knowledge_identity",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CoreKnowledgeIdentity",
-        ["recordCount"] = 2,
+        ["recordCount"] = 1,
     },
     {
         ["domain"] = "core_semantic_responses",
@@ -394,7 +394,7 @@ return {
         ["domain"] = "health_content",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/HealthContent",
-        ["recordCount"] = 6,
+        ["recordCount"] = 2,
     },
     {
         ["domain"] = "medical_event_call",
@@ -448,7 +448,7 @@ return {
         ["domain"] = "quest_content",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/QuestContent",
-        ["recordCount"] = 12,
+        ["recordCount"] = 4,
     },
     {
         ["domain"] = "social",
@@ -574,13 +574,13 @@ return {
         ["domain"] = "static_suggestion_text",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/StaticSuggestionText",
-        ["recordCount"] = 47,
+        ["recordCount"] = 33,
     },
     {
         ["domain"] = "task_lifecycle",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/TaskLifecycle",
-        ["recordCount"] = 40,
+        ["recordCount"] = 8,
     },
     {
         ["domain"] = "task_tool_replies",
@@ -592,7 +592,7 @@ return {
         ["domain"] = "trading",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/Trading",
-        ["recordCount"] = 3,
+        ["recordCount"] = 11,
     },
     {
         ["domain"] = "wellbeing_content",

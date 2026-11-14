@@ -1,0 +1,50 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "question",
+  "id": "needs",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "textNamespace": "UI_PNC_Conversation_Suggestion",
+    "ui": {
+      "id": "question.needs",
+      "order": 30,
+      "patternID": "pnc.question.needs_offer_plain",
+      "dialogueFollowUp": "NEEDS_QUANTITY",
+      "hubAudience": "owned_companion",
+      "hubID": "whats_up",
+      "intent": "QUESTION",
+      "speechAct": "QUESTION",
+      "subject": "NEEDS",
+      "topic": "needs",
+      "domain": "needs"
+    }
+  },
+  "invoke": {
+    "patternID": "pnc.question.needs_offer_plain",
+    "intent": "QUESTION",
+    "speechAct": "QUESTION",
+    "subject": "NEEDS",
+    "topic": "needs"
+  },
+  "affordance": {
+    "label": {
+      "EN": "Ask about needs",
+      "TL": "Itanong ang pangangailangan"
+    },
+    "consumers": [
+      "player",
+      "npc"
+    ],
+    "groups": [
+      "needs"
+    ],
+    "utility": {
+      "care": 1.0
+    }
+  },
+  "say": {
+    "EN": "Do you need anything?",
+    "TL": "May kailangan ka ba?"
+  }
+}

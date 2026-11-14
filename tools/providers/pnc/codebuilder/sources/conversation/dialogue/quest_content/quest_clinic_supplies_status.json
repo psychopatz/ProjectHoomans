@@ -1,0 +1,110 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "quest.clinic_supplies",
+  "id": "status",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:quest_content",
+    "contentOwner": "projecthoomans.dialogue_content.quest",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+    "responseAct": "REACT"
+  },
+  "reply": {
+    "queued": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I'll check the clinic-supplies request.",
+          "I'll see how we're doing on those medical supplies.",
+          "Checking our progress on the clinic gear now.",
+          "I'll look into the status of the clinic task.",
+          "Reviewing where we stand with the clinic supplies.",
+          "I'll pull up the clinic supply checklist.",
+          "Let me verify our clinic supplies count.",
+          "I'm checking the medical supplies progress.",
+          "I'll inspect the clinic supplies status for you.",
+          "Looking into the clinic request right now."
+        ],
+        "TL": [
+          "Susuriin ko ang kahilingan para sa suplay ng klinika.",
+          "Titingnan ko kung kamusta na ang mga medikal na suplay natin.",
+          "Sinusuri na ang progreso natin sa gamot para sa klinika.",
+          "Sisiyasatin ko ang katayuan ng gawain sa klinika.",
+          "Sinusuri kung nasaan na tayo sa mga suplay ng klinika.",
+          "Kukunin ko ang listahan ng suplay para sa klinika.",
+          "Hayaan mong kumpirmahin ko ang bilang ng suplay sa klinika.",
+          "Sinusuri ko ang progreso ng mga medikal na suplay.",
+          "Titingnan ko ang katayuan ng suplay sa klinika para sa'yo.",
+          "Sinisiyasat ko na ang kahilingan ng klinika ngayon."
+        ]
+      }
+    },
+    "rejected": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I can't check that request right now.",
+          "Too busy to review the clinic task status.",
+          "Can't inspect the medical supplies list at the moment.",
+          "Not able to pull up that status right now.",
+          "I won't be checking that request today.",
+          "I have to decline looking into the status now.",
+          "Can't check the clinic supplies progress right now.",
+          "Unable to review the request at this time.",
+          "I can't follow up on that clinic task currently.",
+          "Not checking clinic status now. Ask later."
+        ],
+        "TL": [
+          "Hindi ko masuri ang kahilingang iyon ngayon.",
+          "Masyadong abala para suriin ang katayuan ng klinika.",
+          "Hindi masisilip ang listahan ng suplay sa sandaling ito.",
+          "Hindi ko mabuksan ang katayuang 'yan ngayon.",
+          "Hindi ko susuriin ang kahilingang 'yan ngayon.",
+          "Kailangan kong tanggihan ang pagsilip sa katayuan ngayon.",
+          "Hindi masusuri ang progreso ng suplay sa klinika ngayon.",
+          "Hindi magagawang suriin ang kahilingan sa oras na 'to.",
+          "Hindi ko matututukan ang gawaing 'yan sa klinika sa kasalukuyan.",
+          "Hindi titingnan ang katayuan sa klinika ngayon. Magtanong mamaya."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I couldn't check that request.",
+          "Unable to verify the status of the clinic supplies.",
+          "Status check on the medical supplies failed.",
+          "Couldn't retrieve the clinic quest details.",
+          "I wasn't able to inspect the request status.",
+          "Failed to look up where we stand on clinic supplies.",
+          "Couldn't confirm progress on that task.",
+          "Unable to check our clinic supplies progress.",
+          "Checking that request didn't go through.",
+          "Couldn't get a status read on the medical run."
+        ],
+        "TL": [
+          "Hindi ko masuri ang kahilingang iyon.",
+          "Hindi ko makumpirma ang katayuan ng mga suplay sa klinika.",
+          "Bigo ang pagsusuri sa katayuan ng mga suplay.",
+          "Hindi makuha ang mga detalye ng misyon sa klinika.",
+          "Hindi ko nasuri ang katayuan ng kahilingan.",
+          "Bigo sa pagtingin sa katayuan ng suplay sa klinika.",
+          "Hindi makumpirma ang progreso sa gawaing 'yan.",
+          "Hindi masuri ang progreso natin sa suplay sa klinika.",
+          "Hindi natuloy ang pagsusuri sa kahilingang 'yan.",
+          "Hindi makakuha ng ulat sa medikal na lakad."
+        ]
+      }
+    }
+  }
+}

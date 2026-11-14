@@ -1,0 +1,168 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "task",
+  "id": "drink",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/drink.json",
+    "responseAct": "REACT"
+  },
+  "reply": {
+    "admitted": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I'll have a drink.",
+          "Understood. Getting some water.",
+          "I could use some water. Drinking now.",
+          "All right, I'll hydrate.",
+          "Good call. I was getting thirsty.",
+          "I'll take a drink from my supply.",
+          "Understood. Hydrating immediately.",
+          "Right. Taking a sip.",
+          "I'll drink that now.",
+          "Sounds good. Drinking."
+        ],
+        "TL": [
+          "Iinom ako.",
+          "Naintindihan. Kukuha ng tubig.",
+          "Kailangan ko nga ng tubig. Iinom na.",
+          "Sige, magpapatubig ako.",
+          "Magandang paalala. Nauuhaw na nga ako.",
+          "Iinom ako mula sa baon ko.",
+          "Naiintindihan ko. Iinom agad.",
+          "Sige. Iinom nang kaunti.",
+          "Iinumin ko na iyan ngayon.",
+          "Maganda 'yan. Iinom na."
+        ]
+      }
+    },
+    "active": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "Taking a drink now.",
+          "Drinking some water right now.",
+          "Quenching my thirst. Give me a second.",
+          "Currently having a drink.",
+          "Taking some fluids now.",
+          "Drinking. Needed this badly.",
+          "Getting some water in me.",
+          "Taking a quick drink.",
+          "Drinking now. Won't take long.",
+          "Having a drink as ordered."
+        ],
+        "TL": [
+          "Umiinom na ako ngayon.",
+          "Umiinom ng kaunting tubig ngayon.",
+          "Pinapawi ang uhaw. Sandali lang.",
+          "Kasalukuyang umiinom.",
+          "Umiinom na ngayon.",
+          "Umiinom. Kailangang-kailangan ko ito.",
+          "Nagpapasok ng tubig sa katawan.",
+          "Umiinom nang mabilisan.",
+          "Umiinom na. Di magtatagal.",
+          "Umiinom ayon sa utos."
+        ]
+      }
+    },
+    "completed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "Much better. Thirst is gone.",
+          "Finished drinking. Feeling refreshed.",
+          "That hit the spot. Done drinking.",
+          "Hydrated and ready to move.",
+          "Finished that drink.",
+          "Done. Throat isn't parched anymore.",
+          "All drank. Ready for action.",
+          "Finished having a drink.",
+          "Done drinking. Let's keep going.",
+          "Hydration complete."
+        ],
+        "TL": [
+          "Mas maayos na. Wala na ang uhaw.",
+          "Tapos nang uminom. Maginhawa na ang pakiramdam.",
+          "Eksakto 'yon. Tapos nang uminom.",
+          "May sapat nang tubig at handang kumilos.",
+          "Naubos na ang inumin.",
+          "Tapos na. Di na tuyo ang lalamunan ko.",
+          "Nainom na lahat. Handa na sa aksyon.",
+          "Natapos nang uminom.",
+          "Tapos nang uminom. Tuloy na tayo.",
+          "Kumpleto na ang pag-inom."
+        ]
+      }
+    },
+    "rejected": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I'm not thirsty right now.",
+          "I don't need to drink at the moment.",
+          "I'm fully hydrated. Saving the water.",
+          "Can't drink right now. Too dangerous to pause.",
+          "Refusing to drink that water. It looks tainted.",
+          "I have plenty of fluids. Don't need to drink.",
+          "No need for a drink yet.",
+          "I'll save our clean water for later.",
+          "Drink order rejected. Not parched.",
+          "Can't drink that right now."
+        ],
+        "TL": [
+          "Hindi ako nauuhaw ngayon.",
+          "Di ko kailangang uminom sa sandaling ito.",
+          "Busog pa ako sa tubig. Itatabi ang inumin.",
+          "Di pwedeng uminom ngayon. Masyadong mapanganib huminto.",
+          "Tumatangging inumin ang tubig na 'yan. Mukhang kontaminado.",
+          "Marami pa akong tubig sa katawan. Di kailangang uminom.",
+          "Wala pang pangangailangan sa inumin.",
+          "Itatabi ko ang malinis na tubig mamaya.",
+          "Tinatanggihan ang pag-inom. Di ako uhaw.",
+          "Di ko maiinom 'yan ngayon."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I couldn't get a drink.",
+          "Failed to drink. Container was empty or tainted.",
+          "Couldn't drink that. It wasn't clean water.",
+          "I was interrupted before I could drink.",
+          "Unable to have a drink right now.",
+          "Spilled it or couldn't reach it. Drinking failed.",
+          "Water container is dry.",
+          "Couldn't drink. Threat forced me to stop.",
+          "Action failed. Still thirsty.",
+          "Failed to take a drink."
+        ],
+        "TL": [
+          "Hindi ako nakainom.",
+          "Bigo sa pag-inom. Walang laman o marumi ang lalagyan.",
+          "Di mainom 'yon. Di malinis na tubig.",
+          "Naabala ako bago ako nakainom.",
+          "Di makainom sa ngayon.",
+          "Natapon o di naabot. Pumalpak ang pag-inom.",
+          "Tuyot ang lalagyan ng tubig.",
+          "Di nakainom. Napilitang huminto dahil sa banta.",
+          "Bigo ang kilos. Nauuhaw pa rin.",
+          "Bigo sa pag-inom."
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "ui.suggestion.identity",
+  "id": "rude",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textTarget": "UI_PNC_Conversation",
+    "textRows": [
+      {
+        "key": "suggestion.identity.rude.label",
+        "text": {
+          "EN": "Don't tell your name",
+          "TL": "Huwag sabihin ang pangalan"
+        }
+      },
+      {
+        "key": "suggestion.identity.rude.utterance",
+        "text": {
+          "EN": "That's none of your business.",
+          "TL": "Wala ka nang pakialam."
+        }
+      }
+    ]
+  },
+  "affordance": {
+    "label": {
+      "EN": "Don't tell your name",
+      "TL": "Huwag sabihin ang pangalan"
+    },
+    "consumers": [
+      "player"
+    ]
+  },
+  "say": {
+    "EN": "That's none of your business.",
+    "TL": "Wala ka nang pakialam."
+  }
+}

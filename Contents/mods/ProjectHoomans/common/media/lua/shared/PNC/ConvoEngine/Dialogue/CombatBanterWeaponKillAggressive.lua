@@ -778,6 +778,14 @@ return {
                 ["textRole"] = "spoken_action",
             },
             ["namespace"] = "combat.kill.killer.aggressive",
+            ["slots"] = {
+                ["weapon"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
             ["textRoles"] = {
                 {
                     ["fallback"] = "This {slot.weapon.name} still shoots straight.",

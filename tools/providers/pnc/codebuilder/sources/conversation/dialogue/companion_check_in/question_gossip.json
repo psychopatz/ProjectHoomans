@@ -1,0 +1,50 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "question",
+  "id": "gossip",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "textNamespace": "UI_PNC_Conversation_Suggestion",
+    "ui": {
+      "id": "question.gossip",
+      "order": 70,
+      "patternID": "pnc.social.gossip_event",
+      "extensions": {
+        "topic": "gossip"
+      },
+      "hubID": "whats_up",
+      "hubOnly": true,
+      "hubRequiresSafeGossip": true,
+      "intent": "GOSSIP",
+      "speechAct": "GOSSIP",
+      "subject": "GOSSIP",
+      "topic": "gossip",
+      "domain": "gossip"
+    }
+  },
+  "invoke": {
+    "patternID": "pnc.social.gossip_event",
+    "intent": "GOSSIP",
+    "speechAct": "GOSSIP",
+    "subject": "GOSSIP",
+    "topic": "gossip"
+  },
+  "affordance": {
+    "label": {
+      "EN": "Ask about gossip",
+      "TL": "Magtanong tungkol sa tsismis"
+    },
+    "consumers": [
+      "player",
+      "npc"
+    ],
+    "groups": [
+      "gossip"
+    ]
+  },
+  "say": {
+    "EN": "Any gossip?",
+    "TL": "May narinig ka bang tsismis?"
+  }
+}

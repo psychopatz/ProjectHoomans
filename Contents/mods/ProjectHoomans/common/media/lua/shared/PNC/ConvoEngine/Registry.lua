@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/ConvoEngine/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "0c0dd14df241eb4b742a95ede0729f2131a3ac66d66cb1497ea50aff9d9e9e39"
-Registry.WHOLE_MODEL_FINGERPRINT = "d928b3977ed5ac186eb549996cac3dc79620ae6f8200b966dd9d02600422fe93"
+Registry.WHOLE_MODEL_FINGERPRINT = "15b1b92bc9c9eee6ecac482992dad5cdb347839a72e0f3d323379db5e6d25198"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -20,6 +20,7 @@ Registry.BEATS = {}
 Registry.PACKS = {}
 Registry.CONVO_PLANS = {}
 Registry.CONVO_RESPONSE_TEMPLATES = {}
+Registry.CONVO_REPLY_INDEX = {}
 Registry.UI = {}
 local function appendContent(loaded)
     if type(loaded) ~= "table" then return end
@@ -66,6 +67,17 @@ local function appendConvoPlans(loaded)
             end
             if type(value.exchangeFamily) == "table" or (type(payload) == "table" and payload.say ~= nil) then
                 Registry.CONVO_RESPONSE_TEMPLATES[tostring(value.id)] = true
+            end
+            local replies = type(value.exchangeFamily) == "table" and value.exchangeFamily.replies or nil
+            if type(replies) == "table" then
+                for outcomeName, _ in pairs(replies) do
+                    local outcomeTemplateID = tostring(value.id) .. "." .. tostring(outcomeName)
+                    Registry.CONVO_RESPONSE_TEMPLATES[outcomeTemplateID] = true
+                    Registry.CONVO_REPLY_INDEX[outcomeTemplateID] = {
+                        plan = value,
+                        outcome = tostring(outcomeName),
+                    }
+                end
             end
             local outputs = type(payload) == "table" and payload.outputs or nil
             if type(outputs) == "table" then
@@ -129,8 +141,8 @@ appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions"
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CompanionCheckIn")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle__a59922ab")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle__82a5588b")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle__3899a7d0")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle__7d8bcf74")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CompanionCommandsPlayer")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CompanionCommandsReplies__a9d02707")
@@ -149,7 +161,7 @@ appendConvoPlans(require "PNC/ConvoEngine/Dialogue/EventReactionsLeaderLoss")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/EventReactionsSafety")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/EventReactionsSocial")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/HealthContent")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/HealthContent__33576e7d")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/HealthContent__f18c9e18")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/MedicalEventCall")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/MedicalEventOverview")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/MedicalEventRepeat")
@@ -187,10 +199,10 @@ appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation_
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__f0e430f3")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesBound__25339a92")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle__b4a76fdc")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle__2b27b80d")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle__f0e914b3")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle__f61ddfca")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskToolReplies")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskToolReplies__fc2eba07")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskToolReplies__adda9390")
@@ -242,5 +254,8 @@ function Registry.PlayerChoice(contentID)
 end
 function Registry.ConvoPlan(planID)
     return Registry.CONVO_PLANS[tostring(planID or "")]
+end
+function Registry.ConvoOutcome(templateID)
+    return Registry.CONVO_REPLY_INDEX[tostring(templateID or "")]
 end
 return Registry

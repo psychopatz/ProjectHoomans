@@ -1,0 +1,40 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "ui.suggestion",
+  "id": "wait_at",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textTarget": "UI_PNC_Conversation",
+    "textRows": [
+      {
+        "key": "suggestion.wait_at.label",
+        "text": {
+          "EN": "Ask them to wait there",
+          "TL": "Sabihing maghintay siya roon"
+        }
+      },
+      {
+        "key": "suggestion.wait_at.utterance",
+        "text": {
+          "EN": "Wait there.",
+          "TL": "Maghintay ka roon."
+        }
+      }
+    ]
+  },
+  "affordance": {
+    "label": {
+      "EN": "Ask them to wait there",
+      "TL": "Sabihing maghintay siya roon"
+    },
+    "consumers": [
+      "player"
+    ]
+  },
+  "say": {
+    "EN": "Wait there.",
+    "TL": "Maghintay ka roon."
+  }
+}

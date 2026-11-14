@@ -1,0 +1,56 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "question",
+  "id": "health",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "textNamespace": "UI_PNC_Conversation_Suggestion",
+    "ui": {
+      "id": "question.health",
+      "order": 40,
+      "patternID": "pnc.question.health.are_you_hurt",
+      "extensions": {
+        "topic": "medical"
+      },
+      "hubAudience": "owned_companion",
+      "hubID": "whats_up",
+      "intent": "QUESTION",
+      "slots": {
+        "attribute": "health_state"
+      },
+      "speechAct": "QUESTION",
+      "subject": "NPC_HEALTH_STATE",
+      "target": "SELF",
+      "topic": "medical",
+      "domain": "medical"
+    }
+  },
+  "invoke": {
+    "patternID": "pnc.question.health.are_you_hurt",
+    "intent": "QUESTION",
+    "speechAct": "QUESTION",
+    "subject": "NPC_HEALTH_STATE",
+    "topic": "medical"
+  },
+  "affordance": {
+    "label": {
+      "EN": "Ask about injuries",
+      "TL": "Itanong ang mga sugat"
+    },
+    "consumers": [
+      "player",
+      "npc"
+    ],
+    "groups": [
+      "medical"
+    ],
+    "utility": {
+      "care": 1.2
+    }
+  },
+  "say": {
+    "EN": "Are you hurt?",
+    "TL": "Nasaktan ka ba?"
+  }
+}

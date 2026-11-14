@@ -1,0 +1,40 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "ui.suggestion",
+  "id": "greeting_thank",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textTarget": "UI_PNC_Conversation",
+    "textRows": [
+      {
+        "key": "suggestion.greeting_thank.label",
+        "text": {
+          "EN": "Thank them",
+          "TL": "Pasalamatan siya"
+        }
+      },
+      {
+        "key": "suggestion.greeting_thank.utterance",
+        "text": {
+          "EN": "Thanks.",
+          "TL": "Salamat."
+        }
+      }
+    ]
+  },
+  "affordance": {
+    "label": {
+      "EN": "Thank them",
+      "TL": "Pasalamatan siya"
+    },
+    "consumers": [
+      "player"
+    ]
+  },
+  "say": {
+    "EN": "Thanks.",
+    "TL": "Salamat."
+  }
+}

@@ -7,6 +7,9 @@ return {
         },
         ["id"] = "needs.member.support",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "gift",
+        },
         ["source"] = "adopters/hoomans/dialogue/needs_support/needs_member_support.json",
     },
     ["needs.neutral.support"] = {
@@ -16,6 +19,9 @@ return {
         },
         ["id"] = "needs.neutral.support",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "gift",
+        },
         ["source"] = "adopters/hoomans/dialogue/needs_support/needs_neutral_support.json",
     },
     ["needs.special.support"] = {
@@ -25,6 +31,9 @@ return {
         },
         ["id"] = "needs.special.support",
         ["kind"] = "dialogue",
+        ["related"] = {
+            "gift",
+        },
         ["source"] = "adopters/hoomans/dialogue/needs_support/needs_special_support.json",
     },
 }

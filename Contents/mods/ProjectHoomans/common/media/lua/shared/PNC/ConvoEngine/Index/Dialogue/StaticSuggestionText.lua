@@ -18,59 +18,23 @@ return {
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_back_label.json",
     },
-    ["ui.suggestion.check_in.label"] = {
+    ["ui.suggestion.check_in"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
         },
-        ["id"] = "ui.suggestion.check_in.label",
+        ["id"] = "ui.suggestion.check_in",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_check_in_label.json",
+        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_check_in.json",
     },
-    ["ui.suggestion.check_in.utterance"] = {
+    ["ui.suggestion.companion_camp"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
         },
-        ["id"] = "ui.suggestion.check_in.utterance",
+        ["id"] = "ui.suggestion.companion_camp",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_check_in_utterance.json",
-    },
-    ["ui.suggestion.companion_camp.label"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        },
-        ["id"] = "ui.suggestion.companion_camp.label",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_label.json",
-    },
-    ["ui.suggestion.companion_camp_here.utterance"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        },
-        ["id"] = "ui.suggestion.companion_camp_here.utterance",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_here_utterance.json",
-    },
-    ["ui.suggestion.companion_camp_room.utterance"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        },
-        ["id"] = "ui.suggestion.companion_camp_room.utterance",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_room_utterance.json",
-    },
-    ["ui.suggestion.companion_campfire.utterance"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        },
-        ["id"] = "ui.suggestion.companion_campfire.utterance",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_campfire_utterance.json",
+        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp.json",
     },
     ["ui.suggestion.companion_orders.label"] = {
         ["domain"] = "static_suggestion_text",
@@ -81,59 +45,32 @@ return {
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_orders_label.json",
     },
-    ["ui.suggestion.follow.label"] = {
+    ["ui.suggestion.follow"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
         },
-        ["id"] = "ui.suggestion.follow.label",
+        ["id"] = "ui.suggestion.follow",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_follow_label.json",
+        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_follow.json",
     },
-    ["ui.suggestion.follow.utterance"] = {
+    ["ui.suggestion.greeting_report_fine"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
         },
-        ["id"] = "ui.suggestion.follow.utterance",
+        ["id"] = "ui.suggestion.greeting_report_fine",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_follow_utterance.json",
+        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine.json",
     },
-    ["ui.suggestion.greeting_report_fine.label"] = {
+    ["ui.suggestion.greeting_thank"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
         },
-        ["id"] = "ui.suggestion.greeting_report_fine.label",
+        ["id"] = "ui.suggestion.greeting_thank",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine_label.json",
-    },
-    ["ui.suggestion.greeting_report_fine.utterance"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        },
-        ["id"] = "ui.suggestion.greeting_report_fine.utterance",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine_utterance.json",
-    },
-    ["ui.suggestion.greeting_thank.label"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        },
-        ["id"] = "ui.suggestion.greeting_thank.label",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_thank_label.json",
-    },
-    ["ui.suggestion.greeting_thank.utterance"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        },
-        ["id"] = "ui.suggestion.greeting_thank.utterance",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_thank_utterance.json",
+        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_thank.json",
     },
     ["ui.suggestion.group.actions.label"] = {
         ["domain"] = "static_suggestion_text",
@@ -252,109 +189,64 @@ return {
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_group_whats_up_label.json",
     },
-    ["ui.suggestion.identity.lie.label"] = {
+    ["ui.suggestion.identity.lie"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
         },
-        ["id"] = "ui.suggestion.identity.lie.label",
+        ["id"] = "ui.suggestion.identity.lie",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie_label.json",
+        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie.json",
     },
-    ["ui.suggestion.identity.lie.utterance"] = {
+    ["ui.suggestion.identity.real"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
         },
-        ["id"] = "ui.suggestion.identity.lie.utterance",
+        ["id"] = "ui.suggestion.identity.real",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie_utterance.json",
+        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_real.json",
     },
-    ["ui.suggestion.identity.real.label"] = {
+    ["ui.suggestion.identity.rude"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
         },
-        ["id"] = "ui.suggestion.identity.real.label",
+        ["id"] = "ui.suggestion.identity.rude",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_real_label.json",
-    },
-    ["ui.suggestion.identity.real.utterance"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
-        },
-        ["id"] = "ui.suggestion.identity.real.utterance",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_real_utterance.json",
-    },
-    ["ui.suggestion.identity.rude.label"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
-        },
-        ["id"] = "ui.suggestion.identity.rude.label",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_rude_label.json",
-    },
-    ["ui.suggestion.identity.rude.utterance"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
-        },
-        ["id"] = "ui.suggestion.identity.rude.utterance",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_rude_utterance.json",
+        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_rude.json",
     },
     ["ui.suggestion.needs_destination.tooltip"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
         },
         ["id"] = "ui.suggestion.needs_destination.tooltip",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_needs_destination_tooltip.json",
     },
-    ["ui.suggestion.personal_check_in.label"] = {
+    ["ui.suggestion.personal_check_in"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
         },
-        ["id"] = "ui.suggestion.personal_check_in.label",
+        ["id"] = "ui.suggestion.personal_check_in",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_personal_check_in_label.json",
+        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_personal_check_in.json",
     },
-    ["ui.suggestion.personal_check_in.utterance"] = {
+    ["ui.suggestion.stay"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
         },
-        ["id"] = "ui.suggestion.personal_check_in.utterance",
+        ["id"] = "ui.suggestion.stay",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_personal_check_in_utterance.json",
-    },
-    ["ui.suggestion.stay.label"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
-        },
-        ["id"] = "ui.suggestion.stay.label",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_stay_label.json",
-    },
-    ["ui.suggestion.stay.utterance"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
-        },
-        ["id"] = "ui.suggestion.stay.utterance",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_stay_utterance.json",
+        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_stay.json",
     },
     ["ui.suggestion.talk_again_about.label"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
         },
         ["id"] = "ui.suggestion.talk_again_about.label",
         ["kind"] = "dialogue",
@@ -363,61 +255,43 @@ return {
     ["ui.suggestion.talk_something_else.label"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
         },
         ["id"] = "ui.suggestion.talk_something_else.label",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_talk_something_else_label.json",
     },
-    ["ui.suggestion.trade.label"] = {
+    ["ui.suggestion.trade"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
         },
-        ["id"] = "ui.suggestion.trade.label",
+        ["id"] = "ui.suggestion.trade",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_trade_label.json",
-    },
-    ["ui.suggestion.trade.utterance"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
-        },
-        ["id"] = "ui.suggestion.trade.utterance",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_trade_utterance.json",
+        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_trade.json",
     },
     ["ui.suggestion.unavailable.tooltip"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
         },
         ["id"] = "ui.suggestion.unavailable.tooltip",
         ["kind"] = "dialogue",
         ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_unavailable_tooltip.json",
     },
-    ["ui.suggestion.wait_at.label"] = {
+    ["ui.suggestion.wait_at"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
         },
-        ["id"] = "ui.suggestion.wait_at.label",
+        ["id"] = "ui.suggestion.wait_at",
         ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_wait_at_label.json",
-    },
-    ["ui.suggestion.wait_at.utterance"] = {
-        ["domain"] = "static_suggestion_text",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
-        },
-        ["id"] = "ui.suggestion.wait_at.utterance",
-        ["kind"] = "dialogue",
-        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_wait_at_utterance.json",
+        ["source"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_wait_at.json",
     },
     ["ui.suggestion.whats_up.label"] = {
         ["domain"] = "static_suggestion_text",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__285ca74c",
+            "PNC/ConvoEngine/Dialogue/StaticSuggestionText__725d3d75",
         },
         ["id"] = "ui.suggestion.whats_up.label",
         ["kind"] = "dialogue",

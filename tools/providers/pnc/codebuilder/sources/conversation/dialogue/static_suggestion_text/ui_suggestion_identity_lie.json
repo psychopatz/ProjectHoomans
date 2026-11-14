@@ -1,0 +1,40 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "ui.suggestion.identity",
+  "id": "lie",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textTarget": "UI_PNC_Conversation",
+    "textRows": [
+      {
+        "key": "suggestion.identity.lie.label",
+        "text": {
+          "EN": "Lie about your name",
+          "TL": "Magsinungaling tungkol sa pangalan"
+        }
+      },
+      {
+        "key": "suggestion.identity.lie.utterance",
+        "text": {
+          "EN": "I'll go by a different name.",
+          "TL": "Ibang pangalan ang gagamitin ko."
+        }
+      }
+    ]
+  },
+  "affordance": {
+    "label": {
+      "EN": "Lie about your name",
+      "TL": "Magsinungaling tungkol sa pangalan"
+    },
+    "consumers": [
+      "player"
+    ]
+  },
+  "say": {
+    "EN": "I'll go by a different name.",
+    "TL": "Ibang pangalan ang gagamitin ko."
+  }
+}

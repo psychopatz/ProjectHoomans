@@ -1,0 +1,110 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "quest.clinic_supplies",
+  "id": "accept",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:quest_content",
+    "contentOwner": "projecthoomans.dialogue_content.quest",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+    "responseAct": "REACT"
+  },
+  "reply": {
+    "queued": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I'll bring the clinic supplies.",
+          "I've got the clinic supply run on my list.",
+          "I'll gather the medical gear as soon as I can.",
+          "Count on me for the clinic supplies.",
+          "I'll track down those medical items for you.",
+          "Queued up. I'll secure those clinic supplies.",
+          "I'm on it. I'll deliver the clinic supplies.",
+          "Medical supplies are queued. I'll get them.",
+          "I'll fetch what the clinic needs.",
+          "Accepted. I'll bring back those clinic supplies."
+        ],
+        "TL": [
+          "Dadalahin ko ang mga suplay ng klinika.",
+          "Nasa listahan ko na ang pagkuha ng suplay para sa klinika.",
+          "Kukunin ko ang mga gamot sa lalong madaling panahon.",
+          "Asahan mo ako sa mga suplay ng klinika.",
+          "Hahanapin ko ang mga gamot na 'yon para sa'yo.",
+          "Nakalista na. Kukunin ko ang mga suplay sa klinika.",
+          "Ako na bahala. Ihahatid ko ang mga suplay ng klinika.",
+          "Nakatala na ang mga medikal na suplay. Kukunin ko.",
+          "Kukunin ko kung ano ang kailangan ng klinika.",
+          "Tinanggap ko na. Dadalhin ko pabalik ang mga suplay sa klinika."
+        ]
+      }
+    },
+    "rejected": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I can't accept that request right now.",
+          "I'm not in a position to take that on.",
+          "Too much on my plate. Can't accept the clinic run.",
+          "Not right now. I have to pass on that request.",
+          "I can't commit to gathering clinic supplies today.",
+          "I have to turn that down for now.",
+          "Can't help with the clinic run at the moment.",
+          "I won't be taking that request.",
+          "Sorry, I can't agree to that right now.",
+          "I must decline that medical supply task."
+        ],
+        "TL": [
+          "Hindi ko matatanggap ang kahilingang iyon ngayon.",
+          "Wala ako sa posisyong balikatin 'yan.",
+          "Masyado akong maraming ginagawa. Hindi ko matatanggap ang klinika.",
+          "Hindi muna ngayon. Tatanggihan ko muna ang kahilingang 'yan.",
+          "Hindi ako makakapangakong mag-ipon ng suplay sa klinika ngayon.",
+          "Kailangan ko munang tanggihan 'yan sa ngayon.",
+          "Hindi makakatulong sa klinika sa ngayon.",
+          "Hindi ko tatanggapin ang kahilingang 'yan.",
+          "Pasensya na, hindi ako makakapayag diyan ngayon.",
+          "Kailangan kong tanggihan ang gawaing medikal na 'yan."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I couldn't accept that request.",
+          "Something went wrong. I couldn't take that on.",
+          "I wasn't able to accept the clinic supply run.",
+          "Unable to commit to that medical task right now.",
+          "The request failed to go through on my end.",
+          "I can't lock that clinic mission in.",
+          "Couldn't confirm that request. Try again later.",
+          "Accepting that task didn't work out.",
+          "I couldn't take on the supplies task right now.",
+          "That request couldn't be accepted."
+        ],
+        "TL": [
+          "Hindi ko matanggap ang kahilingang iyon.",
+          "May nagkaproblema. Hindi ko magawang tanggapin 'yan.",
+          "Hindi ko nagawang tanggapin ang pagkuha ng suplay sa klinika.",
+          "Hindi makakapangako sa medikal na gawaing 'yan ngayon.",
+          "Hindi pumasok ang kahilingan sa panig ko.",
+          "Hindi ko maitalaga ang misyong 'yan sa klinika.",
+          "Hindi makumpirma ang kahilingang 'yan. Subukan ulit mamaya.",
+          "Hindi nagtagumpay ang pagtanggap sa gawaing 'yan.",
+          "Hindi ko kayang balikatin ang gawain sa suplay ngayon.",
+          "Hindi natanggap ang kahilingang iyon."
+        ]
+      }
+    }
+  }
+}

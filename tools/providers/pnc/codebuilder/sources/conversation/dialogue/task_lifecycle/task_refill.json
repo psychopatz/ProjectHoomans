@@ -1,0 +1,168 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "task",
+  "id": "refill",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/refill.json",
+    "responseAct": "REACT"
+  },
+  "reply": {
+    "admitted": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I'll refill that.",
+          "Understood. Topping up the water supply.",
+          "I'll go get the bottles filled.",
+          "All right, refilling the containers.",
+          "Good call. We need full canteens.",
+          "I'll take it to the water source.",
+          "Understood. Refilling immediately.",
+          "Right. Getting fresh water.",
+          "I'll refill what's empty.",
+          "Sounds good. Heading to refill."
+        ],
+        "TL": [
+          "Lalagyan ko ng laman iyon.",
+          "Naintindihan. Pupunuin ang supply ng tubig.",
+          "Pupunta ako para punuin ang mga bote.",
+          "Sige, pupunuin ang mga lalagyan.",
+          "Magandang paalala. Kailangan natin ng punong sisidlan.",
+          "Dadalhin ko sa pinagkukunan ng tubig.",
+          "Naiintindihan ko. Pupunuin agad.",
+          "Sige. Kukuha ng sariwang tubig.",
+          "Pupunuin ko ang walang laman.",
+          "Maganda 'yan. Pupunta para magpuno."
+        ]
+      }
+    },
+    "active": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "Refilling the container now.",
+          "Currently filling up on water.",
+          "Topping off the fluids right now.",
+          "Working on refilling the bottle.",
+          "Gathering water into the container.",
+          "In the middle of refilling.",
+          "Refilling as instructed.",
+          "Collecting clean water now.",
+          "Topping it up. Give me a moment.",
+          "Refill in progress."
+        ],
+        "TL": [
+          "Nilalagyan ng laman ang lalagyan ngayon.",
+          "Kasalukuyang nagpapasok ng tubig.",
+          "Pinupuno ang inumin ngayon.",
+          "Pinupuno ang bote.",
+          "Kumukuha ng tubig sa lalagyan.",
+          "Kasalukuyang nagpupuno.",
+          "Nagpupuno ayon sa utos.",
+          "Kumukuha ng malinis na tubig ngayon.",
+          "Pinupuno ito. Sandali lang.",
+          "Kasalukuyang nagpupuno."
+        ]
+      }
+    },
+    "completed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "All topped off. Container is full.",
+          "Refill complete. Ready for the road.",
+          "Finished refilling with clean water.",
+          "Bottles are full again.",
+          "Task done. Plenty of water now.",
+          "Refilled and secured.",
+          "Canteens are full. Good work.",
+          "All filled up.",
+          "Water refilled successfully.",
+          "Completed refilling the supply."
+        ],
+        "TL": [
+          "Puno na lahat. Punong-puno ang lalagyan.",
+          "Tapos na ang pagpuno. Handa na sa paglakad.",
+          "Tapos nang lagyan ng malinis na tubig.",
+          "Puno na muli ang mga bote.",
+          "Tapos na ang gawain. Marami nang tubig ngayon.",
+          "Napuno na at naselyuhan.",
+          "Puno na ang mga sisidlan. Magaling.",
+          "Puno na ang lahat.",
+          "Matagumpay na nalagyan ng tubig.",
+          "Natapos ang pagpuno sa supply."
+        ]
+      }
+    },
+    "rejected": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I can't refill that right now.",
+          "There is no known clean water source nearby.",
+          "The container is already completely full.",
+          "Too exposed to stand around pumping water.",
+          "I won't approach that water source. It's a death trap.",
+          "Can't refill. No suitable vessel available.",
+          "Refill order rejected. Bad timing.",
+          "Water is tainted there. I refuse to collect it.",
+          "We need to deal with threats before refilling.",
+          "I can't refill that under current danger."
+        ],
+        "TL": [
+          "Hindi ko malalagyan ng laman iyon ngayon.",
+          "Walang kilalang malinis na tubig sa malapit.",
+          "Puno na ang lalagyan.",
+          "Masyadong lantad para magbomba ng tubig.",
+          "Di ako lalapit sa tubig na 'yan. Bitag 'yan.",
+          "Di makapagpuno. Walang angkop na sisidlan.",
+          "Tinatanggihan ang pagpuno. Maling oras.",
+          "Marumi ang tubig doon. Tumatanggi akong kumuha.",
+          "Harapin muna natin ang banta bago magpuno.",
+          "Di ko malalagyan 'yan sa gitna ng panganib."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I couldn't refill that.",
+          "The water source was dry or cut off.",
+          "Failed to refill. Water was contaminated.",
+          "I was interrupted while trying to gather water.",
+          "Unable to find a functional water tap.",
+          "Container is damaged or cracked. Refill failed.",
+          "Couldn't reach the source safely.",
+          "Hostiles near the water source. Refill aborted.",
+          "Action failed. Bottle still empty.",
+          "Could not refill container."
+        ],
+        "TL": [
+          "Hindi ko nalagyan ng laman iyon.",
+          "Tuyot o putol ang pinagkukunan ng tubig.",
+          "Bigo sa pagpuno. Kontaminado ang tubig.",
+          "Naabala ako habang sumusubok kumuha ng tubig.",
+          "Walang makitang gumaganang gripo.",
+          "May basag ang lalagyan. Pumalpak ang pagpuno.",
+          "Di maabot ang pinagkukunan nang ligtas.",
+          "May kalaban malapit sa tubig. Itinigil ang pagpuno.",
+          "Bigo ang kilos. Walang laman pa rin ang bote.",
+          "Hindi napuno ang lalagyan."
+        ]
+      }
+    }
+  }
+}

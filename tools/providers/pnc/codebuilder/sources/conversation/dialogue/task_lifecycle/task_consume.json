@@ -1,0 +1,168 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "task",
+  "id": "consume",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/consume.json",
+    "responseAct": "REACT"
+  },
+  "reply": {
+    "admitted": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I'll use that.",
+          "Understood. I will consume that item.",
+          "All right, I'll take that.",
+          "Good idea. I'll use it.",
+          "Got it. Taking that now.",
+          "I'll go ahead and apply that.",
+          "Understood. That will help.",
+          "Right. Using that item.",
+          "I'll use what you specified.",
+          "Sounds good. Consuming it."
+        ],
+        "TL": [
+          "Gagamitin ko iyon.",
+          "Naintindihan. Gagamitin ko ang bagay na iyon.",
+          "Sige, gagamitin ko iyon.",
+          "Magandang ideya. Gagamitin ko.",
+          "Nakuha ko. Gagamitin na ngayon.",
+          "Sige, ilalapat ko iyan.",
+          "Naiintindihan ko. Makatutulong iyan.",
+          "Sige. Gagamitin ang gamit na 'yan.",
+          "Gagamitin ko ang tinukoy mo.",
+          "Maganda 'yan. Gagamitin na."
+        ]
+      }
+    },
+    "active": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I'm using that now.",
+          "Currently using the item.",
+          "Applying it right now.",
+          "In the middle of consuming that.",
+          "Working through this item.",
+          "Taking this now. Give me a second.",
+          "Using the supplies as requested.",
+          "Consuming it right now.",
+          "Holding still to use this.",
+          "Using it. Almost done."
+        ],
+        "TL": [
+          "Ginagamit ko na iyon ngayon.",
+          "Kasalukuyang ginagamit ang gamit.",
+          "Inilalapat na ngayon.",
+          "Kasalukuyang ginagamit iyan.",
+          "Ginagamit ang bagay na ito.",
+          "Ginagamit ko na ito. Bigyan mo ako ng sandali.",
+          "Ginagamit ang mga kagamitan ayon sa hiling.",
+          "Ginagamit ko na ngayon.",
+          "Nakahinto para gamitin ito.",
+          "Ginagamit na. Halos tapos na."
+        ]
+      }
+    },
+    "completed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "That's done.",
+          "Finished using that.",
+          "All used up. Feeling better.",
+          "Done. That helped out.",
+          "Finished consuming the item.",
+          "That's taken care of.",
+          "All done with that supply.",
+          "Consumed. Ready to move on.",
+          "Finished. Much needed.",
+          "Done. Put to good use."
+        ],
+        "TL": [
+          "Tapos na iyon.",
+          "Tapos nang gamitin iyon.",
+          "Naubos na. Mas maayos na ang pakiramdam.",
+          "Tapos na. Nakatulong iyon.",
+          "Natapos nang gamitin ang bagay.",
+          "Naasikaso na iyon.",
+          "Tapos na sa gamit na 'yon.",
+          "Nagamit na. Handa nang magpatuloy.",
+          "Tapos na. Kailangan ko talaga 'yon.",
+          "Tapos na. Nagamit nang maayos."
+        ]
+      }
+    },
+    "rejected": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I can't use that right now.",
+          "I don't need to use that at the moment.",
+          "That's not suitable for me right now.",
+          "Unable to consume that. Not needed.",
+          "I can't use that under these conditions.",
+          "Save it for later. I don't need it now.",
+          "Refusing to consume that. Not appropriate.",
+          "I don't have a use for that right now.",
+          "Can't use that. Not the right time.",
+          "Consume order rejected."
+        ],
+        "TL": [
+          "Hindi ko magamit iyon ngayon.",
+          "Di ko kailangang gamitin iyan sa sandaling ito.",
+          "Di angkop sa akin 'yan ngayon.",
+          "Di magagamit 'yan. Di kailangan.",
+          "Di ko magagamit 'yan sa ganitong kalagayan.",
+          "Itabi mo muna. Di ko kailangan ngayon.",
+          "Tumatangging gamitin 'yan. Di nararapat.",
+          "Wala akong paggagamitan niyan ngayon.",
+          "Di magagamit 'yan. Maling oras.",
+          "Tinatanggihan ang utos na gamitin."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I couldn't use that.",
+          "Failed to consume that item.",
+          "Something interrupted me while trying to use that.",
+          "Couldn't finish using it.",
+          "Unable to apply that right now.",
+          "Using that failed. Something went wrong.",
+          "I lost hold of it or couldn't use it.",
+          "Couldn't consume it. Area wasn't secure.",
+          "Action interrupted. Item not consumed.",
+          "Failed to take that."
+        ],
+        "TL": [
+          "Hindi ko nagamit iyon.",
+          "Bigo sa paggamit ng bagay na iyon.",
+          "May umabala sa akin habang sinusubukang gamitin iyon.",
+          "Di natapos gamitin.",
+          "Di mailapat iyan sa ngayon.",
+          "Pumalpak ang paggamit. May nangyaring mali.",
+          "Nabitawan ko o di nagamit.",
+          "Di nagamit. Di ligtas ang paligid.",
+          "Naabala ang kilos. Di nagamit ang bagay.",
+          "Bigo sa paggamit niyan."
+        ]
+      }
+    }
+  }
+}

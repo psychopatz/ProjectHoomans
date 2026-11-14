@@ -2,7 +2,7 @@
 return {
     ["pack.DT.trader_story"] = {
         ["dependents"] = {
-            "trade.conversation.suggestions",
+            "trade.conversation.suggestions_recognition",
         },
         ["domain"] = "trading",
         ["generated"] = {
@@ -10,6 +10,6 @@ return {
         },
         ["id"] = "pack.DT.trader_story",
         ["kind"] = "pack",
-        ["source"] = "adopters/dt/dialogue/trading/trade_conversation_suggestions.json",
+        ["source"] = "adopters/dt/dialogue/trading/suggestions_recognition.json",
     },
 }

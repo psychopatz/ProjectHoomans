@@ -1,0 +1,235 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "command",
+  "id": "camp",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/camp.json",
+    "responseAct": "REPLY"
+  },
+  "reply": {
+    "queued": {
+      "act": "REPLY",
+      "say": {
+        "1": {
+          "variants": [
+            {
+              "id": "neutral",
+              "text": {
+                "EN": [
+                  "Okay, I'll set up camp there.",
+                  "Understood. Setting up our camp now.",
+                  "I'll go get the camp established.",
+                  "On my way to set up camp.",
+                  "Making camp in that spot. Understood.",
+                  "Right. Setting up shelter over there.",
+                  "I'll secure the camp site now.",
+                  "Moving to establish camp as ordered.",
+                  "Got it. Pitching camp.",
+                  "Understood. Heading over to make camp."
+                ],
+                "TL": [
+                  "Sige, magse-set up ako ng kampo roon.",
+                  "Naintindihan. Itatayo na ang kampo natin ngayon.",
+                  "Pupunta ako para itayo ang kampo.",
+                  "Papunta na para magtayo ng kampo.",
+                  "Magtatayo ng kampo sa pwestong 'yon. Naintindihan.",
+                  "Sige. Magtatayo ng silungan doon.",
+                  "Seselyuhan ko ang kampo ngayon.",
+                  "Kikilos para magtayo ng kampo ayon sa utos.",
+                  "Nakuha ko. Maglalatag ng kampo.",
+                  "Naiintindihan ko. Pupunta roon para magkampo."
+                ]
+              }
+            },
+            {
+              "id": "friendly",
+              "text": {
+                "EN": [
+                  "Sure, I'll set up camp there. Sounds cozy.",
+                  "Happy to! Let's get a good fire going.",
+                  "Good call, friend. I'll get our camp ready.",
+                  "Leave it to me! I'll make sure it's safe and comfortable.",
+                  "Great idea. I'll go set up camp for us.",
+                  "Right on! Time to get off our feet. Setting up now.",
+                  "Gladly. I'll have the beds laid out shortly.",
+                  "Sounds wonderful. I'll get our shelter squared away.",
+                  "Sure thing, partner! Camp will be ready in no time.",
+                  "On it, friend! Rest easy, I'll handle camp."
+                ],
+                "TL": [
+                  "Sige, magse-set up ako ng kampo roon. Mukhang maaliwalas.",
+                  "Masayang gagawin! Magpaningas tayo ng maayos na apoy.",
+                  "Magandang pasya, kaibigan. Ihahanda ko ang kampo.",
+                  "Ipaubaya mo sa akin! Titiyakin kong ligtas at komportable.",
+                  "Magandang ideya. Pupunta ako para itayo ang kampo natin.",
+                  "Aba oo! Oras na para magpahinga. Magtatayo na ngayon.",
+                  "Malugod kong gagawin. Ilalatag ko ang higaan maya-maya.",
+                  "Napakaganda. Aayusin ko ang silungan natin.",
+                  "Walang anuman, kasama! Handa na ang kampo agad.",
+                  "Inaasikaso na, kaibigan! Magpahinga ka, ako na sa kampo."
+                ]
+              }
+            },
+            {
+              "id": "repeated",
+              "text": {
+                "EN": [
+                  "I'm still setting up camp there.",
+                  "Already working on the camp. Give me a minute.",
+                  "Still on it. Setting up takes a little time.",
+                  "I'm already pitching the camp there.",
+                  "Working as fast as I can on that camp.",
+                  "Yeah, I heard you the first time. Still making camp.",
+                  "I'm already in the middle of setting up.",
+                  "Camp setup is already in progress.",
+                  "Still securing the campsite. Hold tight.",
+                  "Almost done with the camp. Don't rush me."
+                ],
+                "TL": [
+                  "Nagtatayo pa rin ako ng kampo roon.",
+                  "Ginagawa ko na ang kampo. Bigyan mo ako ng sandali.",
+                  "Inaasikaso pa rin. May katagalan ang pagtatayo.",
+                  "Naglalatag na ako ng kampo roon.",
+                  "Ginagawa ko nang mabilis ang kampong 'yon.",
+                  "Oo, narinig ko sa una pa lang. Ginagawa pa rin ang kampo.",
+                  "Kasalukuyan na akong nagtatayo roon.",
+                  "Kasalukuyan nang isinasagawa ang pagkakampo.",
+                  "Sinisigurado pa rin ang kampo. Maghintay lang.",
+                  "Halos tapos na sa kampo. Huwag mo akong madaliin."
+                ]
+              }
+            },
+            {
+              "id": "trusted",
+              "text": {
+                "EN": [
+                  "All right, I'll make camp there.",
+                  "I trust your eye for good ground. Setting up camp.",
+                  "You picked the spot, I'll build the shelter.",
+                  "Understood. I'll make sure our campsite is locked down tight.",
+                  "I know you've got our safety in mind. Making camp.",
+                  "Right away. We'll be secure there together.",
+                  "I'll get it ready for both of us.",
+                  "Trust your judgment completely. Camp is going up.",
+                  "Setting up camp. We earned this rest.",
+                  "Good call, partner. I'll secure the camp perimeter."
+                ],
+                "TL": [
+                  "Sige, magtatayo ako ng kampo roon.",
+                  "Tiwala ako sa pagpili mo ng lupa. Magtatayo ng kampo.",
+                  "Pinili mo ang pwesto, itatayo ko ang silungan.",
+                  "Naintindihan. Titiyakin kong saradong-sarado ang kampo natin.",
+                  "Alam kong kaligtasan natin ang iniisip mo. Magkakampo.",
+                  "Agad-agad. Ligtas tayo roon nang magkasama.",
+                  "Ihahanda ko para sa ating dalawa.",
+                  "Lubos akong nagtitiwala sa pasya mo. Itatayo na ang kampo.",
+                  "Nagtatayo ng kampo. Karapat-dapat tayo sa pahingang ito.",
+                  "Magandang pasya, kasama. Seselyuhan ko ang paligid ng kampo."
+                ]
+              }
+            },
+            {
+              "id": "withdrawn",
+              "text": {
+                "EN": [
+                  "I'll set up camp there.",
+                  "Fine. Heading over to camp.",
+                  "Understood. Camping.",
+                  "If you say so. I'll make camp.",
+                  "Going to set it up now.",
+                  "All right. Pitching shelter.",
+                  "I'll do it.",
+                  "Making camp. Leave me to it.",
+                  "Fine. Camping there.",
+                  "Heard. Setting up."
+                ],
+                "TL": [
+                  "Magtatayo ako ng kampo roon.",
+                  "Sige. Pupunta roon para magkampo.",
+                  "Naintindihan. Magkakampo.",
+                  "Kung sinasabi mo. Magtatayo ako ng kampo.",
+                  "Pupunta para itayo ngayon.",
+                  "Sige. Magtatayo ng silong.",
+                  "Gagawin ko.",
+                  "Nagtatayo ng kampo. Hayaan mo na ako rito.",
+                  "Sige. Magkakampo roon.",
+                  "Narinig ko. Nagtatayo na."
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "rejected": {
+      "act": "REPLY",
+      "say": {
+        "EN": [
+          "I can't set up camp there right now.",
+          "That spot is far too dangerous to sleep in.",
+          "No way. It's crawling with dead over there.",
+          "I refuse to camp in that area. Find somewhere safer.",
+          "Too exposed. We'd get ambushed in our sleep.",
+          "Can't camp there. No walls, no fire, no cover.",
+          "Not camping there. That's asking to be eaten alive.",
+          "Unable to comply. That position is totally compromised.",
+          "I won't bed down there. Pick another room.",
+          "Camping rejected. We need real security first."
+        ],
+        "TL": [
+          "Hindi ako makapag-set up ng kampo roon ngayon.",
+          "Masyadong mapanganib ang pwestong 'yon para tulugan.",
+          "Ayoko nga. Puno ng patay doon.",
+          "Tumatanggi akong magkampo roon. Maghanap ng mas ligtas.",
+          "Masyadong bukas. Matatambangan tayo habang natutulog.",
+          "Di makapagkampo roon. Walang pader, apoy, o silong.",
+          "Di ako magkakampo roon. Parang nagpapakain tayo nang buhay.",
+          "Di makasusunod. Masyadong dehado ang pwestong 'yan.",
+          "Di ako hihiga roon. Pumili ka ng ibang kwarto.",
+          "Tinatanggihan ang kampo. Kailangan natin ng tunay na kaligtasan."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REPLY",
+      "say": {
+        "EN": [
+          "I couldn't set up camp there.",
+          "Failed to establish camp. That spot wasn't viable.",
+          "I tried to camp there, but it didn't work out.",
+          "Couldn't secure that position for a camp.",
+          "Camp setup failed. The area is too exposed.",
+          "Unable to bed down there. Too many issues.",
+          "That campsite didn't pan out. Too dangerous.",
+          "Attempted to camp, but had to pull out.",
+          "Can't pitch camp there. Ground wasn't secure.",
+          "Camping attempt failed. Finding another spot."
+        ],
+        "TL": [
+          "Hindi ako nakapag-set up ng kampo roon.",
+          "Bigo sa pagtatayo ng kampo. Di angkop ang lugar.",
+          "Sinubukan kong magkampo roon, pero hindi umubra.",
+          "Hindi ma-secure ang pwestong 'yon para sa kampo.",
+          "Pumalpak ang pagtatayo ng kampo. Masyadong bukas ang lugar.",
+          "Di makatulog doon. Masyadong maraming aberya.",
+          "Di umubra ang kampong 'yon. Masyadong mapanganib.",
+          "Sinubukang magkampo, pero kinailangang umurong.",
+          "Di makapaglatag ng kampo roon. Di ligtas ang lupa.",
+          "Bigo ang pagtatangkang magkampo. Maghanap ng iba."
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,398 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "question",
+  "id": "health_state",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:health_content",
+    "contentOwner": "projecthoomans.dialogue_content.health",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/health_state.json",
+    "responseAct": "REACT"
+  },
+  "reply": {
+    "healthy": {
+      "act": "REACT",
+      "say": {
+        "1": {
+          "variants": [
+            {
+              "id": "neutral",
+              "text": {
+                "EN": [
+                  "I'm doing okay.",
+                  "Healthy as can be expected out here.",
+                  "No wounds or sickness bothering me right now.",
+                  "Feeling solid. No injuries to speak of.",
+                  "I'm in good health today, all things considered.",
+                  "Everything's working the way it should.",
+                  "No complaints on the physical side today.",
+                  "Feeling intact and steady. No wounds on me.",
+                  "Health is holding up fine. Ready for work.",
+                  "Not carrying any injuries right now."
+                ],
+                "TL": [
+                  "Ayos lang ako.",
+                  "Malusog naman ayon sa inaasahan dito.",
+                  "Walang sugat o sakit na gumugulo sa akin ngayon.",
+                  "Maayos ang pakiramdam ko. Walang iniindang sugat.",
+                  "Mabuti ang kalusugan ko ngayon, sa kabila ng lahat.",
+                  "Gumagana ang lahat nang maayos sa katawan ko.",
+                  "Walang reklamo sa pisikal kong kalagayan ngayon.",
+                  "Buo at matatag ang pakiramdam ko. Walang sugat sa akin.",
+                  "Maayos ang kalusugan ko. Handa na para sa gawain.",
+                  "Wala akong iniindang anumang sugat ngayon."
+                ]
+              }
+            },
+            {
+              "id": "guarded",
+              "text": {
+                "EN": [
+                  "I'm fine. Don't make a thing of it.",
+                  "Nothing wrong with me. Keep your eyes on the road.",
+                  "No injuries to report. Step back.",
+                  "I'm in fighting shape. Don't worry about me.",
+                  "Not a scratch on me. That's all you get.",
+                  "I'm completely healthy. Leave it alone.",
+                  "Body's holding up just fine. Mind your own health.",
+                  "Clean bill of health. You don't need to inspect me.",
+                  "I'm intact and able-bodied. Let's move on.",
+                  "No wounds, no sickness. Keep your distance."
+                ],
+                "TL": [
+                  "Mabuti ako. Huwag mo nang palakihin.",
+                  "Walang mali sa akin. Tumutok ka sa daan.",
+                  "Walang sugat na dapat sabihin. Umatras ka.",
+                  "Kaya ko pang lumaban. Huwag mo akong alalahanin.",
+                  "Kahit gasgas wala ako. Iyon lang ang masasabi ko.",
+                  "Malusog ako. Huwag mo nang usisain.",
+                  "Maayos ang katawan ko. Asikasuhin mo ang sarili mong kalusugan.",
+                  "Ligtas ako sa anumang sakit. Hindi mo kailangang siyasatin ako.",
+                  "Buo ako at maayos ang katawan. Magpatuloy na tayo.",
+                  "Walang sugat, walang sakit. Lumayo ka."
+                ]
+              }
+            },
+            {
+              "id": "terse",
+              "text": {
+                "EN": [
+                  "I'm okay.",
+                  "Healthy.",
+                  "No injuries.",
+                  "All clear.",
+                  "Fine.",
+                  "Uninjured.",
+                  "Doing fine.",
+                  "No wounds.",
+                  "Good shape.",
+                  "Solid."
+                ],
+                "TL": [
+                  "Ayos lang.",
+                  "Malusog.",
+                  "Walang sugat.",
+                  "Ligtas.",
+                  "Ayos.",
+                  "Walang tama.",
+                  "Maayos.",
+                  "Walang sugat.",
+                  "Magandang kondisyon.",
+                  "Matatag."
+                ]
+              }
+            },
+            {
+              "id": "warm",
+              "text": {
+                "EN": [
+                  "I'm doing okay. Thanks for checking in.",
+                  "Healthy and feeling good today. Truly appreciate you asking.",
+                  "Not a scratch on me. Glad you're keeping an eye out.",
+                  "Feeling strong and healthy, friend. Hope you are too.",
+                  "All intact on my side. Thank you for looking after me.",
+                  "Doing wonderfully, thank you. It's comforting that you asked.",
+                  "In great health today. Ready to face whatever comes our way.",
+                  "Feeling well rested and sound. Appreciate the kind check-in.",
+                  "No bumps or scrapes today. Thank you for caring.",
+                  "I'm doing great, honestly. Let's make sure we both stay that way."
+                ],
+                "TL": [
+                  "Ayos lang ako. Salamat sa pagsuri.",
+                  "Malusog at maganda ang pakiramdam ko ngayon. Salamat sa pagtatanong.",
+                  "Kahit gasgas wala ako. Salamat sa pagbabantay.",
+                  "Malakas at malusog ang pakiramdam ko, kaibigan. Sana ikaw rin.",
+                  "Buo ang lahat sa akin. Salamat sa pag-aalaga mo.",
+                  "Napakaganda ng kalagayan ko, salamat. Nakakapanatag na nagtanong ka.",
+                  "Napakalusog ko ngayon. Handa harapin ang anumang dumating.",
+                  "Mabuti ang pahinga at kalagayan ko. Salamat sa magandang pangangamusta.",
+                  "Walang pasa o gasgas ngayon. Salamat sa pagmamalasakit.",
+                  "Maayos talaga ako. Siguraduhin nating manatili tayong parehong ganito."
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "injured": {
+      "act": "REACT",
+      "say": {
+        "1": {
+          "variants": [
+            {
+              "id": "neutral",
+              "text": {
+                "EN": [
+                  "I'm hurt, but I'm managing.",
+                  "Took a beating earlier. Bandages are holding for now.",
+                  "Nursing a wound here. Trying not to reopen it.",
+                  "I've been injured, but nothing that'll take me down.",
+                  "Got caught in a bad spot. Dealing with the damage.",
+                  "Bleeding is mostly stopped, but movement is painful.",
+                  "Stung pretty bad by an attack earlier.",
+                  "Injuries are slowing me down, but I can keep moving.",
+                  "Could use some medical supplies when we find them.",
+                  "I'm hurting right now, but taking it step by step."
+                ],
+                "TL": [
+                  "Nasaktan ako, pero kinakaya ko.",
+                  "Medyo napuruhan kanina. Hawak pa naman ng benda sa ngayon.",
+                  "Inaalagaan ko ang sugat na ito. Iniiwasang bumuka ulit.",
+                  "Nasugatan ako, pero hindi 'to makakapagpatumba sa akin.",
+                  "Naipit sa masamang sitwasyon. Tinitiis ang tinamong sugat.",
+                  "Karamihan sa dugo tumigil na, pero masakit kumilos.",
+                  "Kumikirot pa rin mula sa pag-atake kanina.",
+                  "Pinapabagal ako ng mga sugat, pero kaya pang lumakad.",
+                  "Kailangan ko ng gamot kapag nakahanap tayo.",
+                  "Masakit ang katawan ko ngayon, pero dahan-dahan lang."
+                ]
+              }
+            },
+            {
+              "id": "guarded",
+              "text": {
+                "EN": [
+                  "I'm hurt. Give me space.",
+                  "Took some damage. I don't need your pity.",
+                  "Got injured, but I'm still dangerous. Step back.",
+                  "Bleeding, but it's under control. Don't hover.",
+                  "I'm wounded. That doesn't mean I'm helpless.",
+                  "I can bandage my own wounds, thank you.",
+                  "It hurts, but you don't need to pry into it.",
+                  "Just a bad cut. Keep your hands where I can see them.",
+                  "I'm dealing with the pain. Leave me be.",
+                  "Injured, yes. Vulnerable, no. Back off."
+                ],
+                "TL": [
+                  "Nasaktan ako. Bigyan mo ako ng espasyo.",
+                  "May tama ako. Hindi ko kailangan ang awa mo.",
+                  "Nasugatan ako, pero mapanganib pa rin ako. Umatras ka.",
+                  "Dumudugo, pero kontrolado ko. Huwag kang mag-aligid.",
+                  "Sugatan ako. Hindi ibig sabihing wala na akong magagawa.",
+                  "Kaya kong bendahan ang sarili kong sugat, salamat.",
+                  "Masakit, pero hindi mo kailangang mag-usisa.",
+                  "Malalim na sugat lang. Ipakita mo ang mga kamay mo.",
+                  "Inaayos ko ang iniinda ko. Hayaan mo muna ako.",
+                  "Sugatan, oo. Mahina, hindi. Lumayo ka."
+                ]
+              }
+            },
+            {
+              "id": "terse",
+              "text": {
+                "EN": [
+                  "I'm hurt.",
+                  "Wounded.",
+                  "Need stitches.",
+                  "Bleeding.",
+                  "Hurts bad.",
+                  "Bandaged up.",
+                  "Still bleeding.",
+                  "Took damage.",
+                  "Slowed down.",
+                  "Managing pain."
+                ],
+                "TL": [
+                  "Nasaktan ako.",
+                  "Sugatan.",
+                  "Kailangan ng tahi.",
+                  "Dumudugo.",
+                  "Sobrang sakit.",
+                  "May benda.",
+                  "Dumudugo pa.",
+                  "Tinamaan.",
+                  "Bumagal.",
+                  "Tinitiis."
+                ]
+              }
+            },
+            {
+              "id": "warm",
+              "text": {
+                "EN": [
+                  "I'm hurt, but I'm managing. Thanks for asking.",
+                  "Took a hit out there, but knowing you're here helps a lot.",
+                  "It hurts, friend, but I promise I'm holding together.",
+                  "Got banged up a little. Thank you for your care and concern.",
+                  "Nursing a wound, but seeing you safe gives me strength.",
+                  "I'll pull through with some rest. Thanks for checking on me.",
+                  "It's painful, but we'll patch it up together, right?",
+                  "Appreciate the check-in. Don't worry too much about me.",
+                  "Got scratched up bad, but I'm glad you're by my side.",
+                  "Hurts like hell, but having good folks around keeps me going."
+                ],
+                "TL": [
+                  "Nasaktan ako, pero kinakaya ko. Salamat sa pagtatanong.",
+                  "Tinamaan ako sa labas, pero malaking tulong na nandito ka.",
+                  "Masakit, kaibigan, pero nangangako akong kakayanin ko.",
+                  "Medyo napuruhan ako. Salamat sa malasakit mo.",
+                  "May sugat ako, pero nagbibigay ng lakas na ligtas ka.",
+                  "Makakaraos din ako kapag nakapagpahinga. Salamat sa pangangamusta.",
+                  "Masakit, pero gagamutin natin ito nang magkasama, di ba?",
+                  "Salamat sa pagsuri. Huwag kang masyadong mag-alala sa akin.",
+                  "Malala ang gasgas ko, pero masaya akong nasa tabi kita.",
+                  "Napakasakit, pero ang mabubuting kasama ang nagpapatuloy sa akin."
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "unknown": {
+      "act": "REACT",
+      "say": {
+        "1": {
+          "variants": [
+            {
+              "id": "neutral",
+              "text": {
+                "EN": [
+                  "I can't confirm my health status right now.",
+                  "Haven't had a chance to inspect myself thoroughly.",
+                  "Not entirely sure how bad it is under the gear.",
+                  "Could be bleeding, could just be a bruise. Hard to tell.",
+                  "Need a quiet moment to check over my condition.",
+                  "Uncertain right now. Adrenaline is masking the pain.",
+                  "Hard to tell without a mirror or better light.",
+                  "I feel sore all over, but can't verify the specifics.",
+                  "Can't confirm if anything is broken or sprained yet.",
+                  "My condition is uncertain at the moment."
+                ],
+                "TL": [
+                  "Hindi ko makumpirma ang kalagayan ko ngayon.",
+                  "Hindi pa ako nagkakaroon ng pagkakataong suriin ang sarili ko.",
+                  "Hindi ako sigurado kung gaano kalala sa ilalim ng suot ko.",
+                  "Pwedeng dumudugo, pwedeng pasa lang. Mahirap masabi.",
+                  "Kailangan ko ng tahimik na sandali para masuri ang katawan ko.",
+                  "Hindi sigurado ngayon. Natatakpan ng adrenaline ang sakit.",
+                  "Mahirap malaman kung walang salamin o mas maayos na ilaw.",
+                  "Masakit ang buong katawan ko, pero hindi ko matukoy ang dahilan.",
+                  "Hindi pa makumpirma kung may bali o pilay ako.",
+                  "Hindi tiyak ang kalagayan ko sa mga sandaling ito."
+                ]
+              }
+            },
+            {
+              "id": "guarded",
+              "text": {
+                "EN": [
+                  "I can't confirm that.",
+                  "Haven't checked properly yet. Mind your own business.",
+                  "Can't tell right now, and I'm not stripping down to check.",
+                  "Unsure. I'll evaluate my own condition later.",
+                  "No idea. Too chaotic out here to be certain.",
+                  "I don't have that information right now. Stand back.",
+                  "Hard to tell through the layers. Let it go.",
+                  "Can't be certain. Focus on your own status.",
+                  "Not clear yet. Don't crowd me.",
+                  "Status unknown. I'll deal with it when I'm safe."
+                ],
+                "TL": [
+                  "Hindi ko makumpirma iyon.",
+                  "Hindi ko pa nasusuri nang maayos. Asikasuhin mo ang sarili mo.",
+                  "Hindi ko masabi ngayon, at hindi ako maghuhubad para magpakita.",
+                  "Hindi sigurado. Susuriin ko ang sarili ko mamaya.",
+                  "Walang ideya. Masyadong magulo rito para makasiguro.",
+                  "Wala akong impormasyon diyan ngayon. Umatras ka.",
+                  "Mahirap malaman dahil sa kapal ng damit. Hayaan mo na.",
+                  "Hindi makasiguro. Ituon ang pansin sa sarili mong kalagayan.",
+                  "Hindi pa malinaw. Huwag mo akong pagkumpulan.",
+                  "Hindi tiyak ang kalagayan. Aayusin ko 'to kapag ligtas na."
+                ]
+              }
+            },
+            {
+              "id": "terse",
+              "text": {
+                "EN": [
+                  "Can't confirm.",
+                  "Unsure.",
+                  "Not sure yet.",
+                  "Need to check.",
+                  "Unknown.",
+                  "Hard to say.",
+                  "Can't tell.",
+                  "Need a look.",
+                  "Unchecked.",
+                  "Too early to tell."
+                ],
+                "TL": [
+                  "Hindi makumpirma.",
+                  "Hindi sigurado.",
+                  "Hindi pa tiyak.",
+                  "Kailangang suriin.",
+                  "Hindi alam.",
+                  "Mahirap sabihin.",
+                  "Hindi masabi.",
+                  "Kailangang tingnan.",
+                  "Hindi pa nasusuri.",
+                  "Masyadong maaga pa."
+                ]
+              }
+            },
+            {
+              "id": "warm",
+              "text": {
+                "EN": [
+                  "I can't confirm it right now, but thanks for asking.",
+                  "Not sure how bad it is yet, but I appreciate your concern.",
+                  "Haven't checked properly, but I'll let you know once I do.",
+                  "Hard to tell right now, friend. Thanks for watching over me.",
+                  "I need to check under the bandages, but I'm grateful you asked.",
+                  "Uncertain for now, but your support means everything to me.",
+                  "Could be fine, could be bruised. Thanks for caring enough to check.",
+                  "I'll do a proper check when we're safe. Thank you, truly.",
+                  "Can't say for sure, but I feel safer with you here.",
+                  "Not sure yet, but don't worry yourself sick over me."
+                ],
+                "TL": [
+                  "Hindi ko makumpirma ngayon, pero salamat sa pagtatanong.",
+                  "Hindi pa sigurado kung gaano kalala, pero salamat sa pag-alala.",
+                  "Hindi pa nasusuri nang maayos, pero sasabihin ko sa 'yo kapag nasuri ko na.",
+                  "Mahirap masabi ngayon, kaibigan. Salamat sa pagbabantay sa akin.",
+                  "Kailangan kong tingnan sa ilalim ng benda, pero salamat sa pagtanong.",
+                  "Hindi sigurado sa ngayon, pero mahalaga ang suporta mo sa akin.",
+                  "Pwedeng ayos lang, pwedeng may pasa. Salamat sa pagmamalasakit.",
+                  "Magsusuri ako kapag ligtas na tayo. Maraming salamat talaga.",
+                  "Hindi masabi nang tiyak, pero mas panatag ako at nandito ka.",
+                  "Hindi pa sigurado, pero huwag kang magpakapagod mag-alala."
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

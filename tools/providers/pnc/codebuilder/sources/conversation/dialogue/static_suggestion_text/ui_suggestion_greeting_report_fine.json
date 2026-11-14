@@ -1,0 +1,40 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "ui.suggestion",
+  "id": "greeting_report_fine",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "sourceProfile": "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+    "textTarget": "UI_PNC_Conversation",
+    "textRows": [
+      {
+        "key": "suggestion.greeting_report_fine.label",
+        "text": {
+          "EN": "Say you're doing fine",
+          "TL": "Sabihing ayos ka lang"
+        }
+      },
+      {
+        "key": "suggestion.greeting_report_fine.utterance",
+        "text": {
+          "EN": "I'm fine, thank you.",
+          "TL": "Ayos lang ako, salamat."
+        }
+      }
+    ]
+  },
+  "affordance": {
+    "label": {
+      "EN": "Say you're doing fine",
+      "TL": "Sabihing ayos ka lang"
+    },
+    "consumers": [
+      "player"
+    ]
+  },
+  "say": {
+    "EN": "I'm fine, thank you.",
+    "TL": "Ayos lang ako, salamat."
+  }
+}

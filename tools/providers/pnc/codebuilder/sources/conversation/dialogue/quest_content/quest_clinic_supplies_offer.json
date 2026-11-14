@@ -1,0 +1,110 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "quest.clinic_supplies",
+  "id": "offer",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:quest_content",
+    "contentOwner": "projecthoomans.dialogue_content.quest",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
+    "responseAct": "REACT"
+  },
+  "reply": {
+    "queued": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I can help with the clinic supplies.",
+          "I'm ready to lend a hand with those medical goods.",
+          "Put me down for the clinic supply run.",
+          "I'm available to help gather medical gear.",
+          "I can assist with securing what the clinic needs.",
+          "Count me in for the clinic supplies.",
+          "I'll pitch in on that medical supply run.",
+          "I can offer my help for the clinic task.",
+          "Glad to help get those supplies to the clinic.",
+          "I can take on part of that clinic effort."
+        ],
+        "TL": [
+          "Matutulungan kita sa mga suplay ng klinika.",
+          "Handa akong tumulong sa mga medikal na gamit na 'yon.",
+          "Ilista mo ako para sa pagkuha ng suplay sa klinika.",
+          "Available ako para tumulong mag-ipon ng gamot.",
+          "Makatutulong ako sa pagkuha ng kailangan ng klinika.",
+          "Isama mo ako sa suplay para sa klinika.",
+          "Tutulong ako sa pagkuha ng medikal na suplay.",
+          "Maaari kong ialok ang tulong ko sa gawaing ito sa klinika.",
+          "Masaya akong makatulong maihatid ang mga suplay sa klinika.",
+          "Kaya kong gampanan ang bahagi ng gawaing 'yan sa klinika."
+        ]
+      }
+    },
+    "rejected": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I can't take that clinic-supplies request right now.",
+          "I have to turn down the clinic offer for now.",
+          "Not able to help with medical supplies today.",
+          "I can't sign up for that clinic mission.",
+          "Must decline the clinic supplies offer.",
+          "I can't accept the offer at this time.",
+          "Medical supply run isn't something I can do now.",
+          "I'll have to pass on this clinic offer.",
+          "Can't take on the medical task right now.",
+          "I must reject that offer for the moment."
+        ],
+        "TL": [
+          "Hindi ko matatanggap ang kahilingan para sa suplay ngayon.",
+          "Kailangan kong tanggihan ang alok sa klinika sa ngayon.",
+          "Hindi makakatulong sa mga medikal na suplay ngayon.",
+          "Hindi ako makakasali sa misyong 'yan sa klinika.",
+          "Kailangang tanggihan ang alok na suplay sa klinika.",
+          "Hindi ko matatanggap ang alok sa panahong ito.",
+          "Hindi ko kayang gawin ang pagkuha ng medikal na suplay ngayon.",
+          "Lalagpasan ko muna ang alok na 'to para sa klinika.",
+          "Hindi maaring hawakan ang medikal na gawain ngayon.",
+          "Kailangan kong tanggihan ang alok na 'yan sa sandaling ito."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I couldn't check that clinic-supplies request.",
+          "Unable to look over the clinic supply offer.",
+          "The offer couldn't be processed.",
+          "Something went wrong while checking the medical offer.",
+          "Couldn't review the supplies request just now.",
+          "I couldn't verify that clinic offer.",
+          "Failed to inspect the clinic supplies details.",
+          "I wasn't able to review that request.",
+          "Could not check the medical offer properly.",
+          "Checking that offer didn't work out."
+        ],
+        "TL": [
+          "Hindi ko masuri ang kahilingan para sa suplay.",
+          "Hindi ko masilip ang alok sa suplay ng klinika.",
+          "Hindi maproseso ang alok na 'yan.",
+          "May nagkaproblema habang sinusuri ang medikal na alok.",
+          "Hindi masuri ang kahilingan sa suplay ngayon.",
+          "Hindi ko makumpirma ang alok na 'yon sa klinika.",
+          "Bigo sa pagsusuri ng detalye ng suplay sa klinika.",
+          "Hindi ko nasuri ang kahilingang iyon.",
+          "Hindi maayos na nasuri ang medikal na alok.",
+          "Hindi gumana ang pagsusuri sa alok na 'yon."
+        ]
+      }
+    }
+  }
+}

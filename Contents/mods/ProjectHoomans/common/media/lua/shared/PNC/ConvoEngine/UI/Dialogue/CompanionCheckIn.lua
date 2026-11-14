@@ -23,6 +23,11 @@ return {
         ["patternID"] = "pnc.question.needs_offer_plain",
         ["speechAct"] = "QUESTION",
         ["subject"] = "NEEDS",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
         ["topic"] = "needs",
         ["utteranceFallback"] = "Do you need anything?",
         ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_Needs_Utterance",
@@ -86,6 +91,11 @@ return {
         ["patternID"] = "pnc.social.gossip_event",
         ["speechAct"] = "GOSSIP",
         ["subject"] = "GOSSIP",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
         ["topic"] = "gossip",
         ["utteranceFallback"] = "Any gossip?",
         ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_Gossip_Utterance",

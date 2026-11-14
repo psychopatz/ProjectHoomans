@@ -1,0 +1,235 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "command",
+  "id": "stay",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/stay.json",
+    "responseAct": "REPLY"
+  },
+  "reply": {
+    "queued": {
+      "act": "REPLY",
+      "say": {
+        "1": {
+          "variants": [
+            {
+              "id": "neutral",
+              "text": {
+                "EN": [
+                  "Okay, I'll stay here.",
+                  "Holding position right here.",
+                  "Understood. Staying put.",
+                  "I'll hold this ground.",
+                  "Standing guard right here. Understood.",
+                  "Right. I won't move from this spot.",
+                  "Holding this perimeter. Go ahead.",
+                  "Understood. Maintaining this position.",
+                  "Got it. Staying right where I am.",
+                  "Holding ground as ordered."
+                ],
+                "TL": [
+                  "Sige, mananatili ako rito.",
+                  "Hawak ko ang pwestong ito.",
+                  "Naintindihan. Dito lang ako.",
+                  "Hahawakan ko ang pwestong ito.",
+                  "Nakatayong bantay dito. Naintindihan.",
+                  "Sige. Di ako aalis sa lugar na 'to.",
+                  "Binabantayan ang paligid na ito. Sige na.",
+                  "Naiintindihan ko. Pananatilihin ang posisyong ito.",
+                  "Nakuha ko. Mananatili kung nasaan ako.",
+                  "Hawak ang pwesto ayon sa utos."
+                ]
+              }
+            },
+            {
+              "id": "friendly",
+              "text": {
+                "EN": [
+                  "Sure, I'll stay here. Take your time, friend!",
+                  "I'll keep watch right here, partner. Be careful!",
+                  "No problem! I'll guard our spot until you get back.",
+                  "Happy to hold the fort here for you, friend.",
+                  "Sure thing! I'll be waiting right here for you.",
+                  "I won't wander off. Stay safe out there, partner!",
+                  "Holding the line right here with a smile. Go do what you need to do.",
+                  "I'll make sure nobody sneaks past this spot, friend.",
+                  "Resting my feet and keeping watch. See you soon!",
+                  "All good! I'll be right here when you return."
+                ],
+                "TL": [
+                  "Sige, mananatili ako rito. Huwag kang magmadali, kaibigan!",
+                  "Magbabantay ako rito, kasama. Mag-ingat ka!",
+                  "Walang problema! Babantayan ko ang pwesto natin hanggang makabalik ka.",
+                  "Masayang babantayan ang kuta rito para sa 'yo, kaibigan.",
+                  "Walang anuman! Maghihintay ako rito mismo para sa 'yo.",
+                  "Di ako lalayo. Mag-ingat ka sa labas, kasama!",
+                  "Hawak ang linya rito nang may ngiti. Gawin mo ang kailangan mo.",
+                  "Titiyakin kong walang makalulusot dito, kaibigan.",
+                  "Ipapahinga ang paa at magbabantay. Kita tayo agad!",
+                  "Ayos ang lahat! Narito lang ako pagbalik mo."
+                ]
+              }
+            },
+            {
+              "id": "repeated",
+              "text": {
+                "EN": [
+                  "I'm already staying here.",
+                  "Still holding this spot. Haven't budged.",
+                  "I'm already staying put, don't worry.",
+                  "Haven't moved an inch. Still right here.",
+                  "Still guarding this exact position.",
+                  "I heard you before. I'm staying right here.",
+                  "Already holding ground. Go on.",
+                  "Still staying here. No need to remind me.",
+                  "I'm rooted right here. Keep moving.",
+                  "Already staying. I'm watching the area."
+                ],
+                "TL": [
+                  "Nananatili na ako rito.",
+                  "Hawak pa rin ang pwesto. Di gumagalaw.",
+                  "Dito na nga ako, huwag kang mag-alala.",
+                  "Di gumalaw kahit isang pulgada. Narito pa rin.",
+                  "Binabantayan pa rin ang mismong posisyong ito.",
+                  "Narinig na kita kanina. Dito lang ako.",
+                  "Hawak na ang lupa. Sige na.",
+                  "Nananatili pa rin dito. Di na kailangang ipaalala.",
+                  "Nakatuntong na ako rito. Tuloy ka na.",
+                  "Nandito na nga. Binabantayan ko ang lugar."
+                ]
+              }
+            },
+            {
+              "id": "trusted",
+              "text": {
+                "EN": [
+                  "All right, I'll stay. Watch your back out there.",
+                  "I trust your plan. I'll secure this position.",
+                  "Holding this ground for both of us, partner.",
+                  "I won't let anything breach this spot while you're away.",
+                  "Understood. I'll stay right here until you call.",
+                  "You can count on me to hold this room, friend.",
+                  "Holding this vantage point. Be careful out there.",
+                  "I'll be right here when you return, partner. Stay alive.",
+                  "Trusting you to come back safe. Holding the line.",
+                  "Understood. I'll hold this post with my life."
+                ],
+                "TL": [
+                  "Sige, mananatili ako. Bantayan mo ang likod mo sa labas.",
+                  "Tiwala ako sa plano mo. Seselyuhan ko ang pwestong ito.",
+                  "Hahawakan ko ang pwestong ito para sa atin, kasama.",
+                  "Walang makakapasok dito habang wala ka.",
+                  "Naintindihan. Dito lang ako hanggang tawagin mo.",
+                  "Makaaasa ka sa akin na bantayan ang kwartong ito, kaibigan.",
+                  "Hawak ang magandang tanawin na ito. Mag-ingat ka sa labas.",
+                  "Narito lang ako pagbalik mo, kasama. Manatiling buhay.",
+                  "Nagtitiwala akong babalik kang ligtas. Hawak ang linya.",
+                  "Naiintindihan ko. Babantayan ko ang posteng ito nang buong tapang."
+                ]
+              }
+            },
+            {
+              "id": "withdrawn",
+              "text": {
+                "EN": [
+                  "Okay, I'll stay.",
+                  "Fine. Staying here.",
+                  "Holding ground.",
+                  "Understood. Staying.",
+                  "I'll stay put.",
+                  "Not moving.",
+                  "Fine by me. Go.",
+                  "Staying right here.",
+                  "Understood. Waiting.",
+                  "Holding position."
+                ],
+                "TL": [
+                  "Sige, mananatili ako.",
+                  "Sige. Dito lang.",
+                  "Hawak ang lupa.",
+                  "Naintindihan. Mananatili.",
+                  "Dito lang ako.",
+                  "Di gagalaw.",
+                  "Ayos sa akin. Alis na.",
+                  "Dito lang mismo.",
+                  "Naiintindihan. Naghihintay.",
+                  "Hawak ang posisyon."
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "rejected": {
+      "act": "REPLY",
+      "say": {
+        "EN": [
+          "I can't stay here right now.",
+          "Too dangerous to stay put. We need to keep moving.",
+          "I won't stay in an open kill zone.",
+          "Staying here is suicide. I'm coming with you.",
+          "I refuse to hold this spot without adequate cover.",
+          "Cannot stay here. The perimeter is totally exposed.",
+          "I'm not standing like a target. I have to move.",
+          "Unable to hold position. Hostiles are too close.",
+          "I won't stay behind while you need backup.",
+          "Stay order rejected. We must relocate."
+        ],
+        "TL": [
+          "Hindi ako makapananatili rito ngayon.",
+          "Masyadong mapanganib manatili rito. Kailangang gumalaw.",
+          "Di ako tatayo sa bukas na lugar na pugad ng patayan.",
+          "Pagpapakamatay ang manatili rito. Sasama ako sa 'yo.",
+          "Tumatanggi akong humawak dito nang walang maayos na silong.",
+          "Di makapanatili rito. Masyadong kita ang paligid.",
+          "Di ako tatayong parang target. Kailangan kong gumalaw.",
+          "Di mahawakan ang pwesto. Masyadong malapit ang kalaban.",
+          "Di ako maiiwan habang kailangan mo ng saklolo.",
+          "Tinatanggihan ang pananatili. Kailangan nating lumipat."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REPLY",
+      "say": {
+        "EN": [
+          "I couldn't start the stay order.",
+          "Failed to hold position here.",
+          "I tried to stay, but the ground wasn't safe.",
+          "Couldn't lock down this position.",
+          "Stay command failed. Enemies forced me to move.",
+          "Unable to stay put in this area.",
+          "Holding ground failed. Too much incoming fire.",
+          "Can't stay here. Position is untenable.",
+          "Attempted to hold, but got pushed back.",
+          "Could not secure a stay order here."
+        ],
+        "TL": [
+          "Hindi ko masimulan ang utos na manatili.",
+          "Bigo sa paghawak ng pwesto rito.",
+          "Sinubukan kong manatili, pero di ligtas ang lupa.",
+          "Di maikandado ang pwestong ito.",
+          "Pumalpak ang pananatili. Pinilit akong gumalaw ng kalaban.",
+          "Di makapanatili sa lugar na ito.",
+          "Bigo ang paghawak sa pwesto. Masyadong maraming putok.",
+          "Di makapanatili rito. Masyadong dehado ang pwesto.",
+          "Sinubukang humawak, pero naitulak paatras.",
+          "Hindi ma-secure ang pananatili rito."
+        ]
+      }
+    }
+  }
+}

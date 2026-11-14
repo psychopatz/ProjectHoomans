@@ -1,0 +1,235 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "command",
+  "id": "follow",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/follow.json",
+    "responseAct": "REPLY"
+  },
+  "reply": {
+    "queued": {
+      "act": "REPLY",
+      "say": {
+        "1": {
+          "variants": [
+            {
+              "id": "neutral",
+              "text": {
+                "EN": [
+                  "Okay, I'll follow you.",
+                  "Right behind you.",
+                  "Following now. Lead the way.",
+                  "Understood. Sticking close behind.",
+                  "Moving with you. Lead on.",
+                  "I'm with you. Let's move.",
+                  "Right on your tail. Watching our rear.",
+                  "Following your pace. Keep going.",
+                  "Understood. Falling in behind you.",
+                  "Got it. Moving out with you."
+                ],
+                "TL": [
+                  "Sige, susundan kita.",
+                  "Nasa likod mo lang ako.",
+                  "Sumusunod na ngayon. Mauna ka.",
+                  "Naintindihan. Didikit sa likod mo.",
+                  "Kumikilos kasabay mo. Mauna na.",
+                  "Kasama mo ako. Kilos na.",
+                  "Nasa buntot mo lang. Binabantayan ang likod.",
+                  "Sasabay sa bilis mo. Tuloy lang.",
+                  "Naiintindihan ko. Papatabi sa likod mo.",
+                  "Nakuha ko. Lalakad kasabay mo."
+                ]
+              }
+            },
+            {
+              "id": "friendly",
+              "text": {
+                "EN": [
+                  "Of course, I'll follow you.",
+                  "Gladly, friend! Lead the way.",
+                  "Always happy to travel with you. Let's go!",
+                  "I'm right behind you, partner. Let's do this.",
+                  "Right with you, friend! Watch your steps.",
+                  "Wouldn't rather be following anyone else.",
+                  "Lead on! I've got your six covered.",
+                  "Sure thing! Sticking like glue to you, friend.",
+                  "Happy to follow. Keep us safe!",
+                  "Right behind you, partner. Onward!"
+                ],
+                "TL": [
+                  "Siyempre, susundan kita.",
+                  "Malugod, kaibigan! Ituro ang daan.",
+                  "Laging masayang maglakbay kasama ka. Tara na!",
+                  "Nasa likod mo lang ako, kasama. Gawin na natin ito.",
+                  "Kasabay mo ako, kaibigan! Mag-ingat sa hakbang.",
+                  "Wala nang ibang gugustuhin kong sundan kundi ikaw.",
+                  "Mauna ka! Hawak ko ang likod mo.",
+                  "Walang anuman! Didikit na parang pandikit sa 'yo, kaibigan.",
+                  "Masayang sumunod. Panatilihin tayong ligtas!",
+                  "Nasa likod mo lang, kasama. Pasulong!"
+                ]
+              }
+            },
+            {
+              "id": "repeated",
+              "text": {
+                "EN": [
+                  "I'm still following you.",
+                  "Already following right behind you.",
+                  "Still on your heels. No need to repeat.",
+                  "I haven't gone anywhere. Still right here.",
+                  "Following you already. Just keep walking.",
+                  "I'm right behind you! Look over your shoulder.",
+                  "Still with you. Don't worry.",
+                  "Already in tow. Lead the way.",
+                  "Following you as we speak.",
+                  "I'm already following. Keep moving."
+                ],
+                "TL": [
+                  "Sinusundan pa rin kita.",
+                  "Nakasunod na ako mismo sa likod mo.",
+                  "Nasa likod mo pa rin. Di na kailangang ulitin.",
+                  "Wala akong pinuntahan. Narito pa rin ako.",
+                  "Sumusunod na sa 'yo. Magpatuloy ka lang sa paglalakad.",
+                  "Nasa likod mo lang ako! Lumingon ka sa balikat mo.",
+                  "Kasama mo pa rin ako. Huwag kang mag-alala.",
+                  "Nakasunod na. Mauna ka na.",
+                  "Sumusunod sa 'yo habang nagsasalita ka.",
+                  "Sumusunod na ako. Tuloy lang sa paglakad."
+                ]
+              }
+            },
+            {
+              "id": "trusted",
+              "text": {
+                "EN": [
+                  "I know you. I'll follow.",
+                  "I trust your lead completely. Following you.",
+                  "Lead the way, partner. I'm with you to the end.",
+                  "You've proven your judgment. I'll follow anywhere.",
+                  "Understood. I trust you to keep us alive.",
+                  "Right behind you. We watch out for one another.",
+                  "I'm at your side, friend. Lead on.",
+                  "You make the calls, I back you up. Following.",
+                  "I know you have my back. Following your lead.",
+                  "Understood, partner. Right behind you."
+                ],
+                "TL": [
+                  "Kilala kita. Susunod ako.",
+                  "Lubos akong nagtitiwala sa pangunguna mo. Susunod sa 'yo.",
+                  "Ituro ang daan, kasama. Kasama mo ako hanggang dulo.",
+                  "Napatunayan mo na ang galing mo. Susunod ako kahit saan.",
+                  "Naintindihan. Tiwala akong bubuhayin mo tayo.",
+                  "Nasa likod mo lang. Nagbabantayan tayo sa isa't isa.",
+                  "Nasa tabi mo ako, kaibigan. Mauna ka.",
+                  "Ikaw ang magpasya, susuportahan kita. Sumusunod.",
+                  "Alam kong hawak mo ang likod ko. Sumusunod sa pangunguna mo.",
+                  "Naiintindihan ko, kasama. Nasa likod mo lang."
+                ]
+              }
+            },
+            {
+              "id": "withdrawn",
+              "text": {
+                "EN": [
+                  "I'll follow.",
+                  "Fine. Walking behind you.",
+                  "Following. Whatever.",
+                  "Understood. Moving.",
+                  "Right behind. Don't stop suddenly.",
+                  "I'll keep up.",
+                  "Following. Keep going.",
+                  "All right. Let's go.",
+                  "Behind you.",
+                  "Moving along."
+                ],
+                "TL": [
+                  "Susunod ako.",
+                  "Sige. Lalakad sa likod mo.",
+                  "Sumusunod. Kahit ano pa.",
+                  "Naintindihan. Kumikilos.",
+                  "Nasa likod lang. Huwag hihinto nang bigla.",
+                  "Sasabay ako.",
+                  "Sumusunod. Tuloy lang.",
+                  "Sige. Tara na.",
+                  "Nasa likod mo.",
+                  "Sumasabay."
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "rejected": {
+      "act": "REPLY",
+      "say": {
+        "EN": [
+          "I can't follow you right now.",
+          "I need to stay here. Can't follow.",
+          "Refusing to follow into that danger.",
+          "Too exhausted or injured to keep up. I can't follow.",
+          "I have business here. You go on ahead.",
+          "Can't follow. My hands are full.",
+          "Not following you into that mess.",
+          "I won't follow you right now.",
+          "Stay back, I'm not following.",
+          "Follow order rejected. I'm holding position."
+        ],
+        "TL": [
+          "Hindi kita masusundan ngayon.",
+          "Kailangan kong manatili rito. Di makasusunod.",
+          "Tumatangging sumunod sa panganib na 'yan.",
+          "Masyadong pagod o sugatan para sumabay. Di makasusunod.",
+          "May inaasikaso ako rito. Mauna ka na.",
+          "Di makasusunod. Marami akong ginagawa.",
+          "Di kita susundan sa gulong 'yan.",
+          "Hindi kita susundan sa ngayon.",
+          "Umatras ka, di ako susunod.",
+          "Tinatanggihan ang utos na sumunod. Hawak ko ang pwesto."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REPLY",
+      "say": {
+        "EN": [
+          "I couldn't start following you.",
+          "Failed to follow. Path was obstructed.",
+          "I tried to follow, but got caught on something.",
+          "Lost your trail. Couldn't keep following.",
+          "Unable to follow through that passage.",
+          "Follow command failed. Way is blocked.",
+          "I couldn't match your route.",
+          "Blocked off. Can't follow that way.",
+          "Attempted to follow, but lost visual.",
+          "Can't reach you to follow. Clear the path."
+        ],
+        "TL": [
+          "Hindi ko masimulan ang pagsunod sa iyo.",
+          "Bigo sa pagsunod. May harang sa daan.",
+          "Sinubukan kong sumunod, pero naipit ako sa kung saan.",
+          "Nawala ang bakas mo. Di nakasunod.",
+          "Di makasunod sa lagusang 'yan.",
+          "Pumalpak ang utos na sumunod. Barado ang daan.",
+          "Hindi ko nasabayan ang ruta mo.",
+          "May harang. Di makasunod sa daang 'yan.",
+          "Sinubukang sumunod, pero nawala sa paningin.",
+          "Di kita maabot para sumunod. Hawiin ang daan."
+        ]
+      }
+    }
+  }
+}

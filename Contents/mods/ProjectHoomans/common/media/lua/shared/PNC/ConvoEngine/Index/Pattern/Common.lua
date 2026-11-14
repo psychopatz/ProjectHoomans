@@ -420,7 +420,6 @@ return {
     ["pnc.question.identity.faction"] = {
         ["dependents"] = {
             "question.identity_faction",
-            "social.core_identity",
         },
         ["domain"] = "common",
         ["generated"] = {
@@ -433,7 +432,6 @@ return {
     ["pnc.question.identity.nickname"] = {
         ["dependents"] = {
             "question.identity_nickname",
-            "social.core_identity",
         },
         ["domain"] = "common",
         ["generated"] = {
@@ -446,7 +444,6 @@ return {
     ["pnc.question.identity.surname"] = {
         ["dependents"] = {
             "question.identity_surname",
-            "social.core_identity",
         },
         ["domain"] = "common",
         ["generated"] = {

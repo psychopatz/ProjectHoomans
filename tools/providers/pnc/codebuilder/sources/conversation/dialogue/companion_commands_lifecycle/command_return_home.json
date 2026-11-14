@@ -1,0 +1,235 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "command",
+  "id": "return_home",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:companion_commands",
+    "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/return_home.json",
+    "responseAct": "REPLY"
+  },
+  "reply": {
+    "queued": {
+      "act": "REPLY",
+      "say": {
+        "1": {
+          "variants": [
+            {
+              "id": "neutral",
+              "text": {
+                "EN": [
+                  "Okay, I'll head home.",
+                  "Heading back to base now.",
+                  "Understood. Moving toward home.",
+                  "I'll make my way back to our shelter.",
+                  "Returning to camp as ordered.",
+                  "Right. Time to head home.",
+                  "Understood. Retracing my steps to base.",
+                  "On my way back home.",
+                  "Got it. Returning to home coordinates.",
+                  "Heading inbound for home."
+                ],
+                "TL": [
+                  "Sige, uuwi ako.",
+                  "Pabalik na sa base ngayon.",
+                  "Naintindihan. Papatungo na sa tahanan.",
+                  "Babalik ako sa silungan natin.",
+                  "Babalik sa kampo ayon sa utos.",
+                  "Sige. Oras na para umuwi.",
+                  "Naiintindihan ko. Binabalikan ang daan sa base.",
+                  "Papauwi na ako ngayon.",
+                  "Nakuha ko. Pabalik sa mga coordinate ng tahanan.",
+                  "Papasok na pauwi."
+                ]
+              }
+            },
+            {
+              "id": "friendly",
+              "text": {
+                "EN": [
+                  "Sure, I'll head home. See you back there soon!",
+                  "Sounds wonderful, friend. I'll get back to camp safely.",
+                  "Heading home, partner! Make sure you stay safe too.",
+                  "I'll go keep the fire warm for when you return.",
+                  "Great idea! I'll head home and stow our gear.",
+                  "Happy to head home. Don't stay out too late, friend!",
+                  "On my way back to our safe place. Take care!",
+                  "Heading home with a smile. See you shortly, partner.",
+                  "I'll get things tidy back at base for us.",
+                  "Heading home! Be careful on your way back."
+                ],
+                "TL": [
+                  "Sige, uuwi ako. Kita tayo roon agad!",
+                  "Napakaganda, kaibigan. Babalik ako sa kampo nang ligtas.",
+                  "Pauwi na, kasama! Tiyakin mong mag-iingat ka rin.",
+                  "Pupunta ako para panatilihing mainit ang apoy pagbalik mo.",
+                  "Magandang ideya! Uuwi ako at itatabi ang gamit natin.",
+                  "Masayang uuwi. Huwag kang magpagabi sa labas, kaibigan!",
+                  "Papauwi na sa ligtas nating lugar. Mag-ingat ka!",
+                  "Pauwi nang may ngiti. Magkita tayo maya-maya, kasama.",
+                  "Aayusin ko ang mga gamit sa base para sa atin.",
+                  "Pauwi na! Mag-ingat ka sa pagbalik mo."
+                ]
+              }
+            },
+            {
+              "id": "repeated",
+              "text": {
+                "EN": [
+                  "I'm still heading home.",
+                  "Already on my way back. Just navigating the path.",
+                  "Still traveling toward base. Be there soon.",
+                  "I haven't stopped moving toward home.",
+                  "Already heading home. Keep calm.",
+                  "Still on the road home.",
+                  "Almost there. Still heading for base.",
+                  "Already following the return route.",
+                  "Still en route to home. No need to yell.",
+                  "I'm already on the way back."
+                ],
+                "TL": [
+                  "Pauwi pa rin ako.",
+                  "Pauwi na ako. Dumaraan lang sa ligtas na ruta.",
+                  "Naglalakbay pa rin patungong base. Nandoon na agad.",
+                  "Di ako humihinto sa paglakad pauwi.",
+                  "Pauwi na nga ako. Kumalma ka lang.",
+                  "Nasa daan pa rin pauwi.",
+                  "Malapit na roon. Papatungo pa rin sa base.",
+                  "Sumusunod na sa rutang pabalik.",
+                  "Nasa biyahe pa rin pauwi. Di kailangang sumigaw.",
+                  "Pauwi na talaga ako."
+                ]
+              }
+            },
+            {
+              "id": "trusted",
+              "text": {
+                "EN": [
+                  "All right, I'm heading home. Guard the rear.",
+                  "I trust your call. I'll make sure base is secure.",
+                  "Heading home, partner. Don't take unnecessary risks out here.",
+                  "Understood. I'll be waiting at camp for your return.",
+                  "Heading home. Make sure you come back in one piece.",
+                  "I'll hold down the fort until you get back.",
+                  "Heading back. Trusting you to watch yourself.",
+                  "I'll see you at home, friend. Stay vigilant.",
+                  "Returning to our haven. Stay alive for me.",
+                  "Understood. Heading back to secure our home."
+                ],
+                "TL": [
+                  "Sige, pauwi na ako. Bantayan mo ang likod.",
+                  "Tiwala ako sa pasya mo. Titiyakin kong ligtas ang base.",
+                  "Pauwi na, kasama. Huwag sumugal sa panganib dito.",
+                  "Naintindihan. Maghihintay ako sa kampo sa pagbalik mo.",
+                  "Pauwi na. Tiyakin mong makababalik ka nang buo.",
+                  "Babantayan ko ang kuta hanggang sa makabalik ka.",
+                  "Pabalik na. Nagtitiwala akong iingatan mo ang sarili mo.",
+                  "Magkita tayo sa bahay, kaibigan. Manatiling mapagmatyag.",
+                  "Babalik sa kanlungan natin. Manatiling buhay para sa akin.",
+                  "Naiintindihan ko. Pabalik na para i-secure ang tahanan natin."
+                ]
+              }
+            },
+            {
+              "id": "withdrawn",
+              "text": {
+                "EN": [
+                  "I'll head home.",
+                  "Going back now.",
+                  "Heading to base.",
+                  "Understood. Home.",
+                  "Fine. I'm leaving.",
+                  "Heading back alone.",
+                  "Going home. Whatever.",
+                  "All right. Heading back.",
+                  "Returning.",
+                  "Moving toward shelter."
+                ],
+                "TL": [
+                  "Uuwi ako.",
+                  "Babalik na ngayon.",
+                  "Papatungo sa base.",
+                  "Naintindihan. Bahay.",
+                  "Sige. Aalis na ako.",
+                  "Babalik mag-isa.",
+                  "Uuwi na. Kahit ano pa.",
+                  "Sige. Pabalik na.",
+                  "Babalik na.",
+                  "Papatungo sa silungan."
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "rejected": {
+      "act": "REPLY",
+      "say": {
+        "EN": [
+          "I can't head home right now.",
+          "The road home is cut off by hordes.",
+          "I'm not leaving you out here alone. Can't go home.",
+          "Too much danger on the way back right now.",
+          "Refusing to return home while we're surrounded.",
+          "I have to finish what we started before I head back.",
+          "Can't head home. The gates are compromised.",
+          "Unable to return to base right now.",
+          "I won't abandon the mission to go home now.",
+          "Return home rejected. Not safe to travel."
+        ],
+        "TL": [
+          "Hindi ako makauuwi ngayon.",
+          "Pinutol ng mga kawan ang daan pauwi.",
+          "Di kita iiwan dito nang mag-isa. Di ako uuwi.",
+          "Masyadong maraming panganib sa daan pabalik ngayon.",
+          "Tumatangging umuwi habang napapaligiran tayo.",
+          "Kailangan kong tapusin ang sinimulan bago umuwi.",
+          "Di makauwi. May sira ang tarangkahan.",
+          "Di makabalik sa base sa ngayon.",
+          "Di ko tatalikuran ang misyon para lang umuwi ngayon.",
+          "Tinatanggihan ang pag-uwi. Di ligtas maglakbay."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REPLY",
+      "say": {
+        "EN": [
+          "I couldn't head home.",
+          "The path back home is completely blocked.",
+          "Failed to return. Too many hostiles along the route.",
+          "I couldn't find a safe way back to base.",
+          "Return trip failed. Had to double back.",
+          "Unable to reach home safely right now.",
+          "Tried heading back, but the streets were overrun.",
+          "Lost the route home in the chaos.",
+          "Can't reach base from this position.",
+          "Return to base aborted. Route compromised."
+        ],
+        "TL": [
+          "Hindi ako nakauwi.",
+          "Ganap na may harang ang daan pabalik sa tahanan.",
+          "Bigo sa pag-uwi. Masyadong maraming kalaban sa ruta.",
+          "Wala akong makitang ligtas na daan pabalik sa base.",
+          "Pumalpak ang pag-uwi. Kinailangang bumalik.",
+          "Di makarating sa tahanan nang ligtas sa ngayon.",
+          "Sinubukang umuwi, pero pinamumugaran ang mga kalsada.",
+          "Nawala ang daan pauwi sa gitna ng gulo.",
+          "Di maabot ang base mula sa pwestong ito.",
+          "Itinigil ang pag-uwi sa base. May aberya sa ruta."
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "task",
+  "id": "eat",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/eat.json",
+    "responseAct": "REACT"
+  },
+  "reply": {
+    "admitted": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I'll eat that.",
+          "Understood. Getting something to eat.",
+          "Good call. My stomach was growling.",
+          "All right, I'll eat some food.",
+          "Taking a bite to keep my strength up.",
+          "Understood. Eating now.",
+          "I'll consume those rations.",
+          "Right. Time for a meal.",
+          "I'll eat what you designated.",
+          "Sounds good. Grabbing food."
+        ],
+        "TL": [
+          "Kakainin ko iyon.",
+          "Naintindihan. Kukuha ng makakain.",
+          "Magandang paalala. Kumakalam na ang tiyan ko.",
+          "Sige, kakain ako ng pagkain.",
+          "Kakain para mapanatili ang lakas.",
+          "Naiintindihan ko. Kakain na.",
+          "Kakainin ko ang mga rasyong 'yan.",
+          "Sige. Oras na para kumain.",
+          "Kakainin ko ang tinukoy mo.",
+          "Maganda 'yan. Kukuha ng pagkain."
+        ]
+      }
+    },
+    "active": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "Eating now.",
+          "Having a bite right now.",
+          "Chewing through some food. Give me a moment.",
+          "Currently eating.",
+          "Getting some calories in me.",
+          "Eating my rations now.",
+          "Taking a meal break as instructed.",
+          "Eating. Needed the energy.",
+          "Having some food now.",
+          "Eating quietly. Won't be long."
+        ],
+        "TL": [
+          "Kumakain na ako ngayon.",
+          "Kumakain ng kaunti ngayon.",
+          "Kumakain ng pagkain. Sandali lang.",
+          "Kasalukuyang kumakain.",
+          "Nagpapasok ng lakas sa katawan.",
+          "Kinakain ang baong pagkain ngayon.",
+          "Kumakain ayon sa utos.",
+          "Kumakain. Kailangan ko ng lakas.",
+          "Kumakain na ngayon.",
+          "Kumakain nang tahimik. Saglit lang ito."
+        ]
+      }
+    },
+    "completed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "Finished eating. Feeling much better.",
+          "That food helped a lot. Done.",
+          "Done eating. Energy restored.",
+          "Stomach is full. Ready to move.",
+          "Finished that meal.",
+          "All eaten. Good to keep going.",
+          "Done. That tasted better than expected.",
+          "Meal completed.",
+          "Finished eating. Back on task.",
+          "Rations finished. Strength is back."
+        ],
+        "TL": [
+          "Tapos nang kumain. Mas maayos na ang pakiramdam.",
+          "Nakatulong nang malaki ang pagkain. Tapos na.",
+          "Tapos nang kumain. Bumalik na ang lakas.",
+          "Busog na ang tiyan. Handa nang kumilos.",
+          "Natapos na ang pagkain.",
+          "Naubos na. Maayos na para magpatuloy.",
+          "Tapos na. Mas masarap kaysa inasahan ko.",
+          "Kumpleto na ang pagkain.",
+          "Tapos nang kumain. Balik sa trabaho.",
+          "Naubos ang rasyon. Nagbalik ang lakas."
+        ]
+      }
+    },
+    "rejected": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I'm not hungry right now.",
+          "I don't need food at the moment.",
+          "I'm already completely full.",
+          "Save the food. I don't need to eat yet.",
+          "Refusing to eat that. Looks unwholesome.",
+          "Can't eat right now. Too tense.",
+          "I have enough energy. Keeping rations safe.",
+          "No need for a meal yet.",
+          "Eat order rejected. Stomach is satisfied.",
+          "I can't eat that right now."
+        ],
+        "TL": [
+          "Hindi ako nagugutom ngayon.",
+          "Di ko kailangan ng pagkain sa sandaling ito.",
+          "Busog na busog pa ako.",
+          "Itabi ang pagkain. Di ko pa kailangang kumain.",
+          "Tumatangging kainin 'yan. Mukhang marumi.",
+          "Di makakain ngayon. Masyadong tensiyonado.",
+          "May sapat pa akong lakas. Itatabi ang rasyon.",
+          "Wala pang pangangailangan sa pagkain.",
+          "Tinatanggihan ang utos na kumain. Busog ang tiyan.",
+          "Di ko makakain 'yan ngayon."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I couldn't eat that.",
+          "Failed to eat. The food was rotten or spoiled.",
+          "Couldn't eat that. It smelled dangerous.",
+          "I was interrupted while trying to eat.",
+          "Unable to eat right now. Area under threat.",
+          "Eating failed. Food was ruined.",
+          "Couldn't stomach that item.",
+          "Dropped or lost the food before eating.",
+          "Action failed. Still starving.",
+          "Failed to consume meal."
+        ],
+        "TL": [
+          "Hindi ko nakain iyon.",
+          "Bigo sa pagkain. Bulok o panis ang pagkain.",
+          "Di makain 'yon. Amoy delikado.",
+          "Naabala ako habang sumusubok kumain.",
+          "Di makakain ngayon. May banta sa lugar.",
+          "Pumalpak ang pagkain. Nasira ang pagkain.",
+          "Di matunawan sa bagay na 'yan.",
+          "Nahulog o nawala ang pagkain bago nakain.",
+          "Bigo ang kilos. Gutom pa rin.",
+          "Bigo sa pagtapos ng pagkain."
+        ]
+      }
+    }
+  }
+}

@@ -333,155 +333,13 @@ return {
     {
         ["domain"] = "static_suggestion_text",
         ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.check_in.label",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
                 },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "Check in with them",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.check_in.label.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Check in with them",
-                                    },
-                                    ["TL"] = {
-                                        "Kumusta tayo",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion.check_in",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Check in with them",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.check_in.label.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Check in with them",
-                        },
-                        ["TL"] = {
-                            "Kumusta tayo",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.check_in.label",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "label",
-            ["sourceId"] = "ui.suggestion.check_in.label",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_check_in_label.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.check_in",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.check_in.label",
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.check_in.label",
-                        ["text"] = {
-                            ["EN"] = "Check in with them",
-                            ["TL"] = "Kumusta tayo",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Check in with them",
-                                    },
-                                    ["TL"] = {
-                                        "Kumusta tayo",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.check_in.label",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Check in with them",
-                            ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.check_in.label.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_check_in_label.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Check in with them",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.check_in.label.say.1.neutral",
+                ["labelFallback"] = "Check in with them",
+                ["labelKey"] = "convo.ui.suggestion.check_in.affordance.label",
+                ["textRole"] = "button_label",
                 ["translations"] = {
                     ["EN"] = {
                         "Check in with them",
@@ -490,15 +348,8 @@ return {
                         "Kumusta tayo",
                     },
                 },
-                ["variantID"] = "neutral",
             },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.check_in.utterance",
+            ["familyID"] = "ui.suggestion.check_in",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
                     "1",
@@ -511,8 +362,8 @@ return {
                         ["variants"] = {
                             {
                                 ["fallback"] = "How are we doing?",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.check_in.utterance.say.1.neutral",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.ui.suggestion.check_in.say.1.default",
                                 ["textRole"] = "spoken_action",
                                 ["translations"] = {
                                     ["EN"] = {
@@ -528,13 +379,26 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
-            ["namespace"] = "ui.suggestion.check_in",
+            ["namespace"] = "ui.suggestion",
             ["textRoles"] = {
+                {
+                    ["fallback"] = "Check in with them",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.check_in.affordance.label",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Check in with them",
+                        },
+                        ["TL"] = {
+                            "Kumusta tayo",
+                        },
+                    },
+                },
                 {
                     ["fallback"] = "How are we doing?",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.check_in.utterance.say.1.neutral",
+                    ["templateID"] = "convo.ui.suggestion.check_in.say.1.default",
                     ["translations"] = {
                         ["EN"] = {
                             "How are we doing?",
@@ -543,20 +407,20 @@ return {
                             "Kumusta tayo?",
                         },
                     },
-                    ["variantID"] = "neutral",
+                    ["variantID"] = "default",
                 },
             },
         },
-        ["id"] = "ui.suggestion.check_in.utterance",
+        ["id"] = "ui.suggestion.check_in",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "utterance",
-            ["sourceId"] = "ui.suggestion.check_in.utterance",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_check_in_utterance.json",
+            ["localId"] = "check_in",
+            ["sourceId"] = "ui.suggestion.check_in",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_check_in.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.check_in",
+        ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -567,10 +431,30 @@ return {
             },
         },
         ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Check in with them",
+                    },
+                    ["TL"] = {
+                        "Kumusta tayo",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
             ["metadata"] = {
                 ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.check_in.utterance",
                 ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.check_in.label",
+                        ["text"] = {
+                            ["EN"] = "Check in with them",
+                            ["TL"] = "Kumusta tayo",
+                        },
+                    },
                     {
                         ["key"] = "suggestion.check_in.utterance",
                         ["text"] = {
@@ -592,7 +476,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["id"] = "neutral",
+                                ["id"] = "default",
                                 ["text"] = {
                                     ["EN"] = {
                                         "How are we doing?",
@@ -613,7 +497,7 @@ return {
         ["responsePlan"] = {
             ["dialogueAct"] = nil,
             ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.check_in.utterance",
+            ["responsePlanID"] = "ui.suggestion.check_in",
             ["schemaVersion"] = 1,
             ["turns"] = {
                 {
@@ -627,7 +511,7 @@ return {
                             },
                             ["fallback"] = "How are we doing?",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.check_in.utterance.say_1",
+                            ["templateID"] = "psdl.ui.suggestion.check_in.say_1",
                         },
                     },
                 },
@@ -635,7 +519,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_check_in_utterance.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_check_in.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -643,10 +527,23 @@ return {
         },
         ["textRoles"] = {
             {
+                ["fallback"] = "Check in with them",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.check_in.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Check in with them",
+                    },
+                    ["TL"] = {
+                        "Kumusta tayo",
+                    },
+                },
+            },
+            {
                 ["fallback"] = "How are we doing?",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.check_in.utterance.say.1.neutral",
+                ["templateID"] = "convo.ui.suggestion.check_in.say.1.default",
                 ["translations"] = {
                     ["EN"] = {
                         "How are we doing?",
@@ -655,7 +552,7 @@ return {
                         "Kumusta tayo?",
                     },
                 },
-                ["variantID"] = "neutral",
+                ["variantID"] = "default",
             },
         },
         ["when"] = nil,
@@ -663,155 +560,13 @@ return {
     {
         ["domain"] = "static_suggestion_text",
         ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.companion_camp.label",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
                 },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "Let's camp...",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.companion_camp.label.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Let's camp...",
-                                    },
-                                    ["TL"] = {
-                                        "Magkampo tayo...",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion.companion_camp",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Let's camp...",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.companion_camp.label.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Let's camp...",
-                        },
-                        ["TL"] = {
-                            "Magkampo tayo...",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.companion_camp.label",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "label",
-            ["sourceId"] = "ui.suggestion.companion_camp.label",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_label.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.companion_camp",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.companion_camp.label",
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.companion_camp.label",
-                        ["text"] = {
-                            ["EN"] = "Let's camp...",
-                            ["TL"] = "Magkampo tayo...",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Let's camp...",
-                                    },
-                                    ["TL"] = {
-                                        "Magkampo tayo...",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.companion_camp.label",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Let's camp...",
-                            ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.companion_camp.label.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_label.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Let's camp...",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.companion_camp.label.say.1.neutral",
+                ["labelFallback"] = "Let's camp...",
+                ["labelKey"] = "convo.ui.suggestion.companion_camp.affordance.label",
+                ["textRole"] = "button_label",
                 ["translations"] = {
                     ["EN"] = {
                         "Let's camp...",
@@ -820,29 +575,24 @@ return {
                         "Magkampo tayo...",
                     },
                 },
-                ["variantID"] = "neutral",
             },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.companion_camp_here.utterance",
+            ["familyID"] = "ui.suggestion.companion_camp",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
                     "1",
+                    "2",
+                    "3",
                 },
-                ["mode"] = "single",
+                ["mode"] = "keyed",
                 ["realizations"] = {
                     ["1"] = {
                         ["key"] = "1",
-                        ["shorthand"] = true,
+                        ["shorthand"] = false,
                         ["variants"] = {
                             {
                                 ["fallback"] = "Let's camp here.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.companion_camp_here.utterance.say.1.neutral",
+                                ["id"] = "variant_1",
+                                ["templateID"] = "convo.ui.suggestion.companion_camp.say.1.variant_1",
                                 ["textRole"] = "spoken_action",
                                 ["translations"] = {
                                     ["EN"] = {
@@ -855,159 +605,14 @@ return {
                             },
                         },
                     },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion.companion_camp_here",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Let's camp here.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.companion_camp_here.utterance.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Let's camp here.",
-                        },
-                        ["TL"] = {
-                            "Magkampo tayo rito.",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.companion_camp_here.utterance",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "utterance",
-            ["sourceId"] = "ui.suggestion.companion_camp_here.utterance",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_here_utterance.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.companion_camp_here",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.companion_camp_here.utterance",
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.companion_camp_here.utterance",
-                        ["text"] = {
-                            ["EN"] = "Let's camp here.",
-                            ["TL"] = "Magkampo tayo rito.",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Let's camp here.",
-                                    },
-                                    ["TL"] = {
-                                        "Magkampo tayo rito.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.companion_camp_here.utterance",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Let's camp here.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.companion_camp_here.utterance.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_here_utterance.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Let's camp here.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.companion_camp_here.utterance.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Let's camp here.",
-                    },
-                    ["TL"] = {
-                        "Magkampo tayo rito.",
-                    },
-                },
-                ["variantID"] = "neutral",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.companion_camp_room.utterance",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
                         ["variants"] = {
                             {
                                 ["fallback"] = "Let's camp in the %1.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.companion_camp_room.utterance.say.1.neutral",
+                                ["id"] = "variant_1",
+                                ["templateID"] = "convo.ui.suggestion.companion_camp.say.2.variant_1",
                                 ["textRole"] = "spoken_action",
                                 ["translations"] = {
                                     ["EN"] = {
@@ -1020,159 +625,14 @@ return {
                             },
                         },
                     },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion.companion_camp_room",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Let's camp in the %1.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.companion_camp_room.utterance.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Let's camp in the %1.",
-                        },
-                        ["TL"] = {
-                            "Magkampo tayo sa %1.",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.companion_camp_room.utterance",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "utterance",
-            ["sourceId"] = "ui.suggestion.companion_camp_room.utterance",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_room_utterance.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.companion_camp_room",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.companion_camp_room.utterance",
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.companion_camp_room.utterance",
-                        ["text"] = {
-                            ["EN"] = "Let's camp in the %1.",
-                            ["TL"] = "Magkampo tayo sa %1.",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Let's camp in the %1.",
-                                    },
-                                    ["TL"] = {
-                                        "Magkampo tayo sa %1.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.companion_camp_room.utterance",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Let's camp in the %1.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.companion_camp_room.utterance.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp_room_utterance.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Let's camp in the %1.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.companion_camp_room.utterance.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Let's camp in the %1.",
-                    },
-                    ["TL"] = {
-                        "Magkampo tayo sa %1.",
-                    },
-                },
-                ["variantID"] = "neutral",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.companion_campfire.utterance",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
                         ["variants"] = {
                             {
                                 ["fallback"] = "Let's camp by the campfire.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.companion_campfire.utterance.say.1.neutral",
+                                ["id"] = "variant_1",
+                                ["templateID"] = "convo.ui.suggestion.companion_camp.say.3.variant_1",
                                 ["textRole"] = "spoken_action",
                                 ["translations"] = {
                                     ["EN"] = {
@@ -1188,13 +648,56 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
-            ["namespace"] = "ui.suggestion.companion_campfire",
+            ["namespace"] = "ui.suggestion",
             ["textRoles"] = {
                 {
-                    ["fallback"] = "Let's camp by the campfire.",
+                    ["fallback"] = "Let's camp...",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.companion_camp.affordance.label",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Let's camp...",
+                        },
+                        ["TL"] = {
+                            "Magkampo tayo...",
+                        },
+                    },
+                },
+                {
+                    ["fallback"] = "Let's camp here.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.companion_campfire.utterance.say.1.neutral",
+                    ["templateID"] = "convo.ui.suggestion.companion_camp.say.1.variant_1",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Let's camp here.",
+                        },
+                        ["TL"] = {
+                            "Magkampo tayo rito.",
+                        },
+                    },
+                    ["variantID"] = "variant_1",
+                },
+                {
+                    ["fallback"] = "Let's camp in the %1.",
+                    ["realizationKey"] = "2",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.ui.suggestion.companion_camp.say.2.variant_1",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Let's camp in the %1.",
+                        },
+                        ["TL"] = {
+                            "Magkampo tayo sa %1.",
+                        },
+                    },
+                    ["variantID"] = "variant_1",
+                },
+                {
+                    ["fallback"] = "Let's camp by the campfire.",
+                    ["realizationKey"] = "3",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.ui.suggestion.companion_camp.say.3.variant_1",
                     ["translations"] = {
                         ["EN"] = {
                             "Let's camp by the campfire.",
@@ -1203,20 +706,20 @@ return {
                             "Magkampo tayo sa tabi ng apoy.",
                         },
                     },
-                    ["variantID"] = "neutral",
+                    ["variantID"] = "variant_1",
                 },
             },
         },
-        ["id"] = "ui.suggestion.companion_campfire.utterance",
+        ["id"] = "ui.suggestion.companion_camp",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "utterance",
-            ["sourceId"] = "ui.suggestion.companion_campfire.utterance",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_campfire_utterance.json",
+            ["localId"] = "companion_camp",
+            ["sourceId"] = "ui.suggestion.companion_camp",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.companion_campfire",
+        ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1227,10 +730,44 @@ return {
             },
         },
         ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Let's camp...",
+                    },
+                    ["TL"] = {
+                        "Magkampo tayo...",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
             ["metadata"] = {
                 ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.companion_campfire.utterance",
                 ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.companion_camp.label",
+                        ["text"] = {
+                            ["EN"] = "Let's camp...",
+                            ["TL"] = "Magkampo tayo...",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.companion_camp_here.utterance",
+                        ["text"] = {
+                            ["EN"] = "Let's camp here.",
+                            ["TL"] = "Magkampo tayo rito.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.companion_camp_room.utterance",
+                        ["text"] = {
+                            ["EN"] = "Let's camp in the %1.",
+                            ["TL"] = "Magkampo tayo sa %1.",
+                        },
+                    },
                     {
                         ["key"] = "suggestion.companion_campfire.utterance",
                         ["text"] = {
@@ -1244,15 +781,51 @@ return {
             ["say"] = {
                 ["keyOrder"] = {
                     "1",
+                    "2",
+                    "3",
                 },
-                ["mode"] = "single",
+                ["mode"] = "keyed",
                 ["realizations"] = {
                     ["1"] = {
                         ["key"] = "1",
-                        ["shorthand"] = true,
+                        ["shorthand"] = false,
                         ["variants"] = {
                             {
-                                ["id"] = "neutral",
+                                ["id"] = "variant_1",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Let's camp here.",
+                                    },
+                                    ["TL"] = {
+                                        "Magkampo tayo rito.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["2"] = {
+                        ["key"] = "2",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "variant_1",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Let's camp in the %1.",
+                                    },
+                                    ["TL"] = {
+                                        "Magkampo tayo sa %1.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    ["3"] = {
+                        ["key"] = "3",
+                        ["shorthand"] = false,
+                        ["variants"] = {
+                            {
+                                ["id"] = "variant_1",
                                 ["text"] = {
                                     ["EN"] = {
                                         "Let's camp by the campfire.",
@@ -1273,7 +846,7 @@ return {
         ["responsePlan"] = {
             ["dialogueAct"] = nil,
             ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.companion_campfire.utterance",
+            ["responsePlanID"] = "ui.suggestion.companion_camp",
             ["schemaVersion"] = 1,
             ["turns"] = {
                 {
@@ -1285,9 +858,9 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "Let's camp by the campfire.",
+                            ["fallback"] = "Let's camp here.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.companion_campfire.utterance.say_1",
+                            ["templateID"] = "psdl.ui.suggestion.companion_camp.say_1",
                         },
                     },
                 },
@@ -1295,7 +868,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_campfire_utterance.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_companion_camp.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1303,10 +876,53 @@ return {
         },
         ["textRoles"] = {
             {
-                ["fallback"] = "Let's camp by the campfire.",
+                ["fallback"] = "Let's camp...",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.companion_camp.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Let's camp...",
+                    },
+                    ["TL"] = {
+                        "Magkampo tayo...",
+                    },
+                },
+            },
+            {
+                ["fallback"] = "Let's camp here.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.companion_campfire.utterance.say.1.neutral",
+                ["templateID"] = "convo.ui.suggestion.companion_camp.say.1.variant_1",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Let's camp here.",
+                    },
+                    ["TL"] = {
+                        "Magkampo tayo rito.",
+                    },
+                },
+                ["variantID"] = "variant_1",
+            },
+            {
+                ["fallback"] = "Let's camp in the %1.",
+                ["realizationKey"] = "2",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.ui.suggestion.companion_camp.say.2.variant_1",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Let's camp in the %1.",
+                    },
+                    ["TL"] = {
+                        "Magkampo tayo sa %1.",
+                    },
+                },
+                ["variantID"] = "variant_1",
+            },
+            {
+                ["fallback"] = "Let's camp by the campfire.",
+                ["realizationKey"] = "3",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.ui.suggestion.companion_camp.say.3.variant_1",
                 ["translations"] = {
                     ["EN"] = {
                         "Let's camp by the campfire.",
@@ -1315,7 +931,7 @@ return {
                         "Magkampo tayo sa tabi ng apoy.",
                     },
                 },
-                ["variantID"] = "neutral",
+                ["variantID"] = "variant_1",
             },
         },
         ["when"] = nil,
@@ -1488,155 +1104,13 @@ return {
     {
         ["domain"] = "static_suggestion_text",
         ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.follow.label",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
                 },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "Follow me.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.follow.label.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Follow me.",
-                                    },
-                                    ["TL"] = {
-                                        "Sumunod ka sa akin.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion.follow",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Follow me.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.follow.label.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Follow me.",
-                        },
-                        ["TL"] = {
-                            "Sumunod ka sa akin.",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.follow.label",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "label",
-            ["sourceId"] = "ui.suggestion.follow.label",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_follow_label.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.follow",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.follow.label",
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.follow.label",
-                        ["text"] = {
-                            ["EN"] = "Follow me.",
-                            ["TL"] = "Sumunod ka sa akin.",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Follow me.",
-                                    },
-                                    ["TL"] = {
-                                        "Sumunod ka sa akin.",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.follow.label",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Follow me.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.follow.label.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_follow_label.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Follow me.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.follow.label.say.1.neutral",
+                ["labelFallback"] = "Follow me.",
+                ["labelKey"] = "convo.ui.suggestion.follow.affordance.label",
+                ["textRole"] = "button_label",
                 ["translations"] = {
                     ["EN"] = {
                         "Follow me.",
@@ -1645,15 +1119,8 @@ return {
                         "Sumunod ka sa akin.",
                     },
                 },
-                ["variantID"] = "neutral",
             },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.follow.utterance",
+            ["familyID"] = "ui.suggestion.follow",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
                     "1",
@@ -1666,8 +1133,8 @@ return {
                         ["variants"] = {
                             {
                                 ["fallback"] = "Follow me.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.follow.utterance.say.1.neutral",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.ui.suggestion.follow.say.1.default",
                                 ["textRole"] = "spoken_action",
                                 ["translations"] = {
                                     ["EN"] = {
@@ -1683,13 +1150,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
-            ["namespace"] = "ui.suggestion.follow",
+            ["namespace"] = "ui.suggestion",
             ["textRoles"] = {
                 {
                     ["fallback"] = "Follow me.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.follow.utterance.say.1.neutral",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.follow.affordance.label",
                     ["translations"] = {
                         ["EN"] = {
                             "Follow me.",
@@ -1698,20 +1164,34 @@ return {
                             "Sumunod ka sa akin.",
                         },
                     },
-                    ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Follow me.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.ui.suggestion.follow.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Follow me.",
+                        },
+                        ["TL"] = {
+                            "Sumunod ka sa akin.",
+                        },
+                    },
+                    ["variantID"] = "default",
                 },
             },
         },
-        ["id"] = "ui.suggestion.follow.utterance",
+        ["id"] = "ui.suggestion.follow",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "utterance",
-            ["sourceId"] = "ui.suggestion.follow.utterance",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_follow_utterance.json",
+            ["localId"] = "follow",
+            ["sourceId"] = "ui.suggestion.follow",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_follow.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.follow",
+        ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -1722,10 +1202,30 @@ return {
             },
         },
         ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Follow me.",
+                    },
+                    ["TL"] = {
+                        "Sumunod ka sa akin.",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
             ["metadata"] = {
                 ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.follow.utterance",
                 ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.follow.label",
+                        ["text"] = {
+                            ["EN"] = "Follow me.",
+                            ["TL"] = "Sumunod ka sa akin.",
+                        },
+                    },
                     {
                         ["key"] = "suggestion.follow.utterance",
                         ["text"] = {
@@ -1747,7 +1247,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["id"] = "neutral",
+                                ["id"] = "default",
                                 ["text"] = {
                                     ["EN"] = {
                                         "Follow me.",
@@ -1768,7 +1268,7 @@ return {
         ["responsePlan"] = {
             ["dialogueAct"] = nil,
             ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.follow.utterance",
+            ["responsePlanID"] = "ui.suggestion.follow",
             ["schemaVersion"] = 1,
             ["turns"] = {
                 {
@@ -1782,7 +1282,7 @@ return {
                             },
                             ["fallback"] = "Follow me.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.follow.utterance.say_1",
+                            ["templateID"] = "psdl.ui.suggestion.follow.say_1",
                         },
                     },
                 },
@@ -1790,7 +1290,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_follow_utterance.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_follow.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -1799,9 +1299,8 @@ return {
         ["textRoles"] = {
             {
                 ["fallback"] = "Follow me.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.follow.utterance.say.1.neutral",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.follow.affordance.label",
                 ["translations"] = {
                     ["EN"] = {
                         "Follow me.",
@@ -1810,7 +1309,21 @@ return {
                         "Sumunod ka sa akin.",
                     },
                 },
-                ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "Follow me.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.ui.suggestion.follow.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Follow me.",
+                    },
+                    ["TL"] = {
+                        "Sumunod ka sa akin.",
+                    },
+                },
+                ["variantID"] = "default",
             },
         },
         ["when"] = nil,
@@ -1818,155 +1331,13 @@ return {
     {
         ["domain"] = "static_suggestion_text",
         ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.greeting_report_fine.label",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
                 },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "Say you're doing fine",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.greeting_report_fine.label.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Say you're doing fine",
-                                    },
-                                    ["TL"] = {
-                                        "Sabihing ayos ka lang",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion.greeting_report_fine",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Say you're doing fine",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.greeting_report_fine.label.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Say you're doing fine",
-                        },
-                        ["TL"] = {
-                            "Sabihing ayos ka lang",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.greeting_report_fine.label",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "label",
-            ["sourceId"] = "ui.suggestion.greeting_report_fine.label",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine_label.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.greeting_report_fine",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.greeting_report_fine.label",
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.greeting_report_fine.label",
-                        ["text"] = {
-                            ["EN"] = "Say you're doing fine",
-                            ["TL"] = "Sabihing ayos ka lang",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Say you're doing fine",
-                                    },
-                                    ["TL"] = {
-                                        "Sabihing ayos ka lang",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.greeting_report_fine.label",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Say you're doing fine",
-                            ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.greeting_report_fine.label.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine_label.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Say you're doing fine",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.greeting_report_fine.label.say.1.neutral",
+                ["labelFallback"] = "Say you're doing fine",
+                ["labelKey"] = "convo.ui.suggestion.greeting_report_fine.affordance.label",
+                ["textRole"] = "button_label",
                 ["translations"] = {
                     ["EN"] = {
                         "Say you're doing fine",
@@ -1975,15 +1346,8 @@ return {
                         "Sabihing ayos ka lang",
                     },
                 },
-                ["variantID"] = "neutral",
             },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.greeting_report_fine.utterance",
+            ["familyID"] = "ui.suggestion.greeting_report_fine",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
                     "1",
@@ -1996,8 +1360,8 @@ return {
                         ["variants"] = {
                             {
                                 ["fallback"] = "I'm fine, thank you.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.greeting_report_fine.utterance.say.1.neutral",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.ui.suggestion.greeting_report_fine.say.1.default",
                                 ["textRole"] = "spoken_action",
                                 ["translations"] = {
                                     ["EN"] = {
@@ -2013,13 +1377,26 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
-            ["namespace"] = "ui.suggestion.greeting_report_fine",
+            ["namespace"] = "ui.suggestion",
             ["textRoles"] = {
+                {
+                    ["fallback"] = "Say you're doing fine",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.greeting_report_fine.affordance.label",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Say you're doing fine",
+                        },
+                        ["TL"] = {
+                            "Sabihing ayos ka lang",
+                        },
+                    },
+                },
                 {
                     ["fallback"] = "I'm fine, thank you.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.greeting_report_fine.utterance.say.1.neutral",
+                    ["templateID"] = "convo.ui.suggestion.greeting_report_fine.say.1.default",
                     ["translations"] = {
                         ["EN"] = {
                             "I'm fine, thank you.",
@@ -2028,20 +1405,20 @@ return {
                             "Ayos lang ako, salamat.",
                         },
                     },
-                    ["variantID"] = "neutral",
+                    ["variantID"] = "default",
                 },
             },
         },
-        ["id"] = "ui.suggestion.greeting_report_fine.utterance",
+        ["id"] = "ui.suggestion.greeting_report_fine",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "utterance",
-            ["sourceId"] = "ui.suggestion.greeting_report_fine.utterance",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine_utterance.json",
+            ["localId"] = "greeting_report_fine",
+            ["sourceId"] = "ui.suggestion.greeting_report_fine",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.greeting_report_fine",
+        ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2052,10 +1429,30 @@ return {
             },
         },
         ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Say you're doing fine",
+                    },
+                    ["TL"] = {
+                        "Sabihing ayos ka lang",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
             ["metadata"] = {
                 ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.greeting_report_fine.utterance",
                 ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.greeting_report_fine.label",
+                        ["text"] = {
+                            ["EN"] = "Say you're doing fine",
+                            ["TL"] = "Sabihing ayos ka lang",
+                        },
+                    },
                     {
                         ["key"] = "suggestion.greeting_report_fine.utterance",
                         ["text"] = {
@@ -2077,7 +1474,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["id"] = "neutral",
+                                ["id"] = "default",
                                 ["text"] = {
                                     ["EN"] = {
                                         "I'm fine, thank you.",
@@ -2098,7 +1495,7 @@ return {
         ["responsePlan"] = {
             ["dialogueAct"] = nil,
             ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.greeting_report_fine.utterance",
+            ["responsePlanID"] = "ui.suggestion.greeting_report_fine",
             ["schemaVersion"] = 1,
             ["turns"] = {
                 {
@@ -2112,7 +1509,7 @@ return {
                             },
                             ["fallback"] = "I'm fine, thank you.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.greeting_report_fine.utterance.say_1",
+                            ["templateID"] = "psdl.ui.suggestion.greeting_report_fine.say_1",
                         },
                     },
                 },
@@ -2120,7 +1517,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine_utterance.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_report_fine.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2128,10 +1525,23 @@ return {
         },
         ["textRoles"] = {
             {
+                ["fallback"] = "Say you're doing fine",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.greeting_report_fine.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Say you're doing fine",
+                    },
+                    ["TL"] = {
+                        "Sabihing ayos ka lang",
+                    },
+                },
+            },
+            {
                 ["fallback"] = "I'm fine, thank you.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.greeting_report_fine.utterance.say.1.neutral",
+                ["templateID"] = "convo.ui.suggestion.greeting_report_fine.say.1.default",
                 ["translations"] = {
                     ["EN"] = {
                         "I'm fine, thank you.",
@@ -2140,7 +1550,7 @@ return {
                         "Ayos lang ako, salamat.",
                     },
                 },
-                ["variantID"] = "neutral",
+                ["variantID"] = "default",
             },
         },
         ["when"] = nil,
@@ -2148,155 +1558,13 @@ return {
     {
         ["domain"] = "static_suggestion_text",
         ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.greeting_thank.label",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
                 },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "Thank them",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.greeting_thank.label.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Thank them",
-                                    },
-                                    ["TL"] = {
-                                        "Pasalamatan siya",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion.greeting_thank",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Thank them",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.greeting_thank.label.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Thank them",
-                        },
-                        ["TL"] = {
-                            "Pasalamatan siya",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.greeting_thank.label",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "label",
-            ["sourceId"] = "ui.suggestion.greeting_thank.label",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_thank_label.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.greeting_thank",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.greeting_thank.label",
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.greeting_thank.label",
-                        ["text"] = {
-                            ["EN"] = "Thank them",
-                            ["TL"] = "Pasalamatan siya",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Thank them",
-                                    },
-                                    ["TL"] = {
-                                        "Pasalamatan siya",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.greeting_thank.label",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Thank them",
-                            ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.greeting_thank.label.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_thank_label.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Thank them",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.greeting_thank.label.say.1.neutral",
+                ["labelFallback"] = "Thank them",
+                ["labelKey"] = "convo.ui.suggestion.greeting_thank.affordance.label",
+                ["textRole"] = "button_label",
                 ["translations"] = {
                     ["EN"] = {
                         "Thank them",
@@ -2305,15 +1573,8 @@ return {
                         "Pasalamatan siya",
                     },
                 },
-                ["variantID"] = "neutral",
             },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.greeting_thank.utterance",
+            ["familyID"] = "ui.suggestion.greeting_thank",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
                     "1",
@@ -2326,8 +1587,8 @@ return {
                         ["variants"] = {
                             {
                                 ["fallback"] = "Thanks.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.greeting_thank.utterance.say.1.neutral",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.ui.suggestion.greeting_thank.say.1.default",
                                 ["textRole"] = "spoken_action",
                                 ["translations"] = {
                                     ["EN"] = {
@@ -2343,13 +1604,26 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
-            ["namespace"] = "ui.suggestion.greeting_thank",
+            ["namespace"] = "ui.suggestion",
             ["textRoles"] = {
+                {
+                    ["fallback"] = "Thank them",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.greeting_thank.affordance.label",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Thank them",
+                        },
+                        ["TL"] = {
+                            "Pasalamatan siya",
+                        },
+                    },
+                },
                 {
                     ["fallback"] = "Thanks.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.greeting_thank.utterance.say.1.neutral",
+                    ["templateID"] = "convo.ui.suggestion.greeting_thank.say.1.default",
                     ["translations"] = {
                         ["EN"] = {
                             "Thanks.",
@@ -2358,20 +1632,20 @@ return {
                             "Salamat.",
                         },
                     },
-                    ["variantID"] = "neutral",
+                    ["variantID"] = "default",
                 },
             },
         },
-        ["id"] = "ui.suggestion.greeting_thank.utterance",
+        ["id"] = "ui.suggestion.greeting_thank",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "utterance",
-            ["sourceId"] = "ui.suggestion.greeting_thank.utterance",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_thank_utterance.json",
+            ["localId"] = "greeting_thank",
+            ["sourceId"] = "ui.suggestion.greeting_thank",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_thank.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.greeting_thank",
+        ["namespace"] = "ui.suggestion",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -2382,10 +1656,30 @@ return {
             },
         },
         ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Thank them",
+                    },
+                    ["TL"] = {
+                        "Pasalamatan siya",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
             ["metadata"] = {
                 ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.greeting_thank.utterance",
                 ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.greeting_thank.label",
+                        ["text"] = {
+                            ["EN"] = "Thank them",
+                            ["TL"] = "Pasalamatan siya",
+                        },
+                    },
                     {
                         ["key"] = "suggestion.greeting_thank.utterance",
                         ["text"] = {
@@ -2407,7 +1701,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["id"] = "neutral",
+                                ["id"] = "default",
                                 ["text"] = {
                                     ["EN"] = {
                                         "Thanks.",
@@ -2428,7 +1722,7 @@ return {
         ["responsePlan"] = {
             ["dialogueAct"] = nil,
             ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.greeting_thank.utterance",
+            ["responsePlanID"] = "ui.suggestion.greeting_thank",
             ["schemaVersion"] = 1,
             ["turns"] = {
                 {
@@ -2442,7 +1736,7 @@ return {
                             },
                             ["fallback"] = "Thanks.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.greeting_thank.utterance.say_1",
+                            ["templateID"] = "psdl.ui.suggestion.greeting_thank.say_1",
                         },
                     },
                 },
@@ -2450,7 +1744,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_thank_utterance.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_greeting_thank.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -2458,10 +1752,23 @@ return {
         },
         ["textRoles"] = {
             {
+                ["fallback"] = "Thank them",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.greeting_thank.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Thank them",
+                    },
+                    ["TL"] = {
+                        "Pasalamatan siya",
+                    },
+                },
+            },
+            {
                 ["fallback"] = "Thanks.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.greeting_thank.utterance.say.1.neutral",
+                ["templateID"] = "convo.ui.suggestion.greeting_thank.say.1.default",
                 ["translations"] = {
                     ["EN"] = {
                         "Thanks.",
@@ -2470,7 +1777,7 @@ return {
                         "Salamat.",
                     },
                 },
-                ["variantID"] = "neutral",
+                ["variantID"] = "default",
             },
         },
         ["when"] = nil,
@@ -4623,155 +3930,13 @@ return {
     {
         ["domain"] = "static_suggestion_text",
         ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.identity.lie.label",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
                 },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "Lie about your name",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.identity.lie.label.say.1.neutral",
-                                ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Lie about your name",
-                                    },
-                                    ["TL"] = {
-                                        "Magsinungaling tungkol sa pangalan",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "ui.suggestion.identity.lie",
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "Lie about your name",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.identity.lie.label.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Lie about your name",
-                        },
-                        ["TL"] = {
-                            "Magsinungaling tungkol sa pangalan",
-                        },
-                    },
-                    ["variantID"] = "neutral",
-                },
-            },
-        },
-        ["id"] = "ui.suggestion.identity.lie.label",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["localId"] = "label",
-            ["sourceId"] = "ui.suggestion.identity.lie.label",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie_label.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.identity.lie",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.identity.lie.label",
-                ["textRows"] = {
-                    {
-                        ["key"] = "suggestion.identity.lie.label",
-                        ["text"] = {
-                            ["EN"] = "Lie about your name",
-                            ["TL"] = "Magsinungaling tungkol sa pangalan",
-                        },
-                    },
-                },
-                ["textTarget"] = "UI_PNC_Conversation",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Lie about your name",
-                                    },
-                                    ["TL"] = {
-                                        "Magsinungaling tungkol sa pangalan",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.identity.lie.label",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "Lie about your name",
-                            ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.identity.lie.label.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie_label.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "Lie about your name",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.identity.lie.label.say.1.neutral",
+                ["labelFallback"] = "Lie about your name",
+                ["labelKey"] = "convo.ui.suggestion.identity.lie.affordance.label",
+                ["textRole"] = "button_label",
                 ["translations"] = {
                     ["EN"] = {
                         "Lie about your name",
@@ -4780,15 +3945,8 @@ return {
                         "Magsinungaling tungkol sa pangalan",
                     },
                 },
-                ["variantID"] = "neutral",
             },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "static_suggestion_text",
-        ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.identity.lie.utterance",
+            ["familyID"] = "ui.suggestion.identity.lie",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
                     "1",
@@ -4801,8 +3959,8 @@ return {
                         ["variants"] = {
                             {
                                 ["fallback"] = "I'll go by a different name.",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.identity.lie.utterance.say.1.neutral",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.ui.suggestion.identity.lie.say.1.default",
                                 ["textRole"] = "spoken_action",
                                 ["translations"] = {
                                     ["EN"] = {
@@ -4818,13 +3976,26 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
-            ["namespace"] = "ui.suggestion.identity.lie",
+            ["namespace"] = "ui.suggestion.identity",
             ["textRoles"] = {
+                {
+                    ["fallback"] = "Lie about your name",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.identity.lie.affordance.label",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Lie about your name",
+                        },
+                        ["TL"] = {
+                            "Magsinungaling tungkol sa pangalan",
+                        },
+                    },
+                },
                 {
                     ["fallback"] = "I'll go by a different name.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.identity.lie.utterance.say.1.neutral",
+                    ["templateID"] = "convo.ui.suggestion.identity.lie.say.1.default",
                     ["translations"] = {
                         ["EN"] = {
                             "I'll go by a different name.",
@@ -4833,20 +4004,20 @@ return {
                             "Ibang pangalan ang gagamitin ko.",
                         },
                     },
-                    ["variantID"] = "neutral",
+                    ["variantID"] = "default",
                 },
             },
         },
-        ["id"] = "ui.suggestion.identity.lie.utterance",
+        ["id"] = "ui.suggestion.identity.lie",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "utterance",
-            ["sourceId"] = "ui.suggestion.identity.lie.utterance",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie_utterance.json",
+            ["localId"] = "lie",
+            ["sourceId"] = "ui.suggestion.identity.lie",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.identity.lie",
+        ["namespace"] = "ui.suggestion.identity",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -4857,10 +4028,30 @@ return {
             },
         },
         ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Lie about your name",
+                    },
+                    ["TL"] = {
+                        "Magsinungaling tungkol sa pangalan",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
             ["metadata"] = {
                 ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.identity.lie.utterance",
                 ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.identity.lie.label",
+                        ["text"] = {
+                            ["EN"] = "Lie about your name",
+                            ["TL"] = "Magsinungaling tungkol sa pangalan",
+                        },
+                    },
                     {
                         ["key"] = "suggestion.identity.lie.utterance",
                         ["text"] = {
@@ -4882,7 +4073,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["id"] = "neutral",
+                                ["id"] = "default",
                                 ["text"] = {
                                     ["EN"] = {
                                         "I'll go by a different name.",
@@ -4903,7 +4094,7 @@ return {
         ["responsePlan"] = {
             ["dialogueAct"] = nil,
             ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.identity.lie.utterance",
+            ["responsePlanID"] = "ui.suggestion.identity.lie",
             ["schemaVersion"] = 1,
             ["turns"] = {
                 {
@@ -4917,7 +4108,7 @@ return {
                             },
                             ["fallback"] = "I'll go by a different name.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.identity.lie.utterance.say_1",
+                            ["templateID"] = "psdl.ui.suggestion.identity.lie.say_1",
                         },
                     },
                 },
@@ -4925,7 +4116,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie_utterance.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_lie.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -4933,10 +4124,23 @@ return {
         },
         ["textRoles"] = {
             {
+                ["fallback"] = "Lie about your name",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.identity.lie.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Lie about your name",
+                    },
+                    ["TL"] = {
+                        "Magsinungaling tungkol sa pangalan",
+                    },
+                },
+            },
+            {
                 ["fallback"] = "I'll go by a different name.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.identity.lie.utterance.say.1.neutral",
+                ["templateID"] = "convo.ui.suggestion.identity.lie.say.1.default",
                 ["translations"] = {
                     ["EN"] = {
                         "I'll go by a different name.",
@@ -4945,7 +4149,7 @@ return {
                         "Ibang pangalan ang gagamitin ko.",
                     },
                 },
-                ["variantID"] = "neutral",
+                ["variantID"] = "default",
             },
         },
         ["when"] = nil,
@@ -4953,7 +4157,23 @@ return {
     {
         ["domain"] = "static_suggestion_text",
         ["exchangeFamily"] = {
-            ["familyID"] = "ui.suggestion.identity.real.label",
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["labelFallback"] = "Say your real name",
+                ["labelKey"] = "convo.ui.suggestion.identity.real.affordance.label",
+                ["textRole"] = "button_label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Say your real name",
+                    },
+                    ["TL"] = {
+                        "Sabihin ang tunay mong pangalan",
+                    },
+                },
+            },
+            ["familyID"] = "ui.suggestion.identity.real",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
                     "1",
@@ -4965,16 +4185,16 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Say your real name",
-                                ["id"] = "neutral",
-                                ["templateID"] = "convo.ui.suggestion.identity.real.label.say.1.neutral",
+                                ["fallback"] = "My real name.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.ui.suggestion.identity.real.say.1.default",
                                 ["textRole"] = "spoken_action",
                                 ["translations"] = {
                                     ["EN"] = {
-                                        "Say your real name",
+                                        "My real name.",
                                     },
                                     ["TL"] = {
-                                        "Sabihin ang tunay mong pangalan",
+                                        "Tunay kong pangalan.",
                                     },
                                 },
                             },
@@ -4983,13 +4203,12 @@ return {
                 },
                 ["textRole"] = "spoken_action",
             },
-            ["namespace"] = "ui.suggestion.identity.real",
+            ["namespace"] = "ui.suggestion.identity",
             ["textRoles"] = {
                 {
                     ["fallback"] = "Say your real name",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.ui.suggestion.identity.real.label.say.1.neutral",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.identity.real.affordance.label",
                     ["translations"] = {
                         ["EN"] = {
                             "Say your real name",
@@ -4998,20 +4217,459 @@ return {
                             "Sabihin ang tunay mong pangalan",
                         },
                     },
+                },
+                {
+                    ["fallback"] = "My real name.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.ui.suggestion.identity.real.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "My real name.",
+                        },
+                        ["TL"] = {
+                            "Tunay kong pangalan.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "ui.suggestion.identity.real",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["localId"] = "real",
+            ["sourceId"] = "ui.suggestion.identity.real",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_real.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.identity",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Say your real name",
+                    },
+                    ["TL"] = {
+                        "Sabihin ang tunay mong pangalan",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
+            ["metadata"] = {
+                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+                ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.identity.real.label",
+                        ["text"] = {
+                            ["EN"] = "Say your real name",
+                            ["TL"] = "Sabihin ang tunay mong pangalan",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.identity.real.utterance",
+                        ["text"] = {
+                            ["EN"] = "My real name.",
+                            ["TL"] = "Tunay kong pangalan.",
+                        },
+                    },
+                },
+                ["textTarget"] = "UI_PNC_Conversation",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "My real name.",
+                                    },
+                                    ["TL"] = {
+                                        "Tunay kong pangalan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "ui.suggestion.identity.real",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "My real name.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.ui.suggestion.identity.real.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_real.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Say your real name",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.identity.real.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Say your real name",
+                    },
+                    ["TL"] = {
+                        "Sabihin ang tunay mong pangalan",
+                    },
+                },
+            },
+            {
+                ["fallback"] = "My real name.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.ui.suggestion.identity.real.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "My real name.",
+                    },
+                    ["TL"] = {
+                        "Tunay kong pangalan.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "static_suggestion_text",
+        ["exchangeFamily"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["labelFallback"] = "Don't tell your name",
+                ["labelKey"] = "convo.ui.suggestion.identity.rude.affordance.label",
+                ["textRole"] = "button_label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Don't tell your name",
+                    },
+                    ["TL"] = {
+                        "Huwag sabihin ang pangalan",
+                    },
+                },
+            },
+            ["familyID"] = "ui.suggestion.identity.rude",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "That's none of your business.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.ui.suggestion.identity.rude.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "That's none of your business.",
+                                    },
+                                    ["TL"] = {
+                                        "Wala ka nang pakialam.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "ui.suggestion.identity",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Don't tell your name",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.identity.rude.affordance.label",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Don't tell your name",
+                        },
+                        ["TL"] = {
+                            "Huwag sabihin ang pangalan",
+                        },
+                    },
+                },
+                {
+                    ["fallback"] = "That's none of your business.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.ui.suggestion.identity.rude.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "That's none of your business.",
+                        },
+                        ["TL"] = {
+                            "Wala ka nang pakialam.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "ui.suggestion.identity.rude",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["localId"] = "rude",
+            ["sourceId"] = "ui.suggestion.identity.rude",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_rude.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion.identity",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Don't tell your name",
+                    },
+                    ["TL"] = {
+                        "Huwag sabihin ang pangalan",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
+            ["metadata"] = {
+                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+                ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.identity.rude.label",
+                        ["text"] = {
+                            ["EN"] = "Don't tell your name",
+                            ["TL"] = "Huwag sabihin ang pangalan",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.identity.rude.utterance",
+                        ["text"] = {
+                            ["EN"] = "That's none of your business.",
+                            ["TL"] = "Wala ka nang pakialam.",
+                        },
+                    },
+                },
+                ["textTarget"] = "UI_PNC_Conversation",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "That's none of your business.",
+                                    },
+                                    ["TL"] = {
+                                        "Wala ka nang pakialam.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "ui.suggestion.identity.rude",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "That's none of your business.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.ui.suggestion.identity.rude.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_rude.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Don't tell your name",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.identity.rude.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Don't tell your name",
+                    },
+                    ["TL"] = {
+                        "Huwag sabihin ang pangalan",
+                    },
+                },
+            },
+            {
+                ["fallback"] = "That's none of your business.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.ui.suggestion.identity.rude.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "That's none of your business.",
+                    },
+                    ["TL"] = {
+                        "Wala ka nang pakialam.",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "static_suggestion_text",
+        ["exchangeFamily"] = {
+            ["familyID"] = "ui.suggestion.needs_destination.tooltip",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Choose a destination first.",
+                                ["id"] = "neutral",
+                                ["templateID"] = "convo.ui.suggestion.needs_destination.tooltip.say.1.neutral",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Choose a destination first.",
+                                    },
+                                    ["TL"] = {
+                                        "Pumili muna ng pupuntahan.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "ui.suggestion.needs_destination",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Choose a destination first.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.ui.suggestion.needs_destination.tooltip.say.1.neutral",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Choose a destination first.",
+                        },
+                        ["TL"] = {
+                            "Pumili muna ng pupuntahan.",
+                        },
+                    },
                     ["variantID"] = "neutral",
                 },
             },
         },
-        ["id"] = "ui.suggestion.identity.real.label",
+        ["id"] = "ui.suggestion.needs_destination.tooltip",
         ["kind"] = "dialogue",
         ["lineage"] = {
-            ["localId"] = "label",
-            ["sourceId"] = "ui.suggestion.identity.real.label",
-            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_real_label.json",
+            ["localId"] = "tooltip",
+            ["sourceId"] = "ui.suggestion.needs_destination.tooltip",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_needs_destination_tooltip.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
         ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
-        ["namespace"] = "ui.suggestion.identity.real",
+        ["namespace"] = "ui.suggestion.needs_destination",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
             ["addressee"] = {
@@ -5024,13 +4682,13 @@ return {
         ["payload"] = {
             ["metadata"] = {
                 ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
-                ["textKey"] = "suggestion.identity.real.label",
+                ["textKey"] = "suggestion.needs_destination.tooltip",
                 ["textRows"] = {
                     {
-                        ["key"] = "suggestion.identity.real.label",
+                        ["key"] = "suggestion.needs_destination.tooltip",
                         ["text"] = {
-                            ["EN"] = "Say your real name",
-                            ["TL"] = "Sabihin ang tunay mong pangalan",
+                            ["EN"] = "Choose a destination first.",
+                            ["TL"] = "Pumili muna ng pupuntahan.",
                         },
                     },
                 },
@@ -5050,10 +4708,10 @@ return {
                                 ["id"] = "neutral",
                                 ["text"] = {
                                     ["EN"] = {
-                                        "Say your real name",
+                                        "Choose a destination first.",
                                     },
                                     ["TL"] = {
-                                        "Sabihin ang tunay mong pangalan",
+                                        "Pumili muna ng pupuntahan.",
                                     },
                                 },
                             },
@@ -5068,7 +4726,7 @@ return {
         ["responsePlan"] = {
             ["dialogueAct"] = nil,
             ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "ui.suggestion.identity.real.label",
+            ["responsePlanID"] = "ui.suggestion.needs_destination.tooltip",
             ["schemaVersion"] = 1,
             ["turns"] = {
                 {
@@ -5080,9 +4738,9 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "Say your real name",
+                            ["fallback"] = "Choose a destination first.",
                             ["kind"] = "translation",
-                            ["templateID"] = "psdl.ui.suggestion.identity.real.label.say_1",
+                            ["templateID"] = "psdl.ui.suggestion.needs_destination.tooltip.say_1",
                         },
                     },
                 },
@@ -5090,7 +4748,7 @@ return {
         },
         ["slots"] = {
         },
-        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_identity_real_label.json",
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_needs_destination_tooltip.json",
         ["target"] = {
             ["multiple"] = false,
             ["required"] = false,
@@ -5098,19 +4756,473 @@ return {
         },
         ["textRoles"] = {
             {
-                ["fallback"] = "Say your real name",
+                ["fallback"] = "Choose a destination first.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
-                ["templateID"] = "convo.ui.suggestion.identity.real.label.say.1.neutral",
+                ["templateID"] = "convo.ui.suggestion.needs_destination.tooltip.say.1.neutral",
                 ["translations"] = {
                     ["EN"] = {
-                        "Say your real name",
+                        "Choose a destination first.",
                     },
                     ["TL"] = {
-                        "Sabihin ang tunay mong pangalan",
+                        "Pumili muna ng pupuntahan.",
                     },
                 },
                 ["variantID"] = "neutral",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "static_suggestion_text",
+        ["exchangeFamily"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["labelFallback"] = "Ask what's on their mind",
+                ["labelKey"] = "convo.ui.suggestion.personal_check_in.affordance.label",
+                ["textRole"] = "button_label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Ask what's on their mind",
+                    },
+                    ["TL"] = {
+                        "Alamin kung may bumabagabag sa kanya",
+                    },
+                },
+            },
+            ["familyID"] = "ui.suggestion.personal_check_in",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Anything bothering you?",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.ui.suggestion.personal_check_in.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Anything bothering you?",
+                                    },
+                                    ["TL"] = {
+                                        "May bumabagabag ba sa'yo?",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "ui.suggestion",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Ask what's on their mind",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.personal_check_in.affordance.label",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Ask what's on their mind",
+                        },
+                        ["TL"] = {
+                            "Alamin kung may bumabagabag sa kanya",
+                        },
+                    },
+                },
+                {
+                    ["fallback"] = "Anything bothering you?",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.ui.suggestion.personal_check_in.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Anything bothering you?",
+                        },
+                        ["TL"] = {
+                            "May bumabagabag ba sa'yo?",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "ui.suggestion.personal_check_in",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["localId"] = "personal_check_in",
+            ["sourceId"] = "ui.suggestion.personal_check_in",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_personal_check_in.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Ask what's on their mind",
+                    },
+                    ["TL"] = {
+                        "Alamin kung may bumabagabag sa kanya",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
+            ["metadata"] = {
+                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+                ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.personal_check_in.label",
+                        ["text"] = {
+                            ["EN"] = "Ask what's on their mind",
+                            ["TL"] = "Alamin kung may bumabagabag sa kanya",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.personal_check_in.utterance",
+                        ["text"] = {
+                            ["EN"] = "Anything bothering you?",
+                            ["TL"] = "May bumabagabag ba sa'yo?",
+                        },
+                    },
+                },
+                ["textTarget"] = "UI_PNC_Conversation",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Anything bothering you?",
+                                    },
+                                    ["TL"] = {
+                                        "May bumabagabag ba sa'yo?",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "ui.suggestion.personal_check_in",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Anything bothering you?",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.ui.suggestion.personal_check_in.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_personal_check_in.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Ask what's on their mind",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.personal_check_in.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Ask what's on their mind",
+                    },
+                    ["TL"] = {
+                        "Alamin kung may bumabagabag sa kanya",
+                    },
+                },
+            },
+            {
+                ["fallback"] = "Anything bothering you?",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.ui.suggestion.personal_check_in.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Anything bothering you?",
+                    },
+                    ["TL"] = {
+                        "May bumabagabag ba sa'yo?",
+                    },
+                },
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "static_suggestion_text",
+        ["exchangeFamily"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["labelFallback"] = "Wait here.",
+                ["labelKey"] = "convo.ui.suggestion.stay.affordance.label",
+                ["textRole"] = "button_label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Wait here.",
+                    },
+                    ["TL"] = {
+                        "Dito ka maghintay.",
+                    },
+                },
+            },
+            ["familyID"] = "ui.suggestion.stay",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Wait here.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["translations"] = {
+                                    ["EN"] = {
+                                        "Wait here.",
+                                    },
+                                    ["TL"] = {
+                                        "Dito ka maghintay.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "ui.suggestion",
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Wait here.",
+                    ["role"] = "button_label",
+                    ["templateID"] = "convo.ui.suggestion.stay.affordance.label",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Wait here.",
+                        },
+                        ["TL"] = {
+                            "Dito ka maghintay.",
+                        },
+                    },
+                },
+                {
+                    ["fallback"] = "Wait here.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
+                    ["translations"] = {
+                        ["EN"] = {
+                            "Wait here.",
+                        },
+                        ["TL"] = {
+                            "Dito ka maghintay.",
+                        },
+                    },
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "ui.suggestion.stay",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["localId"] = "stay",
+            ["sourceId"] = "ui.suggestion.stay",
+            ["sourcePath"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_stay.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/StaticSuggestionText",
+        ["namespace"] = "ui.suggestion",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["affordance"] = {
+                ["consumers"] = {
+                    "player",
+                },
+                ["label"] = {
+                    ["EN"] = {
+                        "Wait here.",
+                    },
+                    ["TL"] = {
+                        "Dito ka maghintay.",
+                    },
+                },
+                ["textRole"] = "button_label",
+            },
+            ["metadata"] = {
+                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
+                ["textRows"] = {
+                    {
+                        ["key"] = "suggestion.stay.label",
+                        ["text"] = {
+                            ["EN"] = "Wait here.",
+                            ["TL"] = "Dito ka maghintay.",
+                        },
+                    },
+                    {
+                        ["key"] = "suggestion.stay.utterance",
+                        ["text"] = {
+                            ["EN"] = "Wait here.",
+                            ["TL"] = "Dito ka maghintay.",
+                        },
+                    },
+                },
+                ["textTarget"] = "UI_PNC_Conversation",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["id"] = "default",
+                                ["text"] = {
+                                    ["EN"] = {
+                                        "Wait here.",
+                                    },
+                                    ["TL"] = {
+                                        "Dito ka maghintay.",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = nil,
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "ui.suggestion.stay",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Wait here.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "psdl.ui.suggestion.stay.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["slots"] = {
+        },
+        ["sourceShard"] = "adopters/hoomans/dialogue/static_suggestion_text/ui_suggestion_stay.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Wait here.",
+                ["role"] = "button_label",
+                ["templateID"] = "convo.ui.suggestion.stay.affordance.label",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Wait here.",
+                    },
+                    ["TL"] = {
+                        "Dito ka maghintay.",
+                    },
+                },
+            },
+            {
+                ["fallback"] = "Wait here.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.ui.suggestion.stay.say.1.default",
+                ["translations"] = {
+                    ["EN"] = {
+                        "Wait here.",
+                    },
+                    ["TL"] = {
+                        "Dito ka maghintay.",
+                    },
+                },
+                ["variantID"] = "default",
             },
         },
         ["when"] = nil,

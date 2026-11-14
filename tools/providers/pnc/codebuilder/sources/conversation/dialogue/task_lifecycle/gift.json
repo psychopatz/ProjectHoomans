@@ -1,0 +1,167 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "id": "gift",
+  "owner": "ProjectHoomans",
+  "participants": {
+    "speaker": [
+      "participant"
+    ],
+    "addressee": [
+      "participant"
+    ]
+  },
+  "metadata": {
+    "category": "projecthoomans:task_lifecycle",
+    "contentOwner": "projecthoomans.dialogue_content.tool_replies",
+    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/gift.json",
+    "responseAct": "REACT"
+  },
+  "reply": {
+    "completed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "Thank you for the gift.",
+          "I appreciate this gesture. Thank you.",
+          "That's generous of you. Thanks.",
+          "Thank you! This will be put to good use.",
+          "A welcome surprise. Thank you, friend.",
+          "Much obliged for the gift.",
+          "I'm grateful for this. Thank you.",
+          "You didn't have to, but thanks a lot.",
+          "Received with gratitude. Thank you.",
+          "Thanks for thinking of me with this gift."
+        ],
+        "TL": [
+          "Salamat sa regalo.",
+          "Salamat sa magandang kalooban. Maraming salamat.",
+          "Bukas-palad ka. Salamat.",
+          "Salamat! Magagamit ito nang maayos.",
+          "Magandang sorpresa. Salamat, kaibigan.",
+          "Maraming salamat sa regalo.",
+          "Nagpapasalamat ako rito. Salamat.",
+          "Di mo kailangang gawin, pero maraming salamat.",
+          "Tinatanggap kalakip ang pasasalamat. Salamat.",
+          "Salamat sa pag-alala sa akin sa regalong ito."
+        ]
+      }
+    },
+    "failed": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I couldn't accept that gift.",
+          "Something went wrong while transferring the gift.",
+          "Gift transfer failed. My hands were full.",
+          "Couldn't receive that right now.",
+          "Unable to take the gift into my inventory.",
+          "Transaction interrupted. Gift not taken.",
+          "Failed to receive the offering.",
+          "I dropped it or couldn't hold it.",
+          "Gift transfer could not be completed.",
+          "Couldn't take that from you."
+        ],
+        "TL": [
+          "Hindi ko matanggap ang regalong iyan.",
+          "May nangyaring mali habang ipinapasa ang regalo.",
+          "Bigo ang paglipat ng regalo. Puno ang kamay ko.",
+          "Di matanggap 'yan sa ngayon.",
+          "Di mailagay ang regalo sa lalagyan ko.",
+          "Naabala ang pagbibigay. Di nakuha ang regalo.",
+          "Bigo sa pagtanggap ng alay.",
+          "Nahulog ko o di nahawakan.",
+          "Di natapos ang paglipat ng regalo.",
+          "Di ko nakuha 'yan mula sa 'yo."
+        ]
+      }
+    },
+    "pending": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I'll take a look at that gift.",
+          "Let's see what you brought.",
+          "Considering the gift now.",
+          "Inspecting what you have for me.",
+          "Hold on, looking at the offering.",
+          "I'll review the item you offered.",
+          "Checking out the gift.",
+          "Let me examine what this is.",
+          "Looking over your gift.",
+          "Give me a second to check this item."
+        ],
+        "TL": [
+          "Titingnan ko ang regalong iyan.",
+          "Tingnan natin kung ano ang dala mo.",
+          "Tinitingnan ang regalo ngayon.",
+          "Sinusuri ang handog mo para sa akin.",
+          "Teka, tinitingnan ang iniaalok.",
+          "Susuriin ko ang bagay na inialok mo.",
+          "Tinitingnan ang regalo.",
+          "Hayaan mong tingnan ko kung ano ito.",
+          "Sinusuri ang regalo mo.",
+          "Bigyan mo ako ng sandali para tingnan ang gamit na ito."
+        ]
+      }
+    },
+    "rejected": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I can't accept that gift right now.",
+          "Keep it. You need it more than I do.",
+          "I have no room for gifts in my pack.",
+          "I don't feel comfortable taking this from you.",
+          "Refusing this gift. We're not there yet.",
+          "Save your supplies. Don't waste them on me.",
+          "I cannot take that offering.",
+          "No thanks. I carry my own weight.",
+          "Gift rejected. Keep your belongings.",
+          "I won't accept that from you today."
+        ],
+        "TL": [
+          "Hindi ko matanggap ang regalong iyan ngayon.",
+          "Itabi mo. Mas kailangan mo 'yan kaysa sa akin.",
+          "Wala nang espasyo sa bag ko para sa mga regalo.",
+          "Hindi magaan sa loob ko na tanggapin ito sa 'yo.",
+          "Tinatanggihan ang regalo. Di pa tayo ganoon kalapit.",
+          "Itabi ang gamit mo. Huwag mong sayangin sa akin.",
+          "Di ko matatanggap ang alay na 'yan.",
+          "Hindi salamat. Kaya kong dalhin ang sarili ko.",
+          "Tinatanggihan ang regalo. Itago ang pag-aari mo.",
+          "Di ko tatanggapin 'yan mula sa 'yo ngayong araw."
+        ]
+      }
+    },
+    "selection_required": {
+      "act": "REACT",
+      "say": {
+        "EN": [
+          "I need to see what you brought me first.",
+          "What exactly are you offering me?",
+          "Select an item to gift before I decide.",
+          "Show me what you want to give.",
+          "Which item are you trying to hand over?",
+          "Pick the specific item first.",
+          "I can't take anything until you select it.",
+          "Show me what's in your hands.",
+          "What gift are we talking about? Choose one.",
+          "Specify the gift from your inventory."
+        ],
+        "TL": [
+          "Kailangan ko munang makita ang dala mo.",
+          "Ano nga ba ang iniaalok mo sa akin?",
+          "Pumili ng bagay na ireregalo bago ako magpasya.",
+          "Ipakita mo kung ano ang nais mong ibigay.",
+          "Aling gamit ba ang sinusubukan mong iabot?",
+          "Piliin muna ang partikular na gamit.",
+          "Wala akong matatanggap hangga't di mo pinipili.",
+          "Ipakita mo ang nasa mga kamay mo.",
+          "Anong regalo ba ang pinag-uusapan natin? Pumili ka.",
+          "Tukuyin ang regalo mula sa bag mo."
+        ]
+      }
+    }
+  }
+}
