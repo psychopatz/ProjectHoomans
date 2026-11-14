@@ -38,6 +38,7 @@ local capabilities = {
     "INTERACTION_PROJECT", "INTERACTION_RESPONSE_WINDOW",
     "INTERACTION_METRICS", "INTERACTION_EXPORT", "INTERACTION_IMPORT",
     "CONVERSATION_PROJECTION", "TALK_PROJECTION",
+    "CONVO_PROBE", "semantic.convo_probe",
 }
 
 function Session.hello(context)

@@ -14,9 +14,11 @@ local Talk = require "worker/CommandRouter_Talk"
 local CombatObservatory = require "worker/CommandRouter_CombatObservatory"
 local SceneObservatory = require "worker/CommandRouter_SceneObservatory"
 local InteractionLifecycle = require "worker/CommandRouter_InteractionLifecycle"
+local ConvoProbe = require "worker/ConvoProbe"
 
 local Handlers = {
     require "worker/EvidenceAcceptance",
+    ConvoProbe,
     Session,
     Conversation,
     Projection,
