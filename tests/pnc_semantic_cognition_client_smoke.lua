@@ -5,9 +5,11 @@ T.addPackagePaths({
     { "ProjectHoomans", "common_lua" },
 })
 getModFileReader = function(modID, path)
-    if modID ~= "ProjectHoomans" then return nil end
+    if modID ~= "ProjectHoomans" and modID ~= "PsychopatzCore" then
+        return nil
+    end
     local handle = io.open(
-        T.path("ProjectHoomans", "common_mod", path),
+        T.path(modID, "common_mod", path),
         "r"
     )
     if not handle then return nil end

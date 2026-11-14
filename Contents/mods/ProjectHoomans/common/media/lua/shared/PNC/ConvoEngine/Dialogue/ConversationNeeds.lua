@@ -112,7 +112,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -536,7 +535,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -951,7 +949,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1180,7 +1177,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1409,7 +1405,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1638,7 +1633,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1867,7 +1861,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2096,7 +2089,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2325,7 +2317,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2554,7 +2545,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

@@ -30,6 +30,7 @@ local EventBus = PsychopatzCore and PsychopatzCore.Events or nil
 
 Presentation.INTERACTION_PRIORITY = Presentation.INTERACTION_PRIORITY or 100
 Presentation.INTERACTION_WEIGHT = Presentation.INTERACTION_WEIGHT or 100
+local pendingPlayerActors = {}
 
 local function speak(actor, text)
     if not actor or not text or text == "" then return false end
@@ -79,8 +80,9 @@ local function interactionEventID(speechEventID, speaker, speakerID, context,
         .. tostring(speakerID or "unknown")
 end
 
-local function deliverPlayerSpeech(text)
-    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+local function deliverPlayerSpeech(text, playerActor)
+    local player = playerActor
+        or (getSpecificPlayer and getSpecificPlayer(0) or nil)
     if not player then return false end
     -- Core already published the canonical queued message.  Say() is the
     -- local visual sink; routing it through PlayerSpeech again would publish
@@ -91,9 +93,14 @@ end
 local function onSpeechDelivered(payload)
     local item = payload and payload.item or nil
     local text = payload and payload.text or nil
+    local playerActor = item and item.eventID
+        and pendingPlayerActors[item.eventID] or nil
+    if item and item.eventID then
+        pendingPlayerActors[item.eventID] = nil
+    end
     if not text or text == "" then return end
     if item and item.speakerKind == "player" then
-        deliverPlayerSpeech(text)
+        deliverPlayerSpeech(text, playerActor)
     elseif item and Registry and Registry.GetLiveZombie then
         speak(Registry.GetLiveZombie(item.speakerID), text)
     end
@@ -219,6 +226,9 @@ function Presentation.EnqueueSpeech(speechEventID, speaker, actor, context, opti
         eventID,
         type(context) == "table" and context.interaction or nil
     )
+    if speaker == "player" and player then
+        pendingPlayerActors[eventID] = player
+    end
     accepted, reason = SocialFlavorClient.Enqueue({
         eventID = eventID,
         speechEventID = realization and realization.realizationID
@@ -253,6 +263,13 @@ function Presentation.EnqueueSpeech(speechEventID, speaker, actor, context, opti
         ttlMs = 15000,
         holdMs = 1200,
     })
+    if accepted == true and SocialFlavorClient
+        and type(SocialFlavorClient.Pump) == "function"
+        and (options.pumpImmediately == true
+            or not (Events and Events.OnTick))
+    then
+        SocialFlavorClient.Pump()
+    end
     return accepted == true, reason, text, eventID
 end
 

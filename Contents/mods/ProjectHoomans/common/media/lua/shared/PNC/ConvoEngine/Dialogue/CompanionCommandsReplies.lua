@@ -112,7 +112,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "ACK",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -341,7 +340,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "ACK",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -570,7 +568,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "ACK",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -799,7 +796,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "ACK",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1028,7 +1024,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "ACK",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1257,7 +1252,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "ACK",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1486,7 +1480,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "ACK",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1715,7 +1708,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "ACK",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1944,7 +1936,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "ACK",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2173,7 +2164,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REPLY",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2402,7 +2392,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REPLY",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2631,7 +2620,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REPLY",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2860,7 +2848,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REPLY",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3089,7 +3076,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REPLY",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3318,7 +3304,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REPLY",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3547,7 +3532,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REPLY",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3776,7 +3760,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REPLY",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/replies.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

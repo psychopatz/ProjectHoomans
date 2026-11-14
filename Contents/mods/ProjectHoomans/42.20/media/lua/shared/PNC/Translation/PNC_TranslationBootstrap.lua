@@ -46,7 +46,10 @@ Translation.Traits = Translation.Systems.Character
 
 local function systemForKey(key)
     if type(key) ~= "string" then return nil end
-    if string.match(key, "^conversation%.content%.") then
+    if string.match(key, "^conversation%.content%.")
+        or string.match(key, "^semantic%.")
+        or string.match(key, "^UI_DT_Conversation_")
+    then
         return "Conversation"
     end
     local segment = string.match(key, "^UI_PNC_([^_]+)")

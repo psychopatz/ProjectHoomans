@@ -256,7 +256,6 @@ return {
                 ["category"] = "projecthoomans:combat_kill",
                 ["contentOwner"] = "projecthoomans.dialogue_content.combat_human",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/combat_human_banter/human_kill/shaken.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

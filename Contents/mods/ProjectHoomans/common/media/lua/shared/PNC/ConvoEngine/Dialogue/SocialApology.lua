@@ -306,7 +306,6 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:social.apology",
                 ["responseAct"] = "APOLOGY_RESPONSE",
-                ["sourceSurface"] = "content/social_apology.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -915,7 +914,6 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:social.apology",
                 ["responseAct"] = "APOLOGY_RESPONSE",
-                ["sourceSurface"] = "content/social_apology.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1524,7 +1522,6 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:social.apology",
                 ["responseAct"] = "APOLOGY_RESPONSE",
-                ["sourceSurface"] = "content/social_apology.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2133,7 +2130,6 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:social.apology",
                 ["responseAct"] = "APOLOGY_RESPONSE",
-                ["sourceSurface"] = "content/social_apology.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

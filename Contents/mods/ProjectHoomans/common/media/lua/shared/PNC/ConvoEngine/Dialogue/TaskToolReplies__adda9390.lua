@@ -184,7 +184,6 @@ return {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_hostile.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -626,7 +625,6 @@ return {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_sexual.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

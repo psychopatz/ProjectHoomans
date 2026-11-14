@@ -76,7 +76,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -233,7 +232,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -390,7 +388,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -547,7 +544,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -704,7 +700,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -861,7 +856,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1018,7 +1012,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1175,7 +1168,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1332,7 +1324,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1489,7 +1480,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1646,7 +1636,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1803,7 +1792,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1960,7 +1948,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2117,7 +2104,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2274,7 +2260,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2431,7 +2416,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2588,7 +2572,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2745,7 +2728,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2902,7 +2884,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3059,7 +3040,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3216,7 +3196,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3373,7 +3352,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3530,7 +3508,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3687,7 +3664,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3844,7 +3820,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -4001,7 +3976,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -4158,7 +4132,6 @@ return {
                 ["category"] = "projecthoomans:compatibility_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.compatibility",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/compatibility.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

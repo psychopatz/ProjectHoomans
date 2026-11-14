@@ -1269,19 +1269,16 @@ T.truthy(option, "Talk option created")
 option.callback()
 T.equal(opened.npcID, "npc-12", "Talk opens selected NPC")
 
-local GeneratedPSDL = require "PNC/ConvoEngine/Registry"
-local greetingPlan = GeneratedPSDL.ConvoPlan(
-    "semantic.flow.greeting.opening.default.neutral"
-)
+local GeneratedConvo = require "PNC/ConvoEngine/Registry"
+local greetingPlan = GeneratedConvo.ConvoPlan("flow.greeting.opening.default")
 T.truthy(
-    greetingPlan and greetingPlan.payload and greetingPlan.payload.response,
-    "greeting wording comes from the Core-generated PSDL plan"
+    greetingPlan and greetingPlan.payload and (greetingPlan.payload.say
+        or greetingPlan.payload.response),
+    "greeting wording comes from the Core-generated ConvoEngine plan"
 )
 T.equal(
     greetingPlan.sourceShard,
     "adopters/hoomans/dialogue/conversation_greeting/flow_greeting_opening_default.json",
     "greeting keeps canonical ConvoEngine source lineage"
 )
-T.finish("pnc_conversation_smoke")
-
 T.finish("pnc_conversation_smoke")

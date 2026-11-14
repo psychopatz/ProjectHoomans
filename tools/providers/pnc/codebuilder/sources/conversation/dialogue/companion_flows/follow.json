@@ -29,10 +29,8 @@
       },
       "version": 1
     },
-    "originalOwner": "ProjectHoomans",
     "priority": 165,
     "responsePoolID": "authored.follow",
-    "sourceProfile": "conversation.source.projecthoomans.8378f35867",
     "triggers": [
       {
         "action": "FOLLOW",

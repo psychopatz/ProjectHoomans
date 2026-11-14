@@ -46,6 +46,7 @@ T.equal(resolved.diagnostics.contextResolvers, 1,
     "resolver diagnostics remain attached")
 
 local malformed, malformedReason = Context.Resolve({
+    schema = "psychopatz.semantic.dialogue-ir.v1",
     schemaVersion = 1,
     kind = "utterance",
     rawText = "bad",

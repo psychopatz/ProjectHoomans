@@ -6,7 +6,6 @@
   "owner": "ProjectHoomans",
   "metadata": {
     "responsePoolID": "question.backstory.follow_up.miss",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
     "responseAct": "MISS"
   },
   "say": {

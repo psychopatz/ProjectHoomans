@@ -15,7 +15,6 @@
   "metadata": {
     "category": "projecthoomans:companion_commands",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
-    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/camp.json",
     "responseAct": "REPLY"
   },
   "reply": {

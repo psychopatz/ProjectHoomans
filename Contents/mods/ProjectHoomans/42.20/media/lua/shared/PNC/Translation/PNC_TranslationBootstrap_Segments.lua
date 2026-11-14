@@ -140,6 +140,7 @@ Translation.Internal.SegmentSystems = {
     DebugDiscoveryDiscover = "Debug",
     DebugDiscoveryHideRaw = "Discovery",
     DebugDiscoveryHint = "Discovery",
+    DebugDiscoveryRawLabel = "Discovery",
     DebugDiscoveryReset = "Discovery",
     DebugDiscoveryShowRaw = "Discovery",
     DebugDiscoveryTitle = "Discovery",

@@ -23,6 +23,25 @@ end
 Presentation.CommandAckSuppressions =
     Presentation.CommandAckSuppressions or {}
 
+local interactionSequence = 0
+
+local function interactionCorrelationID(commandID, context, options)
+    local explicit = (type(options) == "table" and options.eventID)
+        or (type(context) == "table" and (context.requestID or context.eventID))
+        or nil
+    if explicit and tostring(explicit) ~= "" then
+        return tostring(explicit)
+    end
+    interactionSequence = interactionSequence + 1
+    local seed = type(context) == "table" and context.seed or nil
+    if seed and tostring(seed) ~= "" then
+        return tostring(commandID or "") .. ":" .. tostring(seed) .. ":"
+            .. tostring(interactionSequence)
+    end
+    return tostring(commandID or "") .. ":" .. tostring(currentTime()) .. ":"
+        .. tostring(interactionSequence)
+end
+
 local function copyContext(context)
     local output = {}
     local key
@@ -92,9 +111,11 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
     local currentTarget
     local targetList = {}
     local npcRealization
+    local correlationID
     options = type(options) == "table" and options or {}
     commandID = tostring(commandID or "")
     outcome = tostring(outcome or "")
+    correlationID = interactionCorrelationID(commandID, context, options)
     playerContext.playerActor = player
     playerContext.target = target
     playerContext.targets = targets
@@ -121,8 +142,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
             player,
             playerContext,
             {
-                eventID = type(context) == "table" and context.requestID
-                    or nil,
+                eventID = correlationID,
                 family = "emote_interaction",
                 semanticRealization = playerSpeech,
             }
@@ -134,8 +154,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
         queued = Presentation.EnqueueSpeech(
             "command.player.camp_none", "player", player,
             playerContext, {
-                eventID = type(context) == "table" and context.requestID
-                    or nil,
+                eventID = correlationID,
                 family = "emote_interaction",
                 semanticRealization = CompanionSpeech
                     and CompanionSpeech.ResolvePlayerCommand
@@ -167,8 +186,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
             player,
             playerContext,
             {
-                eventID = type(context) == "table" and context.requestID
-                    or nil,
+                eventID = correlationID,
                 family = "emote_interaction",
                 semanticRealization = playerSpeech,
             }
@@ -245,8 +263,7 @@ function Presentation.ShowCommandInteraction(player, commandID, target, targets,
             actor,
             npcContext,
             {
-                eventID = tostring(type(context) == "table"
-                    and (context.requestID or context.eventID) or commandID)
+                eventID = tostring(correlationID)
                     .. ":npc:" .. tostring(currentTarget.id or ""),
                 family = "emote_interaction",
                 resolvedText = npcContext.resolvedText,

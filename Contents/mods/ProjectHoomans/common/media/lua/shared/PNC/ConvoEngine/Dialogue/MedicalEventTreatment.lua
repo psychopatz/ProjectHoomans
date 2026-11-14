@@ -111,7 +111,6 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
                 ["responseAct"] = "MEDICAL_RESPONSE",
-                ["sourceSurface"] = "content/event/medical/treatment.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -339,7 +338,6 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:medical_event",
                 ["responseAct"] = "MEDICAL_RESPONSE",
-                ["sourceSurface"] = "content/event/medical/treatment.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

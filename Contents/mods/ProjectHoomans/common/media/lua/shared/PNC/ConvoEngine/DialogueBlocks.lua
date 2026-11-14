@@ -212,14 +212,26 @@ local function registerPlan(plan)
     local response = type(plan.payload) == "table"
         and type(plan.payload.response) == "table"
         and plan.payload.response or nil
+    local say = type(plan.payload) == "table"
+        and type(plan.payload.say) == "table"
+        and plan.payload.say or nil
     local turns = response and response.turns or nil
     local turn = type(turns) == "table" and turns[1] or nil
     local variants = response and response.variants or nil
+    local sayRealization = say and type(say.realizations) == "table"
+        and say.realizations["1"] or nil
+    local sayVariants = type(sayRealization) == "table"
+        and type(sayRealization.variants) == "table"
+        and sayRealization.variants or nil
     local turnMetadata = type(turn) == "table"
         and type(turn.metadata) == "table" and turn.metadata or {}
-    if type(turn) ~= "table" and type(variants) ~= "table" then return false end
+    if type(turn) ~= "table" and type(variants) ~= "table"
+        and type(sayVariants) ~= "table"
+    then
+        return false
+    end
     if type(turn) == "table" and type(turn.text) ~= "table"
-        and type(variants) ~= "table"
+        and type(variants) ~= "table" and type(sayVariants) ~= "table"
     then
         return false
     end
@@ -238,7 +250,7 @@ local function registerPlan(plan)
     local nodes = {}
     local entryNode = "opening"
     local nodeCount = 0
-    if type(response.variants) == "table" then
+    if response and type(response.variants) == "table" then
         local node = { choices = {} }
         node.textKeys = {}
         for _, variant in ipairs(response.variants) do
@@ -261,6 +273,34 @@ local function registerPlan(plan)
                     addChoice(node, offer)
                 end
             end
+        end
+        nodes[entryNode] = node
+        nodeCount = 1
+    elseif type(sayVariants) == "table" then
+        local node = { choices = {}, textKeys = {} }
+        if type(values.textRows) == "table" and #values.textRows > 0 then
+            for _, row in ipairs(values.textRows) do
+                if type(row) == "table" and type(row.key) == "string"
+                    and row.key ~= ""
+                    and string.sub(row.key, 1, 9) ~= "response."
+                then
+                    node.textKeys[#node.textKeys + 1] = row.key
+                end
+            end
+        end
+        if #node.textKeys == 0 then
+            for _, variant in ipairs(sayVariants) do
+                if type(variant) == "table" and variant.id then
+                    local variantMetadata = type(variant.metadata) == "table"
+                        and variant.metadata or {}
+                    node.textKeys[#node.textKeys + 1] = tostring(
+                        variantMetadata.textKey or variant.id
+                    )
+                end
+            end
+        end
+        if values.portraitAnimation then
+            node.portraitAnimation = tostring(values.portraitAnimation)
         end
         nodes[entryNode] = node
         nodeCount = 1

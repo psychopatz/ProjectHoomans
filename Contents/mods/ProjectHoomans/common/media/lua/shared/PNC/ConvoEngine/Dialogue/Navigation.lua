@@ -306,7 +306,6 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:navigation",
                 ["responseAct"] = "NAVIGATION_RESPONSE",
-                ["sourceSurface"] = "content/navigation.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -915,7 +914,6 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:navigation",
                 ["responseAct"] = "NAVIGATION_RESPONSE",
-                ["sourceSurface"] = "content/navigation.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1524,7 +1522,6 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:navigation",
                 ["responseAct"] = "NAVIGATION_RESPONSE",
-                ["sourceSurface"] = "content/navigation.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2133,7 +2130,6 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:navigation",
                 ["responseAct"] = "NAVIGATION_RESPONSE",
-                ["sourceSurface"] = "content/navigation.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2742,7 +2738,6 @@ return {
             ["metadata"] = {
                 ["category"] = "projecthoomans:navigation",
                 ["responseAct"] = "NAVIGATION_RESPONSE",
-                ["sourceSurface"] = "content/navigation.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

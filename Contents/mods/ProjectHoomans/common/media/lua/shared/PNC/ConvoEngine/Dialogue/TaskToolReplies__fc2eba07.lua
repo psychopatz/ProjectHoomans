@@ -184,7 +184,6 @@ return {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_compliment.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -554,7 +553,6 @@ return {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_flirt.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -924,7 +922,6 @@ return {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_generic.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1294,7 +1291,6 @@ return {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_hostile.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1664,7 +1660,6 @@ return {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_insult.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2034,7 +2029,6 @@ return {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_praise.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2404,7 +2398,6 @@ return {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_romantic.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2774,7 +2767,6 @@ return {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/queued_sexual.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3144,7 +3136,6 @@ return {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_game.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3514,7 +3505,6 @@ return {
                 ["category"] = "projecthoomans:tool_replies",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/tool_replies/rejected_generic.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

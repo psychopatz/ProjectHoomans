@@ -84,7 +84,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "DIRECTIVE",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -257,7 +256,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "DIRECTIVE",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -430,7 +428,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "DIRECTIVE",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -603,7 +600,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "DIRECTIVE",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -784,7 +780,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "DIRECTIVE",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -957,7 +952,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "DIRECTIVE",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1122,7 +1116,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "DIRECTIVE",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1295,7 +1288,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "DIRECTIVE",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1460,7 +1452,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "DIRECTIVE",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1625,7 +1616,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "DIRECTIVE",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1798,7 +1788,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "DIRECTIVE",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/player.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

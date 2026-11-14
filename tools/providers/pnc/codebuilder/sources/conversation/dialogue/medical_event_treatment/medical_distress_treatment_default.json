@@ -14,7 +14,6 @@
   },
   "metadata": {
     "category": "projecthoomans:medical_event",
-    "sourceSurface": "content/event/medical/treatment.json",
     "responseAct": "MEDICAL_RESPONSE"
   },
   "say": {

@@ -464,7 +464,6 @@ return {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/refill.json",
             },
             ["reply"] = {
                 ["active"] = {
@@ -1362,7 +1361,6 @@ return {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/wait_at.json",
             },
             ["reply"] = {
                 ["active"] = {

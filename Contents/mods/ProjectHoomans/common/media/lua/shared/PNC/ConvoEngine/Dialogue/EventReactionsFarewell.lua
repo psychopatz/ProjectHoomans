@@ -112,7 +112,6 @@ return {
                 ["category"] = "projecthoomans:event_reactions",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
                 ["responseAct"] = "FAREWELL",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/farewell.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -341,7 +340,6 @@ return {
                 ["category"] = "projecthoomans:event_reactions",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
                 ["responseAct"] = "FAREWELL",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/farewell.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

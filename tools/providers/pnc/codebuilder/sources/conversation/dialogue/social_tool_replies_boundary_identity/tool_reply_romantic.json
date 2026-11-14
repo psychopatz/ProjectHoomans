@@ -15,7 +15,6 @@
   "metadata": {
     "category": "projecthoomans:core_social_content",
     "contentOwner": "projecthoomans.dialogue_content.social",
-    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/romantic.json",
     "responseAct": "REACT"
   },
   "say": {

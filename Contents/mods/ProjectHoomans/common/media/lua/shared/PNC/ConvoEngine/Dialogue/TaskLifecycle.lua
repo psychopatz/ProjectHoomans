@@ -461,7 +461,6 @@ return {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/gift.json",
             },
             ["reply"] = {
                 ["completed"] = {
@@ -1359,7 +1358,6 @@ return {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/consume.json",
             },
             ["reply"] = {
                 ["active"] = {
@@ -2257,7 +2255,6 @@ return {
                 ["category"] = "projecthoomans:task_lifecycle",
                 ["contentOwner"] = "projecthoomans.dialogue_content.tool_replies",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/task/lifecycle/drink.json",
             },
             ["reply"] = {
                 ["active"] = {

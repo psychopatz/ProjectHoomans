@@ -112,7 +112,6 @@ return {
                 ["category"] = "projecthoomans:event_reactions",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
                 ["responseAct"] = "WARN",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/safety.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -341,7 +340,6 @@ return {
                 ["category"] = "projecthoomans:event_reactions",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
                 ["responseAct"] = "WARN",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/safety.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

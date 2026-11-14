@@ -15,7 +15,6 @@
   "metadata": {
     "category": "projecthoomans:conversation_content",
     "contentOwner": "projecthoomans.dialogue_content.commands_emotes",
-    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/greeting.json",
     "responseAct": "REACT"
   },
   "say": {

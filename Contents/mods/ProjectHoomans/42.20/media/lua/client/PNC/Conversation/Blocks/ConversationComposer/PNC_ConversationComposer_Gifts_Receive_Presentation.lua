@@ -2,8 +2,9 @@
 
 local Conversation = PNC.Conversation
 local Composer = Conversation.Composer
-local Registry = PsychopatzCore.Conversation.Registry
-local Loader = PsychopatzCore.Conversation.TextCatalog
+local CoreConversation = PsychopatzCore and PsychopatzCore.Conversation or nil
+local Registry = CoreConversation and CoreConversation.Registry or nil
+local Loader = CoreConversation and CoreConversation.TextCatalog or nil
 local Internal = Composer.Internal
 local Presentation = {}
 
@@ -159,7 +160,9 @@ function Presentation.AppendSuccess(state, result)
             requiredKeys[#requiredKeys + 1] = key
         end
         requiredKeys[#requiredKeys + 1] = result.giftReplyKey
-        Loader.EnsureSource(result.giftSource, requiredKeys)
+        if Loader and type(Loader.EnsureSource) == "function" then
+            Loader.EnsureSource(result.giftSource, requiredKeys)
+        end
         -- A selector gift has a separate spoken item-selection line. An
         -- explicit semantic gift already has its original line in the log;
         -- appending the synthetic selector line would duplicate it.

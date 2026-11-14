@@ -92,11 +92,9 @@ return {
                     },
                     ["version"] = 1,
                 },
-                ["originalOwner"] = "ProjectHoomans",
                 ["priority"] = 165,
                 ["responseAct"] = "FLOW_RESPONSE",
                 ["responsePoolID"] = "authored.follow",
-                ["sourceProfile"] = "conversation.source.projecthoomans.8378f35867",
                 ["triggers"] = {
                     {
                         ["action"] = "FOLLOW",
@@ -301,11 +299,9 @@ return {
                     },
                     ["version"] = 1,
                 },
-                ["originalOwner"] = "SemanticLab",
                 ["priority"] = 170,
                 ["responseAct"] = "FLOW_RESPONSE",
                 ["responsePoolID"] = "lab.stay.with.you",
-                ["sourceProfile"] = "conversation.source.projecthoomans.8378f35867",
                 ["triggers"] = {
                     {
                         ["action"] = "STAY",

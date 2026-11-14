@@ -256,7 +256,6 @@ return {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/hostile.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -767,7 +766,6 @@ return {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/insult.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1206,7 +1204,6 @@ return {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/orientation.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1576,7 +1573,6 @@ return {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/personality.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2018,7 +2014,6 @@ return {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/praise.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2457,7 +2452,6 @@ return {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/relationship.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2899,7 +2893,6 @@ return {
                 ["category"] = "projecthoomans:core_social_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.social",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/social/tool_replies/romantic.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

@@ -111,7 +111,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "ACCEPT",
                 ["responsePoolID"] = "accept",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -339,7 +338,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "COMPLIMENT",
                 ["responsePoolID"] = "compliment",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -534,7 +532,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "RAINING",
                 ["responsePoolID"] = "flow.weather.raining",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -788,7 +785,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "GREETING",
                 ["responsePoolID"] = "greeting",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1072,7 +1068,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "OFFER",
                 ["responsePoolID"] = "offer",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1360,7 +1355,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "ACTIVITY",
                 ["responsePoolID"] = "question.activity",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1580,7 +1574,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "AMBIGUOUS",
                 ["responsePoolID"] = "question.backstory.ambiguous",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1740,7 +1733,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "LOCATION",
                 ["responsePoolID"] = "question.backstory.follow_up.location",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1900,7 +1892,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "MISS",
                 ["responsePoolID"] = "question.backstory.follow_up.miss",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2060,7 +2051,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "KNOWN",
                 ["responsePoolID"] = "question.backstory.known",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2223,7 +2213,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "EDUCATION",
                 ["responsePoolID"] = "question.backstory.known.education",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2386,7 +2375,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "FAMILY_BACKGROUND",
                 ["responsePoolID"] = "question.backstory.known.family_background",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2549,7 +2537,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "FEAR",
                 ["responsePoolID"] = "question.backstory.known.fear",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2712,7 +2699,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "FORMER_JOB",
                 ["responsePoolID"] = "question.backstory.known.former_job",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2875,7 +2861,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "HOBBY",
                 ["responsePoolID"] = "question.backstory.known.hobby",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3038,7 +3023,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "HOMETOWN",
                 ["responsePoolID"] = "question.backstory.known.hometown",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3201,7 +3185,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "TRAGEDY",
                 ["responsePoolID"] = "question.backstory.known.tragedy",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3364,7 +3347,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "REFUSAL",
                 ["responsePoolID"] = "question.backstory.refusal",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3524,7 +3506,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "SUSPECTED",
                 ["responsePoolID"] = "question.backstory.suspected",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3706,7 +3687,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "PROPOSAL",
                 ["responsePoolID"] = "question.needs.proposal",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3932,7 +3912,6 @@ return {
             ["metadata"] = {
                 ["responseAct"] = "QUANTITY",
                 ["responsePoolID"] = "question.needs.quantity",
-                ["sourceProfile"] = "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
             },
             ["say"] = {
                 ["keyOrder"] = {

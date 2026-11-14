@@ -14,7 +14,6 @@
   },
   "metadata": {
     "category": "projecthoomans:social.apology",
-    "sourceSurface": "content/social_apology.json",
     "responseAct": "APOLOGY_RESPONSE"
   },
   "say": {

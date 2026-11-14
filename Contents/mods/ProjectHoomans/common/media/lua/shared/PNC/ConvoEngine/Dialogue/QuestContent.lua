@@ -292,7 +292,6 @@ return {
                 ["category"] = "projecthoomans:quest_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.quest",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
             },
             ["reply"] = {
                 ["failed"] = {
@@ -852,7 +851,6 @@ return {
                 ["category"] = "projecthoomans:quest_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.quest",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
             },
             ["reply"] = {
                 ["failed"] = {
@@ -1412,7 +1410,6 @@ return {
                 ["category"] = "projecthoomans:quest_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.quest",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
             },
             ["reply"] = {
                 ["failed"] = {
@@ -1972,7 +1969,6 @@ return {
                 ["category"] = "projecthoomans:quest_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.quest",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/quest.json",
             },
             ["reply"] = {
                 ["failed"] = {

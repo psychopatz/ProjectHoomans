@@ -28,10 +28,8 @@
       },
       "version": 1
     },
-    "originalOwner": "SemanticLab",
     "priority": 170,
     "responsePoolID": "lab.stay.with.you",
-    "sourceProfile": "conversation.source.projecthoomans.8378f35867",
     "triggers": [
       {
         "action": "STAY",

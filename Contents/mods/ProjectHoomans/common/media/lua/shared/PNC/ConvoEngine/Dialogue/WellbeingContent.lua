@@ -307,7 +307,6 @@ return {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/general.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -917,7 +916,6 @@ return {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/general.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1332,7 +1330,6 @@ return {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1561,7 +1558,6 @@ return {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1790,7 +1786,6 @@ return {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2019,7 +2014,6 @@ return {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2443,7 +2437,6 @@ return {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/emotional.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2858,7 +2851,6 @@ return {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/emotional.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3087,7 +3079,6 @@ return {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/emotional.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -3316,7 +3307,6 @@ return {
                 ["category"] = "projecthoomans:wellbeing_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.wellbeing",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/wellbeing/needs.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

@@ -93,6 +93,27 @@ return {
                 ["textDomain"] = "pnc.psdl.social.greetings.settlement_admission.arrival",
                 ["textRows"] = {
                     {
+                        ["key"] = "opening.001",
+                        ["text"] = {
+                            ["EN"] = "Please… let me stay. We have been walking for days, and I do not know how much longer the others can keep going.",
+                            ["TL"] = "Please... hayaan mo akong manatili. Ilang araw na kaming naglalakad, at hindi ko alam kung gaano katagal kayang magpatuloy ang iba.",
+                        },
+                    },
+                    {
+                        ["key"] = "opening.002",
+                        ["text"] = {
+                            ["EN"] = "I am not asking for much. A roof, a meal, and a chance to be useful. Please let us join you.",
+                            ["TL"] = "Hindi ako humihingi ng marami. Isang bubong, isang pagkain, at isang pagkakataon na maging kapaki-pakinabang. Mangyaring hayaan mo kaming samahan ka.",
+                        },
+                    },
+                    {
+                        ["key"] = "opening.003",
+                        ["text"] = {
+                            ["EN"] = "You have a settlement. We have nothing left but each other. If there is room, I will work for it.",
+                            ["TL"] = "You have a pamayanan. We have nothing left but each other. If there is room, I will trabaho for it.",
+                        },
+                    },
+                    {
                         ["key"] = "response.settlement_admission.accepted.1",
                         ["text"] = {
                             ["EN"] = "Thank you. I thought I would have to keep walking until there was nowhere left to go.",

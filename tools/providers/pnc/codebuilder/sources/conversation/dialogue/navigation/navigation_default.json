@@ -14,7 +14,6 @@
   },
   "metadata": {
     "category": "projecthoomans:navigation",
-    "sourceSurface": "content/navigation.json",
     "responseAct": "NAVIGATION_RESPONSE"
   },
   "say": {

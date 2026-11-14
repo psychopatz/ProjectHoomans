@@ -909,7 +909,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REPLY",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/camp.json",
             },
             ["reply"] = {
                 ["completed"] = {
@@ -2268,7 +2267,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REPLY",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/follow.json",
             },
             ["reply"] = {
                 ["failed"] = {

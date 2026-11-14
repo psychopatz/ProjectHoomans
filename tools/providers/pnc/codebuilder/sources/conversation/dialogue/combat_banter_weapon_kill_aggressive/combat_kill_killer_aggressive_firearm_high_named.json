@@ -18,7 +18,6 @@
   "metadata": {
     "category": "projecthoomans:combat_kill",
     "contentOwner": "projecthoomans.dialogue_content.events",
-    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/combat_banter/weapon_kill/aggressive.json",
     "responseAct": "REACT"
   },
   "say": {

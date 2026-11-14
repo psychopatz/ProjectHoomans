@@ -556,7 +556,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REPLY",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/return_home.json",
             },
             ["reply"] = {
                 ["failed"] = {
@@ -1632,7 +1631,6 @@ return {
                 ["category"] = "projecthoomans:companion_commands",
                 ["contentOwner"] = "projecthoomans.dialogue_content.commands_emotes",
                 ["responseAct"] = "REPLY",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/command/lifecycle/stay.json",
             },
             ["reply"] = {
                 ["failed"] = {

@@ -15,7 +15,6 @@
   "metadata": {
     "category": "projecthoomans:health_content",
     "contentOwner": "projecthoomans.dialogue_content.health",
-    "sourceSurface": "tools/semantic_harness/codebuilder/sources/conversation/content/health/medical_bite.json",
     "responseAct": "REACT"
   },
   "reply": {

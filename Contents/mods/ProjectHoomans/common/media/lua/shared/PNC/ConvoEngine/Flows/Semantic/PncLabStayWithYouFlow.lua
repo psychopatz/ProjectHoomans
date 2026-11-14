@@ -10,7 +10,7 @@ return {
                 ["terminal"] = true,
             },
         },
-        ["owner"] = "SemanticLab",
+        ["owner"] = "ProjectHoomans",
         ["triggers"] = {
             {
                 ["action"] = "STAY",

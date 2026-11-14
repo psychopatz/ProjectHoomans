@@ -73,7 +73,6 @@ return {
         },
         ["payload"] = {
             ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
                 ["textKey"] = "suggestion.talk_again_about.label",
                 ["textRows"] = {
                     {
@@ -238,7 +237,6 @@ return {
         },
         ["payload"] = {
             ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
                 ["textKey"] = "suggestion.talk_something_else.label",
                 ["textRows"] = {
                     {
@@ -446,7 +444,6 @@ return {
                 ["textRole"] = "button_label",
             },
             ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
                 ["textRows"] = {
                     {
                         ["key"] = "suggestion.trade.label",
@@ -630,7 +627,6 @@ return {
         },
         ["payload"] = {
             ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
                 ["textKey"] = "suggestion.unavailable.tooltip",
                 ["textRows"] = {
                     {
@@ -838,7 +834,6 @@ return {
                 ["textRole"] = "button_label",
             },
             ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
                 ["textRows"] = {
                     {
                         ["key"] = "suggestion.wait_at.label",
@@ -1022,7 +1017,6 @@ return {
         },
         ["payload"] = {
             ["metadata"] = {
-                ["sourceProfile"] = "conversation.source.project.hoomans.conversation.authoring.51ad5f4261",
                 ["textKey"] = "suggestion.whats_up.label",
                 ["textRows"] = {
                     {

@@ -5,7 +5,6 @@
   "owner": "ProjectHoomans",
   "metadata": {
     "responsePoolID": "compliment",
-    "sourceProfile": "conversation.source.project.hoomans.common.interaction.seed.7a0582ab2e",
     "responseAct": "COMPLIMENT"
   },
   "say": {

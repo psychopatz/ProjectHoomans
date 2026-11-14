@@ -112,7 +112,6 @@ return {
                 ["category"] = "projecthoomans:event_reactions",
                 ["contentOwner"] = "projecthoomans.dialogue_content.events",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/event/reactions/social.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

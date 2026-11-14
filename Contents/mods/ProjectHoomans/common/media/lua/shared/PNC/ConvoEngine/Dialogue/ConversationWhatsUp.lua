@@ -307,7 +307,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.conversation",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -917,7 +916,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.conversation",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -1527,7 +1525,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.conversation",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2137,7 +2134,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.conversation",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
             },
             ["say"] = {
                 ["keyOrder"] = {
@@ -2747,7 +2743,6 @@ return {
                 ["category"] = "projecthoomans:conversation_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.conversation",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/conversation.json",
             },
             ["say"] = {
                 ["keyOrder"] = {

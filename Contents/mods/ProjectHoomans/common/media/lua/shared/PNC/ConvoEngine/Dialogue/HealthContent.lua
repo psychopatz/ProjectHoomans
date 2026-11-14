@@ -886,7 +886,6 @@ return {
                 ["category"] = "projecthoomans:health_content",
                 ["contentOwner"] = "projecthoomans.dialogue_content.health",
                 ["responseAct"] = "REACT",
-                ["sourceSurface"] = "tools/semantic_harness/codebuilder/sources/conversation/content/health/health_state.json",
             },
             ["reply"] = {
                 ["healthy"] = {
